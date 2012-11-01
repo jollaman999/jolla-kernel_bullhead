@@ -40,7 +40,7 @@ zen_get_data(struct request_queue *q) {
 static void zen_dispatch(struct zen_data *, struct request *);
 
 static void
-zen_merged_requests(struct request_queue *q, struct request *rq,
+zen_merged_requests(struct request_queue *q, struct request *req,
                     struct request *next)
 {
 	/*
@@ -51,9 +51,10 @@ zen_merged_requests(struct request_queue *q, struct request *rq,
 		if (time_before(rq_fifo_time(next), rq_fifo_time(req))) {
 			list_move(&req->queuelist, &next->queuelist);
 			rq_set_fifo_time(req, rq_fifo_time(next));
+		}
 	}
 
-	/* Delete next request */
+	/* next request is gone */
 	rq_fifo_clear(next);
 }
 
