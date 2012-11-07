@@ -61,7 +61,7 @@ zen_merged_requests(struct request_queue *q, struct request *req,
 static void zen_add_request(struct request_queue *q, struct request *rq)
 {
 	struct zen_data *zdata = zen_get_data(q);
-	const int dir = rq_is_sync(rq);
+	const int dir = rq_data_dir(rq);
 
 	if (zdata->fifo_expire[dir]) {
 		rq_set_fifo_time(rq, jiffies + zdata->fifo_expire[dir]);
@@ -97,6 +97,10 @@ zen_expired_request(struct zen_data *zdata, int ddir)
         return NULL;
 }
 
+/*
+ * zen_check_fifo returns 0 if there are no expired requests on the fifo,
+ * otherwise it returns the next expired request
+ */
 static struct request *
 zen_check_fifo(struct zen_data *zdata)
 {
@@ -104,13 +108,15 @@ zen_check_fifo(struct zen_data *zdata)
         struct request *rq_async = zen_expired_request(zdata, ASYNC);
 
         if (rq_async && rq_sync) {
-        if (time_after(rq_fifo_time(rq_async), rq_fifo_time(rq_sync)))
+        	if (time_after(rq_fifo_time(rq_async), rq_fifo_time(rq_sync)))
+                	return rq_sync;
+        } else if (rq_sync) {
                 return rq_sync;
-        }
-        else if (rq_sync)
-                return rq_sync;
+	} else if (rq_async) {
+		return rq_async;
+	}
 
-        return rq_async;
+        return 0;
 }
 
 static struct request *
