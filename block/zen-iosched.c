@@ -1,6 +1,6 @@
 /*
  * Zen IO scheduler
- * Based on Noop, V(R), and SIO IO schedulers.
+ * Primarily based on Noop, deadline, and SIO IO schedulers.
  *
  * Copyright (C) 2012 Brandon Berhent <bbedward@gmail.com>
  *
