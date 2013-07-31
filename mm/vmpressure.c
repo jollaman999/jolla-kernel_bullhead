@@ -321,7 +321,7 @@ void vmpressure_memcg(gfp_t gfp, struct mem_cgroup *memcg,
 	window_size = vmpr->window_size;
 	spin_unlock(&vmpr->sr_lock);
 
-	if (scanned < window_size || work_pending(&vmpr->work))
+	if (scanned < window_size)
 		return;
 	schedule_work(&vmpr->work);
 }
