@@ -42,7 +42,7 @@ struct vmpressure {
 	unsigned long reclaimed;
 	unsigned long stall;
 	/* The lock is used to keep the members above in sync. */
-	struct mutex sr_lock;
+	struct spinlock sr_lock;
 
 	/* The list of vmpressure_event structs. */
 	struct list_head events;
