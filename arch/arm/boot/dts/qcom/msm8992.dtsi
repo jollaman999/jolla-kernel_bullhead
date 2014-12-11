@@ -1813,7 +1813,6 @@
 				<81 512 2048000 4096000>; /* Max. bandwidth */
 		qcom,bus-bw-vectors-bps = <0 400000 20000000 25000000 50000000
 						100000000 200000000 4294967295>;
-
 		status = "disabled";
 	};
 
@@ -2903,6 +2902,20 @@
 			qcom,descriptor-fifo-size = <0x800>;
 			qcom,reset-bam-on-connect;
 		};
+		/* USB BAM pipe (consumer) configuration for accelerated DPL */
+		qcom,pipe3 {
+			label = "ssusb-dpl-ipa-in-1";
+			qcom,usb-bam-mem-type = <2>;
+			qcom,bam-type = <0>;
+			qcom,dir = <1>;
+			qcom,pipe-num = <1>;
+			qcom,peer-bam = <2>;
+			qcom,dst-bam-physical-address = <0xf9304000>;
+			qcom,dst-bam-pipe-index = <2>;
+			qcom,data-fifo-size = <0x8000>;
+			qcom,descriptor-fifo-size = <0x2000>;
+			qcom,reset-bam-on-connect;
+	   };
 	};
 
 	usb_otg: usb@f9a55000 {
