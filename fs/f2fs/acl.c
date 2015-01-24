@@ -312,7 +312,7 @@ int f2fs_acl_chmod(struct inode *inode)
 		return PTR_ERR(acl);
 
 	error = posix_acl_chmod(&acl, GFP_KERNEL, mode);
-	if (error)
+	if (!error)
 		return error;
 
 	error = f2fs_set_acl(inode, ACL_TYPE_ACCESS, acl, NULL);
