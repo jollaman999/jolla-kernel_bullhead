@@ -241,8 +241,21 @@ static inline int valid_io_request(struct zram *zram, struct bio *bio)
 	return 1;
 }
 
-static void zram_meta_free(struct zram_meta *meta)
+static void zram_meta_free(struct zram_meta *meta, u64 disksize)
 {
+	size_t num_pages = disksize >> PAGE_SHIFT;
+	size_t index;
+
+	/* Free all pages that are still in this zram device */
+	for (index = 0; index < num_pages; index++) {
+		unsigned long handle = meta->table[index].handle;
+
+		if (!handle)
+			continue;
+
+		zs_free(meta->mem_pool, handle);
+	}
+
 	zs_destroy_pool(meta->mem_pool);
 	vfree(meta->table);
 	kfree(meta);
@@ -607,29 +620,15 @@ static void zram_bio_discard(struct zram *zram, u32 index,
 
 static void zram_reset_device(struct zram *zram, bool reset_capacity)
 {
-	size_t index;
-	struct zram_meta *meta;
-
 	down_write(&zram->init_lock);
 	if (!init_done(zram)) {
 		up_write(&zram->init_lock);
 		return;
 	}
 
-	meta = zram->meta;
-	/* Free all pages that are still in this zram device */
-	for (index = 0; index < zram->disksize >> PAGE_SHIFT; index++) {
-		unsigned long handle = meta->table[index].handle;
-		if (!handle)
-			continue;
-
-		zs_free(meta->mem_pool, handle);
-	}
-
 	zcomp_destroy(zram->comp);
 	zram->max_comp_streams = 1;
-
-	zram_meta_free(zram->meta);
+	zram_meta_free(zram->meta, zram->disksize);
 	zram->meta = NULL;
 	/* Reset stats */
 	memset(&zram->stats, 0, sizeof(zram->stats));
@@ -701,7 +700,7 @@ out_destroy_comp:
 	up_write(&zram->init_lock);
 	zcomp_destroy(comp);
 out_free_meta:
-	zram_meta_free(meta);
+	zram_meta_free(meta, disksize);
 	return err;
 }
 
