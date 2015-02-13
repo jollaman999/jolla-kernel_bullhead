@@ -368,26 +368,15 @@ static ssize_t read_file_slot(struct file *file, char __user *user_buf,
 {
 	struct ath9k_htc_priv *priv = file->private_data;
 	char buf[512];
-	unsigned int len = 0;
+	unsigned int len;
 
 	spin_lock_bh(&priv->tx.tx_lock);
-
-	len += snprintf(buf + len, sizeof(buf) - len, "TX slot bitmap : ");
-
-	len += bitmap_scnprintf(buf + len, sizeof(buf) - len,
-			       priv->tx.tx_slot, MAX_TX_BUF_NUM);
-
-	len += snprintf(buf + len, sizeof(buf) - len, "\n");
-
-	len += snprintf(buf + len, sizeof(buf) - len,
+	len = scnprintf(buf, sizeof(buf),
+			"TX slot bitmap : %*pb\n"
 			"Used slots     : %d\n",
+			MAX_TX_BUF_NUM, priv->tx.tx_slot,
 			bitmap_weight(priv->tx.tx_slot, MAX_TX_BUF_NUM));
-
 	spin_unlock_bh(&priv->tx.tx_lock);
-
-	if (len > sizeof(buf))
-		len = sizeof(buf);
-
 	return simple_read_from_buffer(user_buf, count, ppos, buf, len);
 }
 
