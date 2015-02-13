@@ -1671,34 +1671,21 @@ static int cpuset_common_read_seq_string(struct cgroup *cont,
 {
 	struct cpuset *cs = cgroup_cs(cont);
 	cpuset_filetype_t type = cft->private;
-	ssize_t count;
-	char *buf, *s;
 	int ret = 0;
-
-	count = seq_get_buf(sf, &buf);
-	s = buf;
 
 	mutex_lock(&callback_mutex);
 
 	switch (type) {
 	case FILE_CPULIST:
-		s += cpulist_scnprintf(s, count, cs->cpus_allowed);
+		seq_printf(sf, "%*pbl\n", cpumask_pr_args(cs->cpus_allowed));
 		break;
 	case FILE_MEMLIST:
-		s += nodelist_scnprintf(s, count, cs->mems_allowed);
+		seq_printf(sf, "%*pbl\n", nodemask_pr_args(&cs->mems_allowed));
 		break;
 	default:
 		ret = -EINVAL;
-		goto out_unlock;
 	}
 
-	if (s < buf + count - 1) {
-		*s++ = '\n';
-		seq_commit(sf, s - buf);
-	} else {
-		seq_commit(sf, -1);
-	}
-out_unlock:
 	mutex_unlock(&callback_mutex);
 	return ret;
 }
@@ -2560,8 +2547,6 @@ int cpuset_mems_allowed_intersects(const struct task_struct *tsk1,
 	return nodes_intersects(tsk1->mems_allowed, tsk2->mems_allowed);
 }
 
-#define CPUSET_NODELIST_LEN	(256)
-
 /**
  * cpuset_print_task_mems_allowed - prints task's cpuset and mems_allowed
  * @task: pointer to task_struct of some task.
@@ -2572,21 +2557,15 @@ int cpuset_mems_allowed_intersects(const struct task_struct *tsk1,
  */
 void cpuset_print_task_mems_allowed(struct task_struct *tsk)
 {
-	 /* Statically allocated to prevent using excess stack. */
-	static char cpuset_nodelist[CPUSET_NODELIST_LEN];
-	static DEFINE_SPINLOCK(cpuset_buffer_lock);
-
 	struct cgroup *cgrp = task_cs(tsk)->css.cgroup;
 
 	rcu_read_lock();
-	spin_lock(&cpuset_buffer_lock);
 
 	nodelist_scnprintf(cpuset_nodelist, CPUSET_NODELIST_LEN,
 			   tsk->mems_allowed);
-	printk(KERN_INFO "%s cpuset=%s mems_allowed=%s\n",
-	       tsk->comm, cgroup_name(cgrp), cpuset_nodelist);
+	printk(KERN_INFO "%s cpuset=%s mems_allowed=%*pbl\n",
+	       tsk->comm, cgroup_name(cgrp), nodemask_pr_args(&tsk->mems_allowed));
 
-	spin_unlock(&cpuset_buffer_lock);
 	rcu_read_unlock();
 }
 
@@ -2672,10 +2651,8 @@ out:
 /* Display task mems_allowed in /proc/<pid>/status file. */
 void cpuset_task_status_allowed(struct seq_file *m, struct task_struct *task)
 {
-	seq_printf(m, "Mems_allowed:\t");
-	seq_nodemask(m, &task->mems_allowed);
-	seq_printf(m, "\n");
-	seq_printf(m, "Mems_allowed_list:\t");
-	seq_nodemask_list(m, &task->mems_allowed);
-	seq_printf(m, "\n");
+	seq_printf(m, "Mems_allowed:\t%*pb\n",
+		   nodemask_pr_args(&task->mems_allowed));
+	seq_printf(m, "Mems_allowed_list:\t%*pbl\n",
+		   nodemask_pr_args(&task->mems_allowed));
 }
