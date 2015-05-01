@@ -118,7 +118,8 @@ static long audio_ioctl_shared(struct file *file, unsigned int cmd,
 		wmapro_cfg.adv_encode_opt2 =
 				wmapro_config->advancedencodeopt2;
 		/* Configure Media format block */
-		rc = q6asm_media_format_block_wmapro(audio->ac, &wmapro_cfg);
+		rc = q6asm_media_format_block_wmapro(audio->ac, &wmapro_cfg,
+				audio->ac->stream_id);
 		if (rc < 0) {
 			pr_err("cmd media format block failed\n");
 			break;
