@@ -405,7 +405,6 @@ int dwc3_send_gadget_ep_cmd(struct dwc3 *dwc, unsigned ep,
 	struct dwc3_ep		*dep = dwc->eps[ep];
 	u32			timeout = 1500;
 	u32			reg;
-	int ret;
 
 	dev_vdbg(dwc->dev, "%s: cmd '%s' params %08x %08x %08x\n",
 			dep->name,
@@ -422,6 +421,8 @@ int dwc3_send_gadget_ep_cmd(struct dwc3 *dwc, unsigned ep,
 		if (!(reg & DWC3_DEPCMD_CMDACT)) {
 			dev_vdbg(dwc->dev, "Command Complete --> %d\n",
 					DWC3_DEPCMD_STATUS(reg));
+			if (DWC3_DEPCMD_STATUS(reg))
+				return -EINVAL;
 			/* SW issues START TRANSFER command to isochronous ep
 			 * with future frame interval. If future interval time
 			 * has already passed when core recieves command, core
@@ -429,10 +430,8 @@ int dwc3_send_gadget_ep_cmd(struct dwc3 *dwc, unsigned ep,
 			 * event. Hence return error in this case.
 			 */
 			if (reg & 0x2000)
-				ret = -EAGAIN;
-			else
-				ret = 0;
-			break;
+				return -EAGAIN;
+			return 0;
 		}
 
 		/*
@@ -444,14 +443,11 @@ int dwc3_send_gadget_ep_cmd(struct dwc3 *dwc, unsigned ep,
 			dev_err(dwc->dev, "%s command timeout for %s\n",
 				dwc3_gadget_ep_cmd_string(cmd),
 				dep->name);
-			ret = -ETIMEDOUT;
-			break;
+			return -ETIMEDOUT;
 		}
 
 		udelay(1);
 	} while (1);
-
-	return ret;
 }
 
 dma_addr_t dwc3_trb_dma_offset(struct dwc3_ep *dep,
