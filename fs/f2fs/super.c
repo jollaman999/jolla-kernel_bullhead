@@ -41,8 +41,7 @@ static struct kset *f2fs_kset;
 
 /* f2fs-wide shrinker description */
 static struct shrinker f2fs_shrinker_info = {
-	.scan_objects = f2fs_shrink_scan,
-	.count_objects = f2fs_shrink_count,
+	.shrink = f2fs_shrink_scan,
 	.seeks = DEFAULT_SEEKS,
 };
 
@@ -757,6 +756,8 @@ static int f2fs_remount(struct super_block *sb, int *flags, char *data)
 	bool need_stop_gc = false;
 	bool no_extent_cache = !test_opt(sbi, EXTENT_CACHE);
 
+	sync_filesystem(sb);
+
 	/*
 	 * Save the old mount options in case we
 	 * need to restore them.
@@ -1469,9 +1470,7 @@ static int __init init_f2fs_fs(void)
 	if (err)
 		goto free_kset;
 
-	err = register_shrinker(&f2fs_shrinker_info);
-	if (err)
-		goto free_crypto;
+	register_shrinker(&f2fs_shrinker_info);
 
 	err = register_filesystem(&f2fs_fs_type);
 	if (err)
@@ -1482,7 +1481,6 @@ static int __init init_f2fs_fs(void)
 
 free_shrinker:
 	unregister_shrinker(&f2fs_shrinker_info);
-free_crypto:
 	f2fs_exit_crypto();
 free_kset:
 	kset_unregister(f2fs_kset);

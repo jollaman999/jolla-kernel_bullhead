@@ -192,14 +192,12 @@ int ra_meta_pages(struct f2fs_sb_info *sbi, block_t start, int nrpages,
 		if (!page)
 			continue;
 		if (PageUptodate(page)) {
-			mark_page_accessed(page);
 			f2fs_put_page(page, 1);
 			continue;
 		}
 
 		fio.page = page;
 		f2fs_submit_page_mbio(&fio);
-		mark_page_accessed(page);
 		f2fs_put_page(page, 0);
 	}
 out:
