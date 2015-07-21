@@ -228,7 +228,7 @@ enum i2c_msm_gpio_name_idx {
 	I2C_MSM_GPIO_SDA,
 };
 
-extern const char * const i2c_msm_mode_str_tbl[];
+extern const char * i2c_msm_mode_str_tbl[];
 
 struct i2c_msm_ctrl;
 
