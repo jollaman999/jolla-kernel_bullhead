@@ -53,7 +53,7 @@ static void i2c_msm_pm_suspend(struct device *dev);
 static void i2c_msm_clk_path_init(struct i2c_msm_ctrl *ctrl);
 
 /* string table for enum i2c_msm_xfer_mode_id */
-const char * const i2c_msm_mode_str_tbl[] = {
+const char * i2c_msm_mode_str_tbl[] = {
 	"FIFO", "BLOCK", "DMA", "None",
 };
 
@@ -1321,7 +1321,7 @@ static void i2c_msm_dma_free_channels(struct i2c_msm_ctrl *ctrl)
 		ctrl->xfer.dma.state = I2C_MSM_DMA_INIT_CORE;
 }
 
-static const char * const i2c_msm_dma_chan_name[] = {"tx", "rx"};
+static const char * i2c_msm_dma_chan_name[] = {"tx", "rx"};
 
 static int i2c_msm_dmaengine_dir[] = {
 	DMA_MEM_TO_DEV, DMA_DEV_TO_MEM
@@ -2800,7 +2800,7 @@ static const struct i2c_algorithm i2c_msm_frmwrk_algrtm = {
 	.functionality	= i2c_msm_frmwrk_func,
 };
 
-static const char const *i2c_msm_adapter_name = "MSM-I2C-v2-adapter";
+static const char *i2c_msm_adapter_name = "MSM-I2C-v2-adapter";
 
 static int i2c_msm_frmwrk_reg(struct platform_device *pdev,
 						struct i2c_msm_ctrl *ctrl)
