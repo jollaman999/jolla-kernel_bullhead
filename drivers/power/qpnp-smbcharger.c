@@ -5414,6 +5414,12 @@ static int smbchg_hw_init(struct smbchg_chip *chip)
 			return rc;
 		}
 	}
+	/* unsuspend dc path, it could be suspended by the bootloader */
+	rc = smbchg_dc_suspend(chip, 0);
+	if (rc < 0) {
+		dev_err(chip->dev, "Couldn't unspended dc path= %d\n", rc);
+		return rc;
+	}
 
 	/* Disable charging stop by battery OV */
 	rc = smbchg_sec_masked_write(chip, chip->chgr_base + CHGR_CFG2,
