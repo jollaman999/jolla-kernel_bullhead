@@ -1163,7 +1163,9 @@ try_onemore:
 	mutex_init(&sbi->writepages);
 	mutex_init(&sbi->cp_mutex);
 	init_rwsem(&sbi->node_write);
-	clear_sbi_flag(sbi, SBI_POR_DOING);
+
+	/* disallow all the data/node/meta page writes */
+	set_sbi_flag(sbi, SBI_POR_DOING);
 	spin_lock_init(&sbi->stat_lock);
 
 	init_rwsem(&sbi->read_io.io_rwsem);
@@ -1307,6 +1309,8 @@ try_onemore:
 			goto free_kobj;
 		}
 	}
+	/* recover_fsync_data() cleared this already */
+	clear_sbi_flag(sbi, SBI_POR_DOING);
 
 	/*
 	 * If filesystem is not mounted as read-only then
