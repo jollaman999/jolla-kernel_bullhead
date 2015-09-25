@@ -6062,6 +6062,8 @@ VOS_STATUS WDA_open(v_VOID_t *vos_context, v_VOID_t *os_ctx,
 	wma_handle->htc_handle = htc_handle;
 	wma_handle->vos_context = vos_context;
 	wma_handle->adf_dev = adf_dev;
+	wma_handle->runtime_pm_ctx =
+			vos_runtime_pm_prevent_suspend_init("wma_runtime_pm");
 
 	/* initialize default target config */
 	wma_set_default_tgt_config(wma_handle);
@@ -6418,6 +6420,9 @@ err_wma_handle:
 #endif
 		vos_wake_lock_destroy(&wma_handle->wow_wake_lock);
 	}
+
+	vos_runtime_pm_prevent_suspend_deinit(wma_handle->runtime_pm_ctx);
+	wma_handle->runtime_pm_ctx = NULL;
 	vos_free_context(vos_context, VOS_MODULE_ID_WDA, wma_handle);
 
 	WMA_LOGD("%s: Exit", __func__);
@@ -14817,7 +14822,7 @@ out:
 static void wma_add_pm_vote(tp_wma_handle wma)
 {
 	if (++wma->ap_client_cnt == 1) {
-		htc_pm_runtime_get(wma->htc_handle);
+		vos_runtime_pm_prevent_suspend(wma->runtime_pm_ctx);
 		vos_pm_control(DISABLE_PCIE_POWER_COLLAPSE);
 	}
 }
@@ -14825,7 +14830,7 @@ static void wma_add_pm_vote(tp_wma_handle wma)
 static void wma_del_pm_vote(tp_wma_handle wma)
 {
 	if (--wma->ap_client_cnt == 0) {
-		htc_pm_runtime_put(wma->htc_handle);
+		vos_runtime_pm_allow_suspend(wma->runtime_pm_ctx);
 		vos_pm_control(ENABLE_PCIE_POWER_COLLAPSE);
 	}
 }
@@ -14841,6 +14846,7 @@ static void wma_prevent_suspend_check(tp_wma_handle wma)
 	wma->ap_client_cnt++;
 	if (wma->ap_client_cnt ==
 	    wma->wlan_resource_config.num_offload_peers) {
+		vos_runtime_pm_prevent_suspend(wma->runtime_context.ap);
 		vos_wake_lock_acquire(&wma->wow_wake_lock,
 				WIFI_POWER_EVENT_WAKELOCK_ADD_STA);
 		WMA_LOGW("%s: %d clients connected, prevent suspend",
@@ -14855,6 +14861,7 @@ static void wma_allow_suspend_check(tp_wma_handle wma)
 	    wma->wlan_resource_config.num_offload_peers - 1) {
 		vos_wake_lock_release(&wma->wow_wake_lock,
                                       WIFI_POWER_EVENT_WAKELOCK_DEL_STA);
+		vos_runtime_pm_allow_suspend(wma->runtime_context.ap);
 		WMA_LOGW("%s: %d clients connected, allow suspend",
 			 __func__, wma->ap_client_cnt);
 	}
@@ -19645,7 +19652,7 @@ pdev_resume:
 	wma_unpause_vdev(wma);
 
 	if (runtime_pm)
-		vos_runtime_pm_allow_suspend();
+		vos_runtime_pm_allow_suspend(wma->runtime_context.resume);
 
 	return ret;
 }
@@ -26876,6 +26883,9 @@ VOS_STATUS wma_close(v_VOID_t *vos_ctx)
 		vos_wake_lock_destroy(&wma_handle->wow_wake_lock);
 	}
 
+	vos_runtime_pm_prevent_suspend_deinit(wma_handle->runtime_pm_ctx);
+	wma_handle->runtime_pm_ctx = NULL;
+
 	/* unregister Firmware debug log */
 	vos_status = dbglog_deinit(wma_handle->wmi_handle);
 	if(vos_status != VOS_STATUS_SUCCESS)
@@ -30129,8 +30139,10 @@ int wma_runtime_resume_req(WMA_HANDLE handle)
 	vos_msg_t       vosMessage;
 	VOS_STATUS vosStatus = VOS_STATUS_SUCCESS;
 	int ret = 0;
+	tp_wma_handle wma = (tp_wma_handle) handle;
+	struct wma_runtime_pm_context *runtime_context = &wma->runtime_context;
 
-	vos_runtime_pm_prevent_suspend();
+	vos_runtime_pm_prevent_suspend(runtime_context->resume);
 
 	vosMessage.bodyptr = NULL;
 	vosMessage.type    = WDA_RUNTIME_PM_RESUME_IND;
@@ -30139,7 +30151,7 @@ int wma_runtime_resume_req(WMA_HANDLE handle)
 	if (!VOS_IS_STATUS_SUCCESS(vosStatus)) {
 		WMA_LOGE("Failed to post Runtime PM Resume IND to VOS");
 		ret = -EAGAIN;
-		vos_runtime_pm_allow_suspend();
+		vos_runtime_pm_allow_suspend(runtime_context->resume);
 	}
 
 	return ret;

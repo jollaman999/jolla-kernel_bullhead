@@ -1820,6 +1820,7 @@ VOS_STATUS hdd_wlan_shutdown(void)
         vos_timer_stop(&pHddCtx->tx_rx_trafficTmr);
    }
 
+   hdd_runtime_suspend_init(pHddCtx);
    hdd_reset_all_adapters(pHddCtx);
 
    vosStatus = hddDevTmUnregisterNotifyCallback(pHddCtx);
@@ -2163,6 +2164,7 @@ VOS_STATUS hdd_wlan_re_init(void *hif_sc)
    vosStatus = WLANBAP_SetConfig(&btAmpConfig);
 #endif //WLAN_BTAMP_FEATURE
 
+   hdd_runtime_suspend_init(pHddCtx);
    /* Restart all adapters */
    hdd_start_all_adapters(pHddCtx);
 
@@ -2239,6 +2241,7 @@ err_unregister_pmops:
 #ifdef CONFIG_HAS_EARLYSUSPEND
    hdd_unregister_mcast_bcast_filter(pHddCtx);
 #endif
+   hdd_runtime_suspend_deinit(pHddCtx);
    hdd_close_all_adapters(pHddCtx);
 #ifdef WLAN_BTAMP_FEATURE
    WLANBAP_Stop(pVosContext);
