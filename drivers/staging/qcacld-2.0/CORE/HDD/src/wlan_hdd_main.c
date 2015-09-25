@@ -7483,6 +7483,87 @@ void hdd_set_station_ops( struct net_device *pWlanDev )
       pWlanDev->netdev_ops = &wlan_drv_ops;
 }
 
+#ifdef FEATURE_RUNTIME_PM
+/**
+ * hdd_runtime_suspend_init() - API to initialize runtime pm context
+ * @hdd_ctx: HDD Context
+ *
+ * The API initializes the context to prevent runtime pm for various use
+ * cases like scan, roc, dfs.
+ * This API can be extended to initialize the context to prevent runtime pm
+ *
+ * Return: void
+ */
+void hdd_runtime_suspend_init(hdd_context_t *hdd_ctx)
+{
+	struct hdd_runtime_pm_context *context = &hdd_ctx->runtime_context;
+
+	context->scan = vos_runtime_pm_prevent_suspend_init("scan");
+	context->roc = vos_runtime_pm_prevent_suspend_init("roc");
+	context->dfs = vos_runtime_pm_prevent_suspend_init("dfs");
+}
+
+/**
+ * hdd_runtime_suspend_deinit() - API to deinit runtime pm context
+ * @hdd_ctx: HDD context
+ *
+ * The API deinit the context to prevent runtime pm.
+ *
+ * Return: void
+ */
+void hdd_runtime_suspend_deinit(hdd_context_t *hdd_ctx)
+{
+	struct hdd_runtime_pm_context *context = &hdd_ctx->runtime_context;
+
+	vos_runtime_pm_prevent_suspend_deinit(context->scan);
+	context->scan = NULL;
+	vos_runtime_pm_prevent_suspend_deinit(context->roc);
+	context->roc = NULL;
+	vos_runtime_pm_prevent_suspend_deinit(context->dfs);
+	context->dfs = NULL;
+}
+
+/**
+ * hdd_adapter_runtime_suspend_init() - API to init runtime pm context/adapter
+ * @adapter: Interface Adapter
+ *
+ * API is used to init the context to prevent runtime pm/adapter
+ *
+ * Return: void
+ */
+static void
+hdd_adapter_runtime_suspend_init(hdd_adapter_t *adapter)
+{
+	struct hdd_adapter_pm_context *context = &adapter->runtime_context;
+
+	context->connect = vos_runtime_pm_prevent_suspend_init("connect");
+}
+
+/**
+ * hdd_adapter_runtime_suspend_denit() - API to deinit runtime pm/adapter
+ * @adapter: Interface Adapter
+ *
+ * API is used to deinit the context to prevent runtime pm/adapter
+ *
+ * Return: void
+ */
+static void hdd_adapter_runtime_suspend_denit(hdd_adapter_t *adapter)
+{
+	struct hdd_adapter_pm_context *context = &adapter->runtime_context;
+
+	vos_runtime_pm_prevent_suspend_deinit(context->connect);
+	context->connect = NULL;
+}
+
+#else
+void hdd_runtime_suspend_init(hdd_context_t *hdd_ctx) { }
+void hdd_runtime_suspend_deinit(hdd_context_t *hdd_ctx) { }
+static inline void
+hdd_adapter_runtime_suspend_init(hdd_adapter_t *adapter) { }
+static inline void
+hdd_adapter_runtime_suspend_denit(hdd_adapter_t *adapter) { }
+#endif
+
 static hdd_adapter_t* hdd_alloc_station_adapter( hdd_context_t *pHddCtx, tSirMacAddr macAddr, const char* name )
 {
    struct net_device *pWlanDev = NULL;
@@ -7562,6 +7643,7 @@ static hdd_adapter_t* hdd_alloc_station_adapter( hdd_context_t *pHddCtx, tSirMac
       /* set pWlanDev's parent to underlying device */
       SET_NETDEV_DEV(pWlanDev, pHddCtx->parent_dev);
       hdd_wmm_init( pAdapter );
+      hdd_adapter_runtime_suspend_init(pAdapter);
    }
 
    return pAdapter;
@@ -7908,6 +7990,7 @@ void hdd_cleanup_adapter(hdd_context_t *pHddCtx, hdd_adapter_t *pAdapter,
       return;
    }
 
+    hdd_adapter_runtime_suspend_denit(pAdapter);
    /* The adapter is marked as closed. When hdd_wlan_exit() call returns,
     * the driver is almost closed and cannot handle either control
     * messages or data. However, unregister_netdevice() call above will
@@ -9054,10 +9137,12 @@ void hdd_connect_result(struct net_device *dev,
 			u16 status,
 			gfp_t gfp)
 {
+	hdd_adapter_t *padapter = (hdd_adapter_t *) netdev_priv(dev);
 
 	cfg80211_connect_result(dev, bssid, req_ie, req_ie_len,
 				resp_ie, resp_ie_len, status, gfp);
-	vos_runtime_pm_allow_suspend();
+
+	vos_runtime_pm_allow_suspend(padapter->runtime_context.connect);
 }
 
 
@@ -10387,6 +10472,7 @@ void hdd_wlan_exit(hdd_context_t *pHddCtx)
 #endif /* WLAN_KD_READY_NOTIFIER */
 
 
+   hdd_runtime_suspend_deinit(pHddCtx);
    hdd_close_all_adapters( pHddCtx );
 
 #ifdef IPA_OFFLOAD
@@ -10621,18 +10707,6 @@ void hdd_prevent_suspend_timeout(v_U32_t timeout, uint32_t reason)
 {
 	vos_wake_lock_timeout_acquire(&wlan_wake_lock, timeout,
                                       reason);
-}
-
-/**
- * hdd_allow_runtime_suspend() - API to allow runtime suspend
- *
- * API to allow runtime suspend if the "wlan_wake_lock" is preventing it.
- *
- * Return: void
- */
-void hdd_allow_runtime_suspend(void)
-{
-	vos_runtime_pm_allow_suspend();
 }
 
 /**---------------------------------------------------------------------------
@@ -11900,6 +11974,7 @@ int hdd_wlan_startup(struct device *dev, v_VOID_t *hif_sc)
    else
       hddLog(LOGE, FL("Registered IPv4 notifier"));
 
+   hdd_runtime_suspend_init(pHddCtx);
    pHddCtx->isLoadInProgress = FALSE;
    vos_set_load_unload_in_progress(VOS_MODULE_ID_VOSS, FALSE);
    complete(&wlan_start_comp);
