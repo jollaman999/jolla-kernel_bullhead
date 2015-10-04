@@ -582,11 +582,13 @@ out:
  *
  * Returns: actual size of data on success, -errno on error
  */
-static int gfs2_xattr_get(struct dentry *dentry, const char *name,
-		void *buffer, size_t size, int type)
+static int gfs2_xattr_get(const struct xattr_handler *handler,
+			  struct dentry *dentry, const char *name,
+			  void *buffer, size_t size)
 {
 	struct gfs2_inode *ip = GFS2_I(dentry->d_inode);
 	struct gfs2_ea_location el;
+	int type = handler->flags;
 	int error;
 
 	if (!ip->i_eattr)
@@ -1225,11 +1227,12 @@ int __gfs2_xattr_set(struct inode *inode, const char *name,
 	return error;
 }
 
-static int gfs2_xattr_set(struct dentry *dentry, const char *name,
-		const void *value, size_t size, int flags, int type)
+static int gfs2_xattr_set(const struct xattr_handler *handler,
+			  struct dentry *dentry, const char *name,
+			  const void *value, size_t size, int flags)
 {
 	return __gfs2_xattr_set(dentry->d_inode, name, value,
-				size, flags, type);
+				size, flags, handler->flags);
 }
 
 

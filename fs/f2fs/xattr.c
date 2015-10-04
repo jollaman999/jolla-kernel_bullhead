@@ -24,14 +24,15 @@
 #include "f2fs.h"
 #include "xattr.h"
 
-static size_t f2fs_xattr_generic_list(struct dentry *dentry, char *list,
-		size_t list_size, const char *name, size_t len, int type)
+static size_t f2fs_xattr_generic_list(const struct xattr_handler *handler,
+		struct dentry *dentry, char *list, size_t list_size,
+		const char *name, size_t len)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(dentry->d_sb);
 	int total_len, prefix_len = 0;
 	const char *prefix = NULL;
 
-	switch (type) {
+	switch (handler->flags) {
 	case F2FS_XATTR_INDEX_USER:
 		if (!test_opt(sbi, XATTR_USER))
 			return -EOPNOTSUPP;
@@ -61,12 +62,13 @@ static size_t f2fs_xattr_generic_list(struct dentry *dentry, char *list,
 	return total_len;
 }
 
-static int f2fs_xattr_generic_get(struct dentry *dentry, const char *name,
-		void *buffer, size_t size, int type)
+static int f2fs_xattr_generic_get(const struct xattr_handler *handler,
+		struct dentry *dentry, const char *name, void *buffer,
+		size_t size)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(dentry->d_sb);
 
-	switch (type) {
+	switch (handler->flags) {
 	case F2FS_XATTR_INDEX_USER:
 		if (!test_opt(sbi, XATTR_USER))
 			return -EOPNOTSUPP;
@@ -82,15 +84,17 @@ static int f2fs_xattr_generic_get(struct dentry *dentry, const char *name,
 	}
 	if (strcmp(name, "") == 0)
 		return -EINVAL;
-	return f2fs_getxattr(dentry->d_inode, type, name, buffer, size, NULL);
+	return f2fs_getxattr(dentry->d_inode, handler->flags, name,
+			     buffer, size, NULL);
 }
 
-static int f2fs_xattr_generic_set(struct dentry *dentry, const char *name,
-		const void *value, size_t size, int flags, int type)
+static int f2fs_xattr_generic_set(const struct xattr_handler *handler,
+		struct dentry *dentry, const char *name, const void *value,
+		size_t size, int flags)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(dentry->d_sb);
 
-	switch (type) {
+	switch (handler->flags) {
 	case F2FS_XATTR_INDEX_USER:
 		if (!test_opt(sbi, XATTR_USER))
 			return -EOPNOTSUPP;
@@ -107,17 +111,18 @@ static int f2fs_xattr_generic_set(struct dentry *dentry, const char *name,
 	if (strcmp(name, "") == 0)
 		return -EINVAL;
 
-	return f2fs_setxattr(dentry->d_inode, type, name,
+	return f2fs_setxattr(dentry->d_inode, handler->flags, name,
 					value, size, NULL, flags);
 }
 
-static size_t f2fs_xattr_advise_list(struct dentry *dentry, char *list,
-		size_t list_size, const char *name, size_t len, int type)
+static size_t f2fs_xattr_advise_list(const struct xattr_handler *handler,
+		struct dentry *dentry, char *list, size_t list_size,
+		const char *name, size_t len)
 {
 	const char *xname = F2FS_SYSTEM_ADVISE_PREFIX;
 	size_t size;
 
-	if (type != F2FS_XATTR_INDEX_ADVISE)
+	if (handler->flags != F2FS_XATTR_INDEX_ADVISE)
 		return 0;
 
 	size = strlen(xname) + 1;
@@ -126,8 +131,9 @@ static size_t f2fs_xattr_advise_list(struct dentry *dentry, char *list,
 	return size;
 }
 
-static int f2fs_xattr_advise_get(struct dentry *dentry, const char *name,
-		void *buffer, size_t size, int type)
+static int f2fs_xattr_advise_get(const struct xattr_handler *handler,
+		struct dentry *dentry, const char *name, void *buffer,
+		size_t size)
 {
 	struct inode *inode = dentry->d_inode;
 
@@ -139,8 +145,9 @@ static int f2fs_xattr_advise_get(struct dentry *dentry, const char *name,
 	return sizeof(char);
 }
 
-static int f2fs_xattr_advise_set(struct dentry *dentry, const char *name,
-		const void *value, size_t size, int flags, int type)
+static int f2fs_xattr_advise_set(const struct xattr_handler *handler,
+		struct dentry *dentry, const char *name, const void *value,
+		size_t size, int flags)
 {
 	struct inode *inode = dentry->d_inode;
 
@@ -461,8 +468,8 @@ ssize_t f2fs_listxattr(struct dentry *dentry, char *buffer, size_t buffer_size)
 		if (!handler)
 			continue;
 
-		size = handler->list(dentry, buffer, rest, entry->e_name,
-				entry->e_name_len, handler->flags);
+		size = handler->list(handler, dentry, buffer, rest,
+				     entry->e_name, entry->e_name_len);
 		if (buffer && size > rest) {
 			error = -ERANGE;
 			goto cleanup;

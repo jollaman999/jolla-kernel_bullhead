@@ -652,8 +652,9 @@ end_removexattr:
 	return err;
 }
 
-static int hfsplus_osx_getxattr(struct dentry *dentry, const char *name,
-					void *buffer, size_t size, int type)
+static int hfsplus_osx_getxattr(const struct xattr_handler *handler,
+				struct dentry *dentry, const char *name,
+				void *buffer, size_t size)
 {
 	char xattr_name[HFSPLUS_ATTR_MAX_STRLEN +
 				XATTR_MAC_OSX_PREFIX_LEN + 1] = {0};
@@ -671,8 +672,9 @@ static int hfsplus_osx_getxattr(struct dentry *dentry, const char *name,
 	return hfsplus_getxattr(dentry, xattr_name, buffer, size);
 }
 
-static int hfsplus_osx_setxattr(struct dentry *dentry, const char *name,
-		const void *buffer, size_t size, int flags, int type)
+static int hfsplus_osx_setxattr(const struct xattr_handler *handler,
+				struct dentry *dentry, const char *name,
+				const void *buffer, size_t size, int flags)
 {
 	char xattr_name[HFSPLUS_ATTR_MAX_STRLEN +
 				XATTR_MAC_OSX_PREFIX_LEN + 1] = {0};

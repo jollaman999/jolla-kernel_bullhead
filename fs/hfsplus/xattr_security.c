@@ -10,8 +10,9 @@
 #include "hfsplus_fs.h"
 #include "xattr.h"
 
-static int hfsplus_security_getxattr(struct dentry *dentry, const char *name,
-					void *buffer, size_t size, int type)
+static int hfsplus_security_getxattr(const struct xattr_handler *handler,
+				     struct dentry *dentry, const char *name,
+				     void *buffer, size_t size)
 {
 	char xattr_name[HFSPLUS_ATTR_MAX_STRLEN + 1] = {0};
 	size_t len = strlen(name);
@@ -28,8 +29,9 @@ static int hfsplus_security_getxattr(struct dentry *dentry, const char *name,
 	return hfsplus_getxattr(dentry, xattr_name, buffer, size);
 }
 
-static int hfsplus_security_setxattr(struct dentry *dentry, const char *name,
-		const void *buffer, size_t size, int flags, int type)
+static int hfsplus_security_setxattr(const struct xattr_handler *handler,
+				     struct dentry *dentry, const char *name,
+				     const void *buffer, size_t size, int flags)
 {
 	char xattr_name[HFSPLUS_ATTR_MAX_STRLEN + 1] = {0};
 	size_t len = strlen(name);

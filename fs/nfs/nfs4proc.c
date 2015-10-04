@@ -5293,9 +5293,10 @@ static int nfs4_release_lockowner(struct nfs_server *server, struct nfs4_lock_st
 
 #define XATTR_NAME_NFSV4_ACL "system.nfs4_acl"
 
-static int nfs4_xattr_set_nfs4_acl(struct dentry *dentry, const char *key,
+static int nfs4_xattr_set_nfs4_acl(const struct xattr_handler *handler,
+				   struct dentry *dentry, const char *key,
 				   const void *buf, size_t buflen,
-				   int flags, int type)
+				   int flags)
 {
 	if (strcmp(key, "") != 0)
 		return -EINVAL;
@@ -5303,8 +5304,9 @@ static int nfs4_xattr_set_nfs4_acl(struct dentry *dentry, const char *key,
 	return nfs4_proc_set_acl(dentry->d_inode, buf, buflen);
 }
 
-static int nfs4_xattr_get_nfs4_acl(struct dentry *dentry, const char *key,
-				   void *buf, size_t buflen, int type)
+static int nfs4_xattr_get_nfs4_acl(const struct xattr_handler *handler,
+				   struct dentry *dentry, const char *key,
+				   void *buf, size_t buflen)
 {
 	if (strcmp(key, "") != 0)
 		return -EINVAL;
@@ -5312,9 +5314,10 @@ static int nfs4_xattr_get_nfs4_acl(struct dentry *dentry, const char *key,
 	return nfs4_proc_get_acl(dentry->d_inode, buf, buflen);
 }
 
-static size_t nfs4_xattr_list_nfs4_acl(struct dentry *dentry, char *list,
+static size_t nfs4_xattr_list_nfs4_acl(const struct xattr_handler *handler,
+				       struct dentry *dentry, char *list,
 				       size_t list_len, const char *name,
-				       size_t name_len, int type)
+				       size_t name_len)
 {
 	size_t len = sizeof(XATTR_NAME_NFSV4_ACL);
 
