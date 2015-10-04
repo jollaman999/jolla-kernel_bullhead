@@ -45,19 +45,8 @@ static int hfsplus_trusted_setxattr(struct dentry *dentry, const char *name,
 	return hfsplus_setxattr(dentry, xattr_name, buffer, size, flags);
 }
 
-static size_t hfsplus_trusted_listxattr(struct dentry *dentry, char *list,
-		size_t list_size, const char *name, size_t name_len, int type)
-{
-	/*
-	 * This method is not used.
-	 * It is used hfsplus_listxattr() instead of generic_listxattr().
-	 */
-	return -EOPNOTSUPP;
-}
-
 const struct xattr_handler hfsplus_xattr_trusted_handler = {
 	.prefix	= XATTR_TRUSTED_PREFIX,
-	.list	= hfsplus_trusted_listxattr,
 	.get	= hfsplus_trusted_getxattr,
 	.set	= hfsplus_trusted_setxattr,
 };
