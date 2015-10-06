@@ -148,7 +148,13 @@ void machine_kexec(struct kimage *kimage)
 	phys_addr_t reboot_code_buffer_phys;
 	void *reboot_code_buffer;
 
-	BUG_ON(num_online_cpus() > 1);
+	if (num_online_cpus() > 1) {
+		if (in_crash_kexec)
+			pr_warn("kdump might fail because %d cpus are still online\n",
+					num_online_cpus());
+		else
+			BUG();
+	}
 
 	reboot_code_buffer_phys = page_to_phys(kimage->control_code_page);
 	reboot_code_buffer = phys_to_virt(reboot_code_buffer_phys);
