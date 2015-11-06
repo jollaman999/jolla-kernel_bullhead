@@ -47,6 +47,7 @@
  */
 #define __visible __attribute__((externally_visible))
 
+#ifndef __CHECKER__
 /*
  * __assume_aligned(n, k): Tell the optimizer that the returned
  * pointer can be assumed to be k modulo n. The second argument is
@@ -60,6 +61,7 @@
  * massaged by 'flags = ptr & 3; ptr &= ~3;').
  */
 #define __assume_aligned(a, ...) __attribute__((__assume_aligned__(a, ## __VA_ARGS__)))
+#endif
 
 /*
  * GCC 'asm goto' miscompiles certain code sequences:
