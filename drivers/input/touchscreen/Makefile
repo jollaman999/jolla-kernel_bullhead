@@ -82,7 +82,4 @@ obj-$(CONFIG_TOUCHSCREEN_SYNAPTICS_DSX_FW_UPDATE) 	+= synaptics_fw_update.o
 obj-$(CONFIG_TOUCHSCREEN_SYNAPTICS_I2C_RMI4)		+= synaptics_i2c_rmi4.o
 obj-$(CONFIG_TOUCHSCREEN_GT9XX)		+= gt9xx/
 obj-$(CONFIG_TOUCHSCREEN_BU21150)	+= bu21150.o
-obj-$(CONFIG_TOUCHSCREEN_SWEEP2WAKE)		+= sweep2wake.o
-obj-$(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE)	+= doubletap2wake.o
-obj-$(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)	+= scroff_volctr.o
 obj-$(CONFIG_INPUT_MT_WRAPPER)		+= input_mt_wrapper.o
