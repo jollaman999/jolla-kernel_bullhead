@@ -39,6 +39,19 @@
 #include "synaptics_i2c_rmi4.h"
 #include <linux/input/mt.h>
 
+#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+#include <linux/wakelock.h>
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+#include <linux/input/sweep2wake.h>
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+#include <linux/input/doubletap2wake.h>
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#include <linux/input/scroff_volctr.h>
+#endif
+#endif
+
 #define DRIVER_NAME "synaptics_rmi4_i2c"
 #define INPUT_PHYS_NAME "synaptics_rmi4_i2c/input0"
 #define DEBUGFS_DIR_NAME "ts_debug"
@@ -115,6 +128,12 @@ enum device_status {
 #define F11_MAX_Y		4096
 #define F12_MAX_X		65536
 #define F12_MAX_Y		65536
+
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+bool scr_suspended = false;
+EXPORT_SYMBOL(scr_suspended);
+static struct wake_lock rmi4_wake_lock;
+#endif
 
 static int synaptics_rmi4_i2c_read(struct synaptics_rmi4_data *rmi4_data,
 		unsigned short addr, unsigned char *data,
@@ -1791,6 +1810,13 @@ static int synaptics_rmi4_sensor_report(struct synaptics_rmi4_data *rmi4_data)
 static irqreturn_t synaptics_rmi4_irq(int irq, void *data)
 {
 	struct synaptics_rmi4_data *rmi4_data = data;
+#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+	/* Make sure 'wakeup_enabled' is updated before using it
+	** since this is interrupt context (other thread...) */
+	smp_rmb();
+
+	wake_lock_timeout(&rmi4_wake_lock, msecs_to_jiffies(5000));
+#endif
 
 	rmi4_data->timestamp = ktime_get();
 
@@ -4043,6 +4069,12 @@ static int synaptics_rmi4_probe(struct i2c_client *client,
 	synaptics_rmi4_set_configuration(rmi4_data);
 
 	rmi4_data->irq = gpio_to_irq(platform_data->irq_gpio);
+#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+	platform_data->irq_flags |= IRQF_NO_SUSPEND;
+	platform_data->irq_flags |= IRQF_EARLY_RESUME;
+	device_init_wakeup(&client->dev, 1);
+	wake_lock_init(&rmi4_wake_lock, WAKE_LOCK_SUSPEND, "rmi4_wake_lock");
+#endif
 
 	retval = request_threaded_irq(rmi4_data->irq, NULL,
 		synaptics_rmi4_irq, platform_data->irq_flags,
@@ -4147,6 +4179,10 @@ static int synaptics_rmi4_remove(struct i2c_client *client)
 	int retval;
 
 	rmi = &(rmi4_data->rmi4_mod_info);
+
+#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+	wake_lock_destroy(&rmi4_wake_lock);
+#endif
 
 	debugfs_remove_recursive(rmi4_data->dir);
 	cancel_delayed_work_sync(&rmi4_data->det_work);
@@ -4588,6 +4624,27 @@ static int synaptics_rmi4_suspend(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 	int retval;
+#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+	bool prevent_sleep = false;
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	prevent_sleep = (s2w_switch > 1);
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	prevent_sleep = prevent_sleep || (dt2w_switch > 0);
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	prevent_sleep = prevent_sleep || (sovc_switch == 1);
+#endif
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	scr_suspended = true;
+#endif
+	if (prevent_sleep) {
+		pr_info("PREVENT SLEEP - SUSPEND\n");
+		enable_irq_wake(rmi4_data->irq);
+		synaptics_rmi4_release_all(rmi4_data);
+		return 0;
+	}
+#endif /* CONFIG_TOUCHSCREEN_PREVENT_SLEEP */
 
 	if (rmi4_data->stay_awake) {
 		rmi4_data->staying_awake = true;
@@ -4677,6 +4734,27 @@ err_lpm_regulator:
 static int synaptics_rmi4_resume(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
+
+#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+	bool prevent_sleep = false;
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	prevent_sleep = (s2w_switch > 1);
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	prevent_sleep = prevent_sleep || (dt2w_switch > 0);
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	prevent_sleep = prevent_sleep || (sovc_switch == 1);
+#endif
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	scr_suspended = false;
+#endif
+	if (prevent_sleep) {
+		pr_info("PREVENT SLEEP - RESUME\n");
+		disable_irq_wake(rmi4_data->irq);
+		return 0;
+	}
+#endif /* CONFIG_TOUCHSCREEN_PREVENT_SLEEP */
 
 	if (rmi4_data->staying_awake)
 		return 0;
