@@ -1629,7 +1629,8 @@ out:
 	return err;
 }
 
-void f2fs_invalidate_page(struct page *page, unsigned long offset)
+void f2fs_invalidate_page(struct page *page, unsigned int offset,
+							unsigned int length)
 {
 	struct inode *inode = page->mapping->host;
 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
