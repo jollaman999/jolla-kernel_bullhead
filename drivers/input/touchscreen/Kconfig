@@ -1052,6 +1052,27 @@ config TOUCHSCREEN_BU21150
 
 	  If unsure, say N.
 
+config TOUCHSCREEN_SWEEP2WAKE
+	tristate "Sweep2Wake for touchscreens"
+	select TOUCHSCREEN_PREVENT_SLEEP
+	default n
+
+config TOUCHSCREEN_DOUBLETAP2WAKE
+	tristate "DoubleTap2Wake for touchscreens"
+	select TOUCHSCREEN_PREVENT_SLEEP
+	default n
+
+config TOUCHSCREEN_SCROFF_VOLCTR
+	tristate "Screen Off Volume & Touch Control for touchscreens"
+	select TOUCHSCREEN_PREVENT_SLEEP
+	default n
+
+config TOUCHSCREEN_PREVENT_SLEEP
+	bool "Inihibit sleep on modified touchscreen drivers"
+	default n
+	help
+	  This disables the sleep function of modified touchscreen drivers.
+
 config INPUT_MT_WRAPPER
 	tristate "Input Multitouch Wrapper"
 	help
