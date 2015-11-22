@@ -1595,7 +1595,7 @@ const struct file_operations ubifs_file_operations = {
 	.fsync          = ubifs_fsync,
 	.unlocked_ioctl = ubifs_ioctl,
 	.splice_read	= generic_file_splice_read,
-	.splice_write	= iter_file_splice_write,
+	.splice_write	= generic_file_splice_write,
 #ifdef CONFIG_COMPAT
 	.compat_ioctl   = ubifs_compat_ioctl,
 #endif
