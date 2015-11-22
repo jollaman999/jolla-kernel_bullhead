@@ -80,6 +80,10 @@ enum {
 #define SLIM_BW_CLK_GEAR_9 6200000
 #define SLIM_BW_UNVOTE 0
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+extern int sovc_tmp_onoff;
+#endif
+
 static int cpe_debug_mode;
 module_param(cpe_debug_mode, int,
 	     S_IRUGO | S_IWUSR | S_IWGRP);
@@ -8967,6 +8971,9 @@ static struct snd_soc_codec_driver soc_codec_dev_tomtom = {
 #ifdef CONFIG_PM
 static int tomtom_suspend(struct device *dev)
 {
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	sovc_tmp_onoff = 0;
+#endif
 	dev_dbg(dev, "%s: system suspend\n", __func__);
 	return 0;
 }
@@ -8975,6 +8982,10 @@ static int tomtom_resume(struct device *dev)
 {
 	struct platform_device *pdev = to_platform_device(dev);
 	struct tomtom_priv *tomtom = platform_get_drvdata(pdev);
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	sovc_tmp_onoff = 1;
+#endif
 
 	if (!tomtom) {
 		dev_err(dev, "%s: tomtom private data is NULL\n", __func__);
