@@ -28,10 +28,10 @@
 #define PCC_ADJ 0x80
 
 // Fix bullhead's shit yellow screen! - by jollaman999
-#define KCAL_RED	0xF1
-#define KCAL_GREEN	0xF1
-#define KCAL_BLUE	DEF_PCC
-#define KCAL_SAT	0x101
+#define KCAL_RED	0xE8	// 232
+#define KCAL_GREEN	0xF1	// 241
+#define KCAL_BLUE	DEF_PCC	// 256
+#define KCAL_SAT	0x102	// 258
 
 
 struct kcal_lut_data {
