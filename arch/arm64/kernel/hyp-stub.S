@@ -54,10 +54,10 @@ ENDPROC(__hyp_stub_vectors)
 
 el1_sync:
 	mrs	x18, esr_el2
-	lsr	x17, x18, #ESR_EL2_EC_SHIFT
-	and	x18, x18, #ESR_EL2_ISS_MASK
+	lsr	x17, x18, #ESR_ELx_EC_SHIFT
+	and	x18, x18, #ESR_ELx_ISS_MASK
 
-	cmp	x17, #ESR_EL2_EC_HVC64
+	cmp	x17, #ESR_ELx_EC_HVC64
 	b.ne	2f				// Not an HVC trap
 
 	cmp	x18, #HVC_GET_VECTORS
