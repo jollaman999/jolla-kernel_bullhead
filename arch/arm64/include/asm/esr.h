@@ -18,6 +18,8 @@
 #ifndef __ASM_ESR_H
 #define __ASM_ESR_H
 
+#include <asm/memory.h>
+
 #define ESR_EL1_WRITE		(1 << 6)
 #define ESR_EL1_CM		(1 << 8)
 #define ESR_EL1_IL		(1 << 25)

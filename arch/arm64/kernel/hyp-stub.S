@@ -21,6 +21,7 @@
 #include <linux/linkage.h>
 
 #include <asm/assembler.h>
+#include <asm/esr.h>
 #include <asm/kvm_arm.h>
 #include <asm/ptrace.h>
 #include <asm/virt.h>

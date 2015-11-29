@@ -52,6 +52,8 @@
 #include <asm/processor.h>
 #include <asm/stacktrace.h>
 
+#include "cpu-reset.h"
+
 #ifdef CONFIG_CC_STACKPROTECTOR
 #include <linux/stackprotector.h>
 unsigned long __stack_chk_guard __read_mostly;
