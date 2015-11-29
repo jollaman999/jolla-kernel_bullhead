@@ -19,22 +19,15 @@
 #include <linux/irqchip/arm-gic.h>
 
 #include <asm/asm-offsets.h>
-<<<<<<< HEAD
-=======
 #include <asm/assembler.h>
-#include <asm/debug-monitors.h>
 #include <asm/esr.h>
->>>>>>> c6d01a9... arm64: kvm: move to ESR_ELx macros
 #include <asm/fpsimdmacros.h>
 #include <asm/kvm.h>
 #include <asm/kvm_arm.h>
 #include <asm/kvm_asm.h>
 #include <asm/kvm_mmu.h>
-<<<<<<< HEAD
 #include <asm/virt.h>
-=======
 #include <asm/memory.h>
->>>>>>> c6d01a9... arm64: kvm: move to ESR_ELx macros
 
 #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
 #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
