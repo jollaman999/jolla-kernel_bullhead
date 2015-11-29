@@ -26,6 +26,10 @@
 #include <linux/types.h>
 #include <asm/sizes.h>
 
+#if defined(CONFIG_KEXEC_HARDBOOT)
+#define KEXEC_HB_PAGE_ADDR             UL(0x1FEFF000)
+#endif
+
 /*
  * Allow for constants defined here to be used from assembly code
  * by prepending the UL suffix only with actual C code compilation.

@@ -35,6 +35,11 @@
 #include <asm/page.h>
 #include <asm/virt.h>
 
+#ifdef CONFIG_KEXEC_HARDBOOT
+  #include <asm/kexec.h>
+  #include <asm/memory.h>
+#endif
+
 /*
  * swapper_pg_dir is the virtual address of the initial page table. We place
  * the page tables 3 * PAGE_SIZE below KERNEL_RAM_VADDR. The idmap_pg_dir has
@@ -86,6 +91,44 @@
 #define MM_MMUFLAGS	PTE_ATTRINDX(MT_NORMAL) | PTE_FLAGS
 #else
 #define MM_MMUFLAGS	PMD_ATTRINDX(MT_NORMAL) | PMD_FLAGS
+#endif
+
+#ifdef CONFIG_KEXEC_HARDBOOT
+		/* Check hardboot page for a kexec kernel. */
+		ldr	x3, =KEXEC_HB_PAGE_ADDR
+		ldr	x0, [x3]
+		ldr	x1, =KEXEC_HB_PAGE_MAGIC
+		cmp	x0, x1
+		bne	not_booting_other
+
+		/* Clear hardboot page magic to avoid boot loop. */
+		mov	x0, #0
+		str	x0, [x3]
+
+		/*
+		 * Copy dtb from location up high in memory to default location.
+		 * Kernel freezes if this is not done.
+		 */
+		ldr	x1, [x3, #12]
+		ldr	x2, [x3, #16]
+		mov	x5, #0
+catags_cpy:
+		ldr	x0, [x1, x5]
+		str	x0, [x8, x5]
+		add	x5, x5, #4
+		cmp	x5, x2
+		blo	catags_cpy
+		ldr	x6, [x3, #4]
+
+		/* set registers and boot kexecd' kernel */
+		mov	x0, #0
+		ldr	x1, [x3, #8]
+		mov	x2, x8
+		br	x6
+
+		.ltorg
+
+not_booting_other:
 #endif
 
 /*

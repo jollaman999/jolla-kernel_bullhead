@@ -28,6 +28,10 @@
 
 #define KEXEC_ARCH KEXEC_ARCH_ARM64
 
+#ifdef CONFIG_KEXEC_HARDBOOT
+#define KEXEC_HB_PAGE_MAGIC 0x4a5db007
+#endif
+
 #if !defined(__ASSEMBLY__)
 
 extern bool in_crash_kexec;
