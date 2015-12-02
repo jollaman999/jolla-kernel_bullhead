@@ -233,12 +233,6 @@ static ssize_t show_hotplug_enable(struct kobject *kobj,
 	return snprintf(buf, MAX_LONG_SIZE, "%d\n", rq_info.hotplug_enabled);
 }
 
-static struct kobj_attribute hotplug_disabled_attr = __ATTR_RO(hotplug_disable);
-
-static struct kobj_attribute hotplug_enabled_attr =
-	__ATTR(hotplug_enable, S_IWUSR | S_IRUSR, show_hotplug_enable,
-	       store_hotplug_enable);
-
 #ifdef CONFIG_BRICKED_HOTPLUG
 unsigned int get_rq_info(void)
 {
@@ -256,6 +250,12 @@ unsigned int get_rq_info(void)
 }
 EXPORT_SYMBOL(get_rq_info);
 #endif
+
+static struct kobj_attribute hotplug_disabled_attr = __ATTR_RO(hotplug_disable);
+
+static struct kobj_attribute hotplug_enabled_attr =
+	__ATTR(hotplug_enable, S_IWUSR | S_IRUSR, show_hotplug_enable,
+	       store_hotplug_enable);
 
 static void def_work_fn(struct work_struct *work)
 {
