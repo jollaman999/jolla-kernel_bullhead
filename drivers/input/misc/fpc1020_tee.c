@@ -51,6 +51,7 @@
 
 #ifdef CONFIG_MSM_HOTPLUG
 #include <linux/msm_hotplug.h>
+#include <linux/workqueue.h>
 #endif
 
 #define FPC1020_RESET_LOW_US 1000
@@ -727,6 +728,14 @@ static const struct attribute_group attribute_group = {
 	.attrs = attributes,
 };
 
+#ifdef CONFIG_MSM_HOTPLUG
+static void msm_hotplug_resume_call(struct work_struct *msm_hotplug_resume_call_work)
+{
+	msm_hotplug_resume_timeout();
+}
+static DECLARE_WORK(msm_hotplug_resume_call_work, msm_hotplug_resume_call);
+#endif
+
 static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 {
 	struct fpc1020_data *fpc1020 = handle;
@@ -742,7 +751,7 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 		msm_hotplug_fingerprint_called = true;
 
 		if (msm_enabled)
-			msm_hotplug_resume_timeout();
+			schedule_work(&msm_hotplug_resume_call_work);
 #endif
 	}
 
