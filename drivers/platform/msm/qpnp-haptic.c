@@ -1329,6 +1329,41 @@ static ssize_t qpnp_hap_vmax_mv_haptic_store(struct device *dev,
 	return count;
 }
 
+/* sysfs show for vmax_mv_ind update */
+static ssize_t qpnp_hap_vmax_mv_ind_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	struct timed_output_dev *timed_dev = dev_get_drvdata(dev);
+	struct qpnp_hap *hap = container_of(timed_dev, struct qpnp_hap,
+					 timed_dev);
+
+	return snprintf(buf, PAGE_SIZE, "%d\n", hap->vmax_mv_ind);
+}
+
+/* sysfs store for vmax_mv_ind */
+static ssize_t qpnp_hap_vmax_mv_ind_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct timed_output_dev *timed_dev = dev_get_drvdata(dev);
+	struct qpnp_hap *hap = container_of(timed_dev, struct qpnp_hap,
+					 timed_dev);
+	u32 val;
+	ssize_t ret;
+
+	ret = kstrtou32(buf, 10, &val);
+	if (ret)
+		return ret;
+
+	if ((val < QPNP_HAP_VMAX_MIN_MV) || (val > QPNP_HAP_VMAX_MAX_MV))
+		return -EINVAL;
+
+	mutex_lock(&hap->wf_lock);
+	hap->vmax_mv_ind = val;
+	mutex_unlock(&hap->wf_lock);
+
+	return count;
+}
+
 /* sysfs attributes */
 static struct device_attribute qpnp_hap_attrs[] = {
 	__ATTR(wf_s0, (S_IRUGO | S_IWUSR | S_IWGRP),
@@ -1379,6 +1414,9 @@ static struct device_attribute qpnp_hap_attrs[] = {
 	__ATTR(vmax_mv_haptic, (S_IRUGO | S_IWUSR | S_IWGRP),
 			qpnp_hap_vmax_mv_haptic_show,
 			qpnp_hap_vmax_mv_haptic_store),
+	__ATTR(vmax_mv_ind, (S_IRUGO | S_IWUSR | S_IWGRP),
+			qpnp_hap_vmax_mv_ind_show,
+			qpnp_hap_vmax_mv_ind_store),
 };
 
 static void calculate_lra_code(struct qpnp_hap *hap)
