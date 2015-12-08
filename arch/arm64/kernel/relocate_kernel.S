@@ -14,7 +14,6 @@
 #include <asm/assembler.h>
 #include <asm/kexec.h>
 #include <asm/kvm_arm.h>
-#include <linux/const.h>
 #include <asm/page.h>
 
 /*
