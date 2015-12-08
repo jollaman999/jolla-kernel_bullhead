@@ -36,8 +36,8 @@
 #include <asm/virt.h>
 
 #ifdef CONFIG_KEXEC_HARDBOOT
-#include <asm/kexec.h>
-#include <asm/memory.h>
+  #include <asm/kexec.h>
+  #include <asm/memory.h>
 #endif
 
 /*
