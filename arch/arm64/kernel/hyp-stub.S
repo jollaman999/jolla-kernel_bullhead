@@ -21,7 +21,6 @@
 #include <linux/linkage.h>
 
 #include <asm/assembler.h>
-#include <asm/kvm_arm.h>
 #include <asm/ptrace.h>
 #include <asm/virt.h>
 
@@ -53,22 +52,14 @@ ENDPROC(__hyp_stub_vectors)
 	.align 11
 
 el1_sync:
-	mrs	x18, esr_el2
-	lsr	x17, x18, #ESR_EL2_EC_SHIFT
-	and	x18, x18, #ESR_EL2_ISS_MASK
-
-	cmp	x17, #ESR_EL2_EC_HVC64
+	mrs	x1, esr_el2
+	lsr	x1, x1, #26
+	cmp	x1, #0x16
 	b.ne	2f				// Not an HVC trap
-
-	cmp	x18, #HVC_GET_VECTORS
-	b.ne	1f
-	mrs	x0, vbar_el2
+	cbz	x0, 1f
+	msr	vbar_el2, x0			// Set vbar_el2
 	b	2f
-
-1:	cmp	x18, #HVC_SET_VECTORS
-	b.ne	2f
-	msr	vbar_el2, x0
-
+1:	mrs	x0, vbar_el2			// Return vbar_el2
 2:	eret
 ENDPROC(el1_sync)
 
@@ -108,12 +99,11 @@ ENDPROC(\label)
  * initialisation entry point.
  */
 
-ENTRY(__hyp_set_vectors)
-	hvc	#HVC_SET_VECTORS
-	ret
-ENDPROC(__hyp_set_vectors)
-
 ENTRY(__hyp_get_vectors)
-	hvc	#HVC_GET_VECTORS
+	mov	x0, xzr
+	// fall through
+ENTRY(__hyp_set_vectors)
+	hvc	#0
 	ret
 ENDPROC(__hyp_get_vectors)
+ENDPROC(__hyp_set_vectors)
