@@ -747,8 +747,8 @@ el1_sync:					// Guest trapped into EL2
 	push	x2, x3
 
 	mrs	x1, esr_el2
-	lsr	x2, x1, #ESR_ELx_EC_SHIFT
-	and	x0, x1, #ESR_ELx_ISS_MASK
+	lsr	x2, x1, #ESR_EL2_EC_SHIFT
+	and	x0, x1, #ESR_EL2_ISS_MASK
 
 	cmp	x2, #ESR_EL2_EC_HVC64
 	b.ne	el1_trap
