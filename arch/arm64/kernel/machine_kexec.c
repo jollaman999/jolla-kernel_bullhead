@@ -17,8 +17,6 @@
 
 #include <asm/cacheflush.h>
 #include <asm/system_misc.h>
-#include <linux/memblock.h>
-#include <linux/of_fdt.h>
 
 #include "cpu-reset.h"
 
@@ -28,13 +26,6 @@ extern const unsigned long arm64_relocate_new_kernel_size;
 
 bool in_crash_kexec;
 static unsigned long kimage_start;
-
-#ifdef CONFIG_KEXEC_HARDBOOT
-extern unsigned long kexec_hardboot;
-extern unsigned long kexec_boot_atags;
-extern unsigned long kexec_boot_atags_len;
-extern unsigned long kexec_kernel_len;
-#endif
 
 /**
  * kexec_is_dtb - Helper routine to check the device tree header signature.
@@ -90,38 +81,6 @@ void machine_kexec_cleanup(struct kimage *kimage)
  */
 int machine_kexec_prepare(struct kimage *kimage)
 {
-	struct kexec_segment *current_segment;
-	__be32 header;
-	int i, err;
-
-	/*
-	 * No segment at default ATAGs address. try to locate
-	 * a dtb using magic.
-	 */
-	for (i = 0; i < kimage->nr_segments; i++) {
-		current_segment = &kimage->segment[i];
-
-		if (!memblock_is_region_memory(current_segment->mem,
-					       current_segment->memsz))
-			return -EINVAL;
-
-#ifdef CONFIG_KEXEC_HARDBOOT
-		if(current_segment->mem == kimage->start)
-			kexec_kernel_len = current_segment->memsz;
-#endif
-
-		err = get_user(header, (__be32*)current_segment->buf);
-		if (err)
-			return err;
-
-		if (be32_to_cpu(header) == OF_DT_HEADER)
-		{
-			kexec_boot_atags = current_segment->mem;
-#ifdef CONFIG_KEXEC_HARDBOOT
-			kexec_boot_atags_len = current_segment->memsz;
-#endif
-		}
-	}
 	kimage_start = kimage->start;
 	kexec_image_info(kimage);
 
@@ -218,13 +177,6 @@ void machine_kexec(struct kimage *kimage)
 		kimage->head);
 	pr_devel("%s:%d: kimage_start:             %lx\n", __func__, __LINE__,
 		kimage_start);
-
-#ifdef CONFIG_KEXEC_HARDBOOT
-	if (!kexec_boot_atags)
-		kexec_boot_atags = kimage->start - 0x8000 + 0x1000;
-
-	kexec_hardboot = kimage->hardboot;
-#endif
 
 	/*
 	 * Copy arm64_relocate_new_kernel to the reboot_code_buffer for use
