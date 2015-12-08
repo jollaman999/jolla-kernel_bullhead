@@ -35,7 +35,6 @@ arm64-obj-$(CONFIG_KGDB)		+= kgdb.o
 arm64-obj-$(CONFIG_EFI)			+= efi.o efi-stub.o efi-entry.o
 arm64-obj-$(CONFIG_KEXEC)		+= machine_kexec.o relocate_kernel.o	\
 					   cpu-reset.o
-arm64-obj-$(CONFIG_CRASH_DUMP)		+= crash_dump.o
 
 obj-$(CONFIG_SWP_EMULATE)	+= swp_emulate.o
 

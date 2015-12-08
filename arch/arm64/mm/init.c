@@ -33,7 +33,6 @@
 #include <linux/dma-mapping.h>
 #include <linux/dma-contiguous.h>
 #include <linux/kexec.h>
-#include <linux/crash_dump.h>
 
 #include <asm/sections.h>
 #include <asm/setup.h>
@@ -117,32 +116,6 @@ static void __init reserve_crashkernel(void)
 	crashk_res.end = crash_base + crash_size - 1;
 }
 #endif /* CONFIG_KEXEC */
-
-#ifdef CONFIG_CRASH_DUMP
-/*
- * reserve_elfcorehdr() - reserves memory for elf core header
- *
- * This function reserves elf core header given in "elfcorehdr=" kernel
- * command line parameter. This region contains all the information about
- * primary kernel's core image and is used by a dump capture kernel to
- * access the system memory on primary kernel.
- */
-static void __init reserve_elfcorehdr(void)
-{
-	if (!elfcorehdr_size)
-		return;
-
-	if (memblock_is_region_reserved(elfcorehdr_addr, elfcorehdr_size)) {
-		pr_warn("elfcorehdr is overlapped\n");
-		return;
-	}
-
-	memblock_reserve(elfcorehdr_addr, elfcorehdr_size);
-
-	pr_info("Reserving %lldKB of memory at %lldMB for elfcorehdr\n",
-		elfcorehdr_size >> 10, elfcorehdr_addr >> 20);
-}
-#endif /* CONFIG_CRASH_DUMP */
 
 static void __init zone_sizes_init(unsigned long min, unsigned long max)
 {
@@ -233,9 +206,6 @@ void __init arm64_memblock_init(void)
 
 #ifdef CONFIG_KEXEC
 	reserve_crashkernel();
-#endif
-#ifdef CONFIG_CRASH_DUMP
-	reserve_elfcorehdr();
 #endif
 
 	early_init_fdt_scan_reserved_mem();
