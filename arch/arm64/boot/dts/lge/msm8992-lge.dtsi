@@ -20,6 +20,14 @@
 			reg = <0x0 0x1ff00000 0x0 0x40000>;
 			label = "ramoops_mem";
 		};
+
+		kexec_hardboot_mem: kexec_hardboot_region@1feff000 {
+			linux,reserve-contiguous-region;
+			linux,reserve-region;
+			linux,remove-completely;
+			reg = <0x0 0x1feff000 0x0 0x1000>;
+			label = "kexec_hardboot_mem";
+		};
 	};
 };
 
@@ -34,6 +42,10 @@
 		android,ramoops-record-size = <0x10000>;
 		android,ramoops-pmsg-size = <0x20000>;
 		android,ramoops-dump-oops = <0x1>;
+	};
+
+	kexec_hardboot {
+		compatible = "qcom,msm-contig-mem";
 	};
 
 	qcom,wdt@f9017000 {

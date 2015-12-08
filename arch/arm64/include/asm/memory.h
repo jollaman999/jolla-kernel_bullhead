@@ -27,7 +27,7 @@
 #include <asm/sizes.h>
 
 #if defined(CONFIG_KEXEC_HARDBOOT)
-#define KEXEC_HB_PAGE_ADDR             UL(0x1FE00000)
+#define KEXEC_HB_PAGE_ADDR             UL(0x1FEFF000)
 #endif
 
 /*
