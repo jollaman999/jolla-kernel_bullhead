@@ -36,7 +36,6 @@
 #include <linux/completion.h>
 #include <linux/of.h>
 #include <linux/irq_work.h>
-#include <linux/kexec.h>
 
 #include <asm/atomic.h>
 #include <asm/cacheflush.h>
@@ -51,8 +50,6 @@
 #include <asm/tlbflush.h>
 #include <asm/ptrace.h>
 #include <asm/edac.h>
-
-#include "cpu-reset.h"
 
 /*
  * as from 2.5, kernels no longer have an init_tasks structure
@@ -565,10 +562,6 @@ DEFINE_PER_CPU(struct pt_regs, regs_before_stop);
  */
 static void ipi_cpu_stop(unsigned int cpu, struct pt_regs *regs)
 {
-#ifdef CONFIG_KEXEC
-	/* printing messages may slow down the shutdown. */
-	if (!in_crash_kexec)
-#endif
 	if (system_state == SYSTEM_BOOTING ||
 	    system_state == SYSTEM_RUNNING) {
 		per_cpu(regs_before_stop, cpu) = *regs;
@@ -584,11 +577,6 @@ static void ipi_cpu_stop(unsigned int cpu, struct pt_regs *regs)
 
 	flush_cache_all();
 	local_irq_disable();
-
-#ifdef CONFIG_KEXEC
-	if (in_crash_kexec)
-		crash_save_cpu(regs, cpu);
-#endif /* CONFIG_KEXEC */
 
 	while (1)
 		cpu_relax();

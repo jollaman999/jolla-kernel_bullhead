@@ -9,7 +9,6 @@
  * published by the Free Software Foundation.
  */
 
-#include <linux/kernel.h>
 #include <linux/kexec.h>
 #include <linux/of_fdt.h>
 #include <linux/slab.h>
@@ -24,7 +23,6 @@
 extern const unsigned char arm64_relocate_new_kernel[];
 extern const unsigned long arm64_relocate_new_kernel_size;
 
-bool in_crash_kexec;
 static unsigned long kimage_start;
 
 /**
@@ -205,38 +203,13 @@ void machine_kexec(struct kimage *kimage)
 	 */
 
 	cpu_soft_restart(virt_to_phys(cpu_reset),
-		in_crash_kexec ? 0 : is_hyp_mode_available(),
+		is_hyp_mode_available(),
 		reboot_code_buffer_phys, kimage->head, kimage_start);
 
 	BUG(); /* Should never get here. */
 }
 
-/**
- * machine_crash_shutdown - shutdown non-boot cpus and save registers
- */
 void machine_crash_shutdown(struct pt_regs *regs)
 {
-	struct pt_regs dummy_regs;
-	int cpu;
-
-	local_irq_disable();
-
-	in_crash_kexec = true;
-
-	/*
-	 * clear and initialize the per-cpu info. This is necessary
-	 * because, otherwise, slots for offline cpus would never be
-	 * filled up. See smp_send_stop().
-	 */
-	memset(&dummy_regs, 0, sizeof(dummy_regs));
-	for_each_possible_cpu(cpu)
-		crash_save_cpu(&dummy_regs, cpu);
-
-	/* shutdown non-boot cpus */
-	smp_send_stop();
-
-	/* for boot cpu */
-	crash_save_cpu(regs, smp_processor_id());
-
-	pr_info("Starting crashdump kernel...\n");
+	/* Empty routine needed to avoid build errors. */
 }
