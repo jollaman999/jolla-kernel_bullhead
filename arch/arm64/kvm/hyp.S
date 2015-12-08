@@ -18,23 +18,15 @@
 #include <linux/linkage.h>
 #include <linux/irqchip/arm-gic.h>
 
-#include <asm/asm-offsets.h>
-<<<<<<< HEAD
-=======
 #include <asm/assembler.h>
-#include <asm/debug-monitors.h>
-#include <asm/esr.h>
->>>>>>> c6d01a9... arm64: kvm: move to ESR_ELx macros
+#include <asm/memory.h>
+#include <asm/asm-offsets.h>
 #include <asm/fpsimdmacros.h>
 #include <asm/kvm.h>
-#include <asm/kvm_arm.h>
 #include <asm/kvm_asm.h>
+#include <asm/kvm_arm.h>
 #include <asm/kvm_mmu.h>
-<<<<<<< HEAD
 #include <asm/virt.h>
-=======
-#include <asm/memory.h>
->>>>>>> c6d01a9... arm64: kvm: move to ESR_ELx macros
 
 #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
 #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
@@ -758,7 +750,7 @@ el1_sync:					// Guest trapped into EL2
 	lsr	x2, x1, #ESR_ELx_EC_SHIFT
 	and	x0, x1, #ESR_ELx_ISS_MASK
 
-	cmp	x2, #ESR_ELx_EC_HVC64
+	cmp	x2, #ESR_EL2_EC_HVC64
 	b.ne	el1_trap
 
 	mrs	x3, vttbr_el2			// If vttbr is valid, the 64bit guest
@@ -796,13 +788,13 @@ el1_trap:
 	 * x1: ESR
 	 * x2: ESR_EC
 	 */
-	cmp	x2, #ESR_ELx_EC_DABT_LOW
-	mov	x0, #ESR_ELx_EC_IABT_LOW
+	cmp	x2, #ESR_EL2_EC_DABT
+	mov	x0, #ESR_EL2_EC_IABT
 	ccmp	x2, x0, #4, ne
 	b.ne	1f		// Not an abort we care about
 
 	/* This is an abort. Check for permission fault */
-	and	x2, x1, #ESR_ELx_FSC_TYPE
+	and	x2, x1, #ESR_EL2_FSC_TYPE
 	cmp	x2, #FSC_PERM
 	b.ne	1f		// Not a permission fault
 
