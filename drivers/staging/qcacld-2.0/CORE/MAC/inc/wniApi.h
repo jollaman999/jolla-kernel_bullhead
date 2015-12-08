@@ -399,6 +399,7 @@ enum eWniMsgTypes
 #endif
     eWNI_SME_FW_DUMP_IND,
     eWNI_SME_LOST_LINK_INFO_IND,
+    eWNI_SME_ROAM_RESTART_REQ,
     eWNI_SME_MSG_TYPES_END
 };
 
