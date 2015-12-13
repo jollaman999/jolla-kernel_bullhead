@@ -40,6 +40,10 @@
 #include "wcdcal-hwdep.h"
 #include "wcd_cpe_core.h"
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#include <linux/input/scroff_volctr.h>
+#endif
+
 enum {
 	VI_SENSE_1,
 	VI_SENSE_2,
@@ -5365,6 +5369,10 @@ static int tomtom_startup(struct snd_pcm_substream *substream,
 	pr_debug("%s(): substream = %s  stream = %d\n" , __func__,
 		 substream->name, substream->stream);
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	sovc_tmp_onoff = 1;
+#endif
+
 	return 0;
 }
 
@@ -5373,6 +5381,14 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 {
 	pr_debug("%s(): substream = %s  stream = %d\n" , __func__,
 		 substream->name, substream->stream);
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (track_changed) {
+		track_changed = false;
+		return;
+	}
+	sovc_tmp_onoff = 0;
+#endif
 }
 
 int tomtom_mclk_enable(struct snd_soc_codec *codec, int mclk_enable, bool dapm)

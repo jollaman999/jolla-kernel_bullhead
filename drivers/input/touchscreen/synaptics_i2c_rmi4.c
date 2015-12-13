@@ -39,6 +39,12 @@
 #include "synaptics_i2c_rmi4.h"
 #include <linux/input/mt.h>
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#include <linux/input/scroff_volctr.h>
+
+static bool irq_wake_enabled = false;
+#endif
+
 #define DRIVER_NAME "synaptics_rmi4_i2c"
 #define INPUT_PHYS_NAME "synaptics_rmi4_i2c/input0"
 #define DEBUGFS_DIR_NAME "ts_debug"
@@ -4589,6 +4595,27 @@ static int synaptics_rmi4_suspend(struct device *dev)
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 	int retval;
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (sovc_switch && sovc_tmp_onoff) {
+		if (!irq_wake_enabled) {
+			enable_irq_wake(rmi4_data->irq);
+			irq_wake_enabled = true;
+		}
+
+		mutex_lock(&suspended_mutex);
+		scr_suspended = true;
+		rmi4_data->suspended = true;
+		mutex_unlock(&suspended_mutex);
+
+		return 0;
+	}
+
+	if (irq_wake_enabled) {
+		disable_irq_wake(rmi4_data->irq);
+		irq_wake_enabled = false;
+	}
+#endif
+
 	if (rmi4_data->stay_awake) {
 		rmi4_data->staying_awake = true;
 		return 0;
@@ -4677,6 +4704,27 @@ err_lpm_regulator:
 static int synaptics_rmi4_resume(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (sovc_switch && sovc_tmp_onoff) {
+		if (irq_wake_enabled) {
+			disable_irq_wake(rmi4_data->irq);
+			irq_wake_enabled = false;
+		}
+
+		mutex_lock(&suspended_mutex);
+		scr_suspended = false;
+		rmi4_data->suspended = false;
+		mutex_unlock(&suspended_mutex);
+
+		return 0;
+	}
+
+	if (irq_wake_enabled) {
+		disable_irq_wake(rmi4_data->irq);
+		irq_wake_enabled = false;
+	}
+#endif
 
 	if (rmi4_data->staying_awake)
 		return 0;

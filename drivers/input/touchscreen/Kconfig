@@ -1062,4 +1062,8 @@ config INPUT_MT_WRAPPER
 
 	  If unsure, say N.
 
+config TOUCHSCREEN_SCROFF_VOLCTR
+	tristate "Screen Off Volume & Touch Control for touchscreens"
+	default n
+
 endif
