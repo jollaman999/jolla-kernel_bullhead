@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 3.10.93-jolla-kernel_bullhead-v1.0 Kernel Configuration
+# Linux/arm64 3.10.94-jolla-kernel_bullhead-v1.0 Kernel Configuration
 #
 CONFIG_ARM64=y
 CONFIG_64BIT=y
@@ -1636,6 +1636,7 @@ CONFIG_TOUCHSCREEN_SYNAPTICS_DSX_FW_UPDATE=y
 # CONFIG_TOUCHSCREEN_GT9XX is not set
 # CONFIG_TOUCHSCREEN_BU21150 is not set
 # CONFIG_INPUT_MT_WRAPPER is not set
+CONFIG_TOUCHSCREEN_SCROFF_VOLCTR=y
 CONFIG_INPUT_MISC=y
 # CONFIG_INPUT_AD714X is not set
 # CONFIG_INPUT_BMA150 is not set
