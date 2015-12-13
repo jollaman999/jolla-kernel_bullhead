@@ -86,6 +86,7 @@ MODULE_LICENSE("GPLv2");
 #define SOVC_VOL_REEXEC_DELAY	250	// Re-exec delay for volume control (ms)
 #define SOVC_TRACK_REEXEC_DELAY	3000	// Re-exec delay for track control (ms)
 #define SOVC_KEY_PRESS_DUR	60	// Ket press duration (ms)
+#define SOVC_POWER_KEY_GAP	700
 #define SOVC_VIB_STRENGTH	20	// Vibrator strength
 
 /* Resources */
@@ -201,6 +202,35 @@ static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 		scroff_volctr_key_delayed_trigger();
 }
 static DECLARE_DELAYED_WORK(scroff_volctr_key_work, scroff_volctr_key);
+
+/* Power Key trigger */
+void sovc_press_power_key(void)
+{
+	if (!mutex_trylock(&keyworklock))
+		return;
+
+#ifdef SOVC_DEBUG
+	pr_info(LOGTAG"SCREEN ON\n");
+#endif
+	input_event(sovc_input, EV_KEY, KEY_POWER, 1);
+	input_event(sovc_input, EV_SYN, 0, 0);
+	msleep(SOVC_KEY_PRESS_DUR);
+	input_event(sovc_input, EV_KEY, KEY_POWER, 0);
+	input_event(sovc_input, EV_SYN, 0, 0);
+
+	msleep(SOVC_POWER_KEY_GAP);
+
+#ifdef SOVC_DEBUG
+	pr_info(LOGTAG"SCREEN OFF\n");
+#endif
+	input_event(sovc_input, EV_KEY, KEY_POWER, 1);
+	input_event(sovc_input, EV_SYN, 0, 0);
+	msleep(SOVC_KEY_PRESS_DUR);
+	input_event(sovc_input, EV_KEY, KEY_POWER, 0);
+	input_event(sovc_input, EV_SYN, 0, 0);
+
+	mutex_unlock(&keyworklock);
+}
 
 /* Key trigger */
 static void scroff_volctr_key_trigger(void)
@@ -482,9 +512,22 @@ static ssize_t sovc_scroff_volctr_temp_show(struct device *dev,
 static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
-	if ((buf[0] == '0' || buf[0] == '1') && buf[1] == '\n')
-		if (sovc_tmp_onoff != buf[0] - '0')
+	int press = 0;
+
+	if ((buf[0] == '0' || buf[0] == '1') && buf[1] == '\n') {
+		if (sovc_tmp_onoff != buf[0] - '0') {
+			press = 1;
 			sovc_tmp_onoff = buf[0] - '0';
+		}
+	}
+
+	if (track_changed) {
+		track_changed = false;
+		return count;
+	}
+
+	if (scr_suspended && press)
+		sovc_press_power_key();
 
 	return count;
 }
@@ -534,6 +577,7 @@ static int __init scroff_volctr_init(void)
 	input_set_capability(sovc_input, EV_KEY, KEY_VOLUMEDOWN);
 	input_set_capability(sovc_input, EV_KEY, KEY_NEXTSONG);
 	input_set_capability(sovc_input, EV_KEY, KEY_PREVIOUSSONG);
+	input_set_capability(sovc_input, EV_KEY, KEY_POWER);
 	sovc_input->name = "sovc_input";
 	sovc_input->phys = "sovc_input/input0";
 

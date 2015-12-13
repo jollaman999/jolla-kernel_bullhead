@@ -26,4 +26,6 @@ extern int sovc_tmp_onoff;
 extern bool scr_suspended;
 extern bool track_changed;
 
+extern void sovc_press_power_key(void);
+
 #endif	/* _LINUX_SCROFF_VOLCTR_H */
