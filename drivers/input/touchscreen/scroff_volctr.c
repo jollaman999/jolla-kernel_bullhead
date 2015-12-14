@@ -203,8 +203,8 @@ static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 }
 static DECLARE_DELAYED_WORK(scroff_volctr_key_work, scroff_volctr_key);
 
-/* Power Key trigger */
-void sovc_press_power_key(void)
+/* Power Key press work */
+static void sovc_press_power_key(struct work_struct *sovc_press_power_key_work)
 {
 	if (track_changed)
 		return;
@@ -237,6 +237,14 @@ void sovc_press_power_key(void)
 
 	mutex_unlock(&keyworklock);
 	return;
+}
+static DECLARE_DELAYED_WORK(sovc_press_power_key_work, sovc_press_power_key);
+
+/* Power Key press trigger */
+void sovc_press_power_key_trigger(int delay)
+{
+	schedule_delayed_work(&sovc_press_power_key_work,
+				msecs_to_jiffies(delay));
 }
 
 /* Key trigger */
@@ -534,7 +542,7 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 	}
 
 	if (scr_suspended && !sovc_tmp_onoff && press)
-		sovc_press_power_key();
+		sovc_press_power_key_trigger(0);
 
 	return count;
 }

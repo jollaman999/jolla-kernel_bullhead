@@ -42,6 +42,8 @@
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 #include <linux/input/scroff_volctr.h>
+
+#define SOVC_POWER_KEY_DELAY	2500	// Power key press delay time (ms)
 #endif
 
 enum {
@@ -5386,7 +5388,7 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	sovc_tmp_onoff = 0;
 	if (scr_suspended)
-		sovc_press_power_key();
+		sovc_press_power_key_trigger(SOVC_POWER_KEY_DELAY);
 #endif
 }
 
