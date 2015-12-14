@@ -5371,6 +5371,7 @@ static int tomtom_startup(struct snd_pcm_substream *substream,
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	sovc_tmp_onoff = 1;
+	track_changed = false;
 #endif
 
 	return 0;
@@ -5383,10 +5384,6 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 		 substream->name, substream->stream);
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (track_changed) {
-		track_changed = false;
-		return;
-	}
 	sovc_tmp_onoff = 0;
 	if (scr_suspended)
 		sovc_press_power_key();

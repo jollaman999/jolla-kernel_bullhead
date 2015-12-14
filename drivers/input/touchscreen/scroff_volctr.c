@@ -85,7 +85,7 @@ MODULE_LICENSE("GPLv2");
 #define SOVC_TIME_GAP		250	// Ignore touch after this time (ms)
 #define SOVC_VOL_REEXEC_DELAY	250	// Re-exec delay for volume control (ms)
 #define SOVC_TRACK_REEXEC_DELAY	3000	// Re-exec delay for track control (ms)
-#define SOVC_KEY_PRESS_DUR	60	// Ket press duration (ms)
+#define SOVC_KEY_PRESS_DUR	60	// Key press duration (ms)
 #define SOVC_POWER_KEY_GAP	700	// Power key press gap time (ms)
 #define SOVC_VIB_STRENGTH	20	// Vibrator strength
 
@@ -111,8 +111,7 @@ enum CONTROL {
 	VOL_UP,
 	VOL_DOWN,
 	TRACK_NEXT,
-	TRACK_PREVIOUS,
-	POWER
+	TRACK_PREVIOUS
 };
 static int control;
 
@@ -191,35 +190,6 @@ static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 		input_event(sovc_input, EV_KEY, KEY_PREVIOUSSONG, 0);
 		input_event(sovc_input, EV_SYN, 0, 0);
 		break;
-	case POWER:
-		control = NO_CONTROL;
-
-		if (!scr_suspended || sovc_tmp_onoff) {
-			mutex_unlock(&keyworklock);
-			return;
-		}
-#ifdef SOVC_DEBUG
-		pr_info(LOGTAG"SCREEN ON\n");
-#endif
-		input_event(sovc_input, EV_KEY, KEY_POWER, 1);
-		input_event(sovc_input, EV_SYN, 0, 0);
-		msleep(SOVC_KEY_PRESS_DUR);
-		input_event(sovc_input, EV_KEY, KEY_POWER, 0);
-		input_event(sovc_input, EV_SYN, 0, 0);
-
-		msleep(SOVC_POWER_KEY_GAP);
-
-#ifdef SOVC_DEBUG
-		pr_info(LOGTAG"SCREEN OFF\n");
-#endif
-		input_event(sovc_input, EV_KEY, KEY_POWER, 1);
-		input_event(sovc_input, EV_SYN, 0, 0);
-		msleep(SOVC_KEY_PRESS_DUR);
-		input_event(sovc_input, EV_KEY, KEY_POWER, 0);
-		input_event(sovc_input, EV_SYN, 0, 0);
-
-		mutex_unlock(&keyworklock);
-		return;
 	}
 
 	// Vibrate when action performed
@@ -236,8 +206,37 @@ static DECLARE_DELAYED_WORK(scroff_volctr_key_work, scroff_volctr_key);
 /* Power Key trigger */
 void sovc_press_power_key(void)
 {
-	control = POWER;
-	schedule_delayed_work(&scroff_volctr_key_work, 0);
+	if (track_changed)
+		return;
+
+	if (!scr_suspended || sovc_tmp_onoff)
+		return;
+
+	if (!mutex_trylock(&keyworklock))
+		return;
+
+#ifdef SOVC_DEBUG
+	pr_info(LOGTAG"SCREEN ON\n");
+#endif
+	input_event(sovc_input, EV_KEY, KEY_POWER, 1);
+	input_event(sovc_input, EV_SYN, 0, 0);
+	msleep(SOVC_KEY_PRESS_DUR);
+	input_event(sovc_input, EV_KEY, KEY_POWER, 0);
+	input_event(sovc_input, EV_SYN, 0, 0);
+
+	msleep(SOVC_POWER_KEY_GAP);
+
+#ifdef SOVC_DEBUG
+	pr_info(LOGTAG"SCREEN OFF\n");
+#endif
+	input_event(sovc_input, EV_KEY, KEY_POWER, 1);
+	input_event(sovc_input, EV_SYN, 0, 0);
+	msleep(SOVC_KEY_PRESS_DUR);
+	input_event(sovc_input, EV_KEY, KEY_POWER, 0);
+	input_event(sovc_input, EV_SYN, 0, 0);
+
+	mutex_unlock(&keyworklock);
+	return;
 }
 
 /* Key trigger */
@@ -529,7 +528,7 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 		}
 	}
 
-	if (!sovc_tmp_onoff && track_changed) {
+	if (sovc_tmp_onoff) {
 		track_changed = false;
 		return count;
 	}
