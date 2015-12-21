@@ -28,6 +28,9 @@
 #include <linux/kernel_stat.h>
 #include <linux/tick.h>
 
+#define LITTLE_CORES	4
+#define BIG_CORES	2
+
 #define MSM_HOTPLUG			"msm_hotplug"
 #define HOTPLUG_ENABLED			0
 #define DEFAULT_UPDATE_RATE		HZ / 10
@@ -36,9 +39,9 @@
 #define DEFAULT_HISTORY_SIZE		10
 #define DEFAULT_DOWN_LOCK_DUR		1000
 #define DEFAULT_BOOST_LOCK_DUR		2500 * 1000L
-#define DEFAULT_NR_CPUS_BOOSTED		NR_CPUS / 2
+#define DEFAULT_NR_CPUS_BOOSTED		LITTLE_CORES / 2
 #define DEFAULT_MIN_CPUS_ONLINE		1
-#define DEFAULT_MAX_CPUS_ONLINE		NR_CPUS
+#define DEFAULT_MAX_CPUS_ONLINE		LITTLE_CORES
 #define DEFAULT_FAST_LANE_LOAD		99
 #define DEFAULT_MAX_CPUS_ONLINE_SUSP	1
 
@@ -108,7 +111,7 @@ static struct cpu_stats {
 	.nupdate_rates = ARRAY_SIZE(default_update_rates),
 	.hist_size = DEFAULT_HISTORY_SIZE,
 	.min_cpus = 1,
-	.total_cpus = NR_CPUS
+	.total_cpus = LITTLE_CORES
 };
 
 struct down_lock {
@@ -131,6 +134,32 @@ struct cpu_load_data {
 static DEFINE_PER_CPU(struct cpu_load_data, cpuload);
 
 static bool io_is_busy;
+
+static int num_online_little_cpus(void)
+{
+	int cpu;
+	unsigned int online_cpus = 0;
+
+	for (cpu = 0; cpu < LITTLE_CORES; cpu++) {
+		if (cpu_online(cpu))
+			online_cpus++;
+	}
+
+	return online_cpus;
+}
+
+static int num_online_big_cpus(void)
+{
+	int cpu;
+	unsigned int online_cpus = 0;
+
+	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
+		if (cpu_online(cpu))
+			online_cpus++;
+	}
+
+	return online_cpus;
+}
 
 static int update_average_load(unsigned int cpu)
 {
@@ -188,7 +217,9 @@ static unsigned int load_at_max_freq(void)
 	unsigned int total_load = 0, max_load = 0;
 	struct cpu_load_data *pcpu;
 
-	for_each_online_cpu(cpu) {
+	for (cpu = 0; cpu < LITTLE_CORES; cpu++) {
+		if (!cpu_online(cpu))
+			continue;
 		pcpu = &per_cpu(cpuload, cpu);
 		update_average_load(cpu);
 		total_load += pcpu->avg_load_maxfreq;
@@ -200,13 +231,14 @@ static unsigned int load_at_max_freq(void)
 
 	return total_load;
 }
+
 static void update_load_stats(void)
 {
 	unsigned int i, j;
 	unsigned int load = 0;
 
 	mutex_lock(&stats.stats_mutex);
-	stats.online_cpus = num_online_cpus();
+	stats.online_cpus = num_online_little_cpus();
 
 	if (stats.hist_size > 1) {
 		stats.load_hist[stats.hist_cnt] = load_at_max_freq();
@@ -281,8 +313,9 @@ static int get_lowest_load_cpu(void)
 	unsigned int proj_load;
 	struct cpu_load_data *pcpu;
 
-	for_each_online_cpu(cpu) {
-		if (cpu == 0)
+	// Skip cpu 0
+	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
+		if (!cpu_online(cpu))
 			continue;
 		pcpu = &per_cpu(cpuload, cpu);
 		cpu_load[cpu] = pcpu->cur_load_maxfreq;
@@ -305,15 +338,28 @@ static int get_lowest_load_cpu(void)
 static void __ref cpu_up_work(struct work_struct *work)
 {
 	int cpu;
-	unsigned int target;
+	unsigned int target_little, target_big;
 
-	target = hotplug.target_cpus;
+	target_little = hotplug.target_cpus;
 
-	for_each_cpu_not(cpu, cpu_online_mask) {
-		if (target <= num_online_cpus())
+	// Skip cpu 0
+	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
+		if (target_little <= num_online_little_cpus())
 			break;
-		if (cpu == 0)
-			continue;
+		cpu_up(cpu);
+		apply_down_lock(cpu);
+	}
+
+	if (target_little >= LITTLE_CORES - 1)
+		target_big = BIG_CORES;
+	else if (target_little >= LITTLE_CORES / 2)
+		target_big = BIG_CORES / 2;
+	else
+		return;
+
+	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
+		if (target_big <= num_online_big_cpus())
+			break;
 		cpu_up(cpu);
 		apply_down_lock(cpu);
 	}
@@ -322,21 +368,33 @@ static void __ref cpu_up_work(struct work_struct *work)
 static void cpu_down_work(struct work_struct *work)
 {
 	int cpu, lowest_cpu;
-	unsigned int target;
+	unsigned int target_little, target_big;
 
-	target = hotplug.target_cpus;
+	target_little = hotplug.target_cpus;
 
-	for_each_online_cpu(cpu) {
-		if (cpu == 0)
-			continue;
+	// Skip cpu 0
+	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
 		lowest_cpu = get_lowest_load_cpu();
 		if (lowest_cpu > 0 && lowest_cpu <= stats.total_cpus) {
 			if (check_down_lock(lowest_cpu))
 				break;
 			cpu_down(lowest_cpu);
 		}
-		if (target >= num_online_cpus())
+		if (target_little >= num_online_little_cpus())
 			break;
+	}
+
+	if (target_little >= LITTLE_CORES - 1)
+		target_big = BIG_CORES;
+	else if (target_little >= LITTLE_CORES / 2)
+		target_big = BIG_CORES / 2;
+	else
+		return;
+
+	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
+		if (target_big >= num_online_big_cpus())
+			break;
+		cpu_down(cpu);
 	}
 }
 
@@ -347,7 +405,7 @@ static void online_cpu(unsigned int target)
 	if (!hotplug.msm_enabled)
 		return;
 
-	online_cpus = num_online_cpus();
+	online_cpus = num_online_little_cpus();
 
 	/* 
 	 * Do not online more CPUs if max_cpus_online reached 
@@ -369,7 +427,7 @@ static void offline_cpu(unsigned int target)
 	if (!hotplug.msm_enabled)
 		return;
 
-	online_cpus = num_online_cpus();
+	online_cpus = num_online_little_cpus();
 
 	/* 
 	 * Do not offline more CPUs if min_cpus_online reached
@@ -563,7 +621,7 @@ static void hotplug_input_event(struct input_handle *handle, unsigned int type,
 	if (now - last_boost_time < MIN_INPUT_INTERVAL)
 		return;
 
-	if (num_online_cpus() >= hotplug.cpus_boosted ||
+	if (num_online_little_cpus() >= hotplug.cpus_boosted ||
 		hotplug.cpus_boosted <= hotplug.min_cpus_online)
 		return;
 
