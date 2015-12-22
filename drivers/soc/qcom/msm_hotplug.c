@@ -19,14 +19,15 @@
 #include <linux/device.h>
 #include <linux/slab.h>
 #include <linux/cpufreq.h>
-#ifdef CONFIG_STATE_NOTIFIER
-#include <linux/state_notifier.h>
-#endif
 #include <linux/mutex.h>
 #include <linux/input.h>
 #include <linux/math64.h>
 #include <linux/kernel_stat.h>
 #include <linux/tick.h>
+
+#ifdef CONFIG_FB
+#include <linux/fb.h>
+#endif
 
 #define LITTLE_CORES	4
 #define BIG_CORES	2
@@ -53,6 +54,10 @@ do { 				\
 	if (debug)		\
 		pr_info(msg);	\
 } while (0)
+
+#ifdef CONFIG_FB
+static struct notifier_block notif;
+#endif
 
 static struct cpu_hotplug {
 	unsigned int msm_enabled;
@@ -339,6 +344,7 @@ static void __ref cpu_up_work(struct work_struct *work)
 {
 	int cpu;
 	unsigned int target_little, target_big;
+	unsigned int online_little;
 
 	target_little = hotplug.target_cpus;
 
@@ -352,9 +358,11 @@ static void __ref cpu_up_work(struct work_struct *work)
 		apply_down_lock(cpu);
 	}
 
-	if (target_little >= LITTLE_CORES - 1)
+	online_little = num_online_little_cpus();
+
+	if (online_little >= LITTLE_CORES - 1)
 		target_big = BIG_CORES;
-	else if (target_little >= LITTLE_CORES / 2)
+	else if (online_little >= LITTLE_CORES / 2)
 		target_big = BIG_CORES / 2;
 	else
 		return;
@@ -373,6 +381,7 @@ static void cpu_down_work(struct work_struct *work)
 {
 	int cpu, lowest_cpu;
 	unsigned int target_little, target_big;
+	unsigned int online_little;
 
 	target_little = hotplug.target_cpus;
 
@@ -390,9 +399,11 @@ static void cpu_down_work(struct work_struct *work)
 			break;
 	}
 
-	if (target_little >= LITTLE_CORES - 1)
+	online_little = num_online_little_cpus();
+
+	if (online_little >= LITTLE_CORES - 1)
 		target_big = BIG_CORES;
-	else if (target_little >= LITTLE_CORES / 2)
+	else if (online_little >= LITTLE_CORES / 2)
 		target_big = BIG_CORES / 2;
 	else
 		return;
@@ -531,7 +542,7 @@ reschedule:
 	reschedule_hotplug_work();
 }
 
-#ifdef CONFIG_STATE_NOTIFIER
+#ifdef CONFIG_FB
 static void msm_hotplug_suspend(void)
 {
 	int cpu;
@@ -558,9 +569,13 @@ static void msm_hotplug_suspend(void)
 			continue;
 		cpu_down(cpu);
 	}
+
+	pr_info("%s: suspended.\n", MSM_HOTPLUG);
+
+	return;
 }
 
-static void __ref msm_hotplug_resume(void)
+static void __cpuinit msm_hotplug_resume(void)
 {
 	int cpu, required_reschedule = 0, required_wakeup = 0;
 
@@ -591,26 +606,29 @@ static void __ref msm_hotplug_resume(void)
 	/* Resume hotplug workqueue if required */
 	if (required_reschedule)
 		reschedule_hotplug_work();
+
+	pr_info("%s: resumed.\n", MSM_HOTPLUG);
+
+	return;
 }
 
-static int state_notifier_callback(struct notifier_block *this,
+
+static int __cpuinit fb_notifier_callback(struct notifier_block *self,
 				unsigned long event, void *data)
 {
-	if (!hotplug.msm_enabled)
-		return NOTIFY_OK;
+	struct fb_event *evdata = data;
+	int *blank;
 
-	switch (event) {
-		case STATE_NOTIFIER_ACTIVE:
+	if (evdata && evdata->data && event == FB_EVENT_BLANK) {
+		blank = evdata->data;
+		if ((*blank == FB_BLANK_UNBLANK) ||
+		    (*blank == FB_BLANK_VSYNC_SUSPEND))
 			msm_hotplug_resume();
-			break;
-		case STATE_NOTIFIER_SUSPEND:
+		else if (*blank == FB_BLANK_POWERDOWN)
 			msm_hotplug_suspend();
-			break;
-		default:
-			break;
 	}
 
-	return NOTIFY_OK;
+	return 0;
 }
 #endif
 
@@ -719,15 +737,6 @@ static int __ref msm_hotplug_start(void)
 		goto err_out;
 	}
 
-#ifdef CONFIG_STATE_NOTIFIER
-	hotplug.notif.notifier_call = state_notifier_callback;
-	if (state_register_client(&hotplug.notif)) {
-		pr_err("%s: Failed to register State notifier callback\n",
-			MSM_HOTPLUG);
-		goto err_dev;
-	}
-#endif
-
 	ret = input_register_handler(&hotplug_input_handler);
 	if (ret) {
 		pr_err("%s: Failed to register input handler: %d\n",
@@ -741,6 +750,16 @@ static int __ref msm_hotplug_start(void)
 		ret = -ENOMEM;
 		goto err_dev;
 	}
+
+#ifdef CONFIG_FB
+	notif.notifier_call = fb_notifier_callback;
+
+	ret = fb_register_client(&notif);
+	if (ret) {
+		pr_err("%s: Failed to register fb_notifier: %d\n",
+		       MSM_HOTPLUG, ret);
+	}
+#endif
 
 	mutex_init(&stats.stats_mutex);
 	mutex_init(&hotplug.msm_hotplug_mutex);
@@ -790,9 +809,6 @@ static void msm_hotplug_stop(void)
 	mutex_destroy(&stats.stats_mutex);
 	kfree(stats.load_hist);
 
-#ifdef CONFIG_STATE_NOTIFIER
-	state_unregister_client(&hotplug.notif);
-#endif
 	hotplug.notif.notifier_call = NULL;
 	input_unregister_handler(&hotplug_input_handler);
 
