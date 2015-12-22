@@ -403,9 +403,9 @@ static void cpu_down_work(struct work_struct *work)
 	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
 		if (!cpu_online(cpu))
 			continue;
+		cpu_down(cpu);
 		if (target_big >= num_online_big_cpus())
 			break;
-		cpu_down(cpu);
 	}
 }
 
