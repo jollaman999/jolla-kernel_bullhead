@@ -352,7 +352,7 @@ static void __ref cpu_up_work(struct work_struct *work)
 
 	online_little = num_online_little_cpus();
 
-	if (online_little >= LITTLE_CORES - 1)
+	if (online_little >= LITTLE_CORES / 3)
 		target_big = BIG_CORES;
 	else if (online_little >= LITTLE_CORES / 2)
 		target_big = BIG_CORES / 2;
@@ -393,9 +393,9 @@ static void cpu_down_work(struct work_struct *work)
 
 	online_little = num_online_little_cpus();
 
-	if (online_little >= LITTLE_CORES - 1)
+	if (online_little <= LITTLE_CORES / 2)
 		target_big = BIG_CORES;
-	else if (online_little >= LITTLE_CORES / 2)
+	else if (online_little <= LITTLE_CORES / 3)
 		target_big = BIG_CORES / 2;
 	else
 		return;
