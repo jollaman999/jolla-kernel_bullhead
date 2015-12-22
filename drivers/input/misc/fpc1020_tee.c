@@ -72,6 +72,10 @@
 
 #define FPC_TTW_HOLD_TIME 1000
 
+#ifdef CONFIG_MSM_HOTPLUG
+extern void msm_hotplug_resume_timeout(void);
+#endif
+
 static const char * const pctl_names[] = {
 	"fpc1020_spi_active",
 	"fpc1020_reset_reset",
@@ -729,6 +733,9 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 
 	if (fpc1020->wakeup_enabled ) {
 		wake_lock_timeout(&fpc1020->ttw_wl, msecs_to_jiffies(FPC_TTW_HOLD_TIME));
+#ifdef CONFIG_MSM_HOTPLUG
+		msm_hotplug_resume_timeout();
+#endif
 	}
 
 	sysfs_notify(&fpc1020->dev->kobj, NULL, dev_attr_irq.attr.name);
