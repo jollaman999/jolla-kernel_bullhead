@@ -575,7 +575,7 @@ static void msm_hotplug_suspend(void)
 	return;
 }
 
-static void __cpuinit msm_hotplug_resume(void)
+static void msm_hotplug_resume(void)
 {
 	int cpu, required_reschedule = 0, required_wakeup = 0;
 
@@ -613,7 +613,7 @@ static void __cpuinit msm_hotplug_resume(void)
 }
 
 
-static int __cpuinit fb_notifier_callback(struct notifier_block *self,
+static int fb_notifier_callback(struct notifier_block *self,
 				unsigned long event, void *data)
 {
 	struct fb_event *evdata = data;
