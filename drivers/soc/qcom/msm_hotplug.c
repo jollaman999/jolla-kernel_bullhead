@@ -344,6 +344,8 @@ static void __ref cpu_up_work(struct work_struct *work)
 
 	// Skip cpu 0
 	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
+		if (cpu_online(cpu))
+			continue;
 		if (target_little <= num_online_little_cpus())
 			break;
 		cpu_up(cpu);
@@ -358,6 +360,8 @@ static void __ref cpu_up_work(struct work_struct *work)
 		return;
 
 	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
+		if (cpu_online(cpu))
+			continue;
 		if (target_big <= num_online_big_cpus())
 			break;
 		cpu_up(cpu);
@@ -374,6 +378,8 @@ static void cpu_down_work(struct work_struct *work)
 
 	// Skip cpu 0
 	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
+		if (!cpu_online(cpu))
+			continue;
 		lowest_cpu = get_lowest_load_cpu();
 		if (lowest_cpu > 0 && lowest_cpu <= stats.total_cpus) {
 			if (check_down_lock(lowest_cpu))
@@ -392,6 +398,8 @@ static void cpu_down_work(struct work_struct *work)
 		return;
 
 	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
+		if (!cpu_online(cpu))
+			continue;
 		if (target_big >= num_online_big_cpus())
 			break;
 		cpu_down(cpu);
