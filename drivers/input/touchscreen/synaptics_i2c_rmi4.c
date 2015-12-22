@@ -122,6 +122,11 @@ enum device_status {
 #define F12_MAX_X		65536
 #define F12_MAX_Y		65536
 
+#ifdef CONFIG_MSM_HOTPLUG
+extern void msm_hotplug_suspend(void);
+extern void msm_hotplug_resume(void);
+#endif
+
 static int synaptics_rmi4_i2c_read(struct synaptics_rmi4_data *rmi4_data,
 		unsigned short addr, unsigned char *data,
 		unsigned short length);
@@ -4454,6 +4459,9 @@ static int synaptics_rmi4_regulator_lpm(struct synaptics_rmi4_data *rmi4_data,
 	}
 
 	pr_info("touch off\n");
+#ifdef CONFIG_MSM_HOTPLUG
+	msm_hotplug_suspend();
+#endif
 
 	return 0;
 
@@ -4504,6 +4512,9 @@ regulator_hpm:
 	}
 
 	pr_info("touch on\n");
+#ifdef CONFIG_MSM_HOTPLUG
+	msm_hotplug_resume();
+#endif
 
 	return 0;
 
