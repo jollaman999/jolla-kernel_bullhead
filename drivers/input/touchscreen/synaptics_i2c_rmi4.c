@@ -4459,9 +4459,6 @@ static int synaptics_rmi4_regulator_lpm(struct synaptics_rmi4_data *rmi4_data,
 	}
 
 	pr_info("touch off\n");
-#ifdef CONFIG_MSM_HOTPLUG
-	msm_hotplug_suspend();
-#endif
 
 	return 0;
 
@@ -4512,9 +4509,6 @@ regulator_hpm:
 	}
 
 	pr_info("touch on\n");
-#ifdef CONFIG_MSM_HOTPLUG
-	msm_hotplug_resume();
-#endif
 
 	return 0;
 
@@ -4605,6 +4599,10 @@ static int synaptics_rmi4_suspend(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 	int retval;
+
+#ifdef CONFIG_MSM_HOTPLUG
+	msm_hotplug_suspend();
+#endif
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	scr_suspended = true;
@@ -4711,6 +4709,10 @@ err_lpm_regulator:
 static int synaptics_rmi4_resume(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
+
+#ifdef CONFIG_MSM_HOTPLUG
+	msm_hotplug_resume();
+#endif
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	scr_suspended = false;
