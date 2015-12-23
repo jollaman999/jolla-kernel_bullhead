@@ -2,6 +2,7 @@
  * MSM Hotplug Driver
  *
  * Copyright (c) 2013-2015, Pranav Vashi <neobuddy89@gmail.com>
+ * Copyright (c) 2015, jollaman999 <admin@jollaman999.com> / Adaptive for big and little.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -27,6 +28,7 @@
 #include <linux/hrtimer.h>
 #include <asm-generic/cputime.h>
 
+// Change this value for your device
 #define LITTLE_CORES	4
 #define BIG_CORES	2
 
@@ -1293,6 +1295,13 @@ static struct platform_driver msm_hotplug_driver = {
 static int __init msm_hotplug_init(void)
 {
 	int ret;
+
+	if (LITTLE_CORES + BIG_CORES != NR_CPUS) {
+		ret = -EPERM;
+		pr_err("%s: Little cores and big cores are not match with this device: %d\n",
+										MSM_HOTPLUG, ret);
+		return ret;
+	}
 
 	ret = platform_driver_register(&msm_hotplug_driver);
 	if (ret) {
