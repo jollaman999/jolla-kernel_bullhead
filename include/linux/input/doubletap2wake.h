@@ -22,5 +22,6 @@
 #define _LINUX_DOUBLETAP2WAKE_H
 
 extern int dt2w_switch;
+extern int dt2w_switch_tmp;
 
 #endif	/* _LINUX_DOUBLETAP2WAKE_H */

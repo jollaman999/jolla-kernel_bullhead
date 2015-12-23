@@ -49,8 +49,9 @@
 #endif
 #include <linux/input/scroff_volctr.h>
 #include "../../../drivers/input/touchscreen/synaptics_i2c_rmi4_scr_suspended.h"
-
 #define SOVC_POWER_KEY_DELAY	2500	// Power key press delay time (ms)
+
+static DEFINE_MUTEX(sovc_lock);
 #endif
 
 enum {
@@ -5379,7 +5380,13 @@ static int tomtom_startup(struct snd_pcm_substream *substream,
 		 substream->name, substream->stream);
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	mutex_lock(&sovc_lock);
 	sovc_tmp_onoff = 1;
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	dt2w_switch_tmp = 1;
+#endif
+	mutex_unlock(&sovc_lock);
+
 	track_changed = false;
 #endif
 
@@ -5393,7 +5400,13 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 		 substream->name, substream->stream);
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	mutex_lock(&sovc_lock);
 	sovc_tmp_onoff = 0;
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	dt2w_switch_tmp = 0;
+#endif
+	mutex_unlock(&sovc_lock);
+
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	if (s2w_switch)
 		return;

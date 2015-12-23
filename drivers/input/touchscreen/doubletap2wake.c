@@ -64,11 +64,13 @@ MODULE_LICENSE("GPLv2");
 
 /* Resources */
 int dt2w_switch = DT2W_DEFAULT;
+int dt2w_switch_tmp = 0;
 static cputime64_t tap_time_pre = 0;
 static int touch_x = 0, touch_y = 0, touch_nr = 0, x_pre = 0, y_pre = 0;
 static bool is_touching = false;
 static struct input_dev * doubletap2wake_pwrdev;
 static DEFINE_MUTEX(pwrkeyworklock);
+static DEFINE_MUTEX(switchlock);
 static struct workqueue_struct *dt2w_input_wq;
 static struct work_struct dt2w_input_work;
 
@@ -145,6 +147,9 @@ static void new_touch(int x, int y) {
 /* Doubletap2wake main function */
 static void detect_doubletap2wake(int x, int y)
 {
+	int tmp;
+	bool change_switch = false;
+
 #if DT2W_DEBUG
         pr_info(LOGTAG"x,y(%4d,%4d)\n", x, y);
 #endif
@@ -154,6 +159,15 @@ static void detect_doubletap2wake(int x, int y)
 
 	if (!is_touching) {
 		is_touching = true;
+
+		if (dt2w_switch_tmp)
+			change_switch = true;
+
+		mutex_lock(&switchlock);
+		if (change_switch) {
+			tmp = dt2w_switch;
+			dt2w_switch = 1;
+		}
 
 		// Make enable to set touch counts (Max : 10) - by jollaman999
 		if (touch_nr == 0) {
@@ -173,11 +187,15 @@ static void detect_doubletap2wake(int x, int y)
 			new_touch(x, y);
 		}
 		// Make enable to set touch counts (Max : 10) - by jollaman999
-		if ((touch_nr > dt2w_switch)) {
+		if (touch_nr > dt2w_switch) {
 			pr_info(LOGTAG"ON\n");
 			doubletap2wake_pwrtrigger();
 			doubletap2wake_reset();
 		}
+
+		if (change_switch)
+			dt2w_switch = tmp;
+		mutex_unlock(&switchlock);
 	}
 }
 
@@ -191,7 +209,7 @@ static void dt2w_input_callback(struct work_struct *unused) {
 static void dt2w_input_event(struct input_handle *handle, unsigned int type,
 				unsigned int code, int value)
 {
-	if ((!scr_suspended) || (!dt2w_switch))
+	if ((!scr_suspended) || (!dt2w_switch && !dt2w_switch_tmp))
 		return;
 
 	/* You can debug here with 'adb shell getevent -l' command. */
@@ -294,12 +312,14 @@ static ssize_t dt2w_doubletap2wake_show(struct device *dev,
 static ssize_t dt2w_doubletap2wake_dump(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
+	mutex_lock(&switchlock);
 	// Make enable to set touch counts (Max : 10) - by jollaman999
 	// You should tap 1 more from set number to wake your device.
 	if (buf[0] >= '0' && buf[0] <= '9' && buf[1] == '\n') {
                 if (dt2w_switch != buf[0] - '0')
 					dt2w_switch = buf[0] - '0';
 	}
+	mutex_unlock(&switchlock);
 
 	return count;
 }
