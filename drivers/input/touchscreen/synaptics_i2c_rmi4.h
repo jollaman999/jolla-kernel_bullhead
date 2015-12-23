@@ -41,6 +41,10 @@
 #include <linux/clk.h>
 #endif
 
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+#include <linux/wakelock.h>
+#endif
+
 #define PDT_PROPS (0x00EF)
 #define PDT_START (0x00E9)
 #define PDT_END (0x000A)
@@ -230,6 +234,9 @@ struct synaptics_rmi4_data {
 	struct early_suspend early_suspend;
 #endif
 	struct dentry *dir;
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	struct wake_lock rmi4_wl;
+#endif
 	char fw_image_name[NAME_BUFFER_SIZE];
 	unsigned char current_page;
 	unsigned char button_0d_enabled;

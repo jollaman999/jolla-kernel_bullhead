@@ -33,6 +33,8 @@
 #include <linux/hrtimer.h>
 #include <asm-generic/cputime.h>
 
+#include "synaptics_i2c_rmi4_scr_suspended.h"
+
 /* ******************* HOW TO WORK *******************
  * == For Volume Control ==
  *  If you sweep touchscreen up or down in SOVC_TIME_GAP (ms) time
@@ -61,8 +63,8 @@
 /* uncomment since no touchscreen defines android touch, do that here */
 //#define ANDROID_TOUCH_DECLARED
 
-/* if CONFIG_WAKE_GESTURES is enabled it will already have taken care of this */
-#ifdef CONFIG_WAKE_GESTURES
+/* if Sweep2Wake is compiled it will already have taken care of this */
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 #define ANDROID_TOUCH_DECLARED
 #endif
 
@@ -92,7 +94,6 @@ MODULE_LICENSE("GPLv2");
 /* Resources */
 int sovc_switch = SOVC_DEFAULT;
 int sovc_tmp_onoff = 0;
-bool scr_suspended = false;
 bool track_changed = false;
 static cputime64_t touch_time_pre = 0;
 static int touch_x = 0, touch_y = 0;

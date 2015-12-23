@@ -41,7 +41,14 @@
 #include "wcd_cpe_core.h"
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+#include <linux/input/sweep2wake.h>
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+#include <linux/input/doubletap2wake.h>
+#endif
 #include <linux/input/scroff_volctr.h>
+#include "../../../drivers/input/touchscreen/synaptics_i2c_rmi4_scr_suspended.h"
 
 #define SOVC_POWER_KEY_DELAY	2500	// Power key press delay time (ms)
 #endif
@@ -5387,6 +5394,14 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	sovc_tmp_onoff = 0;
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	if (s2w_switch)
+		return;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	if (dt2w_switch)
+		return;
+#endif
 	if (scr_suspended)
 		sovc_press_power_key_trigger(SOVC_POWER_KEY_DELAY);
 #endif

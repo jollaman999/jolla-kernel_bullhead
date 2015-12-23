@@ -1,7 +1,7 @@
 /*
- * include/linux/input/scroff_volctr.h
+ * include/linux/input/doubletap2wake.h
  *
- * Copyright (c) 2015, jollaman999 <admin@jollaman999.com>
+ * Copyright (c) 2013, Dennis Rassmann <showp1984@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,13 +18,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _LINUX_SCROFF_VOLCTR_H
-#define _LINUX_SCROFF_VOLCTR_H
+#ifndef _LINUX_DOUBLETAP2WAKE_H
+#define _LINUX_DOUBLETAP2WAKE_H
 
-extern int sovc_switch;
-extern int sovc_tmp_onoff;
-extern bool track_changed;
+extern int dt2w_switch;
 
-extern void sovc_press_power_key_trigger(int delay);
-
-#endif	/* _LINUX_SCROFF_VOLCTR_H */
+#endif	/* _LINUX_DOUBLETAP2WAKE_H */

@@ -39,10 +39,40 @@
 #include "synaptics_i2c_rmi4.h"
 #include <linux/input/mt.h>
 
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+#include <linux/input/sweep2wake.h>
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+#include <linux/input/doubletap2wake.h>
+#endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 #include <linux/input/scroff_volctr.h>
+#endif
 
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+#include "synaptics_i2c_rmi4_scr_suspended.h"
+#define RMI4_WL_HOLD_TIME_MS 1000
+
+bool scr_suspended = false;
 static bool irq_wake_enabled = false;
+static cputime64_t wake_lock_start_time = 0;
+
+static bool is_touch_on(void)
+{
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	if (s2w_switch)
+		return true;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	if (dt2w_switch)
+		return true;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (sovc_switch && sovc_tmp_onoff)
+		return true;
+#endif
+	return false;
+}
 #endif
 
 #define DRIVER_NAME "synaptics_rmi4_i2c"
@@ -1811,6 +1841,15 @@ static irqreturn_t synaptics_rmi4_irq(int irq, void *data)
 
 	if (synaptics_rmi4_sensor_report(rmi4_data) == -EIO)
 		queue_work(rmi4_data->det_workqueue, &rmi4_data->recovery_work);
+
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	if (is_touch_on() && scr_suspended &&
+	    ktime_to_ms(ktime_get()) - wake_lock_start_time > RMI4_WL_HOLD_TIME_MS) {
+		wake_lock_start_time = ktime_to_ms(ktime_get());
+		wake_lock_timeout(&rmi4_data->rmi4_wl, msecs_to_jiffies(RMI4_WL_HOLD_TIME_MS));
+		pr_info("touch wakelock working\n");
+	}
+#endif
 
 	return IRQ_HANDLED;
 }
@@ -4068,6 +4107,10 @@ static int synaptics_rmi4_probe(struct i2c_client *client,
 		goto err_enable_irq;
 	}
 
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	wake_lock_init(&rmi4_data->rmi4_wl, WAKE_LOCK_SUSPEND, "rmi4_wl");
+#endif
+
 	synaptics_secure_touch_init(rmi4_data);
 	synaptics_secure_touch_stop(rmi4_data, 1);
 
@@ -4167,6 +4210,10 @@ static int synaptics_rmi4_remove(struct i2c_client *client)
 
 	rmi4_data->touch_stopped = true;
 	wake_up(&rmi4_data->wait);
+
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	wake_lock_destroy(&rmi4_data->rmi4_wl);
+#endif
 
 	free_irq(rmi4_data->irq, rmi4_data);
 
@@ -4606,10 +4653,10 @@ static int synaptics_rmi4_suspend(struct device *dev)
 	msm_hotplug_suspend();
 #endif
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 	scr_suspended = true;
 
-	if (sovc_switch && sovc_tmp_onoff) {
+	if (is_touch_on()) {
 		if (!irq_wake_enabled) {
 			enable_irq_wake(rmi4_data->irq);
 			irq_wake_enabled = true;
@@ -4717,7 +4764,7 @@ static int synaptics_rmi4_resume(struct device *dev)
 	msm_hotplug_resume();
 #endif
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 	scr_suspended = false;
 
 	if (irq_wake_enabled) {

@@ -1,6 +1,4 @@
 /*
- * include/linux/input/scroff_volctr.h
- *
  * Copyright (c) 2015, jollaman999 <admin@jollaman999.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,13 +16,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _LINUX_SCROFF_VOLCTR_H
-#define _LINUX_SCROFF_VOLCTR_H
+#ifndef _SYNAPTICS_DSX_RMI4_SCR_SUSPENDED_H_
+#define _SYNAPTICS_DSX_RMI4_SCR_SUSPENDED_H_
 
-extern int sovc_switch;
-extern int sovc_tmp_onoff;
-extern bool track_changed;
+extern bool scr_suspended;
 
-extern void sovc_press_power_key_trigger(int delay);
-
-#endif	/* _LINUX_SCROFF_VOLCTR_H */
+#endif
