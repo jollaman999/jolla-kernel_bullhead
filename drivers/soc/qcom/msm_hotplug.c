@@ -1,6 +1,8 @@
 /*
  * MSM Hotplug Driver
  *
+ * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2014, Fluxi <linflux@arcor.de>
  * Copyright (c) 2013-2015, Pranav Vashi <neobuddy89@gmail.com>
  * Copyright (c) 2015, jollaman999 <admin@jollaman999.com> / Adaptive for big and little.
  *
