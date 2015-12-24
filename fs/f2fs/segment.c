@@ -2406,7 +2406,7 @@ static void discard_dirty_segmap(struct f2fs_sb_info *sbi,
 	struct dirty_seglist_info *dirty_i = DIRTY_I(sbi);
 
 	mutex_lock(&dirty_i->seglist_lock);
-	kvfree(dirty_i->dirty_segmap[dirty_type]);
+	f2fs_kvfree(dirty_i->dirty_segmap[dirty_type]);
 	dirty_i->nr_dirty[dirty_type] = 0;
 	mutex_unlock(&dirty_i->seglist_lock);
 }
@@ -2414,7 +2414,7 @@ static void discard_dirty_segmap(struct f2fs_sb_info *sbi,
 static void destroy_victim_secmap(struct f2fs_sb_info *sbi)
 {
 	struct dirty_seglist_info *dirty_i = DIRTY_I(sbi);
-	kvfree(dirty_i->victim_secmap);
+	f2fs_kvfree(dirty_i->victim_secmap);
 }
 
 static void destroy_dirty_segmap(struct f2fs_sb_info *sbi)
@@ -2453,8 +2453,8 @@ static void destroy_free_segmap(struct f2fs_sb_info *sbi)
 	if (!free_i)
 		return;
 	SM_I(sbi)->free_info = NULL;
-	kvfree(free_i->free_segmap);
-	kvfree(free_i->free_secmap);
+	f2fs_kvfree(free_i->free_segmap);
+	f2fs_kvfree(free_i->free_secmap);
 	kfree(free_i);
 }
 
@@ -2475,9 +2475,9 @@ static void destroy_sit_info(struct f2fs_sb_info *sbi)
 	}
 	kfree(sit_i->tmp_map);
 
-	kvfree(sit_i->sentries);
-	kvfree(sit_i->sec_entries);
-	kvfree(sit_i->dirty_sentries_bitmap);
+	f2fs_kvfree(sit_i->sentries);
+	f2fs_kvfree(sit_i->sec_entries);
+	f2fs_kvfree(sit_i->dirty_sentries_bitmap);
 
 	SM_I(sbi)->sit_info = NULL;
 	kfree(sit_i->sit_bitmap);
