@@ -352,7 +352,7 @@ static int get_lowest_load_cpu(void)
 	return lowest_cpu;
 }
 
-static void __ref cpu_up_work(struct work_struct *work)
+static void cpu_up_work(struct work_struct *work)
 {
 	int cpu;
 	unsigned int target_little, target_big;
@@ -752,7 +752,7 @@ static struct input_handler hotplug_input_handler = {
 	.id_table	= hotplug_ids,
 };
 
-static int __ref msm_hotplug_start(void)
+static int msm_hotplug_start(void)
 {
 	int cpu, ret = 0;
 	struct down_lock *dl;
