@@ -45,7 +45,7 @@ static ssize_t show_online(struct device *dev,
 	return sprintf(buf, "%u\n", !!cpu_online(cpu->dev.id));
 }
 
-static ssize_t __ref store_online(struct device *dev,
+static ssize_t store_online(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buf, size_t count)
 {
@@ -186,7 +186,7 @@ static ssize_t show_sched_mostly_idle_load(struct device *dev,
 	return rc;
 }
 
-static ssize_t __ref store_sched_mostly_idle_load(struct device *dev,
+static ssize_t store_sched_mostly_idle_load(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buf, size_t count)
 {
@@ -222,7 +222,7 @@ static ssize_t show_sched_mostly_idle_freq(struct device *dev,
 	return rc;
 }
 
-static ssize_t __ref store_sched_mostly_idle_freq(struct device *dev,
+static ssize_t store_sched_mostly_idle_freq(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buf, size_t count)
 {
@@ -258,7 +258,7 @@ static ssize_t show_sched_mostly_idle_nr_run(struct device *dev,
 	return rc;
 }
 
-static ssize_t __ref store_sched_mostly_idle_nr_run(struct device *dev,
+static ssize_t store_sched_mostly_idle_nr_run(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buf, size_t count)
 {
@@ -294,7 +294,7 @@ static ssize_t show_sched_prefer_idle(struct device *dev,
 	return rc;
 }
 
-static ssize_t __ref store_sched_prefer_idle(struct device *dev,
+static ssize_t store_sched_prefer_idle(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buf, size_t count)
 {
