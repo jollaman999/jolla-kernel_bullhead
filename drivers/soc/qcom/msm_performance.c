@@ -1553,7 +1553,7 @@ static struct notifier_block perf_govinfo_nb = {
  * Attempt to offline CPUs based on their power cost.
  * CPUs with higher power costs are offlined first.
  */
-static int __ref rm_high_pwr_cost_cpus(struct cluster *cl)
+static int rm_high_pwr_cost_cpus(struct cluster *cl)
 {
 	unsigned int cpu, i;
 	struct cpu_pwr_stats *per_cpu_info = get_cpu_pwr_stats();
@@ -1625,7 +1625,7 @@ end:
  * It loops through the currently managed CPUs and tries to online/offline
  * them until the max_cpu_request criteria is met.
  */
-static void __ref try_hotplug(struct cluster *data)
+static void try_hotplug(struct cluster *data)
 {
 	unsigned int i;
 
@@ -1682,7 +1682,7 @@ static void __ref try_hotplug(struct cluster *data)
 	mutex_unlock(&managed_cpus_lock);
 }
 
-static void __ref release_cluster_control(struct cpumask *off_cpus)
+static void release_cluster_control(struct cpumask *off_cpus)
 {
 	int cpu;
 
@@ -1717,7 +1717,7 @@ static void check_cluster_status(struct work_struct *work)
 	}
 }
 
-static int __ref msm_performance_cpu_callback(struct notifier_block *nfb,
+static int msm_performance_cpu_callback(struct notifier_block *nfb,
 		unsigned long action, void *hcpu)
 {
 	uint32_t cpu = (uintptr_t)hcpu;
@@ -1778,7 +1778,7 @@ static int __ref msm_performance_cpu_callback(struct notifier_block *nfb,
 	return NOTIFY_OK;
 }
 
-static struct notifier_block __refdata msm_performance_cpu_notifier = {
+static struct notifier_block msm_performance_cpu_notifier = {
 	.notifier_call = msm_performance_cpu_callback,
 };
 
