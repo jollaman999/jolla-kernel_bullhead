@@ -335,7 +335,7 @@ static int set_cpu_min_freq(const char *buf, const struct kernel_param *kp)
 	int msm_perf = strcmp(current->comm, "perfd");
 
 	if (msm_perf == 0)
-		return ret;
+		return -EINVAL;
 
 	while ((cp = strpbrk(cp + 1, " :")))
 		ntokens++;
