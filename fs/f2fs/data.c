@@ -449,6 +449,14 @@ repeat:
 
 		/* wait for read completion */
 		lock_page(page);
+		if (unlikely(!PageUptodate(page))) {
+			f2fs_put_page(page, 1);
+			return ERR_PTR(-EIO);
+		}
+		if (unlikely(page->mapping != mapping)) {
+			f2fs_put_page(page, 1);
+			goto repeat;
+		}
 	}
 got_it:
 	if (new_i_size && i_size_read(inode) <
