@@ -745,12 +745,25 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 			goto end;
 	}
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (sovc_switch && sovc_tmp_onoff) {
-		ctrl->off_cmds.cmds[1].payload[0] = 0x11;
-	}
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	if (s2w_switch)
+		goto touch_on;
 #endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	if (dt2w_switch)
+		goto touch_on;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (sovc_switch && sovc_tmp_onoff)
+		goto touch_on;
+#endif
+	goto touch_off;
 
+touch_on:
+	ctrl->off_cmds.cmds[1].payload[0] = 0x11;
+touch_off:
+#endif
 	if (ctrl->off_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
 
