@@ -325,8 +325,9 @@ int f2fs_acl_chmod(struct inode *inode)
 	return error;
 }
 
-static size_t f2fs_xattr_list_acl(struct dentry *dentry, char *list,
-		size_t list_size, const char *name, size_t name_len, int type)
+static size_t f2fs_xattr_list_acl(const struct xattr_handler *handler,
+		struct dentry *dentry, char *list, size_t list_size,
+		const char *name, size_t len)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(dentry->d_sb);
 	const char *xname = POSIX_ACL_XATTR_DEFAULT;
@@ -335,7 +336,7 @@ static size_t f2fs_xattr_list_acl(struct dentry *dentry, char *list,
 	if (!test_opt(sbi, POSIX_ACL))
 		return 0;
 
-	if (type == ACL_TYPE_ACCESS)
+	if (handler->flags == ACL_TYPE_ACCESS)
 		xname = POSIX_ACL_XATTR_ACCESS;
 
 	size = strlen(xname) + 1;
@@ -344,8 +345,9 @@ static size_t f2fs_xattr_list_acl(struct dentry *dentry, char *list,
 	return size;
 }
 
-static int f2fs_xattr_get_acl(struct dentry *dentry, const char *name,
-		void *buffer, size_t size, int type)
+static int f2fs_xattr_get_acl(const struct xattr_handler *handler,
+		struct dentry *dentry, const char *name, void *buffer,
+		size_t size)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(dentry->d_sb);
 	struct posix_acl *acl;
@@ -356,7 +358,7 @@ static int f2fs_xattr_get_acl(struct dentry *dentry, const char *name,
 	if (!test_opt(sbi, POSIX_ACL))
 		return -EOPNOTSUPP;
 
-	acl = f2fs_get_acl(dentry->d_inode, type);
+	acl = f2fs_get_acl(dentry->d_inode, handler->flags);
 	if (IS_ERR(acl))
 		return PTR_ERR(acl);
 	if (!acl)
@@ -367,8 +369,9 @@ static int f2fs_xattr_get_acl(struct dentry *dentry, const char *name,
 	return error;
 }
 
-static int f2fs_xattr_set_acl(struct dentry *dentry, const char *name,
-		const void *value, size_t size, int flags, int type)
+static int f2fs_xattr_set_acl(const struct xattr_handler *handler,
+		struct dentry *dentry, const char *name, const void *value,
+		size_t size, int flags)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(dentry->d_sb);
 	struct inode *inode = dentry->d_inode;
@@ -395,7 +398,7 @@ static int f2fs_xattr_set_acl(struct dentry *dentry, const char *name,
 		acl = NULL;
 	}
 
-	error = f2fs_set_acl(inode, type, acl, NULL);
+	error = f2fs_set_acl(inode, handler->flags, acl, NULL);
 
 release_and_out:
 	posix_acl_release(acl);
