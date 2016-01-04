@@ -36,6 +36,10 @@
 #include <soc/qcom/lge/lge_handle_panic.h>
 #endif
 
+#ifdef CONFIG_KEXEC_HARDBOOT
+#include <asm/kexec.h>
+#endif
+
 #define EMERGENCY_DLOAD_MAGIC1    0x322A4F99
 #define EMERGENCY_DLOAD_MAGIC2    0xC67E4350
 #define EMERGENCY_DLOAD_MAGIC3    0x77777777
@@ -67,6 +71,7 @@ static bool scm_dload_supported;
 
 static int dload_set(const char *val, struct kernel_param *kp);
 // Disable the lge crash handler
+// Should be disable for prevent to goto download mode when hardboot.
 // static int download_mode = 1;
 static int download_mode = 0;
 module_param_call(download_mode, dload_set, param_get_int,
@@ -479,8 +484,18 @@ static struct platform_driver msm_restart_driver = {
 	},
 };
 
+#ifdef CONFIG_KEXEC_HARDBOOT
+static void msm_kexec_hardboot_hook(void)
+{
+	qpnp_pon_system_pwr_off(PON_POWER_OFF_WARM_RESET);
+}
+#endif
+
 static int __init msm_restart_init(void)
 {
+#ifdef CONFIG_KEXEC_HARDBOOT
+	kexec_hardboot_hook = msm_kexec_hardboot_hook;
+#endif
 	return platform_driver_register(&msm_restart_driver);
 }
 device_initcall(msm_restart_init);
