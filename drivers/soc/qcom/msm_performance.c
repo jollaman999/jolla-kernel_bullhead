@@ -419,6 +419,10 @@ static int set_cpu_max_freq(const char *buf, const struct kernel_param *kp)
 	struct cpufreq_policy policy;
 	cpumask_var_t limit_mask;
 	int ret;
+	int msm_perf = strcmp(current->comm, "perfd");
+
+	if (msm_perf == 0)
+		return -EINVAL;
 
 	while ((cp = strpbrk(cp + 1, " :")))
 		ntokens++;
