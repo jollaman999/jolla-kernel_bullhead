@@ -443,7 +443,6 @@ int ext4_encrypted_zeroout(struct inode *inode, struct ext4_extent *ex)
 			goto errout;
 		lblk++; pblk++;
 	}
-	err = 0;
 errout:
 	ext4_release_crypto_ctx(ctx);
 	return err;
