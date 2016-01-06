@@ -438,8 +438,6 @@ int ext4_encrypted_zeroout(struct inode *inode, struct ext4_extent *ex)
 			goto errout;
 		}
 		err = submit_bio_wait(WRITE, bio);
-		if ((err == 0) && bio->bi_error)
-			err = -EIO;
 		bio_put(bio);
 		if (err)
 			goto errout;
