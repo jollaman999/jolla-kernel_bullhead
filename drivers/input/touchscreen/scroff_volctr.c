@@ -32,6 +32,7 @@
 #include <linux/input.h>
 #include <linux/hrtimer.h>
 #include <asm-generic/cputime.h>
+#include <linux/wakelock.h>
 
 #include "synaptics_i2c_rmi4_scr_suspended.h"
 
@@ -89,6 +90,7 @@ MODULE_LICENSE("GPLv2");
 #define SOVC_TRACK_REEXEC_DELAY	3000	// Re-exec delay for track control (ms)
 #define SOVC_KEY_PRESS_DUR	60	// Key press duration (ms)
 #define SOVC_POWER_KEY_GAP	700	// Power key press gap time (ms)
+#define SOVC_WL_HOLD_TIME_MS	1000	// Wakelock timeout (ms)
 #define SOVC_VIB_STRENGTH	20	// Vibrator strength
 
 /* Resources */
@@ -96,6 +98,7 @@ int sovc_switch = SOVC_DEFAULT;
 int sovc_tmp_onoff = 0;
 bool track_changed = false;
 static cputime64_t touch_time_pre = 0;
+static cputime64_t wake_lock_start_time = 0;
 static int touch_x = 0, touch_y = 0;
 static int prev_x = 0, prev_y = 0;
 static bool is_new_touch_x = false, is_new_touch_y = false;
@@ -106,6 +109,7 @@ static struct workqueue_struct *sovc_volume_input_wq;
 static struct workqueue_struct *sovc_track_input_wq;
 static struct work_struct sovc_volume_input_work;
 static struct work_struct sovc_track_input_work;
+struct wake_lock sovc_wl;
 
 enum CONTROL {
 	NO_CONTROL,
@@ -346,6 +350,12 @@ static int sovc_input_common_event(struct input_handle *handle, unsigned int typ
 
 	if (!scr_suspended || !sovc_tmp_onoff)
 		return 1;
+
+	if (ktime_to_ms(ktime_get()) - wake_lock_start_time > SOVC_WL_HOLD_TIME_MS) {
+		wake_lock_start_time = ktime_to_ms(ktime_get());
+		wake_lock_timeout(&sovc_wl, msecs_to_jiffies(SOVC_WL_HOLD_TIME_MS));
+		pr_info(LOGTAG"wakelock working\n");
+	}
 
 	/* You can debug here with 'adb shell getevent -l' command. */
 	switch(code) {
@@ -642,6 +652,8 @@ static int __init scroff_volctr_init(void)
 		pr_warn("%s: sysfs_create_file failed for scroff_volctr_version\n", __func__);
 	}
 
+	wake_lock_init(&sovc_wl, WAKE_LOCK_SUSPEND, "sovc_wl");
+
 err_input_dev:
 	input_free_device(sovc_input);
 err_alloc_dev:
@@ -652,6 +664,7 @@ err_alloc_dev:
 
 static void __exit scroff_volctr_exit(void)
 {
+	wake_lock_destroy(&sovc_wl);
 #ifndef ANDROID_TOUCH_DECLARED
 	kobject_del(android_touch_kobj);
 #endif

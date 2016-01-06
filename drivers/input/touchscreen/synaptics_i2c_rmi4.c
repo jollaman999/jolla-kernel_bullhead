@@ -51,7 +51,7 @@
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 #include "synaptics_i2c_rmi4_scr_suspended.h"
-#define RMI4_WL_HOLD_TIME_MS 1000
+#define RMI4_WL_HOLD_TIME_MS 3000
 
 bool scr_suspended = false;
 static bool irq_wake_enabled = false;

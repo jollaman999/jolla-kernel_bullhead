@@ -32,6 +32,7 @@
 #include <linux/input.h>
 #include <linux/hrtimer.h>
 #include <asm-generic/cputime.h>
+#include <linux/wakelock.h>
 
 #include "synaptics_i2c_rmi4_scr_suspended.h"
 
@@ -60,12 +61,14 @@ MODULE_LICENSE("GPLv2");
 
 #define DT2W_FEATHER		200
 #define DT2W_TIME_GAP		200
+#define DT2W_WL_HOLD_TIME_MS	1000
 #define DT2W_VIB_STRENGTH	20	// Vibrator strength
 
 /* Resources */
 int dt2w_switch = DT2W_DEFAULT;
 int dt2w_switch_tmp = 0;
 static cputime64_t tap_time_pre = 0;
+static cputime64_t wake_lock_start_time = 0;
 static int touch_x = 0, touch_y = 0, touch_nr = 0, x_pre = 0, y_pre = 0;
 static bool is_touching = false;
 static struct input_dev * doubletap2wake_pwrdev;
@@ -73,6 +76,7 @@ static DEFINE_MUTEX(pwrkeyworklock);
 static DEFINE_MUTEX(switchlock);
 static struct workqueue_struct *dt2w_input_wq;
 static struct work_struct dt2w_input_work;
+struct wake_lock dt2w_wl;
 
 // Vibrate when screen on
 #ifdef CONFIG_QPNP_HAPTIC
@@ -211,6 +215,12 @@ static void dt2w_input_event(struct input_handle *handle, unsigned int type,
 {
 	if ((!scr_suspended) || (!dt2w_switch && !dt2w_switch_tmp))
 		return;
+
+	if (ktime_to_ms(ktime_get()) - wake_lock_start_time > DT2W_WL_HOLD_TIME_MS) {
+		wake_lock_start_time = ktime_to_ms(ktime_get());
+		wake_lock_timeout(&dt2w_wl, msecs_to_jiffies(DT2W_WL_HOLD_TIME_MS));
+		pr_info(LOGTAG"wakelock working\n");
+	}
 
 	/* You can debug here with 'adb shell getevent -l' command. */
 	switch(code) {
@@ -428,6 +438,8 @@ static int __init doubletap2wake_init(void)
 		pr_warn("%s: sysfs_create_file failed for doubletap2wake_version\n", __func__);
 	}
 
+	wake_lock_init(&dt2w_wl, WAKE_LOCK_SUSPEND, "dt2w_wl");
+
 err_input_dev:
 	input_free_device(doubletap2wake_pwrdev);
 err_alloc_dev:
@@ -438,6 +450,7 @@ err_alloc_dev:
 
 static void __exit doubletap2wake_exit(void)
 {
+	wake_lock_destroy(&dt2w_wl);
 #ifndef ANDROID_TOUCH_DECLARED
 	kobject_del(android_touch_kobj);
 #endif
