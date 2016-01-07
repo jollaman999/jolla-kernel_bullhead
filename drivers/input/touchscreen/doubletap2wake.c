@@ -61,7 +61,7 @@ MODULE_LICENSE("GPLv2");
 
 #define DT2W_FEATHER		200
 #define DT2W_TIME_GAP		200
-#define DT2W_WL_HOLD_TIME_MS	1000
+#define DT2W_WL_HOLD_TIME_MS	DT2W_TIME_GAP * 10
 #define DT2W_VIB_STRENGTH	20	// Vibrator strength
 
 /* Resources */
