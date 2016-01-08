@@ -31,7 +31,6 @@
 #include <linux/workqueue.h>
 #include <linux/input.h>
 #include <linux/hrtimer.h>
-#include <linux/wakelock.h>
 
 #include "synaptics_i2c_rmi4_scr_suspended.h"
 
@@ -53,12 +52,10 @@ MODULE_LICENSE("GPLv2");
 #define S2W_DEBUG		0
 #define S2W_DEFAULT		0
 #define S2W_FEATHER             500
-#define S2W_WL_HOLD_TIME_MS	1000
 #define S2W_VIB_STRENGTH	20	// Vibrator strength
 
 /* Resources */
 int s2w_switch = S2W_DEFAULT;
-static cputime64_t wake_lock_start_time = 0;
 static int touch_x = 0;
 static int prev_x = 0;
 static bool is_new_touch = false;
@@ -67,7 +64,6 @@ static struct input_dev * sweep2wake_pwrdev;
 static DEFINE_MUTEX(pwrkeyworklock);
 static struct workqueue_struct *s2w_input_wq;
 static struct work_struct s2w_input_work;
-struct wake_lock s2w_wl;
 
 // Vibrate when screen on
 #ifdef CONFIG_QPNP_HAPTIC
@@ -165,12 +161,6 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 {
 	if ((!scr_suspended) || (!s2w_switch))
 		return;
-
-	if (ktime_to_ms(ktime_get()) - wake_lock_start_time > S2W_WL_HOLD_TIME_MS) {
-		wake_lock_start_time = ktime_to_ms(ktime_get());
-		wake_lock_timeout(&s2w_wl, msecs_to_jiffies(S2W_WL_HOLD_TIME_MS));
-		pr_info(LOGTAG"wakelock working\n");
-	}
 
 	/* You can debug here with 'adb shell getevent -l' command. */
 	switch(code) {
@@ -351,8 +341,6 @@ static int __init sweep2wake_init(void)
 		pr_warn("%s: sysfs_create_file failed for sweep2wake_version\n", __func__);
 	}
 
-	wake_lock_init(&s2w_wl, WAKE_LOCK_SUSPEND, "s2w_wl");
-
 err_input_dev:
 	input_free_device(sweep2wake_pwrdev);
 err_alloc_dev:
@@ -363,7 +351,6 @@ err_alloc_dev:
 
 static void __exit sweep2wake_exit(void)
 {
-	wake_lock_destroy(&s2w_wl);
 #ifndef ANDROID_TOUCH_DECLARED
 	kobject_del(android_touch_kobj);
 #endif
