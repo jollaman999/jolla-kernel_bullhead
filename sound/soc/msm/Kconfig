@@ -317,7 +317,6 @@ config SND_SOC_MSM8994
 	select MSM_QDSP6_APRV2
 	select MSM_QDSP6V2_CODECS
 	select SND_SOC_WCD9330
-	select SND_SOC_MSM_HDMI_CODEC_RX
 	select QTI_PP
 	select DTS_SRS_TM
 	select SND_SOC_CPE
@@ -331,6 +330,12 @@ config SND_SOC_MSM8994
 	 interfaces with DSP, also it will enable
 	 the machine drivers and the corresponding
 	 DAI-links.
+
+config SND_SOC_MSM8994_HDMI_CODEC_RX
+	bool "HDMI_CODEC_RX support for MSM8994"
+	depends on SND_SOC_MSM8994
+	select SND_SOC_MSM_HDMI_CODEC_RX
+	default n
 
 config SND_SOC_MDM9640
 	tristate "SoC Machine driver for MDM9640 boards"
