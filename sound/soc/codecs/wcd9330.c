@@ -5380,14 +5380,16 @@ static int tomtom_startup(struct snd_pcm_substream *substream,
 		 substream->name, substream->stream);
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	track_changed = false;
+	if (!sovc_switch)
+		return 0;
+
 	mutex_lock(&sovc_lock);
 	sovc_tmp_onoff = 1;
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
 	dt2w_switch_tmp = 1;
 #endif
 	mutex_unlock(&sovc_lock);
-
-	track_changed = false;
 #endif
 
 	return 0;
