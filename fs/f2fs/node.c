@@ -1118,8 +1118,8 @@ repeat:
 		goto repeat;
 	}
 page_hit:
-	f2fs_bug_on(sbi, nid != nid_of_node(page));
 	mark_page_accessed(page);
+	f2fs_bug_on(sbi, nid != nid_of_node(page));
 	return page;
 }
 
