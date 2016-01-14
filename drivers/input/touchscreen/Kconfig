@@ -10,7 +10,6 @@ menuconfig INPUT_TOUCHSCREEN
 	  If unsure, say Y.
 
 if INPUT_TOUCHSCREEN
-tristate "Screen Off Volume & Touch Control for touchscreens"
 source "drivers/input/touchscreen/synaptics_dsx/Kconfig"
 
 config TOUCHSCREEN_88PM860X
