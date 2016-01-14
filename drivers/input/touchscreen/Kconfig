@@ -10,7 +10,7 @@ menuconfig INPUT_TOUCHSCREEN
 	  If unsure, say Y.
 
 if INPUT_TOUCHSCREEN
-
+tristate "Screen Off Volume & Touch Control for touchscreens"
 source "drivers/input/touchscreen/synaptics_dsx/Kconfig"
 
 config TOUCHSCREEN_88PM860X
@@ -1071,7 +1071,7 @@ config TOUCHSCREEN_DOUBLETAP2WAKE
 	default n
 
 config TOUCHSCREEN_SCROFF_VOLCTR
-	tristate "Screen Off Volume & Touch Control for touchscreens"
+	tristate "Screen Off Volume & Track Control for touchscreens"
 	default n
 
 endif
