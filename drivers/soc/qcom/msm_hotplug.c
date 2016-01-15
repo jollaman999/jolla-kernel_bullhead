@@ -372,9 +372,12 @@ static void cpu_up_work(struct work_struct *work)
 
 	online_little = num_online_little_cpus();
 
-	if (online_little >= LITTLE_CORES / 3)
+	// If LITTLE_CORES is 4 and BIG_CORES is 2.
+	// online_little >= 3 -> Turn on all of big cores. (2)
+	// 3 > online_little >= 2 -> Turn on half of big cores. (1)
+	if (online_little >= LITTLE_CORES - LITTLE_CORES / 3)
 		target_big = BIG_CORES;
-	else if (online_little >= LITTLE_CORES / 2)
+	else if (online_little >= LITTLE_CORES - LITTLE_CORES / 2)
 		target_big = BIG_CORES / 2;
 	else
 		return;
@@ -424,7 +427,10 @@ static void cpu_down_work(struct work_struct *work)
 
 	online_little = num_online_little_cpus();
 
-	if (online_little <= LITTLE_CORES / 2)
+	// If LITTLE_CORES is 4 and BIG_CORES is 2.
+	// online_little < 2 -> Turn off all of big cores. (2)
+	// 2 <= online_little <= 3 -> Turn off half of big cores. (1)
+	if (online_little < LITTLE_CORES / 2)
 		target_big = BIG_CORES;
 	else if (online_little <= LITTLE_CORES / 3)
 		target_big = BIG_CORES / 2;
