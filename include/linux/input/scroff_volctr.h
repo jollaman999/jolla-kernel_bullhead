@@ -23,6 +23,7 @@
 
 extern int sovc_switch;
 extern int sovc_tmp_onoff;
+extern bool sovc_mic_detected;
 extern bool track_changed;
 
 extern void sovc_press_power_key_trigger(int delay);

@@ -68,8 +68,13 @@ static bool is_touch_on(void)
 		return true;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (sovc_switch && sovc_tmp_onoff)
+	if (sovc_switch && sovc_tmp_onoff) {
+		if (sovc_mic_detected) {
+			pr_info("%s() mic detected\n", __func__);
+			return false;
+		}
 		return true;
+	}
 #endif
 	return false;
 }

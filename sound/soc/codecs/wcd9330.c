@@ -5380,6 +5380,9 @@ static int tomtom_startup(struct snd_pcm_substream *substream,
 		 substream->name, substream->stream);
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (!strcmp(dai->name, "tomtom_tx1"))
+		sovc_mic_detected = true;
+
 	track_changed = false;
 	if (!sovc_switch)
 		return 0;
@@ -5402,6 +5405,9 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 		 substream->name, substream->stream);
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (!strcmp(dai->name, "tomtom_tx1"))
+		sovc_mic_detected = false;
+
 	mutex_lock(&sovc_lock);
 	sovc_tmp_onoff = 0;
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
