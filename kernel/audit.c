@@ -573,9 +573,18 @@ static int audit_netlink_ok(struct sk_buff *skb, u16 msg_type)
 {
 	int err = 0;
 
+	/*
+	 *  If 'CONFIG_USER_NS' is not defined, current_user_ns()
+	 * is already defined as '&init_user_ns'.
+	 *  In GCC 6 it makes tautological-compare warning.
+	 *  So just compare when 'CONFIG_USER_NS' is defined.
+	 * - jollaman999 -
+	 */
+#ifdef CONFIG_USER_NS
 	/* Only support initial user namespace for now. */
 	if ((current_user_ns() != &init_user_ns))
 		return -EPERM;
+#endif
 
 	switch (msg_type) {
 	case AUDIT_LIST:
