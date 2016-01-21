@@ -5550,49 +5550,49 @@ tSirRetStatus limSendAddBARsp( tpAniSirGlobal pMac,
                               frmAddBARsp.AddBAParameterSet.amsduSupported,
                               frmAddBARsp.Status.status);
 
-    if( ( SIR_BAND_5_GHZ == limGetRFBand(psessionEntry->currentOperChannel))
+      if( ( SIR_BAND_5_GHZ == limGetRFBand(psessionEntry->currentOperChannel))
        || ( psessionEntry->pePersona == VOS_P2P_CLIENT_MODE ) ||
          ( psessionEntry->pePersona == VOS_P2P_GO_MODE)
          )
-    {
+      {
         txFlag |= HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME;
-    }
+      }
 
-    MTRACE(vos_trace(VOS_MODULE_ID_PE, TRACE_CODE_TX_MGMT,
-           psessionEntry->peSessionId, pMacHdr->fc.subType));
-    halStatus = halTxFrame( pMac,
-                            pPacket,
-                            (tANI_U16) frameLen,
-                            HAL_TXRX_FRM_802_11_MGMT,
-                            ANI_TXDIR_TODS,
-                            7,
-                            limTxComplete,
-                            pAddBARspBuffer, txFlag, smeSessionId);
-    MTRACE(vos_trace(VOS_MODULE_ID_PE, TRACE_CODE_TX_COMPLETE,
-           psessionEntry->peSessionId, halStatus));
-    if (eHAL_STATUS_SUCCESS != halStatus )
-    {
-        limLog( pMac, LOGE,
-                FL( "halTxFrame FAILED! Status [%d]" ),
-                halStatus );
+      MTRACE(vos_trace(VOS_MODULE_ID_PE, TRACE_CODE_TX_MGMT,
+             psessionEntry->peSessionId, pMacHdr->fc.subType));
+      halStatus = halTxFrame( pMac,
+                              pPacket,
+                              (tANI_U16) frameLen,
+                              HAL_TXRX_FRM_802_11_MGMT,
+                              ANI_TXDIR_TODS,
+                              7,
+                              limTxComplete,
+                              pAddBARspBuffer, txFlag, smeSessionId);
+      MTRACE(vos_trace(VOS_MODULE_ID_PE, TRACE_CODE_TX_COMPLETE,
+             psessionEntry->peSessionId, halStatus));
+      if (eHAL_STATUS_SUCCESS != halStatus )
+      {
+          limLog( pMac, LOGE,
+              FL( "halTxFrame FAILED! Status [%d]" ),
+              halStatus );
 
-    // FIXME - HAL error codes are different from PE error
-    // codes!! And, this routine is returning tSirRetStatus
-    statusCode = eSIR_FAILURE;
-    //Pkt will be freed up by the callback
-    return statusCode;
-   }
-   else
-      return eSIR_SUCCESS;
+          // FIXME - HAL error codes are different from PE error
+          // codes!! And, this routine is returning tSirRetStatus
+          statusCode = eSIR_FAILURE;
+          //Pkt will be freed up by the callback
+          return statusCode;
+      }
+      else
+          return eSIR_SUCCESS;
 
       returnAfterError:
 
       // Release buffer, if allocated
       if( NULL != pAddBARspBuffer )
-        palPktFree( pMac->hHdd,
-            HAL_TXRX_FRM_802_11_MGMT,
-            (void *) pAddBARspBuffer,
-            (void *) pPacket );
+          palPktFree( pMac->hHdd,
+              HAL_TXRX_FRM_802_11_MGMT,
+              (void *) pAddBARspBuffer,
+              (void *) pPacket );
 
       return statusCode;
 }
@@ -5626,9 +5626,9 @@ tSirRetStatus limSendDelBAInd( tpAniSirGlobal pMac,
     eHalStatus halStatus;
     void *pPacket;
     tANI_U8 txFlag = 0;
-   tANI_U8             smeSessionId = 0;
+    tANI_U8             smeSessionId = 0;
 
-     if(NULL == psessionEntry)
+    if(NULL == psessionEntry)
     {
         return eSIR_FAILURE;
     }
@@ -5636,107 +5636,107 @@ tSirRetStatus limSendDelBAInd( tpAniSirGlobal pMac,
     smeSessionId = psessionEntry->smeSessionId;
     vos_mem_set( (void *) &frmDelBAInd, sizeof( frmDelBAInd ), 0);
 
-      // Category - 3 (BA)
-      frmDelBAInd.Category.category = SIR_MAC_ACTION_BLKACK;
-      // Action - 2 (DELBA)
-      frmDelBAInd.Action.action = SIR_MAC_BLKACK_DEL;
+    // Category - 3 (BA)
+    frmDelBAInd.Category.category = SIR_MAC_ACTION_BLKACK;
+    // Action - 2 (DELBA)
+    frmDelBAInd.Action.action = SIR_MAC_BLKACK_DEL;
 
-      // Fill the DELBA Parameter Set as provided by caller
-      frmDelBAInd.DelBAParameterSet.tid = pMlmDelBAReq->baTID;
-      frmDelBAInd.DelBAParameterSet.initiator = pMlmDelBAReq->baDirection;
+    // Fill the DELBA Parameter Set as provided by caller
+    frmDelBAInd.DelBAParameterSet.tid = pMlmDelBAReq->baTID;
+    frmDelBAInd.DelBAParameterSet.initiator = pMlmDelBAReq->baDirection;
 
-      // BA Starting Sequence Number
-      // Fragment number will always be zero
-      frmDelBAInd.Reason.code = pMlmDelBAReq->delBAReasonCode;
+    // BA Starting Sequence Number
+    // Fragment number will always be zero
+    frmDelBAInd.Reason.code = pMlmDelBAReq->delBAReasonCode;
 
-      nStatus = dot11fGetPackedDelBAIndSize( pMac, &frmDelBAInd, &nPayload );
+    nStatus = dot11fGetPackedDelBAIndSize( pMac, &frmDelBAInd, &nPayload );
 
-      if( DOT11F_FAILED( nStatus ))
-      {
-        limLog( pMac, LOGW,
-            FL( "Failed to calculate the packed size for "
+    if( DOT11F_FAILED( nStatus ))
+    {
+      limLog( pMac, LOGW,
+          FL( "Failed to calculate the packed size for "
               "an DELBA Indication (0x%08x)."),
-            nStatus );
+              nStatus );
 
-        // We'll fall back on the worst case scenario:
-        nPayload = sizeof( tDot11fDelBAInd );
-      }
-      else if( DOT11F_WARNED( nStatus ))
-      {
-        limLog( pMac, LOGW,
-            FL( "There were warnings while calculating "
+          // We'll fall back on the worst case scenario:
+          nPayload = sizeof( tDot11fDelBAInd );
+    }
+    else if( DOT11F_WARNED( nStatus ))
+    {
+      limLog( pMac, LOGW,
+          FL( "There were warnings while calculating "
               "the packed size for an DELBA Ind (0x%08x)."),
-            nStatus );
-      }
+              nStatus );
+    }
 
-      // Add the MGMT header to frame length
-      frameLen = nPayload + sizeof( tSirMacMgmtHdr );
+    // Add the MGMT header to frame length
+    frameLen = nPayload + sizeof( tSirMacMgmtHdr );
 
-      // Allocate shared memory
-      if( eHAL_STATUS_SUCCESS !=
-          (halStatus = palPktAlloc( pMac->hHdd,
-                                    HAL_TXRX_FRM_802_11_MGMT,
-                                    (tANI_U16) frameLen,
-                                    (void **) &pDelBAIndBuffer,
-                                    (void **) &pPacket )))
-      {
-        // Log error
-        limLog( pMac, LOGP,
-            FL("palPktAlloc FAILED! Length [%d], Status [%d]"),
-            frameLen,
-            halStatus );
+    // Allocate shared memory
+    if( eHAL_STATUS_SUCCESS !=
+        (halStatus = palPktAlloc( pMac->hHdd,
+                                  HAL_TXRX_FRM_802_11_MGMT,
+                                  (tANI_U16) frameLen,
+                                  (void **) &pDelBAIndBuffer,
+                                  (void **) &pPacket )))
+    {
+      // Log error
+      limLog( pMac, LOGP,
+          FL("palPktAlloc FAILED! Length [%d], Status [%d]"),
+          frameLen,
+          halStatus );
 
-        statusCode = eSIR_MEM_ALLOC_FAILED;
-        goto returnAfterError;
-      }
+      statusCode = eSIR_MEM_ALLOC_FAILED;
+      goto returnAfterError;
+    }
 
-      vos_mem_set( (void *) pDelBAIndBuffer, frameLen, 0 );
+    vos_mem_set( (void *) pDelBAIndBuffer, frameLen, 0 );
 
-      // Copy necessary info to BD
-      if( eSIR_SUCCESS !=
-          (statusCode = limPopulateMacHeader( pMac,
-                                       pDelBAIndBuffer,
-                                       SIR_MAC_MGMT_FRAME,
-                                       SIR_MAC_MGMT_ACTION,
-                                       pMlmDelBAReq->peerMacAddr,psessionEntry->selfMacAddr)))
-        goto returnAfterError;
+    // Copy necessary info to BD
+    if( eSIR_SUCCESS !=
+        (statusCode = limPopulateMacHeader( pMac,
+                                     pDelBAIndBuffer,
+                                     SIR_MAC_MGMT_FRAME,
+                                     SIR_MAC_MGMT_ACTION,
+                                     pMlmDelBAReq->peerMacAddr,psessionEntry->selfMacAddr)))
+      goto returnAfterError;
 
-      // Update A3 with the BSSID
-      pMacHdr = ( tpSirMacMgmtHdr ) pDelBAIndBuffer;
+    // Update A3 with the BSSID
+    pMacHdr = ( tpSirMacMgmtHdr ) pDelBAIndBuffer;
 
-      sirCopyMacAddr(pMacHdr->bssId,psessionEntry->bssId);
+    sirCopyMacAddr(pMacHdr->bssId,psessionEntry->bssId);
 
 #ifdef WLAN_FEATURE_11W
-      limSetProtectedBit(pMac, psessionEntry, pMlmDelBAReq->peerMacAddr, pMacHdr);
+    limSetProtectedBit(pMac, psessionEntry, pMlmDelBAReq->peerMacAddr, pMacHdr);
 #endif
 
-      // Now, we're ready to "pack" the frames
-      nStatus = dot11fPackDelBAInd( pMac,
-          &frmDelBAInd,
-          pDelBAIndBuffer + sizeof( tSirMacMgmtHdr ),
-          nPayload,
-          &nPayload );
+    // Now, we're ready to "pack" the frames
+    nStatus = dot11fPackDelBAInd( pMac,
+        &frmDelBAInd,
+        pDelBAIndBuffer + sizeof( tSirMacMgmtHdr ),
+        nPayload,
+        &nPayload );
 
-      if( DOT11F_FAILED( nStatus ))
-      {
-        limLog( pMac, LOGE,
-            FL( "Failed to pack an DELBA Ind (0x%08x)." ),
-            nStatus );
+    if( DOT11F_FAILED( nStatus ))
+    {
+      limLog( pMac, LOGE,
+          FL( "Failed to pack an DELBA Ind (0x%08x)." ),
+          nStatus );
 
-        // FIXME - Need to convert to tSirRetStatus
-        statusCode = eSIR_FAILURE;
-        goto returnAfterError;
-      }
-      else if( DOT11F_WARNED( nStatus ))
-      {
-        limLog( pMac, LOGW,
-                FL( "There were warnings while packing an DELBA Ind (0x%08x)." ),
-                nStatus);
-      }
-
+      // FIXME - Need to convert to tSirRetStatus
+      statusCode = eSIR_FAILURE;
+      goto returnAfterError;
+    }
+    else if( DOT11F_WARNED( nStatus ))
+    {
       limLog( pMac, LOGW,
-          FL( "Sending a DELBA IND to " ));
-      limPrintMacAddr( pMac, pMlmDelBAReq->peerMacAddr, LOGW );
+              FL( "There were warnings while packing an DELBA Ind (0x%08x)." ),
+              nStatus);
+    }
+
+    limLog( pMac, LOGW,
+        FL( "Sending a DELBA IND to " ));
+    limPrintMacAddr( pMac, pMlmDelBAReq->peerMacAddr, LOGW );
 
     if( ( SIR_BAND_5_GHZ == limGetRFBand(psessionEntry->currentOperChannel))
        || ( psessionEntry->pePersona == VOS_P2P_CLIENT_MODE ) ||
@@ -5758,26 +5758,26 @@ tSirRetStatus limSendDelBAInd( tpAniSirGlobal pMac,
                             pDelBAIndBuffer, txFlag, smeSessionId);
     MTRACE(vos_trace(VOS_MODULE_ID_PE, TRACE_CODE_TX_COMPLETE,
                      psessionEntry->peSessionId, halStatus));
-   if (eHAL_STATUS_SUCCESS != halStatus )
-   {
-       PELOGE(limLog( pMac, LOGE, FL( "halTxFrame FAILED! Status [%d]" ), halStatus );)
-       statusCode = eSIR_FAILURE;
-       //Pkt will be freed up by the callback
-       return statusCode;
+    if (eHAL_STATUS_SUCCESS != halStatus )
+    {
+        PELOGE(limLog( pMac, LOGE, FL( "halTxFrame FAILED! Status [%d]" ), halStatus );)
+        statusCode = eSIR_FAILURE;
+        //Pkt will be freed up by the callback
+        return statusCode;
     }
     else
-      return eSIR_SUCCESS;
+        return eSIR_SUCCESS;
 
-      returnAfterError:
+    returnAfterError:
 
-      // Release buffer, if allocated
-      if( NULL != pDelBAIndBuffer )
-        palPktFree( pMac->hHdd,
-            HAL_TXRX_FRM_802_11_MGMT,
-            (void *) pDelBAIndBuffer,
-            (void *) pPacket );
+    // Release buffer, if allocated
+    if( NULL != pDelBAIndBuffer )
+      palPktFree( pMac->hHdd,
+          HAL_TXRX_FRM_802_11_MGMT,
+          (void *) pDelBAIndBuffer,
+          (void *) pPacket );
 
-      return statusCode;
+    return statusCode;
 }
 
 #if defined WLAN_FEATURE_VOWIFI
