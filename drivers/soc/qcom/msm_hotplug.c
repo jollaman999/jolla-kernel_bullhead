@@ -47,6 +47,7 @@
 #define DEFAULT_MAX_CPUS_ONLINE		LITTLE_CORES
 #define DEFAULT_FAST_LANE_LOAD		99
 #define DEFAULT_BIG_CORE_UP_DELAY	2500
+#define DEFAULT_BIG_CORE_DOWN_DELAY	800
 #define DEFAULT_MAX_CPUS_ONLINE_SUSP	1
 
 // Use for msm_hotplug_resume_timeout
@@ -83,6 +84,7 @@ static struct cpu_hotplug {
 	u64 last_input;
 	unsigned int fast_lane_load;
 	unsigned int big_core_up_delay;
+	unsigned int big_core_down_delay;
 	struct work_struct up_work;
 	struct work_struct down_work;
 	struct mutex msm_hotplug_mutex;
@@ -99,7 +101,8 @@ static struct cpu_hotplug {
 	.down_lock_dur = DEFAULT_DOWN_LOCK_DUR,
 	.boost_lock_dur = DEFAULT_BOOST_LOCK_DUR,
 	.fast_lane_load = DEFAULT_FAST_LANE_LOAD,
-	.big_core_up_delay = DEFAULT_BIG_CORE_UP_DELAY
+	.big_core_up_delay = DEFAULT_BIG_CORE_UP_DELAY,
+	.big_core_down_delay = DEFAULT_BIG_CORE_DOWN_DELAY
 };
 
 static struct workqueue_struct *hotplug_wq;
@@ -108,7 +111,9 @@ static struct delayed_work hotplug_work;
 static u64 last_boost_time;
 static unsigned int default_update_rates[] = { DEFAULT_UPDATE_RATE };
 static bool big_core_up_ready_checked = false;
+static bool big_core_down_ready_checked = false;
 static cputime64_t big_core_up_ready_time = 0;
+static cputime64_t big_core_down_ready_time = 0;
 
 static struct cpu_stats {
 	unsigned int *update_rates;
@@ -399,7 +404,6 @@ static void cpu_up_work(struct work_struct *work)
 		}
 
 		big_core_up_ready_checked = false;
-		return;
 	}
 }
 
@@ -437,12 +441,22 @@ static void cpu_down_work(struct work_struct *work)
 	else
 		return;
 
-	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
-		if (!cpu_online(cpu))
-			continue;
-		cpu_down(cpu);
-		if (target_big >= num_online_big_cpus())
-			break;
+	if (!big_core_down_ready_checked) {
+		big_core_down_ready_checked = true;
+		big_core_down_ready_time = ktime_to_ms(ktime_get());
+		return;
+	}
+
+	if (ktime_to_ms(ktime_get()) - big_core_down_ready_time > hotplug.big_core_down_delay) {
+		for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
+			if (!cpu_online(cpu))
+				continue;
+			cpu_down(cpu);
+			if (target_big >= num_online_big_cpus())
+				break;
+		}
+
+		big_core_down_ready_checked = false;
 	}
 }
 
@@ -1215,6 +1229,29 @@ static ssize_t store_big_core_up_delay(struct device *dev,
 	return count;
 }
 
+static ssize_t show_big_core_down_delay(struct device *dev,
+				   struct device_attribute *msm_hotplug_attrs,
+				   char *buf)
+{
+	return sprintf(buf, "%u\n", hotplug.big_core_down_delay);
+}
+
+static ssize_t store_big_core_down_delay(struct device *dev,
+				    struct device_attribute *msm_hotplug_attrs,
+				    const char *buf, size_t count)
+{
+	int ret;
+	unsigned int val;
+
+	ret = sscanf(buf, "%u", &val);
+	if (ret != 1)
+		return -EINVAL;
+
+	hotplug.big_core_down_delay = val;
+
+	return count;
+}
+
 static ssize_t show_io_is_busy(struct device *dev,
 				   struct device_attribute *msm_hotplug_attrs,
 				   char *buf)
@@ -1264,6 +1301,8 @@ static DEVICE_ATTR(fast_lane_load, 644, show_fast_lane_load,
 		   store_fast_lane_load);
 static DEVICE_ATTR(big_core_up_delay, 644, show_big_core_up_delay,
 		   store_big_core_up_delay);
+static DEVICE_ATTR(big_core_down_delay, 644, show_big_core_down_delay,
+		   store_big_core_down_delay);
 static DEVICE_ATTR(io_is_busy, 644, show_io_is_busy, store_io_is_busy);
 static DEVICE_ATTR(current_load, 444, show_current_load, NULL);
 
@@ -1280,6 +1319,7 @@ static struct attribute *msm_hotplug_attrs[] = {
 	&dev_attr_offline_load.attr,
 	&dev_attr_fast_lane_load.attr,
 	&dev_attr_big_core_up_delay.attr,
+	&dev_attr_big_core_down_delay.attr,
 	&dev_attr_io_is_busy.attr,
 	&dev_attr_current_load.attr,
 	NULL,
