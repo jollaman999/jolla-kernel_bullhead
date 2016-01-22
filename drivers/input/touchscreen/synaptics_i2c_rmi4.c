@@ -39,6 +39,10 @@
 #include "synaptics_i2c_rmi4.h"
 #include <linux/input/mt.h>
 
+#ifdef CONFIG_MSM_HOTPLUG
+#include <linux/msm_hotplug.h>
+#endif
+
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 #include <linux/input/sweep2wake.h>
 #endif
@@ -157,7 +161,6 @@ enum device_status {
 #define F12_MAX_Y		65536
 
 #ifdef CONFIG_MSM_HOTPLUG
-extern bool msm_hotplug_scr_suspended;
 extern void msm_hotplug_suspend(void);
 extern void msm_hotplug_resume(void);
 #endif
@@ -4654,7 +4657,8 @@ static int synaptics_rmi4_suspend(struct device *dev)
 
 #ifdef CONFIG_MSM_HOTPLUG
 	msm_hotplug_scr_suspended = true;
-	msm_hotplug_suspend();
+	if (msm_enabled)
+		msm_hotplug_suspend();
 #endif
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
@@ -4765,7 +4769,8 @@ static int synaptics_rmi4_resume(struct device *dev)
 
 #ifdef CONFIG_MSM_HOTPLUG
 	msm_hotplug_scr_suspended = false;
-	msm_hotplug_resume();
+	if (msm_enabled)
+		msm_hotplug_resume();
 #endif
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
