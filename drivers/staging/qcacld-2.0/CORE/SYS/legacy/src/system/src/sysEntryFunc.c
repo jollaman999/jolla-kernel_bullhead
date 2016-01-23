@@ -166,6 +166,7 @@ sysBbtProcessMessageCore(tpAniSirGlobal pMac, tpSirMsgQ pMsg, tANI_U32 type,
 
             if (subType == SIR_MAC_MGMT_DEAUTH)
             {
+#ifdef DEBUG
                 tpSirMacMgmtHdr pMacHdr = WDA_GET_RX_MAC_HEADER(pBd);
                 PELOGE(sysLog( pMac, LOGE,
                        FL("DEAUTH frame allowed: "
@@ -177,6 +178,7 @@ sysBbtProcessMessageCore(tpAniSirGlobal pMac, tpSirMsgQ pMsg, tANI_U32 type,
                        MAC_ADDR_ARRAY(pMacHdr->sa),
                        MAC_ADDR_ARRAY(pMacHdr->bssId),
                        pMac->sys.gSysFrameCount[type][subType] ););
+#endif
                 lastDeauthPacketTime = adf_os_ticks();
             }
 

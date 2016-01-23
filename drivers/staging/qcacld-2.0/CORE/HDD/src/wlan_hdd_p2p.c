@@ -901,11 +901,13 @@ int __wlan_hdd_cfg80211_remain_on_channel( struct wiphy *wiphy,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,6,0))
     struct net_device *dev = wdev->netdev;
 #endif
+#ifdef HDD_TRACE_RECORD
     hdd_adapter_t *pAdapter = WLAN_HDD_GET_PRIV_PTR( dev );
 
     MTRACE(vos_trace(VOS_MODULE_ID_HDD,
                      TRACE_CODE_HDD_REMAIN_ON_CHANNEL,
                      pAdapter->sessionId, REMAIN_ON_CHANNEL_REQUEST));
+#endif
     return wlan_hdd_request_remain_on_channel(wiphy, dev,
                                         chan,
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0))
@@ -2153,14 +2155,18 @@ int __wlan_hdd_del_virtual_intf(struct wiphy *wiphy, struct net_device *dev)
     struct net_device *dev = wdev->netdev;
 #endif
     hdd_context_t *pHddCtx = (hdd_context_t*) wiphy_priv(wiphy);
+#ifdef HDD_TRACE_RECORD
     hdd_adapter_t *pAdapter = WLAN_HDD_GET_PRIV_PTR( dev );
+#endif
     hdd_adapter_t *pVirtAdapter = WLAN_HDD_GET_PRIV_PTR(dev);
     int status;
     ENTER();
 
+#ifdef HDD_TRACE_RECORD
     MTRACE(vos_trace(VOS_MODULE_ID_HDD,
                      TRACE_CODE_HDD_DEL_VIRTUAL_INTF,
                      pAdapter->sessionId, pAdapter->device_mode));
+#endif
     hddLog(VOS_TRACE_LEVEL_INFO, "%s: device_mode = %d",
            __func__,pVirtAdapter->device_mode);
 
@@ -2393,7 +2399,9 @@ void hdd_indicateMgmtFrame( hdd_adapter_t *pAdapter,
                 vos_mem_compare(&pbFrames[WLAN_HDD_PUBLIC_ACTION_FRAME_OFFSET+2], SIR_MAC_P2P_OUI, SIR_MAC_P2P_OUI_SIZE))
             // P2P action frames
             {
+#ifdef WLAN_FEATURE_P2P_DEBUG
                 u8 *macFrom = &pbFrames[WLAN_HDD_80211_FRM_DA_OFFSET+6];
+#endif
                 actionFrmType = pbFrames[WLAN_HDD_PUBLIC_ACTION_FRAME_TYPE_OFFSET];
                 hddLog(LOG1, "Rx Action Frame %u", actionFrmType);
 #ifdef WLAN_FEATURE_P2P_DEBUG

@@ -346,6 +346,8 @@ struct ipa_uc_pending_event {
 	uint8_t mac_addr[VOS_MAC_ADDR_SIZE];
 };
 
+
+#ifdef HDD_TRACE_RECORD
 static const char *op_string[] = {
 	"TX_SUSPEND",
 	"TX_RESUME",
@@ -353,6 +355,7 @@ static const char *op_string[] = {
 	"RX_RESUME",
 	"STATS",
 };
+#endif
 #endif /* IPA_UC_OFFLOAD */
 
 struct hdd_ipa_priv {
@@ -951,8 +954,10 @@ static void hdd_ipa_uc_op_cb(v_U8_t *op_msg, void *usr_ctxt)
 
 	hdd_ctx = (hdd_context_t *)usr_ctxt;
 	hdd_ipa = (struct hdd_ipa_priv *)hdd_ctx->hdd_ipa;
+#ifdef HDD_TRACE_RECORD
 	HDD_IPA_LOG(VOS_TRACE_LEVEL_DEBUG,
 		"%s, OPCODE %s", __func__, op_string[msg->op_code]);
+#endif
 
 	if ((HDD_IPA_UC_OPCODE_TX_RESUME == msg->op_code) ||
 		(HDD_IPA_UC_OPCODE_RX_RESUME == msg->op_code)) {

@@ -16284,15 +16284,19 @@ static int __wlan_hdd_cfg80211_add_station(struct wiphy *wiphy,
 {
     int status = -EPERM;
 #ifdef FEATURE_WLAN_TDLS
+#ifdef HDD_TRACE_RECORD
     hdd_adapter_t *pAdapter =  WLAN_HDD_GET_PRIV_PTR(dev);
+#endif
     hdd_context_t *pHddCtx = wiphy_priv(wiphy);
     u32 mask, set;
 
     ENTER();
 
+#ifdef HDD_TRACE_RECORD
     MTRACE(vos_trace(VOS_MODULE_ID_HDD,
                      TRACE_CODE_HDD_CFG80211_ADD_STA,
                      pAdapter->sessionId, params->listen_interval));
+#endif
 
     if (0 != wlan_hdd_validate_context(pHddCtx))
     {

@@ -159,6 +159,7 @@ wmi_buf_alloc(wmi_unified_t wmi_handle, u_int16_t len)
 	return wmi_buf;
 }
 
+#ifdef DEBUG
 static u_int8_t* get_wmi_cmd_string(WMI_CMD_ID wmi_command)
 {
 	switch(wmi_command)
@@ -209,7 +210,7 @@ static u_int8_t* get_wmi_cmd_string(WMI_CMD_ID wmi_command)
 		CASE_RETURN_STRING(WMI_PDEV_GET_TPC_CONFIG_CMDID);
 
 		/** set the base MAC address for the physical device before a VDEV is created.
-		 *  For firmware that doesn’t support this feature and this command, the pdev
+		 *  For firmware that doesn't support this feature and this command, the pdev
 		 *  MAC address will not be changed. */
 		CASE_RETURN_STRING(WMI_PDEV_SET_BASE_MACADDR_CMDID);
 
@@ -645,6 +646,7 @@ static u_int8_t* get_wmi_cmd_string(WMI_CMD_ID wmi_command)
 	}
 	return "Invalid WMI cmd";
 }
+#endif
 
 /* worker thread to recover when Target doesn't respond with credits */
 static void recovery_work_handler(struct work_struct *recovery)
@@ -756,8 +758,10 @@ dont_tag:
 
 	SET_HTC_PACKET_NET_BUF_CONTEXT(pkt, buf);
 
+#ifdef DEBUG
 	WMA_LOGD("Send WMI command:%s command_id:%d",
 			get_wmi_cmd_string(cmd_id), cmd_id);
+#endif
 
 #ifdef WMI_INTERFACE_EVENT_LOGGING
 	adf_os_spin_lock_bh(&wmi_handle->wmi_record_lock);
