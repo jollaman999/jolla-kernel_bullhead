@@ -166,9 +166,9 @@ static int is_full_zero(const void *s1, size_t len)
 #elif defined(CONFIG_ARM)
 #include "uksm_arm.h"
 #else
-static int is_full_zero(void *s1, size_t len)
+static int is_full_zero(const void *s1, size_t len)
 {
-	unsigned long *src = s1;
+	const unsigned long *src = s1;
 	int i;
 
 	len /= sizeof(*src);
