@@ -164,7 +164,7 @@ static int is_full_zero(const void *s1, size_t len)
 
 #endif
 #else
-static int is_full_zero(const void *s1, size_t len)
+static int is_full_zero(void *s1, size_t len)
 {
 	unsigned long *src = s1;
 	int i;
@@ -180,7 +180,6 @@ static int is_full_zero(const void *s1, size_t len)
 }
 #endif
 
-#define U64_MAX		(~((u64)0))
 #define UKSM_RUNG_ROUND_FINISHED  (1 << 0)
 #define TIME_RATIO_SCALE	10000
 
@@ -1604,7 +1603,7 @@ static inline int check_collision(struct rmap_item *rmap_item,
 static struct page *page_trans_compound_anon(struct page *page)
 {
 	if (PageTransCompound(page)) {
-		struct page *head = compound_trans_head(page);
+		struct page *head = compound_head(page);
 		/*
 		 * head may actually be splitted and freed from under
 		 * us but it's ok here.
@@ -4714,7 +4713,8 @@ out:
 	return referenced;
 }
 
-int try_to_unmap_ksm(struct page *page, enum ttu_flags flags)
+int try_to_unmap_ksm(struct page *page, enum ttu_flags flags,
+			struct vm_area_struct *target_vma)
 {
 	struct stable_node *stable_node;
 	struct node_vma *node_vma;
