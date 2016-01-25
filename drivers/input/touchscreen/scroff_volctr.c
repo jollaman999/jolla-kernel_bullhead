@@ -143,7 +143,7 @@ __setup("sovc=", read_sovc_cmdline);
 /* Key work func */
 static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 {
-	if (!scr_suspended)
+	if (!scr_suspended || !is_touching)
 		return;
 
 	if (!mutex_trylock(&keyworklock))
