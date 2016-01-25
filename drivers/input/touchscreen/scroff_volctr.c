@@ -37,27 +37,27 @@
 
 /* ******************* HOW TO WORK *******************
  * == For Volume Control ==
- *  If you sweep touchscreen up or down in SOVC_TIME_GAP (ms) time
- * and detach your finger, volume will increase/decrease
+ *  If you swipe the touchscreen up or down in SOVC_TIME_GAP (ms)
+ * time and remove your finger, volume will increase/decrease
  * just one time.
  *
- *  Otherwise if you sweep touchscreen up or down and hold your
- * finger on touchscreen, volume will increase/decrease
+ *  Otherwise if you swipe touchscreen up or down and hold your
+ * finger on the touchscreen, volume will increase/decrease
  * continuously based on SOVC_VOL_REEXEC_DELAY (ms) time.
  *
- * See the working vedio
- * https://youtu.be/htDYZ148Q-w
- *
  * == For Track Control ==
- *  If you sweep touchscreen right to left in
- * SOVC_TIME_GAP (ms) time, you can play next track.
+ *  If you swipe the touchscreen right to left in
+ * SOVC_TIME_GAP (ms) time, it will play the next track.
  *
- *  Otherwise if you sweep touchscreen left to right,
- * you can play previous track.
+ *  Otherwise if you swipe the touchscreen left to right,
+ * it will play the previous track.
  *
- * Also if you sweep touchscreen right or left and hold your
- * finger on touchscreen, track will change
+ *  Also if you swipe the touchscreen right or left and
+ * hold your finger on touchscreen, track will change
  * continuously based on SOVC_TRACK_REEXEC_DELAY (ms) time.
+ *
+ * See the demo video.
+ * http://buf.jollaman999.com/jolla-kernel_AIO-bullhead/Screen_Off_Volume_Control.mp4
  */
 
 /* uncomment since no touchscreen defines android touch, do that here */
@@ -71,7 +71,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Screen Off Volume & Track Control for almost any device"
-#define DRIVER_VERSION "2.1"
+#define DRIVER_VERSION "2.2"
 #define LOGTAG "[scroff_volctr]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
