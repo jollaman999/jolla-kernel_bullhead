@@ -1928,6 +1928,7 @@ static int unix_dgram_recvmsg(struct kiocb *iocb, struct socket *sock,
 	struct scm_cookie tmp_scm;
 	struct sock *sk = sock->sk;
 	struct unix_sock *u = unix_sk(sk);
+	int noblock = flags & MSG_DONTWAIT;
 	struct sk_buff *skb;
 	int err;
 	int peeked, skip;
