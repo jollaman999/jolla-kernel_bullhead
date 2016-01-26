@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 3.10.95-jolla-kernel_bullhead-v4.3 Kernel Configuration
+# Linux/arm64 3.10.95-jolla-kernel_bullhead-v5.0 Kernel Configuration
 #
 CONFIG_ARM64=y
 CONFIG_64BIT=y
@@ -2659,6 +2659,7 @@ CONFIG_HID_CYPRESS=y
 # CONFIG_HID_EMS_FF is not set
 CONFIG_HID_ELECOM=y
 CONFIG_HID_EZKEY=y
+CONFIG_HID_FIIO=y
 CONFIG_HID_HOLTEK=y
 # CONFIG_HOLTEK_FF is not set
 # CONFIG_HID_KEYTOUCH is not set
