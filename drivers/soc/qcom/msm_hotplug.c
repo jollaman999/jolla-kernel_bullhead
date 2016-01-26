@@ -402,7 +402,6 @@ static void cpu_up_work(struct work_struct *work)
 			if (target_big <= num_online_big_cpus())
 				break;
 			cpu_up(cpu);
-			apply_down_lock(cpu);
 		}
 
 		big_core_up_ready_checked = false;
