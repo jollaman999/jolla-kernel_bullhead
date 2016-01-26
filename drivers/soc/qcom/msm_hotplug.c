@@ -379,11 +379,12 @@ static void cpu_up_work(struct work_struct *work)
 	online_little = num_online_little_cpus();
 
 	// If LITTLE_CORES is 4 and BIG_CORES is 2.
-	// online_little >= 3 -> Turn on all of big cores. (2)
-	// 3 > online_little >= 2 -> Turn on half of big cores. (1)
-	if (online_little >= LITTLE_CORES - LITTLE_CORES / 3)
+	// online_little == 4 -> Turn on all of big cores. (2)
+	// online_little == 3 -> Turn on half of big cores. (1)
+	// else -> skip
+	if (online_little == LITTLE_CORES)
 		target_big = BIG_CORES;
-	else if (online_little >= LITTLE_CORES - LITTLE_CORES / 2)
+	else if (online_little == LITTLE_CORES - 1)
 		target_big = BIG_CORES / 2;
 	else
 		return;
@@ -433,14 +434,15 @@ static void cpu_down_work(struct work_struct *work)
 	online_little = num_online_little_cpus();
 
 	// If LITTLE_CORES is 4 and BIG_CORES is 2.
-	// online_little < 2 -> Turn off all of big cores. (2)
-	// 2 <= online_little <= 3 -> Turn off half of big cores. (1)
-	if (online_little < LITTLE_CORES - LITTLE_CORES / 2)
-		target_big = BIG_CORES;
-	else if (online_little <= LITTLE_CORES - LITTLE_CORES / 3)
+	// online_little == 4 -> skip
+	// online_little == 3 -> Turn off half of big cores. (1)
+	// else -> Turn off all of big cores. (2)
+	if (online_little == LITTLE_CORES)
+		return;
+	else if (online_little == LITTLE_CORES - 1)
 		target_big = BIG_CORES / 2;
 	else
-		return;
+		target_big = BIG_CORES;
 
 	if (!big_core_down_ready_checked) {
 		big_core_down_ready_checked = true;
