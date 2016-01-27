@@ -1023,9 +1023,7 @@ VOS_STATUS hdd_Ibss_GetStaId(hdd_station_ctx_t *pHddStaCtx, v_MACADDR_t *pMacAdd
  */
 static void __hdd_tx_timeout(struct net_device *dev)
 {
-#ifdef HDD_TRACE_RECORD
    hdd_adapter_t *pAdapter =  WLAN_HDD_GET_PRIV_PTR(dev);
-#endif
    struct netdev_queue *txq;
    int i = 0;
 
@@ -1035,7 +1033,7 @@ static void __hdd_tx_timeout(struct net_device *dev)
    //disabled either because of disassociation or low resource scenarios. In
    //case of disassociation it is ok to ignore this. But if associated, we have
    //do possible recovery here
-#ifdef HDD_TRACE_RECORD
+
    VOS_TRACE( VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_INFO,
               "num_bytes AC0: %d AC1: %d AC2: %d AC3: %d",
               pAdapter->wmm_tx_queue[0].count,
@@ -1049,7 +1047,6 @@ static void __hdd_tx_timeout(struct net_device *dev)
               pAdapter->isTxSuspended[1],
               pAdapter->isTxSuspended[2],
               pAdapter->isTxSuspended[3]);
-#endif
 
    for (i = 0; i < NUM_TX_QUEUES; i++) {
       txq = netdev_get_tx_queue(dev, i);

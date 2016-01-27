@@ -11563,7 +11563,6 @@ void sme_UpdateEnableSSR(tHalHandle hHal, tANI_BOOLEAN enableSSR)
  * SME API to stringify bonding mode. (hostapd convention)
  */
 
-#ifdef SME_TRACE_RECORD
 static const char* sme_CBMode2String( tANI_U32 mode)
 {
    switch (mode)
@@ -11589,7 +11588,6 @@ static const char* sme_CBMode2String( tANI_U32 mode)
          return "Unknown";
    }
 }
-#endif
 
 /*
  * SME API to adjust bonding mode to regulatory, dfs nol .. etc.
@@ -11662,12 +11660,10 @@ static VOS_STATUS sme_AdjustCBMode(tAniSirGlobal* pMac,
    if (chanBitmap == 0)
    {
       /* never be in this case */
-#ifdef SME_TRACE_RECORD
       VOS_TRACE(VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_ERROR,
             FL("channel %d %s is not supported"),
             channel,
             sme_CBMode2String(mode));
-#endif
       return VOS_STATUS_E_INVAL;
    }
 
@@ -11709,12 +11705,10 @@ static VOS_STATUS sme_AdjustCBMode(tAniSirGlobal* pMac,
             break;
       }
 
-#ifdef SME_TRACE_RECORD
       VOS_TRACE(VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_WARN,
             FL("bonding mode adjust: %s to %s"),
             sme_CBMode2String(mode),
             sme_CBMode2String(newMode));
-#endif
 
    }
 

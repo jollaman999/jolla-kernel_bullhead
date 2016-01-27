@@ -37,8 +37,6 @@
 #include "wlan_hdd_trace.h"
 #include "wlan_hdd_main.h"
 
-#ifdef HDD_TRACE_RECORD
-
 static tANI_U8 *hddTraceGetEventString(tANI_U32 code)
 {
 	switch (code) {
@@ -119,5 +117,3 @@ void hddTraceInit()
 {
 	vosTraceRegister(VOS_MODULE_ID_HDD, (tpvosTraceCb) & hddTraceDump);
 }
-
-#endif
