@@ -49,7 +49,6 @@
 #define MISC_DYNAMIC_MINOR	255
 
 struct device;
-struct attribute_group;
 
 struct miscdevice  {
 	int minor;
@@ -58,7 +57,6 @@ struct miscdevice  {
 	struct list_head list;
 	struct device *parent;
 	struct device *this_device;
-	const struct attribute_group **groups;
 	const char *nodename;
 	umode_t mode;
 };
