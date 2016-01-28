@@ -16,7 +16,11 @@
 
 include $(srctree)/arch/arm64/boot/dts/Makefile
 
+ifeq ($(CONFIG_BUILD_ARM64_LZ4_COMPRESSED_APPENDED_DTB_IMAGE),y)
+targets := Image Image.lz4
+else
 targets := Image Image.gz
+endif
 
 dtb-y += $(notdir $(wildcard $(obj)/dts/*.dtb))
 DTB_NAMES := $(subst $\",,$(CONFIG_BUILD_ARM64_APPENDED_DTB_IMAGE_NAMES))
@@ -33,11 +37,19 @@ $(obj)/Image: vmlinux FORCE
 $(obj)/Image.wrapper: $(obj)/Image FORCE
 	$(CONFIG_SHELL) $(srctree)/$(src)/wrapper $(obj)/Image
 
+ifeq ($(CONFIG_BUILD_ARM64_LZ4_COMPRESSED_APPENDED_DTB_IMAGE),y)
+$(obj)/Image.lz4: $(obj)/Image FORCE
+	$(call if_changed,lz4)
+
+$(obj)/Image.lz4-dtb: $(obj)/Image.lz4 $(DTB_OBJS) FORCE
+	$(call if_changed,cat)
+else
 $(obj)/Image.gz: $(obj)/Image FORCE
 	$(call if_changed,gzip)
 
 $(obj)/Image.gz-dtb: $(obj)/Image.gz $(DTB_OBJS) FORCE
 	$(call if_changed,cat)
+endif
 
 $(obj)/Image-dtb: $(obj)/Image.wrapper $(DTB_OBJS) FORCE
 	$(call if_changed,cat)
