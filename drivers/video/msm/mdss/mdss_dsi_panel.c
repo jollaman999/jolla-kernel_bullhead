@@ -21,7 +21,7 @@
 #include <linux/leds.h>
 #include <linux/qpnp/pwm.h>
 #include <linux/err.h>
-
+#include <linux/display_state.h>
 #include "mdss_dsi.h"
 
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
@@ -45,6 +45,14 @@ DEFINE_LED_TRIGGER(bl_led_trigger);
 
 static int mdss_bl_ctrl_panel = false;
 static int bl_default_lvl = 1800;
+
+
+static bool display_on = true;
+
+bool is_display_on()
+{
+	return display_on;
+}
 
 void mdss_set_bl_ctrl_by_panel(int enable)
 {
@@ -692,6 +700,8 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 		return -EINVAL;
 	}
 
+	display_on = true;
+
 	pinfo = &pdata->panel_info;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
@@ -766,6 +776,8 @@ touch_off:
 #endif
 	if (ctrl->off_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
+
+	display_on = false;
 
 end:
 	pinfo->blank_state = MDSS_PANEL_BLANK_BLANK;
