@@ -658,73 +658,6 @@ int hdd_priv_get_data(struct iw_point *p_priv_data,
    return 0;
 }
 
-
-/**---------------------------------------------------------------------------
-
-  \brief hdd_wlan_get_stats -
-
-   Helper function to get stats
-
-  \param  - pAdapter Pointer to the adapter.
-            wrqu - Pointer to IOCTL REQUEST Data.
-            extra - Pointer to char
-
-
-  \return - none
-
-  --------------------------------------------------------------------------*/
-void hdd_wlan_get_stats(hdd_adapter_t *pAdapter, v_U16_t *length,
-                        char *buffer, v_U16_t buf_len)
-{
-    hdd_tx_rx_stats_t *pStats = &pAdapter->hdd_stats.hddTxRxStats;
-
-    snprintf(buffer, buf_len,
-        "\nTransmit"
-        "\ncalled %u, dropped %u,"
-        "\n      dropped BK %u, BE %u, VI %u, VO %u"
-        "\n   classified BK %u, BE %u, VI %u, VO %u"
-        "\ncompleted %u,"
-        "\n\nReceive"
-        "\nchains %u, packets %u, dropped %u, delivered %u, refused %u"
-        "\n"
-        "\nNetQueue State %s"
-        "\ndisable count %u, enable count %u"
-        "\n\nTX_FLOW"
-        "\nCurrent status %s"
-        "\ntx-flow timer start count %u"
-        "\npause count %u, unpause count %u",
-        pStats->txXmitCalled,
-        pStats->txXmitDropped,
-
-        pStats->txXmitDroppedAC[WLANTL_AC_BK],
-        pStats->txXmitDroppedAC[WLANTL_AC_BE],
-        pStats->txXmitDroppedAC[WLANTL_AC_VI],
-        pStats->txXmitDroppedAC[WLANTL_AC_VO],
-
-        pStats->txXmitClassifiedAC[WLANTL_AC_BK],
-        pStats->txXmitClassifiedAC[WLANTL_AC_BE],
-        pStats->txXmitClassifiedAC[WLANTL_AC_VI],
-        pStats->txXmitClassifiedAC[WLANTL_AC_VO],
-
-        pStats->txCompleted,
-
-        pStats->rxChains,
-        pStats->rxPackets,
-        pStats->rxDropped,
-        pStats->rxDelivered,
-        pStats->rxRefused,
-        (pStats->netq_state_off == TRUE ? "OFF": "ON"),
-        pStats->netq_disable_cnt,
-        pStats->netq_enable_cnt,
-        (pStats->is_txflow_paused == TRUE ? "paused": "unpaused"),
-        pStats->txflow_timer_cnt,
-        pStats->txflow_pause_cnt,
-        pStats->txflow_unpause_cnt
-        );
-    *length = strlen(buffer) + 1;
-}
-
-
 /**---------------------------------------------------------------------------
 
   \brief hdd_wlan_get_version() -
@@ -1579,207 +1512,6 @@ v_U8_t* wlan_hdd_get_vendor_oui_ie_ptr(v_U8_t *oui, v_U8_t oui_size, v_U8_t *ie,
     return NULL;
 }
 
-/**
- * hdd_get_ldpc() - Get adapter LDPC
- * @adapter: adapter being queried
- * @value: where to store the value
- *
- * Return: 0 on success, negative errno on failure
- */
-int hdd_get_ldpc(hdd_adapter_t *adapter, int *value)
-{
-	tHalHandle hal = WLAN_HDD_GET_HAL_CTX(adapter);
-	int ret;
-
-	ENTER();
-	ret = sme_GetHTConfig(hal, adapter->sessionId,
-			      WNI_CFG_HT_CAP_INFO_ADVANCE_CODING);
-	if (ret < 0) {
-		hddLog(LOGE, FL("Failed to get LDPC value"));
-	} else {
-		*value = ret;
-		ret = 0;
-	}
-	return ret;
-}
-
-/**
- * hdd_set_ldpc() - Set adapter LDPC
- * @adapter: adapter being modified
- * @value: new LDPC value
- *
- * Return: 0 on success, negative errno on failure
- */
-int hdd_set_ldpc(hdd_adapter_t *adapter, int value)
-{
-	tHalHandle hal = WLAN_HDD_GET_HAL_CTX(adapter);
-	int ret;
-
-	hddLog(LOG1, FL("%d"), value);
-	if (value) {
-		/* make sure HT capabilities allow this */
-		eHalStatus status;
-		uint32_t cfg_value;
-		union {
-			uint16_t cfg_value16;
-			tSirMacHTCapabilityInfo ht_cap_info;
-		} u;
-
-		status = ccmCfgGetInt(hal, WNI_CFG_HT_CAP_INFO, &cfg_value);
-		if (eHAL_STATUS_SUCCESS != status) {
-			hddLog(LOGE, FL("Failed to get HT capability info"));
-			return -EIO;
-		}
-		u.cfg_value16 = cfg_value & 0xFFFF;
-		if (!u.ht_cap_info.advCodingCap) {
-			hddLog(LOGE, FL("LDCP not supported"));
-			return -EINVAL;
-		}
-	}
-
-	ret = sme_UpdateHTConfig(hal, adapter->sessionId,
-				 WNI_CFG_HT_CAP_INFO_ADVANCE_CODING,
-				 value);
-	if (ret)
-		hddLog(LOGE, FL("Failed to set LDPC value"));
-
-	return ret;
-}
-
-/**
- * hdd_get_tx_stbc() - Get adapter TX STBC
- * @adapter: adapter being queried
- * @value: where to store the value
- *
- * Return: 0 on success, negative errno on failure
- */
-int hdd_get_tx_stbc(hdd_adapter_t *adapter, int *value)
-{
-	tHalHandle hal = WLAN_HDD_GET_HAL_CTX(adapter);
-	int ret;
-
-	ENTER();
-	ret = sme_GetHTConfig(hal, adapter->sessionId,
-			      WNI_CFG_HT_CAP_INFO_TX_STBC);
-	if (ret < 0) {
-		hddLog(LOGE, FL("Failed to get TX STBC value"));
-	} else {
-		*value = ret;
-		ret = 0;
-	}
-
-	return ret;
-}
-
-/**
- * hdd_set_tx_stbc() - Set adapter TX STBC
- * @adapter: adapter being modified
- * @value: new TX STBC value
- *
- * Return: 0 on success, negative errno on failure
- */
-int hdd_set_tx_stbc(hdd_adapter_t *adapter, int value)
-{
-	tHalHandle hal = WLAN_HDD_GET_HAL_CTX(adapter);
-	int ret;
-
-	hddLog(LOG1, FL("%d"), value);
-	if (value) {
-		/* make sure HT capabilities allow this */
-		eHalStatus status;
-		uint32_t cfg_value;
-		union {
-			uint16_t cfg_value16;
-			tSirMacHTCapabilityInfo ht_cap_info;
-		} u;
-
-		status = ccmCfgGetInt(hal, WNI_CFG_HT_CAP_INFO, &cfg_value);
-		if (eHAL_STATUS_SUCCESS != status) {
-			hddLog(LOGE, FL("Failed to get HT capability info"));
-			return -EIO;
-		}
-		u.cfg_value16 = cfg_value & 0xFFFF;
-		if (!u.ht_cap_info.txSTBC) {
-			hddLog(LOGE, FL("TX STBC not supported"));
-			return -EINVAL;
-		}
-	}
-	ret = sme_UpdateHTConfig(hal, adapter->sessionId,
-				 WNI_CFG_HT_CAP_INFO_TX_STBC,
-				 value);
-	if (ret)
-		hddLog(LOGE, FL("Failed to set TX STBC value"));
-
-	return ret;
-}
-
-/**
- * hdd_get_rx_stbc() - Get adapter RX STBC
- * @adapter: adapter being queried
- * @value: where to store the value
- *
- * Return: 0 on success, negative errno on failure
- */
-int hdd_get_rx_stbc(hdd_adapter_t *adapter, int *value)
-{
-	tHalHandle hal = WLAN_HDD_GET_HAL_CTX(adapter);
-	int ret;
-
-	ENTER();
-	ret = sme_GetHTConfig(hal, adapter->sessionId,
-			      WNI_CFG_HT_CAP_INFO_RX_STBC);
-	if (ret < 0) {
-		hddLog(LOGE, FL("Failed to get RX STBC value"));
-	} else {
-		*value = ret;
-		ret = 0;
-	}
-
-	return ret;
-}
-
-/**
- * hdd_set_rx_stbc() - Set adapter RX STBC
- * @adapter: adapter being modified
- * @value: new RX STBC value
- *
- * Return: 0 on success, negative errno on failure
- */
-int hdd_set_rx_stbc(hdd_adapter_t *adapter, int value)
-{
-	tHalHandle hal = WLAN_HDD_GET_HAL_CTX(adapter);
-	int ret;
-
-	hddLog(LOG1, FL("%d"), value);
-	if (value) {
-		/* make sure HT capabilities allow this */
-		eHalStatus status;
-		uint32_t cfg_value;
-		union {
-			uint16_t cfg_value16;
-			tSirMacHTCapabilityInfo ht_cap_info;
-		} u;
-
-		status = ccmCfgGetInt(hal, WNI_CFG_HT_CAP_INFO, &cfg_value);
-		if (eHAL_STATUS_SUCCESS != status) {
-			hddLog(LOGE, FL("Failed to get HT capability info"));
-			return -EIO;
-		}
-		u.cfg_value16 = cfg_value & 0xFFFF;
-		if (!u.ht_cap_info.rxSTBC) {
-			hddLog(LOGE, FL("RX STBC not supported"));
-			return -EINVAL;
-		}
-	}
-	ret = sme_UpdateHTConfig(hal, adapter->sessionId,
-				 WNI_CFG_HT_CAP_INFO_RX_STBC,
-				 value);
-	if (ret)
-		hddLog(LOGE, FL("Failed to set RX STBC value"));
-
-	return ret;
-}
-
 static int iw_set_commit(struct net_device *dev, struct iw_request_info *info,
                          union iwreq_data *wrqu, char *extra)
 {
@@ -2270,12 +2002,11 @@ static int iw_set_genie(struct net_device *dev,
         union iwreq_data *wrqu,
         char *extra)
 {
-    hdd_adapter_t *pAdapter = WLAN_HDD_GET_PRIV_PTR(dev);
+   hdd_adapter_t *pAdapter = WLAN_HDD_GET_PRIV_PTR(dev);
     hdd_wext_state_t *pWextState = WLAN_HDD_GET_WEXT_STATE_PTR(pAdapter);
     u_int8_t *genie = NULL;
     u_int8_t *base_genie = NULL;
     v_U16_t remLen;
-    int ret = 0;
 
    ENTER();
 
@@ -2325,8 +2056,8 @@ static int iw_set_genie(struct net_device *dev,
             case IE_EID_VENDOR:
                 if ((IE_LEN_SIZE+IE_EID_SIZE+IE_VENDOR_OUI_SIZE) > eLen) /* should have at least OUI */
                 {
-                    ret = -EINVAL;
-                    goto exit;
+                    kfree(base_genie);
+                    return -EINVAL;
                 }
 
                 if (0 == memcmp(&genie[0], "\x00\x50\xf2\x04", 4))
@@ -2340,8 +2071,8 @@ static int iw_set_genie(struct net_device *dev,
                        hddLog(VOS_TRACE_LEVEL_FATAL, "Cannot accommodate genIE. "
                                                       "Need bigger buffer space");
                        VOS_ASSERT(0);
-                       ret = -EINVAL;
-                       goto exit;
+                       kfree(base_genie);
+                       return -ENOMEM;
                     }
                     // save to Additional IE ; it should be accumulated to handle WPS IE + other IE
                     memcpy( pWextState->genIE.addIEdata + curGenIELen, genie - 2, eLen + 2);
@@ -2350,14 +2081,6 @@ static int iw_set_genie(struct net_device *dev,
                 else if (0 == memcmp(&genie[0], "\x00\x50\xf2", 3))
                 {
                     hddLog (VOS_TRACE_LEVEL_INFO, "%s Set WPA IE (len %d)",__func__, eLen + 2);
-                    if ((eLen + 2) > (sizeof(pWextState->WPARSNIE)))
-                    {
-                       hddLog(VOS_TRACE_LEVEL_FATAL, "Cannot accommodate genIE. "
-                                                      "Need bigger buffer space");
-                       ret = -EINVAL;
-                       VOS_ASSERT(0);
-                       goto exit;
-                    }
                     memset( pWextState->WPARSNIE, 0, MAX_WPA_RSN_IE_LEN );
                     memcpy( pWextState->WPARSNIE, genie - 2, (eLen + 2));
                     pWextState->roamProfile.pWPAReqIE = pWextState->WPARSNIE;
@@ -2374,8 +2097,8 @@ static int iw_set_genie(struct net_device *dev,
                        hddLog(VOS_TRACE_LEVEL_FATAL, "Cannot accommodate genIE. "
                                                       "Need bigger buffer space");
                        VOS_ASSERT(0);
-                       ret = -ENOMEM;
-                       goto exit;
+                       kfree(base_genie);
+                       return -ENOMEM;
                     }
                     // save to Additional IE ; it should be accumulated to handle WPS IE + other IE
                     memcpy( pWextState->genIE.addIEdata + curGenIELen, genie - 2, eLen + 2);
@@ -2384,14 +2107,6 @@ static int iw_set_genie(struct net_device *dev,
               break;
          case DOT11F_EID_RSN:
                 hddLog (LOG1, "%s Set RSN IE (len %d)",__func__, eLen+2);
-                if ((eLen + 2) > (sizeof(pWextState->WPARSNIE)))
-                {
-                    hddLog(VOS_TRACE_LEVEL_FATAL, "Cannot accommodate genIE. "
-                                                  "Need bigger buffer space");
-                    ret = -EINVAL;
-                    VOS_ASSERT(0);
-                    goto exit;
-                }
                 memset( pWextState->WPARSNIE, 0, MAX_WPA_RSN_IE_LEN );
                 memcpy( pWextState->WPARSNIE, genie - 2, (eLen + 2));
                 pWextState->roamProfile.pRSNReqIE = pWextState->WPARSNIE;
@@ -2400,15 +2115,15 @@ static int iw_set_genie(struct net_device *dev,
 
          default:
                 hddLog (LOGE, "%s Set UNKNOWN IE %X",__func__, elementId);
-                goto exit;
+            kfree(base_genie);
+            return 0;
     }
         genie += eLen;
         remLen -= eLen;
     }
-exit:
     EXIT();
     kfree(base_genie);
-    return ret;
+    return 0;
 }
 
 static int iw_get_genie(struct net_device *dev,
@@ -3335,13 +3050,6 @@ static int iw_softap_set_channel_range( struct net_device *dev,
     hdd_adapter_t *pHostapdAdapter = (netdev_priv(dev));
     tHalHandle hHal = WLAN_HDD_GET_HAL_CTX(pHostapdAdapter);
     hdd_context_t *pHddCtx = WLAN_HDD_GET_CTX(pHostapdAdapter);
-
-    if (!capable(CAP_NET_ADMIN))
-    {
-        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                  FL("permission check failed"));
-        return -EPERM;
-    }
 
     status = WLANSAP_SetChannelRange(hHal, startChannel, endChannel, band);
 
@@ -4559,8 +4267,6 @@ static int iw_set_mlme(struct net_device *dev,
 
                 netif_tx_disable(dev);
                 netif_carrier_off(dev);
-                pAdapter->hdd_stats.hddTxRxStats.netq_disable_cnt++;
-                pAdapter->hdd_stats.hddTxRxStats.netq_state_off = TRUE;
 
             }
             else
@@ -5270,15 +4976,10 @@ static int iw_setint_getnone(struct net_device *dev, struct iw_request_info *inf
 
         case WE_SET_NSS:
         {
-           hddLog(LOG1, "Set NSS = %d", set_value);
-           if ((set_value > 2) || (set_value <= 0)) {
-               hddLog(LOGE, "NSS greater than 2 not supported");
-               ret = -EINVAL;
-           } else {
-               if (VOS_STATUS_SUCCESS !=
-                     hdd_update_nss(WLAN_HDD_GET_CTX(pAdapter), set_value))
-                   ret = -EINVAL;
-           }
+           hddLog(LOG1, "WMI_VDEV_PARAM_NSS val %d", set_value);
+           ret = process_wma_set_command((int)pAdapter->sessionId,
+                                         (int)WMI_VDEV_PARAM_NSS,
+                                         set_value, VDEV_CMD);
            break;
         }
 
@@ -5355,16 +5056,103 @@ static int iw_setint_getnone(struct net_device *dev, struct iw_request_info *inf
         }
 
         case WE_SET_LDPC:
-           ret = hdd_set_ldpc(pAdapter, set_value);
+        {
+           tANI_U32 value;
+           union {
+              tANI_U16                        nCfgValue16;
+              tSirMacHTCapabilityInfo         htCapInfo;
+           }uHTCapabilityInfo;
+
+           hddLog(LOG1, "LDPC val %d", set_value);
+           /* get the HT capability info*/
+           ret = ccmCfgGetInt(hHal, WNI_CFG_HT_CAP_INFO, &value);
+           if (eHAL_STATUS_SUCCESS != ret) {
+               VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                         "%s: could not get HT capability info",
+                         __func__);
+               return -EIO;
+           }
+
+           uHTCapabilityInfo.nCfgValue16 = 0xFFFF & value;
+           if ((set_value && (uHTCapabilityInfo.htCapInfo.advCodingCap)) ||
+                (!set_value)) {
+               ret = sme_UpdateHTConfig(hHal, pAdapter->sessionId,
+                                  WNI_CFG_HT_CAP_INFO_ADVANCE_CODING,
+                                  set_value);
+           }
+
+           if (ret)
+               VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                     "Failed to set LDPC value");
+
            break;
+        }
 
         case WE_SET_TX_STBC:
-           ret = hdd_set_tx_stbc(pAdapter, set_value);
+        {
+           tANI_U32 value;
+           union {
+              tANI_U16                        nCfgValue16;
+              tSirMacHTCapabilityInfo         htCapInfo;
+           }uHTCapabilityInfo;
+
+           hddLog(LOG1, "TX_STBC val %d", set_value);
+           /* get the HT capability info*/
+           ret = ccmCfgGetInt(hHal, WNI_CFG_HT_CAP_INFO, &value);
+           if (eHAL_STATUS_SUCCESS != ret) {
+               VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                         "%s: could not get HT capability info",
+                         __func__);
+               return -EIO;
+           }
+
+           uHTCapabilityInfo.nCfgValue16 = 0xFFFF & value;
+           if ((set_value && (uHTCapabilityInfo.htCapInfo.txSTBC)) ||
+               (!set_value)) {
+               ret = sme_UpdateHTConfig(hHal, pAdapter->sessionId,
+                                  WNI_CFG_HT_CAP_INFO_TX_STBC,
+                                  set_value);
+           }
+
+           if (ret)
+               VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                     "Failed to set TX STBC value");
+
            break;
+        }
 
         case WE_SET_RX_STBC:
-           ret = hdd_set_rx_stbc(pAdapter, set_value);
+        {
+           tANI_U32 value;
+           union {
+              tANI_U16                        nCfgValue16;
+              tSirMacHTCapabilityInfo         htCapInfo;
+           }uHTCapabilityInfo;
+
+           hddLog(LOG1, "WMI_VDEV_PARAM_RX_STBC val %d", set_value);
+           /* get the HT capability info*/
+           ret = ccmCfgGetInt(hHal, WNI_CFG_HT_CAP_INFO, &value);
+           if (eHAL_STATUS_SUCCESS != ret) {
+               VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
+                         "%s: could not get HT capability info",
+                         __func__);
+               return -EIO;
+           }
+
+           uHTCapabilityInfo.nCfgValue16 = 0xFFFF & value;
+           if ((set_value && (uHTCapabilityInfo.htCapInfo.rxSTBC)) ||
+               (!set_value)) {
+               ret = sme_UpdateHTConfig(hHal, pAdapter->sessionId,
+                                 WNI_CFG_HT_CAP_INFO_RX_STBC,
+                                 (!set_value)? set_value :
+                                           uHTCapabilityInfo.htCapInfo.rxSTBC);
+           }
+
+           if (ret)
+               VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                     "Failed to set RX STBC value");
            break;
+        }
 
         case WE_SET_SHORT_GI:
         {
@@ -6200,24 +5988,11 @@ static int iw_setchar_getnone(struct net_device *dev, struct iw_request_info *in
 #endif /* WLAN_FEATURE_VOWIFI */
     struct iw_point s_priv_data;
 
-    if (!capable(CAP_NET_ADMIN))
-    {
-        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                  FL("permission check failed"));
-        return -EPERM;
-    }
-
     if ((WLAN_HDD_GET_CTX(pAdapter))->isLogpInProgress)
     {
         VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_FATAL,
                                   "%s:LOGP in Progress. Ignore!!!", __func__);
         return -EBUSY;
-    }
-
-    if (!capable(CAP_NET_ADMIN)){
-        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                  FL("permission check failed"));
-        return -EPERM;
     }
 
     /* helper function to get iwreq_data with compat handling. */
@@ -6392,9 +6167,11 @@ static int iw_setnone_getint(struct net_device *dev, struct iw_request_info *inf
 
         case WE_GET_NSS:
         {
-           sme_GetConfigParam(hHal, &smeConfig);
-           *value = (smeConfig.csrConfig.enable2x2 == 0) ? 1 : 2;
-           hddLog(LOG1, "GET_NSS: Current NSS:%d", *value);
+           hddLog(LOG1, "GET WMI_VDEV_PARAM_NSS");
+           *value = wma_cli_get_command(wmapvosContext,
+                                        (int)pAdapter->sessionId,
+                                        (int)WMI_VDEV_PARAM_NSS,
+                                        VDEV_CMD);
            break;
         }
 
@@ -6479,16 +6256,28 @@ static int iw_setnone_getint(struct net_device *dev, struct iw_request_info *inf
         }
 
         case WE_GET_LDPC:
-           ret = hdd_get_ldpc(pAdapter, value);
+        {
+           hddLog(LOG1, "GET WMI_VDEV_PARAM_LDPC");
+           *value = sme_GetHTConfig(hHal, pAdapter->sessionId,
+                                           WNI_CFG_HT_CAP_INFO_ADVANCE_CODING);
            break;
+        }
 
         case WE_GET_TX_STBC:
-           ret = hdd_get_tx_stbc(pAdapter, value);
+        {
+           hddLog(LOG1, "GET WMI_VDEV_PARAM_TX_STBC");
+           *value = sme_GetHTConfig(hHal, pAdapter->sessionId,
+                                           WNI_CFG_HT_CAP_INFO_TX_STBC);
            break;
+        }
 
         case WE_GET_RX_STBC:
-           ret = hdd_get_rx_stbc(pAdapter, value);
+        {
+           hddLog(LOG1, "GET WMI_VDEV_PARAM_RX_STBC");
+           *value = sme_GetHTConfig(hHal, pAdapter->sessionId,
+                                           WNI_CFG_HT_CAP_INFO_RX_STBC);
            break;
+        }
 
         case WE_GET_SHORT_GI:
         {
@@ -6860,12 +6649,6 @@ int iw_set_three_ints_getnone(struct net_device *dev,
         return -EBUSY;
     }
 
-    if (!capable(CAP_NET_ADMIN)) {
-        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                  FL("permission check failed"));
-        return -EPERM;
-    }
-
     switch(sub_cmd) {
 
     case WE_SET_WLAN_DBG:
@@ -6922,8 +6705,93 @@ static int iw_get_char_setnone(struct net_device *dev, struct iw_request_info *i
 
         case WE_GET_STATS:
         {
-            hdd_wlan_get_stats(pAdapter, &(wrqu->data.length),
-                               extra, WE_MAX_STR_LEN);
+            hdd_tx_rx_stats_t *pStats = &pAdapter->hdd_stats.hddTxRxStats;
+
+            snprintf(extra, WE_MAX_STR_LEN,
+                     "\nTransmit"
+                     "\ncalled %u, dropped %u, backpressured %u, queued %u"
+                     "\n      dropped BK %u, BE %u, VI %u, VO %u"
+                     "\n   classified BK %u, BE %u, VI %u, VO %u"
+                     "\nbackpressured BK %u, BE %u, VI %u, VO %u"
+                     "\n       queued BK %u, BE %u, VI %u, VO %u"
+                     "\nfetched %u, empty %u, lowres %u, deqerr %u"
+                     "\ndequeued %u, depressured %u, deque-depressured %u, completed %u, flushed %u"
+                     "\n      fetched BK %u, BE %u, VI %u, VO %u"
+                     "\n     dequeued BK %u, BE %u, VI %u, VO %u"
+                     "\n  depressured BK %u, BE %u, VI %u, VO %u"
+                     "\nDeque depressured BK %u, BE %u, VI %u, VO %u"
+                     "\n      flushed BK %u, BE %u, VI %u, VO %u"
+                     "\n\nReceive"
+                     "\nchains %u, packets %u, dropped %u, delivered %u, refused %u"
+                     "\n",
+                     pStats->txXmitCalled,
+                     pStats->txXmitDropped,
+                     pStats->txXmitBackPressured,
+                     pStats->txXmitQueued,
+
+                     pStats->txXmitDroppedAC[WLANTL_AC_BK],
+                     pStats->txXmitDroppedAC[WLANTL_AC_BE],
+                     pStats->txXmitDroppedAC[WLANTL_AC_VI],
+                     pStats->txXmitDroppedAC[WLANTL_AC_VO],
+
+                     pStats->txXmitClassifiedAC[WLANTL_AC_BK],
+                     pStats->txXmitClassifiedAC[WLANTL_AC_BE],
+                     pStats->txXmitClassifiedAC[WLANTL_AC_VI],
+                     pStats->txXmitClassifiedAC[WLANTL_AC_VO],
+
+                     pStats->txXmitBackPressuredAC[WLANTL_AC_BK],
+                     pStats->txXmitBackPressuredAC[WLANTL_AC_BE],
+                     pStats->txXmitBackPressuredAC[WLANTL_AC_VI],
+                     pStats->txXmitBackPressuredAC[WLANTL_AC_VO],
+
+                     pStats->txXmitQueuedAC[WLANTL_AC_BK],
+                     pStats->txXmitQueuedAC[WLANTL_AC_BE],
+                     pStats->txXmitQueuedAC[WLANTL_AC_VI],
+                     pStats->txXmitQueuedAC[WLANTL_AC_VO],
+
+                     pStats->txFetched,
+                     pStats->txFetchEmpty,
+                     pStats->txFetchLowResources,
+                     pStats->txFetchDequeueError,
+
+                     pStats->txFetchDequeued,
+                     pStats->txFetchDePressured,
+                     pStats->txDequeDePressured,
+                     pStats->txCompleted,
+                     pStats->txFlushed,
+
+                     pStats->txFetchedAC[WLANTL_AC_BK],
+                     pStats->txFetchedAC[WLANTL_AC_BE],
+                     pStats->txFetchedAC[WLANTL_AC_VI],
+                     pStats->txFetchedAC[WLANTL_AC_VO],
+
+                     pStats->txFetchDequeuedAC[WLANTL_AC_BK],
+                     pStats->txFetchDequeuedAC[WLANTL_AC_BE],
+                     pStats->txFetchDequeuedAC[WLANTL_AC_VI],
+                     pStats->txFetchDequeuedAC[WLANTL_AC_VO],
+
+                     pStats->txFetchDePressuredAC[WLANTL_AC_BK],
+                     pStats->txFetchDePressuredAC[WLANTL_AC_BE],
+                     pStats->txFetchDePressuredAC[WLANTL_AC_VI],
+                     pStats->txFetchDePressuredAC[WLANTL_AC_VO],
+
+                     pStats->txDequeDePressuredAC[WLANTL_AC_BK],
+                     pStats->txDequeDePressuredAC[WLANTL_AC_BE],
+                     pStats->txDequeDePressuredAC[WLANTL_AC_VI],
+                     pStats->txDequeDePressuredAC[WLANTL_AC_VO],
+
+                     pStats->txFlushedAC[WLANTL_AC_BK],
+                     pStats->txFlushedAC[WLANTL_AC_BE],
+                     pStats->txFlushedAC[WLANTL_AC_VI],
+                     pStats->txFlushedAC[WLANTL_AC_VO],
+
+                     pStats->rxChains,
+                     pStats->rxPackets,
+                     pStats->rxDropped,
+                     pStats->rxDelivered,
+                     pStats->rxRefused
+                     );
+            wrqu->data.length = strlen(extra)+1;
             break;
         }
 
@@ -7534,11 +7402,6 @@ static int __iw_set_var_ints_getnone(struct net_device *dev,
     int staId = 0;
     struct iw_point s_priv_data;
 
-    if (!capable(CAP_NET_ADMIN)) {
-        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                FL("permission check failed"));
-        return -EPERM;
-    }
     /* helper function to get iwreq_data with compat handling. */
     if (hdd_priv_get_data(&s_priv_data, wrqu)) {
        return -EINVAL;
@@ -8168,12 +8031,6 @@ static int iw_clear_dynamic_mcbc_filter(struct net_device *dev,
     tpSirWlanSetRxpFilters wlanRxpFilterParam;
     hddLog(VOS_TRACE_LEVEL_INFO_HIGH, "%s: ", __func__);
 
-    if (!capable(CAP_NET_ADMIN)) {
-        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                 FL("permission check failed"));
-        return -EPERM;
-    }
-
     //Reset the filter to INI value as we have to clear the dynamic filter
     pHddCtx->configuredMcastBcastFilter = pHddCtx->cfg_ini->mcastBcastFilterSetting;
 
@@ -8413,9 +8270,6 @@ int wlan_hdd_set_filter(hdd_context_t *pHddCtx, tpPacketFilterCfg pRequest,
 
                 hddLog(VOS_TRACE_LEVEL_INFO, "Data Offset %d Data Len %d",
                         pRequest->paramsData[i].dataOffset, pRequest->paramsData[i].dataLength);
-                if ((sizeof(packetFilterSetReq.paramsData[i].compareData)) <
-                           (pRequest->paramsData[i].dataLength))
-                    return -EINVAL;
 
                 memcpy(&packetFilterSetReq.paramsData[i].compareData,
                         pRequest->paramsData[i].compareData, pRequest->paramsData[i].dataLength);
@@ -8750,12 +8604,6 @@ static int iw_set_packet_filter_params(struct net_device *dev,
     tpPacketFilterCfg pRequest = NULL;
     int ret;
     struct iw_point s_priv_data;
-
-    if (!capable(CAP_NET_ADMIN)) {
-        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                  FL("permission check failed"));
-        return -EPERM;
-    }
 
     if (hdd_priv_get_data(&s_priv_data, wrqu)) {
        return -EINVAL;
@@ -9216,6 +9064,63 @@ VOS_STATUS iw_set_pno(struct net_device *dev, struct iw_request_info *info,
     ptr += nOffset;
   }/*For ucNetworkCount*/
 
+  ucParams = sscanf(ptr,"%hhu %n",
+                    &(pnoRequest.scanTimers.ucScanTimersCount),
+                    &nOffset);
+
+  /*Read the scan timers*/
+  if (( 1 == ucParams ) && ( pnoRequest.scanTimers.ucScanTimersCount > 0 ))
+  {
+     ptr += nOffset;
+
+     VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
+        "Scan timer count %d offset %d",
+        pnoRequest.scanTimers.ucScanTimersCount,
+        nOffset );
+
+     if ( SIR_PNO_MAX_SCAN_TIMERS < pnoRequest.scanTimers.ucScanTimersCount )
+     {
+       VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                    "Incorrect cmd - too many scan timers");
+       return VOS_STATUS_E_FAILURE;
+     }
+
+     for ( i = 0; i < pnoRequest.scanTimers.ucScanTimersCount; i++ )
+     {
+        ucParams = sscanf(ptr,"%u %u %n",
+           &(pnoRequest.scanTimers.aTimerValues[i].uTimerValue),
+           &( pnoRequest.scanTimers.aTimerValues[i].uTimerRepeat),
+           &nOffset);
+
+        if (2 != ucParams)
+        {
+            VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                    "Incorrect cmd - diff params then expected %d", ucParams);
+            return VOS_STATUS_E_FAILURE;
+        }
+
+        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
+            "PNO Timer value %d Timer repeat %d offset %d",
+            pnoRequest.scanTimers.aTimerValues[i].uTimerValue,
+            pnoRequest.scanTimers.aTimerValues[i].uTimerRepeat,
+            nOffset );
+
+        ptr += nOffset;
+     }
+
+  }
+  else
+  {
+    VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
+       "No scan timers provided param count %d scan timers %d",
+        ucParams,  pnoRequest.scanTimers.ucScanTimersCount );
+
+    /*Scan timers defaults to 5 minutes*/
+    pnoRequest.scanTimers.ucScanTimersCount = 1;
+    pnoRequest.scanTimers.aTimerValues[0].uTimerValue  = 60;
+    pnoRequest.scanTimers.aTimerValues[0].uTimerRepeat = 0;
+  }
+
   ucParams = sscanf(ptr,"%hhu %n",&(ucMode), &nOffset);
 
   pnoRequest.modePNO = ucMode;
@@ -9448,12 +9353,6 @@ static int iw_set_band_config(struct net_device *dev,
         return -EBUSY;
     }
 
-    if (!capable(CAP_NET_ADMIN)) {
-        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                  FL("permission check failed"));
-        return -EPERM;
-    }
-
     return hdd_setBand(dev, value[0]);
 }
 
@@ -9465,12 +9364,6 @@ static int iw_set_power_params_priv(struct net_device *dev,
   char *ptr;
   VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
                 "Set power params Private");
-
-  if (!capable(CAP_NET_ADMIN)) {
-      VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                 FL("permission check failed"));
-      return -EPERM;
-  }
   /* ODD number is used for set, copy data using copy_from_user */
   ptr = mem_alloc_copy_from_user_helper(wrqu->data.pointer,
                                         wrqu->data.length);
@@ -9653,8 +9546,6 @@ int iw_set_two_ints_getnone(struct net_device *dev,
 #ifdef DEBUG
     case WE_SET_FW_CRASH_INJECT:
         hddLog(LOGE, "WE_SET_FW_CRASH_INJECT: %d %d", value[1], value[2]);
-        pr_err("SSR is triggered by iwpriv CRASH_INJECT: %d %d\n",
-                                                value[1], value[2]);
         ret = process_wma_set_command_twoargs((int) pAdapter->sessionId,
                                               (int) GEN_PARAM_CRASH_INJECT,
                                               value[1], value[2], GEN_CMD);

@@ -58,10 +58,9 @@ static inline void
 adf_os_timer_init(adf_os_handle_t      hdl,
                   adf_os_timer_t      *timer,
                   adf_os_timer_func_t  func,
-                  void                *arg,
-                  uint8_t              type)
+                  void                *arg)
 {
-    __adf_os_timer_init(hdl, timer, func, arg, type);
+    __adf_os_timer_init(hdl, timer, func, arg);
 }
 
 /**

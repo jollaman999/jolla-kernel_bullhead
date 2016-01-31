@@ -644,7 +644,6 @@ WLANSAP_StartBss
     ptSapContext pSapCtx = NULL;
     tANI_BOOLEAN restartNeeded;
     tHalHandle hHal;
-    tpAniSirGlobal pmac = NULL;
     int ret;
 
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
@@ -736,13 +735,6 @@ WLANSAP_StartBss
             }
         }
 
-        pmac = PMAC_STRUCT( hHal );
-        /*
-         * Copy the DFS Test Mode setting to pmac for
-         * access in lower layers
-         */
-        pmac->sap.SapDfsInfo.disable_dfs_ch_switch =
-                                   pConfig->disableDFSChSwitch;
         // Copy MAC filtering settings to sap context
         pSapCtx->eSapMacAddrAclMode = pConfig->SapMacaddr_acl;
         vos_mem_copy(pSapCtx->acceptMacList, pConfig->accept_mac, sizeof(pConfig->accept_mac));
@@ -1309,7 +1301,7 @@ WLANSAP_ModifyACL
                                                   eCsrForcedDeauthSta,
                                                   (SIR_MAC_MGMT_DEAUTH >> 4),
                                                    &delStaParams);
-                    WLANSAP_DeauthSta(pCtx, &delStaParams);
+                    WLANSAP_DeauthSta(pSapCtx, &delStaParams);
                     VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_LOW, "size of accept and deny lists %d %d",
                             pSapCtx->nAcceptMac, pSapCtx->nDenyMac);
                 }
@@ -1363,7 +1355,7 @@ WLANSAP_ModifyACL
                                                  eCsrForcedDeauthSta,
                                                  (SIR_MAC_MGMT_DEAUTH >> 4),
                                                  &delStaParams);
-                    WLANSAP_DeauthSta(pCtx, &delStaParams);
+                    WLANSAP_DeauthSta(pSapCtx, &delStaParams);
                     VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
                             "... Now add to black list");
                     sapAddMacToACL(pSapCtx->denyMacList, &pSapCtx->nDenyMac, pPeerStaMac);
@@ -1439,7 +1431,7 @@ VOS_STATUS
 WLANSAP_DisassocSta
 (
     v_PVOID_t pCtx,
-    struct tagCsrDelStaParams *pDelStaParams
+    v_U8_t *pPeerStaMac
 )
 {
     ptSapContext pSapCtx = VOS_GET_SAP_CB(pCtx);
@@ -1456,7 +1448,7 @@ WLANSAP_DisassocSta
     }
 
     sme_RoamDisconnectSta(VOS_GET_HAL_CB(pSapCtx->pvosGCtx), pSapCtx->sessionId,
-                            pDelStaParams);
+                            pPeerStaMac);
 
     return VOS_STATUS_SUCCESS;
 }

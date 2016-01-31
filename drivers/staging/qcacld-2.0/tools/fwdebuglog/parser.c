@@ -54,55 +54,17 @@
 #include <android/log.h>
 
 #define FWDEBUG_LOG_NAME        "ROME"
-#define FWDEBUG_NAME            "ROME_DEBUG"
-#define android_printf(...) \
-       __android_log_print(ANDROID_LOG_INFO, FWDEBUG_LOG_NAME, __VA_ARGS__);
-
-#define debug_printf(...) do {     \
-    if (optionflag & DEBUG_FLAG)   \
-       __android_log_print(ANDROID_LOG_INFO, FWDEBUG_NAME, __VA_ARGS__);    \
-} while(0)
-#else
-#define android_printf printf
-#define debug_printf(...) do {} while(0);
+#define printf(...) __android_log_print(ANDROID_LOG_INFO, FWDEBUG_LOG_NAME, __VA_ARGS__);
 #endif
 
 #define qxdm_log(buf) MSG_SPRINTF_1(MSG_SSID_WLAN, MSG_LEGACY_HIGH, "%s", buf);
 
 unsigned char buf[RECLEN];
 extern int optionflag;
-extern int32_t max_records;
-extern int32_t record;
-extern FILE *log_out;
 
 #define MAX_DBG_MSGS 256
 
 module_dbg_print mod_print[WLAN_MODULE_ID_MAX];
-
-void
-diag_print_legacy_logs(const char *buf)
-{
-   uint32_t res;
-
-    if (optionflag & QXDM_FLAG) {
-        qxdm_log(buf);
-    }
-
-    if (optionflag & LOGFILE_FLAG) {
-        record++;
-        if (log_out)
-            fprintf(log_out, "%s\n", buf);
-        else
-            return;
-        if (record == max_records) {
-            record = 0;
-            fseek(log_out, record, SEEK_SET);
-        }
-    }
-    if (optionflag & CONSOLE_FLAG) {
-        android_printf("%s\n", buf);
-    }
-}
 
 int
 diag_msg_handler(uint32_t id, char *payload,  uint16_t vdevid,
@@ -1339,7 +1301,11 @@ dbglog_printf(
     vsnprintf(buf+j, sizeof(buf)-j, fmt, ap);
     va_end(ap);
 
-    diag_print_legacy_logs(buf);
+    if (optionflag & QXDM_FLAG) {
+        qxdm_log(buf);
+    } else {
+        printf("%s\n", buf);
+    }
 }
 
 void
@@ -1364,7 +1330,11 @@ dbglog_printf_no_line_break(
     vsnprintf(buf+j, sizeof(buf)-j, fmt, ap);
     va_end(ap);
 
-    diag_print_legacy_logs(buf);
+    if (optionflag & QXDM_FLAG) {
+        qxdm_log(buf);
+    } else {
+        printf("%s", buf);
+    }
 }
 
 #define USE_NUMERIC 0
@@ -1398,7 +1368,11 @@ dbglog_default_print_handler(A_UINT32 mod_id, A_UINT16 vap_id, A_UINT32 dbg_id,
     }
     snprintf(tempbuf+j, sizeof(tempbuf)-j, ")\n");
 
-    diag_print_legacy_logs(buf);
+    if (optionflag & QXDM_FLAG) {
+        qxdm_log(tempbuf);
+    } else {
+        printf("%s", tempbuf);
+    }
     return TRUE;
 }
 
@@ -1415,7 +1389,7 @@ dbglog_parse_debug_logs(u_int8_t *datap, u_int16_t len, u_int16_t dropped)
     A_UINT32 length = len >> 2;
 
     if(dropped > 0)
-        debug_printf("%d log buffer got dropped in firmware\n", dropped);
+        printf("%d log buffer got dropped in firmware\n", dropped);
 
     buffer = (A_UINT32 *)datap;
     length = (len >> 2);
@@ -1463,7 +1437,7 @@ dbglog_reg_modprint(A_UINT32 mod_id, module_dbg_print printfn)
     if (!mod_print[mod_id]) {
         mod_print[mod_id] = printfn;
     } else {
-        debug_printf("module print is already registered for this module %d\n",
+        printf("module print is already registered for this module %d\n",
                mod_id);
     }
 }
@@ -2156,7 +2130,7 @@ A_BOOL dbglog_coex_print_handler(
         A_UINT16 numargs,
         A_UINT32 * args)
 {
-    A_UINT8 i, j = 0;
+    A_UINT8 i;
     char * dbg_id_str;
 
     static const char * wlan_rx_xput_status[] = {
@@ -2428,9 +2402,9 @@ A_BOOL dbglog_coex_print_handler(
                 dbglog_printf_no_line_break(timestamp, vap_id, "%s: %s",
                     dbg_id_str, coex_psp_error_type[args[0]]);
                 for (i = 1; i < numargs; i++) {
-                    j += snprintf(buf + j, sizeof(buf) - j, ", %u", args[i]);
+                    printf(", %u", args[i]);
                 }
-                diag_print_legacy_logs(buf);
+                printf("\n");
             } else {
                 return FALSE;
             }
@@ -2475,9 +2449,9 @@ A_BOOL dbglog_coex_print_handler(
                 dbglog_printf_no_line_break(timestamp, vap_id, "%s: %u",
                         dbg_id_str, args[0]);
                 for (i = 1; i < numargs; i++) {
-                    j += snprintf(buf + j, sizeof(buf) - j, ", %u", args[i]);
+                    printf(", %u", args[i]);
                 }
-                diag_print_legacy_logs(buf);
+                printf("\n");
             } else {
                 return FALSE;
             }

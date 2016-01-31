@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -527,18 +527,10 @@ static int tlshim_mgmt_rx_process(void *context, u_int8_t *data,
 	rx_pkt->pkt_meta.channel = hdr->channel;
         rx_pkt->pkt_meta.scan_src = hdr->flags;
 
-	/* Get the rssi value from the current snr value
-	 * using standard noise floor of -96.
-	 */
+	/*Get the absolute rssi value from the current rssi value
+	 *the sinr value is hardcoded into 0 in the core stack*/
 	rx_pkt->pkt_meta.rssi = hdr->snr + TLSHIM_TGT_NOISE_FLOOR_DBM;
 	rx_pkt->pkt_meta.snr = hdr->snr;
-
-	/* If absolute rssi is available from firmware, use it */
-	if (hdr->rssi != 0)
-		rx_pkt->pkt_meta.rssi_raw = hdr->rssi;
-	else
-		rx_pkt->pkt_meta.rssi_raw = rx_pkt->pkt_meta.rssi;
-
 	/*
 	 * FIXME: Assigning the local timestamp as hw timestamp is not
 	 * available. Need to see if pe/lim really uses this data.
@@ -603,10 +595,9 @@ static int tlshim_mgmt_rx_process(void *context, u_int8_t *data,
 #endif
 
 	TLSHIM_LOGD(
-		"%s: BSSID: "MAC_ADDRESS_STR" snr: %d, hdr_rssi: %d rssi: %d, rssi_raw: %d",
-			__func__, MAC_ADDR_ARRAY(wh->i_addr3),
-			hdr->snr, hdr->rssi, rx_pkt->pkt_meta.rssi,
-			rx_pkt->pkt_meta.rssi_raw);
+		FL("BSSID: "MAC_ADDRESS_STR" snr = %d, rssi = %d tsf_delta: %u"),
+			MAC_ADDR_ARRAY(wh->i_addr3), hdr->snr,
+			rx_pkt->pkt_meta.rssi, hdr->tsf_delta);
 
 	if (!tl_shim->mgmt_rx) {
 		TLSHIM_LOGE("Not registered for Mgmt rx, dropping the frame");
@@ -1132,6 +1123,7 @@ adf_nbuf_t WLANTL_SendSTA_DataFrame(void *vos_ctx, u_int8_t sta_id,
 	adf_nbuf_t ret;
 	struct ol_txrx_peer_t *peer;
 
+	ENTER();
 	if (!tl_shim) {
 		TLSHIM_LOGE("tl_shim is NULL");
 		return skb;
@@ -1143,7 +1135,7 @@ adf_nbuf_t WLANTL_SendSTA_DataFrame(void *vos_ctx, u_int8_t sta_id,
 	}
 
 	if (vos_is_load_unload_in_progress(VOS_MODULE_ID_TL, NULL)) {
-		TLSHIM_LOGW("%s: Driver load/unload in progress", __func__);
+		TLSHIM_LOGP("%s: Driver load/unload in progress", __func__);
 		return skb;
 	}
 	/*
@@ -1613,9 +1605,7 @@ VOS_STATUS WLANTL_ChangeSTAState(void *vos_ctx, u_int8_t sta_id,
 	peer = ol_txrx_peer_find_by_local_id(
 			((pVosContextType) vos_ctx)->pdev_txrx_ctx,
 			sta_id);
-
-	if ((peer == NULL) ||
-                (adf_os_atomic_read(&peer->delete_in_progress) == 1))
+	if (!peer)
 		return VOS_STATUS_E_FAULT;
 
 	if (sta_state == WLANTL_STA_CONNECTED)
@@ -1959,9 +1949,6 @@ VOS_STATUS WLANTL_Open(void *vos_ctx, WLANTL_ConfigInfoType *tl_cfg)
 	tl_shim->ip_checksum_offload = tl_cfg->ip_checksum_offload;
 	tl_shim->delay_interval = tl_cfg->uDelayedTriggerFrmInt;
 	tl_shim->enable_rxthread = tl_cfg->enable_rxthread;
-	if (tl_shim->enable_rxthread)
-		TLSHIM_LOGE("TL Shim RX thread enabled");
-
 	return status;
 }
 
@@ -2036,20 +2023,6 @@ void *tl_shim_get_vdev_by_sta_id(void *vos_context, uint8_t sta_id)
 	}
 
 	return peer->vdev;
-}
-
-void
-WLANTL_PauseUnPauseQs(void *vos_context, v_BOOL_t flag)
-{
-	ol_txrx_pdev_handle pdev = vos_get_context(VOS_MODULE_ID_TXRX,
-					vos_context);
-
-	if (true == flag)
-		wdi_in_pdev_pause(pdev,
-				   OL_TXQ_PAUSE_REASON_VDEV_SUSPEND);
-	else
-		wdi_in_pdev_unpause(pdev,
-				   OL_TXQ_PAUSE_REASON_VDEV_SUSPEND);
 }
 
 #ifdef QCA_LL_TX_FLOW_CT

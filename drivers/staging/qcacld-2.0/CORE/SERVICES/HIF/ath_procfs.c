@@ -39,7 +39,6 @@
 #include "if_ath_sdio.h"
 #endif
 #include "vos_api.h"
-#include <adf_os_atomic.h>
 
 #define PROCFS_NAME		"athdiagpfs"
 #define PROCFS_DIR		"cld"
@@ -198,12 +197,9 @@ int athdiag_procfs_init(void *scn)
  */
 void athdiag_procfs_remove(void)
 {
-	if (proc_dir  != NULL) {
-	    remove_proc_entry(PROCFS_NAME, proc_dir);
-	    pr_debug("/proc/%s/%s removed\n", PROCFS_DIR, PROCFS_NAME);
-	    remove_proc_entry(PROCFS_DIR, NULL);
-	    pr_debug("/proc/%s removed\n", PROCFS_DIR);
-	    proc_dir  = NULL;
-        }
+	remove_proc_entry(PROCFS_NAME, proc_dir);
+	pr_debug("/proc/%s/%s removed\n", PROCFS_DIR, PROCFS_NAME);
+	remove_proc_entry(PROCFS_DIR, NULL);
+	pr_debug("/proc/%s removed\n", PROCFS_DIR);
 }
 #endif

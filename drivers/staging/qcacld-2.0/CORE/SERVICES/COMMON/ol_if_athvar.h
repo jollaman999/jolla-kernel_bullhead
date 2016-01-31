@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -278,17 +278,9 @@ struct ol_softc {
     unsigned long ramdump_address;
     unsigned long ramdump_size;
 #endif
-    bool enable_self_recovery;
+
 #ifdef WLAN_FEATURE_LPSS
     bool                    enablelpasssupport;
-#endif
-#ifdef FEATURE_SECURE_FIRMWARE
-    bool enable_fw_hash_check;
-#endif
-
-#ifdef FEATURE_RUNTIME_PM
-    bool enable_runtime_pm;
-    u_int32_t runtime_pm_delay;
 #endif
 };
 

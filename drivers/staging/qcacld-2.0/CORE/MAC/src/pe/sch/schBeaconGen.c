@@ -60,7 +60,7 @@
 // Temporarily (maybe for all of Alpha-1), assuming TIM = 0
 //
 
-tANI_U8 P2pOui[] = {0x50, 0x6F, 0x9A, 0x9};
+const tANI_U8 P2pOui[] = {0x50, 0x6F, 0x9A, 0x9};
 
 
 tSirRetStatus schGetP2pIeOffset(tANI_U8 *pExtraIe, tANI_U32 extraIeLen, tANI_U16 *pP2pIeOffset)
@@ -123,8 +123,8 @@ tSirRetStatus schAppendAddnIE(tpAniSirGlobal pMac, tpPESession psessionEntry,
                     noaLen = limGetNoaAttrStream(pMac, noaStream, psessionEntry);
                     if(noaLen)
                     {
-                        if ((noaLen + len) <=
-                                        WNI_CFG_PROBE_RSP_BCN_ADDNIE_DATA_LEN) {
+                        if(noaLen + len <= WNI_CFG_PROBE_RSP_BCN_ADDNIE_DATA_LEN)
+                        {
                             vos_mem_copy(&addIE[len], noaStream, noaLen);
                             len += noaLen;
                             /* Update IE Len */
@@ -689,13 +689,6 @@ void limUpdateProbeRspTemplateIeBitmapBeacon2(tpAniSirGlobal pMac,
         SetProbeRspIeBitmap(DefProbeRspIeBitmap,SIR_MAC_WPA_EID);
         vos_mem_copy((void *)&prb_rsp->WMMCaps, (void *)&beacon2->WMMCaps,
                      sizeof(beacon2->WMMCaps));
-    }
-
-    /* Extended Capability */
-    if (beacon2->ExtCap.present) {
-        SetProbeRspIeBitmap(DefProbeRspIeBitmap, DOT11F_EID_EXTCAP);
-        vos_mem_copy((void *)&prb_rsp->ExtCap, (void *)&beacon2->ExtCap,
-                     sizeof(beacon2->ExtCap));
     }
 
 }

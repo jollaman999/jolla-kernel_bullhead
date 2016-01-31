@@ -42,18 +42,6 @@
 #include <linux/uaccess.h> /* for copy_to_user */
 
 /**
- * hdd_fw_dump_context - hdd firmware memory dump context
- *
- * @request_id: userspace assigned firmware memory dump request ID
- * @response_event: firmware memory dump request wait event
- */
-struct hdd_fw_dump_context {
-	uint32_t request_id;
-	struct completion response_event;
-};
-static struct hdd_fw_dump_context fw_dump_context;
-
-/**
  * memdump_cleanup_timer_cb() - Timer callback function for memory dump cleanup.
  *
  * @data: Callback data (used to stored HDD context)
@@ -111,73 +99,44 @@ static void memdump_cleanup_timer_cb(void *data)
 static void wlan_hdd_cfg80211_fw_mem_dump_cb(void *ctx,
 					     struct fw_dump_rsp *dump_rsp)
 {
-	hdd_context_t *hdd_ctx = ctx;
-	struct hdd_fw_dump_context *context;
+	hdd_context_t *pHddCtx = (hdd_context_t *)ctx;
 	int status;
+	struct sk_buff *skb = NULL;
 
-	status = wlan_hdd_validate_context(hdd_ctx);
+	status = wlan_hdd_validate_context(pHddCtx);
 	if (0 != status) {
 		hddLog(LOGE, FL("HDD context is not valid"));
 		return;
 	}
 
-	spin_lock(&hdd_context_lock);
-	context = &fw_dump_context;
-	/* validate the response received */
-	if (!dump_rsp->dump_complete ||
-	    context->request_id != dump_rsp->request_id) {
-		spin_unlock(&hdd_context_lock);
-		hddLog(LOGE,
-		       FL("Error @ request_id: %d response_id: %d status: %d"),
-		       context->request_id, dump_rsp->request_id,
-		       dump_rsp->dump_complete);
+	if (!dump_rsp->dump_complete) {
+		hddLog(LOGE, FL("fw dump copy failed status from FW."));
 		return;
-	} else {
-		complete(&context->response_event);
-	}
-	spin_unlock(&hdd_context_lock);
-
-	return;
-}
-
-/**
- * wlan_hdd_send_memdump_rsp - send memory dump response to user space
- * @hdd_ctx: Pointer to hdd context
- *
- * Return: 0 for success; non-zero for failure
- */
-static int wlan_hdd_send_memdump_rsp(hdd_context_t *hdd_ctx)
-{
-	struct sk_buff *skb;
-	int status;
-
-	status = wlan_hdd_validate_context(hdd_ctx);
-	if (0 != status) {
-		hddLog(LOGE, FL("HDD context is not valid"));
-		return status;
 	}
 
-	skb = cfg80211_vendor_cmd_alloc_reply_skb(hdd_ctx->wiphy,
-			NLMSG_HDRLEN + NLA_HDRLEN + sizeof(uint32_t));
+	skb = cfg80211_vendor_event_alloc(pHddCtx->wiphy,
+		sizeof(uint32_t) + NLA_HDRLEN + NLMSG_HDRLEN,
+		QCA_NL80211_VENDOR_SUBCMD_WIFI_LOGGER_MEMORY_DUMP_INDEX,
+		GFP_KERNEL);
 
 	if (!skb) {
-		hddLog(LOGE, FL("cfg80211_vendor_cmd_alloc_reply_skb failed"));
-		return -ENOMEM;
+		hddLog(LOGE, FL("cfg80211_vendor_event_alloc failed"));
+		return;
 	}
 
 	if (nla_put_u32(skb, QCA_WLAN_VENDOR_ATTR_MEMDUMP_SIZE,
-			     FW_MEM_DUMP_SIZE)) {
+			FW_MEM_DUMP_SIZE)) {
 		hddLog(LOGE, FL("nla put fail"));
 		goto nla_put_failure;
 	}
 
-	cfg80211_vendor_cmd_reply(skb);
+	cfg80211_vendor_event(skb, GFP_KERNEL);
 	hddLog(LOG1, FL("Memdump event sent successfully to user space"));
-	return 0;
+	return;
 
 nla_put_failure:
 	kfree_skb(skb);
-	return -EINVAL;
+	return;
 }
 
 /**
@@ -205,8 +164,6 @@ int wlan_hdd_cfg80211_get_fw_mem_dump(struct wiphy *wiphy,
 	adf_os_dma_addr_t paddr;
 	adf_os_dma_addr_t dma_ctx;
 	adf_os_device_t adf_ctx;
-	unsigned long rc;
-	struct hdd_fw_dump_context *context;
 
 	status = wlan_hdd_validate_context(hdd_ctx);
 	if (0 != status) {
@@ -289,12 +246,6 @@ int wlan_hdd_cfg80211_get_fw_mem_dump(struct wiphy *wiphy,
 			MEMDUMP_COMPLETION_TIME_MS);
 	hdd_ctx->memdump_in_progress = true;
 
-	spin_lock(&hdd_context_lock);
-	context = &fw_dump_context;
-	context->request_id = fw_mem_dump_req.request_id;
-	INIT_COMPLETION(context->response_event);
-	spin_unlock(&hdd_context_lock);
-
 	sme_status = sme_fw_mem_dump(hdd_ctx->hHal, &fw_mem_dump_req);
 	if (VOS_STATUS_SUCCESS != sme_status) {
 		hddLog(LOGE, FL("sme_fw_mem_dump Failed"));
@@ -311,25 +262,11 @@ int wlan_hdd_cfg80211_get_fw_mem_dump(struct wiphy *wiphy,
 		return -EINVAL;
 	}
 
-	rc = wait_for_completion_timeout(&context->response_event,
-		msecs_to_jiffies(MEMDUMP_COMPLETION_TIME_MS));
-	if (!rc) {
-		hddLog(LOGE, FL("Target response timed out for request_id: %d"),
-		       context->request_id);
-		return -ETIMEDOUT;
-	}
-
-	status = wlan_hdd_send_memdump_rsp(hdd_ctx);
-	if (status)
-		hddLog(LOGE,
-			FL("Failed to send FW memory dump rsp to user space"));
-
-	return status;
+	return 0;
 }
 
 #define PROCFS_MEMDUMP_DIR "debug"
 #define PROCFS_MEMDUMP_NAME "fwdump"
-#define PROCFS_MEMDUMP_PERM 0444
 
 static struct proc_dir_entry *proc_file, *proc_dir;
 
@@ -481,7 +418,7 @@ static int memdump_procfs_init(void *vos_ctx)
 	}
 
 	proc_file = proc_create_data(PROCFS_MEMDUMP_NAME,
-				     PROCFS_MEMDUMP_PERM, proc_dir,
+				     S_IRUSR | S_IWUSR, proc_dir,
 				     &memdump_fops, hdd_ctx);
 	if (proc_file == NULL) {
 		remove_proc_entry(PROCFS_MEMDUMP_NAME, proc_dir);
@@ -557,8 +494,6 @@ int memdump_init(void)
 		hddLog(LOGE , FL("Failed to create proc file"));
 		return status;
 	}
-
-	init_completion(&fw_dump_context.response_event);
 
 	vos_status = vos_timer_init(&hdd_ctx->memdump_cleanup_timer,
 				    VOS_TIMER_TYPE_SW, memdump_cleanup_timer_cb,

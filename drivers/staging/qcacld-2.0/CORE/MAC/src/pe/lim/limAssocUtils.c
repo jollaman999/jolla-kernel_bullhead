@@ -1110,6 +1110,7 @@ limDecideApProtectionOnDelete(tpAniSirGlobal pMac,
                                     pStaDs->staAddr, sizeof(tSirMacAddr)))
                             {
                                 psessionEntry->gLim11aParams.numSta--;
+                                psessionEntry->protStaCache[i].active = false;
                                 break;
                             }
                         }
@@ -1216,6 +1217,7 @@ limDecideApProtectionOnDelete(tpAniSirGlobal pMac,
                                 pStaDs->staAddr, sizeof(tSirMacAddr)))
                         {
                             psessionEntry->gLimNonGfParams.numSta--;
+                            psessionEntry->protStaCache[i].active = false;
                             break;
                         }
                     }
@@ -1251,6 +1253,7 @@ limDecideApProtectionOnDelete(tpAniSirGlobal pMac,
                                 pStaDs->staAddr, sizeof(tSirMacAddr)))
                         {
                             psessionEntry->gLimLsigTxopParams.numSta--;
+                            psessionEntry->protStaCache[i].active = false;
                             break;
                         }
                     }
@@ -3873,7 +3876,7 @@ tSirRetStatus limStaSendAddBss( tpAniSirGlobal pMac, tpSirAssocRsp pAssocRsp,
             pAddBssParams->staContext.greenFieldCapable,
             pAddBssParams->staContext.lsigTxopProtection);
 #ifdef WLAN_FEATURE_11AC
-            if (psessionEntry->vhtCapability && IS_BSS_VHT_CAPABLE(pBeaconStruct->VHTCaps))
+            if (psessionEntry->vhtCapability && pBeaconStruct->VHTCaps.present)
             {
                 pAddBssParams->staContext.vhtCapable = 1;
                 pAddBssParams->staContext.vhtSupportedRxNss = pStaDs->vhtSupportedRxNss;
@@ -4293,7 +4296,7 @@ tSirRetStatus limStaSendAddBssPreAssoc( tpAniSirGlobal pMac, tANI_U8 updateEntry
     limLog(pMac, LOG2, FL("currentOperChannel %d"),
     pAddBssParams->currentOperChannel);
 #ifdef WLAN_FEATURE_11AC
-    if (psessionEntry->vhtCapability && IS_BSS_VHT_CAPABLE(pBeaconStruct->VHTCaps))
+    if (psessionEntry->vhtCapability && ( pBeaconStruct->VHTCaps.present ))
     {
         pAddBssParams->vhtCapable = pBeaconStruct->VHTCaps.present;
         pAddBssParams->vhtTxChannelWidthSet = pBeaconStruct->VHTOperation.chanWidth;
@@ -4352,7 +4355,7 @@ tSirRetStatus limStaSendAddBssPreAssoc( tpAniSirGlobal pMac, tANI_U8 updateEntry
             pAddBssParams->staContext.greenFieldCapable,
             pAddBssParams->staContext.lsigTxopProtection);
 #ifdef WLAN_FEATURE_11AC
-            if (psessionEntry->vhtCapability && IS_BSS_VHT_CAPABLE(pBeaconStruct->VHTCaps))
+            if (psessionEntry->vhtCapability && pBeaconStruct->VHTCaps.present)
             {
                 pAddBssParams->staContext.vhtCapable = 1;
                 if ((pBeaconStruct->VHTCaps.suBeamFormerCap ||

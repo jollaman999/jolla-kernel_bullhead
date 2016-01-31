@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -520,7 +520,6 @@ ol_tx_completion_handler(
         tx_desc->status = status;
         netbuf = tx_desc->netbuf;
 
-        htc_pm_runtime_put(pdev->htt_pdev->htc_pdev);
         adf_nbuf_trace_update(netbuf, trace_str);
         /* Per SDU update of byte count */
         byte_cnt += adf_nbuf_len(netbuf);
@@ -545,8 +544,8 @@ ol_tx_completion_handler(
         adf_os_spin_lock(&pdev->tx_mutex);
         tx_desc_last->next = pdev->tx_desc.freelist;
         pdev->tx_desc.freelist = lcl_freelist;
-        pdev->tx_desc.num_free += (u_int16_t) num_msdus;
         adf_os_spin_unlock(&pdev->tx_mutex);
+        pdev->tx_desc.num_free += (u_int16_t) num_msdus;
     } else {
         ol_tx_desc_frame_list_free(pdev, &tx_descs, status != htt_tx_status_ok);
     }

@@ -350,38 +350,36 @@ wdi_in_vdev_unpause(ol_txrx_vdev_handle data_vdev, u_int32_t reason);
 /**
  * @brief Suspend all tx data for the specified physical device.
  * @details
- *  This function applies to HL systems -
- *  in LL systems, applies when txrx_vdev_pause_all is enabled.
+ *  This function applies only to HL systems - in LL systems, tx flow control
+ *  is handled entirely within the target FW.
  *  In some systems it is necessary to be able to temporarily
  *  suspend all WLAN traffic, e.g. to allow another device such as bluetooth
  *  to temporarily have exclusive access to shared RF chain resources.
  *  This function suspends tx traffic within the specified physical device.
  *
  * @param data_pdev - the physical device being paused
- * @param reason - pause reason
  */
-#if defined(CONFIG_HL_SUPPORT) || defined(QCA_SUPPORT_TXRX_VDEV_PAUSE_LL)
+#if defined(CONFIG_HL_SUPPORT)
 void
-wdi_in_pdev_pause(ol_txrx_pdev_handle data_pdev, u_int32_t reason);
+wdi_in_pdev_pause(ol_txrx_pdev_handle data_pdev);
 #else
-#define wdi_in_pdev_pause(data_pdev, reason) /* no-op */
-#endif
+#define wdi_in_pdev_pause(data_pdev) /* no-op */
+#endif /* CONFIG_HL_SUPPORT */
 
 /**
  * @brief Resume tx for the specified physical device.
  * @details
- *  This function applies to HL systems -
- *  in LL systems, applies when txrx_vdev_pause_all is enabled.
+ *  This function applies only to HL systems - in LL systems, tx flow control
+ *  is handled entirely within the target FW.
  *
  * @param data_pdev - the physical device being unpaused
- * @param reason - pause reason
  */
-#if defined(CONFIG_HL_SUPPORT) || defined(QCA_SUPPORT_TXRX_VDEV_PAUSE_LL)
+#if defined(CONFIG_HL_SUPPORT)
 void
-wdi_in_pdev_unpause(ol_txrx_pdev_handle data_pdev, u_int32_t reason);
+wdi_in_pdev_unpause(ol_txrx_pdev_handle data_pdev);
 #else
-#define wdi_in_pdev_unpause(data_pdev, reason) /* no-op */
-#endif
+#define wdi_in_pdev_unpause(data_pdev) /* no-op */
+#endif /* CONFIG_HL_SUPPORT */
 
 /**
  * @brief Synchronize the data-path tx with a control-path target download

@@ -179,8 +179,7 @@ limProcessProbeRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo,tpPESession 
             VOS_TRACE(VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_INFO,
                       FL("Probe Resp Frame Received: BSSID " MAC_ADDRESS_STR " (RSSI %d)"),
                       MAC_ADDR_ARRAY(pHdr->bssId),
-                      (uint)abs((tANI_S8)WDA_GET_RX_RSSI_NORMALIZED(
-                                                        pRxPacketInfo)));
+                      (uint)abs((tANI_S8)WDA_GET_RX_RSSI_DB(pRxPacketInfo)));
         }
 
         // Get pointer to Probe Response frame body
@@ -405,8 +404,7 @@ limProcessProbeRspFrameNoSession(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo)
             VOS_TRACE(VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_INFO,
                       FL("Probe Resp Frame Received: BSSID " MAC_ADDRESS_STR " (RSSI %d)"),
                       MAC_ADDR_ARRAY(pHdr->bssId),
-                      (uint)abs((tANI_S8)
-                                 WDA_GET_RX_RSSI_NORMALIZED(pRxPacketInfo)));
+                      (uint)abs((tANI_S8)WDA_GET_RX_RSSI_DB(pRxPacketInfo)));
         }
 
         // Get pointer to Probe Response frame body
@@ -453,8 +451,7 @@ limProcessProbeRspFrameNoSession(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo)
             VOS_TRACE(VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_INFO,
                       FL("Probe Resp Frame Received: BSSID " MAC_ADDRESS_STR " (RSSI %d)"),
                       MAC_ADDR_ARRAY(pHdr->bssId),
-                      (uint)abs((tANI_S8)WDA_GET_RX_RSSI_NORMALIZED(
-                                                       pRxPacketInfo)));
+                      (uint)abs((tANI_S8)WDA_GET_RX_RSSI_DB(pRxPacketInfo)));
         }
 
         // Get pointer to Probe Response frame body

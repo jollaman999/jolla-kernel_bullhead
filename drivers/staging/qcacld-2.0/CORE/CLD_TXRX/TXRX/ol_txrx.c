@@ -153,16 +153,11 @@ ol_txrx_peer_find_by_local_id(
     struct ol_txrx_pdev_t *pdev,
     u_int8_t local_peer_id)
 {
-    struct ol_txrx_peer_t *peer;
     if ((local_peer_id == OL_TXRX_INVALID_LOCAL_PEER_ID) ||
         (local_peer_id >= OL_TXRX_NUM_LOCAL_PEER_IDS)) {
         return NULL;
     }
-
-    adf_os_spin_lock_bh(&pdev->local_peer_ids.lock);
-    peer = pdev->local_peer_ids.map[local_peer_id];
-    adf_os_spin_unlock_bh(&pdev->local_peer_ids.lock);
-    return peer;
+    return pdev->local_peer_ids.map[local_peer_id];
 }
 
 static void
@@ -884,7 +879,7 @@ ol_txrx_vdev_attach(
             pdev->osdev,
             &vdev->ll_pause.timer,
             ol_tx_vdev_ll_pause_queue_send,
-            vdev, ADF_DEFERRABLE_TIMER);
+            vdev);
     adf_os_atomic_init(&vdev->os_q_paused);
     adf_os_atomic_set(&vdev->os_q_paused, 0);
     vdev->tx_fl_lwm = 0;
@@ -1616,29 +1611,6 @@ ol_txrx_peer_find_by_addr(struct ol_txrx_pdev_t *pdev, u_int8_t *peer_mac_addr)
     return peer;
 }
 
-/**
- * ol_txrx_dump_tx_desc() - dump tx desc info
- * @pdev_handle: Pointer to pdev handle
- *
- * Return: none
- */
-void ol_txrx_dump_tx_desc(ol_txrx_pdev_handle pdev_handle)
-{
-	struct ol_txrx_pdev_t *pdev = pdev_handle;
-	int total;
-
-	if (ol_cfg_is_high_latency(pdev->ctrl_pdev))
-		total = adf_os_atomic_read(&pdev->orig_target_tx_credit);
-	else
-		total = ol_cfg_target_tx_credit(pdev->ctrl_pdev);
-
-	TXRX_PRINT(TXRX_PRINT_LEVEL_ERR,
-		"Total tx credits %d free_credits %d",
-		total, pdev->tx_desc.num_free);
-
-	return;
-}
-
 int
 ol_txrx_get_tx_pending(ol_txrx_pdev_handle pdev_handle)
 {
@@ -1867,22 +1839,6 @@ ol_txrx_fw_stats_handler(
             case HTT_DBG_STATS_TX_PPDU_LOG:
                 bytes = 0; /* TO DO: specify how many bytes are present */
                 /* TO DO: add copying to the requestor's buffer */
-                break;
-
-            case HTT_DBG_STATS_RX_REMOTE_RING_BUFFER_INFO:
-
-                bytes = sizeof(struct rx_remote_buffer_mgmt_stats);
-                if (req->base.copy.buf) {
-                    int limit;
-
-                    limit = sizeof(struct rx_remote_buffer_mgmt_stats);
-                    if (req->base.copy.byte_limit < limit) {
-                        limit = req->base.copy.byte_limit;
-                    }
-                    buf = req->base.copy.buf + req->offset;
-                    adf_os_mem_copy(buf, stats_data, limit);
-                }
-                break;
 
             default:
                 break;

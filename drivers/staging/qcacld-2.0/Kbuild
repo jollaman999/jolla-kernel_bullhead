@@ -84,10 +84,7 @@ ifeq ($(KERNEL_BUILD), 0)
                 CONFIG_LINUX_QCMBR :=y
         endif
 	#Flag to enable memdump feature
-	CONFIG_WLAN_FEATURE_MEMDUMP := y
-
-	#Flag to enable offload packets feature
-	CONFIG_WLAN_OFFLOAD_PACKETS := y
+	CONFIG_FEATURE_MEMDUMP := y
 endif
 
 # To enable ESE upload, dependent config
@@ -370,7 +367,7 @@ ifeq ($(CONFIG_QCOM_TDLS),y)
 HDD_OBJS +=	$(HDD_SRC_DIR)/wlan_hdd_tdls.o
 endif
 
-ifeq ($(CONFIG_WLAN_FEATURE_MEMDUMP),y)
+ifeq ($(CONFIG_FEATURE_MEMDUMP),y)
 HDD_OBJS += $(HDD_SRC_DIR)/wlan_hdd_memdump.o
 endif
 
@@ -1212,11 +1209,6 @@ ifeq ($(CONFIG_SMP),y)
 CDEFINES += -DQCA_CONFIG_SMP
 endif
 
-#rps feature
-ifeq ($(CONFIG_RPS),y)
-CDEFINES += -DQCA_FEATURE_RPS
-endif
-
 #features specific to mdm9630
 ifeq ($(CONFIG_ARCH_MDM9630), y)
 
@@ -1275,11 +1267,6 @@ ifeq ($(CONFIG_FEATURE_SECURE_FIRMWARE), 1)
 CDEFINES += -DFEATURE_SECURE_FIRMWARE
 endif
 
-#Enable/disable FW hash check for secure firmware feature
-ifeq ($(CONFIG_CLD_DEBUG), y)
-CDEFINES += -DFEATURE_FW_HASH_CHECK
-endif
-
 ifeq ($(CONFIG_ATH_PCIE_ACCESS_DEBUG), 1)
 CDEFINES += -DCONFIG_ATH_PCIE_ACCESS_DEBUG
 endif
@@ -1289,10 +1276,6 @@ ifeq ($(CONFIG_PCI_MSM), y)
 CDEFINES += -DFEATURE_WLAN_D0WOW
 endif
 
-# Flag to enable bus auto suspend
-ifeq ($(CONFIG_BUS_AUTO_SUSPEND), y)
-CDEFINES += -DFEATURE_RUNTIME_PM
-endif
 # Some kernel include files are being moved.  Check to see if
 # the old version of the files are present
 
@@ -1309,12 +1292,8 @@ ifeq ($(CONFIG_LINUX_QCMBR),y)
 CDEFINES += -DLINUX_QCMBR
 endif
 
-ifeq ($(CONFIG_WLAN_FEATURE_MEMDUMP),y)
+ifeq ($(CONFIG_FEATURE_MEMDUMP),y)
 CDEFINES += -DWLAN_FEATURE_MEMDUMP
-endif
-
-ifeq ($(CONFIG_WLAN_OFFLOAD_PACKETS),y)
-CDEFINES += -DWLAN_FEATURE_OFFLOAD_PACKETS
 endif
 
 KBUILD_CPPFLAGS += $(CDEFINES)
@@ -1324,7 +1303,7 @@ KBUILD_CPPFLAGS += $(CDEFINES)
 # WLAN driver.  Note that we must use EXTRA_CFLAGS here so that it
 # will override the kernel settings.
 ifeq ($(call cc-option-yn, -Wmaybe-uninitialized),y)
-EXTRA_CFLAGS += -Os -Wmaybe-uninitialized -Wno-misleading-indentation -Wno-bool-compare
+EXTRA_CFLAGS += -Os -Wmaybe-uninitialized -Wno-misleading-indentation -Wno-bool-compare -Wno-logical-not-parentheses -Wno-discarded-array-qualifiers
 endif
 
 # Module information used by KBuild framework

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -605,8 +605,7 @@ static int __ol_transfer_bin_file(struct ol_softc *scn, ATH_BIN_FILE file,
 		goto end;
 	}
 
-	if (scn->enable_fw_hash_check &&
-	    ol_check_fw_hash(fw_entry->data, fw_entry_size, file)) {
+	if (ol_check_fw_hash(fw_mem, fw_entry_size, file)) {
 		pr_err("Hash Check failed for file:%s\n", filename);
 		status = A_ERROR;
 		goto end;
@@ -934,7 +933,7 @@ static void ramdump_work_handler(struct work_struct *ramdump)
 		goto out_fail;
 
 	printk("%s: RAM dump collecting completed!\n", __func__);
-
+	msleep(250);
 #if defined(HIF_SDIO)
 	panic("CNSS Ram dump collected\n");
 #else
@@ -1076,9 +1075,9 @@ void ol_ramdump_handler(struct ol_softc *scn)
 			fw_ram_seg_addr[i] = (scn->ramdump[i])->mem;
 			pr_err("FW %s start addr = %#08x\n",
 				fw_ram_seg_name[i], *reg);
-			pr_err("Memory addr for %s = %p\n",
+			pr_err("Memory addr for %s = %#08x\n",
 				fw_ram_seg_name[i],
-				(scn->ramdump[i])->mem);
+				(A_UINT32) (scn->ramdump[i])->mem);
 			(scn->ramdump[i])->start_addr = *reg;
 			(scn->ramdump[i])->length = 0;
 		}
@@ -1107,8 +1106,6 @@ void ol_ramdump_handler(struct ol_softc *scn)
 void ol_target_failure(void *instance, A_STATUS status)
 {
 	struct ol_softc *scn = (struct ol_softc *)instance;
-	void *vos_context = vos_get_global_context(VOS_MODULE_ID_WDA, NULL);
-	tp_wma_handle wma = vos_get_context(VOS_MODULE_ID_WDA, vos_context);
 #ifndef CONFIG_CNSS
 	A_UINT32 reg_dump_area = 0;
 	A_UINT32 reg_dump_values[REGISTER_DUMP_LEN_MAX];
@@ -1118,6 +1115,8 @@ void ol_target_failure(void *instance, A_STATUS status)
 	struct dbglog_hdr_host dbglog_hdr;
 	struct dbglog_buf_host dbglog_buf;
 	A_UINT8 *dbglog_data;
+	void *vos_context = vos_get_global_context(VOS_MODULE_ID_WDA, NULL);
+	tp_wma_handle wma = vos_get_context(VOS_MODULE_ID_WDA, vos_context);
 #else
 	int ret;
 #endif
@@ -1131,19 +1130,12 @@ void ol_target_failure(void *instance, A_STATUS status)
 	}
 #endif
 
-	vos_event_set(&wma->recovery_event);
-
 	if (OL_TRGET_STATUS_RESET == scn->target_status) {
 		printk("Target is already asserted, ignore!\n");
 		return;
 	}
 
 	scn->target_status = OL_TRGET_STATUS_RESET;
-
-	if (vos_is_logp_in_progress(VOS_MODULE_ID_VOSS, NULL)) {
-		pr_info("%s: LOGP is in progress, ignore!\n", __func__);
-		return;
-	}
 
 	if (vos_is_load_unload_in_progress(VOS_MODULE_ID_VOSS, NULL)) {
 		printk("%s: Loading/Unloading is in progress, ignore!\n",
@@ -1155,10 +1147,8 @@ void ol_target_failure(void *instance, A_STATUS status)
 #ifdef CONFIG_CNSS
 	ret = hif_pci_check_fw_reg(scn->hif_sc);
 	if (0 == ret) {
-		if (scn->enable_self_recovery) {
-			ol_schedule_fw_indication_work(scn);
-			return;
-		}
+		ol_schedule_fw_indication_work(scn);
+		return;
 	} else if (-1 == ret) {
 		return;
 	}
@@ -1192,11 +1182,6 @@ void ol_target_failure(void *instance, A_STATUS status)
 	printk("Target Register Dump\n");
 	for (i = 0; i < reg_dump_cnt; i++) {
 		printk("[%02d]   :  0x%08X\n", i, reg_dump_values[i]);
-	}
-
-	if (!scn->enablefwlog) {
-		printk("%s: FWLog is disabled in ini\n", __func__);
-		goto disable_fwlog;
 	}
 
 	if (HIFDiagReadMem(scn->hif_hdl,
@@ -1246,8 +1231,6 @@ void ol_target_failure(void *instance, A_STATUS status)
 
 	    adf_os_mem_free(dbglog_data);
 	}
-
-disable_fwlog:
 #endif
 
 #if  defined(CONFIG_CNSS) || defined(HIF_SDIO)
@@ -2231,20 +2214,9 @@ int ol_target_coredump(void *inst, void *memoryBlock, u_int32_t blockLength)
 	* SECTION = REG
 	* START   = 0x00000800
 	* LENGTH  = 0x0007F820
-	*
-	* SECTION = IRAM1
-	* START   = 0x00980000
-	* LENGTH  = 0x00080000
-	*
-	* SECTION = IRAM2
-	* START   = 0x00a00000
-	* LENGTH  = 0x00040000
 	*/
-#ifdef HIF_PCI
-	while ((sectionCount < 5) && (amountRead < blockLength)) {
-#else
+
 	while ((sectionCount < 3) && (amountRead < blockLength)) {
-#endif
 		switch (sectionCount) {
 		case 0:
 			/* DRAM SECTION */
@@ -2265,35 +2237,6 @@ int ol_target_coredump(void *inst, void *memoryBlock, u_int32_t blockLength)
 			readLen = 0;
 			printk("%s: Dumping Register section...\n", __func__);
 			break;
-#ifdef HIF_PCI
-		case 3:
-			if ((scn->target_status != OL_TRGET_STATUS_RESET) ||
-				hif_pci_set_ram_config_reg(scn->hif_sc,
-							IRAM1_LOCATION >> 20)) {
-				pr_debug("%s: Skipping IRAM1 section...\n",
-					__func__);
-				return 0;
-			}
-
-			/* IRAM1 SECTION */
-			pos = IRAM1_LOCATION;
-			readLen = IRAM1_SIZE;
-			pr_err("%s: Dumping IRAM1 section...\n", __func__);
-			break;
-		case 4:
-			if (hif_pci_set_ram_config_reg(scn->hif_sc,
-							IRAM2_LOCATION >> 20)) {
-				pr_debug("%s: Skipping IRAM2 section...\n",
-					__func__);
-				return 0;
-			}
-
-			/* IRAM2 SECTION */
-			pos = IRAM2_LOCATION;
-			readLen = IRAM2_SIZE;
-			pr_err("%s: Dumping IRAM2 section...\n", __func__);
-			break;
-#endif
 		}
 
 		if ((blockLength - amountRead) >= readLen) {

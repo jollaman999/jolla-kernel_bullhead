@@ -252,13 +252,9 @@ limGetBssDescription( tpAniSirGlobal pMac, tSirBssDescription *pBssDescription,
     if (limCheckRemainingLength(pMac, len) == eSIR_FAILURE)
         return eSIR_FAILURE;
 
-    /* Extract raw rssi value */
-    pBssDescription->rssi_raw = (tANI_S8) *pBuf++;
-    len--;
-
-    /* 2 reserved bytes for padding */
-    pBuf += (2 * sizeof(tANI_U8));
-    len  -= 2;
+    /* 3 reserved bytes for padding */
+    pBuf += (3 * sizeof(tANI_U8));
+    len  -= 3;
 
     pBssDescription->WscIeLen = limGetU32( pBuf );
     pBuf += sizeof(tANI_U32);
@@ -1132,7 +1128,7 @@ limJoinReqSerDes(tpAniSirGlobal pMac, tpSirSmeJoinReq pJoinReq, tANI_U8 *pBuf)
     if (pJoinReq->addIEScan.length)
     {
         // Check for IE length (that includes length of type & length)
-        if (pJoinReq->addIEScan.length > SIR_MAC_MAX_ADD_IE_LENGTH + 2)
+        if (pJoinReq->addIEScan.length > SIR_MAC_MAX_IE_LENGTH + 2)
         {
             limLog(pMac, LOGE,
                    FL("Invalid addIE Scan length %d in SME_JOIN_REQ"),

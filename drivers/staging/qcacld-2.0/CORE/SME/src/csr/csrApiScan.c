@@ -291,9 +291,6 @@ static void csrSetDefaultScanTiming( tpAniSirGlobal pMac, tSirScanType scanType,
     //This portion of the code executed if multi-session not supported
     //(WLAN_AP_STA_CONCURRENCY not defined) or no multi-session.
     //Use the "regular" (non-concurrency) default scan timing.
-    ccmCfgSetInt(pMac->hHdd,WNI_CFG_PASSIVE_MAXIMUM_CHANNEL_TIME,
-                     pMac->roam.configParam.nPassiveMaxChnTime,
-                     NULL,eANI_BOOLEAN_FALSE);
     if(pScanRequest->scanType == eSIR_ACTIVE_SCAN)
     {
         pScanRequest->maxChnTime = pMac->roam.configParam.nActiveMaxChnTime;
@@ -2998,20 +2995,8 @@ tANI_BOOLEAN csrRemoveDupBssDescription( tpAniSirGlobal pMac, tSirBssDescription
         if ( csrIsDuplicateBssDescription( pMac, &pBssDesc->Result.BssDescriptor,
                                                         pSirBssDescr, pIes, fForced ) )
         {
-            int32_t rssi_new, rssi_old;
-
-            rssi_new = (int32_t) pSirBssDescr->rssi;
-            rssi_old = (int32_t) pBssDesc->Result.BssDescriptor.rssi;
-            rssi_new = ((rssi_new * CSR_SCAN_RESULT_RSSI_WEIGHT) +
-                         rssi_old * (100 - CSR_SCAN_RESULT_RSSI_WEIGHT)) / 100;
-            pSirBssDescr->rssi = (tANI_S8) rssi_new;
-
-            rssi_new = (int32_t) pSirBssDescr->rssi_raw;
-            rssi_old = (int32_t) pBssDesc->Result.BssDescriptor.rssi_raw;
-            rssi_new = ((rssi_new * CSR_SCAN_RESULT_RSSI_WEIGHT) +
-                         rssi_old * (100 - CSR_SCAN_RESULT_RSSI_WEIGHT)) / 100;
-            pSirBssDescr->rssi_raw = (tANI_S8) rssi_new;
-
+            pSirBssDescr->rssi = (tANI_S8)( (((tANI_S32)pSirBssDescr->rssi * CSR_SCAN_RESULT_RSSI_WEIGHT ) +
+                                             ((tANI_S32)pBssDesc->Result.BssDescriptor.rssi * (100 - CSR_SCAN_RESULT_RSSI_WEIGHT) )) / 100 );
             // Remove the 'old' entry from the list....
             if( csrLLRemoveEntry( &pMac->scan.scanResultList, pEntry, LL_ACCESS_LOCK ) )
             {
@@ -7842,11 +7827,6 @@ void csrSetCfgValidChannelList( tpAniSirGlobal pMac, tANI_U8 *pChannelList, tANI
     {
         VOS_TRACE(VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_INFO,
                 "Scan offload is enabled, update default chan list");
-        /*
-         * disable fcc constraint since new country code
-         * is being set
-         */
-        pMac->scan.fcc_constraint = false;
         status = csrUpdateChannelList(pMac);
         if (eHAL_STATUS_SUCCESS != status)
         {

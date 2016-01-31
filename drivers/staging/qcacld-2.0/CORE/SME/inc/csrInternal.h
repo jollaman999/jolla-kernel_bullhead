@@ -691,8 +691,6 @@ typedef struct tagCsrConfig
 #endif
     tANI_BOOLEAN obssEnabled;
     struct roam_ext_params roam_params;
-    tANI_BOOLEAN ignorePeerErpInfo;
-    v_U16_t pkt_err_disconn_th;
 }tCsrConfig;
 
 typedef struct tagCsrChannelPowerInfo
@@ -814,8 +812,11 @@ typedef struct tagCsrScanStruct
     tANI_S8     inScanResultBestAPRssi;
     eCsrBand  scanBandPreference;  //This defines the band perference for scan
     csrScanCompleteCallback callback11dScanDone;
-    bool fcc_constraint;
 }tCsrScanStruct;
+
+
+
+
 
 //Save the connected information. This structure + connectedProfile
 //should contain all information about the connection
@@ -930,8 +931,7 @@ typedef struct tagCsrRoamSession
     tCsrRoamConnectedInfo connectedInfo;
     tCsrRoamProfile *pCurRoamProfile;
     tSirBssDescription *pConnectBssDesc;
-    tANI_U16 NumPmkidCache; /* valid no. of pmkid in the cache */
-    uint16_t curr_cache_idx; /* the index in pmkidcache to write next to */
+    tANI_U16 NumPmkidCache;
     tPmkidCacheInfo PmkidCacheInfo[CSR_MAX_PMKID_ALLOWED];
     tANI_U8 cJoinAttemps;
     //This may or may not have the up-to-date valid channel list

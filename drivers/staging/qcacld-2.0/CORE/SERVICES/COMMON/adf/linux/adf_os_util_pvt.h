@@ -64,7 +64,7 @@
         printk(KERN_ERR "Assertion failed! %s:%s %s:%d\n",   \
               #expr, __FUNCTION__, __FILE__, __LINE__);      \
         dump_stack();                                      \
-        BUG_ON(1);          \
+        panic("Take care of the assert first\n");          \
     }     \
 }while(0)
 

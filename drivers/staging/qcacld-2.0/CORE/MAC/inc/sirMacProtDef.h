@@ -398,7 +398,6 @@
 #define SIR_MAC_ANI_WORKAROUND_EID_MIN     0
 #define SIR_MAC_ANI_WORKAROUND_EID_MAX     255
 
-#define SIR_MAC_MAX_ADD_IE_LENGTH       500
 /// Maximum length of each IE
 #define SIR_MAC_MAX_IE_LENGTH       255
 
@@ -481,8 +480,7 @@
 
 #ifdef WLAN_NS_OFFLOAD
 #define SIR_MAC_NS_OFFLOAD_SIZE             1  //support only one IPv6 offload
-/* Number of target IP V6 addresses for NS offload */
-#define SIR_MAC_NUM_TARGET_IPV6_NS_OFFLOAD_NA   16
+#define SIR_MAC_NUM_TARGET_IPV6_NS_OFFLOAD_NA   2 //Number of target IP in NA frames. It must be at least 2
 #define SIR_MAC_IPV6_ADDR_LEN               16
 #define SIR_IPV6_ADDR_VALID                 1
 #endif //WLAN_NS_OFFLOAD
@@ -1003,7 +1001,7 @@ typedef __ani_attr_pre_packed struct sSirMacRateSet
 typedef __ani_attr_pre_packed struct sSirMacSSid
 {
     tANI_U8        length;
-    tANI_U8        ssId[SIR_MAC_MAX_SSID_LENGTH];
+    tANI_U8        ssId[32];
 } __ani_attr_packed tSirMacSSid;
 
 typedef __ani_attr_pre_packed struct sSirMacWpaInfo

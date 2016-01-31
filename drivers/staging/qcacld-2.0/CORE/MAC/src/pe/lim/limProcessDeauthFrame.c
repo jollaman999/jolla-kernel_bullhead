@@ -410,11 +410,8 @@ limProcessDeauthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession p
                         }
                         else
                         {
-                            /* Delete all the TDLS peers only if Deauth
-                             * is received from the AP
-                             */
-                            if (IS_CURRENT_BSSID(pMac, pHdr->sa, psessionEntry))
-                               limDeleteTDLSPeers(pMac, psessionEntry);
+
+                            limDeleteTDLSPeers(pMac, psessionEntry);
 #endif
                            /**
                             * This could be Deauthentication frame from
@@ -479,20 +476,18 @@ limProcessDeauthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession p
     }
 
     if ((pStaDs->mlmStaContext.mlmState == eLIM_MLM_WT_DEL_STA_RSP_STATE) ||
-        (pStaDs->mlmStaContext.mlmState == eLIM_MLM_WT_DEL_BSS_RSP_STATE) ||
-        (pStaDs->isDisassocDeauthInProgress)) {
+        (pStaDs->mlmStaContext.mlmState == eLIM_MLM_WT_DEL_BSS_RSP_STATE))
+    {
         /**
          * Already in the process of deleting context for the peer
          * and received Deauthentication frame. Log and Ignore.
          */
         PELOGE(limLog(pMac, LOGE,
            FL("received Deauth frame from peer that is in state %X, addr "
-           MAC_ADDRESS_STR", isDisassocDeauthInProgress : %d\n"),
-           pStaDs->mlmStaContext.mlmState,MAC_ADDR_ARRAY(pHdr->sa),
-           pStaDs->isDisassocDeauthInProgress);)
+           MAC_ADDRESS_STR),
+           pStaDs->mlmStaContext.mlmState,MAC_ADDR_ARRAY(pHdr->sa));)
         return;
     }
-    pStaDs->isDisassocDeauthInProgress++;
     pStaDs->mlmStaContext.disassocReason = (tSirMacReasonCodes)reasonCode;
     pStaDs->mlmStaContext.cleanupTrigger = eLIM_PEER_ENTITY_DEAUTH;
 

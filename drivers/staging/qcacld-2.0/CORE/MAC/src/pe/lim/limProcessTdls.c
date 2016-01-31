@@ -2989,10 +2989,6 @@ static void limTdlsGetIntersection(tANI_U8 *input_array1,tANI_U8 input1_length,
                             tANI_U8 *output_array,tANI_U8 *output_length)
 {
     tANI_U8 i,j,k=0,flag=0;
-
-    if (input1_length > WNI_CFG_VALID_CHANNEL_LIST_LEN)
-       input1_length = WNI_CFG_VALID_CHANNEL_LIST_LEN;
-
     for(i=0;i<input1_length;i++)
     {
         flag=0;
@@ -3079,8 +3075,7 @@ tSirRetStatus limProcesSmeTdlsLinkEstablishReq(tpAniSirGlobal pMac,
         return eSIR_MEM_ALLOC_FAILED;
     }
 
-    vos_mem_set((tANI_U8 *)pMsgTdlsLinkEstablishReq,
-                sizeof(tTdlsLinkEstablishParams), 0);
+    vos_mem_set( (tANI_U8 *)pMsgTdlsLinkEstablishReq, sizeof(tpTdlsLinkEstablishParams), 0);
 
     pMsgTdlsLinkEstablishReq->staIdx = pStaDs->staIndex;
     pMsgTdlsLinkEstablishReq->isResponder = pTdlsLinkEstablishReq->isResponder;
@@ -3090,9 +3085,8 @@ tSirRetStatus limProcesSmeTdlsLinkEstablishReq(tpAniSirGlobal pMac,
     pMsgTdlsLinkEstablishReq->isOffChannelSupported =
                                 pTdlsLinkEstablishReq->isOffChannelSupported;
 
-    if ((pTdlsLinkEstablishReq->supportedChannelsLen > 0) &&
-        (pTdlsLinkEstablishReq->supportedChannelsLen <=
-                SIR_MAC_MAX_SUPP_CHANNELS)) {
+    if ( 0 != pTdlsLinkEstablishReq->supportedChannelsLen)
+    {
         tANI_U32   selfNumChans = WNI_CFG_VALID_CHANNEL_LIST_LEN;
         tANI_U8    selfSupportedChannels[WNI_CFG_VALID_CHANNEL_LIST_LEN];
         if (wlan_cfgGetStr(pMac, WNI_CFG_VALID_CHANNEL_LIST,

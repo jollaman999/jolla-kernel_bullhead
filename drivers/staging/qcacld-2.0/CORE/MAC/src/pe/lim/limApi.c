@@ -826,9 +826,6 @@ tSirRetStatus peOpen(tpAniSirGlobal pMac, tMacOpenParameters *pMacOpenParam)
 {
     tSirRetStatus status = eSIR_SUCCESS;
 
-    if (eDRIVER_TYPE_MFG == pMacOpenParam->driverType)
-       return eSIR_SUCCESS;
-
     pMac->lim.maxBssId = pMacOpenParam->maxBssId;
     pMac->lim.maxStation = pMacOpenParam->maxStation;
 

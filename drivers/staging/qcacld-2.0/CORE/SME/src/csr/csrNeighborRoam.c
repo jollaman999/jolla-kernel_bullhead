@@ -1288,23 +1288,11 @@ eHalStatus csrNeighborRoamAddBssIdToPreauthFailList(tpAniSirGlobal pMac,
                                                     tANI_U8 sessionId,
                                                     tSirMacAddr bssId)
 {
-    tANI_U8 i = 0;
     tpCsrNeighborRoamControlInfo pNeighborRoamInfo =
                                  &pMac->roam.neighborRoamInfo[sessionId];
 
-    NEIGHBOR_ROAM_DEBUG(pMac, LOGE, FL("Added BSSID "MAC_ADDRESS_STR
+    NEIGHBOR_ROAM_DEBUG(pMac, LOGE, FL(" Added BSSID "MAC_ADDRESS_STR
                         " to Preauth failed list"), MAC_ADDR_ARRAY(bssId));
-
-    for (i = 0; i < pNeighborRoamInfo->FTRoamInfo.preAuthFailList.numMACAddress;
-                i++) {
-        if (VOS_TRUE == vos_mem_compare(
-                    pNeighborRoamInfo->FTRoamInfo.preAuthFailList.macAddress[i],
-                    bssId, sizeof(tSirMacAddr))) {
-            smsLog(pMac, LOGW, FL("BSSID "MAC_ADDRESS_STR" already present in preauth fail list"),
-                   MAC_ADDR_ARRAY(bssId));
-            return eHAL_STATUS_SUCCESS;
-        }
-    }
 
     if ((pNeighborRoamInfo->FTRoamInfo.preAuthFailList.numMACAddress + 1) >
             MAX_NUM_PREAUTH_FAIL_LIST_ADDRESS)
@@ -1864,25 +1852,19 @@ csrNeighborRoamPrepareScanProfileFilter(tpAniSirGlobal pMac,
 
     pScanFilter->BSSType = pCurProfile->BSSType;
 
-    if (pNeighborRoamInfo->roamChannelInfo.currentChannelListInfo.numOfChannels)
+    /* We are intrested only in the scan results on channels that we scanned  */
+    pScanFilter->ChannelInfo.numOfChannels = pNeighborRoamInfo->roamChannelInfo.currentChannelListInfo.numOfChannels;
+    pScanFilter->ChannelInfo.ChannelList = vos_mem_malloc(pScanFilter->ChannelInfo.numOfChannels * sizeof(tANI_U8));
+    if (NULL == pScanFilter->ChannelInfo.ChannelList)
     {
-      /* We are interested only in the scan results on channels we scanned */
-      pScanFilter->ChannelInfo.numOfChannels =
-        pNeighborRoamInfo->roamChannelInfo.currentChannelListInfo.numOfChannels;
-      pScanFilter->ChannelInfo.ChannelList =
-       vos_mem_malloc(pScanFilter->ChannelInfo.numOfChannels * sizeof(tANI_U8));
-      if (NULL == pScanFilter->ChannelInfo.ChannelList) {
         smsLog(pMac, LOGE, FL("Scan Filter Channel list mem alloc failed"));
         vos_mem_free(pScanFilter->SSIDs.SSIDList);
         pScanFilter->SSIDs.SSIDList = NULL;
         return eHAL_STATUS_FAILED_ALLOC;
-      }
-      for (i = 0; i < pScanFilter->ChannelInfo.numOfChannels; i++)
-       pScanFilter->ChannelInfo.ChannelList[i] =
-       pNeighborRoamInfo->roamChannelInfo.currentChannelListInfo.ChannelList[i];
-    } else {
-       pScanFilter->ChannelInfo.numOfChannels = 0;
-       pScanFilter->ChannelInfo.ChannelList = NULL;
+    }
+    for (i = 0; i < pScanFilter->ChannelInfo.numOfChannels; i++)
+    {
+        pScanFilter->ChannelInfo.ChannelList[i] = pNeighborRoamInfo->roamChannelInfo.currentChannelListInfo.ChannelList[i];
     }
 
 #ifdef WLAN_FEATURE_VOWIFI_11R
@@ -3676,7 +3658,7 @@ VOS_STATUS csrNeighborRoamMergeChannelLists(
              __func__, inputNumOfChannels);
          return VOS_STATUS_E_INVAL;
     }
-    if (outputNumOfChannels >= WNI_CFG_VALID_CHANNEL_LIST_LEN)
+    if (outputNumOfChannels > WNI_CFG_VALID_CHANNEL_LIST_LEN)
     {
          VOS_TRACE (VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_ERROR,
              "%s: Wrong Number of Output Channels %d",
@@ -5431,26 +5413,23 @@ eHalStatus csrNeighborRoamInit(tpAniSirGlobal pMac, tANI_U8 sessionId)
     pNeighborRoamInfo->cfgParams.neighborScanPeriod = pMac->roam.configParam.neighborRoamConfig.nNeighborScanTimerPeriod;
     pNeighborRoamInfo->cfgParams.neighborResultsRefreshPeriod = pMac->roam.configParam.neighborRoamConfig.nNeighborResultsRefreshPeriod;
     pNeighborRoamInfo->cfgParams.emptyScanRefreshPeriod = pMac->roam.configParam.neighborRoamConfig.nEmptyScanRefreshPeriod;
-    pNeighborRoamInfo->cfgParams.channelInfo.numOfChannels   =
-                  pMac->roam.configParam.neighborRoamConfig.neighborScanChanList.numChannels;
-    if (pNeighborRoamInfo->cfgParams.channelInfo.numOfChannels != 0) {
 
-        pNeighborRoamInfo->cfgParams.channelInfo.ChannelList =
+    pNeighborRoamInfo->cfgParams.channelInfo.numOfChannels   =
+                        pMac->roam.configParam.neighborRoamConfig.neighborScanChanList.numChannels;
+
+    pNeighborRoamInfo->cfgParams.channelInfo.ChannelList =
                 vos_mem_malloc(pMac->roam.configParam.neighborRoamConfig.neighborScanChanList.numChannels);
-        if (NULL == pNeighborRoamInfo->cfgParams.channelInfo.ChannelList) {
-            smsLog(pMac, LOGE, FL("Memory Allocation for CFG Channel List failed"));
-            return eHAL_STATUS_RESOURCES;
-        }
-        /* Update the roam global structure from CFG */
-        vos_mem_copy(pNeighborRoamInfo->cfgParams.channelInfo.ChannelList,
-                     pMac->roam.configParam.neighborRoamConfig.neighborScanChanList.channelList,
-                     pMac->roam.configParam.neighborRoamConfig.neighborScanChanList.numChannels);
+
+    if (NULL == pNeighborRoamInfo->cfgParams.channelInfo.ChannelList)
+    {
+        smsLog(pMac, LOGE, FL("Memory Allocation for CFG Channel List failed"));
+        return eHAL_STATUS_RESOURCES;
     }
-    else {
-        pNeighborRoamInfo->cfgParams.channelInfo.ChannelList = NULL;
-        smsLog(pMac, LOGW, FL("invalid neighbor roam channel list: %u"),
-               pNeighborRoamInfo->cfgParams.channelInfo.numOfChannels);
-    }
+
+    /* Update the roam global structure from CFG */
+    vos_mem_copy(pNeighborRoamInfo->cfgParams.channelInfo.ChannelList,
+                        pMac->roam.configParam.neighborRoamConfig.neighborScanChanList.channelList,
+                        pMac->roam.configParam.neighborRoamConfig.neighborScanChanList.numChannels);
     pNeighborRoamInfo->cfgParams.hi_rssi_scan_max_count =
             pMac->roam.configParam.neighborRoamConfig.nhi_rssi_scan_max_count;
     pNeighborRoamInfo->cfgParams.hi_rssi_scan_rssi_delta =
@@ -5558,8 +5537,6 @@ eHalStatus csrNeighborRoamInit(tpAniSirGlobal pMac, tANI_U8 sessionId)
 
     CSR_NEIGHBOR_ROAM_STATE_TRANSITION(eCSR_NEIGHBOR_ROAM_STATE_INIT, sessionId)
     pNeighborRoamInfo->roamChannelInfo.IAPPNeighborListReceived = eANI_BOOLEAN_FALSE;
-    /* Set the Last Sent Cmd as RSO_STOP */
-    pNeighborRoamInfo->lastSentCmd = ROAM_SCAN_OFFLOAD_STOP;
     return eHAL_STATUS_SUCCESS;
 }
 

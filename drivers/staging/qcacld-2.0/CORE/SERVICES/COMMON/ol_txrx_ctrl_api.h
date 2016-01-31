@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -61,7 +61,6 @@ enum wlan_op_mode {
 #define OL_TXQ_PAUSE_REASON_PEER_UNAUTHORIZED (1 << 1)
 #define OL_TXQ_PAUSE_REASON_TX_ABORT          (1 << 2)
 #define OL_TXQ_PAUSE_REASON_VDEV_STOP         (1 << 3)
-#define OL_TXQ_PAUSE_REASON_VDEV_SUSPEND      (1 << 4)
 
 /**
  * @brief Set up the data SW subsystem.
@@ -394,45 +393,37 @@ ol_txrx_throttle_unpause(ol_txrx_pdev_handle data_pdev);
 #endif /* CONFIG_HL_SUPPORT */
 
 /**
- * ol_txrx_pdev_pause() - Suspend all tx data for the specified physical device.
- * @data_pdev: the physical device being paused.
- * @reason:  pause reason.
- *		One can provide multiple line descriptions
- *		for arguments.
+ * @brief Suspend all tx data for the specified physical device.
+ * @details
+ *  This function applies only to HL systems - in LL systems, tx flow control
+ *  is handled entirely within the target FW.
+ *  In some systems it is necessary to be able to temporarily
+ *  suspend all WLAN traffic, e.g. to allow another device such as bluetooth
+ *  to temporarily have exclusive access to shared RF chain resources.
+ *  This function suspends tx traffic within the specified physical device.
  *
- * This function applies to HL systems -
- * in LL systems, applies when txrx_vdev_pause_all is enabled.
- * In some systems it is necessary to be able to temporarily
- * suspend all WLAN traffic, e.g. to allow another device such as bluetooth
- * to temporarily have exclusive access to shared RF chain resources.
- * This function suspends tx traffic within the specified physical device.
- *
- *
- * Return: None
+ * @param data_pdev - the physical device being paused
  */
-#if defined(CONFIG_HL_SUPPORT) || defined(QCA_SUPPORT_TXRX_VDEV_PAUSE_LL)
+#if defined(CONFIG_HL_SUPPORT)
 void
-ol_txrx_pdev_pause(ol_txrx_pdev_handle data_pdev, u_int32_t reason);
+ol_txrx_pdev_pause(ol_txrx_pdev_handle data_pdev);
 #else
-#define ol_txrx_pdev_pause(data_pdev,reason) /* no-op */
+#define ol_txrx_pdev_pause(data_pdev) /* no-op */
 #endif /* CONFIG_HL_SUPPORT */
 
 /**
- * ol_txrx_pdev_unpause() - Resume tx for the specified physical device..
- * @data_pdev: the physical device being paused.
- * @reason:  pause reason.
+ * @brief Resume tx for the specified physical device.
+ * @details
+ *  This function applies only to HL systems - in LL systems, tx flow control
+ *  is handled entirely within the target FW.
  *
- *  This function applies to HL systems -
- *  in LL systems, applies when txrx_vdev_pause_all is enabled.
- *
- *
- * Return: None
+ * @param data_pdev - the physical device being unpaused
  */
-#if defined(CONFIG_HL_SUPPORT) || defined(QCA_SUPPORT_TXRX_VDEV_PAUSE_LL)
+#if defined(CONFIG_HL_SUPPORT)
 void
-ol_txrx_pdev_unpause(ol_txrx_pdev_handle data_pdev, u_int32_t reason);
+ol_txrx_pdev_unpause(ol_txrx_pdev_handle data_pdev);
 #else
-#define ol_txrx_pdev_unpause(data_pdev,reason) /* no-op */
+#define ol_txrx_pdev_unpause(data_pdev) /* no-op */
 #endif /* CONFIG_HL_SUPPORT */
 
 /**
@@ -665,8 +656,6 @@ ol_txrx_set_curchan(
 int
 ol_txrx_get_tx_pending(
     ol_txrx_pdev_handle pdev);
-
-void ol_txrx_dump_tx_desc(ol_txrx_pdev_handle pdev);
 
 /**
  * @brief Discard all tx frames that are pending in txrx.

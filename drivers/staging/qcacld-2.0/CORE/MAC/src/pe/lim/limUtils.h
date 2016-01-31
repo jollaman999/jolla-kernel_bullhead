@@ -404,7 +404,8 @@ tSirRetStatus limPostSMStateUpdate(tpAniSirGlobal pMac,
 
 void limDeleteStaContext(tpAniSirGlobal pMac, tpSirMsgQ limMsg);
 void limProcessAddBaInd(tpAniSirGlobal pMac, tpSirMsgQ limMsg);
-void limDeleteBASessions(tpAniSirGlobal pMac, tpPESession pSessionEntry, tANI_U32 baDirection);
+void limDeleteBASessions(tpAniSirGlobal pMac, tpPESession pSessionEntry,
+                         tANI_U32 baDirection, tSirMacReasonCodes baReasonCode);
 void limDelPerBssBASessionsBtc(tpAniSirGlobal pMac);
 void limDelAllBASessions(tpAniSirGlobal pMac);
 void limDeleteDialogueTokenList(tpAniSirGlobal pMac);
@@ -609,24 +610,6 @@ void lim_set_ht_caps(tpAniSirGlobal p_mac,
 			tANI_U32 num_bytes);
 bool lim_validate_received_frame_a1_addr(tpAniSirGlobal mac_ctx,
 		tSirMacAddr a1, tpPESession session);
-#ifdef WLAN_FEATURE_11AC
-void lim_set_vht_caps(tpAniSirGlobal p_mac,
-			tpPESession p_session_entry,
-			tANI_U8 *p_ie_start,
-			tANI_U32 num_bytes);
-#endif /* WLAN_FEATURE_11AC */
 
 void lim_set_stads_rtt_cap(tpDphHashNode sta_ds, struct s_ext_cap *ext_cap);
-eHalStatus lim_send_ext_cap_ie(tpAniSirGlobal mac_ctx,
-			       uint32_t session_id,
-			       tDot11fIEExtCap *extracted_extcap, bool merge);
-
-tSirRetStatus lim_strip_extcap_ie(tpAniSirGlobal mac_ctx, uint8_t *addn_ie,
-			uint16_t *addn_ielen, uint8_t *extracted_extcap);
-void lim_update_extcap_struct(tpAniSirGlobal mac_ctx, uint8_t *buf,
-			       tDot11fIEExtCap *ext_cap);
-tSirRetStatus lim_strip_extcap_update_struct(tpAniSirGlobal mac_ctx,
-		uint8_t* addn_ie, uint16_t *addn_ielen, tDot11fIEExtCap *dst);
-void lim_merge_extcap_struct(tDot11fIEExtCap *dst, tDot11fIEExtCap *src);
-
 #endif /* __LIM_UTILS_H */

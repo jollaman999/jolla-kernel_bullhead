@@ -305,7 +305,7 @@ rrmProcessLinkMeasurementRequest( tpAniSirGlobal pMac,
    LinkReport.dialogToken = pLinkReq->DialogToken.token;
    LinkReport.rxAntenna = 0;
    LinkReport.txAntenna = 0;
-   currentRSSI = WDA_GET_RX_RSSI_RAW(pRxPacketInfo);
+   currentRSSI = WDA_GET_RX_RSSI_DB(pRxPacketInfo);
 
    limLog( pMac, LOG1,
           "Received Link report frame with %d", currentRSSI);

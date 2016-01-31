@@ -335,9 +335,6 @@ extern int hdd_wlan_get_frag_threshold(hdd_adapter_t *pAdapter,
 extern void hdd_wlan_get_version(hdd_adapter_t *pAdapter,
                                  union iwreq_data *wrqu, char *extra);
 
-extern void hdd_wlan_get_stats(hdd_adapter_t *pAdapter, v_U16_t *length,
-                               char *buffer, v_U16_t buf_len);
-
 extern int iw_get_scan(struct net_device *dev,
                        struct iw_request_info *info,
                        union iwreq_data *wrqu, char *extra);
@@ -419,13 +416,6 @@ VOS_STATUS wlan_hdd_get_station_stats(hdd_adapter_t *pAdapter);
 VOS_STATUS wlan_hdd_get_rssi(hdd_adapter_t *pAdapter, v_S7_t *rssi_value);
 
 VOS_STATUS wlan_hdd_get_snr(hdd_adapter_t *pAdapter, v_S7_t *snr);
-
-int hdd_get_ldpc(hdd_adapter_t *adapter, int *value);
-int hdd_set_ldpc(hdd_adapter_t *adapter, int value);
-int hdd_get_tx_stbc(hdd_adapter_t *adapter, int *value);
-int hdd_set_tx_stbc(hdd_adapter_t *adapter, int value);
-int hdd_get_rx_stbc(hdd_adapter_t *adapter, int *value);
-int hdd_set_rx_stbc(hdd_adapter_t *adapter, int value);
 
 void hdd_wmm_tx_snapshot(hdd_adapter_t *pAdapter);
 

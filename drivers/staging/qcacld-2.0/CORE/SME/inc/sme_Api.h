@@ -119,7 +119,6 @@ typedef struct _smeConfigParams
     tANI_BOOLEAN  enable5gEBT;
     tANI_BOOLEAN  enableSelfRecovery;
     uint32_t      fine_time_meas_cap;
-    int8_t       first_scan_bucket_threshold;
 } tSmeConfigParams, *tpSmeConfigParams;
 
 typedef enum
@@ -743,8 +742,7 @@ eHalStatus sme_RoamGetAssociatedStas(tHalHandle hHal, tANI_U8 sessionId,
     \param pPeerMacAddr - Caller allocated memory filled with peer MAC address (6 bytes)
     \return eHalStatus  SUCCESS  Roam callback will be called to indicate actual results
   -------------------------------------------------------------------------------*/
-eHalStatus sme_RoamDisconnectSta(tHalHandle hHal, tANI_U8 sessionId,
-                         struct tagCsrDelStaParams *pDelStaParams);
+eHalStatus sme_RoamDisconnectSta(tHalHandle hHal, tANI_U8 sessionId, tANI_U8 *pPeerMacAddr);
 
 /* ---------------------------------------------------------------------------
     \fn sme_RoamDeauthSta
@@ -4102,18 +4100,5 @@ eHalStatus sme_update_roam_scan_hi_rssi_scan_params(tHalHandle hal_handle,
 
 eHalStatus sme_wifi_start_logger(tHalHandle hal,
 		struct sir_wifi_start_log start_log);
-
-eHalStatus sme_update_nss(tHalHandle h_hal, uint8_t nss);
-
-uint8_t    sme_is_any_session_in_connected_state(tHalHandle h_hal);
-
-eHalStatus sme_set_rssi_monitoring(tHalHandle hal,
-					struct rssi_monitor_req *input);
-eHalStatus sme_set_rssi_threshold_breached_cb(tHalHandle hal,
-			void (*cb)(void *, struct rssi_breach_event *));
-
-eHalStatus sme_disable_non_fcc_channel(tHalHandle hHal,
-				       bool fcc_constraint);
-bool smeNeighborRoamIsHandoffInProgress(tHalHandle hHal, tANI_U8 sessionId);
 
 #endif //#if !defined( __SME_API_H )
