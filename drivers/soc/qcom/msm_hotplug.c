@@ -375,6 +375,10 @@ static void cpu_up_work(struct work_struct *work)
 		apply_down_lock(cpu);
 	}
 
+	// Skip if all of big cores turned on.
+	if (num_online_big_cpus() == BIG_CORES)
+		return;
+
 	// If LITTLE_CORES is 4 and BIG_CORES is 2.
 	// target_little == 4 -> Turn on all of big cores. (2)
 	// target_little == 3 -> Turn on half of big cores. (1)
@@ -425,6 +429,10 @@ static void cpu_down_work(struct work_struct *work)
 		if (target_little >= num_online_little_cpus())
 			break;
 	}
+
+	// Skip if all of big cores turned off.
+	if (num_online_big_cpus() == 0)
+		return;
 
 	// If LITTLE_CORES is 4 and BIG_CORES is 2.
 	// target_little == 4 -> skip
