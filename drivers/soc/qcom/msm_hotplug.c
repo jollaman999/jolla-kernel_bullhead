@@ -362,7 +362,6 @@ static void cpu_up_work(struct work_struct *work)
 {
 	int cpu;
 	unsigned int target_little, target_big;
-	unsigned int online_little;
 
 	target_little = hotplug.target_cpus;
 
@@ -376,15 +375,13 @@ static void cpu_up_work(struct work_struct *work)
 		apply_down_lock(cpu);
 	}
 
-	online_little = num_online_little_cpus();
-
 	// If LITTLE_CORES is 4 and BIG_CORES is 2.
-	// online_little == 4 -> Turn on all of big cores. (2)
-	// online_little == 3 -> Turn on half of big cores. (1)
+	// target_little == 4 -> Turn on all of big cores. (2)
+	// target_little == 3 -> Turn on half of big cores. (1)
 	// else -> skip
-	if (online_little == LITTLE_CORES)
+	if (target_little == LITTLE_CORES)
 		target_big = BIG_CORES;
-	else if (online_little == LITTLE_CORES - 1)
+	else if (target_little == LITTLE_CORES - 1)
 		target_big = BIG_CORES / 2;
 	else
 		return;
@@ -412,7 +409,6 @@ static void cpu_down_work(struct work_struct *work)
 {
 	int cpu, lowest_cpu;
 	unsigned int target_little, target_big;
-	unsigned int online_little;
 
 	target_little = hotplug.target_cpus;
 
@@ -430,15 +426,13 @@ static void cpu_down_work(struct work_struct *work)
 			break;
 	}
 
-	online_little = num_online_little_cpus();
-
 	// If LITTLE_CORES is 4 and BIG_CORES is 2.
-	// online_little == 4 -> skip
-	// online_little == 3 -> Turn off half of big cores. (1)
+	// target_little == 4 -> skip
+	// target_little == 3 -> Turn off half of big cores. (1)
 	// else -> Turn off all of big cores. (2)
-	if (online_little == LITTLE_CORES)
+	if (target_little == LITTLE_CORES)
 		return;
-	else if (online_little == LITTLE_CORES - 1)
+	else if (target_little == LITTLE_CORES - 1)
 		target_big = BIG_CORES / 2;
 	else
 		target_big = BIG_CORES;
