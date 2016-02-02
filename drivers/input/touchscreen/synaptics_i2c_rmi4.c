@@ -39,6 +39,10 @@
 #include "synaptics_i2c_rmi4.h"
 #include <linux/input/mt.h>
 
+#ifdef CONFIG_KSM
+#include <linux/ksm.h>
+#endif
+
 #ifdef CONFIG_MSM_HOTPLUG
 #include <linux/msm_hotplug.h>
 #endif
@@ -4655,6 +4659,14 @@ static int synaptics_rmi4_suspend(struct device *dev)
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 	int retval;
 
+#if CONFIG_UKSM
+	if (uksm_run_stored != UKSM_RUN_STOP)
+		uksm_run = UKSM_RUN_STOP;
+#elif defined(CONFIG_KSM_LEGACY)
+	if (ksm_run_stored != KSM_RUN_STOP)
+		ksm_run = KSM_RUN_STOP;
+#endif
+
 #ifdef CONFIG_MSM_HOTPLUG
 	msm_hotplug_scr_suspended = true;
 	if (msm_enabled)
@@ -4766,6 +4778,14 @@ err_lpm_regulator:
 static int synaptics_rmi4_resume(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
+
+#if CONFIG_UKSM
+	if (uksm_run_stored != UKSM_RUN_STOP)
+		uksm_run = uksm_run_stored;
+#elif defined(CONFIG_KSM_LEGACY)
+	if (ksm_run_stored != KSM_RUN_STOP)
+		ksm_run = ksm_run_stored;
+#endif
 
 #ifdef CONFIG_MSM_HOTPLUG
 	msm_hotplug_scr_suspended = false;

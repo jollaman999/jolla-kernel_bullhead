@@ -565,9 +565,8 @@ struct list_head vma_slot_dedup = LIST_HEAD_INIT(vma_slot_dedup);
 /* How many times the ksmd has slept since startup */
 static unsigned long long uksm_sleep_times;
 
-#define UKSM_RUN_STOP	0
-#define UKSM_RUN_MERGE	1
-static unsigned int uksm_run = 1;
+unsigned int uksm_run = UKSM_RUN_MERGE;
+unsigned int uksm_run_stored;
 
 static DECLARE_WAIT_QUEUE_HEAD(uksm_thread_wait);
 static DEFINE_MUTEX(uksm_thread_mutex);
@@ -5038,6 +5037,8 @@ static ssize_t run_store(struct kobject *kobj, struct kobj_attribute *attr,
 	}
 	mutex_unlock(&uksm_thread_mutex);
 
+	uksm_run_stored = uksm_run;
+
 	return count;
 }
 UKSM_ATTR(run);
@@ -5749,6 +5750,9 @@ static int __init uksm_init(void)
 	 */
 	hotplug_memory_notifier(uksm_memory_callback, 100);
 #endif
+
+	uksm_run_stored = uksm_run;
+
 	return 0;
 
 out_free:

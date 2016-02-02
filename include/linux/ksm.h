@@ -17,6 +17,16 @@ struct stable_node;
 struct mem_cgroup;
 
 #ifdef CONFIG_KSM
+
+#ifdef CONFIG_KSM_LEGACY
+#define KSM_RUN_STOP	0
+#define KSM_RUN_MERGE	1
+#define KSM_RUN_UNMERGE	2
+#define KSM_RUN_OFFLINE	4
+extern unsigned long ksm_run;
+extern unsigned long ksm_run_stored;
+#endif
+
 int ksm_madvise(struct vm_area_struct *vma, unsigned long start,
 		unsigned long end, int advice, unsigned long *vm_flags);
 

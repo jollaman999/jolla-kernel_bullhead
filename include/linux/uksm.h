@@ -16,6 +16,11 @@
 #include <linux/rmap.h>
 #include <linux/sched.h>
 
+#define UKSM_RUN_STOP	0
+#define UKSM_RUN_MERGE	1
+extern unsigned int uksm_run;
+extern unsigned int uksm_run_stored;
+
 extern unsigned long zero_pfn __read_mostly;
 extern unsigned long uksm_zero_pfn __read_mostly;
 extern struct page *empty_uksm_zero_page;

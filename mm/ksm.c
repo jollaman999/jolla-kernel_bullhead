@@ -236,11 +236,8 @@ static int ksm_nr_node_ids = 1;
 #define ksm_nr_node_ids		1
 #endif
 
-#define KSM_RUN_STOP	0
-#define KSM_RUN_MERGE	1
-#define KSM_RUN_UNMERGE	2
-#define KSM_RUN_OFFLINE	4
-static unsigned long ksm_run = KSM_RUN_MERGE;
+unsigned long ksm_run = KSM_RUN_MERGE;
+unsigned long ksm_run_stored;
 static void wait_while_offlining(void);
 
 static DECLARE_WAIT_QUEUE_HEAD(ksm_thread_wait);
@@ -2335,6 +2332,8 @@ static ssize_t run_store(struct kobject *kobj, struct kobj_attribute *attr,
 	if (flags & KSM_RUN_MERGE)
 		wake_up_interruptible(&ksm_thread_wait);
 
+	ksm_run_stored = ksm_run;
+
 	return count;
 }
 KSM_ATTR(run);
@@ -2518,6 +2517,9 @@ static int __init ksm_init(void)
 #endif
 
 	show_mem_notifier_register(&ksm_show_mem_notifier_block);
+
+	ksm_run_stored = ksm_run;
+
 	return 0;
 
 out_free:
