@@ -1858,8 +1858,8 @@ static int __cpufreq_governor(struct cpufreq_policy *policy,
 	   restrictions, like e.g. conservative or ondemand.
 	   That this is the case is already ensured in Kconfig
 	*/
-#ifdef CONFIG_CPU_FREQ_GOV_PERFORMANCE
-	struct cpufreq_governor *gov = &cpufreq_gov_performance;
+#ifdef CONFIG_CPU_FREQ_GOV_INTERACTIVE
+	struct cpufreq_governor *gov = &cpufreq_gov_interactive;
 #else
 	struct cpufreq_governor *gov = NULL;
 #endif
