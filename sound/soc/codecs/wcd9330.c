@@ -5449,7 +5449,7 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 	if (dt2w_switch)
 		return;
 #endif
-	if (scr_suspended)
+	if (sovc_switch && scr_suspended)
 		sovc_press_power_key_trigger(SOVC_POWER_KEY_DELAY);
 #endif
 }
