@@ -1295,8 +1295,8 @@ static ssize_t qpnp_hap_ramp_test_data_show(struct device *dev,
 
 }
 
-/* sysfs show for vmax_mv_haptic update */
-static ssize_t qpnp_hap_vmax_mv_haptic_show(struct device *dev,
+/* sysfs show for vmax_mv_strong update */
+static ssize_t qpnp_hap_vmax_mv_strong_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
 	struct timed_output_dev *timed_dev = dev_get_drvdata(dev);
@@ -1306,8 +1306,8 @@ static ssize_t qpnp_hap_vmax_mv_haptic_show(struct device *dev,
 	return snprintf(buf, PAGE_SIZE, "%d\n", hap->vmax_mv_haptic);
 }
 
-/* sysfs store for vmax_mv_haptic */
-static ssize_t qpnp_hap_vmax_mv_haptic_store(struct device *dev,
+/* sysfs store for vmax_mv_strong */
+static ssize_t qpnp_hap_vmax_mv_strong_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
 	struct timed_output_dev *timed_dev = dev_get_drvdata(dev);
@@ -1412,9 +1412,9 @@ static struct device_attribute qpnp_hap_attrs[] = {
 	__ATTR(min_max_test, (S_IRUGO | S_IWUSR | S_IWGRP),
 			qpnp_hap_min_max_test_data_show,
 			qpnp_hap_min_max_test_data_store),
-	__ATTR(vmax_mv_haptic, (S_IRUGO | S_IWUSR | S_IWGRP),
-			qpnp_hap_vmax_mv_haptic_show,
-			qpnp_hap_vmax_mv_haptic_store),
+	__ATTR(vmax_mv_strong, (S_IRUGO | S_IWUSR | S_IWGRP),
+			qpnp_hap_vmax_mv_strong_show,
+			qpnp_hap_vmax_mv_strong_store),
 	__ATTR(vmax_mv_ind, (S_IRUGO | S_IWUSR | S_IWGRP),
 			qpnp_hap_vmax_mv_ind_show,
 			qpnp_hap_vmax_mv_ind_store),
