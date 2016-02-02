@@ -1596,7 +1596,7 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 	return 0;
 }
 
-#ifndef CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVE
+#ifdef CONFIG_CPU_FREQ_GOV_INTERACTIVE_MODULE
 static
 #endif
 struct cpufreq_governor cpufreq_gov_interactive = {
