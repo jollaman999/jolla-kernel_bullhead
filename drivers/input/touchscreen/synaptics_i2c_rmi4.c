@@ -4675,7 +4675,7 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 		return;
 	}
 
-	if (!scr_suspended || sovc_tmp_onoff) {
+	if (!scr_suspended || (sovc_tmp_onoff && !sovc_mic_detected)) {
 		synaptics_rmi4_touch_off_triggered = false;
 		return;
 	}
