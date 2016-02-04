@@ -2049,8 +2049,8 @@ static inline unsigned long sched_get_busy(int cpu)
 {
 	return 0;
 }
-static inline void sched_get_cpus_busy(struct sched_load *busy,
-				       const struct cpumask *query_cpus) {};
+static inline void sched_get_cpus_busy(unsigned long *busy,
+				const struct cpumask *query_cpus) {};
 static inline void sched_set_io_is_busy(int val) {};
 
 static inline int sched_update_freq_max_load(const cpumask_t *cpumask)
