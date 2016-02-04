@@ -4828,7 +4828,7 @@ static int synaptics_rmi4_suspend(struct device *dev)
 	}
 #endif
 
-	synaptics_rmi4_touch_off(0);
+	synaptics_rmi4_touch_off(NULL);
 	return touch_off_rc;
 }
 
