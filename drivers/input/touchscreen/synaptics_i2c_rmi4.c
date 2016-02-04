@@ -4796,7 +4796,7 @@ static int synaptics_rmi4_suspend(struct device *dev)
 
 	rmi4_data_touch_off = rmi4_data;
 
-#if CONFIG_UKSM
+#ifdef CONFIG_UKSM
 	if (uksm_run_stored != UKSM_RUN_STOP)
 		uksm_run = UKSM_RUN_STOP;
 #elif defined(CONFIG_KSM_LEGACY)
@@ -4846,7 +4846,7 @@ static int synaptics_rmi4_resume(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 
-#if CONFIG_UKSM
+#ifdef CONFIG_UKSM
 	if (uksm_run_stored != UKSM_RUN_STOP)
 		uksm_run = uksm_run_stored;
 #elif defined(CONFIG_KSM_LEGACY)
