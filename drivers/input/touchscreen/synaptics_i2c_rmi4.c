@@ -4654,10 +4654,147 @@ static int synaptics_rmi4_check_configuration(struct synaptics_rmi4_data
  * disables the interrupt, and turns off the power to the sensor.
  */
 #ifdef CONFIG_PM
+static struct synaptics_rmi4_data *rmi4_data_touch_off = NULL;
+static int touch_off_rc = 0;
+static bool synaptics_rmi4_touch_off_triggered = false;
+static bool rmi4_touch_is_off = false;
+extern void synaptics_rmi4_touch_off_trigger(unsigned int delay);
+
+static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_off_work)
+{
+	int retval;
+
+	if (synaptics_rmi4_touch_off_triggered)
+		return;
+
+	synaptics_rmi4_touch_off_triggered = true;
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (track_changed) {
+		synaptics_rmi4_touch_off_triggered = false;
+		return;
+	}
+
+	if (!scr_suspended || sovc_tmp_onoff) {
+		synaptics_rmi4_touch_off_triggered = false;
+		return;
+	}
+#endif
+
+	if (!rmi4_data_touch_off) {
+		pr_info("%s: Failed to turn off touchscreen. Rescheduling...\n", __func__);
+		goto reschedule;
+	}
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (irq_wake_enabled) {
+		disable_irq_wake(rmi4_data_touch_off->irq);
+		irq_wake_enabled = false;
+	}
+#endif
+
+	if (rmi4_data_touch_off->stay_awake) {
+		rmi4_data_touch_off->staying_awake = true;
+		touch_off_rc = 0;
+		synaptics_rmi4_touch_off_triggered = false;
+		return;
+	} else
+		rmi4_data_touch_off->staying_awake = false;
+
+	cancel_work_sync(&rmi4_data_touch_off->init_work);
+
+	if (rmi4_data_touch_off->suspended && rmi4_touch_is_off) {
+		pr_info("%s: Already in suspend state\n", __func__);
+		touch_off_rc = 0;
+		synaptics_rmi4_touch_off_triggered = false;
+		return;
+	}
+
+	synaptics_secure_touch_stop(rmi4_data_touch_off, 1);
+
+	if (!rmi4_data_touch_off->fw_updating) {
+		if (!rmi4_data_touch_off->sensor_sleep) {
+			rmi4_data_touch_off->touch_stopped = true;
+			wake_up(&rmi4_data_touch_off->wait);
+			synaptics_rmi4_irq_enable(rmi4_data_touch_off, false);
+			synaptics_rmi4_sensor_sleep(rmi4_data_touch_off);
+		}
+
+		synaptics_rmi4_release_all(rmi4_data_touch_off);
+
+		retval = synaptics_rmi4_regulator_lpm(rmi4_data_touch_off, true);
+		if (retval < 0) {
+			pr_info("%s: failed to enter low power mode\n", __func__);
+			goto err_lpm_regulator;
+		}
+	} else {
+		pr_err("%s: Firmware updating, cannot go into suspend mode\n", __func__);
+		touch_off_rc = 0;
+		synaptics_rmi4_touch_off_triggered = false;
+		return;
+	}
+
+	if (rmi4_data_touch_off->board->disable_gpios) {
+		if (rmi4_data_touch_off->ts_pinctrl) {
+			retval = pinctrl_select_state(rmi4_data_touch_off->ts_pinctrl,
+					rmi4_data_touch_off->pinctrl_state_suspend);
+			if (retval < 0)
+				pr_err("%s: failed to select idle pinctrl state\n", __func__);
+		}
+
+		retval = synaptics_rmi4_gpio_configure(rmi4_data_touch_off, false);
+		if (retval < 0) {
+			pr_err("%s: failed to put gpios in suspend state\n", __func__);
+			goto err_gpio_configure;
+		}
+	}
+	mutex_lock(&suspended_mutex);
+	rmi4_data_touch_off->suspended = true;
+	rmi4_touch_is_off = true;
+	mutex_unlock(&suspended_mutex);
+
+	touch_off_rc = 0;
+	synaptics_rmi4_touch_off_triggered = false;
+	return;
+
+err_gpio_configure:
+	if (rmi4_data_touch_off->ts_pinctrl) {
+		retval = pinctrl_select_state(rmi4_data_touch_off->ts_pinctrl,
+					rmi4_data_touch_off->pinctrl_state_active);
+		if (retval < 0)
+			pr_err("%s: failed to select get default pinctrl state\n", __func__);
+	}
+	synaptics_rmi4_regulator_lpm(rmi4_data_touch_off, false);
+
+err_lpm_regulator:
+	if (rmi4_data_touch_off->sensor_sleep) {
+		synaptics_rmi4_sensor_wake(rmi4_data_touch_off);
+		synaptics_rmi4_irq_enable(rmi4_data_touch_off, true);
+		rmi4_data_touch_off->touch_stopped = false;
+	}
+
+	touch_off_rc = retval;
+	synaptics_rmi4_touch_off_triggered = false;
+	return;
+
+reschedule:
+	synaptics_rmi4_touch_off_triggered = false;
+	synaptics_rmi4_touch_off_trigger(100);
+}
+static DECLARE_DELAYED_WORK(synaptics_rmi4_touch_off_work, synaptics_rmi4_touch_off);
+
+void synaptics_rmi4_touch_off_trigger(unsigned int delay)
+{
+	schedule_delayed_work(&synaptics_rmi4_touch_off_work,
+				msecs_to_jiffies(delay));
+}
+EXPORT_SYMBOL(synaptics_rmi4_touch_off_trigger);
+
 static int synaptics_rmi4_suspend(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
-	int retval;
+
+	rmi4_data_touch_off = rmi4_data;
 
 #if CONFIG_UKSM
 	if (uksm_run_stored != UKSM_RUN_STOP)
@@ -4684,85 +4821,15 @@ static int synaptics_rmi4_suspend(struct device *dev)
 
 		mutex_lock(&suspended_mutex);
 		rmi4_data->suspended = true;
+		rmi4_touch_is_off = false;
 		mutex_unlock(&suspended_mutex);
 
 		return 0;
 	}
 #endif
 
-	if (rmi4_data->stay_awake) {
-		rmi4_data->staying_awake = true;
-		return 0;
-	} else
-		rmi4_data->staying_awake = false;
-
-	cancel_work_sync(&rmi4_data->init_work);
-
-	if (rmi4_data->suspended) {
-		dev_info(dev, "Already in suspend state\n");
-		return 0;
-	}
-
-	synaptics_secure_touch_stop(rmi4_data, 1);
-
-	if (!rmi4_data->fw_updating) {
-		if (!rmi4_data->sensor_sleep) {
-			rmi4_data->touch_stopped = true;
-			wake_up(&rmi4_data->wait);
-			synaptics_rmi4_irq_enable(rmi4_data, false);
-			synaptics_rmi4_sensor_sleep(rmi4_data);
-		}
-
-		synaptics_rmi4_release_all(rmi4_data);
-
-		retval = synaptics_rmi4_regulator_lpm(rmi4_data, true);
-		if (retval < 0) {
-			dev_err(dev, "failed to enter low power mode\n");
-			goto err_lpm_regulator;
-		}
-	} else {
-		dev_err(dev,
-			"Firmware updating, cannot go into suspend mode\n");
-		return 0;
-	}
-
-	if (rmi4_data->board->disable_gpios) {
-		if (rmi4_data->ts_pinctrl) {
-			retval = pinctrl_select_state(rmi4_data->ts_pinctrl,
-					rmi4_data->pinctrl_state_suspend);
-			if (retval < 0)
-				dev_err(dev, "failed to select idle pinctrl state\n");
-		}
-
-		retval = synaptics_rmi4_gpio_configure(rmi4_data, false);
-		if (retval < 0) {
-			dev_err(dev, "failed to put gpios in suspend state\n");
-			goto err_gpio_configure;
-		}
-	}
-	mutex_lock(&suspended_mutex);
-	rmi4_data->suspended = true;
-	mutex_unlock(&suspended_mutex);
-
-	return 0;
-
-err_gpio_configure:
-	if (rmi4_data->ts_pinctrl) {
-		retval = pinctrl_select_state(rmi4_data->ts_pinctrl,
-					rmi4_data->pinctrl_state_active);
-		if (retval < 0)
-			dev_err(dev, "failed to select get default pinctrl state\n");
-	}
-	synaptics_rmi4_regulator_lpm(rmi4_data, false);
-
-err_lpm_regulator:
-	if (rmi4_data->sensor_sleep) {
-		synaptics_rmi4_sensor_wake(rmi4_data);
-		synaptics_rmi4_irq_enable(rmi4_data, true);
-		rmi4_data->touch_stopped = false;
-	}
-
-	return retval;
+	synaptics_rmi4_touch_off(0);
+	return touch_off_rc;
 }
 
  /**
