@@ -1790,15 +1790,10 @@ unsigned int power_cost_at_freq(int cpu, unsigned int freq)
 		 * hungry. */
 		return cpu_rq(cpu)->max_possible_capacity;
 
-	costs = per_cpu_info[cpu].ptable;
-
-	if (!freq) {
+	if (!freq)
 		freq = min_max_freq;
-	} else {
-		i = per_cpu_info[cpu].len / 2;
-		if (costs[i].freq > freq)
-			i = 0;
-	}
+
+	costs = per_cpu_info[cpu].ptable;
 
 	while (costs[i].freq != 0) {
 		if (costs[i].freq >= freq ||
@@ -1814,25 +1809,24 @@ unsigned int power_cost_at_freq(int cpu, unsigned int freq)
  * the CPU. */
 static unsigned int power_cost(u64 task_load, int cpu)
 {
-	int i, end;
+	unsigned int task_freq, cur_freq;
 	struct rq *rq = cpu_rq(cpu);
-	struct hmp_power_cost_table *ptr = &rq->pwr_cost_table;
+	u64 demand;
 
-	if (!sysctl_sched_enable_power_aware || !ptr->len)
+	if (!sysctl_sched_enable_power_aware)
 		return rq->max_possible_capacity;
 
-	/* do simple divide & conquer */
-	i = ptr->len / 2;
-	end = ptr->len;
-	if (!(ptr->map[i].demand < task_load))
-		i = 0;
+	/* calculate % of max freq needed */
+	demand = task_load * 100;
+	demand = div64_u64(demand, max_task_load());
 
-	for (; i < end; i++) {
-		if (task_load <= ptr->map[i].demand &&
-		    ptr->map[i].freq >= rq->cur_freq)
-			return *(ptr->map[i].power_cost);
-	}
-	return *(ptr->map[i - 1].power_cost);
+	task_freq = demand * rq->max_possible_freq;
+	task_freq /= 100; /* khz needed */
+
+	cur_freq = rq->cur_freq;
+	task_freq = max(cur_freq, task_freq);
+
+	return power_cost_at_freq(cpu, task_freq);
 }
 
 static int best_small_task_cpu(struct task_struct *p, int sync)
