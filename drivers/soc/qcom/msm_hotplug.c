@@ -58,7 +58,6 @@ unsigned int msm_enabled = HOTPLUG_ENABLED;
 static bool timeout_enabled = false;
 static cputime64_t pre_time;
 bool msm_hotplug_scr_suspended = false;
-EXPORT_SYMBOL(msm_hotplug_scr_suspended);
 
 void msm_hotplug_suspend(void);
 
