@@ -171,6 +171,8 @@ void machine_kexec_cleanup(struct kimage *image)
  */
 int machine_kexec_prepare(struct kimage *image)
 {
+	unsigned long *hardboot_page;
+
 	kexec_image_info(image);
 	fill_bypass(image);
 	if (bypass_purgatory) {
@@ -183,6 +185,10 @@ int machine_kexec_prepare(struct kimage *image)
 #ifdef CONFIG_KEXEC_HARDBOOT
 	arm64_kexec_hardboot = image->hardboot;
 #endif
+	// debug; please remove
+	hardboot_page = ioremap(KEXEC_HB_PAGE_ADDR, SZ_1M);
+	pr_info("Last hardboot status: %lx\n", hardboot_page[0]);
+	iounmap(hardboot_page);
 
 	return 0;
 }
@@ -389,4 +395,12 @@ void machine_kexec(struct kimage *image)
 void machine_crash_shutdown(struct pt_regs *regs)
 {
 	/* Empty routine needed to avoid build errors. */
+}
+
+bool arch_kexec_is_hardboot_buffer_range(unsigned long start,
+	unsigned long end) {
+	unsigned long hardboot_reserve = KEXEC_HB_PAGE_ADDR;
+	unsigned long tempdest = hardboot_reserve - (SZ_1M * 64);
+	// reserve is the end, tempdest is the start of the buffer
+	return start < hardboot_reserve && end >= tempdest;
 }
