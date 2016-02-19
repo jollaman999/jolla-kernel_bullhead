@@ -149,6 +149,11 @@ void arch_crash_save_vmcoreinfo(void);
 __printf(1, 2)
 void vmcoreinfo_append_str(const char *fmt, ...);
 unsigned long paddr_vmcoreinfo_note(void);
+#ifdef CONFIG_KEXEC_HARDBOOT
+/* FIXME: Hack: memory reservation should be done properly - see kexec.c */
+bool arch_kexec_is_hardboot_buffer_range(unsigned long start,
+	unsigned long end);
+#endif
 
 #define VMCOREINFO_OSRELEASE(value) \
 	vmcoreinfo_append_str("OSRELEASE=%s\n", value)
