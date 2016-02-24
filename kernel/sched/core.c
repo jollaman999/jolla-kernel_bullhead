@@ -3004,6 +3004,9 @@ again:
 static void __sched __schedule(void)
 {
 	struct task_struct *prev, *next;
+#ifdef CONFIG_TASK_CPUFREQ_STATS
+	struct task_struct *parent;
+#endif
 	unsigned long *switch_count;
 	struct rq *rq;
 	int cpu;
@@ -3059,6 +3062,14 @@ need_resched:
 		update_rq_clock(rq);
 
 	next = pick_next_task(rq, prev);
+#ifdef CONFIG_TASK_CPUFREQ_STATS
+	parent = prev;
+	if (prev->pid != prev->tgid) {
+		parent = find_task_by_vpid(prev->tgid);
+	}
+	task_update_cumulative_time_in_state(prev, parent, cpu_of(rq));
+	task_update_time_in_state(next, cpu_of(rq));
+#endif
 	clear_tsk_need_resched(prev);
 	//TJK clear_preempt_need_resched();
 	rq->skip_clock_update = 0;
