@@ -454,9 +454,11 @@ int cpu_up(unsigned int cpu)
 #endif
 
 #ifdef CONFIG_MSM_HOTPLUG
-	if ((cpu == 4 || cpu == 5) &&
-	    msm_hotplug_scr_suspended && msm_enabled)
-		return 0;
+	if (msm_hotplug_scr_suspended && msm_enabled) {
+		if ((cpu == 4 || cpu == 5) &&
+		    !msm_hotplug_fingerprint_called)
+			return 0;
+	}
 #endif
 
 	if (!cpu_possible(cpu)) {

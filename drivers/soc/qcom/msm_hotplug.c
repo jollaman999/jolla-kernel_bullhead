@@ -58,6 +58,7 @@ unsigned int msm_enabled = HOTPLUG_ENABLED;
 static bool timeout_enabled = false;
 static cputime64_t pre_time;
 bool msm_hotplug_scr_suspended = false;
+bool msm_hotplug_fingerprint_called = false;
 
 void msm_hotplug_suspend(void);
 
@@ -551,6 +552,7 @@ static void msm_hotplug_work(struct work_struct *work)
 		}
 
 		timeout_enabled = false;
+		msm_hotplug_fingerprint_called = false;
 	}
 
 	update_load_stats();
@@ -615,9 +617,10 @@ void msm_hotplug_suspend(void)
 		return;
 
 	/* Flush hotplug workqueue */
-	if (timeout_enabled)
+	if (timeout_enabled) {
 		timeout_enabled = false;
-	else {
+		msm_hotplug_fingerprint_called = false;
+	} else {
 		flush_workqueue(hotplug_wq);
 		cancel_delayed_work_sync(&hotplug_work);
 	}

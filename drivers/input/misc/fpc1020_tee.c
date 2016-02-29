@@ -739,6 +739,8 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 	if (fpc1020->wakeup_enabled ) {
 		wake_lock_timeout(&fpc1020->ttw_wl, msecs_to_jiffies(FPC_TTW_HOLD_TIME));
 #ifdef CONFIG_MSM_HOTPLUG
+		msm_hotplug_fingerprint_called = true;
+
 		if (msm_enabled)
 			msm_hotplug_resume_timeout();
 #endif
