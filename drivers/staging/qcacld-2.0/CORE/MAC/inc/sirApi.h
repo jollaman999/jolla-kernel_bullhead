@@ -103,7 +103,7 @@ typedef tANI_U8 tSirVersionString[SIR_VERSION_STRING_LEN];
 
 #ifdef FEATURE_WLAN_EXTSCAN
 
-#define WLAN_EXTSCAN_MAX_CHANNELS                 40
+#define WLAN_EXTSCAN_MAX_CHANNELS                 36
 #define WLAN_EXTSCAN_MAX_BUCKETS                  16
 #define WLAN_EXTSCAN_MAX_HOTLIST_APS              128
 #define WLAN_EXTSCAN_MAX_SIGNIFICANT_CHANGE_APS   64
@@ -753,7 +753,7 @@ typedef struct sSirBssDescription
     // Please keep the structure 4 bytes aligned above the ieFields
 
     tANI_U8              fProbeRsp; //whether it is from a probe rsp
-    tANI_U8              reservedPadding1;
+    tANI_S8              rssi_raw;
     tANI_U8              reservedPadding2;
     tANI_U8              reservedPadding3;
     tANI_U32             WscIeLen;
@@ -793,10 +793,10 @@ typedef struct sSirSmeStartBssRsp
     tSirBssType         bssType;//Add new type for WDS mode
     tANI_U16            beaconInterval;//Beacon Interval for both type
     tANI_U32            staId;//Staion ID for Self
-    tSirBssDescription  bssDescription;//Peer BSS description
 #ifdef FEATURE_WLAN_MCC_TO_SCC_SWITCH
     tSirSmeHTProfile    HTProfile;
 #endif
+    tSirBssDescription  bssDescription;//Peer BSS description
 } tSirSmeStartBssRsp, *tpSirSmeStartBssRsp;
 
 
@@ -1182,10 +1182,11 @@ typedef struct sSirSmeJoinRsp
     bool tdls_chan_swit_prohibited;
 #endif
 
-    tANI_U8         frames[ 1 ];
 #ifdef FEATURE_WLAN_MCC_TO_SCC_SWITCH
     tSirSmeHTProfile    HTProfile;
 #endif
+
+    tANI_U8         frames[ 1 ];
 } tSirSmeJoinRsp, *tpSirSmeJoinRsp;
 
 /// Definition for Authentication indication from peer
@@ -1722,6 +1723,7 @@ typedef struct sSirSmeDeauthInd
 
     tANI_U16            staId;
     tANI_U32            reasonCode;
+    tANI_S8             rssi;
 } tSirSmeDeauthInd, *tpSirSmeDeauthInd;
 
 /// Definition for Deauthentication confirm
@@ -3446,9 +3448,8 @@ typedef struct sSirUpdateAPWPARSNIEsReq
 typedef struct sSirNsOffloadReq
 {
     tANI_U8 srcIPv6Addr[16];
-    tANI_U8 selfIPv6Addr[16];
-    //Only support 2 possible Network Advertisement IPv6 address
-    tANI_U8 targetIPv6Addr[SIR_MAC_NUM_TARGET_IPV6_NS_OFFLOAD_NA][16];
+    tANI_U8 selfIPv6Addr[SIR_MAC_NUM_TARGET_IPV6_NS_OFFLOAD_NA][SIR_MAC_IPV6_ADDR_LEN];
+    tANI_U8 targetIPv6Addr[SIR_MAC_NUM_TARGET_IPV6_NS_OFFLOAD_NA][SIR_MAC_IPV6_ADDR_LEN];
     tANI_U8 selfMacAddr[6];
     tANI_U8 srcIPv6AddrValid;
     tANI_U8 targetIPv6AddrValid[SIR_MAC_NUM_TARGET_IPV6_NS_OFFLOAD_NA];
@@ -3460,6 +3461,7 @@ typedef struct sSirHostOffloadReq
 {
     tANI_U8 offloadType;
     tANI_U8 enableOrDisable;
+    uint32_t num_ns_offload_count;
     union
     {
         tANI_U8 hostIpv4Addr [4];
@@ -3496,6 +3498,7 @@ typedef struct sSirSmeAddStaSelfReq
     tANI_U32        type;
     tANI_U32        subType;
     tANI_U8         sessionId;
+    tANI_U16        pkt_err_disconn_th;
 }tSirSmeAddStaSelfReq, *tpSirSmeAddStaSelfReq;
 
 typedef struct sSirSmeDelStaSelfReq
@@ -3665,7 +3668,6 @@ typedef struct sSirWlanSetRxpFilters
 #define SIR_PNO_MAX_NETW_CHANNELS  26
 #define SIR_PNO_MAX_NETW_CHANNELS_EX  60
 #define SIR_PNO_MAX_SUPP_NETWORKS  16
-#define SIR_PNO_MAX_SCAN_TIMERS    10
 
 /*size based of dot11 declaration without extra IEs as we will not carry those for PNO*/
 #define SIR_PNO_MAX_PB_REQ_SIZE    450
@@ -3692,31 +3694,35 @@ typedef struct
   tANI_S32    rssiThreshold;
 } tSirNetworkType;
 
-typedef struct
-{
-  tANI_U32    uTimerValue;
-  tANI_U32    uTimerRepeat;
-}tSirScanTimer;
-
-typedef struct
-{
-  tANI_U8        ucScanTimersCount;
-  tSirScanTimer  aTimerValues[SIR_PNO_MAX_SCAN_TIMERS];
-} tSirScanTimersType;
-
-typedef struct sSirPNOScanReq
-{
-  tANI_U8             enable;
+/**
+ * struct sSirPNOScanReq - PNO Scan request structure
+ * @enable: flag to enable or disable
+ * @modePNO: PNO Mode
+ * @ucNetworksCount: Number of networks
+ * @aNetworks: Preferred network list
+ * @sessionId: Session identifier
+ * @fast_scan_period: Fast Scan period
+ * @slow_scan_period: Slow scan period
+ * @fast_scan_max_cycles: Fast scan max cycles
+ * @us24GProbeTemplateLen: 2.4G probe template length
+ * @p24GProbeTemplate: 2.4G probe template
+ * @us5GProbeTemplateLen: 5G probe template length
+ * @p5GProbeTemplate: 5G probe template
+ */
+typedef struct sSirPNOScanReq {
+	uint8_t         enable;
   eSirPNOMode         modePNO;
-  tANI_U8             ucNetworksCount;
+	uint8_t         ucNetworksCount;
   tSirNetworkType     aNetworks[SIR_PNO_MAX_SUPP_NETWORKS];
-  tSirScanTimersType  scanTimers;
-  tANI_U8             sessionId;
+	uint8_t         sessionId;
+	uint32_t        fast_scan_period;
+	uint32_t        slow_scan_period;
+	uint8_t         fast_scan_max_cycles;
 
-  tANI_U16  us24GProbeTemplateLen;
-  tANI_U8   p24GProbeTemplate[SIR_PNO_MAX_PB_REQ_SIZE];
-  tANI_U16  us5GProbeTemplateLen;
-  tANI_U8   p5GProbeTemplate[SIR_PNO_MAX_PB_REQ_SIZE];
+	uint16_t        us24GProbeTemplateLen;
+	uint8_t         p24GProbeTemplate[SIR_PNO_MAX_PB_REQ_SIZE];
+	uint16_t        us5GProbeTemplateLen;
+	uint8_t         p5GProbeTemplate[SIR_PNO_MAX_PB_REQ_SIZE];
 } tSirPNOScanReq, *tpSirPNOScanReq;
 
 typedef struct sSirSetRSSIFilterReq
@@ -4877,6 +4883,14 @@ typedef enum
    WIFI_SCAN_COMPLETE,
 } tWifiScanEventType;
 
+/**
+ * enum extscan_configuration_flags - extscan config flags
+ * @EXTSCAN_LP_EXTENDED_BATCHING: extended batching
+ */
+enum extscan_configuration_flags {
+	EXTSCAN_LP_EXTENDED_BATCHING = 0x00000001,
+};
+
 typedef struct
 {
    tSirMacAddr    bssid;
@@ -5173,6 +5187,7 @@ typedef struct
  * @max_dwell_time_active: per bucket maximum active dwell time
  * @min_dwell_time_passive: per bucket minimum passive dwell time
  * @max_dwell_time_passive: per bucket maximum passive dwell time
+ * @configuration_flags: configuration flags
  * @buckets: bucket list
  */
 typedef struct
@@ -5190,6 +5205,7 @@ typedef struct
 	uint32_t                max_dwell_time_active;
 	uint32_t                min_dwell_time_passive;
 	uint32_t                max_dwell_time_passive;
+	uint32_t                configuration_flags;
 	tSirWifiScanBucketSpec  buckets[WLAN_EXTSCAN_MAX_BUCKETS];
 } tSirWifiScanCmdReqParams, *tpSirWifiScanCmdReqParams;
 
@@ -5940,6 +5956,53 @@ struct fw_dump_rsp
 {
 	uint32_t request_id;
 	uint32_t dump_complete;
+};
+
+/**
+ * struct vdev_ie_info - IE info
+ * @vdev_i - vdev for which the IE is being sent
+ * @ie_id - ID of the IE
+ * @length - length of the IE data
+ * @data - IE data
+ *
+ * This structure is used to store the IE information.
+ */
+struct vdev_ie_info
+{
+	uint32_t vdev_id;
+	uint32_t ie_id;
+	uint32_t length;
+	uint8_t *data;
+};
+
+/*
+ * struct rssi_monitor_req - rssi monitoring
+ * @request_id: request id
+ * @session_id: session id
+ * @min_rssi: minimum rssi
+ * @max_rssi: maximum rssi
+ * @control: flag to indicate start or stop
+ */
+struct rssi_monitor_req {
+	uint32_t request_id;
+	uint32_t session_id;
+	int8_t   min_rssi;
+	int8_t   max_rssi;
+	bool     control;
+};
+
+/**
+ * struct rssi_breach_event - rssi breached event structure
+ * @request_id: request id
+ * @session_id: session id
+ * @curr_rssi: current rssi
+ * @curr_bssid: current bssid
+ */
+struct rssi_breach_event {
+	uint32_t     request_id;
+	uint32_t     session_id;
+	int8_t       curr_rssi;
+	v_MACADDR_t  curr_bssid;
 };
 
 #endif /* __SIR_API_H */

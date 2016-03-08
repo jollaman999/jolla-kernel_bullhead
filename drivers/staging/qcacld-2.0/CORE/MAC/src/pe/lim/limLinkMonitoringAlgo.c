@@ -100,16 +100,16 @@ limDeleteStaContext(tpAniSirGlobal pMac, tpSirMsgQ limMsg)
     tpDeleteStaContext  pMsg = (tpDeleteStaContext)limMsg->bodyptr;
     tpDphHashNode       pStaDs;
     tpPESession psessionEntry ;
-    tANI_U8     sessionId;
 
     if(NULL == pMsg)
     {
         PELOGE(limLog(pMac, LOGE,FL("Invalid body pointer in message"));)
         return;
     }
-    if((psessionEntry = peFindSessionByBssid(pMac,pMsg->bssId,&sessionId))== NULL)
+    psessionEntry = pe_find_session_by_sme_session_id(pMac, pMsg->vdev_id);
+    if(NULL == psessionEntry)
     {
-        PELOGE(limLog(pMac, LOGE,FL("session does not exist for given BSSId"));)
+        limLog(pMac, LOGE, FL("session not found for given sme session"));
         vos_mem_free(pMsg);
         return;
     }
@@ -117,8 +117,50 @@ limDeleteStaContext(tpAniSirGlobal pMac, tpSirMsgQ limMsg)
     switch(pMsg->reasonCode)
     {
         case HAL_DEL_STA_REASON_CODE_KEEP_ALIVE:
-        case HAL_DEL_STA_REASON_CODE_TIM_BASED:
-             PELOGE(limLog(pMac, LOGE, FL(" Deleting station: staId = %d, reasonCode = %d"), pMsg->staId, pMsg->reasonCode);)
+             if (LIM_IS_STA_ROLE(psessionEntry) && !pMsg->is_tdls) {
+                 /*
+                  * If roaming is in progress, then ignore the STA kick out
+                  * and let the connection happen. The roaming_in_progress
+                  * flag is set whenever a candidate found indication is
+                  * received. It is enabled on the PE session for which
+                  * the indication is received. There is really no need to
+                  * re-set the flag, since the PE session on which it was
+                  * set will be deleted, even if roaming is success or failure.
+                  * When roaming is a success, the PE session for AP1 is
+                  * deleted. When we get a candidate indication, it would be
+                  * on the PE session of the AP1. AP2 to which we are about to
+                  * roam will have a new PE session ID.If roaming fails for
+                  * any reason, then it will anyways delete the PE session of
+                  * of the AP1.
+                  */
+                 if (psessionEntry->roaming_in_progress ||
+                      limIsReassocInProgress(pMac, psessionEntry)) {
+                     limLog(pMac, LOGE,
+                        FL("roam_progress=%d, reassoc=%d. Not disconnecting"),
+                           psessionEntry->roaming_in_progress,
+                           limIsReassocInProgress(pMac, psessionEntry));
+                     vos_mem_free(pMsg);
+                     return;
+                 }
+                 pStaDs = dphGetHashEntry(pMac,
+                                          DPH_STA_HASH_INDEX_PEER,
+                                          &psessionEntry->dph.dphHashTable);
+                 if (NULL == pStaDs) {
+                     limLog(pMac, LOGE, FL("Dph entry not found."));
+                     vos_mem_free(pMsg);
+                     return;
+                 }
+                 pStaDs->del_sta_ctx_rssi = pMsg->rssi;
+                 limSendDeauthMgmtFrame(pMac,
+                                   eSIR_MAC_DISASSOC_DUE_TO_INACTIVITY_REASON,
+                                   pMsg->addr2, psessionEntry, FALSE);
+                 limTearDownLinkWithAp(pMac, psessionEntry->peSessionId,
+                                 eSIR_MAC_PEER_STA_REQ_LEAVING_BSS_REASON);
+                 /* only break for STA role (non TDLS) */
+                 break;
+             }
+             limLog(pMac, LOGE, FL("Deleting sta: staId %d, reasonCode %d"),
+                             pMsg->staId, pMsg->reasonCode);
              if (eLIM_STA_IN_IBSS_ROLE == psessionEntry->limSystemRole)
                  return;
 

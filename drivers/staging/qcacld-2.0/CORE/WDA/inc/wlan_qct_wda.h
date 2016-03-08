@@ -543,15 +543,13 @@ tSirRetStatus uMacPostCtrlMsg(void* pSirGlobal, tSirMbMsg* pMb);
 
 #define WDA_MAX_TXPOWER_INVALID HAL_MAX_TXPOWER_INVALID
 
-// Volans RF
-#  define WDA_RSSI_OFFSET             100
-#  define WDA_GET_RSSI0_DB(rssi0)     (rssi0 - WDA_RSSI_OFFSET)
-#  define WDA_GET_RSSI1_DB(rssi0)     (0 - WDA_RSSI_OFFSET)
-#  define WDA_MAX_OF_TWO(val1, val2)  ( ((val1) > (val2)) ? (val1) : (val2))
-#  define WDA_GET_RSSI_DB(rssi0)  \
-                WDA_MAX_OF_TWO(WDA_GET_RSSI0_DB(rssi0), WDA_GET_RSSI1_DB(rssi0))
-#define WDA_GET_RX_RSSI_DB(pRxMeta) \
+/* rssi value normalized to noise floor of -96 dBm */
+#define WDA_GET_RX_RSSI_NORMALIZED(pRxMeta) \
                        (((t_packetmeta *)pRxMeta)->rssi)
+
+/* raw rssi based on actual noise floor in hardware */
+#define WDA_GET_RX_RSSI_RAW(pRxMeta) \
+                       (((t_packetmeta *)pRxMeta)->rssi_raw)
 
 //WDA Messages to HAL messages Mapping
 #if 0
@@ -979,6 +977,7 @@ tSirRetStatus uMacPostCtrlMsg(void* pSirGlobal, tSirMbMsg* pMb);
 #define WDA_RESET_PASSPOINT_LIST_REQ        SIR_HAL_RESET_PASSPOINT_LIST_REQ
 #define WDA_EXTSCAN_SET_SSID_HOTLIST_REQ    SIR_HAL_EXTSCAN_SET_SSID_HOTLIST_REQ
 #define WDA_EXTSCAN_STATUS_IND              SIR_HAL_EXTSCAN_STATUS_IND
+#define WDA_EXTSCAN_OPERATION_IND           SIR_HAL_EXTSCAN_OPERATION_IND
 
 #endif /* FEATURE_WLAN_EXTSCAN */
 
@@ -1000,7 +999,15 @@ tSirRetStatus uMacPostCtrlMsg(void* pSirGlobal, tSirMbMsg* pMb);
 
 #define WDA_SET_SCAN_MAC_OUI_REQ              SIR_HAL_SET_SCAN_MAC_OUI_REQ
 
+#ifdef FEATURE_RUNTIME_PM
+#define WDA_RUNTIME_PM_SUSPEND_IND            SIR_HAL_RUNTIME_PM_SUSPEND_IND
+#define WDA_RUNTIME_PM_RESUME_IND             SIR_HAL_RUNTIME_PM_RESUME_IND
+#endif
+
 #define WDA_FW_MEM_DUMP_REQ                   SIR_HAL_FW_MEM_DUMP_REQ
+#define WDA_SET_RSSI_MONITOR_REQ              SIR_HAL_SET_RSSI_MONITOR_REQ
+
+#define WDA_SET_IE_INFO                       SIR_HAL_SET_IE_INFO
 
 tSirRetStatus wdaPostCtrlMsg(tpAniSirGlobal pMac, tSirMsgQ *pMsg);
 

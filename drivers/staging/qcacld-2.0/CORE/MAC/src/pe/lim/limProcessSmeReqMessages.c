@@ -1145,11 +1145,37 @@ static eHalStatus limSendHalStartScanOffloadReq(tpAniSirGlobal pMac,
     tANI_U8 *p;
     tANI_U8 *ht_cap_ie;
     tSirMsgQ msg;
-    tANI_U16 i, len, ht_cap_len = 0;
-    tSirRetStatus rc = eSIR_SUCCESS;
+    tANI_U16 i, len;
+    tANI_U16  ht_cap_len = 0, addn_ie_len = 0;
+#ifdef WLAN_FEATURE_11AC
+    tANI_U8 *vht_cap_ie;
+    tANI_U16 vht_cap_len = 0;
+#endif /* WLAN_FEATURE_11AC */
+    tSirRetStatus status, rc = eSIR_SUCCESS;
+    tDot11fIEExtCap extracted_extcap = {0};
+    bool extcap_present = true;
 
     pMac->lim.fOffloadScanPending = 0;
     pMac->lim.fOffloadScanP2PSearch = 0;
+
+    if (pScanReq->uIEFieldLen) {
+        status = lim_strip_extcap_update_struct(pMac,
+                     (uint8_t *) pScanReq + pScanReq->uIEFieldOffset,
+                     &pScanReq->uIEFieldLen, &extracted_extcap);
+
+        if (eSIR_SUCCESS != status) {
+            extcap_present = false;
+            limLog(pMac, LOG1, FL("Unable to Strip ExtCap IE from Scan Req"));
+        }
+
+        if (extcap_present) {
+            limLog(pMac, LOG1, FL("Extcap was part of SCAN IE - Updating FW"));
+            lim_send_ext_cap_ie(pMac, pScanReq->sessionId,
+                                &extracted_extcap, true);
+        }
+    } else {
+        limLog(pMac, LOG1, FL("No IEs in the scan request from supplicant"));
+    }
 
     /* The tSirScanOffloadReq will reserve the space for first channel,
        so allocate the memory for (numChannels - 1) and uIEFieldLen */
@@ -1161,7 +1187,21 @@ static eHalStatus limSendHalStartScanOffloadReq(tpAniSirGlobal pMac,
                FL("Adding HT Caps IE since dot11mode=%d"), pScanReq->dot11mode);
         ht_cap_len = 2 + sizeof(tHtCaps); /* 2 bytes for EID and Length */
         len += ht_cap_len;
+        addn_ie_len += ht_cap_len;
     }
+
+#ifdef WLAN_FEATURE_11AC
+    if (IS_DOT11_MODE_VHT(pScanReq->dot11mode)) {
+        limLog(pMac, LOG1,
+               FL("Adding VHT Caps IE since dot11mode=%d"),
+               pScanReq->dot11mode);
+        /* 2 bytes for EID and Length */
+        vht_cap_len = 2 + sizeof(tSirMacVHTCapabilityInfo) +
+                          sizeof(tSirVhtMcsInfo);
+        len += vht_cap_len;
+        addn_ie_len += vht_cap_len;
+    }
+#endif /* WLAN_FEATURE_11AC */
 
     pScanOffloadReq = vos_mem_malloc(len);
     if ( NULL == pScanOffloadReq )
@@ -1227,7 +1267,7 @@ static eHalStatus limSendHalStartScanOffloadReq(tpAniSirGlobal pMac,
         p[i] = pScanReq->channelList.channelNumber[i];
 
     pScanOffloadReq->uIEFieldLen = pScanReq->uIEFieldLen;
-    pScanOffloadReq->uIEFieldOffset = len - ht_cap_len -
+    pScanOffloadReq->uIEFieldOffset = len - addn_ie_len -
                                       pScanOffloadReq->uIEFieldLen;
     vos_mem_copy(
             (tANI_U8 *) pScanOffloadReq + pScanOffloadReq->uIEFieldOffset,
@@ -1243,9 +1283,24 @@ static eHalStatus limSendHalStartScanOffloadReq(tpAniSirGlobal pMac,
         vos_mem_set(ht_cap_ie, ht_cap_len, 0);
         *ht_cap_ie = SIR_MAC_HT_CAPABILITIES_EID;
         *(ht_cap_ie + 1) =  ht_cap_len - 2;
-        lim_set_ht_caps(pMac, NULL, ht_cap_ie, len - ht_cap_len);
+        lim_set_ht_caps(pMac, NULL, ht_cap_ie, ht_cap_len);
         pScanOffloadReq->uIEFieldLen += ht_cap_len;
     }
+
+#ifdef WLAN_FEATURE_11AC
+    /* Copy VHT Capability info if dot11mode is VHT Capable */
+    if (IS_DOT11_MODE_VHT(pScanReq->dot11mode)) {
+        /* Populate EID and Length field here */
+        vht_cap_ie = (tANI_U8 *) pScanOffloadReq +
+                                 pScanOffloadReq->uIEFieldOffset +
+                                 pScanOffloadReq->uIEFieldLen;
+        vos_mem_set(vht_cap_ie, vht_cap_len, 0);
+        *vht_cap_ie = SIR_MAC_VHT_CAPABILITIES_EID;
+        *(vht_cap_ie + 1) =  vht_cap_len - 2;
+        lim_set_vht_caps(pMac, NULL, vht_cap_ie, vht_cap_len);
+        pScanOffloadReq->uIEFieldLen += vht_cap_len;
+    }
+#endif /* WLAN_FEATURE_11AC */
 
     rc = wdaPostCtrlMsg(pMac, &msg);
     if (rc != eSIR_SUCCESS)
@@ -2208,6 +2263,12 @@ __limProcessSmeJoinReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
         /* Indicate whether spectrum management is enabled*/
         psessionEntry->spectrumMgtEnabled =
            pSmeJoinReq->spectrumMgtIndicator;
+
+        /* Enable the spectrum management if this is a DFS channel */
+        if (psessionEntry->countryInfoPresent &&
+             limIsconnectedOnDFSChannel(psessionEntry->currentOperChannel))
+             psessionEntry->spectrumMgtEnabled = TRUE;
+
         psessionEntry->isOSENConnection =
            pSmeJoinReq->isOSENConnection;
 
@@ -2553,13 +2614,17 @@ __limProcessSmeReassocReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
      *  is lost upon disassociation and reassociation.
      */
 
-    limDeleteBASessions(pMac, psessionEntry, BA_BOTH_DIRECTIONS,
-                        eSIR_MAC_UNSPEC_FAILURE_REASON);
+    limDeleteBASessions(pMac, psessionEntry, BA_BOTH_DIRECTIONS);
 
     pMlmReassocReq->listenInterval = (tANI_U16) val;
 
     /* Indicate whether spectrum management is enabled*/
     psessionEntry->spectrumMgtEnabled = pReassocReq->spectrumMgtIndicator;
+
+    /* Enable the spectrum management if this is a DFS channel */
+    if (psessionEntry->countryInfoPresent &&
+             limIsconnectedOnDFSChannel(psessionEntry->currentOperChannel))
+             psessionEntry->spectrumMgtEnabled = TRUE;
 
     psessionEntry->limPrevSmeState = psessionEntry->limSmeState;
     psessionEntry->limSmeState    = eLIM_SME_WT_REASSOC_STATE;
@@ -3042,15 +3107,17 @@ __limProcessSmeDeauthReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
 
                     break;
                 case eLIM_SME_WT_DEAUTH_STATE:
+                case eLIM_SME_WT_DISASSOC_STATE:
                     /*
-                     * PE Recieved a Deauth frame. Normally it gets
-                     * DEAUTH_CNF but it received DEAUTH_REQ. Which
+                     * PE Recieved a Deauth/Disassoc frame. Normally it gets
+                     * DEAUTH_CNF/DISASSOC_CNF but it received DEAUTH_REQ. Which
                      * means host is also trying to disconnect.
                      * PE can continue processing DEAUTH_REQ and send
                      * the response instead of failing the request.
-                     * SME will anyway ignore DEAUTH_IND that was sent
-                     * for deauth frame.
+                     * SME will anyway ignore DEAUTH_IND/DISASSOC_IND that
+                     * was sent for deauth/disassoc frame.
                      */
+                    psessionEntry->limSmeState = eLIM_SME_WT_DEAUTH_STATE;
                     limLog(pMac, LOG1, FL("Rcvd SME_DEAUTH_REQ while in "
                        "SME_WT_DEAUTH_STATE. "));
                     break;
@@ -5135,6 +5202,7 @@ __limProcessSmeAddStaSelfReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
    pAddStaSelfParams->sessionId = pSmeReq->sessionId;
    pAddStaSelfParams->type = pSmeReq->type;
    pAddStaSelfParams->subType = pSmeReq->subType;
+   pAddStaSelfParams->pkt_err_disconn_th = pSmeReq->pkt_err_disconn_th;
 
    msg.type = SIR_HAL_ADD_STA_SELF_REQ;
    msg.reserved = 0;
@@ -6472,6 +6540,8 @@ limProcessSmeDfsCsaIeRequest(tpAniSirGlobal pMac, tANI_U32 *pMsg)
         /* Channel switch announcement needs to be included in beacon */
         psessionEntry->dfsIncludeChanSwIe = VOS_TRUE;
         psessionEntry->gLimChannelSwitch.switchCount = LIM_MAX_CSA_IE_UPDATES;
+        if (pMac->sap.SapDfsInfo.disable_dfs_ch_switch == VOS_FALSE)
+            psessionEntry->gLimChannelSwitch.switchMode = 1;
 
         /* Validate if SAP is operating HT or VHT
          * mode and set the Channel Switch Wrapper

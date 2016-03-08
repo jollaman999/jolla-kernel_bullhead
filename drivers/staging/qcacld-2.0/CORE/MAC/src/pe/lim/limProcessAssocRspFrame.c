@@ -351,8 +351,8 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
               FL("received Re/Assoc(%d) resp on sessionid: %d with systemrole: %d "
               "and mlmstate: %d RSSI %d from "MAC_ADDRESS_STR),subType,
               psessionEntry->peSessionId,
-              psessionEntry->limSystemRole,psessionEntry->limMlmState,
-              (uint)abs((tANI_S8)WDA_GET_RX_RSSI_DB(pRxPacketInfo)),
+              GET_LIM_SYSTEM_ROLE(psessionEntry), psessionEntry->limMlmState,
+              (uint)abs((tANI_S8)WDA_GET_RX_RSSI_NORMALIZED(pRxPacketInfo)),
               MAC_ADDR_ARRAY(pHdr->sa));
 
     pBeaconStruct = vos_mem_malloc(sizeof(tSchBeaconStruct));
@@ -519,25 +519,23 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
         vos_mem_free(psessionEntry->ricData);
         psessionEntry->ricData = NULL;
     }
-    if(pAssocRsp->ricPresent)
-    {
-        psessionEntry->RICDataLen = pAssocRsp->num_RICData * sizeof(tDot11fIERICDataDesc);
-        psessionEntry->ricData = vos_mem_malloc(psessionEntry->RICDataLen);
-        if ( NULL == psessionEntry->ricData )
-        {
-            PELOGE(limLog(pMac, LOGE, FL("Unable to allocate memory to store assoc response"));)
-            psessionEntry->RICDataLen = 0;
-        }
-        else
-        {
-            vos_mem_copy(psessionEntry->ricData,
+    if(pAssocRsp->ricPresent) {
+        psessionEntry->RICDataLen =
+                pAssocRsp->num_RICData * sizeof(tDot11fIERICDataDesc);
+        if (psessionEntry->RICDataLen) {
+            psessionEntry->ricData = vos_mem_malloc(psessionEntry->RICDataLen);
+            if (NULL == psessionEntry->ricData) {
+               limLog(pMac, LOGE, FL("Unable to alloc mem for RIC data"));
+               psessionEntry->RICDataLen = 0;
+            } else {
+               vos_mem_copy(psessionEntry->ricData,
                          &pAssocRsp->RICData[0], psessionEntry->RICDataLen);
+            }
+        } else {
+               limLog(pMac, LOGE, FL("RIC Data not present"));
         }
-    }
-    else
-    {
-        limLog(pMac, LOG1, FL("Ric is not present Setting RICDataLen 0 and ricData "
-        "as NULL"));
+    } else {
+        limLog(pMac, LOG1, FL("RIC is not present"));
         psessionEntry->RICDataLen = 0;
         psessionEntry->ricData = NULL;
     }
@@ -566,27 +564,25 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
         vos_mem_free(psessionEntry->tspecIes);
         psessionEntry->tspecIes = NULL;
     }
-    if(pAssocRsp->tspecPresent)
-    {
+    if(pAssocRsp->tspecPresent) {
+        limLog(pMac, LOG1, FL("Tspec EID present in assoc rsp"));
         psessionEntry->tspecLen = pAssocRsp->num_tspecs * sizeof(tDot11fIEWMMTSPEC);
-        psessionEntry->tspecIes = vos_mem_malloc(psessionEntry->tspecLen);
-        if ( NULL == psessionEntry->tspecIes )
-        {
-            PELOGE(limLog(pMac, LOGE, FL("Unable to allocate memory to store assoc response"));)
-            psessionEntry->tspecLen = 0;
-        }
-        else
-        {
-            vos_mem_copy(psessionEntry->tspecIes,
+        if (psessionEntry->tspecLen) {
+            psessionEntry->tspecIes = vos_mem_malloc(psessionEntry->tspecLen);
+            if (NULL == psessionEntry->tspecIes) {
+                limLog(pMac, LOGE, FL("Unable to alloc mem for TSPEC"));
+                psessionEntry->tspecLen = 0;
+            } else {
+                vos_mem_copy(psessionEntry->tspecIes,
                          &pAssocRsp->TSPECInfo[0], psessionEntry->tspecLen);
+            }
+        } else {
+                 limLog(pMac, LOGE, FL("TSPEC has Zero length"));
         }
-        PELOG1(limLog(pMac, LOG1, FL(" Tspec EID present in assoc rsp "));)
-    }
-    else
-    {
+    } else {
         psessionEntry->tspecLen = 0;
         psessionEntry->tspecIes = NULL;
-        PELOG1(limLog(pMac, LOG1, FL(" Tspec EID *NOT* present in assoc rsp "));)
+        limLog(pMac, LOG1, FL("Tspec EID *NOT* present in assoc rsp"));
     }
 #endif
 
@@ -639,7 +635,8 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
 
     if (pAssocRsp->statusCode != eSIR_MAC_SUCCESS_STATUS
 #ifdef WLAN_FEATURE_11W
-      && pAssocRsp->statusCode != eSIR_MAC_TRY_AGAIN_LATER
+      && (!psessionEntry->limRmfEnabled ||
+	      pAssocRsp->statusCode != eSIR_MAC_TRY_AGAIN_LATER)
 #endif /* WLAN_FEATURE_11W */
       )
     {
@@ -692,7 +689,8 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
      */
 
 #ifdef WLAN_FEATURE_11W
-    if (pAssocRsp->statusCode == eSIR_MAC_TRY_AGAIN_LATER) {
+    if (psessionEntry->limRmfEnabled &&
+		pAssocRsp->statusCode == eSIR_MAC_TRY_AGAIN_LATER) {
         /* fetch timer value from IE */
         if (pAssocRsp->TimeoutInterval.present &&
             (pAssocRsp->TimeoutInterval.timeoutType ==

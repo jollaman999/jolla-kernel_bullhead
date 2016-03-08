@@ -1008,15 +1008,13 @@ VosMCThread
     } // while message loop processing
   } // while TRUE
   // If we get here the MC thread must exit
-  VOS_TRACE( VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
+  VOS_TRACE( VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
       "%s: MC Thread exiting!!!!", __func__);
   complete_and_exit(&pSchedContext->McShutdown, 0);
 } /* VosMCThread() */
 
 v_BOOL_t isWDresetInProgress(void)
 {
-   VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
-                "%s: Reset is in Progress...",__func__);
    if(gpVosWatchdogContext!=NULL)
    {
       return gpVosWatchdogContext->resetInProgress;
@@ -1749,7 +1747,7 @@ static int VosTlshimRxThread(void *arg)
                              &pSchedContext->tlshimRxEvtFlg);
                    complete(&pSchedContext->SuspndTlshimRxEvent);
                }
-               VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
+               VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                          "%s: Shutting down tl shim Tlshim rx thread", __func__);
                shutdown = true;
                break;
@@ -1771,7 +1769,7 @@ static int VosTlshimRxThread(void *arg)
        }
    }
 
-   VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
+   VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
              "%s: Exiting VOSS Tlshim rx thread", __func__);
    complete_and_exit(&pSchedContext->TlshimRxShutdown, 0);
 }
@@ -2427,8 +2425,6 @@ void vos_ssr_protect(const char *caller_func)
      unsigned long irq_flags;
 
      count = atomic_inc_return(&ssr_protect_entry_count);
-     VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
-               "%s: ENTRY ACTIVE %d", caller_func, count);
 
      spin_lock_irqsave(&ssr_protect_lock, irq_flags);
 
@@ -2468,8 +2464,6 @@ void vos_ssr_unprotect(const char *caller_func)
    unsigned long irq_flags;
 
    count = atomic_dec_return(&ssr_protect_entry_count);
-   VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
-             "%s: ENTRY INACTIVE %d", caller_func, count);
 
    spin_lock_irqsave(&ssr_protect_lock, irq_flags);
 
@@ -2530,4 +2524,20 @@ bool vos_is_ssr_ready(const char *caller_func)
              "Allowing SSR for %s", caller_func);
 
     return true;
+}
+
+/**
+ * vos_get_gfp_flags(): get GFP flags
+ *
+ * Based on the scheduled context, return GFP flags
+ * Return: gfp flags
+ */
+int vos_get_gfp_flags(void)
+{
+	int flags = GFP_KERNEL;
+
+	if (in_interrupt() || in_atomic() || irqs_disabled())
+		flags = GFP_ATOMIC;
+
+	return flags;
 }

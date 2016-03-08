@@ -542,6 +542,12 @@ limSendMlmAssocReq( tpAniSirGlobal pMac,
     PELOG1(limLog(pMac, LOG1, FL("SessionId:%d Authenticated with BSS"),
            psessionEntry->peSessionId);)
 
+    if (NULL == psessionEntry->pLimJoinReq) {
+        limLog(pMac, LOGE, FL("Join Request is NULL."));
+        /* No need to Assert. JOIN timeout will handle this error */
+        return;
+    }
+
     pMlmAssocReq = vos_mem_malloc(sizeof(tLimMlmAssocReq));
     if ( NULL == pMlmAssocReq ) {
         limLog(pMac, LOGP, FL("call to AllocateMemory failed for mlmAssocReq"));
@@ -966,6 +972,24 @@ limProcessMlmReassocCnf(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
         vos_mem_free(psessionEntry->pLimReAssocReq);
         psessionEntry->pLimReAssocReq = NULL;
     }
+
+    /* Upon Reassoc success or failure, freeup the cached
+     * preauth request, to ensure that channel switch is now
+     * allowed following any change in HT params.
+     */
+    if (psessionEntry->ftPEContext.pFTPreAuthReq) {
+        limLog(pMac, LOG1, FL("Freeing pFTPreAuthReq= %p"),
+               psessionEntry->ftPEContext.pFTPreAuthReq);
+        if (psessionEntry->ftPEContext.pFTPreAuthReq->pbssDescription) {
+            vos_mem_free(
+                psessionEntry->ftPEContext.pFTPreAuthReq->pbssDescription);
+            psessionEntry->ftPEContext.pFTPreAuthReq->pbssDescription = NULL;
+        }
+        vos_mem_free(psessionEntry->ftPEContext.pFTPreAuthReq);
+        psessionEntry->ftPEContext.pFTPreAuthReq = NULL;
+        psessionEntry->ftPEContext.ftPreAuthSession = VOS_FALSE;
+    }
+
 #ifdef WLAN_FEATURE_ROAM_OFFLOAD
     if (psessionEntry->bRoamSynchInProgress) {
             VOS_TRACE(VOS_MODULE_ID_PE, VOS_TRACE_LEVEL_DEBUG,
@@ -3817,6 +3841,17 @@ static void limProcessSwitchChannelJoinReq(tpAniSirGlobal pMac, tpPESession pses
             goto error;
         }
     }
+
+    psessionEntry->limPrevMlmState = psessionEntry->limMlmState;
+    psessionEntry->limMlmState = eLIM_MLM_WT_JOIN_BEACON_STATE;
+    MTRACE(macTrace(pMac, TRACE_CODE_MLM_STATE,
+        psessionEntry->peSessionId, psessionEntry->limMlmState));
+
+    limLog(pMac, LOG1,
+        FL("Sessionid %d prev lim state %d new lim state %d systemrole %d"),
+        psessionEntry->peSessionId,
+        psessionEntry->limPrevMlmState,
+        psessionEntry->limMlmState, GET_LIM_SYSTEM_ROLE(psessionEntry));
 
     /* Update the lim global gLimTriggerBackgroundScanDuringQuietBss */
     if(wlan_cfgGetInt(pMac, WNI_CFG_TRIG_STA_BK_SCAN, &val) != eSIR_SUCCESS)

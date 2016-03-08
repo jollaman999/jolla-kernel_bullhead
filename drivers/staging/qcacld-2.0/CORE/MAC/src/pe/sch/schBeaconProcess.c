@@ -131,7 +131,8 @@ ap_beacon_process(
                 if (((!(pBcnStruct->erpPresent)) &&
                       !(pBcnStruct->HTInfo.present))||
                     //if erp not present then  11B AP overlapping
-                    (pBcnStruct->erpPresent &&
+                    (!pMac->roam.configParam.ignorePeerErpInfo &&
+                      pBcnStruct->erpPresent &&
                     (pBcnStruct->erpIEInfo.useProtection ||
                     pBcnStruct->erpIEInfo.nonErpPresent)))
                 {
@@ -158,7 +159,8 @@ ap_beacon_process(
               if (((!(pBcnStruct->erpPresent)) &&
                     !(pBcnStruct->HTInfo.present))||
                   //if erp not present then  11B AP overlapping
-                  (pBcnStruct->erpPresent &&
+                  (!pMac->roam.configParam.ignorePeerErpInfo &&
+                    pBcnStruct->erpPresent &&
                   (pBcnStruct->erpIEInfo.useProtection ||
                   pBcnStruct->erpIEInfo.nonErpPresent)))
               {
@@ -531,6 +533,15 @@ static void __schBeaconProcessForSession( tpAniSirGlobal      pMac,
                 limCheckVHTOpModeChange(pMac, psessionEntry,
                       pBeacon->OperatingMode.chanWidth,
                       pStaDs->staIndex, pMh->sa);
+             }
+             /* Update Nss setting */
+             if (pStaDs->vhtSupportedRxNss !=
+                     (pBeacon->OperatingMode.rxNSS + 1)) {
+                 pStaDs->vhtSupportedRxNss =
+                     (pBeacon->OperatingMode.rxNSS + 1);
+                 limSetNssChange( pMac, psessionEntry,
+                         pStaDs->vhtSupportedRxNss,
+                         pStaDs->staIndex, pMh->sa);
              }
           }
           else if (psessionEntry->vhtCapability && pBeacon->VHTOperation.present)

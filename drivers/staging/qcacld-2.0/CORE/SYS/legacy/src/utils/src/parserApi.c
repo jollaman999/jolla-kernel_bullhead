@@ -403,8 +403,7 @@ PopulateDot11fDSParams(tpAniSirGlobal     pMac,
                        tDot11fIEDSParams *pDot11f, tANI_U8 channel,
                        tpPESession psessionEntry)
 {
-    if ((IS_24G_CH(channel)) || pMac->rrm.rrmPEContext.rrmEnable)
-    {
+    if (IS_24G_CH(channel)) {
         // .11b/g mode PHY => Include the DS Parameter Set IE:
         pDot11f->curr_channel = channel;
         pDot11f->present = 1;
@@ -1074,18 +1073,18 @@ PopulateDot11fExtCap(tpAniSirGlobal   pMac,
 
     pDot11f->present = 1;
 
-    if (psessionEntry->sap_dot11mc) {
-        PELOGE(limLog(pMac, LOG1,
-               FL("11MC support enabled"));)
+    if (!psessionEntry) {
+        limLog(pMac, LOG1, FL("11MC support enabled for non-SAP cases"));
+        pDot11f->num_bytes = DOT11F_IE_EXTCAP_MAX_LEN;
+    } else if (psessionEntry->sap_dot11mc) {
+        limLog(pMac, LOG1, FL("11MC support enabled"));
         pDot11f->num_bytes = DOT11F_IE_EXTCAP_MAX_LEN;
     } else {
         if (eLIM_AP_ROLE != psessionEntry->limSystemRole) {
-            PELOGE(limLog(pMac, LOG1,
-                   FL("11MC support enabled"));)
+            limLog(pMac, LOG1, FL("11MC support enabled"));
             pDot11f->num_bytes = DOT11F_IE_EXTCAP_MAX_LEN;
         } else  {
-            PELOGE(limLog(pMac, LOG1,
-                   FL("11MC support disabled"));)
+            limLog(pMac, LOG1, FL("11MC support disabled"));
             pDot11f->num_bytes = DOT11F_IE_EXTCAP_MIN_LEN;
         }
     }
@@ -1106,7 +1105,7 @@ PopulateDot11fExtCap(tpAniSirGlobal   pMac,
 
     if (val)   // If set to true then set RTTv3
     {
-        if (LIM_IS_STA_ROLE(psessionEntry)) {
+        if (!psessionEntry || LIM_IS_STA_ROLE(psessionEntry)) {
             p_ext_cap->fine_time_meas_initiator =
               (pMac->fine_time_meas_cap & FINE_TIME_MEAS_STA_INITIATOR) ? 1 : 0;
             p_ext_cap->fine_time_meas_responder =
@@ -2696,11 +2695,13 @@ sirConvertAssocRespFrame2Struct(tpAniSirGlobal pMac,
 
     if ( ar.HTCaps.present )
     {
+        limLog(pMac, LOG1, FL("Received Assoc Response with HT Cap"));
         vos_mem_copy( &pAssocRsp->HTCaps, &ar.HTCaps, sizeof( tDot11fIEHTCaps ) );
     }
 
     if ( ar.HTInfo.present )
     {
+        limLog(pMac, LOG1, FL("Received Assoc Response with HT Info"));
         vos_mem_copy( &pAssocRsp->HTInfo, &ar.HTInfo, sizeof( tDot11fIEHTInfo ) );
     }
 

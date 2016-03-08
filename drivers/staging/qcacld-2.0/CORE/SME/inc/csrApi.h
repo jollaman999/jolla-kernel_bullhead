@@ -1248,7 +1248,7 @@ typedef struct tagCsrConfigParam
 #endif
 #endif
 
-
+    tANI_BOOLEAN ignorePeerErpInfo;
     tANI_U8 scanCfgAgingTime;
 
     tANI_U8   enableTxLdpc;
@@ -1269,6 +1269,8 @@ typedef struct tagCsrConfigParam
 
     tANI_BOOLEAN obssEnabled;
 
+    v_U16_t    pkt_err_disconn_th;
+    int8_t    first_scan_bucket_threshold;
 }tCsrConfigParam;
 
 //Tush

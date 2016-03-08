@@ -32,7 +32,7 @@
 #define HDD_MAX_NUM_IBSS_STA          ( 32 )
 #ifdef FEATURE_WLAN_TDLS
 #define HDD_MAX_NUM_TDLS_STA          ( 8 )
-#define HDD_MAX_NUM_TDLS_STA_P_UAPSD  ( 1 )
+#define HDD_MAX_NUM_TDLS_STA_P_UAPSD_OFFCHAN  ( 1 )
 #define TDLS_STA_INDEX_VALID(staId) \
                           (((staId) >= 1) && ((staId) < 0xFF))
 #endif
@@ -126,6 +126,7 @@ typedef enum
 }ePeerStatus;
 
 extern v_BOOL_t hdd_connIsConnected( hdd_station_ctx_t *pHddStaCtx );
+extern bool hdd_is_connecting(hdd_station_ctx_t *hdd_sta_ctx);
 eCsrBand hdd_connGetConnectedBand( hdd_station_ctx_t *pHddStaCtx );
 extern eHalStatus hdd_smeRoamCallback( void *pContext, tCsrRoamInfo *pRoamInfo, v_U32_t roamId,
                                 eRoamCmdStatus roamStatus, eCsrRoamResult roamResult );

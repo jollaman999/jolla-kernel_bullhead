@@ -63,6 +63,7 @@
 #include <wlan_hdd_hostapd.h>
 #include <wlan_hdd_softap_tx_rx.h>
 #include <vos_sched.h>
+#include "sme_Api.h"
 
 // change logging behavior based upon debug flag
 #ifdef HDD_WMM_DEBUG
@@ -798,8 +799,7 @@ static eHalStatus hdd_wmm_sme_callback (tHalHandle hHal,
       VOS_TRACE( VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_ERROR,
                  "%s: Setup failed, not a QoS AP",
                  __func__);
-      if (!HDD_WMM_HANDLE_IMPLICIT == pQosContext->handle)
-      {
+      if (HDD_WMM_HANDLE_IMPLICIT != pQosContext->handle) {
          VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO,
                    "%s: Explicit Qos, notifying user space",
                    __func__);
@@ -1232,15 +1232,14 @@ int hdd_wmmps_helper(hdd_adapter_t *pAdapter, tANI_U8 *ptr)
    return 0;
 }
 
-/**============================================================================
-  @brief hdd_wmm_do_implicit_qos() - Function which will attempt to setup
-  QoS for any AC requiring it
-
-  @param work     : [in]  pointer to work structure
-
-  @return         : void
-  ===========================================================================*/
-static void hdd_wmm_do_implicit_qos(struct work_struct *work)
+/**
+ * __hdd_wmm_do_implicit_qos() - Function which will attempt to setup
+ *				QoS for any AC requiring it.
+ * @work: [in] pointer to work structure.
+ *
+ * Return: none
+ */
+static void __hdd_wmm_do_implicit_qos(struct work_struct *work)
 {
    hdd_wmm_qos_context_t* pQosContext =
       container_of(work, hdd_wmm_qos_context_t, wmmAcSetupImplicitQos);
@@ -1252,6 +1251,7 @@ static void hdd_wmm_do_implicit_qos(struct work_struct *work)
    sme_QosStatusType smeStatus;
 #endif
    sme_QosWmmTspecInfo qosInfo;
+   hdd_context_t *hdd_ctx;
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO_LOW,
              "%s: Entered, context %p",
@@ -1266,6 +1266,13 @@ static void hdd_wmm_do_implicit_qos(struct work_struct *work)
    }
 
    pAdapter = pQosContext->pAdapter;
+
+   hdd_ctx = WLAN_HDD_GET_CTX(pAdapter);
+   if (0 != wlan_hdd_validate_context(hdd_ctx)) {
+       hddLog(LOGE, FL("HDD context is not valid"));
+       return;
+   }
+
    acType = pQosContext->acType;
    pAc = &pAdapter->hddWmmStatus.wmmAcStatus[acType];
 
@@ -1469,6 +1476,19 @@ static void hdd_wmm_do_implicit_qos(struct work_struct *work)
 
 }
 
+/**
+ * hdd_wmm_do_implicit_qos() - SSR wraper function for hdd_wmm_do_implicit_qos
+ * @work: pointer to work_struct
+ *
+ * Return: none
+ */
+static void hdd_wmm_do_implicit_qos(struct work_struct *work)
+{
+	vos_ssr_protect(__func__);
+	__hdd_wmm_do_implicit_qos(work);
+	vos_ssr_unprotect(__func__);
+}
+
 /**============================================================================
   @brief hdd_wmm_init() - Function which will initialize the WMM configuration
   and status to an initial state.  The configuration can later be overwritten
@@ -1596,7 +1616,10 @@ VOS_STATUS hdd_wmm_adapter_close ( hdd_adapter_t* pAdapter )
 #ifdef FEATURE_WLAN_ESE
       hdd_wmm_disable_inactivity_timer(pQosContext);
 #endif
-      vos_flush_work(&pQosContext->wmmAcSetupImplicitQos);
+      if (pQosContext->handle == HDD_WMM_HANDLE_IMPLICIT
+          && pQosContext->magic == HDD_WMM_CTX_MAGIC)
+          vos_flush_work(&pQosContext->wmmAcSetupImplicitQos);
+
       hdd_wmm_free_context(pQosContext);
    }
 
@@ -2292,6 +2315,26 @@ VOS_STATUS hdd_wmm_connect( hdd_adapter_t* pAdapter,
                (pAdapter->hddWmmStatus.wmmAcStatus[ac].wmmAcTspecInfo.ts_info.direction !=
                 SME_QOS_WMM_TS_DIR_DOWNLINK)) {
             pAdapter->hddWmmStatus.wmmAcStatus[ac].wmmAcAccessAllowed = VOS_TRUE;
+
+            /*
+             * Making TSPEC invalid here so downgrading can happen while
+             * roaming. It is expected this will be SET in hdd_wmm_sme_callback,
+             * once sme is done with the AddTspec.
+             * Here we avoid 11r and ccx based association because Tspec will
+             * be part of assoc/reassoc request.
+             */
+#if defined (WLAN_FEATURE_VOWIFI_11R)
+            if (pRoamInfo->u.pConnectedProfile->AuthType != eCSR_AUTH_TYPE_FT_RSN
+                && pRoamInfo->u.pConnectedProfile->AuthType != eCSR_AUTH_TYPE_FT_RSN_PSK
+#if defined (FEATURE_WLAN_ESE)
+                && pRoamInfo->u.pConnectedProfile->AuthType != eCSR_AUTH_TYPE_CCKM_WPA
+                && pRoamInfo->u.pConnectedProfile->AuthType != eCSR_AUTH_TYPE_CCKM_RSN
+#endif
+               )
+#endif
+            {
+                pAdapter->hddWmmStatus.wmmAcStatus[ac].wmmAcTspecValid = VOS_FALSE;
+            }
          }
       }
       else

@@ -50,6 +50,10 @@
 #include "if_usb.h"
 #endif
 
+#if defined(QCA_WIFI_2_0) && !defined(QCA_WIFI_ISOC) && defined(CONFIG_CNSS)
+#include <net/cnss.h>
+#endif
+
 #define WMI_MIN_HEAD_ROOM 64
 
 #ifdef WMI_INTERFACE_EVENT_LOGGING
@@ -243,7 +247,7 @@ static u_int8_t* get_wmi_cmd_string(WMI_CMD_ID wmi_command)
 		CASE_RETURN_STRING(WMI_VDEV_PLMREQ_START_CMDID);
 		CASE_RETURN_STRING(WMI_VDEV_PLMREQ_STOP_CMDID);
 		CASE_RETURN_STRING(WMI_VDEV_TSF_TSTAMP_ACTION_CMDID);
-
+		CASE_RETURN_STRING(WMI_VDEV_SET_IE_CMDID);
 		/* peer specific commands */
 
 		/** create a peer */
@@ -494,7 +498,7 @@ static u_int8_t* get_wmi_cmd_string(WMI_CMD_ID wmi_command)
 		CASE_RETURN_STRING(WMI_SET_MCASTBCAST_FILTER_CMDID);
 		/** set thermal management params **/
 		CASE_RETURN_STRING(WMI_THERMAL_MGMT_CMDID);
-
+		CASE_RETURN_STRING(WMI_RSSI_BREACH_MONITOR_CONFIG_CMDID);
 		/* GPIO Configuration */
 		CASE_RETURN_STRING(WMI_GPIO_CONFIG_CMDID);
 		CASE_RETURN_STRING(WMI_GPIO_OUTPUT_CMDID);
@@ -630,10 +634,32 @@ static u_int8_t* get_wmi_cmd_string(WMI_CMD_ID wmi_command)
 		CASE_RETURN_STRING(WMI_DCC_CLEAR_STATS_CMDID);
 		CASE_RETURN_STRING(WMI_DCC_UPDATE_NDL_CMDID);
 		CASE_RETURN_STRING(WMI_ROAM_FILTER_CMDID);
+		CASE_RETURN_STRING(WMI_ROAM_SUBNET_CHANGE_CONFIG_CMDID);
 		CASE_RETURN_STRING(WMI_DEBUG_MESG_FLUSH_CMDID);
+		CASE_RETURN_STRING(WMI_PEER_SET_RATE_REPORT_CONDITION_CMDID);
+		CASE_RETURN_STRING(WMI_SOC_SET_PCL_CMDID);
+		CASE_RETURN_STRING(WMI_SOC_SET_HW_MODE_CMDID);
+		CASE_RETURN_STRING(WMI_SOC_SET_DUAL_MAC_CONFIG_CMDID);
+		CASE_RETURN_STRING(WMI_WOW_ENABLE_ICMPV6_NA_FLT_CMDID);
+		CASE_RETURN_STRING(WMI_DIAG_EVENT_LOG_CONFIG_CMDID);
 	}
 	return "Invalid WMI cmd";
 }
+
+/* worker thread to recover when Target doesn't respond with credits */
+static void recovery_work_handler(struct work_struct *recovery)
+{
+    cnss_device_self_recovery();
+}
+
+static DECLARE_WORK(recovery_work, recovery_work_handler);
+
+#ifdef FEATURE_RUNTIME_PM
+inline bool wmi_get_runtime_pm_inprogress(wmi_unified_t wmi_handle)
+{
+	return adf_os_atomic_read(&wmi_handle->runtime_pm_inprogress);
+}
+#endif
 
 /* WMI command API */
 int wmi_unified_cmd_send(wmi_unified_t wmi_handle, wmi_buf_t buf, int len,
@@ -643,15 +669,39 @@ int wmi_unified_cmd_send(wmi_unified_t wmi_handle, wmi_buf_t buf, int len,
 	A_STATUS status;
 	void *vos_context;
 	struct ol_softc *scn;
+	A_UINT16 htc_tag = 0;
+
+	if (wmi_get_runtime_pm_inprogress(wmi_handle))
+		goto skip_suspend_check;
 
 	if (adf_os_atomic_read(&wmi_handle->is_target_suspended) &&
-		( (WMI_WOW_HOSTWAKEUP_FROM_SLEEP_CMDID != cmd_id) &&
-		  (WMI_PDEV_RESUME_CMDID != cmd_id)) ){
-		pr_err("%s: Target is suspended  could not send WMI command\n", __func__);
+			( (WMI_WOW_HOSTWAKEUP_FROM_SLEEP_CMDID != cmd_id) &&
+			  (WMI_PDEV_RESUME_CMDID != cmd_id)) ) {
+		pr_err("%s: Target is suspended  could not send WMI command: %d\n",
+				__func__, cmd_id);
 		VOS_ASSERT(0);
 		return -EBUSY;
+	} else
+		goto dont_tag;
+
+skip_suspend_check:
+	switch(cmd_id) {
+	case WMI_WOW_ENABLE_CMDID:
+	case WMI_PDEV_SUSPEND_CMDID:
+	case WMI_WOW_ENABLE_DISABLE_WAKE_EVENT_CMDID:
+	case WMI_WOW_ADD_WAKE_PATTERN_CMDID:
+	case WMI_WOW_HOSTWAKEUP_FROM_SLEEP_CMDID:
+	case WMI_PDEV_RESUME_CMDID:
+	case WMI_WOW_DEL_WAKE_PATTERN_CMDID:
+#ifdef FEATURE_WLAN_D0WOW
+	case WMI_D0_WOW_ENABLE_DISABLE_CMDID:
+#endif
+		htc_tag = HTC_TX_PACKET_TAG_AUTO_PM;
+	default:
+		break;
 	}
 
+dont_tag:
 	/* Do sanity check on the TLV parameter structure */
 	{
 		void *buf_ptr = (void *) adf_nbuf_data(buf);
@@ -683,7 +733,8 @@ int wmi_unified_cmd_send(wmi_unified_t wmi_handle, wmi_buf_t buf, int len,
 		//dump_CE_debug_register(scn->hif_sc);
 		adf_os_atomic_dec(&wmi_handle->pending_cmds);
 		pr_err("%s: MAX 1024 WMI Pending cmds reached.\n", __func__);
-		VOS_BUG(0);
+		vos_set_logp_in_progress(VOS_MODULE_ID_VOSS, TRUE);
+		schedule_work(&recovery_work);
 		return -EBUSY;
 	}
 
@@ -701,7 +752,7 @@ int wmi_unified_cmd_send(wmi_unified_t wmi_handle, wmi_buf_t buf, int len,
 			len + sizeof(WMI_CMD_HDR),
 			/* htt_host_data_dl_len(buf)+20 */
 			wmi_handle->wmi_endpoint_id,
-			0/*htc_tag*/);
+			htc_tag);
 
 	SET_HTC_PACKET_NET_BUF_CONTEXT(pkt, buf);
 
@@ -828,18 +879,10 @@ void wmi_control_rx(void *ctx, HTC_PACKET *htc_packet)
 {
 	struct wmi_unified *wmi_handle = (struct wmi_unified *)ctx;
 	wmi_buf_t evt_buf;
-
-#ifndef QCA_CONFIG_SMP
-	/* MDM is single core apps processor
-	 * As a result, PAUSE event cannot be processed fast enough
-	 * if RX process reserve CPU
-	 * To ensure PAUSE event processed fast enough
-	 * only PAUSE event should not be scheduled on worker thread */
 	u_int32_t len;
 	void *wmi_cmd_struct_ptr = NULL;
 	u_int32_t idx = 0;
 	int tlv_ok_status = 0;
-#endif /* QCA_CONFIG_SMP */
 
 #if  defined(WMI_INTERFACE_EVENT_LOGGING) || !defined(QCA_CONFIG_SMP)
 	u_int32_t id;
@@ -847,10 +890,10 @@ void wmi_control_rx(void *ctx, HTC_PACKET *htc_packet)
 #endif
 
 	evt_buf = (wmi_buf_t) htc_packet->pPktContext;
-#ifndef QCA_CONFIG_SMP
 	id = WMI_GET_FIELD(adf_nbuf_data(evt_buf), WMI_CMD_HDR, COMMANDID);
 	/* TX_PAUSE EVENT should be handled with tasklet context */
-	if (WMI_TX_PAUSE_EVENTID == id) {
+	if ((WMI_TX_PAUSE_EVENTID == id) ||
+		(WMI_WOW_WAKEUP_HOST_EVENTID == id)) {
 		if (adf_nbuf_pull_head(evt_buf, sizeof(WMI_CMD_HDR)) == NULL)
 			return;
 
@@ -861,11 +904,9 @@ void wmi_control_rx(void *ctx, HTC_PACKET *htc_packet)
 					data, len, id,
 					&wmi_cmd_struct_ptr);
 		if (tlv_ok_status != 0) {
-			if (tlv_ok_status == 1) {
-				wmi_cmd_struct_ptr = data;
-			} else {
-				return;
-			}
+			WMA_LOGE("Error: id=0x%x, wmitlv_check_and_pad_tlvs ret=%d",
+				id, tlv_ok_status);
+			return;
 		}
 
 		idx = wmi_unified_get_event_handler_ix(wmi_handle, id);
@@ -881,7 +922,6 @@ void wmi_control_rx(void *ctx, HTC_PACKET *htc_packet)
 		adf_nbuf_free(evt_buf);
 		return;
 	}
-#endif /* QCA_CONFIG_SMP */
 
 #ifdef WMI_INTERFACE_EVENT_LOGGING
 	id = WMI_GET_FIELD(adf_nbuf_data(evt_buf), WMI_CMD_HDR, COMMANDID);
@@ -1009,6 +1049,9 @@ wmi_unified_attach(ol_scn_t scn_handle, wma_wow_tx_complete_cbk func)
     wmi_handle->scn_handle = scn_handle;
     adf_os_atomic_init(&wmi_handle->pending_cmds);
     adf_os_atomic_init(&wmi_handle->is_target_suspended);
+#ifdef FEATURE_RUNTIME_PM
+    adf_os_atomic_init(&wmi_handle->runtime_pm_inprogress);
+#endif
     adf_os_spinlock_init(&wmi_handle->eventq_lock);
     adf_nbuf_queue_init(&wmi_handle->event_queue);
 #ifdef CONFIG_CNSS
@@ -1121,6 +1164,13 @@ void wmi_set_target_suspend(wmi_unified_t wmi_handle, A_BOOL val)
 {
 	adf_os_atomic_set(&wmi_handle->is_target_suspended, val);
 }
+
+#ifdef FEATURE_RUNTIME_PM
+void wmi_set_runtime_pm_inprogress(wmi_unified_t wmi_handle, A_BOOL val)
+{
+	adf_os_atomic_set(&wmi_handle->runtime_pm_inprogress, val);
+}
+#endif
 
 #ifdef FEATURE_WLAN_D0WOW
 void wmi_set_d0wow_flag(wmi_unified_t wmi_handle, A_BOOL flag)

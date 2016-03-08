@@ -290,11 +290,14 @@ int hdd_hostapd_stop (struct net_device *dev)
 {
    ENTER();
 
-   //Stop all tx queues
-   netif_tx_disable(dev);
+   if (NULL != dev) {
+       //Stop all tx queues
+       hddLog(LOG1, FL("Disabling queues"));
+       netif_tx_disable(dev);
 
-   //Turn OFF carrier state
-   netif_carrier_off(dev);
+       //Turn OFF carrier state
+       netif_carrier_off(dev);
+   }
 
    EXIT();
    return 0;
@@ -313,19 +316,29 @@ associated with the device
   --------------------------------------------------------------------------*/
 static void hdd_hostapd_uninit (struct net_device *dev)
 {
-   hdd_adapter_t *pHostapdAdapter = netdev_priv(dev);
+	hdd_adapter_t *adapter = netdev_priv(dev);
+	hdd_context_t *hdd_ctx;
 
-   ENTER();
+	ENTER();
 
-   if (pHostapdAdapter && pHostapdAdapter->pHddCtx)
-   {
-      hdd_deinit_adapter(pHostapdAdapter->pHddCtx, pHostapdAdapter);
+	if (WLAN_HDD_ADAPTER_MAGIC != adapter->magic) {
+		hddLog(LOGE, FL("Invalid magic"));
+		return;
+	}
 
-      /* after uninit our adapter structure will no longer be valid */
-      pHostapdAdapter->dev = NULL;
-   }
+	hdd_ctx = WLAN_HDD_GET_CTX(adapter);
+	if (NULL == hdd_ctx) {
+		hddLog(LOGE, FL("NULL hdd_ctx"));
+		return;
+	}
 
-   EXIT();
+	hdd_deinit_adapter(hdd_ctx, adapter, true);
+
+	/* after uninit our adapter structure will no longer be valid */
+	adapter->dev = NULL;
+	adapter->magic = 0;
+
+	EXIT();
 }
 
 
@@ -514,7 +527,6 @@ static int hdd_hostapd_ioctl(struct net_device *dev,
    pHddCtx = WLAN_HDD_GET_CTX(pAdapter);
    ret = wlan_hdd_validate_context(pHddCtx);
    if (ret) {
-      hddLog(VOS_TRACE_LEVEL_ERROR, "%s: invalid context", __func__);
       ret = -EBUSY;
       goto exit;
    }
@@ -692,6 +704,7 @@ void hdd_clear_all_sta(hdd_adapter_t *pHostapdAdapter, v_PVOID_t usrDataForCallb
 {
     v_U8_t staId = 0;
     struct net_device *dev;
+    struct tagCsrDelStaParams delStaParams;
     dev = (struct net_device *)usrDataForCallback;
 
     hddLog(LOGE, FL("Clearing all the STA entry...."));
@@ -700,8 +713,12 @@ void hdd_clear_all_sta(hdd_adapter_t *pHostapdAdapter, v_PVOID_t usrDataForCallb
         if ( pHostapdAdapter->aStaInfo[staId].isUsed &&
            ( staId != (WLAN_HDD_GET_AP_CTX_PTR(pHostapdAdapter))->uBCStaId))
         {
+             WLANSAP_PopulateDelStaParams(&pHostapdAdapter->aStaInfo[staId].macAddrSTA.bytes[0],
+                                                    eSIR_MAC_DEAUTH_LEAVING_BSS_REASON,
+                                                    (SIR_MAC_MGMT_DISASSOC >> 4),
+                                                     &delStaParams);
             //Disconnect all the stations
-            hdd_softap_sta_disassoc(pHostapdAdapter, &pHostapdAdapter->aStaInfo[staId].macAddrSTA.bytes[0]);
+            hdd_softap_sta_disassoc(pHostapdAdapter, &delStaParams);
         }
     }
 }
@@ -1053,26 +1070,20 @@ VOS_STATUS hdd_hostapd_SAPEventCB( tpSap_Event pSapEvent, v_PVOID_t usrDataForCa
         case eSAP_DFS_CAC_START:
             wlan_hdd_send_svc_nlink_msg(WLAN_SVC_DFS_CAC_START_IND,
                                       &dfs_info, sizeof(struct wlan_dfs_info));
-#ifdef WLAN_FEATURE_MBSSID
             pHddCtx->dev_dfs_cac_status = DFS_CAC_IN_PROGRESS;
-#endif
             break;
 
         case eSAP_DFS_CAC_END:
             wlan_hdd_send_svc_nlink_msg(WLAN_SVC_DFS_CAC_END_IND,
                                       &dfs_info, sizeof(struct wlan_dfs_info));
             pHddApCtx->dfs_cac_block_tx = VOS_FALSE;
-#ifdef WLAN_FEATURE_MBSSID
             pHddCtx->dev_dfs_cac_status = DFS_CAC_ALREADY_DONE;
-#endif
             break;
 
         case eSAP_DFS_RADAR_DETECT:
             wlan_hdd_send_svc_nlink_msg(WLAN_SVC_DFS_RADAR_DETECT_IND,
                                       &dfs_info, sizeof(struct wlan_dfs_info));
-#ifdef WLAN_FEATURE_MBSSID
             pHddCtx->dev_dfs_cac_status = DFS_CAC_NEVER_DONE;
-#endif
             break;
 
         case eSAP_DFS_NO_AVAILABLE_CHANNEL:
@@ -2740,6 +2751,19 @@ static iw_softap_setparam(struct net_device *dev,
                 ret = wlan_hdd_update_phymode(dev, hHal, set_value, phddctx);
                 break;
             }
+
+        case QCASAP_PARAM_LDPC:
+            ret = hdd_set_ldpc(pHostapdAdapter, set_value);
+            break;
+
+        case QCASAP_PARAM_TX_STBC:
+            ret = hdd_set_tx_stbc(pHostapdAdapter, set_value);
+            break;
+
+        case QCASAP_PARAM_RX_STBC:
+            ret = hdd_set_rx_stbc(pHostapdAdapter, set_value);
+            break;
+
         default:
             hddLog(LOGE, FL("Invalid setparam command %d value %d"),
                     sub_cmd, set_value);
@@ -2950,6 +2974,18 @@ static iw_softap_getparam(struct net_device *dev,
                         VDEV_CMD);
             break;
         }
+
+    case QCASAP_PARAM_LDPC:
+        ret = hdd_get_ldpc(pHostapdAdapter, value);
+        break;
+
+    case QCASAP_PARAM_TX_STBC:
+        ret = hdd_get_tx_stbc(pHostapdAdapter, value);
+        break;
+
+    case QCASAP_PARAM_RX_STBC:
+        ret = hdd_get_rx_stbc(pHostapdAdapter, value);
+        break;
 
     default:
         hddLog(LOGE, FL("Invalid getparam command %d"), sub_cmd);
@@ -3204,8 +3240,16 @@ static iw_softap_disassoc_sta(struct net_device *dev,
 {
     hdd_adapter_t *pHostapdAdapter = (netdev_priv(dev));
     v_U8_t *peerMacAddr;
+    struct tagCsrDelStaParams delStaParams;
 
     ENTER();
+
+    if (!capable(CAP_NET_ADMIN)) {
+        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                 FL("permission check failed"));
+        return -EPERM;
+    }
+
     /* iwpriv tool or framework calls this ioctl with
      * data passed in extra (less than 16 octets);
      */
@@ -3213,7 +3257,14 @@ static iw_softap_disassoc_sta(struct net_device *dev,
 
     hddLog(LOG1, "%s data "  MAC_ADDRESS_STR,
            __func__, MAC_ADDR_ARRAY(peerMacAddr));
-    hdd_softap_sta_disassoc(pHostapdAdapter, peerMacAddr);
+
+
+    WLANSAP_PopulateDelStaParams(peerMacAddr,
+                   eSIR_MAC_DEAUTH_LEAVING_BSS_REASON,
+                   (SIR_MAC_MGMT_DISASSOC >> 4),
+                   &delStaParams);
+
+    hdd_softap_sta_disassoc(pHostapdAdapter, &delStaParams);
     EXIT();
     return 0;
 }
@@ -3261,6 +3312,18 @@ static iw_softap_ap_stats(struct net_device *dev,
     return 0;
 }
 
+int
+static iw_softap_get_stats(struct net_device *dev,
+                           struct iw_request_info *info,
+                           union iwreq_data *wrqu, char *extra)
+{
+    hdd_adapter_t *p_host_adapter = netdev_priv(dev);
+
+    hdd_wlan_get_stats(p_host_adapter, &(wrqu->data.length),
+                       extra, WE_MAX_STR_LEN);
+    return 0;
+}
+
 static int iw_softap_set_channel_range(struct net_device *dev,
                           struct iw_request_info *info,
                           union iwreq_data *wrqu, char *extra)
@@ -3275,6 +3338,13 @@ static int iw_softap_set_channel_range(struct net_device *dev,
     int band = value[2];
     VOS_STATUS status;
     int ret = 0; /* success */
+
+    if (!capable(CAP_NET_ADMIN))
+    {
+        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                  FL("permission check failed"));
+        return -EPERM;
+    }
 
     status = WLANSAP_SetChannelRange(hHal,startChannel,endChannel,band);
     if(status != VOS_STATUS_SUCCESS)
@@ -3824,8 +3894,15 @@ static int iw_softap_setwpsie(struct net_device *dev,
    u_int8_t WPSIeType;
    u_int16_t length;
    struct iw_point s_priv_data;
+   int ret = 0;
 
    ENTER();
+
+   if (!capable(CAP_NET_ADMIN)) {
+       VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                FL("permission check failed"));
+       return -EPERM;
+   }
 
    /* helper function to get iwreq_data with compat handling. */
    if (hdd_priv_get_data(&s_priv_data, wrqu)) {
@@ -3869,9 +3946,8 @@ static int iw_softap_setwpsie(struct net_device *dev,
          case DOT11F_EID_WPA:
             if (wps_genie[1] < 2 + 4)
             {
-               vos_mem_free(pSap_WPSIe);
-               kfree(fwps_genie);
-               return -EINVAL;
+                ret = -EINVAL;
+                goto exit;
             }
             else if (memcmp(&wps_genie[2], "\x00\x50\xf2\x04", 4) == 0)
             {
@@ -3929,6 +4005,11 @@ static int iw_softap_setwpsie(struct net_device *dev,
                       pos += 2;
                       length = *pos<<8 | *(pos+1);
                       pos += 2;
+                      if (length > sizeof(pSap_WPSIe->sapwpsie.sapWPSBeaconIE.UUID_E))
+                      {
+                          ret = -EINVAL;
+                          goto exit;
+                      }
                       vos_mem_copy(pSap_WPSIe->sapwpsie.sapWPSBeaconIE.UUID_E, pos, length);
                       pSap_WPSIe->sapwpsie.sapWPSBeaconIE.FieldPresent |= WPS_BEACON_UUIDE_PRESENT;
                       pos += length;
@@ -3943,9 +4024,8 @@ static int iw_softap_setwpsie(struct net_device *dev,
 
                    default:
                       hddLog (LOGW, "UNKNOWN TLV in WPS IE(%x)", (*pos<<8 | *(pos+1)));
-                      vos_mem_free(pSap_WPSIe);
-                      kfree(fwps_genie);
-                      return -EINVAL;
+                      ret = -EINVAL;
+                      goto exit;
                 }
               }
             }
@@ -3957,9 +4037,8 @@ static int iw_softap_setwpsie(struct net_device *dev,
 
          default:
             hddLog (LOGE, "%s Set UNKNOWN IE %X",__func__, wps_genie[0]);
-            vos_mem_free(pSap_WPSIe);
-            kfree(fwps_genie);
-            return 0;
+            ret = -EINVAL;
+            goto exit;
       }
     }
     else if( wps_genie[0] == eQC_WPS_PROBE_RSP_IE)
@@ -3971,9 +4050,8 @@ static int iw_softap_setwpsie(struct net_device *dev,
          case DOT11F_EID_WPA:
             if (wps_genie[1] < 2 + 4)
             {
-               vos_mem_free(pSap_WPSIe);
-               kfree(fwps_genie);
-               return -EINVAL;
+                ret = -EINVAL;
+                goto exit;
             }
             else if (memcmp(&wps_genie[2], "\x00\x50\xf2\x04", 4) == 0)
             {
@@ -4037,6 +4115,11 @@ static int iw_softap_setwpsie(struct net_device *dev,
                       pos += 2;
                       length = *pos<<8 | *(pos+1);
                       pos += 2;
+                      if (length > (sizeof(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.UUID_E)))
+                      {
+                          ret = -EINVAL;
+                          goto exit;
+                      }
                       vos_mem_copy(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.UUID_E, pos, length);
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.FieldPresent |= WPS_PROBRSP_UUIDE_PRESENT;
                       pos += length;
@@ -4046,6 +4129,11 @@ static int iw_softap_setwpsie(struct net_device *dev,
                       pos += 2;
                       length = *pos<<8 | *(pos+1);
                       pos += 2;
+                      if (length >  (sizeof(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.Manufacture.name)))
+                      {
+                          ret = -EINVAL;
+                          goto exit;
+                      }
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.Manufacture.num_name = length;
                       vos_mem_copy(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.Manufacture.name, pos, length);
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.FieldPresent |= WPS_PROBRSP_MANUFACTURE_PRESENT;
@@ -4056,6 +4144,11 @@ static int iw_softap_setwpsie(struct net_device *dev,
                       pos += 2;
                       length = *pos<<8 | *(pos+1);
                       pos += 2;
+                      if (length > (sizeof(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.ModelName.text)))
+                      {
+                          ret = -EINVAL;
+                          goto exit;
+                      }
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.ModelName.num_text = length;
                       vos_mem_copy(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.ModelName.text, pos, length);
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.FieldPresent |= WPS_PROBRSP_MODELNAME_PRESENT;
@@ -4065,6 +4158,11 @@ static int iw_softap_setwpsie(struct net_device *dev,
                       pos += 2;
                       length = *pos<<8 | *(pos+1);
                       pos += 2;
+                      if (length > (sizeof(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.ModelNumber.text)))
+                      {
+                          ret = -EINVAL;
+                          goto exit;
+                      }
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.ModelNumber.num_text = length;
                       vos_mem_copy(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.ModelNumber.text, pos, length);
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.FieldPresent |= WPS_PROBRSP_MODELNUMBER_PRESENT;
@@ -4074,6 +4172,11 @@ static int iw_softap_setwpsie(struct net_device *dev,
                       pos += 2;
                       length = *pos<<8 | *(pos+1);
                       pos += 2;
+                      if (length > (sizeof(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.SerialNumber.text)))
+                      {
+                          ret = -EINVAL;
+                          goto exit;
+                      }
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.SerialNumber.num_text = length;
                       vos_mem_copy(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.SerialNumber.text, pos, length);
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.FieldPresent |= WPS_PROBRSP_SERIALNUMBER_PRESENT;
@@ -4097,6 +4200,11 @@ static int iw_softap_setwpsie(struct net_device *dev,
                       pos += 2;
                       length = *pos<<8 | *(pos+1);
                       pos += 2;
+                      if (length > (sizeof(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.DeviceName.text)))
+                      {
+                          ret = -EINVAL;
+                          goto exit;
+                      }
                       pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.DeviceName.num_text = length;
                       vos_mem_copy(pSap_WPSIe->sapwpsie.sapWPSProbeRspIE.DeviceName.text, pos, length);
                       pos += length;
@@ -4133,6 +4241,8 @@ static int iw_softap_setwpsie(struct net_device *dev,
 #else
     halStatus = WLANSAP_Set_WpsIe(pVosContext, pSap_WPSIe);
 #endif
+    if (halStatus != eHAL_STATUS_SUCCESS)
+        ret = -EINVAL;
     pHostapdState = WLAN_HDD_GET_HOSTAP_STATE_PTR(pHostapdAdapter);
     if( pHostapdState->bCommit && WPSIeType == eQC_WPS_PROBE_RSP_IE)
     {
@@ -4144,11 +4254,11 @@ static int iw_softap_setwpsie(struct net_device *dev,
         WLANSAP_Update_WpsIe ( pVosContext );
 #endif
     }
-
+exit:
     vos_mem_free(pSap_WPSIe);
     kfree(fwps_genie);
     EXIT();
-    return halStatus;
+    return ret;
 }
 
 static int iw_softap_stopbss(struct net_device *dev,
@@ -4741,6 +4851,19 @@ static const struct iw_priv_args hostapd_private_args[] = {
         0,
         "setphymode" },
 
+    {   QCASAP_PARAM_LDPC,
+        IW_PRIV_TYPE_INT| IW_PRIV_SIZE_FIXED | 1,
+        0,
+        "set_ldpc" },
+    {   QCASAP_PARAM_TX_STBC,
+        IW_PRIV_TYPE_INT| IW_PRIV_SIZE_FIXED | 1,
+        0,
+        "set_tx_stbc" },
+    {   QCASAP_PARAM_RX_STBC,
+        IW_PRIV_TYPE_INT| IW_PRIV_SIZE_FIXED | 1,
+        0,
+        "set_rx_stbc" },
+
   { QCSAP_IOCTL_GETPARAM, 0,
       IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1,    "getparam" },
   { QCSAP_IOCTL_GETPARAM, 0,
@@ -4775,6 +4898,12 @@ static const struct iw_priv_args hostapd_private_args[] = {
       IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1,    "getdfsnol" },
   { QCSAP_GET_ACL, 0,
       IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1,    "get_acl_list" },
+  { QCASAP_PARAM_LDPC, 0,
+      IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1,    "get_ldpc" },
+  { QCASAP_PARAM_TX_STBC, 0,
+      IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1,    "get_tx_stbc" },
+  { QCASAP_PARAM_RX_STBC, 0,
+      IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1,    "get_rx_stbc" },
   { QCASAP_TX_CHAINMASK_CMD, 0,
       IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1,    "get_txchainmask" },
   { QCASAP_RX_CHAINMASK_CMD, 0,
@@ -4800,6 +4929,8 @@ static const struct iw_priv_args hostapd_private_args[] = {
         IW_PRIV_TYPE_BYTE | IW_PRIV_SIZE_FIXED | 6 , 0, "disassoc_sta" },
   { QCSAP_IOCTL_AP_STATS, 0,
         IW_PRIV_TYPE_CHAR | QCSAP_MAX_WSC_IE, "ap_stats" },
+  { QCSAP_IOCTL_GET_STATS, 0,
+        IW_PRIV_TYPE_CHAR | WE_MAX_STR_LEN, "get_stats" },
   { QCSAP_IOCTL_PRIV_GET_SOFTAP_LINK_SPEED,
         IW_PRIV_TYPE_CHAR | 18,
         IW_PRIV_TYPE_CHAR | 5, "getLinkSpeed" },
@@ -4908,6 +5039,7 @@ static const iw_handler hostapd_private[] = {
    [QCSAP_IOCTL_ASSOC_STA_MACADDR - SIOCIWFIRSTPRIV] = iw_softap_getassoc_stamacaddr,
    [QCSAP_IOCTL_DISASSOC_STA - SIOCIWFIRSTPRIV] = iw_softap_disassoc_sta,
    [QCSAP_IOCTL_AP_STATS - SIOCIWFIRSTPRIV] = iw_softap_ap_stats,
+   [QCSAP_IOCTL_GET_STATS - SIOCIWFIRSTPRIV] = iw_softap_get_stats,
    [QCSAP_IOCTL_PRIV_SET_THREE_INT_GET_NONE - SIOCIWFIRSTPRIV]  = iw_set_three_ints_getnone,
    [QCSAP_IOCTL_PRIV_SET_VAR_INT_GET_NONE - SIOCIWFIRSTPRIV]     = iw_set_var_ints_getnone,
    [QCSAP_IOCTL_SET_CHANNEL_RANGE - SIOCIWFIRSTPRIV] = iw_softap_set_channel_range,
@@ -5177,7 +5309,7 @@ VOS_STATUS hdd_register_hostapd( hdd_adapter_t *pAdapter, tANI_U8 rtnl_lock_held
    return status;
 }
 
-VOS_STATUS hdd_unregister_hostapd(hdd_adapter_t *pAdapter)
+VOS_STATUS hdd_unregister_hostapd(hdd_adapter_t *pAdapter, bool rtnl_held)
 {
 #ifdef WLAN_FEATURE_MBSSID
    VOS_STATUS status;
@@ -5193,7 +5325,13 @@ VOS_STATUS hdd_unregister_hostapd(hdd_adapter_t *pAdapter)
       detach the wireless device handlers */
    if (pAdapter->dev)
    {
-      pAdapter->dev->wireless_handlers = NULL;
+      if (rtnl_held)
+          pAdapter->dev->wireless_handlers = NULL;
+      else {
+          rtnl_lock();
+          pAdapter->dev->wireless_handlers = NULL;
+          rtnl_unlock();
+      }
    }
 
 #ifdef WLAN_FEATURE_MBSSID

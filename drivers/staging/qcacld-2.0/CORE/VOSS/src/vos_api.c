@@ -95,6 +95,7 @@
 #endif
 #include "vos_utils.h"
 #include "wlan_logging_sock_svc.h"
+#include "wma.h"
 
 /*---------------------------------------------------------------------------
  * Preprocessor Definitions and Constants
@@ -225,6 +226,35 @@ VOS_STATUS vos_preClose( v_CONTEXT_t *pVosContext )
    return VOS_STATUS_SUCCESS;
 
 } /* vos_preClose()*/
+
+#if defined (FEATURE_SECURE_FIRMWARE) && defined (FEATURE_FW_HASH_CHECK)
+static inline void vos_fw_hash_check_config(struct ol_softc *scn,
+					hdd_context_t *pHddCtx)
+{
+	scn->enable_fw_hash_check = pHddCtx->cfg_ini->enable_fw_hash_check;
+}
+#elif defined (FEATURE_SECURE_FIRMWARE)
+static inline void vos_fw_hash_check_config(struct ol_softc *scn,
+					hdd_context_t *pHddCtx)
+{
+	scn->enable_fw_hash_check = true;
+}
+#else
+static inline void vos_fw_hash_check_config(struct ol_softc *scn,
+					hdd_context_t *pHddCtx) { }
+#endif
+
+#ifdef FEATURE_RUNTIME_PM
+static inline void vos_runtime_pm_config(struct ol_softc *scn,
+		hdd_context_t *pHddCtx)
+{
+	scn->enable_runtime_pm = pHddCtx->cfg_ini->runtime_pm;
+	scn->runtime_pm_delay = pHddCtx->cfg_ini->runtime_pm_delay;
+}
+#else
+static inline void vos_runtime_pm_config(struct ol_softc *scn,
+		hdd_context_t *pHddCtx) { }
+#endif
 
 /*---------------------------------------------------------------------------
 
@@ -361,6 +391,10 @@ VOS_STATUS vos_open( v_CONTEXT_t *pVosContext, v_SIZE_t hddContextSize )
 #ifdef WLAN_FEATURE_LPSS
    scn->enablelpasssupport = pHddCtx->cfg_ini->enablelpasssupport;
 #endif
+   scn->enable_self_recovery = pHddCtx->cfg_ini->enableSelfRecovery;
+
+   vos_fw_hash_check_config(scn, pHddCtx);
+   vos_runtime_pm_config(scn, pHddCtx);
 
    /* Initialize BMI and Download firmware */
    if (bmi_download_firmware(scn)) {
@@ -447,6 +481,9 @@ VOS_STATUS vos_open( v_CONTEXT_t *pVosContext, v_SIZE_t hddContextSize )
     macOpenParms.ucRxIndRingCount = pHddCtx->cfg_ini->IpaUcRxIndRingCount;
     macOpenParms.ucTxPartitionBase = pHddCtx->cfg_ini->IpaUcTxPartitionBase;
 #endif /* IPA_UC_OFFLOAD */
+
+    macOpenParms.tx_chain_mask_cck = pHddCtx->cfg_ini->tx_chain_mask_cck;
+    macOpenParms.self_gen_frm_pwr = pHddCtx->cfg_ini->self_gen_frm_pwr;
 
    vStatus = WDA_open( gpVosContext, gpVosContext->pHDDContext,
                        hdd_update_tgt_cfg,
@@ -2058,8 +2095,8 @@ vos_fetch_tl_cfg_parms
   pTLConfig->uDelayedTriggerFrmInt = pConfig->DelayedTriggerFrmInt;
   pTLConfig->uMinFramesProcThres = pConfig->MinFramesProcThres;
   pTLConfig->ip_checksum_offload = pConfig->enableIPChecksumOffload;
-  pTLConfig->enable_rxthread = pConfig->enableRxThread;
-
+  pTLConfig->enable_rxthread =
+    (WLAN_HDD_RX_HANDLE_RX_THREAD == pConfig->rxhandle) ? 1 : 0;
 }
 
 v_BOOL_t vos_is_apps_power_collapse_allowed(void* pHddCtx)
@@ -2440,22 +2477,50 @@ v_BOOL_t vos_is_packet_log_enabled(void)
    return pHddCtx->cfg_ini->enablePacketLog;
 }
 
-#if defined(CONFIG_CNSS)
-/* worker thread to recover when target does not respond over PCIe */
-void self_recovery_work_handler(struct work_struct *recovery)
-{
-    cnss_device_self_recovery();
-}
-
-static DECLARE_WORK(self_recovery_work, self_recovery_work_handler);
-#endif
-
 void vos_trigger_recovery(void)
 {
+	pVosContextType vos_context;
+	tp_wma_handle wma_handle;
+	VOS_STATUS status = VOS_STATUS_SUCCESS;
+
+	vos_context = vos_get_global_context(VOS_MODULE_ID_VOSS, NULL);
+	if (!vos_context) {
+		VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
+			"VOS context is invald!");
+		return;
+	}
+
+	wma_handle = (tp_wma_handle)vos_get_context(VOS_MODULE_ID_WDA,
+						vos_context);
+	if (!wma_handle) {
+		VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
+			"WMA context is invald!");
+		return;
+	}
+
+	vos_runtime_pm_prevent_suspend();
+
+	wma_crash_inject(wma_handle, RECOVERY_SIM_SELF_RECOVERY, 0);
+
+	status = vos_wait_single_event(&wma_handle->recovery_event,
+		WMA_CRASH_INJECT_TIMEOUT);
+
+	if (VOS_STATUS_SUCCESS != status) {
+		VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
+			"CRASH_INJECT command is timed out!");
 #ifdef CONFIG_CNSS
-    vos_set_logp_in_progress(VOS_MODULE_ID_VOSS, TRUE);
-    schedule_work(&self_recovery_work);
+		if (vos_is_logp_in_progress(VOS_MODULE_ID_VOSS, NULL)) {
+			VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
+				"LOGP is in progress, ignore!");
+			goto out;
+		}
+		vos_set_logp_in_progress(VOS_MODULE_ID_VOSS, TRUE);
+		cnss_schedule_recovery_work();
 #endif
+	}
+
+out:
+	vos_runtime_pm_allow_suspend();
 }
 
 v_U64_t vos_get_monotonic_boottime(void)
@@ -2568,6 +2633,12 @@ void vos_set_ring_log_level(uint32_t ring_id, uint32_t log_level)
 	} else if (ring_id == RING_ID_PER_PACKET_STATS) {
 		vos_context->packet_stats_log_level = log_val;
 		return;
+	} else if (ring_id == RIND_ID_DRIVER_DEBUG) {
+		vos_context->driver_debug_log_level = log_val;
+		return;
+	} else if (ring_id == RING_ID_FIRMWARE_DEBUG) {
+		vos_context->fw_debug_log_level = log_val;
+		return;
 	}
 }
 
@@ -2596,6 +2667,10 @@ enum wifi_driver_log_level vos_get_ring_log_level(uint32_t ring_id)
 		return vos_context->connectivity_log_level;
 	else if (ring_id == RING_ID_PER_PACKET_STATS)
 		return vos_context->packet_stats_log_level;
+	else if (ring_id == RIND_ID_DRIVER_DEBUG)
+		return vos_context->driver_debug_log_level;
+	else if (ring_id == RING_ID_FIRMWARE_DEBUG)
+		return vos_context->fw_debug_log_level;
 
 	return WLAN_LOG_LEVEL_OFF;
 }

@@ -432,6 +432,8 @@ typedef struct _VosContextType
    uint32_t wakelock_log_level;
    uint32_t connectivity_log_level;
    uint32_t packet_stats_log_level;
+   uint32_t driver_debug_log_level;
+   uint32_t fw_debug_log_level;
 
    struct vos_log_complete log_complete;
    vos_spin_lock_t bug_report_lock;
@@ -673,6 +675,7 @@ void vos_ssr_protect_init(void);
 void vos_ssr_protect(const char *caller_func);
 void vos_ssr_unprotect(const char *caller_func);
 bool vos_is_ssr_ready(const char *caller_func);
+int vos_get_gfp_flags(void);
 
 #define vos_wait_for_work_thread_completion(func) vos_is_ssr_ready(func)
 
