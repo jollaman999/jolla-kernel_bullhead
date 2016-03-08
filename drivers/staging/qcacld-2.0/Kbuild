@@ -1324,7 +1324,7 @@ KBUILD_CPPFLAGS += $(CDEFINES)
 # WLAN driver.  Note that we must use EXTRA_CFLAGS here so that it
 # will override the kernel settings.
 ifeq ($(call cc-option-yn, -Wmaybe-uninitialized),y)
-EXTRA_CFLAGS += -Os -Wmaybe-uninitialized
+EXTRA_CFLAGS += -Wmaybe-uninitialized
 endif
 
 # Module information used by KBuild framework
