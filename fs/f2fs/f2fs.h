@@ -253,6 +253,8 @@ static inline bool __has_cursum_space(struct f2fs_journal *journal,
 #define F2FS_IOC_WRITE_CHECKPOINT	_IO(F2FS_IOCTL_MAGIC, 7)
 #define F2FS_IOC_DEFRAGMENT		_IO(F2FS_IOCTL_MAGIC, 8)
 
+#define F2FS_IOC_KEYCTL		_IOW(F2FS_IOCTL_MAGIC, 9, struct f2fs_key)
+
 #define F2FS_IOC_SET_ENCRYPTION_POLICY	FS_IOC_SET_ENCRYPTION_POLICY
 #define F2FS_IOC_GET_ENCRYPTION_POLICY	FS_IOC_GET_ENCRYPTION_POLICY
 #define F2FS_IOC_GET_ENCRYPTION_PWSALT	FS_IOC_GET_ENCRYPTION_PWSALT
@@ -265,6 +267,20 @@ static inline bool __has_cursum_space(struct f2fs_journal *journal,
 #define F2FS_IOC32_SETFLAGS		FS_IOC32_SETFLAGS
 #define F2FS_IOC32_GETVERSION		FS_IOC32_GETVERSION
 #endif
+
+#define F2FS_KEY_SIZE	8
+#define F2FS_KEY_DESC_PREFIX		"f2fs:"
+#define F2FS_KEY_DESC_PREFIX_SIZE	5
+
+enum f2fs_key_mode {
+	F2FS_SET_KEY,
+	F2FS_DROP_KEY,
+};
+
+struct f2fs_key {
+	u8 key[F2FS_KEY_SIZE];
+	u8 mode;
+};
 
 struct f2fs_defragment {
 	u64 start;
@@ -389,6 +405,7 @@ struct f2fs_map_blocks {
 #define FADVISE_LOST_PINO_BIT	0x02
 #define FADVISE_ENCRYPT_BIT	0x04
 #define FADVISE_ENC_NAME_BIT	0x08
+#define FADVISE_KEY_BIT		0x10
 
 #define file_is_cold(inode)	is_file(inode, FADVISE_COLD_BIT)
 #define file_wrong_pino(inode)	is_file(inode, FADVISE_LOST_PINO_BIT)
@@ -401,6 +418,9 @@ struct f2fs_map_blocks {
 #define file_clear_encrypt(inode) clear_file(inode, FADVISE_ENCRYPT_BIT)
 #define file_enc_name(inode)	is_file(inode, FADVISE_ENC_NAME_BIT)
 #define file_set_enc_name(inode) set_file(inode, FADVISE_ENC_NAME_BIT)
+#define file_has_key(inode)	is_file(inode, FADVISE_KEY_BIT)
+#define file_set_key(inode)	set_file(inode, FADVISE_KEY_BIT)
+#define file_clear_key(inode)	clear_file(inode, FADVISE_KEY_BIT)
 
 #define DEF_DIR_LEVEL		0
 
