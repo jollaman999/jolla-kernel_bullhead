@@ -54,9 +54,10 @@
 unsigned int msm_enabled = HOTPLUG_ENABLED;
 
 // Use for msm_hotplug_resume_timeout
-#define HOTPLUG_TIMEOUT			2000
+#define HOTPLUG_TIMEOUT			3000
 static bool timeout_enabled = false;
 static cputime64_t pre_time;
+static unsigned int down_lock_dur_tmp;
 bool msm_hotplug_scr_suspended = false;
 bool msm_hotplug_fingerprint_called = false;
 
@@ -553,6 +554,7 @@ static void msm_hotplug_work(struct work_struct *work)
 
 		timeout_enabled = false;
 		msm_hotplug_fingerprint_called = false;
+		hotplug.down_lock_dur = down_lock_dur_tmp;
 	}
 
 	update_load_stats();
@@ -662,6 +664,10 @@ void msm_hotplug_resume(void)
 			if (cpu == 0)
 				continue;
 			cpu_up(cpu);
+			if (timeout_enabled) {
+				down_lock_dur_tmp = hotplug.down_lock_dur;
+				hotplug.down_lock_dur = HOTPLUG_TIMEOUT - 1000;
+			}
 			apply_down_lock(cpu);
 		}
 	}
