@@ -544,15 +544,17 @@ static void msm_hotplug_work(struct work_struct *work)
 		return;
 	}
 
-	if (timeout_enabled &&
-	    (ktime_to_ms(ktime_get()) - pre_time > HOTPLUG_TIMEOUT)) {
-		if (msm_hotplug_scr_suspended) {
-			msm_hotplug_suspend();
-			return;
-		}
+	if (timeout_enabled) {
+		if (ktime_to_ms(ktime_get()) - pre_time > HOTPLUG_TIMEOUT) {
+			if (msm_hotplug_scr_suspended) {
+				msm_hotplug_suspend();
+				return;
+			}
 
-		timeout_enabled = false;
-		msm_hotplug_fingerprint_called = false;
+			timeout_enabled = false;
+			msm_hotplug_fingerprint_called = false;
+		}
+		goto reschedule;
 	}
 
 	update_load_stats();
@@ -662,7 +664,8 @@ void msm_hotplug_resume(void)
 			if (cpu == 0)
 				continue;
 			cpu_up(cpu);
-			apply_down_lock(cpu);
+			if (!timeout_enabled)
+				apply_down_lock(cpu);
 		}
 	}
 
