@@ -263,15 +263,26 @@ sioplus_latter_request(struct request_queue *q, struct request *rq)
 	return list_entry(rq->queuelist.next, struct request, queuelist);
 }
 
-static void *
-sioplus_init_queue(struct request_queue *q)
+static int sioplus_init_queue(struct request_queue *q, struct elevator_type *e)
 {
 	struct sioplus_data *sd;
+	struct elevator_queue *eq;
+
+	eq = elevator_alloc(q, e);
+	if (!eq)
+		return -ENOMEM;
 
 	/* Allocate structure */
 	sd = kmalloc_node(sizeof(*sd), GFP_KERNEL, q->node);
-	if (!sd)
-		return NULL;
+	if (!sd) {
+		kobject_put(&eq->kobj);
+		return -ENOMEM;
+	}
+	eq->elevator_data = sd;
+
+	spin_lock_irq(q->queue_lock);
+	q->elevator = eq;
+	spin_unlock_irq(q->queue_lock);
 
 	/* Initialize fifo lists */
 	INIT_LIST_HEAD(&sd->fifo_list[SYNC][READ]);
@@ -291,7 +302,7 @@ sioplus_init_queue(struct request_queue *q)
 	sd->writes_starved = writes_starved;
 	sd->async_reads_starved = async_reads_starved;
 
-	return sd;
+	return 0;
 }
 
 static void
