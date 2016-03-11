@@ -82,7 +82,7 @@ MODULE_LICENSE("GPLv2");
 /* Tuneables */
 //#define SOVC_DEBUG			// Uncomment this to turn on the debug
 #define SOVC_DEFAULT		1	// Default On/Off
-#define SOVC_VOL_FEATHER	400	// Touch degree for volume control
+#define SOVC_VOL_FEATHER	350	// Touch degree for volume control
 #define SOVC_TRACK_FEATHER	500	// Touch degree for track control
 #define SOVC_TIME_GAP		250	// Ignore touch after this time (ms)
 #define SOVC_VOL_REEXEC_DELAY	250	// Re-exec delay for volume control (ms)
