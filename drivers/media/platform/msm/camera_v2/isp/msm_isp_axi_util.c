@@ -2044,8 +2044,6 @@ static int msm_isp_start_axi_stream(struct vfe_device *vfe_dev,
 			SRC_TO_INTF(stream_info->stream_src) < VFE_SRC_MAX) {
 			vfe_dev->axi_data.src_info[SRC_TO_INTF(
 				stream_info->stream_src)].frame_id = 0;
-			vfe_dev->axi_data.src_info[SRC_TO_INTF(
-				stream_info->stream_src)].active = 1;
 		}
 	}
 	msm_isp_update_stream_bandwidth(vfe_dev);
@@ -2097,33 +2095,42 @@ static int msm_isp_stop_axi_stream(struct vfe_device *vfe_dev,
 		wait_for_complete_for_this_stream = 0;
 
 		stream_info->state = STOP_PENDING;
-		vfe_dev->hw_info->vfe_ops.axi_ops.cfg_framedrop(
-			vfe_dev->vfe_base, stream_info, 0, 0);
 		pr_debug("%s, Stream 0x%x,\n", __func__, stream_info->stream_id);
+		if (stream_info->stream_src == CAMIF_RAW ||
+			stream_info->stream_src == IDEAL_RAW) {
+			/* We dont get reg update IRQ for raw snapshot
+			 * so frame skip cant be ocnfigured
+			*/
+			if ((camif_update != DISABLE_CAMIF_IMMEDIATELY) &&
+				(!ext_read))
+				wait_for_complete_for_this_stream = 1;
+
+		} else if (stream_info->stream_type == BURST_STREAM &&
+				stream_info->runtime_num_burst_capture == 0) {
+			/* Configure AXI writemasters to stop immediately
+			 * since for burst case, write masters already skip
+			 * all frames.
+			 */
+			if (stream_info->stream_src == RDI_INTF_0 ||
+				stream_info->stream_src == RDI_INTF_1 ||
+				stream_info->stream_src == RDI_INTF_2)
+				wait_for_complete_for_this_stream = 1;
+		} else {
+			if  ((camif_update != DISABLE_CAMIF_IMMEDIATELY) &&
+				(!ext_read))
+				wait_for_complete_for_this_stream = 1;
+		}
 
 		intf = SRC_TO_INTF(stream_info->stream_src);
-		/*
-		 * Cases we do not wait for stream to stop.
-		 * 1. The input source itself is inactive
-		 * 2. Inout is ext read
-		 * 3. Input is pix and camif is to be stopped immediately
-		 * 4. It's a burst stream, it is not controllable
-		 *    and burst count is 0. This is live snapshot case.
-		 */
-		if (!vfe_dev->axi_data.src_info[intf].active ||
-			ext_read ||
-			(DISABLE_CAMIF_IMMEDIATELY == camif_update &&
-			stream_info->stream_src < RDI_INTF_0) ||
-			(stream_info->stream_type == BURST_STREAM &&
-			stream_info->runtime_num_burst_capture == 0 &&
-			!stream_info->controllable_output)) {
+		if (!wait_for_complete_for_this_stream ||
+			stream_info->state == INACTIVE ||
+			!vfe_dev->axi_data.src_info[intf].active) {
 			msm_isp_axi_stream_enable_cfg(vfe_dev, stream_info, 0);
 			stream_info->state = INACTIVE;
 			vfe_dev->hw_info->vfe_ops.core_ops.reg_update(vfe_dev,
 				SRC_TO_INTF(stream_info->stream_src));
-		} else {
+		} else
 			src_mask |= (1 << intf);
-		}
 
 	}
 
@@ -2173,16 +2180,6 @@ static int msm_isp_stop_axi_stream(struct vfe_device *vfe_dev,
 		vfe_dev->hw_info->vfe_ops.core_ops.init_hw_reg(vfe_dev);
 		vfe_dev->ignore_error = 0;
 	}
-
-	for (i = 0; i < stream_cfg_cmd->num_streams; i++) {
-		stream_info = &axi_data->stream_info[
-			HANDLE_TO_IDX(stream_cfg_cmd->stream_handle[i])];
-		if (SRC_TO_INTF(stream_info->stream_src) >= VFE_RAW_0 &&
-			SRC_TO_INTF(stream_info->stream_src) < VFE_SRC_MAX)
-			vfe_dev->axi_data.src_info[SRC_TO_INTF(
-				stream_info->stream_src)].active = 0;
-	}
-
 	msm_isp_update_camif_output_count(vfe_dev, stream_cfg_cmd);
 	msm_isp_update_stream_bandwidth(vfe_dev);
 
@@ -2385,7 +2382,6 @@ static int msm_isp_request_frame(struct vfe_device *vfe_dev,
 		rc = msm_isp_cfg_ping_pong_address(vfe_dev, stream_info,
 			VFE_PING_FLAG, 1, 1);
 		if (rc) {
-			stream_info->undelivered_request_cnt--;
 			spin_unlock_irqrestore(&stream_info->lock, flags);
 			pr_err("%s:%d fail to set ping pong address\n",
 				__func__, __LINE__);
@@ -2424,7 +2420,6 @@ static int msm_isp_request_frame(struct vfe_device *vfe_dev,
 		rc = msm_isp_cfg_ping_pong_address(vfe_dev, stream_info,
 			pingpong_status, 1, 1);
 		if (rc) {
-			stream_info->undelivered_request_cnt--;
 			spin_unlock_irqrestore(&stream_info->lock, flags);
 			pr_err("%s:%d fail to set ping pong address\n",
 				__func__, __LINE__);
