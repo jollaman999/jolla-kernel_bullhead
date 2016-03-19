@@ -5473,11 +5473,6 @@ static int probe_cc(struct device_node *node, struct msm_thermal_data *data,
 		hotplug_enabled = 1;
 	}
 
-	key = "qcom,core-limit-temp";
-	ret = of_property_read_u32(node, key, &data->core_limit_temp_degC);
-	if (ret)
-		goto read_node_fail;
-
 	key = "qcom,core-temp-hysteresis";
 	ret = of_property_read_u32(node, key, &data->core_temp_hysteresis_degC);
 	if (ret)
