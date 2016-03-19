@@ -43,7 +43,6 @@
 
 	qcom,msm-thermal {
 		compatible = "qcom,msm-thermal";
-		qcom,core-limit-temp = <90>;
 		qcom,core-control-mask = <0x36>;
 		qcom,hotplug-temp = <105>;
 		qcom,hotplug-temp-hysteresis = <50>;
