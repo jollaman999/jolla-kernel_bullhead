@@ -83,11 +83,13 @@
 		_val |= 2;				\
 } while (0)
 
-//custom thermal
-#define DEF_TEMP_THRESHOLD 46
+// Big thermal limit
+#define DEF_BIG_TEMP_THRESHOLD 46
 #define HOTPLUG_SENSOR_ID 18
 #define HOTPLUG_HYSTERESIS 2
-unsigned int temp_threshold = DEF_TEMP_THRESHOLD;
+
+// Cluster thermal threshold for control frequency
+unsigned int temp_threshold;
 module_param(temp_threshold, int, 0644);
 
 static struct msm_thermal_data msm_thermal_info;
@@ -1275,9 +1277,9 @@ static void do_cluster_freq_ctrl(long temp)
 	bool mitigate = false;
 	struct cluster_info *cluster_ptr = NULL;
 
-	if (temp >= msm_thermal_info.limit_temp_degC)
+	if (temp >= temp_threshold)
 		mitigate = true;
-	else if (temp < msm_thermal_info.limit_temp_degC -
+	else if (temp < temp_threshold -
 		 msm_thermal_info.temp_hysteresis_degC)
 		mitigate = false;
 	else
@@ -2389,7 +2391,7 @@ static void __ref do_core_control(long temp)
 
 	mutex_lock(&core_control_mutex);
 	if (msm_thermal_info.core_control_mask &&
-		temp >= temp_threshold) {
+		temp >= DEF_BIG_TEMP_THRESHOLD) {
 		for (i = num_possible_cpus(); i > 0; i--) {
 			if (i < 4 && !polling_enabled)
 				continue;
@@ -2412,7 +2414,7 @@ static void __ref do_core_control(long temp)
 			break;
 		}
 	} else if (msm_thermal_info.core_control_mask && cpus_offlined &&
-		temp <= (temp_threshold - HOTPLUG_HYSTERESIS)) {
+		temp <= (DEF_BIG_TEMP_THRESHOLD - HOTPLUG_HYSTERESIS)) {
 		for (i = 0; i < num_possible_cpus(); i++) {
 			if (!(cpus_offlined & BIT(i)))
 				continue;
@@ -2895,7 +2897,7 @@ static void do_freq_control(long temp)
 	if (!freq_table_get)
 		return;
 
-	if (temp >= msm_thermal_info.limit_temp_degC) {
+	if (temp >= temp_threshold) {
 		if (limit_idx == limit_idx_low)
 			return;
 
@@ -2903,7 +2905,7 @@ static void do_freq_control(long temp)
 		if (limit_idx < limit_idx_low)
 			limit_idx = limit_idx_low;
 		max_freq = table[limit_idx].frequency;
-	} else if (temp < msm_thermal_info.limit_temp_degC -
+	} else if (temp < temp_threshold -
 		 msm_thermal_info.temp_hysteresis_degC) {
 		if (limit_idx == limit_idx_high)
 			return;
@@ -5801,7 +5803,7 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 		goto fail;
 
 	key = "qcom,limit-temp";
-	ret = of_property_read_u32(node, key, &data.limit_temp_degC);
+	ret = of_property_read_u32(node, key, &temp_threshold);
 	if (ret)
 		goto fail;
 
