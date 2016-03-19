@@ -90,7 +90,11 @@
 
 // Cluster thermal threshold for control frequency
 unsigned int temp_threshold;
+unsigned int temp_step = 2;
+unsigned int temp_count_max = 3;
 module_param(temp_threshold, int, 0644);
+module_param(temp_step, int, 0644);
+module_param(temp_count_max, int, 0644);
 
 static struct msm_thermal_data msm_thermal_info;
 static struct delayed_work check_temp_work;
@@ -1270,20 +1274,24 @@ static void update_cluster_freq(void)
 	}
 }
 
+static int cur_index = 0;
+
 static void do_cluster_freq_ctrl(long temp)
 {
 	uint32_t _cluster = 0;
 	int _cpu = -1, freq_idx = 0;
-	bool mitigate = false;
+	int index;
 	struct cluster_info *cluster_ptr = NULL;
 
-	if (temp >= temp_threshold)
-		mitigate = true;
-	else if (temp < temp_threshold -
-		 msm_thermal_info.temp_hysteresis_degC)
-		mitigate = false;
-	else
+	if (temp < temp_threshold)
 		return;
+
+	index = (temp - temp_threshold) / temp_step + 1;
+	if (index == cur_index)
+		return;
+	if (index > temp_count_max)
+		index = temp_count_max;
+	cur_index = index;
 
 	get_online_cpus();
 	for (; _cluster < core_ptr->entity_count; _cluster++) {
@@ -1291,18 +1299,9 @@ static void do_cluster_freq_ctrl(long temp)
 		if (!cluster_ptr->freq_table)
 			continue;
 
-		if (mitigate)
-			freq_idx = max_t(int, cluster_ptr->freq_idx_low,
-				(cluster_ptr->freq_idx
-				- msm_thermal_info.bootup_freq_step));
-		else
-			freq_idx = min_t(int, cluster_ptr->freq_idx_high,
-				(cluster_ptr->freq_idx
-				+ msm_thermal_info.bootup_freq_step));
-		if (freq_idx == cluster_ptr->freq_idx)
-			continue;
+		freq_idx = cluster_ptr->freq_idx
+			- msm_thermal_info.bootup_freq_step * index;
 
-		cluster_ptr->freq_idx = freq_idx;
 		for_each_cpu_mask(_cpu, cluster_ptr->cluster_cores) {
 			if (!(msm_thermal_info.bootup_freq_control_mask
 				& BIT(_cpu)))
