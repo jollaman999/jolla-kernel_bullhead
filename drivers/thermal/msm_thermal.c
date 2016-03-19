@@ -2951,6 +2951,9 @@ static void check_temp(struct work_struct *work)
 			goto reschedule;
 		}
 		do_core_control(temp);
+		if (!freq_table_get)
+			check_freq_table();
+		do_freq_control(temp);
 
 		goto reschedule;
 	}
