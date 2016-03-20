@@ -1275,6 +1275,7 @@ static void update_cluster_freq(void)
 }
 
 static int cur_index = 0;
+static bool restored = true;
 
 static void do_cluster_freq_ctrl(long temp)
 {
@@ -1283,8 +1284,15 @@ static void do_cluster_freq_ctrl(long temp)
 	int index;
 	struct cluster_info *cluster_ptr = NULL;
 
-	if (temp < temp_threshold)
-		return;
+	if (temp < temp_threshold) {
+		if (restored)
+			return;
+		else {
+			cur_index = index = 0;
+			restored = true;
+			goto freq_control;
+		}
+	}
 
 	index = (temp - temp_threshold) / temp_step + 1;
 	if (index == cur_index)
@@ -1292,7 +1300,9 @@ static void do_cluster_freq_ctrl(long temp)
 	if (index > temp_count_max)
 		index = temp_count_max;
 	cur_index = index;
+	restored = false;
 
+freq_control:
 	get_online_cpus();
 	for (; _cluster < core_ptr->entity_count; _cluster++) {
 		cluster_ptr = &core_ptr->child_entity_ptr[_cluster];
