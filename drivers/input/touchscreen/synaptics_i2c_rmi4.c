@@ -4664,6 +4664,11 @@ static bool synaptics_rmi4_touch_off_triggered = false;
 static bool rmi4_touch_is_off = false;
 extern void synaptics_rmi4_touch_off_trigger(unsigned int delay);
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+extern int mdss_dsi_panel_power_off_disable_vreg(void);
+extern void mdss_dsi_panel_reset_dsvreg_off(void);
+#endif
+
 static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_off_work)
 {
 	int retval;
@@ -4691,6 +4696,9 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 	}
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	mdss_dsi_panel_power_off_disable_vreg();
+	mdss_dsi_panel_reset_dsvreg_off();
+
 	if (irq_wake_enabled) {
 		disable_irq_wake(rmi4_data_touch_off->irq);
 		irq_wake_enabled = false;
