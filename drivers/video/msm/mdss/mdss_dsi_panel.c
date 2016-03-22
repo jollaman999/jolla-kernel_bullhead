@@ -284,6 +284,34 @@ disp_en_gpio_err:
 	return rc;
 }
 
+static struct mdss_dsi_ctrl_pdata *cur_ctrl_pdata = NULL;
+static bool dsvreg_off = false;
+
+void mdss_dsi_panel_reset_dsvreg_off(void)
+{
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
+
+	if (dsvreg_off)
+		return;
+
+	ctrl_pdata = cur_ctrl_pdata;
+
+	if (ctrl_pdata->dsvreg && ctrl_pdata->dsvreg_pre_off)
+		if (regulator_disable(ctrl_pdata->dsvreg))
+			pr_err("%s: failed to pre-off dsv\n",
+						__func__);
+	gpio_set_value((ctrl_pdata->rst_gpio), 0);
+	gpio_free(ctrl_pdata->rst_gpio);
+	if (ctrl_pdata->dsvreg && !ctrl_pdata->dsvreg_pre_off)
+		if (regulator_disable(ctrl_pdata->dsvreg))
+			pr_err("%s: failed to post-off dsv\n",
+						__func__);
+
+	dsvreg_off = true;
+	pr_info("%s: dsvreg off\n", __func__);
+}
+EXPORT_SYMBOL(mdss_dsi_panel_reset_dsvreg_off);
+
 int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
@@ -297,6 +325,7 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
+	cur_ctrl_pdata = ctrl_pdata;
 
 	if (!gpio_is_valid(ctrl_pdata->disp_en_gpio)) {
 		pr_debug("%s:%d, reset line not configured\n",
@@ -372,6 +401,8 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			gpio_free(ctrl_pdata->disp_en_gpio);
 		}
 
+		dsvreg_off = false;
+
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 		if (s2w_switch)
 			goto end;
@@ -384,23 +415,15 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 		if (sovc_switch && sovc_tmp_onoff)
 			goto end;
 #endif
-		if (ctrl_pdata->dsvreg && ctrl_pdata->dsvreg_pre_off)
-			if (regulator_disable(ctrl_pdata->dsvreg))
-				pr_err("%s: failed to pre-off dsv\n",
-							__func__);
-		gpio_set_value((ctrl_pdata->rst_gpio), 0);
-		gpio_free(ctrl_pdata->rst_gpio);
-		if (ctrl_pdata->dsvreg && !ctrl_pdata->dsvreg_pre_off)
-			if (regulator_disable(ctrl_pdata->dsvreg))
-				pr_err("%s: failed to post-off dsv\n",
-							__func__);
 
-		if (gpio_is_valid(ctrl_pdata->mode_gpio))
-			gpio_free(ctrl_pdata->mode_gpio);
-	}
+	mdss_dsi_panel_reset_dsvreg_off();
+
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 end:
 #endif
+		if (gpio_is_valid(ctrl_pdata->mode_gpio))
+			gpio_free(ctrl_pdata->mode_gpio);
+	}
 	return rc;
 }
 
