@@ -312,7 +312,7 @@ int fscrypt_zeroout_range(struct inode *inode, pgoff_t lblk,
 			goto errout;
 		}
 		bio->bi_bdev = inode->i_sb->s_bdev;
-		bio->bi_iter.bi_sector =
+		bio->bi_sector =
 			pblk << (inode->i_sb->s_blocksize_bits - 9);
 		ret = bio_add_page(bio, ciphertext_page,
 					inode->i_sb->s_blocksize, 0);
@@ -344,7 +344,7 @@ EXPORT_SYMBOL(fscrypt_zeroout_range);
  */
 static int fscrypt_d_revalidate(struct dentry *dentry, unsigned int flags)
 {
-	struct inode *dir = d_inode(dentry->d_parent);
+	struct inode *dir = dentry->d_parent->d_inode;
 	struct fscrypt_info *ci = dir->i_crypt_info;
 	int dir_has_key, cached_with_key;
 
@@ -373,7 +373,7 @@ static int fscrypt_d_revalidate(struct dentry *dentry, unsigned int flags)
 	 * We also fail the validation if the dentry was created with
 	 * the key present, but we no longer have the key, or vice versa.
 	 */
-	if ((!cached_with_key && d_is_negative(dentry)) ||
+	if ((!cached_with_key && !dentry->d_inode) ||
 			(!cached_with_key && dir_has_key) ||
 			(cached_with_key && !dir_has_key))
 		return 0;
