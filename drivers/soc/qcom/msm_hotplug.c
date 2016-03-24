@@ -51,7 +51,7 @@ unsigned int msm_enabled = HOTPLUG_ENABLED;
 // Use for msm_hotplug_resume_timeout
 #define HOTPLUG_TIMEOUT			2000
 static bool timeout_enabled = false;
-static cputime64_t pre_time;
+static s64 pre_time;
 bool msm_hotplug_scr_suspended = false;
 bool msm_hotplug_fingerprint_called = false;
 
@@ -97,7 +97,7 @@ static struct delayed_work hotplug_work;
 
 static unsigned int default_update_rates[] = { DEFAULT_UPDATE_RATE };
 static bool big_core_up_ready_checked = false;
-static cputime64_t big_core_up_ready_time = 0;
+static s64 big_core_up_ready_time = 0;
 
 static struct cpu_stats {
 	unsigned int *update_rates;

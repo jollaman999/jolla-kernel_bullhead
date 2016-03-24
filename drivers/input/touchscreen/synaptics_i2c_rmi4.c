@@ -80,7 +80,7 @@ extern void unregister_sovc(void);
 
 bool scr_suspended = false;
 static bool irq_wake_enabled = false;
-static cputime64_t wake_lock_start_time = 0;
+static s64 wake_lock_start_time = 0;
 
 static bool is_touch_on(void)
 {

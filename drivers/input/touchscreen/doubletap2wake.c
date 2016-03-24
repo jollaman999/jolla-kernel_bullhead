@@ -65,7 +65,7 @@ MODULE_LICENSE("GPLv2");
 /* Resources */
 int dt2w_switch = DT2W_DEFAULT;
 int dt2w_switch_tmp = 0;
-static cputime64_t tap_time_pre = 0;
+static s64 tap_time_pre = 0;
 static int touch_x = 0, touch_y = 0, touch_nr = 0, x_pre = 0, y_pre = 0;
 static bool is_touching = false;
 static struct input_dev * doubletap2wake_pwrdev;
