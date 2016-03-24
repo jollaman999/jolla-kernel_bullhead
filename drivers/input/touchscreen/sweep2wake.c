@@ -57,7 +57,7 @@ MODULE_LICENSE("GPLv2");
 
 /* Resources */
 int s2w_switch = S2W_DEFAULT;
-static cputime64_t tap_time_pre = 0;
+static s64 tap_time_pre = 0;
 static int touch_x = 0;
 static int prev_x = 0;
 static bool is_new_touch = false;

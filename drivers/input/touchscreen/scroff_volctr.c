@@ -95,7 +95,7 @@ int sovc_switch = SOVC_DEFAULT;
 int sovc_tmp_onoff = 0;
 bool sovc_mic_detected = false;
 bool track_changed = false;
-static cputime64_t touch_time_pre = 0;
+static s64 touch_time_pre = 0;
 static int touch_x = 0, touch_y = 0;
 static int prev_x = 0, prev_y = 0;
 static bool is_new_touch_x = false, is_new_touch_y = false;
