@@ -83,16 +83,15 @@
 		_val |= 2;				\
 } while (0)
 
-// Big thermal limit
-#define DEF_BIG_TEMP_THRESHOLD 50
-#define HOTPLUG_SENSOR_ID 18
-#define HOTPLUG_HYSTERESIS 2
+static int big_core_start;
 
 // Cluster thermal threshold for control frequency
 unsigned int temp_threshold;
+unsigned int temp_big_threshold;
 unsigned int temp_step = 2;
 unsigned int temp_count_max = 3;
 module_param(temp_threshold, int, 0644);
+module_param(temp_big_threshold, int, 0644);
 module_param(temp_step, int, 0644);
 module_param(temp_count_max, int, 0644);
 
@@ -138,7 +137,6 @@ static bool ocr_nodes_called;
 static bool ocr_probed;
 static bool ocr_reg_init_defer;
 static bool hotplug_enabled;
-static bool interrupt_mode_enable;
 static bool msm_thermal_probed;
 static bool gfx_crit_phase_ctrl_enabled;
 static bool gfx_warm_phase_ctrl_enabled;
@@ -2400,10 +2398,8 @@ static void __ref do_core_control(long temp)
 
 	mutex_lock(&core_control_mutex);
 	if (msm_thermal_info.core_control_mask &&
-		temp >= DEF_BIG_TEMP_THRESHOLD) {
-		for (i = num_possible_cpus(); i > 0; i--) {
-			if (i < 4 && !polling_enabled)
-				continue;
+		temp >= temp_big_threshold) {
+		for (i = big_core_start; i < num_possible_cpus(); i++) { // Only on/off big cores
 			if (!(msm_thermal_info.core_control_mask & BIT(i)))
 				continue;
 			if (cpus_offlined & BIT(i) && !cpu_online(i))
@@ -2423,8 +2419,8 @@ static void __ref do_core_control(long temp)
 			break;
 		}
 	} else if (msm_thermal_info.core_control_mask && cpus_offlined &&
-		temp <= (DEF_BIG_TEMP_THRESHOLD - HOTPLUG_HYSTERESIS)) {
-		for (i = 0; i < num_possible_cpus(); i++) {
+		temp <= (temp_big_threshold - msm_thermal_info.core_temp_hysteresis_degC)) {
+		for (i = big_core_start; i < num_possible_cpus(); i++) { // Only on/off big cores
 			if (!(cpus_offlined & BIT(i)))
 				continue;
 			cpus_offlined &= ~BIT(i);
@@ -2952,21 +2948,6 @@ static void check_temp(struct work_struct *work)
 
 	do_therm_reset();
 
-	if (!polling_enabled) {
-		ret = therm_get_temp(HOTPLUG_SENSOR_ID, THERM_ZONE_ID, &temp);
-		if (ret) {
-			pr_err("Unable to read sensor:%d. err:%d\n",
-				HOTPLUG_SENSOR_ID, ret);
-			goto reschedule;
-		}
-		do_core_control(temp);
-		if (!freq_table_get)
-			check_freq_table();
-		do_freq_control(temp);
-
-		goto reschedule;
-	}
-
 	ret = therm_get_temp(msm_thermal_info.sensor_id, THERM_TSENS_ID, &temp);
 	if (ret) {
 		pr_err("Unable to read TSENS sensor:%d. err:%d\n",
@@ -2992,7 +2973,7 @@ static void check_temp(struct work_struct *work)
 	do_freq_control(temp);
 
 reschedule:
-	//if (polling_enabled)
+	if (polling_enabled)
 		schedule_delayed_work(&check_temp_work,
 				msecs_to_jiffies(msm_thermal_info.poll_ms));
 }
@@ -4122,7 +4103,6 @@ cx_node_exit:
 	return ret;
 }
 
-#if 0
 /*
  * We will reset the cpu frequencies limits here. The core online/offline
  * status will be carried over to the process stopping the msm_thermal, as
@@ -4149,18 +4129,13 @@ static void __ref disable_msm_thermal(void)
 	update_cluster_freq();
 	put_online_cpus();
 }
-#endif
 
 static void interrupt_mode_init(void)
 {
-	if (!msm_thermal_probed) {
-		interrupt_mode_enable = true;
-		return;
-	}
 	if (polling_enabled) {
 		pr_info("Interrupt mode init\n");
 		polling_enabled = 0;
-		//disable_msm_thermal();
+		disable_msm_thermal();
 		hotplug_init();
 		freq_mitigation_init();
 		thermal_monitor_init();
@@ -4265,9 +4240,6 @@ static ssize_t __ref store_cpus_offlined(struct kobject *kobj,
 		pr_err("Invalid input %s. err:%d\n", buf, ret);
 		goto done_cc;
 	}
-
-	//return early
-	goto done_cc;
 
 	if (polling_enabled) {
 		pr_err("Ignoring request; polling thread is enabled.\n");
@@ -5814,6 +5786,16 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 	if (ret)
 		goto fail;
 
+	key = "qcom,limit-temp-big";
+	ret = of_property_read_u32(node, key, &temp_big_threshold);
+	if (ret)
+		goto fail;
+
+	key = "qcom,big-core-start";
+	ret = of_property_read_u32(node, key, &big_core_start);
+	if (ret)
+		goto fail;
+
 	key = "qcom,temp-hysteresis";
 	ret = of_property_read_u32(node, key, &data.temp_hysteresis_degC);
 	if (ret)
@@ -5889,11 +5871,6 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 	msm_thermal_ioctl_init();
 	ret = msm_thermal_init(&data);
 	msm_thermal_probed = true;
-
-	if (interrupt_mode_enable) {
-		interrupt_mode_init();
-		interrupt_mode_enable = false;
-	}
 
 	return ret;
 fail:
@@ -5986,7 +5963,6 @@ int __init msm_thermal_late_init(void)
 		}
 	}
 	msm_thermal_add_mx_nodes();
-	interrupt_mode_init();
 	create_cpu_topology_sysfs();
 	create_thermal_debugfs();
 	msm_thermal_add_bucket_info_nodes();
