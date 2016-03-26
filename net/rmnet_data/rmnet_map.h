@@ -145,6 +145,6 @@ void rmnet_map_aggregate(struct sk_buff *skb,
 
 int rmnet_map_checksum_downlink_packet(struct sk_buff *skb);
 int rmnet_map_checksum_uplink_packet(struct sk_buff *skb,
-				      struct net_device *orig_dev);
+	struct net_device *orig_dev, uint32_t egress_data_format);
 
 #endif /* _RMNET_MAP_H_ */
