@@ -353,6 +353,9 @@ static void cpu_up_work(struct work_struct *work)
 	int cpu;
 	unsigned int target_little, target_big;
 
+	// target_little - how many little cores to online
+	// target_big    - how many big cores to online
+
 	target_little = hotplug.target_cpus;
 
 	// Skip cpu 0
@@ -395,6 +398,9 @@ static void cpu_down_work(struct work_struct *work)
 	int cpu, lowest_cpu;
 	unsigned int target_little, target_big;
 
+	// target_little - how many little cores to online
+	// target_big    - how many big cores to offline
+
 	target_little = hotplug.target_cpus;
 
 	// Skip cpu 0
@@ -429,9 +435,11 @@ static void cpu_down_work(struct work_struct *work)
 	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
 		if (!cpu_online(cpu))
 			continue;
-		cpu_down(cpu);
-		if (target_big >= num_online_big_cpus())
+		if (check_down_lock(cpu))
+			continue;
+		if (target_big <= BIG_CORES - num_online_big_cpus())
 			break;
+		cpu_down(cpu);
 	}
 }
 
