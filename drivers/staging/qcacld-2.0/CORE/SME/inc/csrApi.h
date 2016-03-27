@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2015 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -122,29 +122,32 @@ typedef enum
 
 }eCsrSecurityType;
 
-typedef enum {
-    eCSR_DOT11_MODE_abg = 0x0001, /* 11a/b/g only, no HT, no proprietary */
+typedef enum
+{
+    eCSR_DOT11_MODE_TAURUS = 0, //This mean everything because it covers all thing we support
+    eCSR_DOT11_MODE_abg = 0x0001,    //11a/b/g only, no HT, no proprietary
     eCSR_DOT11_MODE_11a = 0x0002,
     eCSR_DOT11_MODE_11b = 0x0004,
     eCSR_DOT11_MODE_11g = 0x0008,
     eCSR_DOT11_MODE_11n = 0x0010,
-    eCSR_DOT11_MODE_11g_ONLY = 0x0020,
-    eCSR_DOT11_MODE_11n_ONLY = 0x0040,
-    eCSR_DOT11_MODE_11b_ONLY = 0x0080,
+    eCSR_DOT11_MODE_POLARIS = 0x0020,
+    eCSR_DOT11_MODE_TITAN = 0x0040,
+    eCSR_DOT11_MODE_11g_ONLY = 0x0080,
+    eCSR_DOT11_MODE_11n_ONLY = 0x0100,
+    eCSR_DOT11_MODE_TAURUS_ONLY = 0x0200,
+    eCSR_DOT11_MODE_11b_ONLY = 0x0400,
+    eCSR_DOT11_MODE_11a_ONLY = 0x0800,
 #ifdef WLAN_FEATURE_11AC
-    eCSR_DOT11_MODE_11ac     = 0x0100,
-    eCSR_DOT11_MODE_11ac_ONLY = 0x0200,
+    eCSR_DOT11_MODE_11ac     = 0x1000,
+    eCSR_DOT11_MODE_11ac_ONLY = 0x2000,
 #endif
-    /*
-     * This is for WIFI test. It is same as eWNIAPI_MAC_PROTOCOL_ALL
-     * except when it starts IBSS in 11B of 2.4GHz
-     * It is for CSR internal use
-     */
-    eCSR_DOT11_MODE_AUTO = 0x0400,
+    //This is for WIFI test. It is same as eWNIAPI_MAC_PROTOCOL_ALL except when it starts IBSS in 11B of 2.4GHz
+    //It is for CSR internal use
+    eCSR_DOT11_MODE_AUTO = 0x4000,
 
-    eCSR_NUM_PHY_MODE = 16, /* specify the number of maximum bits for phyMode */
+    eCSR_NUM_PHY_MODE = 16,     //specify the number of maximum bits for phyMode
+}eCsrPhyMode;
 
-} eCsrPhyMode;
 
 typedef tANI_U8 tCsrBssid[VOS_MAC_ADDR_SIZE];
 
@@ -299,18 +302,13 @@ typedef struct tagCsrScanRequest
     tANI_U32 maxChnTime;    //in units of milliseconds
     tANI_U32 minChnTimeBtc;    //in units of milliseconds
     tANI_U32 maxChnTimeBtc;    //in units of milliseconds
-    /* In units of milliseconds, ignored when not connected */
-    uint32_t restTime;
-    /* In units of milliseconds, ignored when not connected */
-    uint32_t min_rest_time;
-    /* In units of milliseconds, ignored when not connected */
-    uint32_t idle_time;
-
+    tANI_U32 restTime;      //in units of milliseconds  //ignored when not connected
     tANI_U32 uIEFieldLen;
     tANI_U8 *pIEField;
     eCsrRequestType requestType;    //11d scan or full scan
     tANI_BOOLEAN p2pSearch;
     tANI_BOOLEAN skipDfsChnlInP2pSearch;
+    tANI_BOOLEAN bcnRptReqScan;     //is Scan issued by Beacon Report Request
 }tCsrScanRequest;
 
 typedef struct tagCsrBGScanRequest
@@ -323,12 +321,7 @@ typedef struct tagCsrBGScanRequest
     tANI_U32 maxChnTime;    //in units of milliseconds
     tANI_U32 minChnTimeBtc;    //in units of milliseconds
     tANI_U32 maxChnTimeBtc;    //in units of milliseconds
-    /* In units of milliseconds, ignored when not connected */
-    uint32_t restTime;
-    /* In units of milliseconds, ignored when not connected */
-    uint32_t min_rest_time;
-    /* In units of milliseconds, ignored when not connected */
-    uint32_t idle_time;
+    tANI_U32 restTime;      //in units of milliseconds  //ignored when not connected
     tANI_U32 throughputImpact;      //specify whether BG scan cares about impacting throughput  //ignored when not connected
     tCsrBssid bssid;    //how to use it?? Apple
 }tCsrBGScanRequest, *tpCsrBGScanRequest;
@@ -499,6 +492,7 @@ typedef enum
     eCSR_ROAM_FT_RESPONSE,
 #endif
     eCSR_ROAM_FT_START,
+    eCSR_ROAM_INDICATE_MGMT_FRAME,
     eCSR_ROAM_REMAIN_CHAN_READY,
     eCSR_ROAM_SEND_ACTION_CNF,
     //this mean error happens before association_start or roaming_start is called.
@@ -524,8 +518,6 @@ typedef enum
     eCSR_ROAM_UNPROT_MGMT_FRAME_IND,
 #endif
 
-    eCSR_ROAM_IBSS_PEER_INFO_COMPLETE,
-
 #if defined(FEATURE_WLAN_ESE) && defined(FEATURE_WLAN_ESE_UPLOAD)
     eCSR_ROAM_TSM_IE_IND,
     eCSR_ROAM_CCKM_PREAUTH_NOTIFY,
@@ -539,7 +531,9 @@ typedef enum
 
     // Channel sw update notification
     eCSR_ROAM_DFS_CHAN_SW_NOTIFY,
-    eCSR_ROAM_EXT_CHG_CHNL_IND,
+#ifdef WLAN_FEATURE_ROAM_OFFLOAD
+    eCSR_ROAM_AUTHORIZED_EVENT
+#endif
 }eRoamCmdStatus;
 
 
@@ -632,15 +626,11 @@ typedef enum
     eCSR_ROAM_RESULT_TDLS_SHOULD_PEER_DISCONNECTED,
 #endif
 
-    eCSR_ROAM_RESULT_IBSS_PEER_INFO_SUCCESS,
-    eCSR_ROAM_RESULT_IBSS_PEER_INFO_FAILED,
-
     eCSR_ROAM_RESULT_DFS_RADAR_FOUND_IND,
     eCSR_ROAM_RESULT_CHANNEL_CHANGE_SUCCESS,
     eCSR_ROAM_RESULT_CHANNEL_CHANGE_FAILURE,
     eCSR_ROAM_RESULT_DFS_CHANSW_UPDATE_SUCCESS,
     eCSR_ROAM_RESULT_DFS_CHANSW_UPDATE_FAILURE,
-    eCSR_ROAM_EXT_CHG_CHNL_UPDATE_IND,
 }eCsrRoamResult;
 
 
@@ -692,8 +682,7 @@ typedef enum
     eCSR_ASSOC_STATE_TYPE_INFRA_DISCONNECTED,
     // Participating in a Infra network and connected to a peer
     eCSR_ASSOC_STATE_TYPE_INFRA_CONNECTED,
-    // Disconnecting with AP or stop connecting process
-    eCSR_ASSOC_STATE_TYPE_INFRA_DISCONNECTING,
+
 }eCsrConnectState;
 
 
@@ -773,7 +762,7 @@ typedef enum
 #define CSR_CB_CENTER_CHANNEL_OFFSET    2
 #define CSR_MAX_24GHz_CHANNEL_NUMBER ( SIR_11B_CHANNEL_END )
 #define CSR_MIN_5GHz_CHANNEL_NUMBER  ( SIR_11A_CHANNEL_BEGIN )
-#define CSR_MAX_5GHz_CHANNEL_NUMBER  ( SIR_11P_CHANNEL_END )
+#define CSR_MAX_5GHz_CHANNEL_NUMBER  ( SIR_11A_CHANNEL_END )
 
 // WEP keysize (in bits)...
 typedef enum
@@ -922,8 +911,7 @@ typedef struct tagCsrRoamProfile
     //that we need to join. Index 1 is the SSID for self BSS.
     tCsrSSIDs SSIDs;
     tCsrBSSIDs BSSIDs;
-    /* this is a bit mask of all the needed phy mode defined in eCsrPhyMode */
-    eCsrPhyMode phyMode;
+    tANI_U32 phyMode;   //this is a bit mask of all the needed phy mode defined in eCsrPhyMode
     eCsrRoamBssType BSSType;
 
     tCsrAuthList AuthType;
@@ -950,7 +938,6 @@ typedef struct tagCsrRoamProfile
     eCsrCBChoice CBMode; //up, down or auto
     tCsrChannelInfo ChannelInfo;
     tANI_U8 operationChannel;
-    tANI_U32 vht_channel_width;
     tANI_U16 beaconInterval;    //If this is 0, SME will fill in for caller.
     // during connect this specifies ACs U-APSD is to be setup
     //   for (Bit0:VO; Bit1:VI; Bit2:BK; Bit3:BE all other bits are ignored).
@@ -1031,7 +1018,6 @@ typedef struct tagCsrRoamConnectedProfile
     tCsrEncryptionList mcEncryptionInfo;
     eCsrCBChoice CBMode; //up, down or auto
     tANI_U8 operationChannel;
-    tANI_U32   vht_channel_width;
     tANI_U16   beaconInterval;
     tCsrKeys Keys;
     // meaningless on connect. It's an OUT param from CSR's point of view
@@ -1106,7 +1092,6 @@ typedef struct tagCsrConfigParam
     tANI_U32 FragmentationThreshold;
     tANI_U32 channelBondingMode24GHz;   // keep this tANI_U32. This gets converted to ePhyChannelBondState
     tANI_U32 channelBondingMode5GHz;    // in csrChangeDefaultConfigParam using convertCBIniValueToPhyCBState
-    uint32_t stacbmode;
     eCsrPhyMode phyMode;
     eCsrBand eBand;
     tANI_U32 RTSThreshold;
@@ -1134,8 +1119,6 @@ typedef struct tagCsrConfigParam
     tANI_U32 nRoamingTime;  //In seconds, CSR will try this long before gives up. 0 means no roaming
     tANI_U8 bCatRssiOffset;     //to set the RSSI difference for each category
     tANI_U8 fEnableMCCMode; //to set MCC Enable/Disable mode
-    bool mcc_rts_cts_prot_enable;
-    bool mcc_bcast_prob_resp_enable;
     tANI_U8 fAllowMCCGODiffBI; //to allow MCC GO different B.I than STA's. NOTE: make sure if RIVA firmware can handle this combination before enabling this
                                //at the moment, this flag is provided only to pass Wi-Fi Cert. 5.1.12
     tCsr11dinfo  Csr11dinfo;
@@ -1181,10 +1164,6 @@ typedef struct tagCsrConfigParam
     tANI_U8   nNumP2PChanCombinedConc;   //number of channels combined for
                                          //P2P in each split scan operation
 #endif
-    /*In units of milliseconds*/
-    uint32_t       min_rest_time_conc;
-    /*In units of milliseconds*/
-    uint32_t       idle_time_conc;
 
     tANI_BOOLEAN IsIdleScanEnabled;
     //in dBm, the maximum TX power
@@ -1234,7 +1213,7 @@ typedef struct tagCsrConfigParam
     /*Customer wants to optimize the scan time. Avoiding scans(passive) on DFS
     * channels while swipping through both bands can save some time
     * (apprx 1.3 sec) */
-    tANI_U8 fEnableDFSChnlScan;
+    tANI_BOOLEAN fEnableDFSChnlScan;
 
     //To enable/disable scanning 2.4Ghz channels twice on a single scan request from HDD
     tANI_BOOLEAN fScanTwice;
@@ -1274,7 +1253,7 @@ typedef struct tagCsrConfigParam
 
     tANI_U8   enableTxLdpc;
 
-    tANI_U8 max_amsdu_num;
+    tANI_U8 isAmsduSupportInAMPDU;
     tANI_U8 nSelect5GHzMargin;
 
     tANI_U8 isCoalesingInIBSSAllowed;
@@ -1289,15 +1268,9 @@ typedef struct tagCsrConfigParam
 #endif
 
     tANI_BOOLEAN obssEnabled;
-    v_U8_t conc_custom_rule1;
-    v_U8_t conc_custom_rule2;
-    v_U8_t is_sta_connection_in_5gz_enabled;
 
-    /* 802.11p enable */
-    bool       enable_dot11p;
-    tANI_BOOLEAN sendDeauthBeforeCon;
     v_U16_t    pkt_err_disconn_th;
-    int8_t    first_scan_bucket_threshold;
+    tANI_BOOLEAN sendDeauthBeforeCon;
 }tCsrConfigParam;
 
 //Tush
@@ -1352,8 +1325,6 @@ typedef struct tagCsrRoamInfo
     tANI_U8 sessionId;
     tANI_U8 rsnIELen;
     tANI_U8 *prsnIE;
-    tANI_U8 wapiIELen;
-    tANI_U8 *pwapiIE;
 
     tANI_U8 addIELen;
     tANI_U8 *paddIE;
@@ -1409,7 +1380,6 @@ typedef struct tagCsrRoamInfo
     tANI_U8 replay_ctr[SIR_REPLAY_CTR_LEN];
 #endif
     tSirSmeChanInfo chan_info;
-    uint8_t target_channel;
 }tCsrRoamInfo;
 
 
@@ -1434,7 +1404,6 @@ typedef struct sSirSmeAssocIndToUpperLayerCnf
     tANI_U8              alternateChannelId;
     tANI_U8              wmmEnabledSta;   //set to true if WMM enabled STA
     tSirRSNie            rsnIE;           // RSN IE received from peer
-    tSirWAPIie           wapiIE;          // WAPI IE received from peer
     tSirAddie            addIE;           // Additional IE received from peer, which can be WSC and/or P2P IE
     tANI_U8              reassocReq;      //set to true if reassoc
     /* Timing and fine Timing measurement capability clubbed together */
@@ -1631,20 +1600,6 @@ struct tagCsrDelStaParams
     tCsrBssid peerMacAddr;
     u16 reason_code;
     u8 subtype;
-};
-
-/**
- * struct wep_update_default_key_idx: wep default key index structure
- *
- * @session_id: session ID for the connection session
- * @default_idx: default key index for wep
- *
- * structure includes sesssion id for connection and default key
- * index used for wep
- */
-struct wep_update_default_key_idx {
-	uint8_t session_id;
-	uint8_t default_idx;
 };
 
 ////////////////////////////////////////////Common SCAN starts
@@ -1857,12 +1812,4 @@ eHalStatus csrRoamIssueFTRoamOffloadSynch(tHalHandle hHal, tANI_U32 sessionId,
 
 ---------------------------------------------------------------------------*/
 typedef void (*tCsrLinkStatusCallback)(v_U8_t status, void *pContext);
-/**
- * tcsr_fw_state_callback() -HDD callback registered with SME for getting
- *  firmware state
- * @context: HDD callback context
- *
- * Return: void
- */
-typedef void (*tcsr_fw_state_callback)(void *context);
 #endif

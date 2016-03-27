@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -112,9 +112,6 @@
 #define WMA_11G_CHANNEL_BEGIN           1
 #define WMA_11G_CHANNEL_END             14
 
-#define WMA_11P_CHANNEL_BEGIN           (170)
-#define WMA_11P_CHANNEL_END             (184)
-
 #define WMA_LOGD(args...) \
 	VOS_TRACE( VOS_MODULE_ID_WDA, VOS_TRACE_LEVEL_DEBUG, ## args)
 #define WMA_LOGI(args...) \
@@ -156,7 +153,6 @@
 #define WMA_GO_MAX_ACTIVE_SCAN_BURST_DURATION   (120)
 #define WMA_DWELL_TIME_PASSIVE_DEFAULT          (110)
 #define WMA_DWELL_TIME_PROBE_TIME_MAP_SIZE      (11)
-#define WMA_3PORT_CONC_SCAN_MAX_BURST_DURATION  (25)
 
 #define WMA_SEC_TO_USEC                     (1000000)
 
@@ -235,8 +231,6 @@ static const t_probeTime_dwellTime
 #define WMA_EXTSCAN_BURST_DURATION      150
 #endif
 
-typedef void (*txFailIndCallback)(u_int8_t *peer_mac, u_int8_t seqNo);
-
 typedef struct {
 	HTC_ENDPOINT_ID endpoint_id;
 }t_cfg_nv_param;
@@ -262,10 +256,6 @@ typedef enum {
 	WMA_TDLS_SUPPORT_DISABLED, /* suppress implicit trigger and not respond to the peer */
 	WMA_TDLS_SUPPORT_EXPLICIT_TRIGGER_ONLY, /* suppress implicit trigger, but respond to the peer */
 	WMA_TDLS_SUPPORT_ENABLED, /* implicit trigger */
-	/* External control means implicit trigger
-	 * but only to a peer mac configured by user space.
-	 */
-	WMA_TDLS_SUPPORT_ACTIVE_EXTERNAL_CONTROL,
 }t_wma_tdls_mode;
 
 /** TDLS EVENTS */
@@ -405,8 +395,6 @@ typedef struct {
 	u_int32_t txpow5g;
 	u_int32_t burst_enable;
 	u_int32_t burst_dur;
-	u_int32_t chainmask_2g;
-	u_int32_t chainmask_5g;
 } pdev_cli_config_t;
 
 typedef struct {
@@ -562,18 +550,12 @@ struct wma_txrx_node {
 	u_int32_t peer_count;
 	v_BOOL_t roam_synch_in_progress;
 	void *plink_status_req;
-	void *psnr_req;
 	u_int8_t delay_before_vdev_stop;
 #ifdef FEATURE_WLAN_EXTSCAN
 	bool extscan_in_progress;
 #endif
 	uint32_t alt_modulated_dtim;
 	bool alt_modulated_dtim_enabled;
-	uint8_t wps_state;
-	uint8_t nss_2g;
-	uint8_t nss_5g;
-
-	uint8_t wep_default_key_idx;
 };
 
 #if defined(QCA_WIFI_FTM)
@@ -613,23 +595,7 @@ typedef struct {
 	u_int32_t ibssPs1RxChainInAtimEnable;
 }ibss_power_save_params;
 
-#define MAX_REQUEST_HANDLERS 20
-
-struct wma_handle;
-typedef VOS_STATUS (*wma_request_handler)(struct wma_handle *wma_handle,
-			void *request, void **response);
-
-typedef struct request_handler_entry {
-	int request_type;
-	wma_request_handler handler;
-} request_handler_entry_t;
-
-struct wma_runtime_pm_context {
-	void *ap;
-	void *resume;
-};
-
-typedef struct wma_handle {
+typedef struct {
 	void *wmi_handle;
 	void *htc_handle;
 	void *vos_context;
@@ -639,8 +605,8 @@ typedef struct wma_handle {
 	vos_event_t wma_resume_event;
 	vos_event_t target_suspend;
 	vos_event_t wow_tx_complete;
-	vos_event_t runtime_suspend;
 	vos_event_t recovery_event;
+	vos_event_t runtime_suspend;
 
 	t_cfg_nv_param cfg_nv;
 
@@ -659,10 +625,6 @@ typedef struct wma_handle {
 	v_U32_t target_fw_version; /* Target f/w build version */
 #ifdef WLAN_FEATURE_LPSS
 	v_U8_t lpss_support; /* LPSS feature is supported in target or not */
-#endif
-	uint8_t ap_arpns_support;
-#ifdef FEATURE_GREEN_AP
-	bool egap_support;
 #endif
 	bool wmi_ready;
 	u_int32_t wlan_init_status;
@@ -735,8 +697,6 @@ typedef struct wma_handle {
 	v_BOOL_t ptrn_match_enable_all_vdev;
 	void* pGetRssiReq;
 	v_S7_t first_rssi;
-	bool get_sta_rssi;
-	v_MACADDR_t peer_macaddr;
 	t_thermal_mgmt thermal_mgmt_info;
         v_BOOL_t  roam_offload_enabled;
         t_wma_roam_preauth_chan_state_t roam_preauth_scan_state;
@@ -755,7 +715,6 @@ typedef struct wma_handle {
 	 */
 	u_int8_t ol_ini_info;
 	v_BOOL_t ssdp;
-	bool enable_bcst_ptrn;
 #ifdef FEATURE_RUNTIME_PM
 	v_BOOL_t runtime_pm;
 	u_int32_t auto_time;
@@ -765,9 +724,6 @@ typedef struct wma_handle {
 
    /*DFS umac interface information*/
    struct ieee80211com *dfs_ic;
-
-        txFailIndCallback hddTxFailCb;
-
 #ifdef FEATURE_WLAN_SCAN_PNO
 	vos_wake_lock_t pno_wake_lock;
 #endif
@@ -795,22 +751,12 @@ typedef struct wma_handle {
 	v_BOOL_t IsRArateLimitEnabled;
 	u_int16_t RArateLimitInterval;
 #endif
-#ifdef WLAN_FEATURE_LPSS
-	bool is_lpass_enabled;
-#endif
 
-#ifdef WLAN_FEATURE_NAN
-	bool is_nan_enabled;
-#endif
 
 	/* Powersave Configuration Parameters */
 	u_int8_t staMaxLIModDtim;
 	u_int8_t staModDtim;
 	u_int8_t staDynamicDtim;
-
-	u_int8_t enable_mhf_offload;
-	/* timestamp when last entries where set */
-	v_TIME_t last_mhf_entries_timestamp;
 
 	int32_t dfs_pri_multiplier;
 
@@ -820,16 +766,8 @@ typedef struct wma_handle {
 #ifdef FEATURE_WLAN_D0WOW
 	atomic_t in_d0wow;
 #endif
-
-	/* OCB request contexts */
-	struct sir_ocb_config *ocb_config_req;
-
-	uint32_t miracast_value;
 	vos_timer_t log_completion_timer;
-	uint32_t txrx_chainmask;
-	uint8_t per_band_chainmask_supp;
 	uint16_t self_gen_frm_pwr;
-	bool tx_chain_mask_cck;
 
 	uint32_t num_of_diag_events_logs;
 	uint32_t *events_logs_list;
@@ -846,13 +784,9 @@ typedef struct wma_handle {
 	uint32_t wow_ipv6_mcast_ra_stats;
 	uint32_t wow_ipv6_mcast_ns_stats;
 	uint32_t wow_ipv6_mcast_na_stats;
+
 	uint32_t wow_wakeup_enable_mask;
 	uint32_t wow_wakeup_disable_mask;
-	uint16_t max_mgmt_tx_fail_count;
-
-	struct wma_runtime_pm_context runtime_context;
-	uint32_t fine_time_measurement_cap;
-	bool bpf_enabled;
 }t_wma_handle, *tp_wma_handle;
 
 struct wma_target_cap {
@@ -990,6 +924,9 @@ typedef enum
    WLAN_HAL_PROCESS_PTT_REQ   = 70,
    WLAN_HAL_PROCESS_PTT_RSP   = 71,
 
+   // BTAMP related events
+   WLAN_HAL_SIGNAL_BTAMP_EVENT_REQ  = 72,
+   WLAN_HAL_SIGNAL_BTAMP_EVENT_RSP  = 73,
    WLAN_HAL_TL_HAL_FLUSH_AC_REQ     = 74,
    WLAN_HAL_TL_HAL_FLUSH_AC_RSP     = 75,
 
@@ -1141,6 +1078,9 @@ typedef enum
 
    WLAN_HAL_P2P_NOA_START_IND               = 184,
 
+   WLAN_HAL_GET_ROAM_RSSI_REQ               = 185,
+   WLAN_HAL_GET_ROAM_RSSI_RSP               = 186,
+
    WLAN_HAL_CLASS_B_STATS_IND               = 187,
    WLAN_HAL_DEL_BA_IND                      = 188,
    WLAN_HAL_DHCP_START_IND                  = 189,
@@ -1203,7 +1143,6 @@ extern void wma_send_regdomain_info(u_int32_t reg_dmn, u_int16_t regdmn2G,
 
 void wma_get_modeselect(tp_wma_handle wma, u_int32_t *modeSelect);
 
-void wma_set_dfs_regdomain(tp_wma_handle wma, uint8_t dfs_region);
 
 /**
   * Frame index
@@ -1236,7 +1175,6 @@ u_int16_t get_regdmn_5g(u_int32_t reg_dmn);
 #define WMA_FW_TX_RC_STATS	0x6
 #define WMA_FW_RX_REM_RING_BUF 0xc
 #define WMA_FW_RX_TXBF_MUSU_NDPA 0xf
-#define WMA_FW_TXRX_FWSTATS_RESET 0x1f
 
 /*
  * Setting the Tx Comp Timeout to 1 secs.
@@ -1285,8 +1223,6 @@ struct wma_vdev_start_req {
 	u_int8_t ht_capable;
 	int32_t dfs_pri_multiplier;
 	u_int8_t dot11_mode;
-	bool is_half_rate;
-	bool is_quarter_rate;
 };
 
 struct wma_set_key_params {
@@ -1490,6 +1426,13 @@ struct wma_decap_info_t {
 	int32_t hdr_len;
 };
 
+enum powersave_mode {
+	PS_NOT_SUPPORTED = 0,
+	PS_LEGACY_NODEEPSLEEP = 1,
+	PS_QPOWER_NODEEPSLEEP = 2,
+	PS_LEGACY_DEEPSLEEP = 3,
+	PS_QPOWER_DEEPSLEEP = 4
+};
 
 #define WMA_DEFAULT_MAX_PSPOLL_BEFORE_WAKE 1
 
@@ -1543,8 +1486,6 @@ typedef struct wma_tdls_params
 	tANI_U32    puapsd_mask;
 	tANI_U32    puapsd_inactivity_time;
 	tANI_U32    puapsd_rx_frame_threshold;
-	uint32_t    teardown_notification_ms;
-	uint32_t    tdls_peer_kickout_threshold;
 } t_wma_tdls_params;
 
 typedef struct {
@@ -1645,13 +1586,7 @@ A_UINT32 eCsrAuthType_to_rsn_authmode (eCsrAuthType authtype,
                                        eCsrEncryptionType encr);
 A_UINT32 eCsrEncryptionType_to_rsn_cipherset (eCsrEncryptionType encr);
 
-/*
- * The firmware value has been changed recently to 0x127
- * But, to maintain backward compatibility, the old
- * value is also preserved.
- */
-#define WMA_TGT_INVALID_SNR_OLD (-1)
-#define WMA_TGT_INVALID_SNR_NEW 0x127
+#define WMA_TGT_INVALID_SNR (-1)
 
 #define WMA_TX_Q_RECHECK_TIMER_WAIT      2    // 2 ms
 #define WMA_TX_Q_RECHECK_TIMER_MAX_WAIT  20   // 20 ms
@@ -1671,14 +1606,6 @@ typedef struct wma_roam_invoke_cmd
     v_U32_t channel;
 }t_wma_roam_invoke_cmd;
 
-struct wma_target_req *wma_fill_vdev_req(tp_wma_handle wma, u_int8_t vdev_id,
-	u_int32_t msg_type, u_int8_t type, void *params, u_int32_t timeout);
-
-VOS_STATUS wma_vdev_start(tp_wma_handle wma, struct wma_vdev_start_req *req,
-	v_BOOL_t isRestart);
-
-void wma_remove_vdev_req(tp_wma_handle wma, u_int8_t vdev_id, u_int8_t type);
-
 #ifdef REMOVE_PKT_LOG
 static inline void wma_set_wifi_start_packet_stats(void *wma_handle,
 					struct sir_wifi_start_log *start_log)
@@ -1687,18 +1614,7 @@ static inline void wma_set_wifi_start_packet_stats(void *wma_handle,
 }
 #endif
 
-/* API's to enable HDD to suspsend FW.
- * This are active only if Bus Layer aggreed to suspend.
- * This will be called for only for SDIO driver, for others
- * by default HIF return failure, as we suspend FW in bus
- * suspend callbacks
- */
-int wma_suspend_fw(void);
-int wma_resume_fw(void);
-
 void wma_send_flush_logs_to_fw(tp_wma_handle wma_handle);
-struct wma_txrx_node *wma_get_interface_by_vdev_id(uint8_t vdev_id);
-bool wma_is_vdev_up(uint8_t vdev_id);
 
 int wma_crash_inject(tp_wma_handle wma_handle, uint32_t type,
 			uint32_t delay_time_ms);

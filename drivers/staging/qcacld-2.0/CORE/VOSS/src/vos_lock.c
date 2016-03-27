@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014-2015 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -48,10 +48,11 @@
 #include "vos_lock.h"
 #include "vos_memory.h"
 #include "vos_trace.h"
-#include "vos_api.h"
 #include "hif.h"
 #include "i_vos_diag_core_event.h"
-#include "vos_cnss.h"
+#ifdef CONFIG_CNSS
+#include <net/cnss.h>
+#endif
 #include "vos_api.h"
 #include "aniGlobal.h"
 
@@ -503,8 +504,11 @@ VOS_STATUS vos_spin_lock_destroy(vos_spin_lock_t *pLock)
   --------------------------------------------------------------------------*/
 VOS_STATUS vos_wake_lock_init(vos_wake_lock_t *pLock, const char *name)
 {
-    vos_pm_wake_lock_init(&pLock->lock, name);
-
+#if defined CONFIG_CNSS
+    cnss_pm_wake_lock_init(pLock, name);
+#elif defined(WLAN_OPEN_SOURCE) && defined(CONFIG_HAS_WAKELOCK)
+    wake_lock_init(pLock, WAKE_LOCK_SUSPEND, name);
+#endif
     return VOS_STATUS_SUCCESS;
 }
 
@@ -517,13 +521,17 @@ VOS_STATUS vos_wake_lock_init(vos_wake_lock_t *pLock, const char *name)
  * Return: Pointer to the name if it is valid or a default string
  *
  */
-
 static const char* vos_wake_lock_name(vos_wake_lock_t *pLock)
 {
-	if (pLock->lock.name)
-		return pLock->lock.name;
+#if  !defined(CONFIG_CNSS) && \
+	!(defined(WLAN_OPEN_SOURCE) && defined(CONFIG_HAS_WAKELOCK))
+	return "UNNAMED_WAKELOCK";
+#else
+	if (pLock->name)
+		return pLock->name;
 	else
 		return "UNNAMED_WAKELOCK";
+#endif
 }
 
 /*--------------------------------------------------------------------------
@@ -542,8 +550,23 @@ VOS_STATUS vos_wake_lock_acquire(vos_wake_lock_t *pLock,
                        WIFI_POWER_EVENT_DEFAULT_WAKELOCK_TIMEOUT,
                        WIFI_POWER_EVENT_WAKELOCK_TAKEN);
 
-    vos_pm_wake_lock(&pLock->lock);
-
+    /*
+     * Dont prevent Autosuspend for these reasons, either it is not required to
+     * do so or runtime functionality is not available at this time
+     */
+    switch(reason) {
+    case WIFI_POWER_EVENT_WAKELOCK_DRIVER_INIT:
+    case WIFI_POWER_EVENT_WAKELOCK_DRIVER_REINIT:
+        break;
+    default:
+        vos_runtime_pm_prevent_suspend();
+        break;
+    }
+#if defined CONFIG_CNSS
+    cnss_pm_wake_lock(pLock);
+#elif defined(WLAN_OPEN_SOURCE) && defined(CONFIG_HAS_WAKELOCK)
+    wake_lock(pLock);
+#endif
     return VOS_STATUS_SUCCESS;
 }
 
@@ -569,8 +592,12 @@ VOS_STATUS vos_wake_lock_timeout_acquire(vos_wake_lock_t *pLock, v_U32_t msec,
                            WIFI_POWER_EVENT_WAKELOCK_TAKEN);
     }
 
-    vos_pm_wake_lock_timeout(&pLock->lock, msec);
-
+    vos_runtime_pm_prevent_suspend_timeout(msec);
+#if defined CONFIG_CNSS
+    cnss_pm_wake_lock_timeout(pLock, msec);
+#elif defined(WLAN_OPEN_SOURCE) && defined(CONFIG_HAS_WAKELOCK)
+    wake_lock_timeout(pLock, msecs_to_jiffies(msec));
+#endif
     return VOS_STATUS_SUCCESS;
 }
 
@@ -588,7 +615,23 @@ VOS_STATUS vos_wake_lock_release(vos_wake_lock_t *pLock, uint32_t reason)
     vos_log_wlock_diag(reason, vos_wake_lock_name(pLock),
                        WIFI_POWER_EVENT_DEFAULT_WAKELOCK_TIMEOUT,
                        WIFI_POWER_EVENT_WAKELOCK_RELEASED);
-    vos_pm_wake_lock_release(&pLock->lock);
+#if defined CONFIG_CNSS
+    cnss_pm_wake_lock_release(pLock);
+#elif defined(WLAN_OPEN_SOURCE) && defined(CONFIG_HAS_WAKELOCK)
+    wake_unlock(pLock);
+#endif
+    /*
+     * Dont allow autosuspend for these reasons, these reasons doesn't prevent
+     * the autosuspend so no need to call allow.
+     */
+    switch(reason) {
+    case WIFI_POWER_EVENT_WAKELOCK_DRIVER_INIT:
+    case WIFI_POWER_EVENT_WAKELOCK_DRIVER_REINIT:
+        break;
+    default:
+        vos_runtime_pm_allow_suspend();
+        break;
+    }
 
     return VOS_STATUS_SUCCESS;
 }
@@ -604,12 +647,15 @@ VOS_STATUS vos_wake_lock_release(vos_wake_lock_t *pLock, uint32_t reason)
   ------------------------------------------------------------------------*/
 VOS_STATUS vos_wake_lock_destroy(vos_wake_lock_t *pLock)
 {
-    vos_pm_wake_lock_destroy(&pLock->lock);
-
+#if defined CONFIG_CNSS
+    cnss_pm_wake_lock_destroy(pLock);
+#elif defined(WLAN_OPEN_SOURCE) && defined(CONFIG_HAS_WAKELOCK)
+    wake_lock_destroy(pLock);
+#endif
     return VOS_STATUS_SUCCESS;
 }
 
-VOS_STATUS vos_runtime_pm_prevent_suspend(runtime_pm_context_t runtime_pm_ctx)
+VOS_STATUS vos_runtime_pm_prevent_suspend(void)
 {
 	void *ol_sc;
 	int ret = 0;
@@ -623,7 +669,7 @@ VOS_STATUS vos_runtime_pm_prevent_suspend(runtime_pm_context_t runtime_pm_ctx)
 		return VOS_STATUS_E_INVAL;
 	}
 
-	ret = hif_pm_runtime_prevent_suspend(ol_sc, runtime_pm_ctx);
+	ret = hif_pm_runtime_prevent_suspend(ol_sc);
 
 	if (ret)
 		return VOS_STATUS_E_FAILURE;
@@ -631,7 +677,7 @@ VOS_STATUS vos_runtime_pm_prevent_suspend(runtime_pm_context_t runtime_pm_ctx)
 	return VOS_STATUS_SUCCESS;
 }
 
-VOS_STATUS vos_runtime_pm_allow_suspend(runtime_pm_context_t runtime_pm_ctx)
+VOS_STATUS vos_runtime_pm_allow_suspend(void)
 {
 	void *ol_sc;
 	int ret = 0;
@@ -645,7 +691,7 @@ VOS_STATUS vos_runtime_pm_allow_suspend(runtime_pm_context_t runtime_pm_ctx)
 		return VOS_STATUS_E_INVAL;
 	}
 
-	ret = hif_pm_runtime_allow_suspend(ol_sc, runtime_pm_ctx);
+	ret = hif_pm_runtime_allow_suspend(ol_sc);
 
 	if (ret)
 		return VOS_STATUS_E_FAILURE;
@@ -667,8 +713,7 @@ VOS_STATUS vos_runtime_pm_allow_suspend(runtime_pm_context_t runtime_pm_ctx)
  *
  * Return: VOS_STATUS
  */
-VOS_STATUS vos_runtime_pm_prevent_suspend_timeout(runtime_pm_context_t context,
-						unsigned int msec)
+VOS_STATUS vos_runtime_pm_prevent_suspend_timeout(unsigned int msec)
 {
 	void *ol_sc;
 	int ret = 0;
@@ -682,36 +727,9 @@ VOS_STATUS vos_runtime_pm_prevent_suspend_timeout(runtime_pm_context_t context,
 		return VOS_STATUS_E_INVAL;
 	}
 
-        ret = hif_pm_runtime_prevent_suspend_timeout(ol_sc, context, msec);
+        ret = hif_pm_runtime_prevent_suspend_timeout(ol_sc, msec);
 	if (ret)
 		return VOS_STATUS_E_FAILURE;
 
 	return VOS_STATUS_SUCCESS;
-}
-
-/**
- * vos_runtime_pm_prevent_suspend_init() - Runtime PM Prevent Suspend Ctx init
- * @name: name of the context
- *
- * Through out driver this API should be called to initialize the runtime pm
- * instance.
- *
- * Return: void*
- */
-void *vos_runtime_pm_prevent_suspend_init(const char *name)
-{
-	return hif_runtime_pm_prevent_suspend_init(name);
-}
-
-/**
- * vos_runtime_pm_prevent_suspend_deinit() - Runtime PM Prevent context deinit
- * @data: Runtime PM context pointer
- *
- * This API should be called to release the Runtime PM context.
- *
- * Return: void
- */
-void vos_runtime_pm_prevent_suspend_deinit(runtime_pm_context_t data)
-{
-	hif_runtime_pm_prevent_suspend_deinit(data);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2013 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -39,7 +39,7 @@
  *
  *=========================================================================*/
 
-#include "wlan_types.h"
+#include "qwlanfw_defs.h"
 
 /* Common type definitions */
 typedef uint8     tANI_U8;

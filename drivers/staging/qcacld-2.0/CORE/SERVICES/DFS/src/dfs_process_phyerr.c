@@ -201,7 +201,7 @@ dfs_process_phyerr_owl(struct ath_dfs *dfs, void *buf, u_int16_t datalen,
     */
    if (rssi == 0 && dur == 0)
       dfs->ath_dfs_stats.datalen_discards++;
-   return (0); // I'm not sure. Is it right position...?
+      return (0);
 
    /*
     * Fill out dfs_phy_err with the information we have
@@ -517,8 +517,8 @@ dump_phyerr_contents(const char *d, int len)
 
 void
 dfs_process_phyerr(struct ieee80211com *ic, void *buf, u_int16_t datalen,
-                   u_int8_t r_rssi, u_int8_t r_ext_rssi, u_int32_t r_rs_tstamp,
-                   u_int64_t r_fulltsf, bool enable_log)
+    u_int8_t r_rssi, u_int8_t r_ext_rssi, u_int32_t r_rs_tstamp,
+    u_int64_t r_fulltsf)
 {
    struct ath_dfs *dfs = (struct ath_dfs *)ic->ic_dfs;
    struct ieee80211_channel *chan=ic->ic_curchan;
@@ -603,9 +603,8 @@ dfs_process_phyerr(struct ieee80211com *ic, void *buf, u_int16_t datalen,
     * + otherwise, Owl (and legacy.)
     */
    if (dfs->dfs_caps.ath_chip_is_bb_tlv) {
-      if (dfs_process_phyerr_bb_tlv(dfs, buf, datalen, r_rssi, r_ext_rssi,
-                                    r_rs_tstamp, r_fulltsf,
-                                    &e, enable_log) == 0) {
+      if (dfs_process_phyerr_bb_tlv(dfs, buf, datalen, r_rssi,
+          r_ext_rssi, r_rs_tstamp, r_fulltsf, &e) == 0) {
                         dfs->dfs_phyerr_reject_count++;
          return;
                     } else {
@@ -631,10 +630,6 @@ dfs_process_phyerr(struct ieee80211com *ic, void *buf, u_int16_t datalen,
          return;
                 }
    }
-
-   VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
-             "\n %s: Frequency at which the phyerror was injected = %d",
-             __func__, e.freq);
 
    /*
     * If the hardware supports radar reporting on the extension channel

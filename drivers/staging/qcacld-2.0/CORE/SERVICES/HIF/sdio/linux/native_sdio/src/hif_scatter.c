@@ -100,8 +100,7 @@ A_STATUS DoHifReadWriteScatter(HIF_DEVICE *device, BUS_REQUEST *busrequest)
 
     pReqPriv = busrequest->pScatterReq;
 
-    if (pReqPriv == NULL)
-        return A_ERROR;
+    A_ASSERT(pReqPriv != NULL);
 
     pReq = pReqPriv->pHifScatterReq;
 
@@ -194,8 +193,8 @@ A_STATUS DoHifReadWriteScatter(HIF_DEVICE *device, BUS_REQUEST *busrequest)
     if (pReq->Request & HIF_ASYNCHRONOUS) {
         AR_DEBUG_PRINTF(ATH_DEBUG_SCATTER, ("HIF-SCATTER: async_task completion routine req: 0x%lX (%d)\n",(unsigned long)busrequest, status));
             /* complete the request */
-        if (pReq->CompletionRoutine != NULL)
-            pReq->CompletionRoutine(pReq);
+        A_ASSERT(pReq->CompletionRoutine != NULL);
+        pReq->CompletionRoutine(pReq);
     } else {
         AR_DEBUG_PRINTF(ATH_DEBUG_SCATTER, ("HIF-SCATTER async_task upping busrequest : 0x%lX (%d)\n", (unsigned long)busrequest,status));
             /* signal wait */
@@ -215,9 +214,7 @@ static A_STATUS HifReadWriteScatter(HIF_DEVICE *device, HIF_SCATTER_REQ *pReq)
 
     do {
 
-        if (NULL == pReqPriv) {
-            return A_ERROR;
-        }
+        A_ASSERT(pReqPriv != NULL);
 
         AR_DEBUG_PRINTF(ATH_DEBUG_SCATTER, ("HIF-SCATTER: total len: %d Scatter Entries: %d\n",
                             pReq->TotalLength, pReq->ValidScatterEntries));
@@ -384,14 +381,13 @@ void CleanupHIFScatterResources(HIF_DEVICE *device)
     while (1) {
 
         pReq = AllocScatterReq(device);
+
         if (NULL == pReq) {
             break;
         }
 
         pReqPriv = (HIF_SCATTER_REQ_PRIV *)pReq->HIFPrivate[0];
-        if (NULL == pReqPriv) {
-            break;
-        }
+        A_ASSERT(pReqPriv != NULL);
 
         if (pReqPriv->busrequest != NULL) {
             pReqPriv->busrequest->pScatterReq = NULL;

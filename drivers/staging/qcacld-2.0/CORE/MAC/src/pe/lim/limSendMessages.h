@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2013 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -72,18 +72,13 @@ tSirRetStatus limSetUserPos(tpAniSirGlobal pMac,
 #if defined WLAN_FEATURE_VOWIFI
 tSirRetStatus limSendSwitchChnlParams(tpAniSirGlobal pMac, tANI_U8 chnlNumber,
                                       ePhyChanBondState secondaryChnlOffset,
-                                      tPowerdBm maxTxPower,tANI_U8 peSessionId,
-                                      uint8_t is_restart);
+                                      tPowerdBm maxTxPower,tANI_U8 peSessionId);
 #else
 tSirRetStatus limSendSwitchChnlParams(tpAniSirGlobal pMac, tANI_U8 chnlNumber,
                                       ePhyChanBondState secondaryChnlOffset,
-                                      tANI_U8 localPwrConstraint,
-                                      tANI_U8 peSessionId,
-                                      uint8_t is_restart);
+                                      tANI_U8 localPwrConstraint,tANI_U8 peSessionId);
 #endif
-tSirRetStatus limSendEdcaParams(tpAniSirGlobal pMac,
-                                tSirMacEdcaParamRecord *pUpdatedEdcaParams,
-                                tANI_U16 bssIdx);
+tSirRetStatus limSendEdcaParams(tpAniSirGlobal pMac, tSirMacEdcaParamRecord *pUpdatedEdcaParams, tANI_U16 bssIdx, tANI_BOOLEAN highPerformance);
 tSirRetStatus limSetLinkState(tpAniSirGlobal pMac, tSirLinkState state,  tSirMacAddr bssId,
                               tSirMacAddr selfMac, tpSetLinkStateCallback callback,
                               void *callbackArg);

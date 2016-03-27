@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -20,9 +20,10 @@
  */
 
 /*
- * This file was originally distributed by Qualcomm Atheros, Inc.
- * under proprietary terms before Copyright ownership was assigned
- * to the Linux Foundation.
+ * Copyright (c) 2014 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ *
  */
 
 
@@ -45,6 +46,9 @@
 #include <linux/spinlock.h>
 #include <linux/kthread.h>
 #include <linux/semaphore.h>
+#if defined(WLAN_OPEN_SOURCE) && defined(CONFIG_HAS_WAKELOCK)
+#include <linux/wakelock.h>
+#endif
 #include <wlan_hdd_ftm.h>
 #include "htc_api.h"
 #include "htc_packet.h"

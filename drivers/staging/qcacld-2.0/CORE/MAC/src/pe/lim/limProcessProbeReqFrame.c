@@ -172,8 +172,8 @@ void limRemovePBCSessions(tpAniSirGlobal pMac, tSirMacAddr pRemoveMac,tpPESessio
           prev->next = pbc->next;
           if (pbc == psessionEntry->pAPWPSPBCSession)
             psessionEntry->pAPWPSPBCSession = pbc->next;
-          vos_mem_free(pbc);
-          return;
+            vos_mem_free(pbc);
+            return;
         }
         prev = pbc;
         pbc = pbc->next;
@@ -378,11 +378,12 @@ limProcessProbeReqFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo,tpPESession 
 
        pHdr = WDA_GET_RX_MAC_HEADER(pRxPacketInfo);
 
-        if (LIM_IS_AP_ROLE(psessionEntry) ||
-            LIM_IS_BT_AMP_AP_ROLE(psessionEntry) ||
-            LIM_IS_BT_AMP_STA_ROLE(psessionEntry) ||
-            (LIM_IS_IBSS_ROLE(psessionEntry) &&
-            (WDA_GET_RX_BEACON_SENT(pRxPacketInfo)))) {
+        if ( (psessionEntry->limSystemRole == eLIM_AP_ROLE) ||
+             (psessionEntry->limSystemRole == eLIM_BT_AMP_AP_ROLE)||
+             (psessionEntry->limSystemRole == eLIM_BT_AMP_STA_ROLE)||
+             ( (psessionEntry->limSystemRole == eLIM_STA_IN_IBSS_ROLE) &&
+             (WDA_GET_RX_BEACON_SENT(pRxPacketInfo)) ) )
+        {
            frameLen = WDA_GET_RX_PAYLOAD_LEN(pRxPacketInfo);
 
             PELOG3(limLog(pMac, LOG3, FL("Received Probe Request %d bytes from "), frameLen);
@@ -440,8 +441,9 @@ limProcessProbeReqFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo,tpPESession 
                         return;
                     }
                 }
+                if ((psessionEntry->limSystemRole == eLIM_AP_ROLE))
+                {
 
-                if (LIM_IS_AP_ROLE(psessionEntry)) {
                     if ( (psessionEntry->APWPSIEs.SirWPSProbeRspIE.FieldPresent &
                                                SIR_WPS_PROBRSP_VER_PRESENT) &&
                          (probeReq.wscIePresent ==  1) &&
@@ -603,7 +605,7 @@ limIndicateProbeReqToHDD(tpAniSirGlobal pMac, tANI_U8 *pBd,
     tpSirMacMgmtHdr     pHdr;
     tANI_U32            frameLen;
 
-    limLog( pMac, LOG1, FL("Received a probe request frame"));
+    limLog( pMac, LOG1, "Received a probe request frame");
 
     pHdr = WDA_GET_RX_MAC_HEADER(pBd);
     frameLen = WDA_GET_RX_PAYLOAD_LEN(pBd);
@@ -642,7 +644,9 @@ limProcessProbeReqFrame_multiple_BSS(tpAniSirGlobal pMac, tANI_U8 *pBd,  tpPESes
 
     if (psessionEntry != NULL)
     {
-        if (LIM_IS_AP_ROLE(psessionEntry)) {
+        if ((eLIM_AP_ROLE == psessionEntry->limSystemRole)
+          )
+        {
             limIndicateProbeReqToHDD(pMac, pBd, psessionEntry);
         }
         limProcessProbeReqFrame(pMac,pBd,psessionEntry);
@@ -654,13 +658,17 @@ limProcessProbeReqFrame_multiple_BSS(tpAniSirGlobal pMac, tANI_U8 *pBd,  tpPESes
         psessionEntry = peFindSessionBySessionId(pMac,i);
         if ( (psessionEntry != NULL) )
         {
-            if (LIM_IS_AP_ROLE(psessionEntry)) {
+            if ((eLIM_AP_ROLE == psessionEntry->limSystemRole)
+              )
+            {
                 limIndicateProbeReqToHDD(pMac, pBd, psessionEntry);
             }
-            if (LIM_IS_AP_ROLE(psessionEntry) ||
-                LIM_IS_IBSS_ROLE(psessionEntry) ||
-                LIM_IS_BT_AMP_AP_ROLE(psessionEntry) ||
-                LIM_IS_BT_AMP_STA_ROLE(psessionEntry)) {
+            if ( (eLIM_AP_ROLE == psessionEntry->limSystemRole) ||
+                (eLIM_STA_IN_IBSS_ROLE == psessionEntry->limSystemRole) ||
+                (eLIM_BT_AMP_AP_ROLE == psessionEntry->limSystemRole) ||
+                (eLIM_BT_AMP_STA_ROLE == psessionEntry->limSystemRole)
+               )
+            {
                 limProcessProbeReqFrame(pMac,pBd,psessionEntry);
             }
         }

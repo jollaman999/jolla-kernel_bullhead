@@ -27,46 +27,47 @@
 
 /*===========================================================================
  *
- *  @file:     wlan_types.h
+ *  @file:     wlan_defs.h
  *
- *  @brief:    This file defines the common types for wlan
+ *  @brief:       This file defines the common typedefs
  *
- *  @author:   Xiaochang Duan
+ *  @author:   Gagan Jain
  *
  *
  *=========================================================================*/
 
-#ifndef __WLAN_TYPES_H__
-#define __WLAN_TYPES_H__
+#ifndef __WLAN_DEFS_H__
+#define __WLAN_DEFS_H__
 
 /*-------------------------------------------------------------------------
   Include Files
 -------------------------------------------------------------------------*/
+#include "wlan_qct_pal_type.h"
+
 /*----------------------------------------------------------------------------
  * Preprocessor Definitions and Constants
  * -------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------
  *  Type Declarations
  * -------------------------------------------------------------------------*/
+typedef wpt_uint32   uint32;      /* Unsigned 32 bit value */
 
-typedef uint32_t   uint32;      /* Unsigned 32 bit value */
+typedef wpt_uint16   uint16;      /* Unsigned 16 bit value */
 
-typedef uint16_t   uint16;      /* Unsigned 16 bit value */
+typedef wpt_uint8    uint8;       /* Unsigned 8  bit value */
 
-typedef uint8_t    uint8;       /* Unsigned 8  bit value */
+typedef wpt_int32    int32;       /* Signed 32 bit value */
 
-typedef int32_t    int32;       /* Signed 32 bit value */
+typedef wpt_int16    int16;       /* Signed 16 bit value */
 
-typedef int16_t    int16;       /* Signed 16 bit value */
+typedef wpt_int8     int8;        /* Signed 8  bit value */
 
-typedef int8_t     int8;        /* Signed 8  bit value */
+typedef wpt_int64    int64;       /* Signed 64 bit value */
 
-typedef int64_t    int64;       /* Signed 64 bit value */
+typedef wpt_uint64   uint64;      /* Unsigned 64 bit value */
 
-typedef uint64_t   uint64;      /* Unsigned 64 bit value */
+typedef wpt_byte     byte;        /* byte type */
 
-typedef uint8_t    byte;        /* byte type */
+typedef wpt_boolean  boolean;     /* Boolean Type */
 
-typedef uint8_t    boolean;     /* Boolean Type */
-
-#endif //__WLAN_TYPES_H__
+#endif //__WLAN_DEFS_H__

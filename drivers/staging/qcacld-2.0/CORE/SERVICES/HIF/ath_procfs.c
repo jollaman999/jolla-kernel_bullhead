@@ -42,11 +42,7 @@
 #include <adf_os_atomic.h>
 
 #define PROCFS_NAME		"athdiagpfs"
-#ifdef MULTI_IF_NAME
-#define PROCFS_DIR		"cld" MULTI_IF_NAME
-#else
 #define PROCFS_DIR		"cld"
-#endif
 
 /**
  * This structure hold information about the /proc file

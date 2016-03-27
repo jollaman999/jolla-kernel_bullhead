@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2013 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -112,22 +112,6 @@ limProcessDisassocFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession
         return;
     }
 
-    if (LIM_IS_STA_ROLE(psessionEntry) &&
-        (eLIM_SME_WT_DISASSOC_STATE == psessionEntry->limSmeState)) {
-        if (pHdr->fc.retry > 0) {
-            /*
-             * This can happen when first disassoc frame is received
-             * but ACK from this STA is lost, in this case 2nd disassoc frame is
-             * already in transmission queue
-             */
-            PELOGE(limLog(pMac, LOGE,
-                   FL("AP is sending disassoc after ACK lost..."));)
-            return;
-        }
-
-    }
-
-
 #ifdef WLAN_FEATURE_11W
     /* PMF: If this session is a PMF session, then ensure that this frame was protected */
     if(psessionEntry->limRmfEnabled  && (WDA_GET_RX_DPU_FEEDBACK(pRxPacketInfo) & DPU_FEEDBACK_UNPROTECTED_ERROR))
@@ -208,7 +192,9 @@ limProcessDisassocFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession
         }
     }
 
-    if (LIM_IS_AP_ROLE(psessionEntry) || LIM_IS_BT_AMP_AP_ROLE(psessionEntry)) {
+    if ( (psessionEntry->limSystemRole == eLIM_AP_ROLE) ||
+         (psessionEntry->limSystemRole == eLIM_BT_AMP_AP_ROLE) )
+    {
         switch (reasonCode)
         {
             case eSIR_MAC_UNSPEC_FAILURE_REASON:
@@ -230,12 +216,14 @@ limProcessDisassocFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession
                        reasonCode, MAC_ADDR_ARRAY(pHdr->sa));)
                 break;
         }
-    } else if ((LIM_IS_STA_ROLE(psessionEntry) ||
-              LIM_IS_BT_AMP_STA_ROLE(psessionEntry)) &&
+    }
+    else if (  ((psessionEntry->limSystemRole == eLIM_STA_ROLE) ||
+                (psessionEntry->limSystemRole == eLIM_BT_AMP_STA_ROLE)) &&
                ((psessionEntry->limSmeState != eLIM_SME_WT_JOIN_STATE) &&
                 (psessionEntry->limSmeState != eLIM_SME_WT_AUTH_STATE)  &&
                 (psessionEntry->limSmeState != eLIM_SME_WT_ASSOC_STATE)  &&
-                (psessionEntry->limSmeState != eLIM_SME_WT_REASSOC_STATE))) {
+                (psessionEntry->limSmeState != eLIM_SME_WT_REASSOC_STATE) ))
+    {
         switch (reasonCode)
         {
             case eSIR_MAC_UNSPEC_FAILURE_REASON:
@@ -282,14 +270,15 @@ limProcessDisassocFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession
         limLog(pMac, LOGE,
                FL("received Disassoc frame with invalid reasonCode %d in role "
                "%d in sme state %d from "MAC_ADDRESS_STR), reasonCode,
-               GET_LIM_SYSTEM_ROLE(psessionEntry), psessionEntry->limSmeState,
+               psessionEntry->limSystemRole, psessionEntry->limSmeState,
                MAC_ADDR_ARRAY(pHdr->sa));
 
         return;
     }
 
     if ((pStaDs->mlmStaContext.mlmState == eLIM_MLM_WT_DEL_STA_RSP_STATE) ||
-        (pStaDs->mlmStaContext.mlmState == eLIM_MLM_WT_DEL_BSS_RSP_STATE)) {
+        (pStaDs->mlmStaContext.mlmState == eLIM_MLM_WT_DEL_BSS_RSP_STATE) ||
+        (pStaDs->isDisassocDeauthInProgress)) {
         /**
          * Already in the process of deleting context for the peer
          * and received Disassociation frame. Log and Ignore.
@@ -319,6 +308,7 @@ limProcessDisassocFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession
 
     } // if (pStaDs->mlmStaContext.mlmState != eLIM_MLM_LINK_ESTABLISHED_STATE)
 
+    pStaDs->isDisassocDeauthInProgress++;
     pStaDs->mlmStaContext.cleanupTrigger = eLIM_PEER_ENTITY_DISASSOC;
     pStaDs->mlmStaContext.disassocReason = (tSirMacReasonCodes) reasonCode;
 

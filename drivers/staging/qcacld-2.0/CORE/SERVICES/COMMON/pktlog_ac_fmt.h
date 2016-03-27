@@ -37,14 +37,9 @@
 #endif
 
 #ifdef __linux__
-#ifdef MULTI_IF_NAME
-#define PKTLOG_PROC_DIR "ath_pktlog" MULTI_IF_NAME
-#define WLANDEV_BASENAME "cld" MULTI_IF_NAME
-#else
 #define PKTLOG_PROC_DIR "ath_pktlog"
-#define WLANDEV_BASENAME "cld"
-#endif
 #define PKTLOG_PROC_SYSTEM "system"
+#define WLANDEV_BASENAME "cld"
 #endif
 
 #ifdef WIN32

@@ -25,20 +25,20 @@
  * to the Linux Foundation.
  */
 
-#ifndef __WLAN_HDD_MDNS_OFFLOAD_H__
-#define __WLAN_HDD_MDNS_OFFLOAD_H__
+#if !defined( __WLAN_QCT_PAL_LIST_H )
+#define __WLAN_QCT_PAL_LIST_H
 
-/**
- *  wlan_hdd_mdns_offload.h - WLAN HDD mDNS Offload API
- */
+/**=========================================================================
 
-#ifdef MDNS_OFFLOAD
-bool wlan_hdd_set_mdns_offload(hdd_adapter_t *adapter);
-#else
-static inline bool wlan_hdd_set_mdns_offload(hdd_adapter_t *adapter)
-{
-	return FALSE;
-}
-#endif
+  \file  wlan_qct_pal_list.h
 
-#endif /* __WLAN_HDD_MDNS_OFFLOAD_H__ */
+  \brief define linked list PAL exports. wpt = (Wlan Pal Type) wpal = (Wlan PAL)
+
+   Definitions for platform independent.
+
+  ========================================================================*/
+
+#include "wlan_qct_os_list.h"
+
+
+#endif // __WLAN_QCT_PAL_LIST_H

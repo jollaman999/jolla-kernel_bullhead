@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014,2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -61,6 +61,7 @@
  * To align with LL case, we also need 2 mbox support just as PCIe LL cases.
  */
 
+#define INVALID_MAILBOX_NUMBER 0xFF
 A_UINT8 HIFDevMapPipeToMailBox(HIF_SDIO_DEVICE *pDev, A_UINT8 pipeid)
 {
     // TODO: temp version, should not hardcoded here, will be updated after HIF design
@@ -91,18 +92,13 @@ A_UINT8 HIFDevMapMailBoxToPipe(HIF_SDIO_DEVICE *pDev, A_UINT8 mboxIndex,
 }
 
 A_STATUS HIFDevMapServiceToPipe(HIF_SDIO_DEVICE *pDev, A_UINT16 ServiceId,
-        A_UINT8 *ULPipe, A_UINT8 *DLPipe, A_BOOL SwapMapping)
+        A_UINT8 *ULPipe, A_UINT8 *DLPipe)
 {
     A_STATUS status = EOK;
     switch (ServiceId) {
     case HTT_DATA_MSG_SVC:
-        if (SwapMapping) {
-            *ULPipe = 1;
-            *DLPipe = 0;
-        } else {
-            *ULPipe = 3;
-            *DLPipe = 2;
-        }
+        *ULPipe = 3;
+        *DLPipe = 2;
         break;
 
     case HTC_CTRL_RSVD_SVC:
@@ -120,13 +116,8 @@ A_STATUS HIFDevMapServiceToPipe(HIF_SDIO_DEVICE *pDev, A_UINT16 ServiceId,
         break;
 
     case WMI_CONTROL_SVC:
-        if (SwapMapping) {
-            *ULPipe = 3;
-            *DLPipe = 2;
-        } else {
-            *ULPipe = 1;
-            *DLPipe = 0;
-        }
+        *ULPipe = 1;
+        *DLPipe = 0;
         break;
 
     default:
@@ -136,13 +127,13 @@ A_STATUS HIFDevMapServiceToPipe(HIF_SDIO_DEVICE *pDev, A_UINT16 ServiceId,
     return status;
 }
 
-HTC_PACKET *HIFDevAllocRxBuffer(HIF_SDIO_DEVICE *pDev, size_t length)
+HTC_PACKET *HIFDevAllocRxBuffer(HIF_SDIO_DEVICE *pDev)
 {
     HTC_PACKET *pPacket;
     adf_nbuf_t netbuf;
     A_UINT32 bufsize = 0, headsize = 0;
 
-    bufsize = length + HIF_SDIO_RX_DATA_OFFSET;
+    bufsize = HIF_SDIO_RX_BUFFER_SIZE + HIF_SDIO_RX_DATA_OFFSET;
     headsize = sizeof(HTC_PACKET);
     netbuf = adf_nbuf_alloc(NULL, bufsize + headsize, 0, 4, FALSE);
     if (netbuf == NULL) {
@@ -259,8 +250,6 @@ A_STATUS HIFDevDisableInterrupts(HIF_SDIO_DEVICE *pDev)
         AR_DEBUG_PRINTF(ATH_DEBUG_ERR,("Failed to update interrupt control registers err: %d", status));
     }
 
-    /* mask the host controller interrupts */
-    HIFMaskInterrupt(pDev->HIFDevice);
     EXIT("status :%d",status);
     return status;
 }

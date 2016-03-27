@@ -268,9 +268,7 @@ void limTriggerBackgroundScan(tpAniSirGlobal pMac)
     smeScanReq.uIEFieldOffset = sizeof(tSirSmeScanReq);
 
     backgroundScan = limSelectsBackgroundScanMode(pMac);
-    PELOG1(limLog(pMac, LOG1, FL("Performing (mode %s (%d)) Background Scan"),
-           lim_BackgroundScanModetoString(backgroundScan),
-           backgroundScan);)
+    PELOG1(limLog(pMac, LOG1, FL("Performing (mode %d) Background Scan "), backgroundScan);)
     smeScanReq.backgroundScanMode = backgroundScan;
 
     //determine whether to send the results or not, If so, notify the BG scan results to SME
