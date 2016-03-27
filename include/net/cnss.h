@@ -15,6 +15,10 @@
 #include <linux/device.h>
 #include <linux/pci.h>
 
+#ifdef CONFIG_WCNSS_MEM_PRE_ALLOC
+#define WCNSS_PRE_ALLOC_GET_THRESHOLD (4*1024)
+#endif
+
 /* max 20mhz channel count */
 #define CNSS_MAX_CH_NUM       45
 
@@ -162,11 +166,17 @@ extern void cnss_remove_pm_qos(void);
 extern int cnss_get_platform_cap(struct cnss_platform_cap *cap);
 extern void cnss_set_driver_status(enum cnss_driver_status driver_status);
 
-#ifndef CONFIG_WCNSS_MEM_PRE_ALLOC
+#ifdef CONFIG_WCNSS_MEM_PRE_ALLOC
+extern void *wcnss_prealloc_get(unsigned int size);
+extern int wcnss_prealloc_put(void *ptr);
+extern int wcnss_pre_alloc_reset(void);
+#else
 static inline int wcnss_pre_alloc_reset(void) { return 0; }
 #endif
 
-#if !defined(CONFIG_WCNSS_MEM_PRE_ALLOC) || !defined(CONFIG_SLUB_DEBUG)
+#if defined(CONFIG_WCNSS_MEM_PRE_ALLOC) && defined(CONFIG_SLUB_DEBUG)
+void wcnss_prealloc_check_memory_leak(void);
+#else
 static inline void wcnss_prealloc_check_memory_leak(void) {}
 #endif
 
