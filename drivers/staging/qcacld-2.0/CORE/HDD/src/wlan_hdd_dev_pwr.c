@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -115,10 +115,10 @@ void hddDevTmTxBlockTimeoutHandler(void *usrData)
 
    staAdapater = hdd_get_adapter(pHddCtx, WLAN_HDD_INFRA_STATION);
 
-   if ((NULL == staAdapater) ||
-       (WLAN_HDD_ADAPTER_MAGIC != staAdapater->magic)) {
+   if(NULL == staAdapater)
+   {
       VOS_TRACE(VOS_MODULE_ID_HDD,VOS_TRACE_LEVEL_ERROR,
-                FL("invalid Adapter %p"), staAdapater);
+                "%s: NULL Adapter", __func__);
       VOS_ASSERT(0);
       return;
    }
@@ -133,7 +133,6 @@ void hddDevTmTxBlockTimeoutHandler(void *usrData)
 
    /* Resume TX flow */
 
-   hddLog(LOG1, FL("Enabling queues"));
    netif_tx_wake_all_queues(staAdapater->dev);
    pHddCtx->tmInfo.qBlocked = VOS_FALSE;
    mutex_unlock(&pHddCtx->tmInfo.tmOperationLock);

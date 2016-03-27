@@ -66,7 +66,7 @@ ol_tx_desc_alloc(struct ol_txrx_pdev_t *pdev, struct ol_txrx_vdev_t *vdev)
     adf_os_spin_lock_bh(&pdev->tx_mutex);
     if (pdev->tx_desc.freelist) {
         pdev->tx_desc.num_free--;
-        tx_desc = pdev->tx_desc.freelist->tx_desc;
+        tx_desc = &pdev->tx_desc.freelist->tx_desc;
         pdev->tx_desc.freelist = pdev->tx_desc.freelist->next;
 #ifdef QCA_SUPPORT_TXDESC_SANITY_CHECKS
         if (tx_desc->pkt_type != 0xff
@@ -96,10 +96,8 @@ ol_tx_desc_alloc(struct ol_txrx_pdev_t *pdev, struct ol_txrx_vdev_t *vdev)
     if (!tx_desc) {
         return NULL;
     }
-#if defined(CONFIG_HL_SUPPORT)
-    tx_desc->vdev = vdev;
-#endif
 #if defined(CONFIG_PER_VDEV_TX_DESC_POOL)
+    tx_desc->vdev = vdev;
     adf_os_atomic_inc(&vdev->tx_desc_count);
 #endif
 
@@ -126,7 +124,7 @@ ol_tx_desc_alloc_hl(struct ol_txrx_pdev_t *pdev, struct ol_txrx_vdev_t *vdev)
 struct ol_tx_desc_t *
 ol_tx_desc_find(struct ol_txrx_pdev_t *pdev, u_int16_t tx_desc_id)
 {
-    return pdev->tx_desc.array[tx_desc_id].tx_desc;
+    return &pdev->tx_desc.array[tx_desc_id].tx_desc;
 }
 
 void
@@ -139,9 +137,8 @@ ol_tx_desc_free(struct ol_txrx_pdev_t *pdev, struct ol_tx_desc_t *tx_desc)
     tx_desc->entry_timestamp_ticks = 0xffffffff;
 #endif
 #endif
-    ((struct ol_tx_desc_list_elem_t *)(tx_desc->p_link))->next =
-        pdev->tx_desc.freelist;
-    pdev->tx_desc.freelist = tx_desc->p_link;
+    ((union ol_tx_desc_list_elem_t *) tx_desc)->next = pdev->tx_desc.freelist;
+    pdev->tx_desc.freelist = (union ol_tx_desc_list_elem_t *) tx_desc;
     pdev->tx_desc.num_free++;
 #if defined(CONFIG_PER_VDEV_TX_DESC_POOL)
 #ifdef QCA_LL_TX_FLOW_CT
@@ -155,8 +152,6 @@ ol_tx_desc_free(struct ol_txrx_pdev_t *pdev, struct ol_tx_desc_t *tx_desc)
     }
 #endif /* QCA_LL_TX_FLOW_CT */
     adf_os_atomic_dec(&tx_desc->vdev->tx_desc_count);
-#endif
-#if defined(CONFIG_HL_SUPPORT)
     tx_desc->vdev = NULL;
 #endif
     adf_os_spin_unlock_bh(&pdev->tx_mutex);
@@ -205,7 +200,7 @@ ol_tx_desc_ll(
 	tx_desc->htt_tx_desc_paddr,
         ol_tx_desc_id(pdev, tx_desc),
         netbuf,
-        &msdu_info->htt, NULL, vdev->opmode == wlan_op_mode_ocb);
+        &msdu_info->htt);
 
     /*
      * Initialize the fragmentation descriptor.

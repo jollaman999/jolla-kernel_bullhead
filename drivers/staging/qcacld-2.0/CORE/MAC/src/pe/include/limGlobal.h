@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -49,7 +49,6 @@
 #include "csrApi.h"
 #include "sapApi.h"
 #include "dot11f.h"
-#include "sys/queue.h"
 
 /// Maximum number of scan hash table entries
 #define LIM_MAX_NUM_OF_SCAN_RESULTS 256
@@ -208,6 +207,7 @@ typedef enum eLimDot11hChanSwStates
     eLIM_11H_CHANSW_END
 } tLimDot11hChanSwStates;
 
+#ifdef GEN4_SCAN
 
 //WLAN_SUSPEND_LINK Related
 typedef void (*SUSPEND_RESUME_LINK_CALLBACK)(tpAniSirGlobal pMac, eHalStatus status, tANI_U32 *data);
@@ -231,6 +231,7 @@ typedef enum eLimHalScanState
   eLIM_HAL_RESUME_LINK_WAIT_STATE,
 //end WLAN_SUSPEND_LINK Related
 } tLimLimHalScanState;
+#endif // GEN4_SCAN
 
 // LIM states related to A-MPDU/BA
 // This is used for maintaining the state between PE and HAL only.
@@ -323,13 +324,11 @@ struct tLimScanResultNode
 typedef struct sLimMlmOemDataReq
 {
     tSirMacAddr           selfMacAddr;
-    uint8_t               data_len;
-    uint8_t               *data;
+    tANI_U8               oemDataReq[OEM_DATA_REQ_SIZE];
 } tLimMlmOemDataReq, *tpLimMlmOemDataReq;
 
 typedef struct sLimMlmOemDataRsp
 {
-   bool                   target_rsp;
    tANI_U8                oemDataRsp[OEM_DATA_RSP_SIZE];
 } tLimMlmOemDataRsp, *tpLimMlmOemDataRsp;
 #endif
@@ -348,15 +347,13 @@ typedef struct tLimPreAuthNode
     tANI_U8             fFree:1;
     tANI_U8             rsvd:5;
     TX_TIMER            timer;
-    tANI_U16            seqNum;
-    v_TIME_t            timestamp;
 }tLimPreAuthNode, *tpLimPreAuthNode;
 
 // Pre-authentication table definition
 typedef struct tLimPreAuthTable
 {
     tANI_U32        numEntry;
-    tLimPreAuthNode **pTable;
+    tpLimPreAuthNode pTable;
 }tLimPreAuthTable, *tpLimPreAuthTable;
 
 /// Per STA context structure definition
@@ -392,29 +389,6 @@ typedef struct sLimDeferredMsgQParams
     tANI_U16         write;
 } tLimDeferredMsgQParams, *tpLimDeferredMsgQParams;
 
-#ifdef SAP_AUTH_OFFLOAD
-/**
- * slim_deferred_sap_msg - member of sap deferred queue
- *
- * list_elem: tq element
- * deferredmsg: deferred msg
- */
-struct slim_deferred_sap_msg
-{
-	TAILQ_ENTRY(slim_deferred_sap_msg) list_elem;
-	tSirMsgQ      deferredmsg;
-};
-
-/**
- * slim_deferred_sap_queue - sap msg deferred queue
- *
- * head: head  of tq
- */
-struct slim_deferred_sap_queue
-{
-	TAILQ_HEAD(t_slim_deferred_sap_msg_head, slim_deferred_sap_msg) tq_head;
-};
-#endif
 typedef struct sCfgProtection
 {
     tANI_U32 overlapFromlla:1;
@@ -479,19 +453,21 @@ struct tLimIbssPeerNode
 {
     tLimIbssPeerNode         *next;
     tSirMacAddr              peerMacAddr;
+    tANI_U8                       aniIndicator:1;
     tANI_U8                       extendedRatesPresent:1;
     tANI_U8                       edcaPresent:1;
     tANI_U8                       wmeEdcaPresent:1;
     tANI_U8                       wmeInfoPresent:1;
     tANI_U8                       htCapable:1;
     tANI_U8                       vhtCapable:1;
-    tANI_U8                       rsvd:2;
+    tANI_U8                       rsvd:1;
     tANI_U8                       htSecondaryChannelOffset;
     tSirMacCapabilityInfo    capabilityInfo;
     tSirMacRateSet           supportedRates;
     tSirMacRateSet           extendedRates;
     tANI_U8                   supportedMCSSet[SIZE_OF_SUPPORTED_MCS_SET];
     tSirMacEdcaParamSetIE    edcaParams;
+    tANI_U16 propCapability;
     tANI_U8  erpIePresent;
 
     //HT Capabilities of IBSS Peer

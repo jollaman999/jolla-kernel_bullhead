@@ -79,17 +79,28 @@ extern tSirRetStatus schBeaconEdcaProcess(tpAniSirGlobal pMac, tSirMacEdcaParamS
  */
 void limUpdateAssocStaDatas(tpAniSirGlobal pMac, tpDphHashNode pStaDs, tpSirAssocRsp pAssocRsp,tpPESession psessionEntry)
 {
+    tANI_U32        prop;
     tANI_U32        phyMode;
+    tANI_U32        val;
     tANI_BOOLEAN    qosMode;
     tANI_U16        rxHighestRate = 0;
-    uint32_t        shortgi_20mhz_support;
-    uint32_t        shortgi_40mhz_support;
 
     limGetPhyMode(pMac, &phyMode, psessionEntry);
 
     pStaDs->staType= STA_ENTRY_SELF;
 
     limGetQosMode(psessionEntry, &qosMode);
+    // set the ani peer bit, if self mode is one of the proprietary modes
+    if(IS_DOT11_MODE_PROPRIETARY(psessionEntry->dot11mode))
+    {
+       wlan_cfgGetInt(pMac, WNI_CFG_PROPRIETARY_ANI_FEATURES_ENABLED, &prop);
+
+       if (prop)
+       {
+           pStaDs->aniPeer = eHAL_SET;
+           pStaDs->propCapability = pAssocRsp->propIEinfo.capability;
+       }
+    }
 
        pStaDs->mlmStaContext.authType = psessionEntry->limCurrentAuthType;
 
@@ -103,61 +114,26 @@ void limUpdateAssocStaDatas(tpAniSirGlobal pMac, tpDphHashNode pStaDs, tpSirAsso
 
            if ( pAssocRsp->HTCaps.present ) {
                pStaDs->htGreenfield = ( tANI_U8 ) pAssocRsp->HTCaps.greenField;
-               if (psessionEntry->htSupportedChannelWidthSet) {
-                   pStaDs->htSupportedChannelWidthSet =
-                           (tANI_U8)(pAssocRsp->HTCaps.supportedChannelWidthSet ?
-                           pAssocRsp->HTInfo.recommendedTxWidthSet :
-                           pAssocRsp->HTCaps.supportedChannelWidthSet);
-               } else
-                   pStaDs->htSupportedChannelWidthSet = eHT_CHANNEL_WIDTH_20MHZ;
+               pStaDs->htSupportedChannelWidthSet = ( tANI_U8 ) (pAssocRsp->HTCaps.supportedChannelWidthSet ?
+                                                                               pAssocRsp->HTInfo.recommendedTxWidthSet :
+                                                                               pAssocRsp->HTCaps.supportedChannelWidthSet );
+                   pStaDs->htLsigTXOPProtection = ( tANI_U8 ) pAssocRsp->HTCaps.lsigTXOPProtection;
+                   pStaDs->htMIMOPSState =  (tSirMacHTMIMOPowerSaveState)pAssocRsp->HTCaps.mimoPowerSave;
+                   pStaDs->htMaxAmsduLength = ( tANI_U8 ) pAssocRsp->HTCaps.maximalAMSDUsize;
+                   pStaDs->htAMpduDensity =             pAssocRsp->HTCaps.mpduDensity;
+                   pStaDs->htDsssCckRate40MHzSupport = (tANI_U8)pAssocRsp->HTCaps.dsssCckMode40MHz;
+                   pStaDs->htShortGI20Mhz = (tANI_U8)pAssocRsp->HTCaps.shortGI20MHz;
+                   pStaDs->htShortGI40Mhz = (tANI_U8)pAssocRsp->HTCaps.shortGI40MHz;
+                   pStaDs->htMaxRxAMpduFactor = pAssocRsp->HTCaps.maxRxAMPDUFactor;
+                   limFillRxHighestSupportedRate(pMac, &rxHighestRate, pAssocRsp->HTCaps.supportedMCSSet);
+                   pStaDs->supportedRates.rxHighestDataRate = rxHighestRate;
+                   /* This is for AP as peer STA and we are INFRA STA. We will put APs offset in dph node which is peer STA */
+                   pStaDs->htSecondaryChannelOffset = (tANI_U8)pAssocRsp->HTInfo.secondaryChannelOffset;
 
-               pStaDs->htLsigTXOPProtection = ( tANI_U8 ) pAssocRsp->HTCaps.lsigTXOPProtection;
-               pStaDs->htMIMOPSState =  (tSirMacHTMIMOPowerSaveState)pAssocRsp->HTCaps.mimoPowerSave;
-               pStaDs->htMaxAmsduLength = ( tANI_U8 ) pAssocRsp->HTCaps.maximalAMSDUsize;
-               pStaDs->htAMpduDensity =             pAssocRsp->HTCaps.mpduDensity;
-               pStaDs->htDsssCckRate40MHzSupport = (tANI_U8)pAssocRsp->HTCaps.dsssCckMode40MHz;
-               pStaDs->htMaxRxAMpduFactor = pAssocRsp->HTCaps.maxRxAMPDUFactor;
-               limFillRxHighestSupportedRate(pMac, &rxHighestRate, pAssocRsp->HTCaps.supportedMCSSet);
-               pStaDs->supportedRates.rxHighestDataRate = rxHighestRate;
-               /* This is for AP as peer STA and we are INFRA STA. We will put APs offset in dph node which is peer STA */
-               pStaDs->htSecondaryChannelOffset = (tANI_U8)pAssocRsp->HTInfo.secondaryChannelOffset;
-
-               //FIXME_AMPDU
-               // In the future, may need to check for "assoc.HTCaps.delayedBA"
-               // For now, it is IMMEDIATE BA only on ALL TID's
-               pStaDs->baPolicyFlag = 0xFF;
-
-               /*
-                * Check if we have support for gShortGI20Mhz and
-                * gShortGI40Mhz from ini file.
-                */
-               if (HAL_STATUS_SUCCESS(ccmCfgGetInt(pMac,
-                                      WNI_CFG_SHORT_GI_20MHZ,
-                                      &shortgi_20mhz_support))) {
-                   if (VOS_TRUE == shortgi_20mhz_support)
-                       pStaDs->htShortGI20Mhz =
-                              (tANI_U8)pAssocRsp->HTCaps.shortGI20MHz;
-                   else
-                       pStaDs->htShortGI20Mhz = VOS_FALSE;
-               } else {
-                   limLog(pMac, LOGE,
-                          FL("could not retrieve shortGI 20Mhz CFG, setting value to default"));
-                   pStaDs->htShortGI20Mhz = WNI_CFG_SHORT_GI_20MHZ_STADEF;
-               }
-
-               if (HAL_STATUS_SUCCESS(ccmCfgGetInt(pMac,
-                                      WNI_CFG_SHORT_GI_40MHZ,
-                                      &shortgi_40mhz_support))) {
-                   if (VOS_TRUE == shortgi_40mhz_support)
-                       pStaDs->htShortGI40Mhz =
-                               (tANI_U8)pAssocRsp->HTCaps.shortGI40MHz;
-                   else
-                       pStaDs->htShortGI40Mhz = VOS_FALSE;
-               } else {
-                   limLog(pMac, LOGE,
-                          FL("could not retrieve shortGI 40Mhz CFG,setting value to default"));
-                   pStaDs->htShortGI40Mhz = WNI_CFG_SHORT_GI_40MHZ_STADEF;
-               }
+                   //FIXME_AMPDU
+                   // In the future, may need to check for "assoc.HTCaps.delayedBA"
+                   // For now, it is IMMEDIATE BA only on ALL TID's
+                   pStaDs->baPolicyFlag = 0xFF;
            }
        }
 
@@ -165,10 +141,6 @@ void limUpdateAssocStaDatas(tpAniSirGlobal pMac, tpDphHashNode pStaDs, tpSirAsso
        if(IS_DOT11_MODE_VHT(psessionEntry->dot11mode))
        {
            pStaDs->mlmStaContext.vhtCapability = pAssocRsp->VHTCaps.present;
-           if (pAssocRsp->VHTCaps.present &&
-               psessionEntry->htSupportedChannelWidthSet)
-               pStaDs->vhtSupportedChannelWidthSet =
-                                   pAssocRsp->VHTOperation.chanWidth;
        }
 
        // If 11ac is supported and if the peer is sending VHT capabilities,
@@ -197,6 +169,16 @@ void limUpdateAssocStaDatas(tpAniSirGlobal pMac, tpDphHashNode pStaDs, tpSirAsso
        if ((phyMode == WNI_CFG_PHY_MODE_11G) && sirIsArate(pStaDs->supportedRates.llaRates[0] & 0x7f))
            pStaDs->erpEnabled = eHAL_SET;
 
+
+       val = WNI_CFG_PROPRIETARY_OPERATIONAL_RATE_SET_LEN;
+       if (wlan_cfgGetStr(pMac, WNI_CFG_PROPRIETARY_OPERATIONAL_RATE_SET,
+                     (tANI_U8 *) &pStaDs->mlmStaContext.propRateSet.propRate,
+                     &val) != eSIR_SUCCESS) {
+           /// Could not get prop rateset from CFG. Log error.
+           limLog(pMac, LOGP, FL("could not retrieve prop rateset"));
+           return;
+       }
+       pStaDs->mlmStaContext.propRateSet.numPropRates = (tANI_U8) val;
 
        pStaDs->qosMode    = 0;
        pStaDs->lleEnabled = 0;
@@ -381,12 +363,13 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
     }
 
 
-    if (LIM_IS_AP_ROLE(psessionEntry) || LIM_IS_BT_AMP_AP_ROLE(psessionEntry)) {
+    if (psessionEntry->limSystemRole == eLIM_AP_ROLE || psessionEntry->limSystemRole == eLIM_BT_AMP_AP_ROLE )
+    {
         // Should not have received Re/Association Response
         // frame on AP. Log error
         limLog(pMac, LOGE,
-               FL("Should not recieved Re/Assoc Response in role %d"),
-               GET_LIM_SYSTEM_ROLE(psessionEntry));
+               FL("Should not recieved Re/Assoc Response in role %d "),
+               psessionEntry->limSystemRole);
 
         vos_mem_free(pBeaconStruct);
         return;
@@ -423,14 +406,11 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
             psessionEntry->limMlmState, psessionEntry->peSessionId);)
 #endif
         // Log error
-        if (!pHdr->fc.retry) {
-            if (!(pMac->lim.retry_packet_cnt & 0xf)) {
-                limLog(pMac, LOGE,
-                   FL("received Re/Assoc rsp frame is not a retry frame"));
-                limPrintMlmState(pMac, LOGE, psessionEntry->limMlmState);
-            } else {
-                pMac->lim.retry_packet_cnt++;
-            }
+        if (!pHdr->fc.retry)
+        {
+            limLog(pMac, LOGE,
+               FL("received Re/Assoc rsp frame is not a retry frame"));
+            limPrintMlmState(pMac, LOGE, psessionEntry->limMlmState);
         }
         vos_mem_free(pBeaconStruct);
         return;
@@ -519,7 +499,6 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
         "and setting NULL"));
         vos_mem_free(psessionEntry->assocRsp);
         psessionEntry->assocRsp = NULL;
-        psessionEntry->assocRspLen = 0;
     }
 
     psessionEntry->assocRsp = vos_mem_malloc(frameLen);
@@ -539,7 +518,6 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
     {
         vos_mem_free(psessionEntry->ricData);
         psessionEntry->ricData = NULL;
-        psessionEntry->RICDataLen = 0;
     }
     if(pAssocRsp->ricPresent) {
         psessionEntry->RICDataLen =
@@ -585,7 +563,6 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
     {
         vos_mem_free(psessionEntry->tspecIes);
         psessionEntry->tspecIes = NULL;
-        psessionEntry->tspecLen = 0;
     }
     if(pAssocRsp->tspecPresent) {
         limLog(pMac, LOG1, FL("Tspec EID present in assoc rsp"));
@@ -671,7 +648,16 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
         // along with STATUS CODE
 
         // Return Assoc confirm to SME with received failure code
-        mlmAssocCnf.resultCode = eSIR_SME_ASSOC_REFUSED;
+
+        if (pAssocRsp->propIEinfo.loadBalanceInfoPresent)
+        {
+            mlmAssocCnf.resultCode = eSIR_SME_TRANSFER_STA;
+            vos_mem_copy(pMac->lim.gLimAlternateRadio.bssId,
+                         pAssocRsp->propIEinfo.alternateRadio.bssId, sizeof(tSirMacAddr));
+            pMac->lim.gLimAlternateRadio.channelId =
+                          pAssocRsp->propIEinfo.alternateRadio.channelId;
+        }else
+            mlmAssocCnf.resultCode = eSIR_SME_ASSOC_REFUSED;
 
         // Delete Pre-auth context for the associated BSS
         if (limSearchPreAuthList(pMac, pHdr->sa))
@@ -710,14 +696,6 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
             (pAssocRsp->TimeoutInterval.timeoutType ==
                SIR_MAC_TI_TYPE_ASSOC_COMEBACK) ) {
             tANI_U16 timeout_value = pAssocRsp->TimeoutInterval.timeoutValue;
-            if (timeout_value < 10) {
-                /*
-                 * if this value is less than 10 then our timer will fail to
-                 * start and due to this we will never re-attempt. Better
-                 * modify the timer value here.
-                 */
-                timeout_value = 10;
-            }
             PELOGE(limLog(pMac, LOG1,
                    FL("ASSOC response with eSIR_MAC_TRY_AGAIN_LATER recvd. "
                    "Starting timer to wait timeout=%d."),
@@ -745,7 +723,8 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
 
     if (!((psessionEntry->bssType == eSIR_BTAMP_STA_MODE) ||
           ((psessionEntry->bssType == eSIR_BTAMP_AP_MODE) &&
-          LIM_IS_BT_AMP_STA_ROLE(psessionEntry)))) {
+          (psessionEntry->limSystemRole == eLIM_BT_AMP_STA_ROLE))))
+    {
             if (limSetLinkState(pMac, eSIR_LINK_POSTASSOC_STATE, psessionEntry->bssId,
                                 psessionEntry->selfMacAddr, NULL, NULL) != eSIR_SUCCESS)
             {
@@ -844,8 +823,16 @@ limProcessAssocRspFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tANI_U8 sub
             if (!psessionEntry->bRoamSynchInProgress)
             {
 #endif
-              limSendEdcaParams(pMac, psessionEntry->gLimEdcaParamsActive,
-                                    pStaDs->bssId);
+               if (pStaDs->aniPeer == eANI_BOOLEAN_TRUE)
+               {
+                  limSendEdcaParams(pMac, psessionEntry->gLimEdcaParamsActive,
+                                    pStaDs->bssId, eANI_BOOLEAN_TRUE);
+               }
+               else
+               {
+                  limSendEdcaParams(pMac, psessionEntry->gLimEdcaParamsActive,
+                                    pStaDs->bssId, eANI_BOOLEAN_FALSE);
+               }
 #ifdef WLAN_FEATURE_ROAM_OFFLOAD
             }
 #endif

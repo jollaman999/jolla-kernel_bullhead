@@ -81,11 +81,15 @@ typedef enum
 
 } VOS_TRACE_LEVEL;
 
-/* By default Data Path module will be enabled ERROR and FATAL level
- * Too many default log level will break performance
+/* By default Data Path module will have all log levels enabled, except debug
+ * log level. Debug level will be left up to the framework or user space modules
+ * to be enabled when issue is detected
  */
 #define VOS_DATA_PATH_TRACE_LEVEL \
-	((1 << VOS_TRACE_LEVEL_FATAL) | (1 << VOS_TRACE_LEVEL_ERROR))
+	((1 << VOS_TRACE_LEVEL_FATAL) | (1 << VOS_TRACE_LEVEL_ERROR) | \
+	 (1 << VOS_TRACE_LEVEL_WARN) | (1 << VOS_TRACE_LEVEL_INFO) | \
+	 (1 << VOS_TRACE_LEVEL_INFO_HIGH) | (1 << VOS_TRACE_LEVEL_INFO_MED) | \
+	 (1 << VOS_TRACE_LEVEL_INFO_LOW))
 
 /*--------------------------------------------------------------------------
   Preprocessor definitions and constants

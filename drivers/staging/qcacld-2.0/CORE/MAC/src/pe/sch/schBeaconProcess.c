@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -278,12 +278,9 @@ static void __schBeaconProcessNoSession(tpAniSirGlobal pMac, tpSchBeaconStruct p
         limHandleIBSScoalescing(pMac, pBeacon, pRxPacketInfo, psessionEntry);
     }
 
-    /*
-     * If station(STA/BT-STA/BT-AP/IBSS) mode, Always save the beacon in the
-     * scan results, if at-least one session is active schBeaconProcessNoSession
-     * will be called only when there is at-least one session active,
-     * so not checking it again here.
-     */
+    //If station(STA/BT-STA/BT-AP/IBSS) mode, Always save the beacon in the scan results, if atleast one session is active
+    //schBeaconProcessNoSession will be called only when there is atleast one session active, so not checking
+    //it again here.
     limCheckAndAddBssDescription(pMac, pBeacon, pRxPacketInfo, eANI_BOOLEAN_FALSE, eANI_BOOLEAN_FALSE);
     return;
 }
@@ -300,11 +297,11 @@ static void __schBeaconProcessNoSession(tpAniSirGlobal pMac, tpSchBeaconStruct p
  *
  * LOGIC:
  *        Following scenarios exist when Session exists
- *             * IBSS STA receiving beacons from IBSS Peers, who are part of IBSS.
+ *             * IBSS STA receving beacons from IBSS Peers, who are part of IBSS.
  *                 - call limHandleIBSScoalescing with that session context.
- *             * Infra STA receiving beacons from AP to which it is connected
+ *             * Infra STA receving beacons from AP to which it is connected
  *                 - call schBeaconProcessFromAP with that session's context.
- *             * BTAMP STA receiving beacons from BTAMP AP
+ *             * BTAMP STA receving beacons from BTAMP AP
  *                 - call schBeaconProcessFromAP with that session's context.
  *             * BTAMP AP receiving beacons from BTAMP STA
  *               (here need to make sure BTAP creates session entry for BT STA)
@@ -350,24 +347,21 @@ static void __schBeaconProcessForSession( tpAniSirGlobal      pMac,
 #if defined FEATURE_WLAN_ESE || defined WLAN_FEATURE_VOWIFI
      tPowerdBm regMax = 0,maxTxPower = 0;
 #endif
-    tANI_U8  cbMode;
 
     vos_mem_zero(&beaconParams, sizeof(tUpdateBeaconParams));
     beaconParams.paramChangeBitmap = 0;
 
-    if (RF_CHAN_14 >= psessionEntry->currentOperChannel)
-        cbMode = pMac->roam.configParam.channelBondingMode24GHz;
-    else
-        cbMode = pMac->roam.configParam.channelBondingMode5GHz;
-
-    if (LIM_IS_IBSS_ROLE(psessionEntry)) {
+    if(eLIM_STA_IN_IBSS_ROLE == psessionEntry->limSystemRole )
+    {
         limHandleIBSScoalescing(pMac, pBeacon,  pRxPacketInfo, psessionEntry);
-    } else if (LIM_IS_STA_ROLE(psessionEntry) ||
-               LIM_IS_BT_AMP_STA_ROLE(psessionEntry)) {
+    }
+    else if(  (eLIM_STA_ROLE == psessionEntry->limSystemRole) ||
+                  (eLIM_BT_AMP_STA_ROLE == psessionEntry->limSystemRole))
+    {
         /*
         *  This handles two cases:
-        *  -- Infra STA receiving beacons from AP
-        *  -- BTAMP_STA receiving beacons from BTAMP_AP
+        *  -- Infra STA receving beacons from AP
+        *  -- BTAMP_STA receving beacons from BTAMP_AP
         */
         //Always save the beacon into LIM's cached scan results
         limCheckAndAddBssDescription(pMac, pBeacon, pRxPacketInfo, eANI_BOOLEAN_FALSE, eANI_BOOLEAN_FALSE);
@@ -383,7 +377,6 @@ static void __schBeaconProcessForSession( tpAniSirGlobal      pMac,
                           psessionEntry->currentOperChannel, pBeacon->channelNumber);)
            goto fail;
         }
-
         limDetectChangeInApCapabilities(pMac, pBeacon, psessionEntry);
         if(limGetStaHashBssidx(pMac, DPH_STA_HASH_INDEX_PEER, &bssIdx, psessionEntry) != eSIR_SUCCESS)
             goto fail;
@@ -450,8 +443,10 @@ static void __schBeaconProcessForSession( tpAniSirGlobal      pMac,
                     // If needed, downgrade the EDCA parameters
                     limSetActiveEdcaParams(pMac, psessionEntry->gLimEdcaParams, psessionEntry);
 
-                    limSendEdcaParams(pMac, psessionEntry->gLimEdcaParamsActive,
-                                      pStaDs->bssId);
+                    if (pStaDs->aniPeer == eANI_BOOLEAN_TRUE)
+                        limSendEdcaParams(pMac, psessionEntry->gLimEdcaParamsActive, pStaDs->bssId, eANI_BOOLEAN_TRUE);
+                    else
+                        limSendEdcaParams(pMac, psessionEntry->gLimEdcaParamsActive, pStaDs->bssId, eANI_BOOLEAN_FALSE);
                 }
                 else
                     PELOGE(schLog(pMac, LOGE, FL("Self Entry missing in Hash Table"));)
@@ -467,35 +462,30 @@ static void __schBeaconProcessForSession( tpAniSirGlobal      pMac,
         limUpdateStaRunTimeHTSwitchChnlParams( pMac, &pBeacon->HTInfo, bssIdx,psessionEntry);
     }
 
-    if (LIM_IS_STA_ROLE(psessionEntry) ||
-        LIM_IS_BT_AMP_STA_ROLE(psessionEntry) ||
-        LIM_IS_IBSS_ROLE(psessionEntry)) {
+    if ( (psessionEntry->limSystemRole == eLIM_STA_ROLE) ||(psessionEntry->limSystemRole == eLIM_BT_AMP_STA_ROLE) ||
+          (psessionEntry->limSystemRole == eLIM_STA_IN_IBSS_ROLE) )
+    {
         /* Channel Switch information element updated */
-        if (pBeacon->channelSwitchPresent) {
-#ifdef FEATURE_WLAN_TDLS
-            /*
-             * on receiving channel switch announcement from AP, delete all
-             * TDLS peers before leaving BSS and proceed for channel switch
-             */
-            if (LIM_IS_STA_ROLE(psessionEntry))
-                limDeleteTDLSPeers(pMac, psessionEntry);
-#endif
+        if(pBeacon->channelSwitchPresent ||
+            pBeacon->propIEinfo.propChannelSwitchPresent)
+        {
             limUpdateChannelSwitch(pMac, pBeacon, psessionEntry);
-        } else if (psessionEntry->gLimSpecMgmt.dot11hChanSwState ==
-                                       eLIM_11H_CHANSW_RUNNING) {
+        }
+        else if (psessionEntry->gLimSpecMgmt.dot11hChanSwState == eLIM_11H_CHANSW_RUNNING)
+        {
             limCancelDot11hChannelSwitch(pMac, psessionEntry);
         }
     }
 
 #ifdef WLAN_FEATURE_11AC
-    if (LIM_IS_STA_ROLE(psessionEntry) ||
-        LIM_IS_BT_AMP_STA_ROLE(psessionEntry) ||
-        LIM_IS_IBSS_ROLE(psessionEntry)) {
+    if ((psessionEntry->limSystemRole == eLIM_STA_ROLE) ||
+        (psessionEntry->limSystemRole == eLIM_BT_AMP_STA_ROLE) ||
+        (psessionEntry->limSystemRole == eLIM_STA_IN_IBSS_ROLE))
+    {
        // check for VHT capability
        pStaDs = dphLookupHashEntry(pMac, pMh->sa, &aid,
              &psessionEntry->dph.dphHashTable);
-       if (NULL != pStaDs && (HAL_STA_INVALID_IDX != pStaDs->staIndex ) &&
-            (WNI_CFG_CHANNEL_BONDING_MODE_DISABLE != cbMode))
+       if (NULL != pStaDs)
        {
           if (psessionEntry->vhtCapability && pBeacon->OperatingMode.present )
           {
@@ -637,7 +627,6 @@ static void __schBeaconProcessForSession( tpAniSirGlobal      pMac,
                 }
                 limCheckVHTOpModeChange(pMac, psessionEntry,
                         chWidth, pStaDs->staIndex, pMh->sa);
-
              }
           }
        }
@@ -785,7 +774,8 @@ void schBeaconProcess(tpAniSirGlobal pMac, tANI_U8* pRxPacketInfo, tpPESession p
 #endif
     )
         {
-            if (!LIM_IS_AP_ROLE(pAPSession)) {
+            if (eLIM_AP_ROLE != pAPSession->limSystemRole)
+            {
                 continue;
             }
 

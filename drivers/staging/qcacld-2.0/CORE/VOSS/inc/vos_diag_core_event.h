@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014-2015 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -260,31 +260,6 @@ struct vos_event_wlan_eapol
 };
 
 /*-------------------------------------------------------------------------
-  Event ID: EVENT_WLAN_LOW_RESOURCE_FAILURE
-  ------------------------------------------------------------------------*/
-/**
- * struct vos_event_wlan_low_resource_failure - Structure holding the
- * low resource failure information
- * @event_sub_type: Gives further information about reason for
- * low resource condition
- *
- * This structure will hold the low resource failure information
- */
-struct vos_event_wlan_low_resource_failure {
-	uint8_t   event_sub_type;
-};
-
-/**
- * enum resource_failure_type - Reason for low resource failure condition
- * @WIFI_EVENT_MEMORY_FAILURE: Memory failure
- *
- * This enum has the reason codes why the low resource situation is observed
- */
-enum resource_failure_type {
-	WIFI_EVENT_MEMORY_FAILURE,
-};
-
-/*-------------------------------------------------------------------------
   Event ID: EVENT_WLAN_WAKE_LOCK
   ------------------------------------------------------------------------*/
 /**
@@ -343,6 +318,7 @@ enum wifi_connectivity_events {
  * @WIFI_POWER_EVENT_WAKELOCK_EXT_SCAN: Extended scan request/response handling
  * @WIFI_POWER_EVENT_WAKELOCK_RESUME_WLAN: Driver resume
  * @WIFI_POWER_EVENT_WAKELOCK_ROC: Remain on channel request/response handling
+ * @WIFI_POWER_EVENT_WAKELOCK_AUTO_SUSPEND: Auto suspend related handling
  * @WIFI_POWER_EVENT_WAKELOCK_IPA: IPA related handling
  * @WIFI_POWER_EVENT_WAKELOCK_ADD_STA: Addition of STA
  * @WIFI_POWER_EVENT_WAKELOCK_HOLD_RX: Wakelocks taken for receive
@@ -363,6 +339,7 @@ enum wake_lock_reason {
 	WIFI_POWER_EVENT_WAKELOCK_EXT_SCAN,
 	WIFI_POWER_EVENT_WAKELOCK_RESUME_WLAN,
 	WIFI_POWER_EVENT_WAKELOCK_ROC,
+	WIFI_POWER_EVENT_WAKELOCK_AUTO_SUSPEND,
 	WIFI_POWER_EVENT_WAKELOCK_IPA,
 	WIFI_POWER_EVENT_WAKELOCK_ADD_STA,
 	WIFI_POWER_EVENT_WAKELOCK_HOLD_RX,

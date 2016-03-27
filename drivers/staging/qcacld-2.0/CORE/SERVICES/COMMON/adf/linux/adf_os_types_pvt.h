@@ -132,9 +132,6 @@ struct __adf_device  {
     struct device          *dev;
     __adf_os_resource_t    res;
     __adf_os_intr          func;/*Interrupt handler*/
-#ifdef QCA_ARP_SPOOFING_WAR
-    void                   *filter_cb;
-#endif
 };
 
 typedef struct __adf_device *__adf_os_device_t;

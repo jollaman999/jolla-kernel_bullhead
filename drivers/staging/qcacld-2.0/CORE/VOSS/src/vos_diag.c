@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -146,6 +146,7 @@ void vos_log_submit(v_VOID_t *plog_hdr_ptr)
     if (nl_srv_is_initialized() != 0)
         return;
 
+
    /* Send the log data to the ptt app only if it is registered
     * with the wlan driver
     */
@@ -177,9 +178,12 @@ void vos_log_submit(v_VOID_t *plog_hdr_ptr)
         *(v_U32_t*)pBuf = DIAG_TYPE_LOGS;
         pBuf += sizeof(v_U32_t);
 
-        vos_mem_copy(pBuf, pHdr, data_len);
+
+        memcpy(pBuf, pHdr,data_len);
 
         if( ptt_sock_send_msg_to_app(wmsg, 0, ANI_NL_MSG_PUMAC, -1) < 0) {
+            VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+                ("Ptt Socket error sending message to the app!!"));
                 vos_mem_free((v_VOID_t *)wmsg);
                 return;
         }
@@ -291,7 +295,7 @@ void vos_event_report_payload(v_U16_t event_Id, v_U16_t length, v_VOID_t *pPaylo
 
         pBuf += sizeof(event_report_t);
 
-        vos_mem_copy(pBuf, pPayload, length);
+        memcpy(pBuf, pPayload,length);
 
         if( ptt_sock_send_msg_to_app(wmsg, 0, ANI_NL_MSG_PUMAC, -1) < 0) {
             VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
@@ -305,25 +309,4 @@ void vos_event_report_payload(v_U16_t event_Id, v_U16_t length, v_VOID_t *pPaylo
 
     return;
 
-}
-
-/**
- * vos_log_low_resource_failure() - This function is used to send low
- * resource failure event
- * @event_sub_type: Reason why the failure was observed
- *
- * This function is used to send low resource failure events to user space
- *
- * Return: None
- *
- */
-void vos_log_low_resource_failure(uint8_t event_sub_type)
-{
-	WLAN_VOS_DIAG_EVENT_DEF(wlan_diag_event,
-			struct vos_event_wlan_low_resource_failure);
-
-	wlan_diag_event.event_sub_type = event_sub_type;
-
-	WLAN_VOS_DIAG_EVENT_REPORT(&wlan_diag_event,
-					EVENT_WLAN_LOW_RESOURCE_FAILURE);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2015 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -182,6 +182,10 @@ int limProcessRemainOnChnlReq(tpAniSirGlobal pMac, tANI_U32 *pMsg)
      * respond with Probe Rsp causing peer device to NOT find us.
      * If we need this optimization, we need to find a way to keep the STA-AP link awake (no BMPS) on home channel when in listen state
      */
+#ifdef CONC_OPER_AND_LISTEN_CHNL_SAME_OPTIMIZE
+    tANI_U8 i;
+    tpPESession psessionEntry;
+#endif
 
     tSirRemainOnChnReq *MsgBuff = (tSirRemainOnChnReq *)pMsg;
     pMac->lim.gpLimRemainOnChanReq = MsgBuff;
@@ -202,6 +206,56 @@ int limProcessRemainOnChnlReq(tpAniSirGlobal pMac, tANI_U32 *pMsg)
         return FALSE;
     }
 
+#ifdef CONC_OPER_AND_LISTEN_CHNL_SAME_OPTIMIZE
+    for (i =0; i < pMac->lim.maxBssId;i++)
+    {
+        psessionEntry = peFindSessionBySessionId(pMac,i);
+
+        if ( (psessionEntry != NULL) )
+        {
+            if (psessionEntry->currentOperChannel == MsgBuff->chnNum)
+            {
+                tANI_U32 val;
+                tSirMacAddr nullBssid = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+                pMac->lim.p2pRemOnChanTimeStamp = vos_timer_get_system_time();
+                pMac->lim.gTotalScanDuration = MsgBuff->duration;
+
+                /* get the duration from the request */
+                val = SYS_MS_TO_TICKS(MsgBuff->duration);
+
+                limLog( pMac, LOG2, "Start listen duration = %d", val);
+                if (tx_timer_change(
+                        &pMac->lim.limTimers.gLimRemainOnChannelTimer, val, 0)
+                                          != TX_SUCCESS)
+                {
+                    limLog(pMac, LOGP,
+                          FL("Unable to change remain on channel Timer val"));
+                    goto error;
+                }
+                else if(TX_SUCCESS != tx_timer_activate(
+                                &pMac->lim.limTimers.gLimRemainOnChannelTimer))
+                {
+                    limLog(pMac, LOGP,
+                    FL("Unable to activate remain on channel Timer"));
+                    limDeactivateAndChangeTimer(pMac, eLIM_REMAIN_CHN_TIMER);
+                    goto error;
+                }
+
+
+                if ((limSetLinkState(pMac, MsgBuff->isProbeRequestAllowed?
+                                     eSIR_LINK_LISTEN_STATE:eSIR_LINK_SEND_ACTION_STATE,
+                                     nullBssid, pMac->lim.gSelfMacAddr,
+                                     limSetLinkStateP2PCallback, NULL)) != eSIR_SUCCESS)
+                {
+                    limLog( pMac, LOGE, "Unable to change link state");
+                    goto error;
+                }
+                return FALSE;
+            }
+        }
+    }
+#endif
     pMac->lim.gLimPrevMlmState = pMac->lim.gLimMlmState;
     pMac->lim.gLimMlmState     = eLIM_MLM_P2P_LISTEN_STATE;
 
@@ -212,6 +266,12 @@ int limProcessRemainOnChnlReq(tpAniSirGlobal pMac, tANI_U32 *pMsg)
                    limRemainOnChnlSuspendLinkHdlr, NULL);
     return FALSE;
 
+#ifdef CONC_OPER_AND_LISTEN_CHNL_SAME_OPTIMIZE
+error:
+    limRemainOnChnRsp(pMac,eHAL_STATUS_FAILURE, NULL);
+    /* pMsg is freed by the caller */
+    return FALSE;
+#endif
 }
 
 
@@ -561,8 +621,8 @@ void limRemainOnChnRsp(tpAniSirGlobal pMac, eHalStatus status, tANI_U32 *data)
         return;
     }
 
-    /* Incase of the Remain on Channel Failure Case
-       Clean up Everything */
+    //Incase of the Remain on Channel Failure Case
+    //Cleanup Everything
     if(eHAL_STATUS_FAILURE == status)
     {
        //Deactivate Remain on Channel Timer
@@ -578,15 +638,15 @@ void limRemainOnChnRsp(tpAniSirGlobal pMac, eHalStatus status, tANI_U32 *data)
 
        pMac->lim.gLimSystemInScanLearnMode = 0;
        pMac->lim.gLimHalScanState = eLIM_HAL_IDLE_SCAN_STATE;
-       SET_LIM_PROCESS_DEFD_MESGS(pMac, true);
     }
 
     /* delete the session */
     if((psessionEntry = peFindSessionByBssid(pMac,
                  MsgRemainonChannel->selfMacAddr,&sessionId)) != NULL)
     {
-        if (LIM_IS_P2P_DEVICE_ROLE(psessionEntry)) {
-            peDeleteSession( pMac, psessionEntry);
+        if ( eLIM_P2P_DEVICE_ROLE == psessionEntry->limSystemRole )
+        {
+           peDeleteSession( pMac, psessionEntry);
         }
     }
 
@@ -621,6 +681,7 @@ void limSendSmeMgmtFrameInd(
                     tANI_U32 rxChannel, tpPESession psessionEntry,
                     tANI_S8 rxRssi)
 {
+    tSirMsgQ              mmhMsg;
     tpSirSmeMgmtFrameInd pSirSmeMgmtFrame = NULL;
     tANI_U16              length;
 
@@ -635,7 +696,8 @@ void limSendSmeMgmtFrameInd(
     }
     vos_mem_set((void*)pSirSmeMgmtFrame, length, 0);
 
-    pSirSmeMgmtFrame->frame_len = frameLen;
+    pSirSmeMgmtFrame->mesgType = eWNI_SME_MGMT_FRM_IND;
+    pSirSmeMgmtFrame->mesgLen = length;
     pSirSmeMgmtFrame->sessionId = sessionId;
     pSirSmeMgmtFrame->frameType = frameType;
     pSirSmeMgmtFrame->rxRssi = rxRssi;
@@ -708,13 +770,11 @@ send_frame:
     vos_mem_zero(pSirSmeMgmtFrame->frameBuf,frameLen);
     vos_mem_copy(pSirSmeMgmtFrame->frameBuf,frame,frameLen);
 
-    if (pMac->mgmt_frame_ind_cb)
-       pMac->mgmt_frame_ind_cb(pSirSmeMgmtFrame);
-    else
-       limLog(pMac, LOGW,
-             FL("Management indication callback not registered!!"));
-    vos_mem_free(pSirSmeMgmtFrame);
+    mmhMsg.type = eWNI_SME_MGMT_FRM_IND;
+    mmhMsg.bodyptr = pSirSmeMgmtFrame;
+    mmhMsg.bodyval = 0;
 
+    limSysProcessMmhMsgApi(pMac, &mmhMsg, ePROT);
     return;
 } /*** end limSendSmeListenRsp() ***/
 
