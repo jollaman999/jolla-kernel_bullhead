@@ -52,6 +52,10 @@
 #include <soc/qcom/lge/lge_handle_panic.h>
 #endif
 
+#ifdef CONFIG_MSM_HOTPLUG
+#include <linux/msm_hotplug.h>
+#endif
+
 #define CREATE_TRACE_POINTS
 #define TRACE_MSM_THERMAL
 #include <trace/trace_thermal.h>
@@ -2954,7 +2958,11 @@ static void check_temp(struct work_struct *work)
 				msm_thermal_info.sensor_id, ret);
 		goto reschedule;
 	}
-	do_core_control(temp);
+
+#ifdef CONFIG_MSM_HOTPLUG
+	if ((!msm_hotplug_scr_suspended && msm_enabled) || !msm_enabled)
+#endif
+		do_core_control(temp);
 	do_vdd_mx();
 	do_psm();
 	do_gfx_phase_cond();
