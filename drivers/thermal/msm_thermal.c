@@ -4152,6 +4152,18 @@ static void interrupt_mode_init(void)
 	}
 }
 
+void msm_thermal_suspend(bool suspend)
+{
+	if (suspend) {
+		interrupt_mode_init();
+		pr_info("suspended\n");
+	} else {
+		schedule_delayed_work(&check_temp_work, 0);
+		pr_info("resumed\n");
+	}
+}
+EXPORT_SYMBOL(msm_thermal_suspend);
+
 static int __ref set_enabled(const char *val, const struct kernel_param *kp)
 {
 	int ret = 0;

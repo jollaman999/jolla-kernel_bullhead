@@ -173,6 +173,10 @@ extern void msm_hotplug_suspend(void);
 extern void msm_hotplug_resume(void);
 #endif
 
+#ifdef CONFIG_THERMAL_MONITOR
+extern void msm_thermal_suspend(bool suspend);
+#endif
+
 static int synaptics_rmi4_i2c_read(struct synaptics_rmi4_data *rmi4_data,
 		unsigned short addr, unsigned char *data,
 		unsigned short length);
@@ -4821,6 +4825,11 @@ static int synaptics_rmi4_suspend(struct device *dev)
 		dyn_fsync_suspend();
 #endif
 
+#ifdef CONFIG_THERMAL_MONITOR
+	// Must be doen before msm_hotplug_suspend()
+	msm_thermal_suspend(true);
+#endif
+
 #ifdef CONFIG_MSM_HOTPLUG
 	msm_hotplug_scr_suspended = true;
 	if (msm_enabled)
@@ -4875,6 +4884,10 @@ static int synaptics_rmi4_resume(struct device *dev)
 	msm_hotplug_scr_suspended = false;
 	if (msm_enabled)
 		msm_hotplug_resume();
+#endif
+
+#ifdef CONFIG_THERMAL_MONITOR
+	msm_thermal_suspend(false);
 #endif
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
