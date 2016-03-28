@@ -2752,8 +2752,8 @@
 		compatible = "qcom,msm-thermal";
 		qcom,sensor-id = <7>;
 		qcom,poll-ms = <250>;
-		qcom,limit-temp = <70>;
-		qcom,limit-temp-big = <68>;
+		qcom,limit-temp = <72>;
+		qcom,limit-temp-big = <70>;
 		qcom,big-core-start = <4>;
 		qcom,temp-hysteresis = <10>;
 		qcom,therm-reset-temp = <115>;
