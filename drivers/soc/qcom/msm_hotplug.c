@@ -23,7 +23,6 @@
 #include <linux/slab.h>
 #include <linux/cpufreq.h>
 #include <linux/mutex.h>
-#include <linux/input.h>
 #include <linux/math64.h>
 #include <linux/kernel_stat.h>
 #include <linux/tick.h>
@@ -39,11 +38,8 @@
 #define HOTPLUG_ENABLED			1
 #define DEFAULT_UPDATE_RATE		HZ / 10
 #define START_DELAY			HZ * 20
-#define MIN_INPUT_INTERVAL		150 * 1000L
 #define DEFAULT_HISTORY_SIZE		10
 #define DEFAULT_DOWN_LOCK_DUR		1000
-#define DEFAULT_BOOST_LOCK_DUR		2500 * 1000L
-#define DEFAULT_NR_CPUS_BOOSTED		LITTLE_CORES / 2
 #define DEFAULT_MIN_CPUS_ONLINE		1
 #define DEFAULT_MAX_CPUS_ONLINE		LITTLE_CORES
 #define DEFAULT_FAST_LANE_LOAD		99
@@ -77,11 +73,8 @@ static struct cpu_hotplug {
 	unsigned int target_cpus;
 	unsigned int min_cpus_online;
 	unsigned int max_cpus_online;
-	unsigned int cpus_boosted;
 	unsigned int offline_load;
 	unsigned int down_lock_dur;
-	u64 boost_lock_dur;
-	u64 last_input;
 	unsigned int fast_lane_load;
 	struct work_struct up_work;
 	struct work_struct down_work;
@@ -94,16 +87,13 @@ static struct cpu_hotplug {
 	.min_cpus_online_res = DEFAULT_MIN_CPUS_ONLINE,
 	.max_cpus_online_res = DEFAULT_MAX_CPUS_ONLINE,
 	.max_cpus_online_susp = DEFAULT_MAX_CPUS_ONLINE_SUSP,
-	.cpus_boosted = DEFAULT_NR_CPUS_BOOSTED,
 	.down_lock_dur = DEFAULT_DOWN_LOCK_DUR,
-	.boost_lock_dur = DEFAULT_BOOST_LOCK_DUR,
 	.fast_lane_load = DEFAULT_FAST_LANE_LOAD,
 };
 
 static struct workqueue_struct *hotplug_wq;
 static struct delayed_work hotplug_work;
 
-static u64 last_boost_time;
 static unsigned int default_update_rates[] = { DEFAULT_UPDATE_RATE };
 
 static struct cpu_stats {
@@ -467,7 +457,6 @@ static void online_cpu(unsigned int target)
 static void offline_cpu(unsigned int target)
 {
 	unsigned int online_cpus;
-	u64 now;
 
 	if (!msm_enabled)
 		return;
@@ -480,11 +469,6 @@ static void offline_cpu(unsigned int target)
 	 */
 	if (target >= online_cpus || 
 		online_cpus <= hotplug.min_cpus_online)
-		return;
-
-	now = ktime_to_us(ktime_get());
-	if (online_cpus <= hotplug.cpus_boosted &&
-	    (now - hotplug.last_input < hotplug.boost_lock_dur))
 		return;
 
 	hotplug.target_cpus = target;
@@ -669,97 +653,6 @@ void msm_hotplug_resume_timeout(void)
 }
 EXPORT_SYMBOL(msm_hotplug_resume_timeout);
 
-static void hotplug_input_event(struct input_handle *handle, unsigned int type,
-				unsigned int code, int value)
-{
-	u64 now;
-
-	if (hotplug.suspended) {
-		dprintk("%s: suspended.\n", MSM_HOTPLUG);
-		return;
-	}
-
-	now = ktime_to_us(ktime_get());
-	hotplug.last_input = now;
-	if (now - last_boost_time < MIN_INPUT_INTERVAL)
-		return;
-
-	if (num_online_little_cpus() >= hotplug.cpus_boosted ||
-		hotplug.cpus_boosted <= hotplug.min_cpus_online)
-		return;
-
-	dprintk("%s: online_cpus: %u boosted\n", MSM_HOTPLUG,
-		stats.online_cpus);
-
-	online_cpu(hotplug.cpus_boosted);
-	last_boost_time = ktime_to_us(ktime_get());
-}
-
-static int hotplug_input_connect(struct input_handler *handler,
-				 struct input_dev *dev,
-				 const struct input_device_id *id)
-{
-	struct input_handle *handle;
-	int err;
-
-	handle = kzalloc(sizeof(struct input_handle), GFP_KERNEL);
-	if (!handle)
-		return -ENOMEM;
-
-	handle->dev = dev;
-	handle->handler = handler;
-	handle->name = handler->name;
-
-	err = input_register_handle(handle);
-	if (err)
-		goto err_register;
-
-	err = input_open_device(handle);
-	if (err)
-		goto err_open;
-
-	return 0;
-err_open:
-	input_unregister_handle(handle);
-err_register:
-	kfree(handle);
-	return err;
-}
-
-static void hotplug_input_disconnect(struct input_handle *handle)
-{
-	input_close_device(handle);
-	input_unregister_handle(handle);
-	kfree(handle);
-}
-
-static const struct input_device_id hotplug_ids[] = {
-	{
-		.flags = INPUT_DEVICE_ID_MATCH_EVBIT |
-			 INPUT_DEVICE_ID_MATCH_ABSBIT,
-		.evbit = { BIT_MASK(EV_ABS) },
-		.absbit = { [BIT_WORD(ABS_MT_POSITION_X)] =
-			    BIT_MASK(ABS_MT_POSITION_X) |
-			    BIT_MASK(ABS_MT_POSITION_Y) },
-	}, /* multi-touch touchscreen */
-	{
-		.flags = INPUT_DEVICE_ID_MATCH_KEYBIT |
-			 INPUT_DEVICE_ID_MATCH_ABSBIT,
-		.keybit = { [BIT_WORD(BTN_TOUCH)] = BIT_MASK(BTN_TOUCH) },
-		.absbit = { [BIT_WORD(ABS_X)] =
-			    BIT_MASK(ABS_X) | BIT_MASK(ABS_Y) },
-	}, /* touchpad */
-	{ },
-};
-
-static struct input_handler hotplug_input_handler = {
-	.event		= hotplug_input_event,
-	.connect	= hotplug_input_connect,
-	.disconnect	= hotplug_input_disconnect,
-	.name		= MSM_HOTPLUG,
-	.id_table	= hotplug_ids,
-};
-
 static int msm_hotplug_start(void)
 {
 	int cpu, ret = 0;
@@ -772,13 +665,6 @@ static int msm_hotplug_start(void)
 		       MSM_HOTPLUG);
 		ret = -ENOMEM;
 		goto err_out;
-	}
-
-	ret = input_register_handler(&hotplug_input_handler);
-	if (ret) {
-		pr_err("%s: Failed to register input handler: %d\n",
-		       MSM_HOTPLUG, ret);
-		goto err_dev;
 	}
 
 	stats.load_hist = kmalloc(sizeof(stats.hist_size), GFP_KERNEL);
@@ -837,7 +723,6 @@ static void msm_hotplug_stop(void)
 	kfree(stats.load_hist);
 
 	hotplug.notif.notifier_call = NULL;
-	input_unregister_handler(&hotplug_input_handler);
 
 	destroy_workqueue(hotplug_wq);
 
@@ -947,30 +832,6 @@ static ssize_t store_down_lock_duration(struct device *dev,
 		return -EINVAL;
 
 	hotplug.down_lock_dur = val;
-
-	return count;
-}
-
-static ssize_t show_boost_lock_duration(struct device *dev,
-				        struct device_attribute
-				        *msm_hotplug_attrs, char *buf)
-{
-	return sprintf(buf, "%llu\n", div_u64(hotplug.boost_lock_dur, 1000));
-}
-
-static ssize_t store_boost_lock_duration(struct device *dev,
-					 struct device_attribute
-					 *msm_hotplug_attrs, const char *buf,
-					 size_t count)
-{
-	int ret;
-	u64 val;
-
-	ret = sscanf(buf, "%llu", &val);
-	if (ret != 1)
-		return -EINVAL;
-
-	hotplug.boost_lock_dur = val * 1000;
 
 	return count;
 }
@@ -1125,29 +986,6 @@ static ssize_t store_max_cpus_online_susp(struct device *dev,
 	return count;
 }
 
-static ssize_t show_cpus_boosted(struct device *dev,
-				 struct device_attribute *msm_hotplug_attrs,
-				 char *buf)
-{
-	return sprintf(buf, "%u\n", hotplug.cpus_boosted);
-}
-
-static ssize_t store_cpus_boosted(struct device *dev,
-				  struct device_attribute *msm_hotplug_attrs,
-				  const char *buf, size_t count)
-{
-	int ret;
-	unsigned int val;
-
-	ret = sscanf(buf, "%u", &val);
-	if (ret != 1 || val < 1 || val > stats.total_cpus)
-		return -EINVAL;
-
-	hotplug.cpus_boosted = val;
-
-	return count;
-}
-
 static ssize_t show_offline_load(struct device *dev,
 				 struct device_attribute *msm_hotplug_attrs,
 				 char *buf)
@@ -1227,8 +1065,6 @@ static ssize_t show_current_load(struct device *dev,
 static DEVICE_ATTR(msm_enabled, 644, show_enable_hotplug, store_enable_hotplug);
 static DEVICE_ATTR(down_lock_duration, 644, show_down_lock_duration,
 		   store_down_lock_duration);
-static DEVICE_ATTR(boost_lock_duration, 644, show_boost_lock_duration,
-		   store_boost_lock_duration);
 static DEVICE_ATTR(update_rates, 644, show_update_rates, store_update_rates);
 static DEVICE_ATTR(load_levels, 644, show_load_levels, store_load_levels);
 static DEVICE_ATTR(min_cpus_online, 644, show_min_cpus_online,
@@ -1237,7 +1073,6 @@ static DEVICE_ATTR(max_cpus_online, 644, show_max_cpus_online,
 		   store_max_cpus_online);
 static DEVICE_ATTR(max_cpus_online_susp, 644, show_max_cpus_online_susp,
 		   store_max_cpus_online_susp);
-static DEVICE_ATTR(cpus_boosted, 644, show_cpus_boosted, store_cpus_boosted);
 static DEVICE_ATTR(offline_load, 644, show_offline_load, store_offline_load);
 static DEVICE_ATTR(fast_lane_load, 644, show_fast_lane_load,
 		   store_fast_lane_load);
@@ -1247,13 +1082,11 @@ static DEVICE_ATTR(current_load, 444, show_current_load, NULL);
 static struct attribute *msm_hotplug_attrs[] = {
 	&dev_attr_msm_enabled.attr,
 	&dev_attr_down_lock_duration.attr,
-	&dev_attr_boost_lock_duration.attr,
 	&dev_attr_update_rates.attr,
 	&dev_attr_load_levels.attr,
 	&dev_attr_min_cpus_online.attr,
 	&dev_attr_max_cpus_online.attr,
 	&dev_attr_max_cpus_online_susp.attr,
-	&dev_attr_cpus_boosted.attr,
 	&dev_attr_offline_load.attr,
 	&dev_attr_fast_lane_load.attr,
 	&dev_attr_io_is_busy.attr,
