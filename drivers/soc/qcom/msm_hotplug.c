@@ -502,7 +502,7 @@ static void msm_hotplug_work(struct work_struct *work)
 {
 	unsigned int i, target = 0;
 
-	if (hotplug.suspended && hotplug.max_cpus_online_susp <= 1) {
+	if (hotplug.suspended) {
 		dprintk("%s: suspended.\n", MSM_HOTPLUG);
 		return;
 	}
@@ -577,10 +577,6 @@ void msm_hotplug_suspend(void)
 	hotplug.max_cpus_online = hotplug.max_cpus_online_susp;
 	mutex_unlock(&hotplug.msm_hotplug_mutex);
 
-	/* Do not cancel hotplug work unless max_cpus_online_susp is 1 */
-	if (hotplug.max_cpus_online_susp > 1)
-		return;
-
 	/* Flush hotplug workqueue */
 	if (timeout_enabled) {
 		timeout_enabled = false;
@@ -590,12 +586,17 @@ void msm_hotplug_suspend(void)
 		cancel_delayed_work_sync(&hotplug_work);
 	}
 
-	/* Put all sibling cores to sleep */
-	for_each_online_cpu(cpu) {
-		if (cpu == 0)
-			continue;
+	// Turn off little cores but remain max_cpus_online_susp
+	// Skip cpu 0
+	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
+		if (hotplug.max_cpus_online_susp == num_online_little_cpus())
+			break;
 		cpu_down(cpu);
 	}
+
+	// Turn off all of big cores
+	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++)
+		cpu_down(cpu);
 
 	pr_info("%s: suspended.\n", MSM_HOTPLUG);
 
@@ -615,10 +616,8 @@ void msm_hotplug_resume(void)
 		mutex_unlock(&hotplug.msm_hotplug_mutex);
 		required_wakeup = 1;
 		/* Initiate hotplug work if it was cancelled */
-		if (hotplug.max_cpus_online_susp <= 1) {
-			required_reschedule = 1;
-			INIT_DELAYED_WORK(&hotplug_work, msm_hotplug_work);
-		}
+		required_reschedule = 1;
+		INIT_DELAYED_WORK(&hotplug_work, msm_hotplug_work);
 	}
 
 	if (required_wakeup) {
