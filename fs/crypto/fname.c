@@ -12,8 +12,6 @@
 
 #include <crypto/hash.h>
 #include <crypto/sha.h>
-#include <keys/encrypted-type.h>
-#include <keys/user-type.h>
 #include <linux/crypto.h>
 #include <linux/scatterlist.h>
 #include <linux/ratelimit.h>
