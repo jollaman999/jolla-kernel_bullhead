@@ -107,6 +107,9 @@ static struct workqueue_struct *sovc_track_input_wq;
 static struct work_struct sovc_volume_input_work;
 static struct work_struct sovc_track_input_work;
 
+static bool registered = false;
+static DEFINE_MUTEX(reg_lock);
+
 extern int synaptics_rmi4_touch_off_trigger(unsigned int delay);
 
 enum CONTROL {
@@ -447,6 +450,87 @@ static struct input_handler sovc_track_input_handler = {
 	.id_table	= sovc_ids,
 };
 
+int register_sovc(void)
+{
+	int rc = 0;
+
+	mutex_lock(&reg_lock);
+
+	if (registered) {
+		pr_info(LOGTAG"%s already registered\n", __func__);
+		goto out;
+	}
+
+	sovc_volume_input_wq = create_workqueue("sovc_volume_iwq");
+	if (!sovc_volume_input_wq) {
+		pr_err("%s: Failed to create sovc_volume_iwq workqueue\n", __func__);
+		mutex_unlock(&reg_lock);
+		return -EFAULT;
+	}
+	INIT_WORK(&sovc_volume_input_work, sovc_volume_input_callback);
+	sovc_track_input_wq = create_workqueue("sovc_track_iwq");
+	if (!sovc_track_input_wq) {
+		pr_err("%s: Failed to create sovc_track_iwq workqueue\n", __func__);
+		mutex_unlock(&reg_lock);
+		return -EFAULT;
+	}
+	INIT_WORK(&sovc_track_input_work, sovc_track_input_callback);
+
+	rc = input_register_handler(&sovc_volume_input_handler);
+	if (rc) {
+		pr_err("%s: Failed to register sovc_volume_input_handler\n", __func__);
+		goto err;
+	}
+	rc = input_register_handler(&sovc_track_input_handler);
+	if (rc) {
+		pr_err("%s: Failed to register sovc_track_input_handler\n", __func__);
+		goto err;
+	}
+
+	registered = true;
+out:
+	mutex_unlock(&reg_lock);
+	pr_info(LOGTAG"%s done\n", __func__);
+
+	return rc;
+err:
+	flush_workqueue(sovc_volume_input_wq);
+	flush_workqueue(sovc_track_input_wq);
+	destroy_workqueue(sovc_volume_input_wq);
+	destroy_workqueue(sovc_track_input_wq);
+	cancel_work_sync(&sovc_volume_input_work);
+	cancel_work_sync(&sovc_track_input_work);
+	mutex_unlock(&reg_lock);
+
+	return rc;
+}
+EXPORT_SYMBOL(register_sovc);
+
+void unregister_sovc(void)
+{
+	mutex_lock(&reg_lock);
+
+	if(!registered) {
+		pr_info(LOGTAG"%s already unregistered\n", __func__);
+		goto out;
+	}
+
+	input_unregister_handler(&sovc_volume_input_handler);
+	input_unregister_handler(&sovc_track_input_handler);
+	flush_workqueue(sovc_volume_input_wq);
+	flush_workqueue(sovc_track_input_wq);
+	destroy_workqueue(sovc_volume_input_wq);
+	destroy_workqueue(sovc_track_input_wq);
+	cancel_work_sync(&sovc_volume_input_work);
+	cancel_work_sync(&sovc_track_input_work);
+
+	registered = false;
+out:
+	mutex_unlock(&reg_lock);
+	pr_info(LOGTAG"%s done\n", __func__);
+}
+EXPORT_SYMBOL(unregister_sovc);
+
 /*
  * SYSFS stuff below here
  */
@@ -560,26 +644,6 @@ static int __init scroff_volctr_init(void)
 		goto err_input_dev;
 	}
 
-	sovc_volume_input_wq = create_workqueue("sovc_volume_iwq");
-	if (!sovc_volume_input_wq) {
-		pr_err("%s: Failed to create sovc_volume_iwq workqueue\n", __func__);
-		return -EFAULT;
-	}
-	INIT_WORK(&sovc_volume_input_work, sovc_volume_input_callback);
-	sovc_track_input_wq = create_workqueue("sovc_track_iwq");
-	if (!sovc_track_input_wq) {
-		pr_err("%s: Failed to create sovc_track_iwq workqueue\n", __func__);
-		return -EFAULT;
-	}
-	INIT_WORK(&sovc_track_input_work, sovc_track_input_callback);
-
-	rc = input_register_handler(&sovc_volume_input_handler);
-	if (rc)
-		pr_err("%s: Failed to register sovc_volume_input_handler\n", __func__);
-	rc = input_register_handler(&sovc_track_input_handler);
-	if (rc)
-		pr_err("%s: Failed to register sovc_track_input_handler\n", __func__);
-
 #ifndef ANDROID_TOUCH_DECLARED
 	android_touch_kobj = kobject_create_and_add("android_touch", NULL) ;
 	if (android_touch_kobj == NULL) {
@@ -612,10 +676,7 @@ static void __exit scroff_volctr_exit(void)
 #ifndef ANDROID_TOUCH_DECLARED
 	kobject_del(android_touch_kobj);
 #endif
-	input_unregister_handler(&sovc_volume_input_handler);
-	input_unregister_handler(&sovc_track_input_handler);
-	destroy_workqueue(sovc_volume_input_wq);
-	destroy_workqueue(sovc_track_input_wq);
+	unregister_sovc();
 	input_unregister_device(sovc_input);
 	input_free_device(sovc_input);
 }
