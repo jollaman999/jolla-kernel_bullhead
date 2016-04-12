@@ -4696,18 +4696,33 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 {
 	int retval;
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	unregister_sovc();
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	if (!dt2w_switch)
+		unregister_dt2w();
+	else
+		return;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	if (s2w_switch)
+		return;
+#endif
+#endif
+
 	if (synaptics_rmi4_touch_off_triggered)
 		return;
 
 	synaptics_rmi4_touch_off_triggered = true;
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (track_changed) {
+	if (track_changed || (sovc_tmp_onoff && !sovc_mic_detected)) {
+		register_sovc();
 		synaptics_rmi4_touch_off_triggered = false;
 		return;
 	}
 
-	if (!scr_suspended || (sovc_tmp_onoff && !sovc_mic_detected)) {
+	if (!scr_suspended) {
 		synaptics_rmi4_touch_off_triggered = false;
 		return;
 	}
@@ -4818,13 +4833,17 @@ static DECLARE_DELAYED_WORK(synaptics_rmi4_touch_off_work, synaptics_rmi4_touch_
 
 void synaptics_rmi4_touch_off_trigger(unsigned int delay)
 {
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-	unregister_dt2w();
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	if (!s2w_switch)
+		unregister_s2w();
 #endif
-	unregister_sovc();
-
-	schedule_delayed_work(&synaptics_rmi4_touch_off_work,
-				msecs_to_jiffies(delay));
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	if (!dt2w_switch && !sovc_switch)
+		unregister_dt2w();
+#endif
+	if (sovc_switch)
+		schedule_delayed_work(&synaptics_rmi4_touch_off_work,
+					msecs_to_jiffies(delay));
 }
 EXPORT_SYMBOL(synaptics_rmi4_touch_off_trigger);
 #endif
