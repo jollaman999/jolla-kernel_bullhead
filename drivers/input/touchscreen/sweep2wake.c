@@ -175,7 +175,7 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 
 		case ABS_MT_POSITION_X:
 			touch_x = value;
-			queue_work_on(0, s2w_input_wq, &s2w_input_work);
+			queue_work(s2w_input_wq, &s2w_input_work);
 			break;
 
 		default:
