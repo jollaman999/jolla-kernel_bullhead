@@ -5529,15 +5529,7 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 #endif
 	mutex_unlock(&sovc_lock);
 
-#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-	if (s2w_switch)
-		return;
-#endif
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-	if (dt2w_switch)
-		return;
-#endif
-	if (sovc_switch && scr_suspended)
+	if (scr_suspended)
 		synaptics_rmi4_touch_off_trigger(SOVC_TOUCH_OFF_DELAY);
 #endif
 }
