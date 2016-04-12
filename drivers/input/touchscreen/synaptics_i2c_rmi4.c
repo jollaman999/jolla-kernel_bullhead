@@ -114,6 +114,8 @@ static bool is_touch_on(void)
 }
 #endif
 
+static DEFINE_MUTEX(suspend_resume_lock);
+
 #define DRIVER_NAME "synaptics_rmi4_i2c"
 #define INPUT_PHYS_NAME "synaptics_rmi4_i2c/input0"
 #define DEBUGFS_DIR_NAME "ts_debug"
@@ -4827,11 +4829,9 @@ void synaptics_rmi4_touch_off_trigger(unsigned int delay)
 EXPORT_SYMBOL(synaptics_rmi4_touch_off_trigger);
 #endif
 
-static int synaptics_rmi4_suspend(struct device *dev)
+static void synaptics_rmi4_suspend_works(struct work_struct *synaptics_rmi4_suspend_work)
 {
-	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
-
-	rmi4_data_touch_off = rmi4_data;
+	mutex_lock(&suspend_resume_lock);
 
 #ifdef CONFIG_UKSM
 	if (uksm_run_stored != UKSM_RUN_STOP)
@@ -4856,6 +4856,18 @@ static int synaptics_rmi4_suspend(struct device *dev)
 	if (msm_enabled)
 		msm_hotplug_suspend();
 #endif
+
+	mutex_unlock(&suspend_resume_lock);
+}
+static DECLARE_WORK(synaptics_rmi4_suspend_work, synaptics_rmi4_suspend_works);
+
+static int synaptics_rmi4_suspend(struct device *dev)
+{
+	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
+
+	rmi4_data_touch_off = rmi4_data;
+
+	schedule_work(&synaptics_rmi4_suspend_work);
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 	scr_suspended = true;
@@ -4889,9 +4901,9 @@ static int synaptics_rmi4_suspend(struct device *dev)
  * from sleep, enables the interrupt, and starts finger data
  * acquisition.
  */
-static int synaptics_rmi4_resume(struct device *dev)
+static void synaptics_rmi4_resume_works(struct work_struct *synaptics_rmi4_resume_work)
 {
-	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
+	mutex_lock(&suspend_resume_lock);
 
 #ifdef CONFIG_UKSM
 	if (uksm_run_stored != UKSM_RUN_STOP)
@@ -4911,6 +4923,26 @@ static int synaptics_rmi4_resume(struct device *dev)
 	msm_thermal_suspend(false);
 #endif
 
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	unregister_s2w();
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	unregister_dt2w();
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	unregister_sovc();
+#endif
+
+	mutex_unlock(&suspend_resume_lock);
+}
+static DECLARE_WORK(synaptics_rmi4_resume_work, synaptics_rmi4_resume_works);
+
+static int synaptics_rmi4_resume(struct device *dev)
+{
+	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
+
+	schedule_work(&synaptics_rmi4_resume_work);
+
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 	scr_suspended = false;
 
@@ -4923,16 +4955,6 @@ static int synaptics_rmi4_resume(struct device *dev)
 		mutex_unlock(&suspended_mutex);
 		return 0;
 	}
-#endif
-
-#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-	unregister_s2w();
-#endif
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-	unregister_dt2w();
-#endif
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	unregister_sovc();
 #endif
 
 	if (rmi4_data->staying_awake)
