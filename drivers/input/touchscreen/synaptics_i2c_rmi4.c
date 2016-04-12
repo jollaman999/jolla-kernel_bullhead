@@ -1885,8 +1885,7 @@ static irqreturn_t synaptics_rmi4_irq(int irq, void *data)
 		queue_work(rmi4_data->det_workqueue, &rmi4_data->recovery_work);
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
-	if (is_touch_on() && scr_suspended &&
-	    ktime_to_ms(ktime_get()) - wake_lock_start_time > RMI4_WL_HOLD_TIME_MS) {
+	if (scr_suspended && ktime_to_ms(ktime_get()) - wake_lock_start_time > RMI4_WL_HOLD_TIME_MS) {
 		wake_lock_start_time = ktime_to_ms(ktime_get());
 		wake_lock_timeout(&rmi4_data->rmi4_wl, msecs_to_jiffies(RMI4_WL_HOLD_TIME_MS));
 		pr_info("touch wakelock working\n");
