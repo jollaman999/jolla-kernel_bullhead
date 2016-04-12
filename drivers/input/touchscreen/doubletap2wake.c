@@ -225,12 +225,12 @@ static void dt2w_input_event(struct input_handle *handle, unsigned int type,
 
 		case ABS_MT_POSITION_X:
 			touch_x = value;
-			queue_work_on(0, dt2w_input_wq, &dt2w_input_work);
+			queue_work(dt2w_input_wq, &dt2w_input_work);
 			break;
 
 		case ABS_MT_POSITION_Y:
 			touch_y = value;
-			queue_work_on(0, dt2w_input_wq, &dt2w_input_work);
+			queue_work(dt2w_input_wq, &dt2w_input_work);
 			break;
 
 		default:

@@ -336,7 +336,7 @@ static void sovc_volume_input_event(struct input_handle *handle, unsigned int ty
 	switch(code) {
 		case ABS_MT_POSITION_Y:
 			touch_y = value;
-			queue_work_on(0, sovc_volume_input_wq, &sovc_volume_input_work);
+			queue_work(sovc_volume_input_wq, &sovc_volume_input_work);
 			break;
 
 		default:
@@ -357,7 +357,7 @@ static void sovc_track_input_event(struct input_handle *handle, unsigned int typ
 	switch(code) {
 		case ABS_MT_POSITION_X:
 			touch_x = value;
-			queue_work_on(0, sovc_track_input_wq, &sovc_track_input_work);
+			queue_work(sovc_track_input_wq, &sovc_track_input_work);
 			break;
 
 		default:
