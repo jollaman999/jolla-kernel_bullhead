@@ -65,6 +65,9 @@ static DEFINE_MUTEX(pwrkeyworklock);
 static struct workqueue_struct *s2w_input_wq;
 static struct work_struct s2w_input_work;
 
+static bool registered = false;
+static DEFINE_MUTEX(reg_lock);
+
 // Vibrate when screen on
 #ifdef CONFIG_QPNP_HAPTIC
 extern void qpnp_hap_td_enable(int value);
@@ -242,6 +245,67 @@ static struct input_handler s2w_input_handler = {
 	.id_table	= s2w_ids,
 };
 
+int register_s2w(void)
+{
+	int rc = 0;
+
+	mutex_lock(&reg_lock);
+
+	if (registered) {
+		pr_info(LOGTAG"%s already registered\n", __func__);
+		goto out;
+	}
+
+	s2w_input_wq = create_workqueue("s2wiwq");
+	if (!s2w_input_wq) {
+		pr_err("%s: Failed to create s2wiwq workqueue\n", __func__);
+		mutex_unlock(&reg_lock);
+		return -EFAULT;
+	}
+	INIT_WORK(&s2w_input_work, s2w_input_callback);
+	rc = input_register_handler(&s2w_input_handler);
+	if (rc) {
+		pr_err("%s: Failed to register s2w_input_handler\n", __func__);
+		goto err;
+	}
+
+	registered = true;
+out:
+	mutex_unlock(&reg_lock);
+	pr_info(LOGTAG"%s done\n", __func__);
+
+	return rc;
+err:
+	flush_workqueue(s2w_input_wq);
+	destroy_workqueue(s2w_input_wq);
+	cancel_work_sync(&s2w_input_work);
+	mutex_unlock(&reg_lock);
+
+	return rc;
+}
+EXPORT_SYMBOL(register_s2w);
+
+void unregister_s2w(void)
+{
+	mutex_lock(&reg_lock);
+
+	if(!registered) {
+		pr_info(LOGTAG"%s already unregistered\n", __func__);
+		goto out;
+	}
+
+	input_unregister_handler(&s2w_input_handler);
+	flush_workqueue(s2w_input_wq);
+	destroy_workqueue(s2w_input_wq);
+	cancel_work_sync(&s2w_input_work);
+
+	registered = false;
+out:
+	mutex_unlock(&reg_lock);
+	pr_info(LOGTAG"%s done\n", __func__);
+}
+EXPORT_SYMBOL(unregister_s2w);
+
 /*
  * SYSFS stuff below here
  */
@@ -316,16 +380,6 @@ static int __init sweep2wake_init(void)
 		goto err_input_dev;
 	}
 
-	s2w_input_wq = create_workqueue("s2wiwq");
-	if (!s2w_input_wq) {
-		pr_err("%s: Failed to create s2wiwq workqueue\n", __func__);
-		return -EFAULT;
-	}
-	INIT_WORK(&s2w_input_work, s2w_input_callback);
-	rc = input_register_handler(&s2w_input_handler);
-	if (rc)
-		pr_err("%s: Failed to register s2w_input_handler\n", __func__);
-
 #ifndef ANDROID_TOUCH_DECLARED
 	android_touch_kobj = kobject_create_and_add("android_touch", NULL) ;
 	if (android_touch_kobj == NULL) {
@@ -354,8 +408,7 @@ static void __exit sweep2wake_exit(void)
 #ifndef ANDROID_TOUCH_DECLARED
 	kobject_del(android_touch_kobj);
 #endif
-	input_unregister_handler(&s2w_input_handler);
-	destroy_workqueue(s2w_input_wq);
+	unregister_s2w();
 	input_unregister_device(sweep2wake_pwrdev);
 	input_free_device(sweep2wake_pwrdev);
 	return;
