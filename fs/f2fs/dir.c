@@ -788,7 +788,6 @@ bool f2fs_fill_dentries(struct file *file, void *dirent, filldir_t filldir,
 	unsigned char d_type;
 	struct f2fs_dir_entry *de = NULL;
 	struct fscrypt_str de_name = FSTR_INIT(NULL, 0);
-	unsigned char *types = f2fs_filetype_table;
 	int over;
 
 	while (bit_pos < d->max) {
