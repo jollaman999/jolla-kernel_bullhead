@@ -4718,6 +4718,9 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	if (track_changed || (sovc_tmp_onoff && !sovc_mic_detected)) {
 		register_sovc();
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+		register_dt2w();
+#endif
 		synaptics_rmi4_touch_off_triggered = false;
 		return;
 	}
