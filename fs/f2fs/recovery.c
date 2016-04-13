@@ -551,13 +551,12 @@ next:
 	return err;
 }
 
-int recover_fsync_data(struct f2fs_sb_info *sbi, bool check_only)
+int recover_fsync_data(struct f2fs_sb_info *sbi)
 {
 	struct curseg_info *curseg = CURSEG_I(sbi, CURSEG_WARM_NODE);
 	struct list_head inode_list;
 	block_t blkaddr;
 	int err;
-	int ret = 0;
 	bool need_writecp = false;
 
 	fsync_entry_slab = f2fs_kmem_cache_create("f2fs_fsync_inode_entry",
@@ -574,13 +573,11 @@ int recover_fsync_data(struct f2fs_sb_info *sbi, bool check_only)
 
 	/* step #1: find fsynced inode numbers */
 	err = find_fsync_dnodes(sbi, &inode_list);
-	if (err || list_empty(&inode_list))
+	if (err)
 		goto out;
 
-	if (check_only) {
-		ret = 1;
+	if (list_empty(&inode_list))
 		goto out;
-	}
 
 	need_writecp = true;
 
@@ -628,5 +625,5 @@ out:
 	} else {
 		mutex_unlock(&sbi->cp_mutex);
 	}
-	return ret ? ret: err;
+	return err;
 }
