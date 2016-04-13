@@ -1257,9 +1257,6 @@ static int __f2fs_commit_super(struct f2fs_sb_info *sbi, int block)
 	struct buffer_head *bh;
 	int err;
 
-	if (f2fs_readonly(sbi->sb) || bdev_read_only(sbi->sb->s_bdev))
-		return -EROFS;
-
 	bh = sb_getblk(sbi->sb, block);
 	if (!bh)
 		return -EIO;
@@ -1539,7 +1536,7 @@ try_onemore:
 	kfree(options);
 
 	/* recover broken superblock */
-	if (recovery) {
+	if (recovery && !f2fs_readonly(sb) && !bdev_read_only(sb->s_bdev)) {
 		err = f2fs_commit_super(sbi, true);
 		f2fs_msg(sb, KERN_INFO,
 			"Try to recover %dth superblock, ret: %ld",
