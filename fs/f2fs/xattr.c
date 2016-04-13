@@ -587,13 +587,6 @@ static int __f2fs_setxattr(struct inode *inode, int index,
 	if (index == F2FS_XATTR_INDEX_ENCRYPTION &&
 			!strcmp(name, F2FS_XATTR_NAME_ENCRYPTION_CONTEXT))
 		f2fs_set_encrypted_inode(inode);
-	if (index == F2FS_XATTR_INDEX_KEY &&
-			!strcmp(name, F2FS_XATTR_NAME_ENCRYPTION_CONTEXT)) {
-		if (value)
-			file_set_key(inode);
-		else
-			file_clear_key(inode);
-	}
 
 	if (ipage)
 		update_inode(inode, ipage);

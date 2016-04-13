@@ -22,7 +22,6 @@
 #include <linux/pagevec.h>
 #include <linux/random.h>
 #include <linux/aio.h>
-#include <keys/user-type.h>
 
 #include "f2fs.h"
 #include "node.h"
@@ -458,40 +457,6 @@ static int f2fs_file_mmap(struct file *file, struct vm_area_struct *vma)
 	return 0;
 }
 
-static int validate_access_key(struct inode *inode)
-{
-	u8 full_key_descriptor[F2FS_KEY_DESC_PREFIX_SIZE +
-					(F2FS_KEY_SIZE * 2) + 1];
-	struct key *keyring_key = NULL;
-	u8 key[F2FS_KEY_SIZE];
-	int ret;
-
-	ret = f2fs_getxattr(inode, F2FS_XATTR_INDEX_KEY,
-				F2FS_XATTR_NAME_ENCRYPTION_CONTEXT,
-				key, F2FS_KEY_SIZE, NULL);
-	if (ret != F2FS_KEY_SIZE)
-		return -EINVAL;
-
-	memcpy(full_key_descriptor, F2FS_KEY_DESC_PREFIX,
-					F2FS_KEY_DESC_PREFIX_SIZE);
-	sprintf(full_key_descriptor + F2FS_KEY_DESC_PREFIX_SIZE,
-					"%*phN", F2FS_KEY_SIZE, key);
-	full_key_descriptor[F2FS_KEY_DESC_PREFIX_SIZE +
-					(2 * F2FS_KEY_SIZE)] = '\0';
-	keyring_key = request_key(&key_type_logon, full_key_descriptor, NULL);
-	if (IS_ERR(keyring_key))
-		return PTR_ERR(keyring_key);
-
-	if (keyring_key->type != &key_type_logon) {
-		printk_once(KERN_WARNING
-				"%s: key type must be logon\n", __func__);
-		key_put(keyring_key);
-		return -ENOKEY;
-	}
-	key_put(keyring_key);
-	return 0;
-}
-
 static int f2fs_file_open(struct inode *inode, struct file *filp)
 {
 	int ret = generic_file_open(inode, filp);
@@ -507,9 +472,6 @@ static int f2fs_file_open(struct inode *inode, struct file *filp)
 	if (f2fs_encrypted_inode(dir) &&
 			!fscrypt_has_permitted_context(dir, inode))
 		return -EPERM;
-
-	if (file_has_key(inode))
-		return validate_access_key(inode);
 	return ret;
 }
 
@@ -1588,35 +1550,6 @@ static bool uuid_is_nonzero(__u8 u[16])
 	return false;
 }
 
-static int f2fs_ioc_keyctl(struct file *filp, unsigned long arg)
-{
-	struct inode *inode = file_inode(filp);
-	struct f2fs_key key;
-	void *value = key.key;
-	int type = XATTR_CREATE;
-
-	if (copy_from_user(&key, (u8 __user *)arg, sizeof(key)))
-		return -EFAULT;
-
-	if (!S_ISREG(inode->i_mode))
-		return -EINVAL;
-
-	if (key.mode == F2FS_DROP_KEY) {
-		int ret = validate_access_key(inode);
-
-		if (ret)
-			return ret;
-
-		value = NULL;
-		type = XATTR_REPLACE;
-	}
-
-	f2fs_update_time(F2FS_I_SB(inode), REQ_TIME);
-	return f2fs_setxattr(inode, F2FS_XATTR_INDEX_KEY,
-				F2FS_XATTR_NAME_ENCRYPTION_CONTEXT,
-				value, F2FS_KEY_SIZE, NULL, type);
-}
-
 static int f2fs_ioc_set_encryption_policy(struct file *filp, unsigned long arg)
 {
 	struct fscrypt_policy policy;
@@ -1930,8 +1863,6 @@ long f2fs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		return f2fs_ioc_shutdown(filp, arg);
 	case FITRIM:
 		return f2fs_ioc_fitrim(filp, arg);
-	case F2FS_IOC_KEYCTL:
-		return f2fs_ioc_keyctl(filp, arg);
 	case F2FS_IOC_SET_ENCRYPTION_POLICY:
 		return f2fs_ioc_set_encryption_policy(filp, arg);
 	case F2FS_IOC_GET_ENCRYPTION_POLICY:
