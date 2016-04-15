@@ -51,7 +51,7 @@ void __delayacct_tsk_init(struct task_struct *tsk)
  */
 static void delayacct_end(u64 *start, u64 *total, u32 *count)
 {
-	s64 ns = ktime_get_ns() - *start;
+	s64 ns = ktime_to_ns(ktime_get()) - *start;
 	unsigned long flags;
 
 	if (ns > 0) {
@@ -64,7 +64,7 @@ static void delayacct_end(u64 *start, u64 *total, u32 *count)
 
 void __delayacct_blkio_start(void)
 {
-	current->delays->blkio_start = ktime_get_ns();
+	current->delays->blkio_start = ktime_to_ns(ktime_get());
 }
 
 void __delayacct_blkio_end(void)
@@ -146,7 +146,7 @@ __u64 __delayacct_blkio_ticks(struct task_struct *tsk)
 
 void __delayacct_freepages_start(void)
 {
-	current->delays->freepages_start = ktime_get_ns();
+	current->delays->freepages_start = ktime_to_ns(ktime_get());
 }
 
 void __delayacct_freepages_end(void)
