@@ -193,10 +193,7 @@ static bool vmpressure_event(struct vmpressure *vmpr,
 			     enum vmpressure_levels level)
 {
 	struct vmpressure_event *ev;
-	unsigned long pressure;
 	bool signalled = false;
-
-	pressure = vmpressure_calc_pressure(scanned, reclaimed);
 
 	mutex_lock(&vmpr->events_lock);
 
@@ -219,6 +216,7 @@ static void vmpressure_work_fn(struct work_struct *work)
 	unsigned long reclaimed;
 	bool report = false;
 	enum vmpressure_levels level;
+	unsigned long pressure;
 
 	/*
 	 * Several contexts might be calling vmpressure(), so it is
@@ -236,7 +234,8 @@ static void vmpressure_work_fn(struct work_struct *work)
 	reclaimed = vmpr->reclaimed;
 	vmpr->scanned = 0;
 	vmpr->reclaimed = 0;
-	level = vmpressure_calc_level(scanned, reclaimed);
+	pressure = vmpressure_calc_pressure(scanned, reclaimed);
+	level = vmpressure_level(pressure);
 	if (++vmpr->nr_windows[level] == vmpressure_windows_needed[level]) {
 		vmpr->nr_windows[level] = 0;
 		report = true;
@@ -352,7 +351,7 @@ void vmpressure_global(gfp_t gfp, unsigned long scanned,
 	reclaimed = vmpr->reclaimed;
 	mutex_unlock(&vmpr->sr_lock);
 
-	if (scanned < vmpressure_win)
+	if (scanned < vmpr->window_size)
 		return;
 
 	mutex_lock(&vmpr->sr_lock);
@@ -557,7 +556,7 @@ void vmpressure_init(struct vmpressure *vmpr, bool is_root)
 
 int vmpressure_global_init(void)
 {
-	vmpressure_init(&global_vmpressure);
+	vmpressure_init(&global_vmpressure, false);
 	return 0;
 }
 late_initcall(vmpressure_global_init);
