@@ -332,6 +332,7 @@ void vmpressure_global(gfp_t gfp, unsigned long scanned,
 	struct vmpressure *vmpr = &global_vmpressure;
 	unsigned long pressure;
 	unsigned long stall;
+	unsigned long window_size;
 
 	if (!(gfp & (__GFP_HIGHMEM | __GFP_MOVABLE | __GFP_IO | __GFP_FS)))
 		return;
@@ -349,9 +350,10 @@ void vmpressure_global(gfp_t gfp, unsigned long scanned,
 	stall = vmpr->stall;
 	scanned = vmpr->scanned;
 	reclaimed = vmpr->reclaimed;
+	window_size = vmpr->window_size;
 	mutex_unlock(&vmpr->sr_lock);
 
-	if (scanned < vmpr->window_size)
+	if (scanned < window_size)
 		return;
 
 	mutex_lock(&vmpr->sr_lock);
@@ -554,9 +556,9 @@ void vmpressure_init(struct vmpressure *vmpr, bool is_root)
 	}
 }
 
-int vmpressure_global_init(void)
+static int vmpressure_global_init(void)
 {
-	vmpressure_init(&global_vmpressure, false);
+	vmpressure_init(&global_vmpressure, true);
 	return 0;
 }
 late_initcall(vmpressure_global_init);
