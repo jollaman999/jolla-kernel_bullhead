@@ -258,7 +258,7 @@ static void vmpressure_work_fn(struct work_struct *work)
 static void vmpressure_update_window_size(struct vmpressure *vmpr,
 					  unsigned long total_pages)
 {
-	mutex_lock(&vmpr->sr_lock);
+	spin_lock(&vmpr->sr_lock);
 	/*
 	 * This is inspired by the low watermark computation:
 	 * We want a small window size for small machines, but don't
@@ -280,7 +280,7 @@ static void vmpressure_update_window_size(struct vmpressure *vmpr,
 	 * 32768MB:	23170k
 	 */
 	vmpr->window_size = int_sqrt(total_pages * 4);
-	mutex_unlock(&vmpr->sr_lock);
+	spin_unlock(&vmpr->sr_lock);
 }
 
 void vmpressure_memcg(gfp_t gfp, struct mem_cgroup *memcg,
@@ -415,9 +415,9 @@ void vmpressure_prio(gfp_t gfp, struct mem_cgroup *memcg, int prio)
 		return;
 
 	vmpr = memcg_to_vmpressure(memcg);
-	mutex_lock(&vmpr->sr_lock);
+	spin_lock(&vmpr->sr_lock);
 	window_size = vmpr->window_size;
-	mutex_unlock(&vmpr->sr_lock);
+	spin_unlock(&vmpr->sr_lock);
 	/*
 	 * OK, the prio is below the threshold, updating vmpressure
 	 * information before shrinker dives into long shrinking of long
