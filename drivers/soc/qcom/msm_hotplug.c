@@ -78,8 +78,6 @@ static struct cpu_hotplug {
 	unsigned int down_lock_dur;
 	unsigned int fast_lane_load;
 	unsigned int big_core_up_delay;
-	struct work_struct up_work;
-	struct work_struct down_work;
 	struct mutex msm_hotplug_mutex;
 	struct notifier_block notif;
 } hotplug = {
@@ -343,37 +341,18 @@ static int get_lowest_load_cpu(void)
 	return lowest_cpu;
 }
 
-static void cpu_up_work(struct work_struct *work)
+static void big_up(unsigned int online_little)
 {
 	int cpu;
-	unsigned int target_little, target_big;
-
-	// target_little - how many little cores to online
-	// target_big    - how many big cores to online
-
-	target_little = hotplug.target_cpus;
-
-	// Skip cpu 0
-	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
-		if (cpu_online(cpu))
-			continue;
-		if (target_little <= num_online_little_cpus())
-			break;
-		cpu_up(cpu);
-		apply_down_lock(cpu);
-	}
-
-	// Skip if all of big cores turned on.
-	if (num_online_big_cpus() == BIG_CORES)
-		return;
+	unsigned int target_big; // how many big cores to online
 
 	// If LITTLE_CORES is 4 and BIG_CORES is 2.
-	// target_little == 4 -> Turn on all of big cores. (2)
-	// target_little == 3 -> Turn on half of big cores. (1)
+	// online_little == 4 -> Turn on all of big cores. (2)
+	// online_little == 3 -> Turn on half of big cores. (1)
 	// else -> skip
-	if (target_little == LITTLE_CORES)
+	if (online_little == LITTLE_CORES)
 		target_big = BIG_CORES;
-	else if (target_little == LITTLE_CORES - 1)
+	else if (online_little == LITTLE_CORES - 1)
 		target_big = BIG_CORES / 2;
 	else
 		return;
@@ -399,41 +378,18 @@ static void cpu_up_work(struct work_struct *work)
 	}
 }
 
-static void cpu_down_work(struct work_struct *work)
+static void big_down(unsigned int online_little)
 {
-	int cpu, lowest_cpu;
-	unsigned int target_little, target_big;
-
-	// target_little - how many little cores to online
-	// target_big    - how many big cores to offline
-
-	target_little = hotplug.target_cpus;
-
-	// Skip cpu 0
-	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
-		if (!cpu_online(cpu))
-			continue;
-		lowest_cpu = get_lowest_load_cpu();
-		if (lowest_cpu > 0 && lowest_cpu <= stats.total_cpus) {
-			if (check_down_lock(lowest_cpu))
-				break;
-			cpu_down(lowest_cpu);
-		}
-		if (target_little >= num_online_little_cpus())
-			break;
-	}
-
-	// Skip if all of big cores turned off.
-	if (num_online_big_cpus() == 0)
-		return;
+	int cpu;
+	unsigned int target_big; // how many big cores to offline
 
 	// If LITTLE_CORES is 4 and BIG_CORES is 2.
-	// target_little == 4 -> skip
-	// target_little == 3 -> Turn off half of big cores. (1)
+	// online_little == 4 -> skip
+	// online_little == 3 -> Turn off half of big cores. (1)
 	// else -> Turn off all of big cores. (2)
-	if (target_little == LITTLE_CORES)
+	if (online_little == LITTLE_CORES)
 		return;
-	else if (target_little == LITTLE_CORES - 1)
+	else if (online_little == LITTLE_CORES - 1)
 		target_big = BIG_CORES / 2;
 	else
 		target_big = BIG_CORES;
@@ -449,46 +405,88 @@ static void cpu_down_work(struct work_struct *work)
 	}
 }
 
+static void big_updown(void)
+{
+	unsigned int online_little, online_big;
+
+	online_little = num_online_little_cpus();
+	online_big = num_online_big_cpus();
+
+	if (online_little >= LITTLE_CORES - 1 &&
+	    online_big < BIG_CORES)
+		big_up(online_little);
+	else if (online_big != 0)
+		big_down(online_little);
+}
+
+static void little_up(void)
+{
+	int cpu;
+
+	// Skip cpu 0
+	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
+		if (cpu_online(cpu))
+			continue;
+		if (hotplug.target_cpus <= num_online_little_cpus())
+			break;
+		cpu_up(cpu);
+		apply_down_lock(cpu);
+	}
+}
+
+static void little_down(void)
+{
+	int cpu, lowest_cpu;
+
+	// Skip cpu 0
+	for (cpu = 1; cpu < LITTLE_CORES; cpu++) {
+		if (!cpu_online(cpu))
+			continue;
+		lowest_cpu = get_lowest_load_cpu();
+		if (lowest_cpu > 0 && lowest_cpu <= stats.total_cpus) {
+			if (check_down_lock(lowest_cpu))
+				break;
+			cpu_down(lowest_cpu);
+		}
+		if (hotplug.target_cpus >= num_online_little_cpus())
+			break;
+	}
+}
+
 static void online_cpu(unsigned int target)
 {
-	unsigned int online_cpus;
+	unsigned int online_little;
 
-	if (!msm_enabled)
-		return;
-
-	online_cpus = num_online_little_cpus();
+	online_little = num_online_little_cpus();
 
 	/* 
 	 * Do not online more CPUs if max_cpus_online reached 
 	 * and cancel online task if target already achieved.
 	 */
-	if (target <= online_cpus ||
-		online_cpus >= hotplug.max_cpus_online)
+	if (target <= online_little ||
+		online_little >= hotplug.max_cpus_online)
 		return;
 
 	hotplug.target_cpus = target;
-	queue_work_on(0, hotplug_wq, &hotplug.up_work);
+	little_up();
 }
 
 static void offline_cpu(unsigned int target)
 {
-	unsigned int online_cpus;
+	unsigned int online_little;
 
-	if (!msm_enabled)
-		return;
-
-	online_cpus = num_online_little_cpus();
+	online_little = num_online_little_cpus();
 
 	/* 
 	 * Do not offline more CPUs if min_cpus_online reached
 	 * and cancel offline task if target already achieved.
 	 */
-	if (target >= online_cpus || 
-		online_cpus <= hotplug.min_cpus_online)
+	if (target >= online_little ||
+		online_little <= hotplug.min_cpus_online)
 		return;
 
 	hotplug.target_cpus = target;
-	queue_work_on(0, hotplug_wq, &hotplug.down_work);
+	little_down();
 }
 
 static unsigned int load_to_update_rate(unsigned int load)
@@ -517,6 +515,9 @@ static void reschedule_hotplug_work(void)
 static void msm_hotplug_work(struct work_struct *work)
 {
 	unsigned int i, target = 0;
+
+	if (!msm_enabled)
+		return;
 
 	if (hotplug.suspended) {
 		dprintk("%s: suspended.\n", MSM_HOTPLUG);
@@ -576,6 +577,8 @@ static void msm_hotplug_work(struct work_struct *work)
 	}
 
 reschedule:
+	big_updown();
+
 	dprintk("%s: cur_avg_load: %3u online_cpus: %u target: %u\n", MSM_HOTPLUG,
 		stats.cur_avg_load, stats.online_cpus, target);
 	reschedule_hotplug_work();
@@ -693,8 +696,6 @@ static int msm_hotplug_start(void)
 	mutex_init(&hotplug.msm_hotplug_mutex);
 
 	INIT_DELAYED_WORK(&hotplug_work, msm_hotplug_work);
-	INIT_WORK(&hotplug.up_work, cpu_up_work);
-	INIT_WORK(&hotplug.down_work, cpu_down_work);
 	for_each_possible_cpu(cpu) {
 		dl = &per_cpu(lock_info, cpu);
 		INIT_DELAYED_WORK(&dl->lock_rem, remove_down_lock);
@@ -729,8 +730,6 @@ static void msm_hotplug_stop(void)
 		dl = &per_cpu(lock_info, cpu);
 		cancel_delayed_work_sync(&dl->lock_rem);
 	}
-	cancel_work_sync(&hotplug.down_work);
-	cancel_work_sync(&hotplug.up_work);
 	cancel_delayed_work_sync(&hotplug_work);
 
 	mutex_destroy(&hotplug.msm_hotplug_mutex);
