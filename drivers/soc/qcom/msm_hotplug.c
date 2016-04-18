@@ -341,21 +341,9 @@ static int get_lowest_load_cpu(void)
 	return lowest_cpu;
 }
 
-static void big_up(unsigned int online_little)
+static void big_up(unsigned int target_big)
 {
 	int cpu;
-	unsigned int target_big; // how many big cores to online
-
-	// If LITTLE_CORES is 4 and BIG_CORES is 2.
-	// online_little == 4 -> Turn on all of big cores. (2)
-	// online_little == 3 -> Turn on half of big cores. (1)
-	// else -> skip
-	if (online_little == LITTLE_CORES)
-		target_big = BIG_CORES;
-	else if (online_little == LITTLE_CORES - 1)
-		target_big = BIG_CORES / 2;
-	else
-		return;
 
 	if (!big_core_up_ready_checked) {
 		big_core_up_ready_checked = true;
@@ -378,28 +366,19 @@ static void big_up(unsigned int online_little)
 	}
 }
 
-static void big_down(unsigned int online_little)
+static void big_down(unsigned int target_big)
 {
 	int cpu;
-	unsigned int target_big; // how many big cores to offline
+	unsigned int target_big_off; // how many big cores to offline
 
-	// If LITTLE_CORES is 4 and BIG_CORES is 2.
-	// online_little == 4 -> skip
-	// online_little == 3 -> Turn off half of big cores. (1)
-	// else -> Turn off all of big cores. (2)
-	if (online_little == LITTLE_CORES)
-		return;
-	else if (online_little == LITTLE_CORES - 1)
-		target_big = BIG_CORES / 2;
-	else
-		target_big = BIG_CORES;
+	target_big_off = BIG_CORES - target_big;
 
 	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
 		if (!cpu_online(cpu))
 			continue;
 		if (check_down_lock(cpu))
 			continue;
-		if (target_big <= BIG_CORES - num_online_big_cpus())
+		if (target_big_off <= BIG_CORES - num_online_big_cpus())
 			break;
 		cpu_down(cpu);
 	}
@@ -408,15 +387,28 @@ static void big_down(unsigned int online_little)
 static void big_updown(void)
 {
 	unsigned int online_little, online_big;
+	unsigned int target_big;
 
 	online_little = num_online_little_cpus();
 	online_big = num_online_big_cpus();
 
-	if (online_little >= LITTLE_CORES - 1 &&
-	    online_big < BIG_CORES)
-		big_up(online_little);
-	else if (online_big != 0)
-		big_down(online_little);
+	// If LITTLE_CORES is 4 and BIG_CORES is 2.
+	// online_little == 4 -> Turn on all of big cores. (2)
+	// online_little == 3 -> Turn on half of big cores. (1)
+	// else               -> Turn off all of big cores. (0)
+	if (online_little == LITTLE_CORES)
+		target_big = BIG_CORES;
+	else if (online_little == LITTLE_CORES - 1)
+		target_big = BIG_CORES / 2;
+	else
+		target_big = 0;
+
+	if (online_big != target_big) {
+		if (target_big > online_big)
+			big_up(target_big);
+		else if (target_big < online_big)
+			big_down(target_big);
+	}
 }
 
 static void little_up(void)
