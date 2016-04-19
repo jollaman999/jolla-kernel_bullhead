@@ -565,7 +565,7 @@ struct list_head vma_slot_dedup = LIST_HEAD_INIT(vma_slot_dedup);
 /* How many times the ksmd has slept since startup */
 static unsigned long long uksm_sleep_times;
 
-unsigned int uksm_run = UKSM_RUN_MERGE;
+unsigned int uksm_run = UKSM_RUN_STOP;
 unsigned int uksm_run_stored;
 
 static DECLARE_WAIT_QUEUE_HEAD(uksm_thread_wait);
