@@ -236,7 +236,7 @@ static int ksm_nr_node_ids = 1;
 #define ksm_nr_node_ids		1
 #endif
 
-unsigned long ksm_run = KSM_RUN_MERGE;
+unsigned long ksm_run = KSM_RUN_STOP;
 unsigned long ksm_run_stored;
 static void wait_while_offlining(void);
 
