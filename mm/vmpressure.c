@@ -21,9 +21,6 @@
 #include <linux/eventfd.h>
 #include <linux/swap.h>
 #include <linux/printk.h>
-#include <linux/notifier.h>
-#include <linux/init.h>
-#include <linux/module.h>
 #include <linux/vmpressure.h>
 
 /*
@@ -52,33 +49,6 @@ static const unsigned long default_window_size = SWAP_CLUSTER_MAX * 16;
 static const unsigned int vmpressure_level_med = 60;
 static const unsigned int vmpressure_level_critical = 95;
 
-static unsigned long vmpressure_scale_max = 100;
-module_param_named(vmpressure_scale_max, vmpressure_scale_max,
-			ulong, S_IRUGO | S_IWUSR);
-
-/* vmpressure values >= this will be scaled based on allocstalls */
-static unsigned long allocstall_threshold = 70;
-module_param_named(allocstall_threshold, allocstall_threshold,
-			ulong, S_IRUGO | S_IWUSR);
-
-static struct vmpressure global_vmpressure;
-BLOCKING_NOTIFIER_HEAD(vmpressure_notifier);
-
-int vmpressure_notifier_register(struct notifier_block *nb)
-{
-	return blocking_notifier_chain_register(&vmpressure_notifier, nb);
-}
-
-int vmpressure_notifier_unregister(struct notifier_block *nb)
-{
-	return blocking_notifier_chain_unregister(&vmpressure_notifier, nb);
-}
-
-void vmpressure_notify(unsigned long pressure)
-{
-	blocking_notifier_call_chain(&vmpressure_notifier, pressure, NULL);
-}
-
 /*
  * When there are too little pages left to scan, vmpressure() may miss the
  * critical pressure as number of pages will be less than "window size".
@@ -105,7 +75,6 @@ static struct vmpressure *work_to_vmpressure(struct work_struct *work)
 	return container_of(work, struct vmpressure, work);
 }
 
-#ifdef CONFIG_MEMCG
 static struct vmpressure *cg_to_vmpressure(struct cgroup *cg)
 {
 	return css_to_vmpressure(cgroup_subsys_state(cg, mem_cgroup_subsys_id));
@@ -121,17 +90,6 @@ static struct vmpressure *vmpressure_parent(struct vmpressure *vmpr)
 		return NULL;
 	return memcg_to_vmpressure(memcg);
 }
-#else
-static struct vmpressure *cg_to_vmpressure(struct cgroup *cg)
-{
-	return NULL;
-}
-
-static struct vmpressure *vmpressure_parent(struct vmpressure *vmpr)
-{
-	return NULL;
-}
-#endif
 
 static const char * const vmpressure_str_levels[] = {
 	[VMPRESSURE_LOW] = "low",
@@ -148,7 +106,7 @@ static enum vmpressure_levels vmpressure_level(unsigned long pressure)
 	return VMPRESSURE_LOW;
 }
 
-static unsigned long vmpressure_calc_pressure(unsigned long scanned,
+static enum vmpressure_levels vmpressure_calc_level(unsigned long scanned,
 						    unsigned long reclaimed)
 {
 	unsigned long scale = scanned + reclaimed;
@@ -167,20 +125,7 @@ static unsigned long vmpressure_calc_pressure(unsigned long scanned,
 	pr_debug("%s: %3lu  (s: %lu  r: %lu)\n", __func__, pressure,
 		 scanned, reclaimed);
 
-	return pressure;
-}
-
-static unsigned long vmpressure_account_stall(unsigned long pressure,
-				unsigned long stall, unsigned long scanned)
-{
-	unsigned long scale;
-
-	if (pressure < allocstall_threshold)
-		return pressure;
-
-	scale = ((vmpressure_scale_max - pressure) * stall) / scanned;
-
-	return pressure + scale;
+	return vmpressure_level(pressure);
 }
 
 struct vmpressure_event {
@@ -214,7 +159,6 @@ static void vmpressure_work_fn(struct work_struct *work)
 	struct vmpressure *vmpr = work_to_vmpressure(work);
 	unsigned long scanned;
 	unsigned long reclaimed;
-	unsigned long pressure;
 	bool report = false;
 	enum vmpressure_levels level;
 
@@ -234,8 +178,7 @@ static void vmpressure_work_fn(struct work_struct *work)
 	reclaimed = vmpr->reclaimed;
 	vmpr->scanned = 0;
 	vmpr->reclaimed = 0;
-	pressure = vmpressure_calc_pressure(scanned, reclaimed);
-	level = vmpressure_level(pressure);
+	level = vmpressure_calc_level(scanned, reclaimed);
 	if (++vmpr->nr_windows[level] == vmpressure_windows_needed[level]) {
 		vmpr->nr_windows[level] = 0;
 		report = true;
@@ -281,13 +224,24 @@ static void vmpressure_update_window_size(struct vmpressure *vmpr,
 	mutex_unlock(&vmpr->sr_lock);
 }
 
-void vmpressure_memcg(gfp_t gfp, struct mem_cgroup *memcg,
+/**
+ * vmpressure() - Account memory pressure through scanned/reclaimed ratio
+ * @gfp:	reclaimer's gfp mask
+ * @memcg:	cgroup memory controller handle
+ * @scanned:	number of pages scanned
+ * @reclaimed:	number of pages reclaimed
+ *
+ * This function should be called from the vmscan reclaim path to account
+ * "instantaneous" memory pressure (scanned/reclaimed ratio). The raw
+ * pressure index is then further refined and averaged over time.
+ *
+ * This function does not return any value.
+ */
+void vmpressure(gfp_t gfp, struct mem_cgroup *memcg,
 		unsigned long scanned, unsigned long reclaimed)
 {
 	unsigned long window_size;
 	struct vmpressure *vmpr = memcg_to_vmpressure(memcg);
-
-	BUG_ON(!vmpr);
 
 	/*
 	 * Here we only want to account pressure that userland is able to
@@ -324,68 +278,6 @@ void vmpressure_memcg(gfp_t gfp, struct mem_cgroup *memcg,
 	if (scanned < window_size || work_pending(&vmpr->work))
 		return;
 	schedule_work(&vmpr->work);
-}
-
-void vmpressure_global(gfp_t gfp, unsigned long scanned,
-		unsigned long reclaimed)
-{
-	struct vmpressure *vmpr = &global_vmpressure;
-	unsigned long pressure;
-	unsigned long stall;
-
-	if (!(gfp & (__GFP_HIGHMEM | __GFP_MOVABLE | __GFP_IO | __GFP_FS)))
-		return;
-
-	if (!scanned)
-		return;
-
-	mutex_lock(&vmpr->sr_lock);
-	vmpr->scanned += scanned;
-	vmpr->reclaimed += reclaimed;
-
-	if (!current_is_kswapd())
-		vmpr->stall += scanned;
-
-	stall = vmpr->stall;
-	scanned = vmpr->scanned;
-	reclaimed = vmpr->reclaimed;
-	mutex_unlock(&vmpr->sr_lock);
-
-	if (scanned < vmpressure_win)
-		return;
-
-	mutex_lock(&vmpr->sr_lock);
-	vmpr->scanned = 0;
-	vmpr->reclaimed = 0;
-	vmpr->stall = 0;
-	mutex_unlock(&vmpr->sr_lock);
-
-	pressure = vmpressure_calc_pressure(scanned, reclaimed);
-	pressure = vmpressure_account_stall(pressure, stall, scanned);
-	vmpressure_notify(pressure);
-}
-
-/**
- * vmpressure() - Account memory pressure through scanned/reclaimed ratio
- * @gfp:	reclaimer's gfp mask
- * @memcg:	cgroup memory controller handle
- * @scanned:	number of pages scanned
- * @reclaimed:	number of pages reclaimed
- *
- * This function should be called from the vmscan reclaim path to account
- * "instantaneous" memory pressure (scanned/reclaimed ratio). The raw
- * pressure index is then further refined and averaged over time.
- *
- * This function does not return any value.
- */
-void vmpressure(gfp_t gfp, struct mem_cgroup *memcg,
-		unsigned long scanned, unsigned long reclaimed)
-{
-	if (!memcg)
-		vmpressure_global(gfp, scanned, reclaimed);
-
-	if (IS_ENABLED(CONFIG_MEMCG))
-		vmpressure_memcg(gfp, memcg, scanned, reclaimed);
 }
 
 /**
@@ -470,8 +362,6 @@ int vmpressure_register_event(struct cgroup *cg, struct cftype *cft,
 	struct vmpressure_event *ev;
 	int level;
 
-	BUG_ON(!vmpr);
-
 	for (level = 0; level < VMPRESSURE_NUM_LEVELS; level++) {
 		if (!strcmp(vmpressure_str_levels[level], args))
 			break;
@@ -514,9 +404,6 @@ void vmpressure_unregister_event(struct cgroup *cg, struct cftype *cft,
 	struct vmpressure *vmpr = cg_to_vmpressure(cg);
 	struct vmpressure_event *ev;
 
-	if (!vmpr)
-		BUG();
-
 	mutex_lock(&vmpr->events_lock);
 	list_for_each_entry(ev, &vmpr->events, node) {
 		if (ev->efd != eventfd)
@@ -553,10 +440,3 @@ void vmpressure_init(struct vmpressure *vmpr, bool is_root)
 		vmpr->window_size = default_window_size;
 	}
 }
-
-int vmpressure_global_init(void)
-{
-	vmpressure_init(&global_vmpressure);
-	return 0;
-}
-late_initcall(vmpressure_global_init);
