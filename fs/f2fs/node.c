@@ -1211,7 +1211,6 @@ repeat:
 	/* Has the page been truncated? */
 	if (unlikely(page->mapping != inode->i_mapping)) {
 		unlock_page(page);
-		put_page(page);
 		goto repeat;
 	}
 
