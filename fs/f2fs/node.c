@@ -1199,12 +1199,20 @@ static void flush_inline_data(struct f2fs_sb_info *sbi, nid_t ino)
 	if (!inode)
 		return;
 
+repeat:
 	page = find_get_page(inode->i_mapping, 0);
+
 	if (!page)
 		goto iput_out;
 
 	if (!trylock_page(page))
 		goto release_out;
+
+	/* Has the page been truncated? */
+	if (unlikely(page->mapping != inode->i_mapping)) {
+		f2fs_put_page(page, 1);
+		goto repeat;
+	}
 
 	if (!PageUptodate(page))
 		goto page_out;
