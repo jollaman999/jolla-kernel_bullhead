@@ -252,7 +252,9 @@ int register_s2w(void)
 	mutex_lock(&reg_lock);
 
 	if (registered) {
+#if S2W_DEBUG
 		pr_info(LOGTAG"%s already registered\n", __func__);
+#endif
 		goto out;
 	}
 
@@ -272,7 +274,9 @@ int register_s2w(void)
 	registered = true;
 out:
 	mutex_unlock(&reg_lock);
+#if S2W_DEBUG
 	pr_info(LOGTAG"%s done\n", __func__);
+#endif
 
 	return rc;
 err:
@@ -290,7 +294,9 @@ void unregister_s2w(void)
 	mutex_lock(&reg_lock);
 
 	if(!registered) {
+#if S2W_DEBUG
 		pr_info(LOGTAG"%s already unregistered\n", __func__);
+#endif
 		goto out;
 	}
 
@@ -302,7 +308,9 @@ void unregister_s2w(void)
 	registered = false;
 out:
 	mutex_unlock(&reg_lock);
+#if S2W_DEBUG
 	pr_info(LOGTAG"%s done\n", __func__);
+#endif
 }
 EXPORT_SYMBOL(unregister_s2w);
 
