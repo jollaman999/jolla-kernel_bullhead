@@ -3,7 +3,7 @@
  *
  *
  * Copyright (c) 2013, Dennis Rassmann <showp1984@gmail.com>
- * Copyright (c) 2015, jollaman999 <admin@jollaman999.com>
+ * Copyright (c) 2016, jollaman999 <admin@jollaman999.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@
  * continuously based on SOVC_TRACK_REEXEC_DELAY (ms) time.
  *
  * See the demo video.
- * http://buf.jollaman999.com/jolla-kernel_AIO-bullhead/Screen_Off_Volume_Control.mp4
+ * http://tp.jollaman999.com/jolla-kernel_AIO-bullhead/Screen_Off_Volume_Control.mp4
  */
 
 /* uncomment since no touchscreen defines android touch, do that here */
@@ -71,7 +71,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Screen Off Volume & Track Control for almost any device"
-#define DRIVER_VERSION "2.2"
+#define DRIVER_VERSION "3.0"
 #define LOGTAG "[scroff_volctr]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
