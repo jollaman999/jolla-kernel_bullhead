@@ -4,7 +4,7 @@
  * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
  * Copyright (c) 2013-2014, Fluxi <linflux@arcor.de>
  * Copyright (c) 2013-2015, Pranav Vashi <neobuddy89@gmail.com>
- * Copyright (c) 2015, jollaman999 <admin@jollaman999.com> / Adaptive for big and little.
+ * Copyright (c) 2016, jollaman999 <admin@jollaman999.com> / Adaptive for big.LITTLE
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -1220,6 +1220,6 @@ static void __exit msm_hotplug_exit(void)
 late_initcall(msm_hotplug_init);
 module_exit(msm_hotplug_exit);
 
-MODULE_AUTHOR("Fluxi <linflux@arcor.de>");
-MODULE_DESCRIPTION("MSM Hotplug Driver");
+MODULE_AUTHOR("jollaman999 <admin@jollaman999.com>");
+MODULE_DESCRIPTION("MSM Hotplug Driver for big.LITTLE");
 MODULE_LICENSE("GPLv2");
