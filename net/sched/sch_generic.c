@@ -243,7 +243,7 @@ static void dev_watchdog(unsigned long arg)
 				trans_start = txq->trans_start ? : dev->trans_start;
 				if (netif_xmit_stopped(txq) &&
 				    time_after(jiffies, (trans_start +
-							 dev->watchdog_timeo))) {
+							 dev->watchdog_timeo * 1000 / HZ))) {
 					some_queue_timedout = 1;
 					txq->trans_timeout++;
 					break;
@@ -257,7 +257,7 @@ static void dev_watchdog(unsigned long arg)
 			}
 			if (!mod_timer(&dev->watchdog_timer,
 				       round_jiffies(jiffies +
-						     dev->watchdog_timeo)))
+						     dev->watchdog_timeo * 1000 / HZ)))
 				dev_hold(dev);
 		}
 	}
@@ -270,9 +270,9 @@ void __netdev_watchdog_up(struct net_device *dev)
 {
 	if (dev->netdev_ops->ndo_tx_timeout) {
 		if (dev->watchdog_timeo <= 0)
-			dev->watchdog_timeo = 5*HZ;
+			dev->watchdog_timeo = 5000;
 		if (!mod_timer(&dev->watchdog_timer,
-			       round_jiffies(jiffies + dev->watchdog_timeo)))
+			       round_jiffies(jiffies + dev->watchdog_timeo * 1000 / HZ)))
 			dev_hold(dev);
 	}
 }
