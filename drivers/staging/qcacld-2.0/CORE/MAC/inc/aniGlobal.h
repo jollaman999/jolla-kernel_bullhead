@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -95,9 +95,6 @@ typedef struct sAniSirGlobal *tpAniSirGlobal;
 #include <limFTDefs.h>
 #endif
 
-#ifdef ANI_DVT_DEBUG
-#include "dvtModule.h"
-#endif
 
 // New HAL API interface defs.
 #include "logDump.h"
@@ -144,6 +141,27 @@ typedef struct sAniSirGlobal *tpAniSirGlobal;
 #define LOW_SEQ_NUM_MASK				0x000F
 #define HIGH_SEQ_NUM_MASK				0x0FF0
 #define HIGH_SEQ_NUM_OFFSET				4
+
+/*
+ * NSS cfg bit definition.
+ * STA          BIT[0:1]
+ * SAP          BIT[2:3]
+ * P2P_GO       BIT[4:5]
+ * P2P_CLIENT   BIT[6:7]
+ * IBSS         BIT[8:9]
+ * TDLS         BIT[10:11]
+ * P2P_DEVICE   BIT[12:13]
+ * OCB          BIT[14:15]
+ */
+
+#define CFG_STA_NSS(_x)     ((((_x) >> 0) & 0x3) ? (((_x) >> 0) & 0x3) : 1)
+#define CFG_SAP_NSS(_x)     ((((_x) >> 2) & 0x3) ? (((_x) >> 2) & 0x3) : 1)
+#define CFG_P2P_GO_NSS(_x)  ((((_x) >> 4) & 0x3) ? (((_x) >> 4) & 0x3) : 1)
+#define CFG_P2P_CLI_NSS(_x) ((((_x) >> 6) & 0x3) ? (((_x) >> 6) & 0x3) : 1)
+#define CFG_IBSS_NSS(_x)    ((((_x) >> 8) & 0x3) ? (((_x) >> 8) & 0x3) : 1)
+#define CFG_TDLS_NSS(_x)    ((((_x) >> 10) & 0x3) ? (((_x) >> 10) & 0x3) : 1)
+#define CFG_P2P_DEV_NSS(_x) ((((_x) >> 12) & 0x3) ? (((_x) >> 12) & 0x3) : 1)
+#define CFG_OCB_NSS(_x)     ((((_x) >> 14) & 0x3) ? (((_x) >> 14) & 0x3) : 1)
 
 /**
  * enum log_event_type - Type of event initiating bug report
@@ -258,7 +276,7 @@ enum wifi_driver_log_level {
  * @RING_ID_WAKELOCK:         Power events ring id
  * @RING_ID_CONNECTIVITY:     Connectivity event ring id
  * @RING_ID_PER_PACKET_STATS: Per packet statistic ring id
- * @RIND_ID_DRIVER_DEBUG:     Driver debug messages ring id
+ * @RING_ID_DRIVER_DEBUG:     Driver debug messages ring id
  * @RING_ID_FIRMWARE_DEBUG:   Firmware debug messages ring id
  *
  * This enum has the ring id values of logging rings
@@ -267,9 +285,16 @@ enum wifi_logging_ring_id {
 	RING_ID_WAKELOCK,
 	RING_ID_CONNECTIVITY,
 	RING_ID_PER_PACKET_STATS,
-	RIND_ID_DRIVER_DEBUG,
+	RING_ID_DRIVER_DEBUG,
 	RING_ID_FIRMWARE_DEBUG,
 };
+
+/* vendor element ID */
+#define IE_EID_VENDOR        (221) /* 0xDD */
+#define IE_LEN_SIZE          (1)
+#define IE_EID_SIZE          (1)
+/* Minimum size of vendor IE = 3 bytes of oui_data + 1 byte of data */
+#define IE_VENDOR_OUI_SIZE   (4)
 
 // -------------------------------------------------------------------
 // Change channel generic scheme
@@ -470,7 +495,7 @@ typedef struct sAniSirLim
     /// Place holder for current channel ID
     /// being scanned during background scanning
     tANI_U32   gLimBackgroundScanChannelId;
-    /// flag to indicate that bacground scan timer has been started
+    /* Flag to indicate that background scan timer has been started */
     tANI_U8    gLimBackgroundScanStarted;
 
     /* Used to store the list of legacy bss sta detected during scan on one channel */
@@ -478,17 +503,17 @@ typedef struct sAniSirLim
     tANI_U16    gLimRestoreCBCount;
     tSirMacAddr gLimLegacyBssidList[MAX_NUM_LEGACY_BSSID_PER_CHANNEL];
 
-    //
-    // If this flag is 1,
-    //   then, LIM will "try and trigger" a background
-    //   scan whenever it receives a Quiet BSS IE
-    //
-    // If this flag is 0,
-    //   then, LIM will simply shut-off Tx/Rx whenever it
-    //   receives a Quiet BSS IE.
-    //   This is the default behavior when a Quiet BSS IE
-    //   is received and 11H is enabled
-    //
+    /*
+     * If this flag is 1,
+     *   then, LIM will "try and trigger" a background
+     *   scan whenever it receives a Quiet BSS IE
+     *
+     * If this flag is 0,
+     *   then, LIM will simply shut-off Tx/Rx whenever it
+     *   receives a Quiet BSS IE.
+     *   This is the default behaviour when a Quiet BSS IE
+     *   is received and 11H is enabled
+     */
     tANI_U32 gLimTriggerBackgroundScanDuringQuietBss;
 
 
@@ -542,6 +567,7 @@ typedef struct sAniSirLim
     /// Definition for storing IBSS peers BSS description
     tLimIbssPeerNode      *gLimIbssPeerList;
     tANI_U32               gLimNumIbssPeers;
+    tANI_U32               gLimIbssRetryCnt;
 
     // ibss info - params for which ibss to join while coalescing
     tAniSirLimIbss      ibssInfo;
@@ -640,7 +666,6 @@ typedef struct sAniSirLim
     /// Previous MLM State
     tLimMlmStates       gLimPrevMlmState;
 
-#ifdef GEN4_SCAN
     // LIM to HAL SCAN Management Message Interface states
     tLimLimHalScanState gLimHalScanState;
 //WLAN_SUSPEND_LINK Related
@@ -655,7 +680,6 @@ typedef struct sAniSirLim
     //current channel. CB state goes along with channel to resume to
     tANI_U16    gResumeChannel;
     ePhyChanBondState    gResumePhyCbState;
-#endif // GEN4_SCAN
 
     // Change channel generic scheme
     CHANGE_CHANNEL_CALLBACK gpchangeChannelCallback;
@@ -702,13 +726,13 @@ typedef struct sAniSirLim
 
     //////////////////////////////////////////     MISC RELATED START ///////////////////////////////////////////
 
-    // WDS info
-    tANI_U32            gLimNumWdsInfoInd;
-    tANI_U32            gLimNumWdsInfoSet;
-    tSirWdsInfo         gLimWdsInfo;
-
-    // Deferred Queue Paramters
+    /* Deferred Queue Parameters */
     tLimDeferredMsgQParams    gLimDeferredMsgQ;
+
+#ifdef SAP_AUTH_OFFLOAD
+    /* SAP deferred msg queue */
+    struct slim_deferred_sap_queue    glim_sap_deferred_msgq;
+#endif
 
     // addts request if any - only one can be outstanding at any time
     tSirAddtsReq       gLimAddtsReq;
@@ -719,7 +743,7 @@ typedef struct sAniSirLim
     tCfgProtection    cfgProtection;
 
     tANI_U8 gLimProtectionControl;
-    //RF band to determibe 2.4/5 GHZ
+    /* RF band to determine 2.4/5 GHz */
 
     // alternate radio info used by STA
     tSirAlternateRadioInfo  gLimAlternateRadio;
@@ -755,7 +779,7 @@ typedef struct sAniSirLim
 
     /* Used on STA for AC downgrade. This is a dynamic mask
      * setting which keep tracks of ACs being admitted.
-     * If bit is set to 0: That partiular AC is not admitted
+     * If bit is set to 0: That particular AC is not admitted
      * If bit is set to 1: That particular AC is admitted
      */
     tANI_U8  gAcAdmitMask[SIR_MAC_DIRECTION_DIRECT];
@@ -824,39 +848,6 @@ typedef struct sAniSirLim
     tCacheParams    protStaCache[LIM_PROT_STA_CACHE_SIZE];
 
     //////////////////////////////////////////     ASSOC RELATED END ///////////////////////////////////////////
-
-
-
-    //
-    // For DEBUG purposes
-    // Primarily for - TITAN BEACON workaround
-    // Symptom - TFP/PHY gets stuck
-    //
-    tANI_U32 gLimScanOverride;
-    // Holds the desired tSirScanType, as requested by SME
-    tSirScanType gLimScanOverrideSaved;
-
-    //
-    // CB State protection, operated upon as follows:
-    // 1 - CB is enabled in the hardware ONLY WHEN a Titan
-    // STA associates with the AP
-    // 0 - CB is enabled/disabled based on the configuration
-    // received as per eWNI_SME_START_BSS_REQ
-    //
-    tANI_U32 gLimCBStateProtection;
-
-    // Count of TITAN STA's currently associated
-    tANI_U16 gLimTitanStaCount;
-
-    //
-    // For DEBUG purposes
-    // Primarily for - TITAN workaround
-    // Symptom - Avoid NULL data frames
-        // Applies to AP only
-    //
-    tANI_U32 gLimBlockNonTitanSta;
-    /////////////////////////// TITAN related globals       //////////////////////////////////////////
-
 
     ////////////////////////////////  HT RELATED           //////////////////////////////////////////
     //
@@ -960,10 +951,10 @@ typedef struct sAniSirLim
     //
     tANI_U8 gHTDualCTSProtection;
 
-    //
-    // Identifies a single STBC MCS that shall ne used for
-    // STBC control frames and STBC beacons
-    //
+    /*
+     * Identifies a single STBC MCS that shall be used for
+     * STBC control frames and STBC beacons
+     */
     tANI_U8 gHTSTBCBasicMCS;
 
     tANI_U8 gHTNonGFDevicesPresent;
@@ -1016,6 +1007,7 @@ tLimMlmOemDataRsp       *gpLimMlmOemDataRsp;
     tANI_U8 fOffloadScanP2PListen; /*Flag to track the p2p listen */
     tANI_U8 probeCounter;
     tANI_U8 maxProbe;
+    uint8_t retry_packet_cnt;
 } tAniSirLim, *tpAniSirLim;
 
 typedef struct sLimMgmtFrameRegistration
@@ -1083,6 +1075,7 @@ typedef struct sMacOpenParameters
  */
     tANI_U8 olIniInfo;
     v_BOOL_t ssdp;
+    bool enable_bcst_ptrn;
     /*
      * DFS Phyerror Filtering offload status from ini
      * 0 indicates offload disabled
@@ -1123,12 +1116,19 @@ typedef struct sMacOpenParameters
 
     bool      tx_chain_mask_cck;
     uint16_t  self_gen_frm_pwr;
+#ifdef WLAN_FEATURE_LPSS
+    bool is_lpass_enabled;
+#endif
+#ifdef WLAN_FEATURE_NAN
+    bool is_nan_enabled;
+#endif
+    uint16_t  max_mgmt_tx_fail_count;
     bool force_target_assert_enabled;
 } tMacOpenParameters;
 
 typedef struct sHalMacStartParameters
 {
-    // parametes for the Firmware
+    /* Parameters for the Firmware */
     tDriverType  driverType;
 
 } tHalMacStartParameters;
@@ -1168,7 +1168,6 @@ typedef enum
 // -------------------------------------------------------------------
 /// MAC Sirius parameter structure
 typedef struct sAniSirGlobal
-
 {
     tDriverType  gDriverType;
 
@@ -1183,9 +1182,6 @@ typedef struct sAniSirGlobal
     /* PAL/HDD handle */
     tHddHandle hHdd;
 
-#ifdef ANI_DVT_DEBUG
-    tAniSirDvt   dvt;
-#endif
 
     tSmeStruct sme;
     tSapStruct sap;
@@ -1213,8 +1209,8 @@ typedef struct sAniSirGlobal
     tANI_U32     menuCurrent;
     /* logDump specific */
     tANI_U32 dumpTablecurrentId;
-    /* Instead of static allocation I will dyanamically allocate memory for dumpTableEntry
-        Thinking of using linkedlist  */
+    /* Instead of static allocation I will dynamically allocate memory
+       for dumpTableEntry thinking of using linked list  */
     tDumpModuleEntry *dumpTableEntry[MAX_DUMP_TABLE_ENTRY];
 #ifdef FEATURE_WLAN_TDLS
     v_BOOL_t isTdlsPowerSaveProhibited;
@@ -1245,14 +1241,26 @@ typedef struct sAniSirGlobal
     csrReadyToExtWoWCallback readyToExtWoWCallback;
     void *readyToExtWoWContext;
 #endif
-    uint32_t fine_time_meas_cap;
 
+#ifdef SAP_AUTH_OFFLOAD
+    bool sap_auth_offload;
+    uint32_t sap_auth_offload_sec_type;
+#endif /* SAP_AUTH_OFFLOAD */
+
+    /* 802.11p enable */
+    bool enable_dot11p;
+    uint32_t f_sta_miracast_mcc_rest_time_val;
+    uint8_t f_prefer_non_dfs_on_radar;
+    uint32_t fine_time_meas_cap;
     /* per band chain mask support */
     bool per_band_chainmask_supp;
     struct vdev_type_nss vdev_type_nss_2g;
     struct vdev_type_nss vdev_type_nss_5g;
+    uint8_t user_configured_nss;
     t_auth_ack_status auth_ack_status;
     bool first_scan_done;
+    int8_t first_scan_bucket_threshold;
+    sir_mgmt_frame_ind_callback mgmt_frame_ind_cb;
 } tAniSirGlobal;
 
 typedef enum

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -81,7 +81,7 @@
 #define SOFTAP_RSSI_WEIGHT      (20)
 #define SOFTAP_COUNT_WEIGHT     (20)
 
-#define SAP_DEFAULT_CHANNEL     (6)
+#define SAP_DEFAULT_24GHZ_CHANNEL     (6)
 #define SAP_DEFAULT_5GHZ_CHANNEL      (40)
 #define SAP_CHANNEL_NOT_SELECTED (0)
 
@@ -183,6 +183,13 @@ typedef struct sSapChSelParams {
 #define SAP_TX_LEAKAGE_THRES 310
 #define SAP_TX_LEAKAGE_MAX  1000
 #define SAP_TX_LEAKAGE_MIN  200
+/*
+ * This define is used to block additional channels
+ * based on the new data gathered on auto platforms
+ * and to differentiate the leakage data among different
+ * platforms.
+ */
+#define SAP_TX_LEAKAGE_AUTO_MIN  210
 
 typedef struct sSapTxLeakInfo {
     v_U8_t  leak_chan;      /* leak channel */

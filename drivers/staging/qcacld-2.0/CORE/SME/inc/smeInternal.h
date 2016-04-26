@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -69,6 +69,7 @@ typedef enum eSmeCommandType
     eSmeCommandRemoveKey,
     eSmeCommandAddStaSession,
     eSmeCommandDelStaSession,
+    eSmeCommandSetMaxTxPower,
 #ifdef FEATURE_WLAN_TDLS
     //eSmeTdlsCommandMask = 0x80000,  //To identify TDLS commands <TODO>
     //These can be considered as csr commands.
@@ -110,6 +111,18 @@ typedef enum eSmeState
 #define SME_IS_START(pMac)  (SME_STATE_STOP != (pMac)->sme.state)
 #define SME_IS_READY(pMac)  (SME_STATE_READY == (pMac)->sme.state)
 
+/* HDD Callback function */
+typedef void(*pIbssPeerInfoCb)(void *pUserData,
+                               tSirPeerInfoRspParams *infoParam);
+
+/* Peer info */
+typedef struct tagSmePeerInfoHddCbkInfo
+{
+   void *pUserData;
+   pIbssPeerInfoCb peerInfoCbk;
+}tSmePeerInfoHddCbkInfo;
+
+
 typedef struct sStatsExtEvent {
     tANI_U32 vdev_id;
     tANI_U32 event_data_len;
@@ -130,12 +143,15 @@ typedef struct sSelfRecoveryStats {
     tANI_U8 cmdStatsIndx;
 } tSelfRecoveryStats;
 
+typedef void (*ocb_callback)(void *context, void *response);
+
 typedef struct tagSmeStruct
 {
     eSmeState state;
     vos_lock_t lkSmeGlobalLock;
     tANI_U32 totalSmeCmd;
-    void *pSmeCmdBufAddr;
+    /* following pointer contains array of pointers for tSmeCmd* */
+    void **pSmeCmdBufAddr;
     tDblLinkList smeCmdActiveList;
     tDblLinkList smeCmdPendingList;
     tDblLinkList smeCmdFreeList;   //preallocated roam cmd list
@@ -149,6 +165,7 @@ typedef struct tagSmeStruct
     tDblLinkList smeScanCmdPendingList;
     //active scan command list
     tDblLinkList smeScanCmdActiveList;
+    tSmePeerInfoHddCbkInfo peerInfoParams;
 #ifdef FEATURE_WLAN_DIAG_SUPPORT_CSR
     vos_event_wlan_status_payload_type eventPayload;
 #endif
@@ -165,24 +182,54 @@ typedef struct tagSmeStruct
     /* Maximum interfaces allowed by the host */
     tANI_U8 max_intf_count;
     void (* StatsExtCallback) (void *, tStatsExtEvent *);
-    /* linkspeed callback */
+    /* link speed callback */
     void (*pLinkSpeedIndCb) (tSirLinkSpeedInfo *indParam, void *pDevContext);
     void *pLinkSpeedCbContext;
+    /* get rssi callback */
+    void (*pget_rssi_ind_cb) (struct sir_rssi_resp *param, void *pcontext);
+    void *pget_rssi_cb_context;
 #ifdef FEATURE_WLAN_EXTSCAN
     void (*pExtScanIndCb) (void *, const tANI_U16, void *);
 #endif /* FEATURE_WLAN_EXTSCAN */
 #ifdef WLAN_FEATURE_NAN
     void (*nanCallback) (void*, tSirNanEvent*);
 #endif
+
+    int (*get_tsf_cb)(void *pcb_cxt, struct stsf *ptsf);
+    void *get_tsf_cxt;
+
     v_BOOL_t enableSelfRecovery;
     tCsrLinkStatusCallback linkStatusCallback;
     void *linkStatusContext;
+    tcsr_fw_state_callback fw_state_callback;
+    void *fw_state_context;
+    /* get temperature event context and callback */
+    void *pTemperatureCbContext;
+    void (*pGetTemperatureCb)(int temperature, void *context);
+    uint8_t miracast_value;
+
+    /* OCB callbacks */
+    void *ocb_set_config_context;
+    ocb_callback ocb_set_config_callback;
+    void *ocb_get_tsf_timer_context;
+    ocb_callback ocb_get_tsf_timer_callback;
+    void *dcc_get_stats_context;
+    ocb_callback dcc_get_stats_callback;
+    void *dcc_update_ndl_context;
+    ocb_callback dcc_update_ndl_callback;
+    void *dcc_stats_event_context;
+    ocb_callback dcc_stats_event_callback;
 #ifdef WLAN_FEATURE_MEMDUMP
     void (*fw_dump_callback)(void *context, struct fw_dump_rsp *rsp);
 #endif
+    void (*set_thermal_level_cb)(void *hdd_context, uint8_t level);
+
     void (*rssi_threshold_breached_cb)(void *, struct rssi_breach_event *);
     void (*lost_link_info_cb)(void *context,
 			      struct sir_lost_link_info *lost_link_info);
+    void (*smps_force_mode_cb)(void *context,
+			struct sir_smps_force_mode_event *smps_force_mode_info);
+    void (*pbpf_get_offload_cb)(void *context, struct sir_bpf_get_offload *);
 } tSmeStruct, *tpSmeStruct;
 
 

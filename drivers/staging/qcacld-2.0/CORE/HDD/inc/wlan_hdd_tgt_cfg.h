@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -43,14 +43,20 @@ struct hdd_tgt_services {
 #endif
         v_BOOL_t beacon_offload;
         u_int32_t lte_coex_ant_share;
+        uint8_t chain_mask_2g;
+        uint8_t chain_mask_5g;
+        bool per_band_chainmask_supp;
 #ifdef FEATURE_WLAN_TDLS
         v_BOOL_t en_tdls;
         v_BOOL_t en_tdls_offchan;
         v_BOOL_t en_tdls_uapsd_buf_sta;
         v_BOOL_t en_tdls_uapsd_sleep_sta;
+#endif
 #ifdef WLAN_FEATURE_ROAM_OFFLOAD
         v_BOOL_t en_roam_offload;
 #endif
+#ifdef SAP_AUTH_OFFLOAD
+        bool sap_auth_offload_service;
 #endif
 };
 
@@ -98,6 +104,13 @@ struct hdd_tgt_cfg {
 #ifdef WLAN_FEATURE_LPSS
         v_U8_t lpss_support;
 #endif
+        uint8_t ap_arpns_support;
+#ifdef FEATURE_GREEN_AP
+        bool egap_support;
+#endif
+        uint32_t fine_time_measurement_cap;
+        bool bpf_enabled;
+        uint16_t wmi_max_len;
 };
 
 struct hdd_dfs_radar_ind {
