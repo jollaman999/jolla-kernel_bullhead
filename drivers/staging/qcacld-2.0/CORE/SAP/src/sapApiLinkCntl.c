@@ -141,7 +141,7 @@ WLANSAP_ScanCallback
     VOS_STATUS sapstatus;
 #ifdef SOFTAP_CHANNEL_RANGE
     v_U32_t operatingBand;
-    v_U32_t event = eSAP_NO_MSG;
+    v_U32_t event;
 #endif
 
     if (psapContext->sapsMachine == eSAP_DISCONNECTED) {
