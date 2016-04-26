@@ -10270,7 +10270,10 @@ VOS_STATUS hdd_init_station_mode( hdd_adapter_t *pAdapter )
    }
 
    //Set the Connection State to Not Connected
-   hdd_connSetConnectionState(pAdapter, eConnectionState_NotConnected);
+   hddLog(VOS_TRACE_LEVEL_INFO,
+            "%s: Set HDD connState to eConnectionState_NotConnected",
+                   __func__);
+   pHddStaCtx->conn_info.connState = eConnectionState_NotConnected;
 
    //Set the default operation channel
    pHddStaCtx->conn_info.operationChannel = pHddCtx->cfg_ini->OperatingChannel;
