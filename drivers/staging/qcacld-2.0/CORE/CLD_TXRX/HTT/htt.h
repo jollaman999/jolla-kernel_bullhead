@@ -1152,13 +1152,13 @@ PREPACK struct htt_tx_msdu_desc_ext_t {
          *     bit  2 -> CCK 5.5 Mbps rate is allowed
          *     bit  3 -> CCK 11 Mbps rate is allowed
          *     bit  4 -> OFDM BPSK modulation, 1/2 coding rate is allowed
-         *     bit  5 -> OFDM QPSK modulation, 1/2 coding rate is allowed
-         *     bit  6 -> OFDM QPSK modulation, 3/4 coding rate is allowed
-         *     bit  7 -> OFDM 16-QAM modulation, 1/2 coding rate is allowed
-         *     bit  8 -> OFDM 16-QAM modulation, 3/4 coding rate is allowed
-         *     bit  9 -> OFDM 64-QAM modulation, 2/3 coding rate is allowed
-         *     bit 10 -> OFDM 64-QAM modulation, 3/4 coding rate is allowed
-         *     bit 11 -> OFDM 64-QAM modulation, 5/6 coding rate is allowed
+         *     bit  5 -> OFDM BPSK modulation, 3/4 coding rate is allowed
+         *     bit  6 -> OFDM QPSK modulation, 1/2 coding rate is allowed
+         *     bit  7 -> OFDM QPSK modulation, 3/4 coding rate is allowed
+         *     bit  8 -> OFDM 16-QAM modulation, 1/2 coding rate is allowed
+         *     bit  9 -> OFDM 16-QAM modulation, 3/4 coding rate is allowed
+         *     bit 10 -> OFDM 64-QAM modulation, 2/3 coding rate is allowed
+         *     bit 11 -> OFDM 64-QAM modulation, 3/4 coding rate is allowed
          *
          * The MCS index specification needs to be compatible with the
          * bandwidth mask specification.  For example, a MCS index == 9

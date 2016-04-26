@@ -107,12 +107,12 @@ limExtractApCapability(tpAniSirGlobal pMac, tANI_U8 *pIE, tANI_U16 ieLen,
     sirDumpBuf( pMac, SIR_LIM_MODULE_ID, LOG3, pIE, ieLen );)
     if (sirParseBeaconIE(pMac, pBeaconStruct, pIE, (tANI_U32)ieLen) == eSIR_SUCCESS)
     {
-        if (pBeaconStruct->wmeInfoPresent || pBeaconStruct->wmeEdcaPresent)
+        if (pBeaconStruct->wmeInfoPresent || pBeaconStruct->wmeEdcaPresent
+            || pBeaconStruct->HTCaps.present)
             LIM_BSS_CAPS_SET(WME, *qosCap);
         if (LIM_BSS_CAPS_GET(WME, *qosCap) && pBeaconStruct->wsmCapablePresent)
             LIM_BSS_CAPS_SET(WSM, *qosCap);
-        if (pBeaconStruct->propIEinfo.aniIndicator &&
-            pBeaconStruct->propIEinfo.capabilityPresent)
+        if (pBeaconStruct->propIEinfo.capabilityPresent)
             *propCap = pBeaconStruct->propIEinfo.capability;
         if (pBeaconStruct->HTCaps.present)
             pMac->lim.htCapabilityPresentInBeacon = 1;
@@ -274,10 +274,7 @@ ePhyChanBondState  limGetHTCBState(ePhyChanBondState aniCBMode)
  * limGetStaPeerType
  *
  *FUNCTION:
- * Based on a combination of the following -
- * 1) tDphHashNode.aniPeer
- * 2) tDphHashNode.propCapability
- * this API determines if a given STA is an ANI peer or not
+ * This API returns STA peer type
  *
  *LOGIC:
  *
@@ -294,19 +291,9 @@ tStaRateMode limGetStaPeerType( tpAniSirGlobal pMac,
     tpDphHashNode pStaDs,
     tpPESession   psessionEntry)
 {
-tStaRateMode staPeerType = eSTA_11b;
-  // Determine the peer-STA type
-  if( pStaDs->aniPeer )
-  {
-    if(PROP_CAPABILITY_GET( TAURUS, pStaDs->propCapability ))
-        staPeerType = eSTA_TAURUS;
-    else if( PROP_CAPABILITY_GET( TITAN, pStaDs->propCapability ))
-        staPeerType = eSTA_TITAN;
-    else
-        staPeerType = eSTA_POLARIS;
-  }
+  tStaRateMode staPeerType = eSTA_11b;
 #ifdef WLAN_FEATURE_11AC
-  else if(pStaDs->mlmStaContext.vhtCapability)
+  if(pStaDs->mlmStaContext.vhtCapability)
       staPeerType = eSTA_11ac;
 #endif
   else if(pStaDs->mlmStaContext.htCapability)

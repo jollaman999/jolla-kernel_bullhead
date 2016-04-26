@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -57,9 +57,9 @@
  *
  *FUNCTION:
  * This function is called while adding a context at
- * DPH & Polaris for a peer in IBSS.
+ * DPH for a peer in IBSS.
  * If peer is found in the list, capabilities from the
- * returned BSS description are used at DPH node & Polaris.
+ * returned BSS description are used at DPH node.
  *
  *LOGIC:
  *
@@ -263,7 +263,10 @@ ibss_sta_caps_update(
         if (pPeerNode->htCapable)
         {
             pStaDs->htGreenfield = pPeerNode->htGreenfield;
-            pStaDs->htSupportedChannelWidthSet =  pPeerNode->htSupportedChannelWidthSet;
+            pStaDs->htSupportedChannelWidthSet =
+                                      pPeerNode->htSupportedChannelWidthSet;
+            pStaDs->htSecondaryChannelOffset =
+                                         pPeerNode->htSecondaryChannelOffset;
             pStaDs->htMIMOPSState =             pPeerNode->htMIMOPSState;
             pStaDs->htMaxAmsduLength =  pPeerNode->htMaxAmsduLength;
             pStaDs->htAMpduDensity =             pPeerNode->htAMpduDensity;
@@ -292,14 +295,6 @@ ibss_sta_caps_update(
         }
     }
 #endif
-
-    if(IS_DOT11_MODE_PROPRIETARY(psessionEntry->dot11mode) &&
-      pPeerNode->aniIndicator)
-    {
-        pStaDs->aniPeer = pPeerNode->aniIndicator;
-        pStaDs->propCapability = pPeerNode->propCapability;
-    }
-
 
     // peer is 11e capable but is not 11e enabled yet
     // some STA's when joining Airgo IBSS, assert qos capability even when
@@ -366,12 +361,12 @@ ibss_sta_rates_update(
 #ifdef WLAN_FEATURE_11AC
     limPopulateMatchingRateSet(pMac, pStaDs, &pPeer->supportedRates,
                                &pPeer->extendedRates, pPeer->supportedMCSSet,
-                               &pStaDs->mlmStaContext.propRateSet,psessionEntry, &pPeer->VHTCaps);
+                               psessionEntry, &pPeer->VHTCaps);
 #else
     // Populate supported rateset
     limPopulateMatchingRateSet(pMac, pStaDs, &pPeer->supportedRates,
                                &pPeer->extendedRates, pPeer->supportedMCSSet,
-                               &pStaDs->mlmStaContext.propRateSet,psessionEntry);
+                               psessionEntry);
 #endif
 
     pStaDs->mlmStaContext.capabilityInfo = pPeer->capabilityInfo;
@@ -381,8 +376,7 @@ ibss_sta_rates_update(
  * ibss_sta_info_update
  *
  *FUNCTION:
- * This is called to program both SW & Polaris context
- * for peer in IBSS.
+ * This is called to program SW context for peer in IBSS.
  *
  *LOGIC:
  *
@@ -960,9 +954,9 @@ limIbssDecideProtection(tpAniSirGlobal pMac, tpDphHashNode pStaDs, tpUpdateBeaco
  *
  *FUNCTION:
  * This function is called while adding a context at
- * DPH & Polaris for a peer in IBSS.
+ * DPH for a peer in IBSS.
  * If peer is found in the list, capabilities from the
- * returned BSS description are used at DPH node & Polaris.
+ * returned BSS description are used at DPH node.
  *
  *LOGIC:
  *
@@ -1074,6 +1068,88 @@ limIbssStaAdd(
     return retCode;
 }
 
+static void
+__limIbssSearchAndDeletePeer(tpAniSirGlobal pMac,
+			tpPESession psessionEntry,
+				tSirMacAddr macAddr)
+{
+	tLimIbssPeerNode *pTempNode, *pPrevNode;
+	tLimIbssPeerNode *pTempNextNode = NULL;
+	tpDphHashNode     pStaDs=NULL;
+	tANI_U16          peerIdx=0;
+	tANI_U16          staIndex=0;
+	tANI_U8           ucUcastSig;
+	tANI_U8           ucBcastSig;
+
+	pPrevNode = pTempNode  = pMac->lim.gLimIbssPeerList;
+
+	limLog(pMac, LOG1, FL("PEER ADDR :" MAC_ADDRESS_STR),
+				MAC_ADDR_ARRAY(macAddr));
+
+	/* Compare Peer */
+	while (NULL != pTempNode) {
+		pTempNextNode = pTempNode->next;
+
+		/* Delete the STA with MAC address */
+		if (vos_mem_compare((tANI_U8 *) macAddr,
+			(tANI_U8 *) &pTempNode->peerMacAddr,
+			sizeof(tSirMacAddr))) {
+			pStaDs = dphLookupHashEntry(pMac, macAddr,
+				&peerIdx, &psessionEntry->dph.dphHashTable);
+			if (pStaDs) {
+				staIndex = pStaDs->staIndex;
+				ucUcastSig = pStaDs->ucUcastSig;
+				ucBcastSig = pStaDs->ucBcastSig;
+				/**
+				 * Send DEL STA only if ADD STA
+				 * was success i.e staid is Valid.
+				*/
+				if (HAL_STA_INVALID_IDX != staIndex)
+					limDelSta(pMac, pStaDs,
+						false /*asynchronous*/,
+						psessionEntry);
+				limDeleteDphHashEntry(pMac,
+						pStaDs->staAddr,
+						peerIdx, psessionEntry);
+				limReleasePeerIdx(pMac, peerIdx, psessionEntry);
+				/**
+				 * Send indication to upper layers only if ADD
+				 * STA was success i.e staid is Valid.
+				 */
+				if (HAL_STA_INVALID_IDX != staIndex)
+					ibss_status_chg_notify(pMac, macAddr,
+						staIndex,
+						ucUcastSig, ucBcastSig,
+						eWNI_SME_IBSS_PEER_DEPARTED_IND,
+						psessionEntry->smeSessionId);
+				if (pTempNode == pMac->lim.gLimIbssPeerList) {
+					pMac->lim.gLimIbssPeerList =
+								pTempNode->next;
+					pPrevNode = pMac->lim.gLimIbssPeerList;
+				} else
+					pPrevNode->next = pTempNode->next;
+
+				vos_mem_free(pTempNode);
+				pMac->lim.gLimNumIbssPeers--;
+
+				pTempNode = pTempNextNode;
+				break;
+			}
+		}
+		pPrevNode = pTempNode;
+		pTempNode = pTempNextNode;
+	}
+	/*
+	 * if it is the last peer walking out, we better
+	 * we set IBSS state to inactive.
+	 */
+	if (0 == pMac->lim.gLimNumIbssPeers) {
+		VOS_TRACE(VOS_MODULE_ID_PE, VOS_TRACE_LEVEL_INFO,
+			"Last STA from IBSS walked out");
+		psessionEntry->limIbssActive = false;
+	}
+}
+
 /* handle the response from HAL for an ADD STA request */
 tSirRetStatus
 limIbssAddStaRsp(
@@ -1087,23 +1163,31 @@ limIbssAddStaRsp(
     SET_LIM_PROCESS_DEFD_MESGS(pMac, true);
     if (pAddStaParams == NULL)
     {
-        PELOGE(limLog(pMac, LOGE, FL("IBSS: ADD_STA_RSP with no body!"));)
+        limLog(pMac, LOGE, FL("IBSS: ADD_STA_RSP with no body!"));
         return eSIR_FAILURE;
     }
 
-    pStaDs = dphLookupHashEntry(pMac, pAddStaParams->staMac, &peerIdx, &psessionEntry->dph.dphHashTable);
+    pStaDs =
+       dphLookupHashEntry(pMac,
+          pAddStaParams->staMac, &peerIdx,
+          &psessionEntry->dph.dphHashTable);
     if (pStaDs == NULL)
     {
-        PELOGE(limLog(pMac, LOGE, FL("IBSS: ADD_STA_RSP for unknown MAC addr "));)
-        limPrintMacAddr(pMac, pAddStaParams->staMac, LOGE);
+        limLog(pMac, LOGE,
+           FL("IBSS: ADD_STA_RSP for unknown MAC addr " MAC_ADDRESS_STR),
+           MAC_ADDR_ARRAY(pAddStaParams->staMac));
         vos_mem_free(pAddStaParams);
         return eSIR_FAILURE;
     }
 
     if (pAddStaParams->status != eHAL_STATUS_SUCCESS)
     {
-        PELOGE(limLog(pMac, LOGE, FL("IBSS: ADD_STA_RSP error (%x) "), pAddStaParams->status);)
-        limPrintMacAddr(pMac, pAddStaParams->staMac, LOGE);
+        limLog(pMac, LOGE,
+          FL("IBSS: ADD_STA_RSP error (%x) for MAC " MAC_ADDRESS_STR),
+          pAddStaParams->status,
+          MAC_ADDR_ARRAY(pAddStaParams->staMac));
+        __limIbssSearchAndDeletePeer(pMac,
+                      psessionEntry, pAddStaParams->staMac);
         vos_mem_free(pAddStaParams);
         return eSIR_FAILURE;
     }
@@ -1287,80 +1371,6 @@ limIbssDelBssRsp(
     }
 }
 
-static void
-__limIbssSearchAndDeletePeer(tpAniSirGlobal    pMac,
-                             tpPESession psessionEntry,
-                             tSirMacAddr macAddr)
-{
-   tLimIbssPeerNode *pTempNode, *pPrevNode;
-   tLimIbssPeerNode *pTempNextNode = NULL;
-   tpDphHashNode     pStaDs=NULL;
-   tANI_U16          peerIdx=0;
-   tANI_U16          staIndex=0;
-   tANI_U8           ucUcastSig;
-   tANI_U8           ucBcastSig;
-
-   pPrevNode = pTempNode  = pMac->lim.gLimIbssPeerList;
-
-   limLog(pMac, LOG1, FL(" PEER ADDR :" MAC_ADDRESS_STR ),MAC_ADDR_ARRAY(macAddr));
-
-   /** Compare Peer */
-   while (NULL != pTempNode)
-   {
-      pTempNextNode = pTempNode->next;
-
-      /* Delete the STA with MAC address */
-      if (vos_mem_compare( (tANI_U8 *) macAddr,
-               (tANI_U8 *) &pTempNode->peerMacAddr,
-               sizeof(tSirMacAddr)) )
-      {
-         pStaDs = dphLookupHashEntry(pMac, macAddr,
-               &peerIdx, &psessionEntry->dph.dphHashTable);
-         if (pStaDs)
-         {
-            staIndex = pStaDs->staIndex;
-            ucUcastSig = pStaDs->ucUcastSig;
-            ucBcastSig = pStaDs->ucBcastSig;
-
-            (void) limDelSta(pMac, pStaDs, false /*asynchronous*/, psessionEntry);
-            limDeleteDphHashEntry(pMac, pStaDs->staAddr, peerIdx, psessionEntry);
-            limReleasePeerIdx(pMac, peerIdx, psessionEntry);
-
-            /* Send indication to upper layers */
-            ibss_status_chg_notify(pMac, macAddr, staIndex,
-                                   ucUcastSig, ucBcastSig,
-                                   eWNI_SME_IBSS_PEER_DEPARTED_IND,
-                                   psessionEntry->smeSessionId );
-            if (pTempNode == pMac->lim.gLimIbssPeerList)
-            {
-               pMac->lim.gLimIbssPeerList = pTempNode->next;
-               pPrevNode = pMac->lim.gLimIbssPeerList;
-            }
-            else
-               pPrevNode->next = pTempNode->next;
-
-            vos_mem_free(pTempNode);
-            pMac->lim.gLimNumIbssPeers--;
-
-            pTempNode = pTempNextNode;
-            break;
-         }
-      }
-      pPrevNode = pTempNode;
-      pTempNode = pTempNextNode;
-   }
-   /*
-    * if it is the last peer walking out, we better
-    * we set IBSS state to inactive.
-    */
-   if (0 == pMac->lim.gLimNumIbssPeers)
-   {
-       VOS_TRACE(VOS_MODULE_ID_PE, VOS_TRACE_LEVEL_INFO,
-            "Last STA from IBSS walked out");
-       psessionEntry->limIbssActive = false;
-   }
-}
-
 /**
  * limIbssCoalesce()
  *
@@ -1469,7 +1479,12 @@ limIbssCoalesce(
          */
         if ((pMac->lim.gLimNumIbssPeers+1) >= pMac->lim.gLimIbssStaLimit)
         {
-            PELOGE(limLog(pMac, LOGE, FL("**** MAX STA LIMIT HAS REACHED ****"));)
+            /*Print every 100th time */
+            if (pMac->lim.gLimIbssRetryCnt % 100 == 0)
+            {
+                PELOGE(limLog(pMac, LOG1, FL("**** MAX STA LIMIT HAS REACHED ****"));)
+            }
+            pMac->lim.gLimIbssRetryCnt++;
             return eSIR_LIM_MAX_STA_REACHED_ERROR;
         }
         PELOGW(limLog(pMac, LOGW, FL("IBSS Peer node does not exist, adding it***"));)
@@ -1482,6 +1497,9 @@ limIbssCoalesce(
                    frameLen);
             return eSIR_MEM_ALLOC_FAILED;
         }
+
+        /* Initialize all peer node properties to 0 */
+        vos_mem_zero(pPeerNode, frameLen);
 
         pPeerNode->beacon = NULL;
         pPeerNode->beaconLen = 0;

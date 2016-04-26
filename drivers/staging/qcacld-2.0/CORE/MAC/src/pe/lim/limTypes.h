@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -45,10 +45,9 @@
 #include "sirMacProtDef.h"
 #include "utilsApi.h"
 
-#include "wlan_qct_wdi_ds.h"
-
 #include "limApi.h"
 #include "limDebug.h"
+#include "limTrace.h"
 #include "limSendSmeRspMessages.h"
 #include "sysGlobal.h"
 #include "dphGlobal.h"
@@ -114,7 +113,7 @@
 
 #define LIM_DECRYPT_ICV_FAIL    1
 
-/// Definitions to distinquish between Association/Reassociaton
+/* Definitions to distinguish between Association/Reassociation */
 #define LIM_ASSOC    0
 #define LIM_REASSOC  1
 
@@ -246,6 +245,7 @@ typedef struct sLimMlmAssocInd
     tAniAuthType         authType;
     tAniSSID             ssId;
     tSirRSNie            rsnIE;
+    tSirWAPIie           wapiIE;
     tSirAddie            addIE; // additional IE received from the peer, which possibly includes WSC IE and/or P2P IE.
     tSirMacCapabilityInfo capabilityInfo;
     tAniBool                spectrumMgtIndicator;
@@ -288,6 +288,7 @@ typedef struct sLimMlmReassocInd
     tAniAuthType         authType;
     tAniSSID             ssId;
     tSirRSNie            rsnIE;
+    tSirWAPIie           wapiIE;
     tSirAddie            addIE; // additional IE received from the peer, which can be WSC IE and/or P2P IE.
     tSirMacCapabilityInfo capabilityInfo;
     tAniBool                spectrumMgtIndicator;
@@ -609,7 +610,7 @@ void limProcessSmeDelBssRsp( tpAniSirGlobal , tANI_U32,tpPESession);
 
 void limGetRandomBssid(tpAniSirGlobal pMac ,tANI_U8 *data);
 
-// Function to handle HT and HT IE CFG parameter intializations
+/* Function to handle HT and HT IE CFG parameter initializations */
 void handleHTCapabilityandHTInfo(struct sAniSirGlobal *pMac, tpPESession psessionEntry);
 
 // Function to handle CFG parameter updates
@@ -624,12 +625,12 @@ void limSetCfgProtection(tpAniSirGlobal pMac, tpPESession pesessionEntry);
 
 
 // Function to Initialize MLM state machine on STA
-void limInitMlm(tpAniSirGlobal);
+tSirRetStatus limInitMlm(tpAniSirGlobal);
 
-// Function to cleanup MLM state machine
+/* Function to clean up MLM state machine */
 void limCleanupMlm(tpAniSirGlobal);
 
-// Function to cleanup LMM state machine
+/* Function to clean up LMM state machine */
 void limCleanupLmm(tpAniSirGlobal);
 
 // Management frame handling functions
@@ -689,6 +690,9 @@ void limContinueChannelScan(tpAniSirGlobal);
 tSirResultCodes limMlmAddBss(tpAniSirGlobal, tLimMlmStartReq *,tpPESession psessionEntry);
 
 tSirRetStatus limSendChannelSwitchMgmtFrame(tpAniSirGlobal, tSirMacAddr, tANI_U8, tANI_U8, tANI_U8, tpPESession);
+tSirRetStatus lim_send_extended_chan_switch_action_frame(tpAniSirGlobal mac_ctx,
+	tSirMacAddr peer, uint8_t mode, uint8_t new_op_class,
+	uint8_t new_channel, uint8_t count, tpPESession session_entry);
 
 #ifdef WLAN_FEATURE_11AC
 tSirRetStatus limSendVHTOpmodeNotificationFrame(tpAniSirGlobal pMac,tSirMacAddr peer,tANI_U8 nMode, tpPESession  psessionEntry );
@@ -760,19 +764,10 @@ void limSetChannel(tpAniSirGlobal pMac, tANI_U8 channel, tANI_U8 secChannelOffse
 void limCompleteMlmScan(tpAniSirGlobal, tSirResultCodes);
 
 #ifdef FEATURE_OEM_DATA_SUPPORT
-/// Funtion that sets system into meas mode for oem data req
+/* Function that sets system into meas mode for oem data req */
 void limSetOemDataReqMode(tpAniSirGlobal pMac, eHalStatus status, tANI_U32* data);
 #endif
 
-#ifdef ANI_SUPPORT_11H
-/// Function that sends Measurement Report action frame
-tSirRetStatus limSendMeasReportFrame(tpAniSirGlobal, tpSirMacMeasReqActionFrame,
-                                     tSirMacAddr, tpPESession psessionEntry);
-
-/// Function that sends TPC Report action frame
-tSirRetStatus limSendTpcReportFrame(tpAniSirGlobal, tpSirMacTpcReqActionFrame, tSirMacAddr,
-                                            tpPESession psessionEntry);
-#endif
 
 /// Function that sends TPC Request action frame
 void limSendTpcRequestFrame(tpAniSirGlobal, tSirMacAddr, tpPESession psessionEntry);
@@ -790,7 +785,6 @@ void limProcessMlmSetBssKeyRsp( tpAniSirGlobal pMac, tpSirMsgQ limMsgQ );
 
 
 
-#ifdef GEN4_SCAN
 // Function to process WDA_INIT_SCAN_RSP message
 void limProcessInitScanRsp(tpAniSirGlobal,  void * );
 
@@ -820,7 +814,6 @@ tANI_U8 limIsLinkSuspended(tpAniSirGlobal pMac);
 void limSuspendLink(tpAniSirGlobal, tSirLinkTrafficCheck, SUSPEND_RESUME_LINK_CALLBACK, tANI_U32*);
 void limResumeLink(tpAniSirGlobal, SUSPEND_RESUME_LINK_CALLBACK, tANI_U32*);
 //end WLAN_SUSPEND_LINK Related
-#endif // GEN4_SCAN
 
 tSirRetStatus limSendAddBAReq( tpAniSirGlobal pMac,
     tpLimMlmAddBAReq pMlmAddBAReq,tpPESession);
@@ -889,10 +882,12 @@ limPostSmeMessage(tpAniSirGlobal pMac, tANI_U32 msgType, tANI_U32 *pMsgBuf)
     msg.type = (tANI_U16)msgType;
     msg.bodyptr = pMsgBuf;
     msg.bodyval = 0;
-    if (msgType > eWNI_SME_MSG_TYPES_BEGIN)
+    if (msgType > eWNI_SME_MSG_TYPES_BEGIN) {
+        MTRACE(macTrace(pMac, TRACE_CODE_TX_SME_MSG, NO_SESSION, msg.type));
         limProcessSmeReqMessages(pMac, &msg);
-    else
+    } else {
         limProcessMlmRspMessages(pMac, msgType, pMsgBuf);
+    }
 } /*** end limPostSmeMessage() ***/
 
 /**
@@ -933,6 +928,7 @@ limPostMlmMessage(tpAniSirGlobal pMac, tANI_U32 msgType, tANI_U32 *pMsgBuf)
     msg.type = (tANI_U16) msgType;
     msg.bodyptr = pMsgBuf;
     msg.bodyval = 0;
+    MTRACE(macTraceMsgRx(pMac, NO_SESSION, msg.type));
     limProcessMlmReqMessages(pMac, &msg);
 } /*** end limPostMlmMessage() ***/
 

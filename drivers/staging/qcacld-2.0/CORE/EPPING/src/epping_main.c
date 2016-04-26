@@ -20,12 +20,10 @@
  */
 
 /*
- * Copyright (c) 2014 Qualcomm Atheros, Inc.
- * All Rights Reserved.
- * Qualcomm Atheros Confidential and Proprietary.
- *
+ * This file was originally distributed by Qualcomm Atheros, Inc.
+ * under proprietary terms before Copyright ownership was assigned
+ * to the Linux Foundation.
  */
-
 
 /*========================================================================
 
@@ -71,6 +69,7 @@
 #include "if_ath_sdio.h"
 #endif
 #include "epping_main.h"
+#include "wlan_hdd_memdump.h"
 #include "epping_internal.h"
 
 #ifdef TIMER_MANAGER
@@ -216,6 +215,7 @@ void epping_exit(v_CONTEXT_t pVosContext)
             __func__);
          return;
       }
+   memdump_deinit();
    if (pEpping_ctx->epping_adapter) {
       epping_destroy_adapter(pEpping_ctx->epping_adapter);
       pEpping_ctx->epping_adapter = NULL;
@@ -256,6 +256,7 @@ void epping_driver_exit(v_CONTEXT_t pVosContext)
       vos_pkt_proto_trace_close();
 #endif /* QCA_PKT_PROTO_TRACE */
       //pHddCtx->isUnloadInProgress = TRUE;
+      vos_set_unload_in_progress(TRUE);
       vos_set_load_unload_in_progress(VOS_MODULE_ID_VOSS, TRUE);
    }
    hif_unregister_driver();
@@ -417,6 +418,7 @@ int epping_wlan_startup(struct device *parent_dev, v_VOID_t *hif_sc)
       }
    }
 #endif /* HIF_PCI */
+   memdump_init();
    EPPING_LOG(VOS_TRACE_LEVEL_INFO_HIGH, "%s: Exit", __func__);
    complete(&pEpping_ctx->wlan_start_comp);
    return ret;
