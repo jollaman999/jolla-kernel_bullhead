@@ -101,6 +101,12 @@ static struct f2fs_dir_entry *find_in_block(struct page *dentry_page,
 		*res_page = dentry_page;
 	else
 		kunmap(dentry_page);
+
+	/*
+	 * For the most part, it should be a bug when name_len is zero.
+	 * We stop here for figuring out where the bugs has occurred.
+	 */
+	f2fs_bug_on(F2FS_P_SB(dentry_page), d.max < 0);
 	return de;
 }
 
@@ -145,9 +151,9 @@ struct f2fs_dir_entry *find_target_dentry(struct fscrypt_name *fname,
 
 		/* remain bug on condition */
 		if (unlikely(!de->name_len))
-			bit_pos++;
-		else
-			bit_pos += GET_DENTRY_SLOTS(le16_to_cpu(de->name_len));
+			d->max = -1;
+
+		bit_pos += GET_DENTRY_SLOTS(le16_to_cpu(de->name_len));
 	}
 
 	de = NULL;
