@@ -2845,7 +2845,7 @@ skip:
     }
 #endif
 
-    pr_info("%s: Resume completes%s in%s mode\n", __func__,
+    pr_debug("%s: Resume completes%s in%s mode\n", __func__,
                 runtime_pm ? " for runtime pm" : "",
                 wma_is_wow_mode_selected(temp_module) ? " wow" : " pdev");
 out:
