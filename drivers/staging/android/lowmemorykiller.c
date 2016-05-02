@@ -79,11 +79,8 @@ static unsigned long lowmem_deathpending_timeout;
 static atomic_t shift_adj = ATOMIC_INIT(0);
 static short adj_max_shift = 353;
 
-static int vm_pressure_adaptive_start = 85;
-#define VM_PRESSURE_ADAPTIVE_STOP	95
-
 /* User knob to enable/disable adaptive lmk feature */
-static int enable_adaptive_lmk = 1;
+static int enable_adaptive_lmk;
 module_param_named(enable_adaptive_lmk, enable_adaptive_lmk, int,
 	S_IRUGO | S_IWUSR);
 
@@ -94,7 +91,7 @@ module_param_named(enable_adaptive_lmk, enable_adaptive_lmk, int,
  * 90-94. Usually this is a pseudo minfree value, higher than the
  * highest configured value in minfree array.
  */
-static int vmpressure_file_min = 66560; /* (65 * 1024) * 4 = 266 MB */
+static int vmpressure_file_min;
 module_param_named(vmpressure_file_min, vmpressure_file_min, int,
 	S_IRUGO | S_IWUSR);
 
@@ -124,37 +121,28 @@ int adjust_minadj(short *min_score_adj)
 	return ret;
 }
 
-static unsigned long pressure = 0;
-
 static int lmk_vmpressure_notifier(struct notifier_block *nb,
 			unsigned long action, void *data)
 {
-	int other_free = 0, other_file = 0;
+	unsigned long pressure = action;
 	int array_size = ARRAY_SIZE(lowmem_adj);
-	pressure = action;
+
+	int other_free = global_page_state(NR_FREE_PAGES) - totalreserve_pages;
+	int other_file = global_page_state(NR_FILE_PAGES) -
+						global_page_state(NR_SHMEM) -
+						total_swapcache_pages();
 
 	if (!enable_adaptive_lmk)
 		return 0;
 
-	if (pressure >= VM_PRESSURE_ADAPTIVE_STOP) {
-		other_file = global_page_state(NR_FILE_PAGES) -
-			global_page_state(NR_SHMEM) -
-			total_swapcache_pages();
-		other_free = global_page_state(NR_FREE_PAGES);
-
+	if (pressure >= 95) {
 		atomic_set(&shift_adj, 1);
 		trace_almk_vmpressure(pressure, other_free, other_file);
-	} else if (pressure >= vm_pressure_adaptive_start) {
+	} else if (pressure >= 90) {
 		if (lowmem_adj_size < array_size)
 			array_size = lowmem_adj_size;
 		if (lowmem_minfree_size < array_size)
 			array_size = lowmem_minfree_size;
-
-		other_file = global_page_state(NR_FILE_PAGES) -
-			global_page_state(NR_SHMEM) -
-			total_swapcache_pages();
-
-		other_free = global_page_state(NR_FREE_PAGES);
 
 		if ((other_free < lowmem_minfree[array_size - 1]) &&
 			(other_file < vmpressure_file_min)) {
@@ -529,9 +517,6 @@ module_param_array_named(adj, lowmem_adj, short, &lowmem_adj_size,
 module_param_array_named(minfree, lowmem_minfree, uint, &lowmem_minfree_size,
 			 S_IRUGO | S_IWUSR);
 module_param_named(debug_level, lowmem_debug_level, uint, S_IRUGO | S_IWUSR);
-module_param_named(vm_pressure_adaptive_start, vm_pressure_adaptive_start, int,
-		   S_IRUGO | S_IWUSR);
-module_param_named(lmk_vm_pressure, pressure, ulong, 0444);
 
 module_init(lowmem_init);
 module_exit(lowmem_exit);
