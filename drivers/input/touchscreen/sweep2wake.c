@@ -52,10 +52,12 @@ MODULE_LICENSE("GPLv2");
 #define S2W_DEBUG		0
 #define S2W_DEFAULT		0
 #define S2W_FEATHER             500
+#define S2W_TIME_GAP		250
 #define S2W_VIB_STRENGTH	20	// Vibrator strength
 
 /* Resources */
 int s2w_switch = S2W_DEFAULT;
+static cputime64_t tap_time_pre = 0;
 static int touch_x = 0;
 static int prev_x = 0;
 static bool is_new_touch = false;
@@ -115,6 +117,7 @@ static void sweep2wake_pwrtrigger(void) {
 
 /* reset on finger release */
 static void sweep2wake_reset(void) {
+	tap_time_pre = 0;
 	is_touching = false;
 	prev_x = 0;
 	is_new_touch = false;
@@ -122,6 +125,7 @@ static void sweep2wake_reset(void) {
 
 /* init a new touch */
 static void new_touch(int x) {
+	tap_time_pre = ktime_to_ms(ktime_get());
 	prev_x = x;
 	is_new_touch = true;
 }
@@ -136,6 +140,9 @@ static void detect_sweep2wake(int x)
 	if (!is_touching) {
 		if (!is_new_touch)
 			new_touch(x);
+
+		if (ktime_to_ms(ktime_get()) - tap_time_pre > S2W_TIME_GAP)
+			return;
 
 		// left->right
 		if (prev_x - x > S2W_FEATHER) {
