@@ -4716,13 +4716,15 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 	synaptics_rmi4_touch_off_triggered = true;
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (track_changed || (sovc_tmp_onoff && !sovc_mic_detected)) {
-		register_sovc();
+	if (!sovc_force_off) {
+		if (track_changed || (sovc_tmp_onoff && !sovc_mic_detected)) {
+			register_sovc();
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-		register_dt2w();
+			register_dt2w();
 #endif
-		synaptics_rmi4_touch_off_triggered = false;
-		return;
+			synaptics_rmi4_touch_off_triggered = false;
+			return;
+		}
 	}
 
 	if (!scr_suspended) {
@@ -4953,6 +4955,7 @@ static void synaptics_rmi4_resume_works(struct work_struct *synaptics_rmi4_resum
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	unregister_sovc();
+	sovc_force_off = false;
 #endif
 
 	mutex_unlock(&suspend_resume_lock);

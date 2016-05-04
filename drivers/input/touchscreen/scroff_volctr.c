@@ -87,15 +87,17 @@ MODULE_LICENSE("GPLv2");
 #define SOVC_TIME_GAP		250	// Ignore touch after this time (ms)
 #define SOVC_VOL_REEXEC_DELAY	250	// Re-exec delay for volume control (ms)
 #define SOVC_TRACK_REEXEC_DELAY	4000	// Re-exec delay for track control (ms)
+#define SOVC_AUTO_OFF_DELAY	4000	// Touch screen will be turned off when user pressing the screen (ms)
 #define SOVC_KEY_PRESS_DUR	60	// Key press duration (ms)
 #define SOVC_VIB_STRENGTH	20	// Vibrator strength
 
 /* Resources */
 int sovc_switch = SOVC_DEFAULT;
 int sovc_tmp_onoff = 0;
+bool sovc_force_off = false;
 bool sovc_mic_detected = false;
 bool track_changed = false;
-static s64 touch_time_pre = 0;
+static s64 touch_time_pre_x = 0, touch_time_pre_y = 0;
 static int touch_x = 0, touch_y = 0;
 static int prev_x = 0, prev_y = 0;
 static bool is_new_touch_x = false, is_new_touch_y = false;
@@ -247,14 +249,14 @@ static void scroff_volctr_reset(void)
 /* init a new touch */
 static void new_touch_x(int x)
 {
-	touch_time_pre = ktime_to_ms(ktime_get());
+	touch_time_pre_x = ktime_to_ms(ktime_get());
 	is_new_touch_x = true;
 	prev_x = x;
 }
 
 static void new_touch_y(int y)
 {
-	// touch_time_pre already calculated in 'new_touch_x'
+	touch_time_pre_y = ktime_to_ms(ktime_get());
 	is_new_touch_y = true;
 	prev_y = y;
 }
@@ -267,35 +269,60 @@ static void exec_key(int key)
 	scroff_volctr_key_trigger();
 }
 
+/* Turn off the touch screen */
+static void touch_off(void)
+{
+	if (sovc_force_off)
+		return;
+
+	sovc_force_off = true;
+	synaptics_rmi4_touch_off_trigger(0);
+
+	// Vibrate when action performed
+#ifdef CONFIG_QPNP_HAPTIC
+	qpnp_hap_td_enable(SOVC_VIB_STRENGTH * 4);
+#endif
+}
+
 /* scroff_volctr volume function */
 static void sovc_volume_input_callback(struct work_struct *unused)
 {
+	s64 time;
+
 	if (!is_touching) {
 		if (!is_new_touch_y)
 			new_touch_y(touch_y);
 
-		if (ktime_to_ms(ktime_get()) - touch_time_pre < SOVC_TIME_GAP) {
+		time = ktime_to_ms(ktime_get()) - touch_time_pre_y;
+
+		if (time > 0 && time < SOVC_TIME_GAP) {
 			if (prev_y - touch_y > SOVC_VOL_FEATHER) // Volume Up (down->up)
 				exec_key(VOL_UP);
 			else if (touch_y - prev_y > SOVC_VOL_FEATHER) // Volume Down (up->down)
 				exec_key(VOL_DOWN);
-		}
+		} else if (time > SOVC_AUTO_OFF_DELAY)
+			touch_off();
 	}
 }
 
 /* scroff_volctr track function */
 static void sovc_track_input_callback(struct work_struct *unused)
 {
+	s64 time;
+
 	if (!is_touching) {
 		if (!is_new_touch_x)
 			new_touch_x(touch_x);
 
-		if (ktime_to_ms(ktime_get()) - touch_time_pre < SOVC_TIME_GAP) {
+		time = ktime_to_ms(ktime_get()) - touch_time_pre_x;
+
+		if (time > 0 && time < SOVC_TIME_GAP) {
 			if (prev_x - touch_x > SOVC_TRACK_FEATHER) // Track Next (right->left)
 				exec_key(TRACK_NEXT);
 			else if (touch_x - prev_x > SOVC_TRACK_FEATHER) // Track Previous (left->right)
 				exec_key(TRACK_PREVIOUS);
-		}
+		} else if (time > SOVC_AUTO_OFF_DELAY)
+			touch_off();
 	}
 }
 
@@ -488,6 +515,8 @@ int register_sovc(void)
 		pr_err("%s: Failed to register sovc_track_input_handler\n", __func__);
 		goto err;
 	}
+
+	scroff_volctr_reset();
 
 	registered = true;
 out:
