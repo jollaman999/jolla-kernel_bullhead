@@ -343,7 +343,7 @@ void f2fs_evict_inode(struct inode *inode)
 	sb_start_intwrite(inode->i_sb);
 	set_inode_flag(fi, FI_NO_ALLOC);
 	i_size_write(inode, 0);
-retry:
+
 	if (F2FS_HAS_BLOCKS(inode))
 		err = f2fs_truncate(inode, true);
 
@@ -373,11 +373,6 @@ no_delete:
 
 	if (err && err != -ENOENT) {
 		if (!exist_written_data(sbi, inode->i_ino, ORPHAN_INO)) {
-			/* give more chances, if ENOMEM case */
-			if (err == -ENOMEM) {
-				err = 0;
-				goto retry;
-			}
 			/*
 			 * get here because we failed to release resource
 			 * of inode previously, reminder our user to run fsck
