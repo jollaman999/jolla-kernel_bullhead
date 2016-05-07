@@ -76,7 +76,7 @@
 #define SUPPLY_IO_REQ_CURRENT   6000U
 #define SUPPLY_ANA_REQ_CURRENT  6000U
 
-#define FPC_TTW_HOLD_TIME 1000
+#define FPC_TTW_HOLD_TIME 2000
 
 #ifdef CONFIG_MSM_HOTPLUG
 extern void msm_hotplug_resume_timeout(void);
