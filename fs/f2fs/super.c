@@ -45,7 +45,6 @@ atomic_t f2fs_ops;
 
 char *fault_name[FAULT_MAX] = {
 	[FAULT_KMALLOC]		= "kmalloc",
-	[FAULT_PAGE_ALLOC]	= "page alloc",
 };
 #endif
 
