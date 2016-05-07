@@ -1851,10 +1851,6 @@ bool alloc_nid(struct f2fs_sb_info *sbi, nid_t *nid)
 	struct f2fs_nm_info *nm_i = NM_I(sbi);
 	struct free_nid *i = NULL;
 retry:
-#ifdef CONFIG_F2FS_FAULT_INJECTION
-	if (time_to_inject(FAULT_ALLOC_NID))
-		return false;
-#endif
 	if (unlikely(sbi->total_valid_node_count + 1 > nm_i->available_nids))
 		return false;
 
