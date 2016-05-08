@@ -225,6 +225,7 @@ retry:
 		memset(raw_key, 0x42, FS_AES_256_XTS_KEY_SIZE);
 		goto got_key;
 	}
+
 	res = validate_user_key(crypt_info, &ctx, raw_key,
 			FS_KEY_DESC_PREFIX, FS_KEY_DESC_PREFIX_SIZE);
 	if (res && inode->i_sb->s_cop->key_prefix) {
