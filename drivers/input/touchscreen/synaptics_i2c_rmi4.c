@@ -4696,40 +4696,38 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 {
 	int retval;
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	unregister_sovc();
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-	if (!dt2w_switch)
-		unregister_dt2w();
-	else
-		return;
-#endif
-#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-	if (s2w_switch)
-		return;
-#endif
-#endif
-
 	if (synaptics_rmi4_touch_off_triggered)
 		return;
 
 	synaptics_rmi4_touch_off_triggered = true;
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (!sovc_force_off) {
+	if (sovc_force_off) {
+		unregister_sovc();
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+		if (dt2w_switch)
+			goto out;
+		else
+			unregister_dt2w();
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+		if (s2w_switch)
+			goto out;
+#endif
+	} else {
 		if (track_changed || (sovc_tmp_onoff && !sovc_mic_detected)) {
 			register_sovc();
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
 			register_dt2w();
 #endif
-			synaptics_rmi4_touch_off_triggered = false;
-			return;
+			goto out;
 		}
 	}
 
 	if (!scr_suspended) {
-		synaptics_rmi4_touch_off_triggered = false;
-		return;
+		unregister_sovc();
+		unregister_dt2w();
+		goto out;
 	}
 #endif
 
@@ -4748,8 +4746,7 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 	if (rmi4_data_touch_off->stay_awake) {
 		rmi4_data_touch_off->staying_awake = true;
 		touch_off_rc = 0;
-		synaptics_rmi4_touch_off_triggered = false;
-		return;
+		goto out;
 	} else
 		rmi4_data_touch_off->staying_awake = false;
 
@@ -4758,8 +4755,7 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 	if (rmi4_data_touch_off->suspended && rmi4_touch_is_off) {
 		pr_info("%s: Already in suspend state\n", __func__);
 		touch_off_rc = 0;
-		synaptics_rmi4_touch_off_triggered = false;
-		return;
+		goto out;
 	}
 
 	synaptics_secure_touch_stop(rmi4_data_touch_off, 1);
@@ -4782,8 +4778,7 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 	} else {
 		pr_err("%s: Firmware updating, cannot go into suspend mode\n", __func__);
 		touch_off_rc = 0;
-		synaptics_rmi4_touch_off_triggered = false;
-		return;
+		goto out;
 	}
 
 	if (rmi4_data_touch_off->board->disable_gpios) {
@@ -4806,8 +4801,7 @@ static void synaptics_rmi4_touch_off(struct work_struct *synaptics_rmi4_touch_of
 	mutex_unlock(&suspended_mutex);
 
 	touch_off_rc = 0;
-	synaptics_rmi4_touch_off_triggered = false;
-	return;
+	goto out;
 
 err_gpio_configure:
 	if (rmi4_data_touch_off->ts_pinctrl) {
@@ -4826,6 +4820,7 @@ err_lpm_regulator:
 	}
 
 	touch_off_rc = retval;
+out:
 	synaptics_rmi4_touch_off_triggered = false;
 	return;
 
