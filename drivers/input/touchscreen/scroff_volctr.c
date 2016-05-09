@@ -97,6 +97,7 @@ int sovc_tmp_onoff = 0;
 bool sovc_force_off = false;
 bool sovc_mic_detected = false;
 bool track_changed = false;
+static int sovc_auto_off_delay = SOVC_AUTO_OFF_DELAY;
 static s64 touch_time_pre_x = 0, touch_time_pre_y = 0;
 static int touch_x = 0, touch_y = 0;
 static int prev_x = 0, prev_y = 0;
@@ -300,7 +301,7 @@ static void sovc_volume_input_callback(struct work_struct *unused)
 				exec_key(VOL_UP);
 			else if (touch_y - prev_y > SOVC_VOL_FEATHER) // Volume Down (up->down)
 				exec_key(VOL_DOWN);
-		} else if (time > SOVC_AUTO_OFF_DELAY)
+		} else if (time > sovc_auto_off_delay)
 			touch_off();
 	}
 }
@@ -321,7 +322,7 @@ static void sovc_track_input_callback(struct work_struct *unused)
 				exec_key(TRACK_NEXT);
 			else if (touch_x - prev_x > SOVC_TRACK_FEATHER) // Track Previous (left->right)
 				exec_key(TRACK_PREVIOUS);
-		} else if (time > SOVC_AUTO_OFF_DELAY)
+		} else if (time > sovc_auto_off_delay)
 			touch_off();
 	}
 }
@@ -630,6 +631,35 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 static DEVICE_ATTR(scroff_volctr_temp, (S_IWUSR|S_IRUGO),
 	sovc_scroff_volctr_temp_show, sovc_scroff_volctr_temp_dump);
 
+static ssize_t sovc_auto_off_delay_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+
+	count += sprintf(buf, "%d\n", sovc_auto_off_delay);
+
+	return count;
+}
+
+static ssize_t sovc_auto_off_delay_dump(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	int ret;
+	int val;
+
+	ret = sscanf(buf, "%d", &val);
+	if (ret != 1)
+		return -EINVAL;
+
+	if (val >= 1000 && val <= 60000)
+		sovc_auto_off_delay = val;
+
+	return count;
+}
+
+static DEVICE_ATTR(sovc_auto_off_delay, (S_IWUSR|S_IRUGO),
+	sovc_auto_off_delay_show, sovc_auto_off_delay_dump);
+
 static ssize_t sovc_version_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -694,6 +724,10 @@ static int __init scroff_volctr_init(void)
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_scroff_volctr_temp.attr);
 	if (rc) {
 		pr_warn("%s: sysfs_create_file failed for scroff_volctr_temp\n", __func__);
+	}
+	rc = sysfs_create_file(android_touch_kobj, &dev_attr_sovc_auto_off_delay.attr);
+	if (rc) {
+		pr_warn("%s: sysfs_create_file failed for sovc_auto_off_delay\n", __func__);
 	}
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_scroff_volctr_version.attr);
 	if (rc) {
