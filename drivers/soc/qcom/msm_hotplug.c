@@ -430,16 +430,13 @@ static void big_updown(void)
 
 		if (ktime_to_ms(ktime_get()) - big_core_up_ready_time
 				> hotplug.big_core_up_delay) {
-			if (cpu_online(LITTLE_CORES + 1))
-				return;
-			cpu_up(LITTLE_CORES + 1);
+			if (!cpu_online(LITTLE_CORES + 1))
+				cpu_up(LITTLE_CORES + 1);
 			big_core_up_ready_checked = false;
-			return;
 		}
 	} else {
-		if (!cpu_online(LITTLE_CORES + 1))
-			return;
-		cpu_down(LITTLE_CORES + 1);
+		if (cpu_online(LITTLE_CORES + 1))
+			cpu_down(LITTLE_CORES + 1);
 	}
 #endif /* BIG_HAS_MORE_THAN_2 */
 }
