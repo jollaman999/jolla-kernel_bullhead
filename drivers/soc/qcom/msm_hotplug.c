@@ -34,17 +34,20 @@
 #define LITTLE_CORES	4
 #define BIG_CORES	2
 
+/* Uncomment this if your big cluster have more then 2 cores */
+// #define BIG_HAS_MORE_THAN_2
+
 #define MSM_HOTPLUG			"msm_hotplug"
 #define HOTPLUG_ENABLED			1
 #define DEFAULT_UPDATE_RATE		100
 #define START_DELAY			20000
 #define DEFAULT_HISTORY_SIZE		10
 #define DEFAULT_DOWN_LOCK_DUR		1000
-#define DEFAULT_MIN_CPUS_ONLINE		2
+#define DEFAULT_MIN_CPUS_ONLINE		1
 #define DEFAULT_MAX_CPUS_ONLINE		LITTLE_CORES
 #define DEFAULT_FAST_LANE_LOAD		99
 #define DEFAULT_BIG_CORE_UP_DELAY	1200
-#define DEFAULT_MAX_CPUS_ONLINE_SUSP	2
+#define DEFAULT_MAX_CPUS_ONLINE_SUSP	1
 
 unsigned int msm_enabled = HOTPLUG_ENABLED;
 
@@ -154,6 +157,7 @@ static int num_online_little_cpus(void)
 	return online_cpus;
 }
 
+#ifdef BIG_HAS_MORE_THAN_2
 static int num_online_big_cpus(void)
 {
 	int cpu;
@@ -166,6 +170,7 @@ static int num_online_big_cpus(void)
 
 	return online_cpus;
 }
+#endif /* BIG_HAS_MORE_THAN_2 */
 
 static int update_average_load(unsigned int cpu)
 {
@@ -341,6 +346,7 @@ static int get_lowest_load_cpu(void)
 	return lowest_cpu;
 }
 
+#ifdef BIG_HAS_MORE_THAN_2
 static void big_up(unsigned int target_big)
 {
 	int cpu;
@@ -373,7 +379,8 @@ static void big_down(unsigned int target_big)
 
 	target_big_off = BIG_CORES - target_big;
 
-	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
+	// Skip first of big core
+	for (cpu = LITTLE_CORES + 1; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
 		if (!cpu_online(cpu))
 			continue;
 		if (check_down_lock(cpu))
@@ -383,25 +390,27 @@ static void big_down(unsigned int target_big)
 		cpu_down(cpu);
 	}
 }
+#endif /* BIG_HAS_MORE_THAN_2 */
 
 static void big_updown(void)
 {
-	unsigned int online_little, online_big;
+	unsigned int online_little;
+#ifdef BIG_HAS_MORE_THAN_2
+	unsigned int online_big;
 	unsigned int target_big;
 
 	online_little = num_online_little_cpus();
 	online_big = num_online_big_cpus();
 
-	// If LITTLE_CORES is 4 and BIG_CORES is 2.
-	// online_little == 4 -> Turn on all of big cores. (2)
-	// online_little == 3 -> Turn on half of big cores. (1)
-	// else               -> Turn off all of big cores. (0)
+	// online_little == full     -> Turn on all of big cores.
+	// online_little == full - 1 -> Turn on half of big cores.
+	// else                      -> Skip
 	if (online_little == LITTLE_CORES)
 		target_big = BIG_CORES;
 	else if (online_little == LITTLE_CORES - 1)
 		target_big = BIG_CORES / 2;
 	else
-		target_big = 0;
+		target_big = 1;
 
 	if (online_big != target_big) {
 		if (target_big > online_big)
@@ -409,6 +418,30 @@ static void big_updown(void)
 		else if (target_big < online_big)
 			big_down(target_big);
 	}
+#else
+	online_little = num_online_little_cpus();
+
+	if (online_little == LITTLE_CORES) {
+		if (!big_core_up_ready_checked) {
+			big_core_up_ready_checked = true;
+			big_core_up_ready_time = ktime_to_ms(ktime_get());
+			return;
+		}
+
+		if (ktime_to_ms(ktime_get()) - big_core_up_ready_time
+				> hotplug.big_core_up_delay) {
+			if (cpu_online(LITTLE_CORES + 1))
+				return;
+			cpu_up(LITTLE_CORES + 1);
+			big_core_up_ready_checked = false;
+			return;
+		}
+	} else {
+		if (!cpu_online(LITTLE_CORES + 1))
+			return;
+		cpu_down(LITTLE_CORES + 1);
+	}
+#endif /* BIG_HAS_MORE_THAN_2 */
 }
 
 static void little_up(void)
@@ -605,8 +638,9 @@ void msm_hotplug_suspend(void)
 		cpu_down(cpu);
 	}
 
-	// Turn off all of big cores
-	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++)
+	// Turn off all of big cores except first one.
+	// Skip first of big cores.
+	for (cpu = LITTLE_CORES + 1; cpu < LITTLE_CORES + BIG_CORES; cpu++)
 		cpu_down(cpu);
 
 	pr_info("%s: suspended.\n", MSM_HOTPLUG);
