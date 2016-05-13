@@ -1363,15 +1363,19 @@ static int f2fs_ioc_setflags(struct file *filp, unsigned long arg)
 	unsigned int oldflags;
 	int ret;
 
-	if (!inode_owner_or_capable(inode))
-		return -EACCES;
-
-	if (get_user(flags, (int __user *)arg))
-		return -EFAULT;
-
 	ret = mnt_want_write_file(filp);
 	if (ret)
 		return ret;
+
+	if (!inode_owner_or_capable(inode)) {
+		ret = -EACCES;
+		goto out;
+	}
+
+	if (get_user(flags, (int __user *)arg)) {
+		ret = -EFAULT;
+		goto out;
+	}
 
 	flags = f2fs_mask_flags(inode->i_mode, flags);
 
@@ -1415,22 +1419,18 @@ static int f2fs_ioc_start_atomic_write(struct file *filp)
 	if (!inode_owner_or_capable(inode))
 		return -EACCES;
 
-	ret = mnt_want_write_file(filp);
-	if (ret)
-		return ret;
-
 	if (f2fs_is_atomic_file(inode))
-		goto out;
+		return 0;
 
 	ret = f2fs_convert_inline_inode(inode);
 	if (ret)
-		goto out;
+		return ret;
 
 	set_inode_flag(F2FS_I(inode), FI_ATOMIC_FILE);
 	f2fs_update_time(F2FS_I_SB(inode), REQ_TIME);
 
 	if (!get_dirty_pages(inode))
-		goto out;
+		return 0;
 
 	f2fs_msg(F2FS_I_SB(inode)->sb, KERN_WARNING,
 		"Unexpected flush for atomic writes: ino=%lu, npages=%u",
@@ -1438,8 +1438,6 @@ static int f2fs_ioc_start_atomic_write(struct file *filp)
 	ret = filemap_write_and_wait_range(inode->i_mapping, 0, LLONG_MAX);
 	if (ret)
 		clear_inode_flag(F2FS_I(inode), FI_ATOMIC_FILE);
-out:
-	mnt_drop_write_file(filp);
 	return ret;
 }
 
@@ -1451,12 +1449,12 @@ static int f2fs_ioc_commit_atomic_write(struct file *filp)
 	if (!inode_owner_or_capable(inode))
 		return -EACCES;
 
+	if (f2fs_is_volatile_file(inode))
+		return 0;
+
 	ret = mnt_want_write_file(filp);
 	if (ret)
 		return ret;
-
-	if (f2fs_is_volatile_file(inode))
-		goto err_out;
 
 	if (f2fs_is_atomic_file(inode)) {
 		clear_inode_flag(F2FS_I(inode), FI_ATOMIC_FILE);
@@ -1481,48 +1479,32 @@ static int f2fs_ioc_start_volatile_write(struct file *filp)
 	if (!inode_owner_or_capable(inode))
 		return -EACCES;
 
-	ret = mnt_want_write_file(filp);
-	if (ret)
-		return ret;
-
 	if (f2fs_is_volatile_file(inode))
-		goto out;
+		return 0;
 
 	ret = f2fs_convert_inline_inode(inode);
 	if (ret)
-		goto out;
+		return ret;
 
 	set_inode_flag(F2FS_I(inode), FI_VOLATILE_FILE);
 	f2fs_update_time(F2FS_I_SB(inode), REQ_TIME);
-out:
-	mnt_drop_write_file(filp);
-	return ret;
+	return 0;
 }
 
 static int f2fs_ioc_release_volatile_write(struct file *filp)
 {
 	struct inode *inode = file_inode(filp);
-	int ret;
 
 	if (!inode_owner_or_capable(inode))
 		return -EACCES;
 
-	ret = mnt_want_write_file(filp);
-	if (ret)
-		return ret;
-
 	if (!f2fs_is_volatile_file(inode))
-		goto out;
+		return 0;
 
-	if (!f2fs_is_first_block_written(inode)) {
-		ret = truncate_partial_data_page(inode, 0, true);
-		goto out;
-	}
+	if (!f2fs_is_first_block_written(inode))
+		return truncate_partial_data_page(inode, 0, true);
 
-	ret = punch_hole(inode, 0, F2FS_BLKSIZE);
-out:
-	mnt_drop_write_file(filp);
-	return ret;
+	return punch_hole(inode, 0, F2FS_BLKSIZE);
 }
 
 static int f2fs_ioc_abort_volatile_write(struct file *filp)
@@ -1555,17 +1537,12 @@ static int f2fs_ioc_shutdown(struct file *filp, unsigned long arg)
 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
 	struct super_block *sb = sbi->sb;
 	__u32 in;
-	int ret;
 
 	if (!capable(CAP_SYS_ADMIN))
 		return -EPERM;
 
 	if (get_user(in, (__u32 __user *)arg))
 		return -EFAULT;
-
-	ret = mnt_want_write_file(filp);
-	if (ret)
-		return ret;
 
 	switch (in) {
 	case FS_GOING_DOWN_FULLSYNC:
@@ -1588,13 +1565,10 @@ static int f2fs_ioc_shutdown(struct file *filp, unsigned long arg)
 		f2fs_stop_checkpoint(sbi);
 		break;
 	default:
-		ret = -EINVAL;
-		goto out;
+		return -EINVAL;
 	}
 	f2fs_update_time(sbi, REQ_TIME);
-out:
-	mnt_drop_write_file(filp);
-	return ret;
+	return 0;
 }
 
 static int f2fs_ioc_fitrim(struct file *filp, unsigned long arg)
@@ -1615,14 +1589,9 @@ static int f2fs_ioc_fitrim(struct file *filp, unsigned long arg)
 				sizeof(range)))
 		return -EFAULT;
 
-	ret = mnt_want_write_file(filp);
-	if (ret)
-		return ret;
-
 	range.minlen = max((unsigned int)range.minlen,
 				q->limits.discard_granularity);
 	ret = f2fs_trim_fs(F2FS_SB(sb), &range);
-	mnt_drop_write_file(filp);
 	if (ret < 0)
 		return ret;
 
@@ -1649,7 +1618,6 @@ static int f2fs_ioc_keyctl(struct file *filp, unsigned long arg)
 	struct f2fs_key key;
 	void *value = key.key;
 	int type = XATTR_CREATE;
-	int ret;
 
 	if (copy_from_user(&key, (u8 __user *)arg, sizeof(key)))
 		return -EFAULT;
@@ -1657,47 +1625,33 @@ static int f2fs_ioc_keyctl(struct file *filp, unsigned long arg)
 	if (!S_ISREG(inode->i_mode))
 		return -EINVAL;
 
-	ret = mnt_want_write_file(filp);
-	if (ret)
-		return ret;
-
 	if (key.mode == F2FS_DROP_KEY) {
 		int ret = validate_access_key(inode);
+
 		if (ret)
-			goto out;
+			return ret;
 
 		value = NULL;
 		type = XATTR_REPLACE;
 	}
 
 	f2fs_update_time(F2FS_I_SB(inode), REQ_TIME);
-	ret = f2fs_setxattr(inode, F2FS_XATTR_INDEX_KEY,
+	return f2fs_setxattr(inode, F2FS_XATTR_INDEX_KEY,
 				F2FS_XATTR_NAME_ENCRYPTION_CONTEXT,
 				value, F2FS_KEY_SIZE, NULL, type);
-out:
-	mnt_drop_write_file(filp);
-	return ret;
 }
 
 static int f2fs_ioc_set_encryption_policy(struct file *filp, unsigned long arg)
 {
 	struct fscrypt_policy policy;
 	struct inode *inode = file_inode(filp);
-	int ret;
 
 	if (copy_from_user(&policy, (struct fscrypt_policy __user *)arg,
 							sizeof(policy)))
 		return -EFAULT;
 
-	ret = mnt_want_write_file(filp);
-	if (ret)
-		return ret;
-
 	f2fs_update_time(F2FS_I_SB(inode), REQ_TIME);
-	ret = fscrypt_process_policy(inode, &policy);
-
-	mnt_drop_write_file(filp);
-	return ret;
+	return fscrypt_process_policy(inode, &policy);
 }
 
 static int f2fs_ioc_get_encryption_policy(struct file *filp, unsigned long arg)
@@ -1754,7 +1708,6 @@ static int f2fs_ioc_gc(struct file *filp, unsigned long arg)
 	struct inode *inode = file_inode(filp);
 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
 	__u32 sync;
-	int ret;
 
 	if (!capable(CAP_SYS_ADMIN))
 		return -EPERM;
@@ -1765,30 +1718,20 @@ static int f2fs_ioc_gc(struct file *filp, unsigned long arg)
 	if (f2fs_readonly(sbi->sb))
 		return -EROFS;
 
-	ret = mnt_want_write_file(filp);
-	if (ret)
-		return ret;
-
 	if (!sync) {
-		if (!mutex_trylock(&sbi->gc_mutex)) {
-			ret = -EBUSY;
-			goto out;
-		}
+		if (!mutex_trylock(&sbi->gc_mutex))
+			return -EBUSY;
 	} else {
 		mutex_lock(&sbi->gc_mutex);
 	}
 
-	ret = f2fs_gc(sbi, sync);
-out:
-	mnt_drop_write_file(filp);
-	return ret;
+	return f2fs_gc(sbi, sync);
 }
 
 static int f2fs_ioc_write_checkpoint(struct file *filp, unsigned long arg)
 {
 	struct inode *inode = file_inode(filp);
 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
-	int ret;
 
 	if (!capable(CAP_SYS_ADMIN))
 		return -EPERM;
@@ -1796,14 +1739,7 @@ static int f2fs_ioc_write_checkpoint(struct file *filp, unsigned long arg)
 	if (f2fs_readonly(sbi->sb))
 		return -EROFS;
 
-	ret = mnt_want_write_file(filp);
-	if (ret)
-		return ret;
-
-	ret = f2fs_sync_fs(sbi->sb, 1);
-
-	mnt_drop_write_file(filp);
-	return ret;
+	return f2fs_sync_fs(sbi->sb, 1);
 }
 
 static int f2fs_defragment_range(struct f2fs_sb_info *sbi,
