@@ -141,7 +141,7 @@ static unsigned int calc_feather(int coord, int prev_coord) {
 
 /* init a new touch */
 static void new_touch(int x, int y) {
-	tap_time_pre = ktime_to_ms(ktime_get());
+	tap_time_pre = ktime_to_ms(ktime_get_real());
 	x_pre = x;
 	y_pre = y;
 	touch_nr++;
@@ -178,8 +178,8 @@ static void detect_doubletap2wake(int x, int y)
 		// Make enable to set touch counts (Max : 10) - by jollaman999
 		} else if (touch_nr >= 1 && touch_nr <= dt2w_switch) {
 			if (((calc_feather(x, x_pre) < DT2W_FEATHER) || (calc_feather(y, y_pre) < DT2W_FEATHER))
-			&& ((ktime_to_ms(ktime_get()) - tap_time_pre) < DT2W_TIME_GAP)) {
-				tap_time_pre = ktime_to_ms(ktime_get());
+			&& ((ktime_to_ms(ktime_get_real()) - tap_time_pre) < DT2W_TIME_GAP)) {
+				tap_time_pre = ktime_to_ms(ktime_get_real());
 				touch_nr++;
 			} else {
 				doubletap2wake_reset();

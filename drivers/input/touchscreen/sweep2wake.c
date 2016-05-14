@@ -125,7 +125,7 @@ static void sweep2wake_reset(void) {
 
 /* init a new touch */
 static void new_touch(int x) {
-	tap_time_pre = ktime_to_ms(ktime_get());
+	tap_time_pre = ktime_to_ms(ktime_get_real());
 	prev_x = x;
 	is_new_touch = true;
 }
@@ -141,7 +141,7 @@ static void detect_sweep2wake(int x)
 		if (!is_new_touch)
 			new_touch(x);
 
-		if (ktime_to_ms(ktime_get()) - tap_time_pre > S2W_TIME_GAP)
+		if (ktime_to_ms(ktime_get_real()) - tap_time_pre > S2W_TIME_GAP)
 			return;
 
 		// left->right

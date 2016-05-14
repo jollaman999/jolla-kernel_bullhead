@@ -1877,8 +1877,10 @@ static int synaptics_rmi4_sensor_report(struct synaptics_rmi4_data *rmi4_data)
 static irqreturn_t synaptics_rmi4_irq(int irq, void *data)
 {
 	struct synaptics_rmi4_data *rmi4_data = data;
+	s64 cur_time;
 
-	rmi4_data->timestamp = ktime_get();
+	rmi4_data->timestamp = ktime_get_real();
+	cur_time = ktime_to_ms(rmi4_data->timestamp);
 
 	if (IRQ_HANDLED == synaptics_filter_interrupt(data))
 		return IRQ_HANDLED;
@@ -1887,8 +1889,8 @@ static irqreturn_t synaptics_rmi4_irq(int irq, void *data)
 		queue_work(rmi4_data->det_workqueue, &rmi4_data->recovery_work);
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
-	if (scr_suspended && ktime_to_ms(ktime_get()) - wake_lock_start_time > RMI4_WL_HOLD_TIME_MS) {
-		wake_lock_start_time = ktime_to_ms(ktime_get());
+	if (scr_suspended && cur_time - wake_lock_start_time > RMI4_WL_HOLD_TIME_MS) {
+		wake_lock_start_time = cur_time;
 		wake_lock_timeout(&rmi4_data->rmi4_wl, msecs_to_jiffies(RMI4_WL_HOLD_TIME_MS));
 	}
 #endif
