@@ -423,10 +423,21 @@ static ssize_t show_##file_name				\
 	return sprintf(buf, "%u\n", policy->object);	\
 }
 
+/* HACK: Prevent big cluster turned off when changing governor settings. */
+extern bool prevent_big_off;
+
+/* HACK: Prevent big cluster turned off when changing governor settings. */
+static ssize_t show_scaling_min_freq
+(struct cpufreq_policy *policy, char *buf)
+{
+	prevent_big_off = true;
+	return sprintf(buf, "%u\n", policy->min);
+}
+
 show_one(cpuinfo_min_freq, cpuinfo.min_freq);
 show_one(cpuinfo_max_freq, cpuinfo.max_freq);
 show_one(cpuinfo_transition_latency, cpuinfo.transition_latency);
-show_one(scaling_min_freq, min);
+// show_one(scaling_min_freq, min);
 show_one(scaling_max_freq, max);
 show_one(scaling_cur_freq, cur);
 

@@ -4881,11 +4881,17 @@ static void synaptics_rmi4_suspend_works(struct work_struct *synaptics_rmi4_susp
 }
 static DECLARE_WORK(synaptics_rmi4_suspend_work, synaptics_rmi4_suspend_works);
 
+/* HACK: Prevent big cluster turned off when changing governor settings. */
+extern bool prevent_big_off;
+
 static int synaptics_rmi4_suspend(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 
 	rmi4_data_touch_off = rmi4_data;
+
+	/* HACK: Prevent big cluster turned off when changing governor settings. */
+	prevent_big_off = false;
 
 	schedule_work(&synaptics_rmi4_suspend_work);
 

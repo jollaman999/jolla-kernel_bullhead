@@ -48,6 +48,10 @@
 
 unsigned int msm_enabled = HOTPLUG_ENABLED;
 
+/* HACK: Prevent big cluster turned off when changing governor settings. */
+bool prevent_big_off = false;
+EXPORT_SYMBOL(prevent_big_off);
+
 // Use for msm_hotplug_resume_timeout
 #define HOTPLUG_TIMEOUT			2000
 static bool timeout_enabled = false;
@@ -374,6 +378,14 @@ static void big_down(unsigned int target_big)
 	target_big_off = BIG_CORES - target_big;
 
 	for (cpu = LITTLE_CORES; cpu < LITTLE_CORES + BIG_CORES; cpu++) {
+		/* HACK: Prevent big cluster turned off when changing governor settings. */
+		if (prevent_big_off && cpu == LITTLE_CORES) {
+			// Turn on first of big cores
+			if (!cpu_online(LITTLE_CORES))
+				cpu_up(LITTLE_CORES);
+			continue;
+		}
+
 		if (!cpu_online(cpu))
 			continue;
 		if (check_down_lock(cpu))
@@ -514,6 +526,13 @@ static void msm_hotplug_work(struct work_struct *work)
 	if (hotplug.suspended) {
 		dprintk("%s: suspended.\n", MSM_HOTPLUG);
 		return;
+	}
+
+	/* HACK: Prevent big cluster turned off when changing governor settings. */
+	// Turn on first of big cores
+	if (prevent_big_off) {
+		if (!cpu_online(LITTLE_CORES))
+			cpu_up(LITTLE_CORES);
 	}
 
 	if (timeout_enabled) {
