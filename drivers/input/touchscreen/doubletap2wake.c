@@ -99,7 +99,8 @@ static int __init read_dt2w_cmdline(char *dt2w)
 __setup("dt2w=", read_dt2w_cmdline);
 
 /* reset on finger release */
-static void doubletap2wake_reset(void) {
+static void doubletap2wake_reset(void)
+{
 	touch_nr = 0;
 	tap_time_pre = 0;
 	x_pre = 0;
@@ -107,9 +108,10 @@ static void doubletap2wake_reset(void) {
 }
 
 /* PowerKey work func */
-static void doubletap2wake_presspwr(struct work_struct * doubletap2wake_presspwr_work) {
+static void doubletap2wake_presspwr(struct work_struct * doubletap2wake_presspwr_work)
+{
 	if (!mutex_trylock(&pwrkeyworklock))
-                return;
+		return;
 	input_event(doubletap2wake_pwrdev, EV_KEY, KEY_POWER, 1);
 	input_event(doubletap2wake_pwrdev, EV_SYN, 0, 0);
 	input_event(doubletap2wake_pwrdev, EV_KEY, KEY_POWER, 0);
@@ -119,19 +121,19 @@ static void doubletap2wake_presspwr(struct work_struct * doubletap2wake_presspwr
 #ifdef CONFIG_QPNP_HAPTIC
 	qpnp_hap_td_enable(DT2W_VIB_STRENGTH);
 #endif
-        mutex_unlock(&pwrkeyworklock);
-	return;
+	mutex_unlock(&pwrkeyworklock);
 }
 static DECLARE_WORK(doubletap2wake_presspwr_work, doubletap2wake_presspwr);
 
 /* PowerKey trigger */
-static void doubletap2wake_pwrtrigger(void) {
+static void doubletap2wake_pwrtrigger(void)
+{
 	schedule_work(&doubletap2wake_presspwr_work);
-        return;
 }
 
 /* unsigned */
-static unsigned int calc_feather(int coord, int prev_coord) {
+static unsigned int calc_feather(int coord, int prev_coord)
+{
 	int calc_coord = 0;
 	calc_coord = coord-prev_coord;
 	if (calc_coord < 0)
@@ -140,7 +142,8 @@ static unsigned int calc_feather(int coord, int prev_coord) {
 }
 
 /* init a new touch */
-static void new_touch(int x, int y) {
+static void new_touch(int x, int y)
+{
 	tap_time_pre = ktime_to_ms(ktime_get_real());
 	x_pre = x;
 	y_pre = y;
@@ -154,7 +157,7 @@ static void detect_doubletap2wake(int x, int y)
 	bool change_switch = false;
 
 #if DT2W_DEBUG
-        pr_info(LOGTAG"x,y(%4d,%4d)\n", x, y);
+	pr_info(LOGTAG"x,y(%4d,%4d)\n", x, y);
 #endif
 
 	if (!scr_suspended)
@@ -202,11 +205,9 @@ static void detect_doubletap2wake(int x, int y)
 	}
 }
 
-static void dt2w_input_callback(struct work_struct *unused) {
-
+static void dt2w_input_callback(struct work_struct *unused)
+{
 	detect_doubletap2wake(touch_x, touch_y);
-
-	return;
 }
 
 static void dt2w_input_event(struct input_handle *handle, unsigned int type,
@@ -241,7 +242,8 @@ static void dt2w_input_event(struct input_handle *handle, unsigned int type,
 	}
 }
 
-static int input_dev_filter(struct input_dev *dev) {
+static int input_dev_filter(struct input_dev *dev)
+{
 	if (strstr(dev->name, "synaptics_rmi4_i2c"))
 		return 0;
 	else
@@ -249,7 +251,8 @@ static int input_dev_filter(struct input_dev *dev) {
 }
 
 static int dt2w_input_connect(struct input_handler *handler,
-				struct input_dev *dev, const struct input_device_id *id) {
+				struct input_dev *dev, const struct input_device_id *id)
+{
 	struct input_handle *handle;
 	int error;
 
@@ -280,7 +283,8 @@ err2:
 	return error;
 }
 
-static void dt2w_input_disconnect(struct input_handle *handle) {
+static void dt2w_input_disconnect(struct input_handle *handle)
+{
 	input_close_device(handle);
 	input_unregister_handle(handle);
 	kfree(handle);
@@ -506,7 +510,6 @@ static void __exit doubletap2wake_exit(void)
 	unregister_dt2w();
 	input_unregister_device(doubletap2wake_pwrdev);
 	input_free_device(doubletap2wake_pwrdev);
-	return;
 }
 
 module_init(doubletap2wake_init);

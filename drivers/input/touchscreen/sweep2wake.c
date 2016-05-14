@@ -92,7 +92,8 @@ static int __init read_s2w_cmdline(char *s2w)
 __setup("s2w=", read_s2w_cmdline);
 
 /* PowerKey work func */
-static void sweep2wake_presspwr(struct work_struct * sweep2wake_presspwr_work) {
+static void sweep2wake_presspwr(struct work_struct * sweep2wake_presspwr_work)
+{
 	if (!mutex_trylock(&pwrkeyworklock))
                 return;
 	input_event(sweep2wake_pwrdev, EV_KEY, KEY_POWER, 1);
@@ -104,19 +105,19 @@ static void sweep2wake_presspwr(struct work_struct * sweep2wake_presspwr_work) {
 #ifdef CONFIG_QPNP_HAPTIC
 	qpnp_hap_td_enable(S2W_VIB_STRENGTH);
 #endif
-        mutex_unlock(&pwrkeyworklock);
-	return;
+	mutex_unlock(&pwrkeyworklock);
 }
 static DECLARE_WORK(sweep2wake_presspwr_work, sweep2wake_presspwr);
 
 /* PowerKey trigger */
-static void sweep2wake_pwrtrigger(void) {
+static void sweep2wake_pwrtrigger(void)
+{
 	schedule_work(&sweep2wake_presspwr_work);
-        return;
 }
 
 /* reset on finger release */
-static void sweep2wake_reset(void) {
+static void sweep2wake_reset(void)
+{
 	tap_time_pre = 0;
 	is_touching = false;
 	prev_x = 0;
@@ -124,7 +125,8 @@ static void sweep2wake_reset(void) {
 }
 
 /* init a new touch */
-static void new_touch(int x) {
+static void new_touch(int x)
+{
 	tap_time_pre = ktime_to_ms(ktime_get_real());
 	prev_x = x;
 	is_new_touch = true;
@@ -134,7 +136,7 @@ static void new_touch(int x) {
 static void detect_sweep2wake(int x)
 {
 #if S2W_DEBUG
-        pr_info(LOGTAG"x(%4d)\n", x);
+	pr_info(LOGTAG"x(%4d)\n", x);
 #endif
 
 	if (!is_touching) {
@@ -159,11 +161,9 @@ static void detect_sweep2wake(int x)
 	}
 }
 
-static void s2w_input_callback(struct work_struct *unused) {
-
+static void s2w_input_callback(struct work_struct *unused)
+{
 	detect_sweep2wake(touch_x);
-
-	return;
 }
 
 static void s2w_input_event(struct input_handle *handle, unsigned int type,
@@ -193,7 +193,8 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 	}
 }
 
-static int input_dev_filter(struct input_dev *dev) {
+static int input_dev_filter(struct input_dev *dev)
+{
 	if (strstr(dev->name, "synaptics_rmi4_i2c")) {
 		return 0;
 	} else {
@@ -202,7 +203,8 @@ static int input_dev_filter(struct input_dev *dev) {
 }
 
 static int s2w_input_connect(struct input_handler *handler,
-				struct input_dev *dev, const struct input_device_id *id) {
+				struct input_dev *dev, const struct input_device_id *id)
+{
 	struct input_handle *handle;
 	int error;
 
@@ -233,7 +235,8 @@ err2:
 	return error;
 }
 
-static void s2w_input_disconnect(struct input_handle *handle) {
+static void s2w_input_disconnect(struct input_handle *handle)
+{
 	input_close_device(handle);
 	input_unregister_handle(handle);
 	kfree(handle);
@@ -426,7 +429,6 @@ static void __exit sweep2wake_exit(void)
 	unregister_s2w();
 	input_unregister_device(sweep2wake_pwrdev);
 	input_free_device(sweep2wake_pwrdev);
-	return;
 }
 
 module_init(sweep2wake_init);
