@@ -28,6 +28,7 @@
 #include <linux/slab.h>
 #include <linux/syscore_ops.h>
 #include <linux/tick.h>
+#include <linux/workqueue.h>
 #include <trace/events/power.h>
 
 /**
@@ -427,10 +428,20 @@ static ssize_t show_##file_name				\
 extern bool prevent_big_off;
 
 /* HACK: Prevent big cluster turned off when changing governor settings. */
+static void prevent_big_off_cancel(struct work_struct *prevent_big_off_cancel_work)
+{
+	prevent_big_off = false;
+}
+static DECLARE_DELAYED_WORK(prevent_big_off_cancel_work, prevent_big_off_cancel);
+
+/* HACK: Prevent big cluster turned off when changing governor settings. */
 static ssize_t show_scaling_min_freq
 (struct cpufreq_policy *policy, char *buf)
 {
 	prevent_big_off = true;
+	cancel_delayed_work(&prevent_big_off_cancel_work);
+	schedule_delayed_work(&prevent_big_off_cancel_work,
+			msecs_to_jiffies(5000));
 	return sprintf(buf, "%u\n", policy->min);
 }
 
