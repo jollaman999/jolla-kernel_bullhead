@@ -34,7 +34,7 @@
 #define LITTLE_CORES	4
 #define BIG_CORES	2
 
-/* Uncomment this if your big cluster has more than 2 cores */
+/* Uncomment this if your big cluster have more then 2 cores */
 // #define BIG_HAS_MORE_THAN_2
 
 #define MSM_HOTPLUG			"msm_hotplug"
