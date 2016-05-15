@@ -47,6 +47,7 @@
 #include <linux/suspend.h>
 #include <soc/qcom/msm-core.h>
 #include <linux/cpumask.h>
+#include <linux/fb.h>
 
 #ifdef CONFIG_LGE_HANDLE_PANIC
 #include <soc/qcom/lge/lge_handle_panic.h>
@@ -82,6 +83,8 @@
 	else if (_trip == THERMAL_TRIP_CONFIGURABLE_LOW)\
 		_val |= 2;				\
 } while (0)
+
+struct notifier_block msm_thermal_fb_notif;
 
 static int big_core_start;
 
@@ -4144,7 +4147,7 @@ static void interrupt_mode_init(void)
 	}
 }
 
-void msm_thermal_suspend(bool suspend)
+static void msm_thermal_suspend(bool suspend)
 {
 	if (suspend) {
 		disable_msm_thermal();
@@ -4154,7 +4157,6 @@ void msm_thermal_suspend(bool suspend)
 		pr_info("resumed\n");
 	}
 }
-EXPORT_SYMBOL(msm_thermal_suspend);
 
 static int __ref set_enabled(const char *val, const struct kernel_param *kp)
 {
@@ -5897,6 +5899,8 @@ static int msm_thermal_dev_exit(struct platform_device *inp_dev)
 {
 	int i = 0;
 
+	fb_unregister_client(&msm_thermal_fb_notif);
+
 	unregister_reboot_notifier(&msm_thermal_reboot_notifier);
 	if (msm_therm_debugfs && msm_therm_debugfs->parent)
 		debugfs_remove_recursive(msm_therm_debugfs->parent);
@@ -5952,9 +5956,46 @@ static struct platform_driver msm_thermal_device_driver = {
 	.remove = msm_thermal_dev_exit,
 };
 
+static int msm_thermal_fb_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data)
+{
+	struct fb_event *evdata = data;
+	int *blank;
+
+	if (event == FB_EVENT_BLANK) {
+		blank = evdata->data;
+
+		switch (*blank) {
+		case FB_BLANK_UNBLANK:
+			msm_thermal_suspend(false);
+			break;
+		case FB_BLANK_POWERDOWN:
+			msm_thermal_suspend(true);
+			break;
+		}
+	}
+
+	return 0;
+}
+
+struct notifier_block msm_thermal_fb_notif = {
+	.notifier_call = msm_thermal_fb_notifier_callback,
+};
+
 int __init msm_thermal_device_init(void)
 {
-	return platform_driver_register(&msm_thermal_device_driver);
+	int ret = 0;
+
+	if (fb_register_client(&msm_thermal_fb_notif))
+		pr_info("%s: Failed to register fb notifier.\n",
+			__func__);
+
+	ret = platform_driver_register(&msm_thermal_device_driver);
+	if (ret)
+		pr_info("%s: Failed to register msm_thermal driver.\n",
+			__func__);
+
+	return ret;
 }
 arch_initcall(msm_thermal_device_init);
 
