@@ -643,6 +643,14 @@ config KERNEL_TEXT_MPU_PROT
 	  all masters; Write access is only permited to the
 	  secure world.
 
+config MSM_HOTPLUG
+	bool "MSM hotplug driver"
+	depends on HOTPLUG_CPU
+	default y
+	help
+	  The MSM hotplug driver controls on-/offlining of additional cores based
+	  on current cpu load.
+
 source "drivers/soc/qcom/memshare/Kconfig"
 
 source "drivers/soc/qcom/lge/Kconfig"
