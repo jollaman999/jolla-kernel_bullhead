@@ -39,6 +39,16 @@
 #include "synaptics_i2c_rmi4.h"
 #include <linux/input/mt.h>
 
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+#include <linux/input/sweep2wake.h>
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+#include <linux/input/doubletap2wake.h>
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#include <linux/input/scroff_volctr.h>
+#endif
+
 #define DRIVER_NAME "synaptics_rmi4_i2c"
 #define INPUT_PHYS_NAME "synaptics_rmi4_i2c/input0"
 #define DEBUGFS_DIR_NAME "ts_debug"
@@ -115,6 +125,39 @@ enum device_status {
 #define F11_MAX_Y		4096
 #define F12_MAX_X		65536
 #define F12_MAX_Y		65536
+
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+#define RMI4_WL_HOLD_TIME_MS 1000
+
+static bool scr_suspended = false;
+static bool irq_wake_enabled = false;
+static s64 wake_lock_start_time = 0;
+
+static bool is_touch_on(void)
+{
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	if (s2w_switch)
+		return true;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	if (dt2w_switch)
+		return true;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (sovc_force_off)
+		return false;
+
+	if (sovc_switch && (track_changed || sovc_tmp_onoff)) {
+		if (sovc_mic_detected)
+			return false;
+		return true;
+	}
+#endif
+	return false;
+}
+#endif
+
+static void synaptics_rmi4_touch_off(struct work_struct *work);
 
 static int synaptics_rmi4_i2c_read(struct synaptics_rmi4_data *rmi4_data,
 		unsigned short addr, unsigned char *data,
@@ -793,8 +836,7 @@ static void configure_sleep(struct synaptics_rmi4_data *rmi4_data)
 
 	retval = fb_register_client(&rmi4_data->fb_notif);
 	if (retval)
-		dev_err(&rmi4_data->i2c_client->dev,
-			"Unable to register fb_notifier: %d\n", retval);
+		pr_info("Unable to register fb_notifier: %d\n", retval);
 	return;
 }
 #elif defined CONFIG_HAS_EARLYSUSPEND
@@ -1791,14 +1833,27 @@ static int synaptics_rmi4_sensor_report(struct synaptics_rmi4_data *rmi4_data)
 static irqreturn_t synaptics_rmi4_irq(int irq, void *data)
 {
 	struct synaptics_rmi4_data *rmi4_data = data;
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	s64 cur_time;
+#endif
 
-	rmi4_data->timestamp = ktime_get();
+	rmi4_data->timestamp = ktime_get_real();
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	cur_time = ktime_to_ms(rmi4_data->timestamp);
+#endif
 
 	if (IRQ_HANDLED == synaptics_filter_interrupt(data))
 		return IRQ_HANDLED;
 
 	if (synaptics_rmi4_sensor_report(rmi4_data) == -EIO)
 		queue_work(rmi4_data->det_workqueue, &rmi4_data->recovery_work);
+
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	if (scr_suspended && cur_time - wake_lock_start_time > RMI4_WL_HOLD_TIME_MS) {
+		wake_lock_start_time = cur_time;
+		wake_lock_timeout(&rmi4_data->rmi4_wl, msecs_to_jiffies(RMI4_WL_HOLD_TIME_MS));
+	}
+#endif
 
 	return IRQ_HANDLED;
 }
@@ -4001,12 +4056,22 @@ static int synaptics_rmi4_probe(struct i2c_client *client,
 	rmi4_data->det_workqueue =
 			alloc_workqueue("rmi_det_workqueue",
 				WQ_UNBOUND | WQ_HIGHPRI | __WQ_ORDERED, 1);
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	rmi4_data->touch_off_workqueue =
+			alloc_workqueue("rmi_touch_off_workqueue",
+				WQ_UNBOUND | WQ_HIGHPRI | __WQ_ORDERED, 1);
+#endif
 
 	INIT_DELAYED_WORK(&rmi4_data->det_work,
 			synaptics_rmi4_detection_work);
 	queue_delayed_work(rmi4_data->det_workqueue,
 			&rmi4_data->det_work,
 			msecs_to_jiffies(EXP_FN_DET_INTERVAL));
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	INIT_DELAYED_WORK(&rmi4_data->touch_off_work,
+			synaptics_rmi4_touch_off);
+#endif
+	rmi4_data->touch_off_triggered = false;
 
 	INIT_WORK(&rmi4_data->recovery_work, synaptics_rmi4_recover_work);
 	INIT_WORK(&rmi4_data->init_work, synaptics_rmi4_init_work);
@@ -4057,6 +4122,10 @@ static int synaptics_rmi4_probe(struct i2c_client *client,
 				__func__);
 		goto err_enable_irq;
 	}
+
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	wake_lock_init(&rmi4_data->rmi4_wl, WAKE_LOCK_SUSPEND, "rmi4_wl");
+#endif
 
 	synaptics_secure_touch_init(rmi4_data);
 	synaptics_secure_touch_stop(rmi4_data, 1);
@@ -4157,6 +4226,10 @@ static int synaptics_rmi4_remove(struct i2c_client *client)
 
 	rmi4_data->touch_stopped = true;
 	wake_up(&rmi4_data->wait);
+
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	wake_lock_destroy(&rmi4_data->rmi4_wl);
+#endif
 
 	free_irq(rmi4_data->irq, rmi4_data);
 
@@ -4316,13 +4389,22 @@ static int fb_notifier_callback(struct notifier_block *self,
 		else if (event == FB_EVENT_BLANK) {
 			blank = evdata->data;
 			if ((*blank == FB_BLANK_UNBLANK) ||
-			    (*blank == FB_BLANK_VSYNC_SUSPEND &&
-			     rmi4_data->suspended))
+			    (*blank == FB_BLANK_VSYNC_SUSPEND)) {
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+				scr_suspended = false;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+				sovc_force_off = false;
+#endif
 				synaptics_rmi4_resume(
 					&(rmi4_data->input_dev->dev));
-			else if (*blank == FB_BLANK_POWERDOWN)
+			} else if (*blank == FB_BLANK_POWERDOWN) {
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+				scr_suspended = true;
+#endif
 				synaptics_rmi4_suspend(
 					&(rmi4_data->input_dev->dev));
+			}
 		}
 	}
 
@@ -4575,33 +4657,50 @@ static int synaptics_rmi4_check_configuration(struct synaptics_rmi4_data
 	return 0;
 }
 
- /**
- * synaptics_rmi4_suspend()
- *
- * Called by the kernel during the suspend phase when the system
- * enters suspend.
- *
- * This function stops finger data acquisition and puts the sensor to
- * sleep (if not already done so during the early suspend phase),
- * disables the interrupt, and turns off the power to the sensor.
- */
-#ifdef CONFIG_PM
-static int synaptics_rmi4_suspend(struct device *dev)
+static int synaptics_rmi4_suspend_trigger(struct synaptics_rmi4_data *rmi4_data)
 {
-	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
-	int retval;
+	int retval = 0;
+
+	if (rmi4_data->touch_off_triggered)
+		return 0;
+
+	rmi4_data->touch_off_triggered = true;
+
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	if (!scr_suspended)
+		goto out;
+
+	if (is_touch_on()) {
+		if (!irq_wake_enabled) {
+			enable_irq_wake(rmi4_data->irq);
+			irq_wake_enabled = true;
+		}
+
+		mutex_lock(&suspended_mutex);
+		rmi4_data->suspended = false;
+		mutex_unlock(&suspended_mutex);
+
+		goto out;
+	}
+#endif
+
+	if (irq_wake_enabled) {
+		disable_irq_wake(rmi4_data->irq);
+		irq_wake_enabled = false;
+	}
 
 	if (rmi4_data->stay_awake) {
 		rmi4_data->staying_awake = true;
-		return 0;
+		goto out;
 	} else
 		rmi4_data->staying_awake = false;
 
 	cancel_work_sync(&rmi4_data->init_work);
 
 	if (rmi4_data->suspended) {
-		dev_info(dev, "Already in suspend state\n");
-		return 0;
+		dev_info(&rmi4_data->i2c_client->dev,
+			"Already in suspend state\n");
+		goto out;
 	}
 
 	synaptics_secure_touch_stop(rmi4_data, 1);
@@ -4618,13 +4717,14 @@ static int synaptics_rmi4_suspend(struct device *dev)
 
 		retval = synaptics_rmi4_regulator_lpm(rmi4_data, true);
 		if (retval < 0) {
-			dev_err(dev, "failed to enter low power mode\n");
+			dev_err(&rmi4_data->i2c_client->dev,
+				"failed to enter low power mode\n");
 			goto err_lpm_regulator;
 		}
 	} else {
-		dev_err(dev,
+		dev_err(&rmi4_data->i2c_client->dev,
 			"Firmware updating, cannot go into suspend mode\n");
-		return 0;
+		goto out;
 	}
 
 	if (rmi4_data->board->disable_gpios) {
@@ -4632,12 +4732,14 @@ static int synaptics_rmi4_suspend(struct device *dev)
 			retval = pinctrl_select_state(rmi4_data->ts_pinctrl,
 					rmi4_data->pinctrl_state_suspend);
 			if (retval < 0)
-				dev_err(dev, "failed to select idle pinctrl state\n");
+				dev_err(&rmi4_data->i2c_client->dev,
+					"failed to select idle pinctrl state\n");
 		}
 
 		retval = synaptics_rmi4_gpio_configure(rmi4_data, false);
 		if (retval < 0) {
-			dev_err(dev, "failed to put gpios in suspend state\n");
+			dev_err(&rmi4_data->i2c_client->dev,
+				"failed to put gpios in suspend state\n");
 			goto err_gpio_configure;
 		}
 	}
@@ -4645,14 +4747,15 @@ static int synaptics_rmi4_suspend(struct device *dev)
 	rmi4_data->suspended = true;
 	mutex_unlock(&suspended_mutex);
 
-	return 0;
+	goto out;
 
 err_gpio_configure:
 	if (rmi4_data->ts_pinctrl) {
 		retval = pinctrl_select_state(rmi4_data->ts_pinctrl,
 					rmi4_data->pinctrl_state_active);
 		if (retval < 0)
-			dev_err(dev, "failed to select get default pinctrl state\n");
+			dev_err(&rmi4_data->i2c_client->dev,
+				"failed to select get default pinctrl state\n");
 	}
 	synaptics_rmi4_regulator_lpm(rmi4_data, false);
 
@@ -4663,7 +4766,50 @@ err_lpm_regulator:
 		rmi4_data->touch_stopped = false;
 	}
 
+out:
+	rmi4_data->touch_off_triggered = false;
 	return retval;
+}
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static void synaptics_rmi4_touch_off(struct work_struct *work)
+{
+	struct synaptics_rmi4_data *rmi4_data =
+		container_of(work, struct synaptics_rmi4_data, touch_off_work.work);
+
+	synaptics_rmi4_suspend_trigger(rmi4_data);
+}
+
+static struct synaptics_rmi4_data *rmi4_data_tmp;
+
+void synaptics_rmi4_touch_off_trigger(unsigned int delay)
+{
+	queue_delayed_work(rmi4_data_tmp->touch_off_workqueue,
+			&rmi4_data_tmp->touch_off_work,
+			msecs_to_jiffies(delay));
+}
+EXPORT_SYMBOL(synaptics_rmi4_touch_off_trigger);
+#endif
+
+ /**
+ * synaptics_rmi4_suspend()
+ *
+ * Called by the kernel during the suspend phase when the system
+ * enters suspend.
+ *
+ * This function stops finger data acquisition and puts the sensor to
+ * sleep (if not already done so during the early suspend phase),
+ * disables the interrupt, and turns off the power to the sensor.
+ */
+#ifdef CONFIG_PM
+static int synaptics_rmi4_suspend(struct device *dev)
+{
+	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	rmi4_data_tmp = rmi4_data;
+#endif
+
+	return synaptics_rmi4_suspend_trigger(rmi4_data);
 }
 
  /**
@@ -4679,6 +4825,18 @@ err_lpm_regulator:
 static int synaptics_rmi4_resume(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
+
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	if (irq_wake_enabled) {
+		disable_irq_wake(rmi4_data->irq);
+		irq_wake_enabled = false;
+
+		mutex_lock(&suspended_mutex);
+		rmi4_data->suspended = false;
+		mutex_unlock(&suspended_mutex);
+		return 0;
+	}
+#endif
 
 	if (rmi4_data->staying_awake)
 		return 0;
