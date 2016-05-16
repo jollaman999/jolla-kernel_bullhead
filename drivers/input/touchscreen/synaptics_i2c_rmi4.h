@@ -41,6 +41,10 @@
 #include <linux/clk.h>
 #endif
 
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+#include <linux/wakelock.h>
+#endif
+
 #define PDT_PROPS (0x00EF)
 #define PDT_START (0x00E9)
 #define PDT_END (0x000A)
@@ -224,12 +228,17 @@ struct synaptics_rmi4_data {
 	struct mutex rmi4_io_ctrl_mutex;
 	struct delayed_work det_work;
 	struct workqueue_struct *det_workqueue;
+	struct delayed_work touch_off_work;
+	struct workqueue_struct *touch_off_workqueue;
 	struct work_struct recovery_work;
 	struct work_struct init_work;
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	struct early_suspend early_suspend;
 #endif
 	struct dentry *dir;
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	struct wake_lock rmi4_wl;
+#endif
 	char fw_image_name[NAME_BUFFER_SIZE];
 	unsigned char current_page;
 	unsigned char button_0d_enabled;
@@ -264,6 +273,7 @@ struct synaptics_rmi4_data {
 	bool stay_awake;
 	bool staying_awake;
 	bool check_build;
+	bool touch_off_triggered;
 	int (*i2c_read)(struct synaptics_rmi4_data *pdata, unsigned short addr,
 			unsigned char *data, unsigned short length);
 	int (*i2c_write)(struct synaptics_rmi4_data *pdata, unsigned short addr,
