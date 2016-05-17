@@ -24,6 +24,10 @@
 
 #include "smpboot.h"
 
+#ifdef CONFIG_THERMAL_MONITOR
+#include <linux/msm_thermal.h>
+#endif
+
 #ifdef CONFIG_SMP
 /* Serializes the updates to cpu_online_mask, cpu_present_mask */
 static DEFINE_MUTEX(cpu_add_remove_lock);
@@ -447,6 +451,11 @@ int __cpuinit cpu_up(unsigned int cpu)
 #ifdef	CONFIG_MEMORY_HOTPLUG
 	int nid;
 	pg_data_t	*pgdat;
+#endif
+
+#ifdef CONFIG_THERMAL_MONITOR
+	if (cpus_offlined & BIT(cpu))
+		return 0;
 #endif
 
 	if (!cpu_possible(cpu)) {
