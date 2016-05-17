@@ -150,6 +150,8 @@ struct device_clnt_data {
 };
 
 #ifdef CONFIG_THERMAL_MONITOR
+extern uint32_t cpus_offlined;
+
 extern int msm_thermal_init(struct msm_thermal_data *pdata);
 extern int msm_thermal_device_init(void);
 extern int msm_thermal_set_frequency(uint32_t cpu, uint32_t freq,
