@@ -587,9 +587,7 @@ static ssize_t sovc_scroff_volctr_dump(struct device *dev,
 		if (sovc_switch != buf[0] - '0')
 			sovc_switch = buf[0] - '0';
 
-	if (sovc_switch)
-		register_sovc();
-	else
+	if (!sovc_switch)
 		unregister_sovc();
 
 	return count;
@@ -622,6 +620,14 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 
 	if (sovc_tmp_onoff)
 		track_changed = false;
+
+	if (sovc_switch && sovc_tmp_onoff && sovc_scr_suspended) {
+		if (sovc_mic_detected)
+			unregister_sovc();
+		else
+			register_sovc();
+	} else
+		unregister_sovc();
 
 	return count;
 }
