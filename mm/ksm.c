@@ -2626,4 +2626,4 @@ out_free:
 out:
 	return err;
 }
-subsys_initcall(ksm_init);
+module_init(ksm_init)
