@@ -38,6 +38,7 @@
 #include <linux/oom.h>
 #include <linux/numa.h>
 #include <linux/show_mem_notifier.h>
+#include <linux/fb.h>
 
 #include <asm/tlbflush.h>
 #include "internal.h"
@@ -49,6 +50,8 @@
 #define NUMA(x)		(0)
 #define DO_NUMA(x)	do { } while (0)
 #endif
+
+struct notifier_block ksm_fb_notif;
 
 /*
  * A few notes about the KSM scanning process,
@@ -241,6 +244,7 @@ static int ksm_nr_node_ids = 1;
 #define KSM_RUN_UNMERGE	2
 #define KSM_RUN_OFFLINE	4
 static unsigned long ksm_run = KSM_RUN_MERGE;
+static unsigned long ksm_run_stored;
 static void wait_while_offlining(void);
 
 static DECLARE_WAIT_QUEUE_HEAD(ksm_thread_wait);
@@ -2505,6 +2509,52 @@ static struct attribute_group ksm_attr_group = {
 };
 #endif /* CONFIG_SYSFS */
 
+static int ksm_fb_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data)
+{
+	struct fb_event *evdata = data;
+	int *blank;
+	int err;
+
+	if (ksm_run == KSM_RUN_STOP && ksm_run_stored == KSM_RUN_STOP)
+		return 0;
+
+	mutex_lock(&ksm_thread_mutex);
+	wait_while_offlining();
+
+	if (event == FB_EVENT_BLANK) {
+		blank = evdata->data;
+
+		switch (*blank) {
+		case FB_BLANK_UNBLANK:
+			ksm_run = ksm_run_stored;
+			if (ksm_run & KSM_RUN_UNMERGE) {
+				set_current_oom_origin();
+				err = unmerge_and_remove_all_rmap_items();
+				clear_current_oom_origin();
+				if (err)
+					ksm_run = KSM_RUN_STOP;
+			}
+			break;
+		case FB_BLANK_POWERDOWN:
+			ksm_run_stored = ksm_run;
+			ksm_run = KSM_RUN_STOP;
+			break;
+		}
+	}
+
+	mutex_unlock(&ksm_thread_mutex);
+
+	if (ksm_run & KSM_RUN_MERGE)
+		wake_up_interruptible(&ksm_thread_wait);
+
+	return 0;
+}
+
+struct notifier_block ksm_fb_notif = {
+	.notifier_call = ksm_fb_notifier_callback,
+};
+
 static int __init ksm_init(void)
 {
 	struct task_struct *ksm_thread;
@@ -2533,12 +2583,18 @@ static int __init ksm_init(void)
 
 #endif /* CONFIG_SYSFS */
 
+	ksm_run_stored = ksm_run;
+
 #ifdef CONFIG_MEMORY_HOTREMOVE
 	/* There is no significance to this priority 100 */
 	hotplug_memory_notifier(ksm_memory_callback, 100);
 #endif
 
 	show_mem_notifier_register(&ksm_show_mem_notifier_block);
+
+	if (fb_register_client(&ksm_fb_notif))
+		printk(KERN_ERR "ksm: fb register failed\n");
+
 	return 0;
 
 out_free:
