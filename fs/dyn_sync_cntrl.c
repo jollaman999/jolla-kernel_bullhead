@@ -33,7 +33,7 @@ struct notifier_block dyn_fsync_fb_notif;
  */
 static DEFINE_MUTEX(fsync_mutex);
 bool dyn_sync_scr_suspended = false;
-bool dyn_fsync_active __read_mostly = true;
+bool dyn_fsync_active __read_mostly = false;
 
 extern void dyn_fsync_suspend_actions(void);
 
@@ -112,6 +112,9 @@ static int dyn_fsync_fb_notifier_callback(struct notifier_block *self,
 	struct fb_event *evdata = data;
 	int *blank;
 
+	if (!dyn_fsync_active)
+		return 0;
+
 	if (event == FB_EVENT_BLANK) {
 		blank = evdata->data;
 
@@ -121,8 +124,7 @@ static int dyn_fsync_fb_notifier_callback(struct notifier_block *self,
 			break;
 		case FB_BLANK_POWERDOWN:
 			dyn_sync_scr_suspended = true;
-			if (dyn_fsync_active)
-				dyn_fsync_suspend();
+			dyn_fsync_suspend();
 			break;
 		}
 	}
