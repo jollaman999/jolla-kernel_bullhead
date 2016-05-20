@@ -4772,12 +4772,17 @@ out:
 }
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+extern void mdss_dsi_panel_reset_dsvreg_off(void);
+extern void mdss_dsi_panel_vreg_off(void);
+
 static void synaptics_rmi4_touch_off(struct work_struct *work)
 {
 	struct synaptics_rmi4_data *rmi4_data =
 		container_of(work, struct synaptics_rmi4_data, touch_off_work.work);
 
 	synaptics_rmi4_suspend_trigger(rmi4_data);
+	mdss_dsi_panel_reset_dsvreg_off();
+	mdss_dsi_panel_vreg_off();
 }
 
 static struct synaptics_rmi4_data *rmi4_data_tmp;
