@@ -63,6 +63,8 @@ struct bcl_param_data {
 };
 
 #ifdef CONFIG_MSM_BCL_CTL
+extern uint32_t bcl_hotplug_request;
+
 struct bcl_param_data *msm_bcl_register_param(enum bcl_param,
 	struct bcl_driver_ops *, char *);
 int msm_bcl_unregister_param(struct bcl_param_data *);
