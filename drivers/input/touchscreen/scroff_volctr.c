@@ -621,11 +621,14 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 	if (sovc_tmp_onoff)
 		track_changed = false;
 
-	if (sovc_switch && sovc_tmp_onoff && sovc_scr_suspended) {
-		if (sovc_mic_detected)
-			unregister_sovc();
-		else
-			register_sovc();
+	if (sovc_switch && sovc_scr_suspended) {
+		if (sovc_tmp_onoff) {
+			if (sovc_mic_detected)
+				unregister_sovc();
+			else
+				register_sovc();
+		} else if (value_changed)
+			synaptics_rmi4_touch_off_trigger(0);
 	} else
 		unregister_sovc();
 
