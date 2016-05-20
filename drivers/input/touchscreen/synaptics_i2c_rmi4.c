@@ -129,7 +129,6 @@ enum device_status {
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 #define RMI4_WL_HOLD_TIME_MS 1000
 
-static bool scr_suspended = false;
 static bool irq_wake_enabled = false;
 static s64 wake_lock_start_time = 0;
 
@@ -155,6 +154,10 @@ static bool is_touch_on(void)
 #endif
 	return false;
 }
+#endif
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static bool scr_suspended = false;
 #endif
 
 static void synaptics_rmi4_touch_off(struct work_struct *work);
@@ -4390,16 +4393,14 @@ static int fb_notifier_callback(struct notifier_block *self,
 			blank = evdata->data;
 			if ((*blank == FB_BLANK_UNBLANK) ||
 			    (*blank == FB_BLANK_VSYNC_SUSPEND)) {
-#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
-				scr_suspended = false;
-#endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+				scr_suspended = false;
 				sovc_force_off = false;
 #endif
 				synaptics_rmi4_resume(
 					&(rmi4_data->input_dev->dev));
 			} else if (*blank == FB_BLANK_POWERDOWN) {
-#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 				scr_suspended = true;
 #endif
 				synaptics_rmi4_suspend(
@@ -4667,9 +4668,6 @@ static int synaptics_rmi4_suspend_trigger(struct synaptics_rmi4_data *rmi4_data)
 	rmi4_data->touch_off_triggered = true;
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
-	if (!scr_suspended)
-		goto out;
-
 	if (is_touch_on()) {
 		if (!irq_wake_enabled) {
 			enable_irq_wake(rmi4_data->irq);
@@ -4779,6 +4777,9 @@ static void synaptics_rmi4_touch_off(struct work_struct *work)
 {
 	struct synaptics_rmi4_data *rmi4_data =
 		container_of(work, struct synaptics_rmi4_data, touch_off_work.work);
+
+	if (!scr_suspended)
+		return;
 
 	synaptics_rmi4_suspend_trigger(rmi4_data);
 	mdss_dsi_panel_reset_dsvreg_off();
