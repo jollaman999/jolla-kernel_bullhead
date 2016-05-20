@@ -276,6 +276,32 @@ disp_en_gpio_err:
 	return rc;
 }
 
+static void mdss_dsi_panel_reset_dsvreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
+{
+	if (ctrl_pdata->dsvreg && ctrl_pdata->dsvreg_pre_off)
+		if (regulator_disable(ctrl_pdata->dsvreg))
+			pr_info("%s: failed to pre-off dsv\n",
+						__func__);
+	gpio_set_value((ctrl_pdata->rst_gpio), 0);
+	gpio_free(ctrl_pdata->rst_gpio);
+	if (ctrl_pdata->dsvreg && !ctrl_pdata->dsvreg_pre_off)
+		if (regulator_disable(ctrl_pdata->dsvreg))
+			pr_info("%s: failed to post-off dsv\n",
+						__func__);
+
+	pr_info("%s: done", __func__);
+}
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+extern struct mdss_dsi_ctrl_pdata *ctrl_pdata_tmp;
+
+void mdss_dsi_panel_reset_dsvreg_off(void)
+{
+	mdss_dsi_panel_reset_dsvreg_off_trigger(ctrl_pdata_tmp);
+}
+EXPORT_SYMBOL(mdss_dsi_panel_vreg_off);
+#endif
+
 int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
@@ -376,16 +402,9 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 		if (sovc_switch && sovc_tmp_onoff)
 			goto end;
 #endif
-		if (ctrl_pdata->dsvreg && ctrl_pdata->dsvreg_pre_off)
-			if (regulator_disable(ctrl_pdata->dsvreg))
-				pr_err("%s: failed to pre-off dsv\n",
-							__func__);
-		gpio_set_value((ctrl_pdata->rst_gpio), 0);
-		gpio_free(ctrl_pdata->rst_gpio);
-		if (ctrl_pdata->dsvreg && !ctrl_pdata->dsvreg_pre_off)
-			if (regulator_disable(ctrl_pdata->dsvreg))
-				pr_err("%s: failed to post-off dsv\n",
-							__func__);
+
+		mdss_dsi_panel_reset_dsvreg_off_trigger(ctrl_pdata);
+
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 end:
 #endif
