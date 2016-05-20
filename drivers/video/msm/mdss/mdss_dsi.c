@@ -161,11 +161,45 @@ static int mdss_dsi_regulator_init(struct platform_device *pdev)
 	return rc;
 }
 
+static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
+{
+	int ret = 0;
+	int i = 0;
+
+	for (i = DSI_MAX_PM - 1; i >= 0; i--) {
+		/*
+		 * Core power module will be disabled when the
+		 * clocks are disabled
+		 */
+		if (DSI_CORE_PM == i)
+			continue;
+		ret = msm_dss_enable_vreg(
+			ctrl_pdata->power_data[i].vreg_config,
+			ctrl_pdata->power_data[i].num_vreg, 0);
+		if (ret)
+			pr_info("%s: failed to disable vregs for %s\n",
+				__func__, __mdss_dsi_pm_name(i));
+	}
+
+	pr_info("%s: done", __func__);
+
+	return ret;
+}
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+struct mdss_dsi_ctrl_pdata *ctrl_pdata_tmp = NULL;
+
+void mdss_dsi_panel_vreg_off(void)
+{
+	mdss_dsi_panel_vreg_off_trigger(ctrl_pdata_tmp);
+}
+EXPORT_SYMBOL(mdss_dsi_panel_vreg_off);
+#endif
+
 static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 {
 	int ret = 0;
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
-	int i = 0;
 
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
@@ -194,6 +228,10 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 		udelay(2000);
 	}
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	ctrl_pdata_tmp = ctrl_pdata;
+#endif
+
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	if (s2w_switch)
 		goto end;
@@ -207,20 +245,7 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 		goto end;
 #endif
 
-	for (i = DSI_MAX_PM - 1; i >= 0; i--) {
-		/*
-		 * Core power module will be disabled when the
-		 * clocks are disabled
-		 */
-		if (DSI_CORE_PM == i)
-			continue;
-		ret = msm_dss_enable_vreg(
-			ctrl_pdata->power_data[i].vreg_config,
-			ctrl_pdata->power_data[i].num_vreg, 0);
-		if (ret)
-			pr_err("%s: failed to disable vregs for %s\n",
-				__func__, __mdss_dsi_pm_name(i));
-	}
+	ret = mdss_dsi_panel_vreg_off_trigger(ctrl_pdata);
 
 end:
 	return ret;
