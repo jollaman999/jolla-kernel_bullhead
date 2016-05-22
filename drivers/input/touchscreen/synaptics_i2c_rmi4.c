@@ -4782,8 +4782,10 @@ static void synaptics_rmi4_touch_off(struct work_struct *work)
 		return;
 
 	synaptics_rmi4_suspend_trigger(rmi4_data);
-	mdss_dsi_panel_reset_dsvreg_off();
-	mdss_dsi_panel_vreg_off();
+	if (rmi4_data->suspended) {
+		mdss_dsi_panel_reset_dsvreg_off();
+		mdss_dsi_panel_vreg_off();
+	}
 }
 
 static struct synaptics_rmi4_data *rmi4_data_tmp;
