@@ -4778,7 +4778,7 @@ static void synaptics_rmi4_touch_off(struct work_struct *work)
 	struct synaptics_rmi4_data *rmi4_data =
 		container_of(work, struct synaptics_rmi4_data, touch_off_work.work);
 
-	if (!scr_suspended || rmi4_data->suspended)
+	if (!scr_suspended)
 		return;
 
 	synaptics_rmi4_suspend_trigger(rmi4_data);
