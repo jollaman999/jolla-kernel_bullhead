@@ -161,6 +161,11 @@ static int mdss_dsi_regulator_init(struct platform_device *pdev)
 	return rc;
 }
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+bool mdss_turned_off = false;
+EXPORT_SYMBOL(mdss_dsi_panel_vreg_off);
+#endif
+
 static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
 	int ret = 0;
@@ -180,6 +185,8 @@ static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdat
 			pr_info("%s: failed to disable vregs for %s\n",
 				__func__, __mdss_dsi_pm_name(i));
 	}
+
+	mdss_turned_off = true;
 
 	pr_info("%s: done", __func__);
 
@@ -308,6 +315,8 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 			pr_err("%s: Panel reset failed. rc=%d\n",
 					__func__, ret);
 	}
+
+	mdss_turned_off = false;
 
 error:
 	if (ret) {
