@@ -158,7 +158,7 @@ static bool is_touch_on(void)
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 static bool scr_suspended = false;
-static bool mdss_turned_off = false;
+extern bool mdss_turned_off;
 extern void mdss_dsi_panel_reset_dsvreg_off(void);
 extern void mdss_dsi_panel_vreg_off(void);
 #endif
@@ -4399,7 +4399,6 @@ static int fb_notifier_callback(struct notifier_block *self,
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 				scr_suspended = false;
 				sovc_force_off = false;
-				mdss_turned_off = false;
 #endif
 				synaptics_rmi4_resume(
 					&(rmi4_data->input_dev->dev));
@@ -4786,7 +4785,6 @@ static void synaptics_rmi4_touch_off(struct work_struct *work)
 	if (rmi4_data->suspended && !mdss_turned_off) {
 		mdss_dsi_panel_reset_dsvreg_off();
 		mdss_dsi_panel_vreg_off();
-		mdss_turned_off = true;
 	}
 }
 
