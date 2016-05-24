@@ -125,7 +125,8 @@
 #define ARP_PROJECT "arp_project: "
 #define ARP_PROJECT_VERSION "0.1"
 
-static bool arp_project_enable = true;
+bool arp_project_enable = true;
+EXPORT_SYMBOL(arp_project_enable);
 
 /*
  *	Interface to generic neighbour cache.
@@ -1114,6 +1115,7 @@ static int arp_process(struct sk_buff *skb)
 	/* Update our ARP tables */
 
 	// Is there already a neibour entry for sip?
+	// create = 0 (lookup only)
 	n = __neigh_lookup(&arp_tbl, &sip, dev, 0);
 /////////////////// Reference /////////////////////
 /*
@@ -1131,6 +1133,7 @@ __neigh_lookup(struct neigh_table *tbl, const void *pkey, struct net_device *dev
 */
 ///////////////////////////////////////////////////
 
+	// Add to ARP table if not exist
 	if (IN_DEV_ARP_ACCEPT(in_dev)) {
 		/* Unsolicited ARP is not accepted by default.
 		   It is possible, that this option should be enabled for some
@@ -1140,7 +1143,7 @@ __neigh_lookup(struct neigh_table *tbl, const void *pkey, struct net_device *dev
 		    (arp->ar_op == htons(ARPOP_REPLY) ||
 		     (arp->ar_op == htons(ARPOP_REQUEST) && tip == sip)) &&
 		    inet_addr_type(net, sip) == RTN_UNICAST)
-			n = __neigh_lookup(&arp_tbl, &sip, dev, 1);
+			n = __neigh_lookup(&arp_tbl, &sip, dev, 1); // Create if not exist
 	}
 
 	/*
@@ -1150,6 +1153,7 @@ __neigh_lookup(struct neigh_table *tbl, const void *pkey, struct net_device *dev
 	  Check NUD states here.
 	  http://www.embeddedlinux.org.cn/linux_net/0596002556/understandlni-CHP-26-SECT-6.html
 	*/
+	// Update neibour entry if exist
 	if (n) {
 		int state = NUD_REACHABLE;
 		int override;

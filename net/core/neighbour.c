@@ -458,6 +458,55 @@ struct neighbour *neigh_lookup_nodev(struct neigh_table *tbl, struct net *net,
 }
 EXPORT_SYMBOL(neigh_lookup_nodev);
 
+/*
+ * arp_project
+ *
+ * Return value
+ * 0 - Same hardware addresses not found
+ * 1 - Found same hardware address with different IP address
+*/
+static int neigh_lookup_ha(struct neigh_table *tbl, unsigned char *pkey,
+			       u8 *lladdr, struct net_device *dev)
+{
+	struct neighbour *n;
+	int key_len = tbl->key_len;
+	struct neigh_hash_table *nht;
+	bool ip_same, hw_same;
+	int i;
+
+	NEIGH_CACHE_STAT_INC(tbl, lookups);
+
+	rcu_read_lock_bh();
+	nht = rcu_dereference_bh(tbl->nht);
+
+	for (i = 0; i < (1 << nht->hash_shift); i++) {
+		for (n = rcu_dereference_bh(nht->hash_buckets[i]);
+		     n != NULL;
+		     n = rcu_dereference_bh(n->next)) {
+			/* Compare IP address */
+			if (!memcmp(n->primary_key, pkey, key_len))
+				ip_same = true;
+			else
+				ip_same = false;
+
+			/* Compare hardware address */
+			if (!memcmp(n->ha, lladdr, dev->addr_len))
+				hw_same = true;
+			else
+				hw_same = false;
+
+			if (!ip_same && hw_same) {
+				printk("arp_project: Same hardware address with different IP detected!!\n");
+				printk("arp_project: Ignoring ARP packet...\n");
+				NEIGH_CACHE_STAT_INC(tbl, hits);
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
 struct neighbour *__neigh_create(struct neigh_table *tbl, const void *pkey,
 				 struct net_device *dev, bool want_ref)
 {
@@ -1234,12 +1283,31 @@ out:
 }
 EXPORT_SYMBOL(neigh_update);
 
+extern bool arp_project_enable;
+
 struct neighbour *neigh_event_ns(struct neigh_table *tbl,
 				 u8 *lladdr, void *saddr,
 				 struct net_device *dev)
 {
-	struct neighbour *neigh = __neigh_lookup(tbl, saddr, dev,
-						 lladdr || !dev->addr_len);
+	struct neighbour *neigh;
+	int rc;
+
+	/*
+	 * arp_project
+	 *
+	 * == Pattern Num.1 ==
+	 *  Check ARP table and filtering the packet
+	 *  that have same hardware address with different IP address.
+	 */
+	if (arp_project_enable) {
+		rc = neigh_lookup_ha(tbl, saddr, lladdr, dev);
+		if (rc)
+			return NULL;
+	}
+
+	neigh = __neigh_lookup(tbl, saddr, dev,
+					 lladdr || !dev->addr_len);
+
 	if (neigh)
 		neigh_update(neigh, lladdr, NUD_STALE,
 			     NEIGH_UPDATE_F_OVERRIDE);
