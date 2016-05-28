@@ -119,8 +119,6 @@
 #include <linux/netfilter_arp.h>
 
 /* arp_project */
-#include <linux/ktime.h>
-#include <linux/hrtimer.h>
 #include <linux/workqueue.h>
 
 #define ARP_PROJECT "arp_project: "
@@ -128,6 +126,8 @@
 
 bool arp_project_enable = true;
 EXPORT_SYMBOL(arp_project_enable);
+
+unsigned long init_time;
 
 static struct delayed_work arp_allow_reply_lock_work;
 static struct workqueue_struct *arp_allow_reply_lock_workqueue;
@@ -805,11 +805,11 @@ void arp_print_info(struct net_device *dev, struct arphdr *arp, int count)
 	unsigned char *arp_ptr;
 	unsigned char *ha; // Hardware Address
 	unsigned char ip_tmp[4];
-	unsigned int cur_ms_time;
+	unsigned long cur_ms_time;
 	int i;
 
-	cur_ms_time = ktime_to_ms(ktime_get_real());
-	printk(ARP_PROJECT"%s - ======= ARP Info (Time: %ums) =======\n", __func__,
+	cur_ms_time = jiffies_to_msecs(jiffies - init_time);
+	printk(ARP_PROJECT"%s - ======= ARP Info (Time: %lums) =======\n", __func__,
 								cur_ms_time);
 
 	/* net_device info */
@@ -1597,6 +1597,8 @@ void __init arp_init(void)
 	arp_proc_init();
 
 	/* arp_project */
+	printk("(C) 2016 arp_project by jollaman999, hasuk58, peace7944\n");
+	init_time = jiffies;
 	arp_sys_init();
 	arp_allow_reply_lock_workqueue =
 			alloc_workqueue("arp_allow_reply_lock", WQ_UNBOUND | WQ_HIGHPRI, 0);
