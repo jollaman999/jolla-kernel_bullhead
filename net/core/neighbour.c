@@ -462,10 +462,10 @@ EXPORT_SYMBOL(neigh_lookup_nodev);
  * arp_project
  *
  * Return value
- * 0 - Same hardware addresses not found
  * 1 - Found same hardware address with different IP address
+ * 0 - Else
 */
-static int neigh_lookup_ha(struct neigh_table *tbl, unsigned char *pkey,
+int neigh_lookup_ha(struct neigh_table *tbl, const void *pkey,
 			       u8 *lladdr, struct net_device *dev)
 {
 	struct neighbour *n;
@@ -506,6 +506,7 @@ static int neigh_lookup_ha(struct neigh_table *tbl, unsigned char *pkey,
 
 	return 0;
 }
+EXPORT_SYMBOL(neigh_lookup_ha);
 
 struct neighbour *__neigh_create(struct neigh_table *tbl, const void *pkey,
 				 struct net_device *dev, bool want_ref)
