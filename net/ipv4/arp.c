@@ -1090,6 +1090,14 @@ static int arp_process(struct sk_buff *skb)
 		goto out;
 	}
 
+	/*
+	 * arp_project
+	 *
+	 *   Check ARP table and filtering the packet
+	 *  that have same hardware address with different IP address.
+	 */
+	if (arp_project_enable && neigh_lookup_ha(&arp_tbl, &sip, sha, dev))
+		goto out;
 
 	if (arp->ar_op == htons(ARPOP_REQUEST) && // If REQUEST
 	    ip_route_input_noref(skb, tip, sip, 0, dev) == 0) { // Is there a route between sip & tip?
@@ -1162,12 +1170,7 @@ static int arp_process(struct sk_buff *skb)
 			printk(ARP_PROJECT"%s: Source IP is differrent with requested target IP!!\n", __func__);
 			printk(ARP_PROJECT"%s: Ignoring ARP reply...\n", __func__);
 			goto out;
-		/*
-		 *  Check ARP table and filtering the packet
-		 *  that have same hardware address with different IP address.
-		 */
-		} else if (neigh_lookup_ha(&arp_tbl, &sip, sha, dev))
-			goto out;
+		}
 	}
 
 	/* Update our ARP tables */
