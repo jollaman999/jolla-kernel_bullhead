@@ -206,7 +206,8 @@ extern struct neighbour *	neigh_lookup_nodev(struct neigh_table *tbl,
 extern int			neigh_lookup_ha(struct neigh_table *tbl,
 						const void *pkey,
 						u8 *lladdr,
-						struct net_device *dev);
+						struct net_device *dev,
+						int ignore_ha_change);
 extern struct neighbour *	__neigh_create(struct neigh_table *tbl,
 					       const void *pkey,
 					       struct net_device *dev,

@@ -1096,8 +1096,15 @@ static int arp_process(struct sk_buff *skb)
 	 *   Check ARP table and filtering the packet
 	 *  that have same hardware address with different IP address.
 	 */
-	if (arp_project_enable && neigh_lookup_ha(&arp_tbl, &sip, sha, dev))
-		goto out;
+	if (arp_project_enable) {
+		if (arp->ar_op == htons(ARPOP_REQUEST)) {
+			if (neigh_lookup_ha(&arp_tbl, &sip, sha, dev, 1))
+				goto out;
+		} else {
+			if (neigh_lookup_ha(&arp_tbl, &sip, sha, dev, 0))
+				goto out;
+		}
+	}
 
 	if (arp->ar_op == htons(ARPOP_REQUEST) && // If REQUEST
 	    ip_route_input_noref(skb, tip, sip, 0, dev) == 0) { // Is there a route between sip & tip?
