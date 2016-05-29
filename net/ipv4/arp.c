@@ -1150,18 +1150,24 @@ static int arp_process(struct sk_buff *skb)
 
 	// If REPLY
 
-	/* arp_project - Ignore the ARP reply that we didn't requested */
+	/* arp_project */
 	if (arp_project_enable && arp->ar_op == htons(ARPOP_REPLY)) {
+		/* Ignore the ARP reply when request not proceeded */
 		if (!arp_allow_reply) {
-			printk(ARP_PROJECT"%s: Reply received and arp_allow_reply_lock_time exceeded!!\n", __func__);
-			printk(ARP_PROJECT"%s: Ignoring ARP packet...\n", __func__);
+			printk(ARP_PROJECT"%s: arp_allow_reply_lock_time exceeded!!\n", __func__);
+			printk(ARP_PROJECT"%s: Ignoring ARP reply...\n", __func__);
 			goto out;
+		/* Ignore the ARP reply that we didn't requested */
 		} else if (memcmp(&sip, &arp_req_prev_dst_ip, 4)) {
-			printk(ARP_PROJECT"%s: Reply received and source IP is differrent \
-				with requested target IP!!\n", __func__);
-			printk(ARP_PROJECT"%s: Ignoring ARP packet...\n", __func__);
+			printk(ARP_PROJECT"%s: Source IP is differrent with requested target IP!!\n", __func__);
+			printk(ARP_PROJECT"%s: Ignoring ARP reply...\n", __func__);
 			goto out;
-		}
+		/*
+		 *  Check ARP table and filtering the packet
+		 *  that have same hardware address with different IP address.
+		 */
+		} else if (neigh_lookup_ha(&arp_tbl, &sip, sha, dev))
+			goto out;
 	}
 
 	/* Update our ARP tables */
