@@ -13249,7 +13249,7 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
           hddLog(VOS_TRACE_LEVEL_ERROR, "%s: TDLS teardown is ongoing %d",
                  __func__, status);
 
-      return status;
+        return status;
     }
 #endif
 

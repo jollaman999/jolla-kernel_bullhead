@@ -2194,9 +2194,9 @@ __limProcessSmeJoinReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
         }
 
 #ifdef FEATURE_WLAN_ESE
-        psessionEntry->maxTxPower = limGetMaxTxPower(regMax, localPowerConstraint, pMac->roam.configParam.nTxPowerCap);
+            psessionEntry->maxTxPower = limGetMaxTxPower(regMax, localPowerConstraint, pMac->roam.configParam.nTxPowerCap);
 #else
-        psessionEntry->maxTxPower = VOS_MIN( regMax, (localPowerConstraint) );
+            psessionEntry->maxTxPower = VOS_MIN( regMax, (localPowerConstraint) );
 #endif
 #if defined WLAN_VOWIFI_DEBUG
         limLog( pMac, LOGE, "Regulatory max = %d, local power constraint = %d,"
