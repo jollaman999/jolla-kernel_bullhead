@@ -471,7 +471,6 @@ int neigh_lookup_ha(struct neigh_table *tbl, const void *pkey,
 	struct neighbour *n;
 	int key_len = tbl->key_len;
 	struct neigh_hash_table *nht;
-	bool ip_same, hw_same;
 	int i;
 
 	NEIGH_CACHE_STAT_INC(tbl, lookups);
@@ -483,27 +482,17 @@ int neigh_lookup_ha(struct neigh_table *tbl, const void *pkey,
 		for (n = rcu_dereference_bh(nht->hash_buckets[i]);
 		     n != NULL;
 		     n = rcu_dereference_bh(n->next)) {
-			/* Compare IP address */
-			if (!memcmp(n->primary_key, pkey, key_len))
-				ip_same = true;
-			else
-				ip_same = false;
-
-			/* Compare hardware address */
-			if (!memcmp(n->ha, lladdr, dev->addr_len))
-				hw_same = true;
-			else
-				hw_same = false;
-
-			if (!ip_same && hw_same) {
+			if (memcmp(n->primary_key, pkey, key_len) &&
+			    !memcmp(n->ha, lladdr, dev->addr_len)) {
 				printk("arp_project: Same hardware address with different IP detected!!\n");
 				printk("arp_project: Ignoring ARP packet...\n");
 				NEIGH_CACHE_STAT_INC(tbl, hits);
+				rcu_read_unlock_bh();
 				return 1;
 			}
 		}
 	}
-
+	rcu_read_unlock_bh();
 	return 0;
 }
 EXPORT_SYMBOL(neigh_lookup_ha);
