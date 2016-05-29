@@ -784,10 +784,9 @@ static void hif_pci_pm_work(struct work_struct *work)
 			pm_work);
 	struct HIF_CE_state *hif_state = (struct HIF_CE_state *)sc->hif_device;
 	MSG_BASED_HIF_CALLBACKS *msg_callbacks;
-/*
+
 	pr_debug("%s: Resume HTT & WMI Service in runtime_pm state %d\n",
 			__func__, atomic_read(&sc->pm_state));
-*/
 
 	msg_callbacks = &hif_state->msg_callbacks_current;
 
@@ -2355,9 +2354,8 @@ __hif_pci_suspend(struct pci_dev *pdev, pm_message_t state, bool runtime_pm)
             ret = -EAGAIN;
             goto out;
         }
-/*
+
         pr_info("%s: Suspend completes (D0WOW)\n", __func__);
-*/
         ret = 0;
         goto out;
     }
@@ -2408,12 +2406,10 @@ __hif_pci_suspend(struct pci_dev *pdev, pm_message_t state, bool runtime_pm)
     }
 
 skip:
-/*
     pr_debug("%s: Suspend completes%s in%s mode event:%d device_state:%d\n",
                    __func__, runtime_pm ? " for runtime pm" : "",
                    wma_is_wow_mode_selected(temp_module) ? " wow" : " pdev",
                    state.event, val);
-*/
     ret = 0;
 
 out:
@@ -2553,11 +2549,10 @@ skip:
         }
     }
 #endif
-/*
+
     pr_debug("%s: Resume completes%s in%s mode\n", __func__,
                 runtime_pm ? " for runtime pm" : "",
                 wma_is_wow_mode_selected(temp_module) ? " wow" : " pdev");
-*/
 out:
     if (err) {
         pr_err("%s: resume failed err:%d\n", __func__, err);
