@@ -611,4 +611,9 @@
 		qcom,master-stats-version = <2>;
 		qcom,master-offset = <2560>;
 	};
+
+	qcom,npa-dump@0xfc190020 {
+		compatible = "qcom,npa-dump";
+		reg = <0xfc190020 0x4>, <0xfc000000 0x1c00>;
+	};
 };
