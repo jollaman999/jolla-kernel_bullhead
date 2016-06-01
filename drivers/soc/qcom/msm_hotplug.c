@@ -77,8 +77,6 @@ do { 				\
 
 static struct cpu_hotplug {
 	unsigned int suspended;
-	unsigned int min_cpus_online_res;
-	unsigned int max_cpus_online_res;
 	unsigned int max_cpus_online_susp;
 	unsigned int target_cpus;
 	unsigned int min_cpus_online;
@@ -93,8 +91,6 @@ static struct cpu_hotplug {
 	.min_cpus_online = DEFAULT_MIN_CPUS_ONLINE,
 	.max_cpus_online = DEFAULT_MAX_CPUS_ONLINE,
 	.suspended = 0,
-	.min_cpus_online_res = DEFAULT_MIN_CPUS_ONLINE,
-	.max_cpus_online_res = DEFAULT_MAX_CPUS_ONLINE,
 	.max_cpus_online_susp = DEFAULT_MAX_CPUS_ONLINE_SUSP,
 	.down_lock_dur = DEFAULT_DOWN_LOCK_DUR,
 	.fast_lane_load = DEFAULT_FAST_LANE_LOAD,
@@ -614,10 +610,6 @@ static void msm_hotplug_suspend(void)
 
 	mutex_lock(&hotplug.msm_hotplug_mutex);
 	hotplug.suspended = 1;
-	hotplug.min_cpus_online_res = hotplug.min_cpus_online;
-	hotplug.min_cpus_online = 1;
-	hotplug.max_cpus_online_res = hotplug.max_cpus_online;
-	hotplug.max_cpus_online = hotplug.max_cpus_online_susp;
 	mutex_unlock(&hotplug.msm_hotplug_mutex);
 
 	/* Flush hotplug workqueue */
@@ -653,8 +645,6 @@ static void msm_hotplug_resume(void)
 	if (hotplug.suspended) {
 		mutex_lock(&hotplug.msm_hotplug_mutex);
 		hotplug.suspended = 0;
-		hotplug.min_cpus_online = hotplug.min_cpus_online_res;
-		hotplug.max_cpus_online = hotplug.max_cpus_online_res;
 		mutex_unlock(&hotplug.msm_hotplug_mutex);
 		required_wakeup = 1;
 		/* Initiate hotplug work if it was cancelled */
