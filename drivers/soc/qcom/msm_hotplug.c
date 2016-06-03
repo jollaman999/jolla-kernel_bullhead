@@ -726,9 +726,6 @@ static int msm_hotplug_start(int start_immediately)
 	else
 		queue_delayed_work_on(0, hotplug_wq, &hotplug_work, START_DELAY);
 
-	if (!msm_hotplug_scr_suspended)
-		msm_hotplug_resume();
-
 	return ret;
 err_dev:
 	destroy_workqueue(hotplug_wq);
@@ -747,7 +744,7 @@ static void msm_hotplug_stop(void)
 		dl = &per_cpu(lock_info, cpu);
 		cancel_delayed_work_sync(&dl->lock_rem);
 	}
-	msm_hotplug_suspend();
+	cancel_delayed_work_sync(&hotplug_work);
 
 	mutex_destroy(&hotplug.msm_hotplug_mutex);
 	mutex_destroy(&stats.stats_mutex);
