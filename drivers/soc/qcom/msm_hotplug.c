@@ -683,7 +683,7 @@ void msm_hotplug_resume_timeout(void)
 }
 EXPORT_SYMBOL(msm_hotplug_resume_timeout);
 
-static int msm_hotplug_start(void)
+static int msm_hotplug_start(int start_immediately)
 {
 	int cpu, ret = 0;
 	struct down_lock *dl;
@@ -721,9 +721,13 @@ static int msm_hotplug_start(void)
 		apply_down_lock(cpu);
 	}
 
-	queue_delayed_work_on(0, hotplug_wq, &hotplug_work,
-			      START_DELAY);
-	msm_hotplug_resume();
+	if (start_immediately)
+		queue_delayed_work_on(0, hotplug_wq, &hotplug_work, 0);
+	else
+		queue_delayed_work_on(0, hotplug_wq, &hotplug_work, START_DELAY);
+
+	if (!msm_hotplug_scr_suspended)
+		msm_hotplug_resume();
 
 	return ret;
 err_dev:
@@ -832,7 +836,7 @@ static ssize_t store_enable_hotplug(struct device *dev,
 	msm_enabled = val;
 
 	if (msm_enabled)
-		msm_hotplug_start();
+		msm_hotplug_start(1);
 	else
 		msm_hotplug_stop();
 
@@ -1171,7 +1175,7 @@ static int msm_hotplug_probe(struct platform_device *pdev)
 	}
 
 	if (msm_enabled) {
-		ret = msm_hotplug_start();
+		ret = msm_hotplug_start(0);
 		if (ret != 0)
 			goto err_dev;
 	}
