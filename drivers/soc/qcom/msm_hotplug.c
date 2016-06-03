@@ -723,6 +723,7 @@ static int msm_hotplug_start(void)
 
 	queue_delayed_work_on(0, hotplug_wq, &hotplug_work,
 			      START_DELAY);
+	msm_hotplug_resume();
 
 	return ret;
 err_dev:
@@ -742,7 +743,7 @@ static void msm_hotplug_stop(void)
 		dl = &per_cpu(lock_info, cpu);
 		cancel_delayed_work_sync(&dl->lock_rem);
 	}
-	cancel_delayed_work_sync(&hotplug_work);
+	msm_hotplug_suspend();
 
 	mutex_destroy(&hotplug.msm_hotplug_mutex);
 	mutex_destroy(&stats.stats_mutex);
@@ -831,7 +832,7 @@ static ssize_t store_enable_hotplug(struct device *dev,
 	msm_enabled = val;
 
 	if (msm_enabled)
-		ret = msm_hotplug_start();
+		msm_hotplug_start();
 	else
 		msm_hotplug_stop();
 
