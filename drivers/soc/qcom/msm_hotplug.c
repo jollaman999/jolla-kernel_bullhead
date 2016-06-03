@@ -752,11 +752,11 @@ static void msm_hotplug_stop(void)
 
 	destroy_workqueue(hotplug_wq);
 
-	/* Put all sibling cores to sleep */
-	for_each_online_cpu(cpu) {
+	/* Fire up all CPUs */
+	for_each_cpu_not(cpu, cpu_online_mask) {
 		if (cpu == 0)
 			continue;
-		cpu_down(cpu);
+		cpu_up(cpu);
 	}
 }
 
