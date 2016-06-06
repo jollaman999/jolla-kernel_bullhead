@@ -77,6 +77,7 @@
 #define SUPPLY_ANA_REQ_CURRENT  6000U
 
 #define FPC_TTW_HOLD_TIME 1000
+#define SCHED_BOOST_HOLD_TIME 2000
 
 #ifdef CONFIG_MSM_HOTPLUG
 extern void msm_hotplug_resume_timeout(void);
@@ -760,7 +761,7 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 		if (!sched_boost_set) {
 			sched_set_boost(1);
 			schedule_delayed_work(&sched_boost_rem_work,
-					msecs_to_jiffies(FPC_TTW_HOLD_TIME));
+					msecs_to_jiffies(SCHED_BOOST_HOLD_TIME));
 			sched_boost_set = true;
 		}
 
