@@ -2968,7 +2968,7 @@ static int hdd_set_rx_filter(hdd_adapter_t *adapter, bool action,
 				    MAC_ADDRESS_STR,
 				    action ? "setting" : "clearing",
 				    MAC_ADDR_ARRAY(filter->multicastAddr[j]));
-				j++
+				j++;
 			}
 		}
 		filter->ulMulticastAddrCnt = j;
