@@ -55,8 +55,6 @@
 #include <a_debug.h>
 #define FWLOG_DEBUG   ATH_DEBUG_MAKE_MODULE_MASK(0)
 
-#if defined(DEBUG)
-
 static bool appstarted = FALSE;
 static bool senddriverstatus = FALSE;
 static bool kd_nl_init = FALSE;
@@ -65,6 +63,7 @@ static int get_version = 0;
 static int gprint_limiter = 0;
 static bool tgt_assert_enable = 0;
 
+#ifdef DEBUG
 static ATH_DEBUG_MASK_DESCRIPTION g_fwlogDebugDescription[] = {
     {FWLOG_DEBUG,"fwlog"},
 };
