@@ -233,27 +233,6 @@ ext4_xattr_check_block(struct inode *inode, struct buffer_head *bh)
 	return error;
 }
 
-static int
-__xattr_check_inode(struct inode *inode, struct ext4_xattr_ibody_header *header,
-			 void *end, const char *function, unsigned int line)
-{
-	struct ext4_xattr_entry *entry = IFIRST(header);
-	int error = -EFSCORRUPTED;
-
-	if (((void *) header >= end) ||
-	    (header->h_magic != le32_to_cpu(EXT4_XATTR_MAGIC)))
-		goto errout;
-	error = ext4_xattr_check_names(entry, end, entry);
-errout:
-	if (error)
-		__ext4_error_inode(inode, function, line, 0,
-				   "corrupted in-inode xattr");
-	return error;
-}
-
-#define xattr_check_inode(inode, header, end) \
-	__xattr_check_inode((inode), (header), (end), __func__, __LINE__)
-
 static inline int
 ext4_xattr_check_entry(struct ext4_xattr_entry *entry, size_t size)
 {
@@ -365,7 +344,7 @@ ext4_xattr_ibody_get(struct inode *inode, int name_index, const char *name,
 	header = IHDR(inode, raw_inode);
 	entry = IFIRST(header);
 	end = (void *)raw_inode + EXT4_SB(inode->i_sb)->s_inode_size;
-	error = xattr_check_inode(inode, header, end);
+	error = ext4_xattr_check_names(entry, end, entry);
 	if (error)
 		goto cleanup;
 	error = ext4_xattr_find_entry(&entry, name_index, name,
@@ -497,7 +476,7 @@ ext4_xattr_ibody_list(struct dentry *dentry, char *buffer, size_t buffer_size)
 	raw_inode = ext4_raw_inode(&iloc);
 	header = IHDR(inode, raw_inode);
 	end = (void *)raw_inode + EXT4_SB(inode->i_sb)->s_inode_size;
-	error = xattr_check_inode(inode, header, end);
+	error = ext4_xattr_check_names(IFIRST(header), end, IFIRST(header));
 	if (error)
 		goto cleanup;
 	error = ext4_xattr_list_entries(dentry, IFIRST(header),
@@ -1014,7 +993,8 @@ int ext4_xattr_ibody_find(struct inode *inode, struct ext4_xattr_info *i,
 	is->s.here = is->s.first;
 	is->s.end = (void *)raw_inode + EXT4_SB(inode->i_sb)->s_inode_size;
 	if (ext4_test_inode_state(inode, EXT4_STATE_XATTR)) {
-		error = xattr_check_inode(inode, header, is->s.end);
+		error = ext4_xattr_check_names(IFIRST(header), is->s.end,
+					       IFIRST(header));
 		if (error)
 			return error;
 		/* Find the named attribute. */
@@ -1310,10 +1290,6 @@ retry:
 	min_offs = end - base;
 	last = entry;
 	total_ino = sizeof(struct ext4_xattr_ibody_header);
-
-	error = xattr_check_inode(inode, header, end);
-	if (error)
-		goto cleanup;
 
 	free = ext4_xattr_free_space(last, &min_offs, base, &total_ino);
 	if (free >= new_extra_isize) {
