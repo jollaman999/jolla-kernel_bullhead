@@ -163,7 +163,7 @@ static int mdss_dsi_regulator_init(struct platform_device *pdev)
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 bool mdss_turned_off = false;
-EXPORT_SYMBOL(mdss_dsi_panel_vreg_off);
+EXPORT_SYMBOL(mdss_turned_off);
 #endif
 
 static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
