@@ -393,14 +393,14 @@ limSetRSNieWPAiefromSmeStartBSSReqMessage(tpAniSirGlobal pMac,
  * received in various SME_REQ messages is valid or not
  *
  *LOGIC:
- * BSS Description validity checks are performed in this function
+ * BSS Descritipion validity checks are performed in this function
  *
  *ASSUMPTIONS:
  *
  *NOTE:
  *
  * @param  pMac      Pointer to Global MAC structure
- * @param  pBssDescr Pointer to received Bss Description
+ * @param  pBssDescr Pointer to received Bss Descritipion
  * @return true when BSS description is valid, false otherwise
  */
 
@@ -495,9 +495,7 @@ limIsSmeStartBssReqValid(tpAniSirGlobal pMac,
     tANI_U8 valid = true;
 
     PELOG1(limLog(pMac, LOG1,
-           FL("Parsed START_BSS_REQ fields are bssType=%s (%d), channelId=%d,"
-              " SSID len=%d, rsnIE len=%d, nwType=%d, rateset len=%d"),
-           lim_BssTypetoString(pStartBssReq->bssType),
+           FL("Parsed START_BSS_REQ fields are bssType=%d, channelId=%d, SSID len=%d, rsnIE len=%d, nwType=%d, rateset len=%d"),
            pStartBssReq->bssType,
            pStartBssReq->channelId,
            pStartBssReq->ssId.length,
@@ -505,19 +503,45 @@ limIsSmeStartBssReqValid(tpAniSirGlobal pMac,
            pStartBssReq->nwType,
            pStartBssReq->operationalRateSet.numRates);)
 
-    switch (pStartBssReq->bssType) {
-         /* Start BSS is valid only for following BSS type */
-        case eSIR_IBSS_MODE:
-        case eSIR_BTAMP_STA_MODE:
-        case eSIR_BTAMP_AP_MODE:
-        case eSIR_INFRA_AP_MODE:
-        case eSIR_NDI_MODE:
-            break;
-
-        default:
+    switch (pStartBssReq->bssType)
+    {
+        case eSIR_INFRASTRUCTURE_MODE:
+            /**
+             * Should not have received start BSS req with bssType
+             * Infrastructure on STA.
+             * Log error.
+             */
             limLog(pMac, LOGE,
                    FL("Invalid bssType %d in eWNI_SME_START_BSS_REQ"),
                    pStartBssReq->bssType);
+            valid = false;
+            goto end;
+            break;
+
+        case eSIR_IBSS_MODE:
+            break;
+
+        /* Added for BT AMP support */
+        case eSIR_BTAMP_STA_MODE:
+            break;
+
+        /* Added for BT AMP support */
+        case eSIR_BTAMP_AP_MODE:
+            break;
+
+        /* Added for SoftAP support */
+        case eSIR_INFRA_AP_MODE:
+            break;
+
+        default:
+            /**
+             * Should not have received start BSS req with bssType
+             * other than Infrastructure/IBSS.
+             * Log error
+             */
+            limLog(pMac, LOGW,
+               FL("Invalid bssType %d in eWNI_SME_START_BSS_REQ"),
+               pStartBssReq->bssType);
 
             valid = false;
             goto end;
@@ -571,7 +595,7 @@ limIsSmeStartBssReqValid(tpAniSirGlobal pMac,
             goto end;
         }
     }
-    /* Check if all the rates in the operational rate set are legal 11G rates */
+    // check if all the rates in the operatioal rate set are legal 11G rates
     else if (pStartBssReq->nwType == eSIR_11G_NW_TYPE)
     {
         for (i = 0; i < pStartBssReq->operationalRateSet.numRates; i++)

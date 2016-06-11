@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2015 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -34,17 +34,17 @@ FILE:
 
 BRIEF DESCRIPTION:
    WLAN Host Version file.
-   Build number automatically updated by build scripts.
+   Build number automaticly updated by build scripts.
 
 ===========================================================================*/
 
 #define QWLAN_VERSION_MAJOR            4
-#define QWLAN_VERSION_MINOR            0
-#define QWLAN_VERSION_PATCH            11
+#define QWLAN_VERSION_MINOR            4
+#define QWLAN_VERSION_PATCH            24
 #define QWLAN_VERSION_EXTRA            ""
-#define QWLAN_VERSION_BUILD            55
+#define QWLAN_VERSION_BUILD            26
 
-#define QWLAN_VERSIONSTR               "4.0.11.55"
+#define QWLAN_VERSIONSTR               "4.4.24.26"
 
 
 #define AR6320_REV1_VERSION             0x5000000
@@ -52,9 +52,7 @@ BRIEF DESCRIPTION:
 #define AR6320_REV1_3_VERSION           0x5000003
 #define AR6320_REV2_1_VERSION           0x5010000
 #define AR6320_REV3_VERSION             0x5020000
-#define QCA9377_REV1_1_VERSION          0x5020001
 #define AR6320_REV3_2_VERSION           0x5030000
-#define QCA9379_REV1_VERSION            0x5040000
 
 struct qwlan_hw {
     u32 id;

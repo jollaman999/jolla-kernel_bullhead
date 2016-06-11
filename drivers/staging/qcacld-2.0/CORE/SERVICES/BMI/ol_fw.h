@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014,2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -44,10 +44,8 @@
 #define AR6320_REV2_VERSION          AR6320_REV1_1_VERSION
 #define AR6320_REV2_1_VERSION        0x5010000
 #define AR6320_REV3_VERSION          0x5020000
-#define QCA9377_REV1_1_VERSION       0x5020001
 #define AR6320_REV3_2_VERSION        0x5030000
 #define AR6320_REV4_VERSION          AR6320_REV2_1_VERSION
-#define QCA9379_REV1_VERSION         0x5040000
 #define AR6320_DEV_VERSION           0x1000000
 #define QCA_FIRMWARE_FILE            "athwlan.bin"
 #define QCA_UTF_FIRMWARE_FILE        "utf.bin"
@@ -73,16 +71,6 @@
  */
 #define REGISTER_LOCATION       0x00000800
 
-#ifdef TARGET_DUMP_FOR_NON_QC_PLATFORM
-#define DRAM_LOCATION           0x00400000
-#define DRAM_SIZE               0x00097FFC
-
-#define IRAM_LOCATION           0x00980000
-#define IRAM_SIZE               0x000BFFFC
-
-#define AXI_LOCATION            0x000a0000
-#define AXI_SIZE                0x0001FFFC
-#else
 #define DRAM_LOCATION           0x00400000
 #define DRAM_SIZE               0x000a8000
 #define DRAM_LOCAL_BASE_ADDRESS (0x100000)
@@ -98,12 +86,7 @@
 #endif
 
 #define AXI_LOCATION            0x000a0000
-#ifdef HIF_PCI
 #define AXI_SIZE                0x00018000
-#else
-#define AXI_SIZE                0x00020000
-#endif /* #ifdef HIF_PCIE */
-#endif
 
 #define CE_OFFSET               0x00000400
 #define CE_USEFUL_SIZE          0x00000058
@@ -132,22 +115,4 @@ int ol_download_firmware(struct ol_softc *scn);
 int ol_configure_target(struct ol_softc *scn);
 void ol_target_failure(void *instance, A_STATUS status);
 u_int8_t ol_get_number_of_peers_supported(struct ol_softc *scn);
-
-#ifdef REMOVE_PKT_LOG
-static inline void ol_pktlog_init(void *)
-{
-}
-#else
-void ol_pktlog_init(void *);
-#endif
-
-#if defined(HIF_SDIO)
-void ol_target_ready(struct ol_softc *scn, void *cfg_ctx);
-#else
-static inline void ol_target_ready(struct ol_softc *scn, void *cfg_ctx)
-{
-
-}
-#endif
-
 #endif /* _OL_FW_H_ */

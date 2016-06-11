@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -145,6 +145,12 @@ typedef enum
    HDD_WLAN_WMM_TS_INFO_ACK_POLICY_HT_IMMEDIATE_BLOCK_ACK    = 1,
 } hdd_wlan_wmm_ts_info_ack_policy_e;
 
+/** vendor element ID */
+#define IE_EID_VENDOR        ( 221 ) /* 0xDD */
+#define IE_LEN_SIZE          1
+#define IE_EID_SIZE          1
+#define IE_VENDOR_OUI_SIZE   4
+
 /** Maximum Length of WPA/RSN IE */
 #define MAX_WPA_RSN_IE_LEN 40
 
@@ -246,40 +252,6 @@ typedef enum
     WEXT_SCAN_PENDING_MAX
 } hdd_scan_pending_option_e;
 
-/**
- * enum hdd_tsf_get_state - status of get tsf action
- *
- * TSF_RETURN:                   get tsf
- * TSF_STA_NOT_CONNECTED_NO_TSF: sta not connected to ap
- * TSF_NOT_RETURNED_BY_FW:       fw not returned tsf
- * TSF_CURRENT_IN_CAP_STATE:     driver in capture state
- * TSF_CAPTURE_FAIL:             capture fail
- * TSF_GET_FAIL:                 get fail
- * TSF_RESET_GPIO_FAIL:          GPIO reset fail
- * TSF_SAP_NOT_STARTED_NO_TSF    SAP not started
- */
-enum hdd_tsf_get_state {
-	TSF_RETURN = 0,
-	TSF_STA_NOT_CONNECTED_NO_TSF,
-	TSF_NOT_RETURNED_BY_FW,
-	TSF_CURRENT_IN_CAP_STATE,
-	TSF_CAPTURE_FAIL,
-	TSF_GET_FAIL,
-	TSF_RESET_GPIO_FAIL,
-	TSF_SAP_NOT_STARTED_NO_TSF
-};
-
-/**
- * enum hdd_tsf_capture_state - status of capture
- *
- * TSF_IDLE:                     idle
- * TSF__CAP_STATE:               current is in capture state
- */
-enum hdd_tsf_capture_state {
-	TSF_IDLE = 0,
-	TSF_CAP_STATE
-};
-
 /*
  * This structure contains the interface level (granularity)
  * configuration information in support of wireless extensions.
@@ -334,8 +306,6 @@ typedef struct hdd_wext_state_s
    v_BOOL_t isESEConnection;
    eCsrAuthType collectedAuthType; /* Collected from ALL SIOCSIWAUTH Ioctls. Will be negotiatedAuthType - in tCsrProfile */
 #endif
-   /* Wireless statistics */
-   struct iw_statistics iw_stats;
 }hdd_wext_state_t;
 
 typedef struct ccp_freq_chan_map_s{
@@ -367,8 +337,6 @@ extern void hdd_wlan_get_version(hdd_adapter_t *pAdapter,
 
 extern void hdd_wlan_get_stats(hdd_adapter_t *pAdapter, v_U16_t *length,
                                char *buffer, v_U16_t buf_len);
-
-extern void hdd_wlan_dump_stats(hdd_adapter_t *pAdapter, int value);
 
 extern int iw_get_scan(struct net_device *dev,
                        struct iw_request_info *info,
@@ -403,8 +371,12 @@ extern int iw_set_auth(struct net_device *dev,struct iw_request_info *info,
 extern int iw_get_auth(struct net_device *dev,struct iw_request_info *info,
                        union iwreq_data *wrqu,char *extra);
 
-int iw_set_pno(struct net_device *dev, struct iw_request_info *info,
-               union iwreq_data *wrqu, char *extra, int nOffset);
+VOS_STATUS iw_set_pno(struct net_device *dev, struct iw_request_info *info,
+                      union iwreq_data *wrqu, char *extra, int nOffset);
+
+
+VOS_STATUS iw_set_rssi_filter(struct net_device *dev, struct iw_request_info *info,
+                              union iwreq_data *wrqu, char *extra, int nOffset);
 
 VOS_STATUS iw_set_power_params(struct net_device *dev, struct iw_request_info *info,
                       union iwreq_data *wrqu, char *extra, int nOffset);
@@ -460,6 +432,9 @@ void hdd_wmm_tx_snapshot(hdd_adapter_t *pAdapter);
 #ifdef FEATURE_WLAN_TDLS
 VOS_STATUS iw_set_tdls_params(struct net_device *dev, struct iw_request_info *info, union iwreq_data *wrqu, char *extra, int nOffset);
 #endif
+#if defined WLAN_FEATURE_VOWIFI_11R || defined FEATURE_WLAN_ESE || defined(FEATURE_WLAN_LFR)
+VOS_STATUS wlan_hdd_get_roam_rssi(hdd_adapter_t *pAdapter, v_S7_t *rssi_value);
+#endif
 
 #ifdef WLAN_FEATURE_PACKET_FILTERING
 void wlan_hdd_set_mc_addr_list(hdd_adapter_t *pAdapter, v_U8_t set);
@@ -476,8 +451,4 @@ int wlan_hdd_update_phymode(struct net_device *net, tHalHandle hal,
 
 int process_wma_set_command_twoargs(int sessid, int paramid,
                                     int sval, int ssecval, int vpdev);
-
-void hdd_GetTemperatureCB(int temperature, void *pContext);
-VOS_STATUS wlan_hdd_get_temperature(hdd_adapter_t *pAdapter,
-        union iwreq_data *wrqu, char *extra);
 #endif // __WEXT_IW_H__

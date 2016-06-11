@@ -231,7 +231,7 @@ VOS_STATUS csrNeighborRoamTransitionToPreauthDone(tpAniSirGlobal pMac);
 eHalStatus csrNeighborRoamPrepareScanProfileFilter(tpAniSirGlobal pMac,
                                               tCsrScanResultFilter *pScanFilter,
                                               tANI_U8 sessionId);
-bool csrNeighborRoamGetHandoffAPInfo(tpAniSirGlobal pMac,
+void csrNeighborRoamGetHandoffAPInfo(tpAniSirGlobal pMac,
                                      tpCsrNeighborRoamBSSInfo pHandoffNode,
                                      tANI_U8 sessionId);
 eHalStatus csrNeighborRoamPreauthRspHandler(tpAniSirGlobal pMac,

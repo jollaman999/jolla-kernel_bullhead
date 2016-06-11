@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014,2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -35,6 +35,7 @@
 #include <adf_nbuf.h>    /* adf_nbuf_t */
 #include <adf_os_lock.h>
 #include <ol_txrx_api.h> /* ol_txrx_vdev_handle */
+
 #include <ol_txrx_types.h>  /* ol_tx_desc_t, ol_txrx_msdu_info_t */
 
 adf_nbuf_t
@@ -43,41 +44,10 @@ ol_tx_ll(ol_txrx_vdev_handle vdev, adf_nbuf_t msdu_list);
 adf_nbuf_t
 ol_tx_ll_queue(ol_txrx_vdev_handle vdev, adf_nbuf_t msdu_list);
 
-#ifdef QCA_SUPPORT_TXRX_HL_BUNDLE
-void
-ol_tx_hl_vdev_bundle_timer(void *vdev);
-
-void
-ol_tx_hl_queue_flush_all(struct ol_txrx_vdev_t* vdev);
-
-adf_nbuf_t
-ol_tx_hl_queue(struct ol_txrx_vdev_t* vdev, adf_nbuf_t msdu_list);
-
-#else
-
-static inline void ol_tx_hl_vdev_bundle_timer(void *vdev)
-{
-	return;
-}
-
-static inline void
-ol_tx_hl_queue_flush_all(struct ol_txrx_vdev_t* vdev)
-{
-	return;
-}
-
-#endif
-
 #ifdef QCA_SUPPORT_TXRX_VDEV_LL_TXQ
 #define OL_TX_LL ol_tx_ll_queue
 #else
 #define OL_TX_LL ol_tx_ll
-#endif
-
-#ifdef QCA_SUPPORT_TXRX_HL_BUNDLE
-#define OL_TX_HL ol_tx_hl_queue
-#else
-#define OL_TX_HL ol_tx_hl
 #endif
 
 void ol_tx_vdev_ll_pause_queue_send(void *context);
@@ -103,7 +73,6 @@ ol_tx_reinject(struct ol_txrx_vdev_t *vdev, adf_nbuf_t msdu, u_int16_t peer_id);
 void
 ol_txrx_mgmt_tx_complete(void *ctxt, adf_nbuf_t netbuf, int err);
 
-#ifdef QCA_SUPPORT_TXRX_VDEV_LL_TXQ
 /**
  * ol_tx_vdev_ll_pause_start_timer() - Start ll-q pause timer for specific virtual device
  * @vdev: the virtual device
@@ -117,12 +86,7 @@ ol_txrx_mgmt_tx_complete(void *ctxt, adf_nbuf_t netbuf, int err);
  */
 void
 ol_tx_vdev_ll_pause_start_timer(struct ol_txrx_vdev_t *vdev);
-#endif
 
 void
 ol_tx_pdev_ll_pause_queue_send_all(struct ol_txrx_pdev_t *pdev);
-
-struct ol_txrx_vdev_t *
-ol_txrx_get_vdev_from_vdev_id(uint8_t vdev_id);
-
 #endif /* _OL_TX__H_ */

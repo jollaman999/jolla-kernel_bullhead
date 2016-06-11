@@ -55,9 +55,7 @@
 #include "a_types.h"
 
 #ifdef __GNUC__
-#ifndef __ATTRIB_PACK
 #define __ATTRIB_PACK           __attribute__ ((packed))
-#endif
 #define __ATTRIB_PRINTF         __attribute__ ((format (printf, 1, 2)))
 #define __ATTRIB_NORETURN       __attribute__ ((noreturn))
 #else /* Not GCC */
@@ -439,9 +437,7 @@ typedef struct ieee80211_cb wbuf_context;
 #else /* __KERNEL__ */
 
 #ifdef __GNUC__
-#ifndef __ATTRIB_PACK
 #define __ATTRIB_PACK           __attribute__ ((packed))
-#endif
 #define __ATTRIB_PRINTF         __attribute__ ((format (printf, 1, 2)))
 #define __ATTRIB_NORETURN       __attribute__ ((noreturn))
 #ifndef INLINE

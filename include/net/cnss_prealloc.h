@@ -18,6 +18,8 @@
 extern void *wcnss_prealloc_get(unsigned int size);
 extern int wcnss_prealloc_put(void *ptr);
 extern int wcnss_pre_alloc_reset(void);
+#ifdef CONFIG_SLUB_DEBUG
 void wcnss_prealloc_check_memory_leak(void);
+#endif
 
 #endif /* _NET_CNSS__PREALLOC_H_ */

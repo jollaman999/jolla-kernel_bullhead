@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2015 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -80,7 +80,7 @@ int ptt_sock_send_msg_to_app(tAniHdr *wmsg, int radio, int src_mod, int pid)
          __func__, radio);
       return -EINVAL;
    }
-   payload_len = wmsg_length + sizeof(wnl->radio) + sizeof(tAniHdr);
+   payload_len = wmsg_length + 4;  // 4 extra bytes for the radio idx
    tot_msg_len = NLMSG_SPACE(payload_len);
    if ((skb = dev_alloc_skb(tot_msg_len)) == NULL) {
       PTT_TRACE(VOS_TRACE_LEVEL_ERROR, "%s: dev_alloc_skb() failed for msg size[%d]\n",
@@ -97,6 +97,8 @@ int ptt_sock_send_msg_to_app(tAniHdr *wmsg, int radio, int src_mod, int pid)
    wnl = (tAniNlHdr *) nlh;
    wnl->radio = radio;
    memcpy(&wnl->wmsg, wmsg, wmsg_length);
+   PTT_TRACE(VOS_TRACE_LEVEL_INFO, "%s: Sending Msg Type [0x%X] to pid[%d]\n",
+      __func__, be16_to_cpu(wmsg->type), pid);
 #ifdef PTT_SOCK_DEBUG_VERBOSE
    ptt_sock_dump_buf((const unsigned char *)skb->data, skb->len);
 #endif
@@ -106,11 +108,7 @@ int ptt_sock_send_msg_to_app(tAniHdr *wmsg, int radio, int src_mod, int pid)
    } else {
        err = nl_srv_bcast(skb);
    }
-   if (err) {
-       PTT_TRACE(VOS_TRACE_LEVEL_INFO,
-       "%s:Failed sending Msg Type [0x%X] to pid[%d]\n",
-       __func__, be16_to_cpu(wmsg->type), pid);
-   }
+
    return err;
 }
 /*

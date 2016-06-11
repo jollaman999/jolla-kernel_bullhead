@@ -94,8 +94,7 @@ int HIFMapServiceToPipe(HIF_DEVICE *hif_device, a_uint16_t ServiceId,
 {
     HIF_SDIO_DEVICE *htc_sdio_device = HIFDevFromHIF(hif_device);
 
-    return HIFDevMapServiceToPipe(htc_sdio_device,
-                   ServiceId, ULPipe, DLPipe, hif_device->swap_mailbox);
+    return HIFDevMapServiceToPipe(htc_sdio_device, ServiceId, ULPipe, DLPipe);
 }
 
 void HIFGetDefaultPipe(HIF_DEVICE *hif_device, a_uint8_t *ULPipe,
@@ -146,9 +145,4 @@ void *hif_get_targetdef(HIF_DEVICE *hif_device)
 
 void HIFDump(HIF_DEVICE *hif_device, u_int8_t cmd_id, bool start) {
     ENTER("Dummy Function");
-}
-
-void HIFSetBundleMode(HIF_DEVICE *hif_device, bool enabled, int rx_bundle_cnt)
-{
-
 }
