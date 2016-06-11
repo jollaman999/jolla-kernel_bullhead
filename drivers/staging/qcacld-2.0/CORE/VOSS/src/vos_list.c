@@ -139,7 +139,6 @@ VOS_STATUS vos_list_insert_front( vos_list_t *pList, vos_list_node_t *pNode )
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -174,7 +173,6 @@ VOS_STATUS vos_list_insert_back( vos_list_t *pList, vos_list_node_t *pNode )
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -209,7 +207,6 @@ VOS_STATUS vos_list_insert_back_size( vos_list_t *pList, vos_list_node_t *pNode,
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -249,7 +246,6 @@ VOS_STATUS vos_list_remove_front( vos_list_t *pList, vos_list_node_t **ppNode )
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -300,7 +296,6 @@ VOS_STATUS vos_list_remove_back( vos_list_t *pList, vos_list_node_t **ppNode )
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -346,7 +341,6 @@ VOS_STATUS vos_list_size( vos_list_t *pList, v_SIZE_t *pSize )
    {
        VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                  "%s: list not initialized", __func__);
-       VOS_ASSERT(0);
        return VOS_STATUS_E_INVAL;
    }
 
@@ -409,7 +403,6 @@ VOS_STATUS vos_list_peek_front( vos_list_t *pList, vos_list_node_t **ppNode )
    {
        VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                  "%s: list not initialized", __func__);
-       VOS_ASSERT(0);
        return VOS_STATUS_E_INVAL;
    }
 
@@ -480,7 +473,6 @@ VOS_STATUS vos_list_peek_back( vos_list_t *pList, vos_list_node_t **ppNode )
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -554,7 +546,6 @@ VOS_STATUS vos_list_peek_next( vos_list_t *pList, vos_list_node_t *pNode,
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -649,7 +640,6 @@ VOS_STATUS vos_list_peek_prev( vos_list_t *pList, vos_list_node_t *pNode,
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -739,9 +729,7 @@ VOS_STATUS vos_list_insert_before( vos_list_t *pList, vos_list_node_t *pNodeToIn
 
    if ( pList->cookie != VOS_LIST_COOKIE )
    {
-      VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
-         "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
+      VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR, "%s: list not initialized", __func__);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -823,7 +811,6 @@ VOS_STATUS vos_list_insert_after( vos_list_t *pList, vos_list_node_t *pNodeToIns
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 
@@ -905,7 +892,6 @@ VOS_STATUS vos_list_remove_node( vos_list_t *pList, vos_list_node_t *pNodeToRemo
    {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
                 "%s: list not initialized", __func__);
-      VOS_ASSERT(0);
       return VOS_STATUS_E_INVAL;
    }
 

@@ -353,6 +353,10 @@ typedef enum
 
 /* Moving the miscellaneous defination required by UMAC are moved here from
  * volansdefs.h */
+/* --------------------------------------------------------------------
+ * Support definitions for taurus
+ * --------------------------------------------------------------------
+ */
 
 /*
  * Volans supports 8 stations in hardware

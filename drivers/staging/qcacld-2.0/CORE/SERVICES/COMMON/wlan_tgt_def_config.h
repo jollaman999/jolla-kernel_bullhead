@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2014-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011, 2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -46,7 +46,7 @@
 
 /* # of WDS entries to support.
  */
-#define CFG_TGT_WDS_ENTRIES             0
+#define CFG_TGT_WDS_ENTRIES             32
 
 /* MAC DMA burst size. 0: 128B - default, 1: 256B, 2: 64B
  */
@@ -125,8 +125,6 @@
 #define CFG_TGT_RX_DECAP_MODE (0x2)
 /* Decap to native Wifi header */
 #define CFG_TGT_RX_DECAP_MODE_NWIFI (0x1)
-/* Decap to raw mode header */
-#define CFG_TGT_RX_DECAP_MODE_RAW   (0x0)
 
 /* maximum number of pending scan requests */
 #define CFG_TGT_DEFAULT_SCAN_MAX_REQS   0x4
@@ -155,7 +153,7 @@
 #define CFG_TGT_DEFAULT_MCAST2UCAST_MODE 2
 #endif
 
-#define CFG_TGT_MAX_MULTICAST_FILTER_ENTRIES 16
+#define CFG_TGT_MAX_MULTICAST_FILTER_ENTRIES 5
 /*
  * Specify how much memory the target should allocate for a debug log of
  * tx PPDU meta-information (how large the PPDU was, when it was sent,
@@ -242,20 +240,5 @@
  * enable all BW 20/40/80/160
  */
 #define CFG_TGT_DEFAULT_GTX_BW_MASK		0xf
-
-/*
- * number of vdevs that can support OCB
- */
-#define CFG_TGT_NUM_OCB_VDEVS			1
-
-/*
- * maximum number of channels that can do OCB
- */
-#define CFG_TGT_NUM_OCB_CHANNELS		2
-
-/*
- * maximum number of channels in an OCB schedule
- */
-#define CFG_TGT_NUM_OCB_SCHEDULES		2
 
 #endif  /*__WLAN_TGT_DEF_CONFIG_H__ */

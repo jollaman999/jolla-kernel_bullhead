@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2013 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -220,15 +220,12 @@ tSirRetStatus limSendBeaconParams(tpAniSirGlobal pMac,
 tSirRetStatus limSendSwitchChnlParams(tpAniSirGlobal pMac,
                                       tANI_U8 chnlNumber,
                                       ePhyChanBondState secondaryChnlOffset,
-                                      tANI_U8 localPwrConstraint,
-                                      tANI_U8 peSessionId,
-                                      uint8_t is_restart)
+                                      tANI_U8 localPwrConstraint, tANI_U8 peSessionId)
 #else
 tSirRetStatus limSendSwitchChnlParams(tpAniSirGlobal pMac,
                                       tANI_U8 chnlNumber,
                                       ePhyChanBondState secondaryChnlOffset,
-                                      tPowerdBm maxTxPower, tANI_U8 peSessionId,
-                                      uint8_t is_restart)
+                                      tPowerdBm maxTxPower, tANI_U8 peSessionId)
 #endif
 {
     tpSwitchChannelParams pChnlParams = NULL;
@@ -268,8 +265,6 @@ tSirRetStatus limSendSwitchChnlParams(tpAniSirGlobal pMac,
        pChnlParams->isDfsChannel= VOS_TRUE;
     else
        pChnlParams->isDfsChannel = VOS_FALSE;
-
-    pChnlParams->restart_on_chan_switch = is_restart;
 
     //we need to defer the message until we get the response back from WDA.
     SET_LIM_PROCESS_DEFD_MESGS(pMac, false);
@@ -317,11 +312,11 @@ returnFailure:
  * @param pMac  pointer to Global Mac structure.
  * @param tpUpdatedEdcaParams pointer to the structure which contains
  *                                       dynamically changing EDCA parameters.
+ * @param highPerformance  If the peer is Airgo (taurus) then switch to highPerformance is true.
+ *
  * @return success if message send is ok, else false.
  */
-tSirRetStatus limSendEdcaParams(tpAniSirGlobal pMac,
-                                tSirMacEdcaParamRecord *pUpdatedEdcaParams,
-                                tANI_U16 bssIdx)
+tSirRetStatus limSendEdcaParams(tpAniSirGlobal pMac, tSirMacEdcaParamRecord *pUpdatedEdcaParams, tANI_U16 bssIdx, tANI_BOOLEAN highPerformance)
 {
     tEdcaParams *pEdcaParams = NULL;
     tSirRetStatus   retCode = eSIR_SUCCESS;
@@ -340,6 +335,7 @@ tSirRetStatus limSendEdcaParams(tpAniSirGlobal pMac,
     pEdcaParams->acbk = pUpdatedEdcaParams[EDCA_AC_BK];
     pEdcaParams->acvi = pUpdatedEdcaParams[EDCA_AC_VI];
     pEdcaParams->acvo = pUpdatedEdcaParams[EDCA_AC_VO];
+    pEdcaParams->highPerformance = highPerformance;
     msgQ.type = WDA_UPDATE_EDCA_PROFILE_IND;
     msgQ.reserved = 0;
     msgQ.bodyptr = pEdcaParams;
@@ -691,6 +687,7 @@ tSirRetStatus limSendBeaconFilterInfo(tpAniSirGlobal pMac,tpPESession psessionEn
     }
     vos_mem_set((tANI_U8 *) pBeaconFilterMsg, msgSize, 0);
     // Fill in capability Info and mask
+    //TBD-RAJESH get the BSS capability from session.
     //Don't send this message if no active Infra session is found.
     pBeaconFilterMsg->capabilityInfo = psessionEntry->limCurrentBssCaps;
     pBeaconFilterMsg->capabilityMask = CAPABILITY_FILTER_MASK;
@@ -751,9 +748,8 @@ tSirRetStatus limSendModeUpdate(tpAniSirGlobal pMac,
     msgQ.reserved = 0;
     msgQ.bodyptr = pVhtOpMode;
     msgQ.bodyval = 0;
-    limLog(pMac, LOG3, FL(
-                "Sending WDA_UPDATE_OP_MODE, opMode - %d, staId - %d"),
-                    pVhtOpMode->opMode, pVhtOpMode->staId);
+    PELOG3(limLog( pMac, LOG3,
+                FL( "Sending WDA_UPDATE_OP_MODE" ));)
     if(NULL == psessionEntry)
     {
         MTRACE(macTraceMsgTx(pMac, NO_SESSION, msgQ.type));

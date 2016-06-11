@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, 2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -81,11 +81,15 @@ typedef enum
 
 } VOS_TRACE_LEVEL;
 
-/* By default Data Path module will be enabled ERROR and FATAL level
- * Too many default log level will break performance
+/* By default Data Path module will have all log levels enabled, except debug
+ * log level. Debug level will be left up to the framework or user space modules
+ * to be enabled when issue is detected
  */
 #define VOS_DATA_PATH_TRACE_LEVEL \
-	((1 << VOS_TRACE_LEVEL_FATAL) | (1 << VOS_TRACE_LEVEL_ERROR))
+	((1 << VOS_TRACE_LEVEL_FATAL) | (1 << VOS_TRACE_LEVEL_ERROR) | \
+	 (1 << VOS_TRACE_LEVEL_WARN) | (1 << VOS_TRACE_LEVEL_INFO) | \
+	 (1 << VOS_TRACE_LEVEL_INFO_HIGH) | (1 << VOS_TRACE_LEVEL_INFO_MED) | \
+	 (1 << VOS_TRACE_LEVEL_INFO_LOW))
 
 /*--------------------------------------------------------------------------
   Preprocessor definitions and constants
@@ -190,16 +194,10 @@ void vos_trace_setLevel( VOS_MODULE_ID module, VOS_TRACE_LEVEL level );
 v_BOOL_t vos_trace_getLevel( VOS_MODULE_ID module, VOS_TRACE_LEVEL level );
 
 typedef void (*tpvosTraceCb) (void *pMac, tpvosTraceRecord, v_U16_t);
-typedef void (*tp_vos_state_info_cb) (char **buf, uint16_t *size);
 void vos_trace(v_U8_t module, v_U8_t code, v_U16_t session, v_U32_t data);
 void vosTraceRegister(VOS_MODULE_ID, tpvosTraceCb);
-void vos_register_debug_callback(VOS_MODULE_ID moduleID,
-					tp_vos_state_info_cb vosStateInfoCb);
 VOS_STATUS vos_trace_spin_lock_init(void);
 void vosTraceInit(void);
-void vos_register_debugcb_init(void);
 void vosTraceEnable(v_U32_t, v_U8_t enable);
 void vosTraceDumpAll(void*, v_U8_t, v_U8_t, v_U32_t, v_U32_t);
-int vos_state_info_dump_all(char *buf, uint16_t size,
-			uint16_t *driver_dump_size);
 #endif

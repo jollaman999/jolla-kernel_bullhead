@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012, 2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2012 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -39,7 +39,6 @@
 #ifndef __RRM_API_H__
 #define __RRM_API_H__
 
-#ifdef WLAN_FEATURE_VOWIFI
 #define RRM_MIN_TX_PWR_CAP    13
 #define RRM_MAX_TX_PWR_CAP    19
 
@@ -84,6 +83,9 @@ extern void rrmCacheMgmtTxPower ( tpAniSirGlobal pMac,
 extern tpRRMCaps rrmGetCapabilities ( tpAniSirGlobal pMac,
                                   tpPESession pSessionEntry );
 
+extern void rrmUpdateConfig ( tpAniSirGlobal pMac,
+                                  tpPESession pSessionEntry );
+
 extern void rrmGetStartTSF ( tpAniSirGlobal pMac,
                                   tANI_U32 *pStartTSF );
 
@@ -99,13 +101,4 @@ rrmProcessNeighborReportReq( tpAniSirGlobal pMac,
 extern tSirRetStatus
 rrmProcessBeaconReportXmit( tpAniSirGlobal pMac,
                             tpSirBeaconReportXmitInd pBcnReport);
-
-extern void lim_update_rrm_capability(tpAniSirGlobal mac_ctx,
-				      tpSirSmeJoinReq join_req);
-#else
-void lim_update_rrm_capability(tpAniSirGlobal pMac,
-			       tpSirSmeJoinReq join_req)
-{
-}
-#endif
 #endif

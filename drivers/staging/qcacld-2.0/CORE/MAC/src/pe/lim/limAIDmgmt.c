@@ -84,13 +84,15 @@ limInitPeerIdxpool(tpAniSirGlobal pMac,tpPESession pSessionEntry)
     //In station role, DPH_STA_HASH_INDEX_PEER (index 1) is reserved for peer
     //station index corresponding to AP. Avoid choosing that index and get index
     //starting from (DPH_STA_HASH_INDEX_PEER + 1) (index 2) for TDLS stations;
-    if (LIM_IS_STA_ROLE(pSessionEntry)) {
+    if (pSessionEntry->limSystemRole == eLIM_STA_ROLE )
+    {
         pSessionEntry->freePeerIdxHead = DPH_STA_HASH_INDEX_PEER + 1;
     }
     else
 #endif
 #ifdef QCA_IBSS_SUPPORT
-    if (LIM_IS_IBSS_ROLE(pSessionEntry)) {
+    if (pSessionEntry->limSystemRole == eLIM_STA_IN_IBSS_ROLE)
+    {
         pSessionEntry->freePeerIdxHead=LIM_START_PEER_IDX;
         maxAssocSta = pMac->lim.gLimIbssStaLimit;
     }

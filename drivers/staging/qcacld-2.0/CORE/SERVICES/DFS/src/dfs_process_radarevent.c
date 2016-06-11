@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, 2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2002-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -421,76 +421,6 @@ dfs_process_radarevent(struct ath_dfs *dfs, struct ieee80211_channel *chan)
             continue;
          }
 
-         /*
-          * Modifying the pulse duration for FCC Type 4
-          * or JAPAN W56 Type 6 radar pulses when the
-          * following condition is reported in radar
-          * summary report.
-          */
-         if ((DFS_FCC_DOMAIN == dfs->dfsdomain ||
-              DFS_MKK4_DOMAIN == dfs->dfsdomain) &&
-             ((chan->ic_flags & IEEE80211_CHAN_VHT80) ==
-              IEEE80211_CHAN_VHT80) &&
-             (chan->ic_pri_freq_center_freq_mhz_separation ==
-                                DFS_WAR_PLUS_30_MHZ_SEPARATION ||
-              chan->ic_pri_freq_center_freq_mhz_separation ==
-                                DFS_WAR_MINUS_30_MHZ_SEPARATION) &&
-             (re.sidx == DFS_WAR_PEAK_INDEX_ZERO) &&
-             (re.re_dur > DFS_TYPE4_WAR_PULSE_DURATION_LOWER_LIMIT &&
-              re.re_dur < DFS_TYPE4_WAR_PULSE_DURATION_UPPER_LIMIT) &&
-             (diff_ts > DFS_TYPE4_WAR_PRI_LOWER_LIMIT &&
-              diff_ts < DFS_TYPE4_WAR_PRI_UPPER_LIMIT)) {
-             VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
-                       "\n%s:chan->ic_flags=0x%x, Pri Chan MHz Separation=%d\n",
-                       __func__, chan->ic_flags,
-                       chan->ic_pri_freq_center_freq_mhz_separation);
-
-             VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
-                "\n%s: Reported Peak Index = %d,re.re_dur = %d,diff_ts = %d\n",
-                 __func__, re.sidx, re.re_dur, diff_ts);
-
-             VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
-                "\n%s: Modifying the pulse duration to fit the valid range \n",
-                 __func__);
-
-             re.re_dur = DFS_TYPE4_WAR_VALID_PULSE_DURATION;
-         }
-
-         /*
-          * Modifying the pulse duration for ETSI Type 2
-          * and ETSI type 3 radar pulses when the following
-          * condition is reported in radar summary report.
-          */
-         if ((DFS_ETSI_DOMAIN == dfs->dfsdomain) &&
-             ((chan->ic_flags & IEEE80211_CHAN_VHT80) ==
-              IEEE80211_CHAN_VHT80) &&
-             (chan->ic_pri_freq_center_freq_mhz_separation ==
-                                DFS_WAR_PLUS_30_MHZ_SEPARATION ||
-              chan->ic_pri_freq_center_freq_mhz_separation ==
-                                DFS_WAR_MINUS_30_MHZ_SEPARATION) &&
-             (re.sidx == DFS_WAR_PEAK_INDEX_ZERO) &&
-             (re.re_dur > DFS_ETSI_TYPE2_TYPE3_WAR_PULSE_DUR_LOWER_LIMIT &&
-              re.re_dur < DFS_ETSI_TYPE2_TYPE3_WAR_PULSE_DUR_UPPER_LIMIT) &&
-             ((diff_ts > DFS_ETSI_TYPE2_WAR_PRI_LOWER_LIMIT &&
-               diff_ts < DFS_ETSI_TYPE2_WAR_PRI_UPPER_LIMIT) ||
-              (diff_ts > DFS_ETSI_TYPE3_WAR_PRI_LOWER_LIMIT &&
-               diff_ts < DFS_ETSI_TYPE3_WAR_PRI_UPPER_LIMIT ))) {
-             VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
-                       "\n%s:chan->ic_flags=0x%x, Pri Chan MHz Separation=%d\n",
-                       __func__, chan->ic_flags,
-                       chan->ic_pri_freq_center_freq_mhz_separation);
-
-             VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
-                "\n%s: Reported Peak Index = %d,re.re_dur = %d,diff_ts = %d\n",
-                 __func__, re.sidx, re.re_dur, diff_ts);
-
-             VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
-                "\n%s: Modifying the ETSI pulse dur to fit the valid range \n",
-                 __func__);
-
-             re.re_dur  = DFS_ETSI_WAR_VALID_PULSE_DURATION;
-         }
-
       /* BIN5 pulses are FCC and Japan specific */
 
       if ((dfs->dfsdomain == DFS_FCC_DOMAIN) || (dfs->dfsdomain == DFS_MKK4_DOMAIN)) {
@@ -555,7 +485,7 @@ dfs_process_radarevent(struct ath_dfs *dfs, struct ieee80211_channel *chan)
             continue;
          }
          for (p=0, found = 0; (p<ft->ft_numfilters) && (!found); p++) {
-                                    rf = ft->ft_filters[p];
+                                    rf = &(ft->ft_filters[p]);
                                     if ((re.re_dur >= rf->rf_mindur) && (re.re_dur <= rf->rf_maxdur)) {
                                         /* The above check is probably not necessary */
                                         deltaT = (this_ts < rf->rf_dl.dl_last_ts) ?
@@ -591,7 +521,7 @@ dfs_process_radarevent(struct ath_dfs *dfs, struct ieee80211_channel *chan)
                                             This is normally 2 but can be higher for W53.
                                         */
 
-                                        if ( (deltaT > ((u_int64_t)dfs->dfs_pri_multiplier * rf->rf_maxpri) ) || (deltaT < rf->rf_minpri) ) {
+                                        if ( (deltaT > (dfs->dfs_pri_multiplier * rf->rf_maxpri) ) || (deltaT < rf->rf_minpri) ) {
                                                 DFS_DPRINTK(dfs, ATH_DEBUG_DFS2,
                                                 "filterID %d : Rejecting on individual filter max PRI deltaT=%lld rf->rf_minpri=%u",
                                                 rf->rf_pulseid, (unsigned long long)deltaT, rf->rf_minpri);
