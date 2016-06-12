@@ -1615,10 +1615,9 @@ void sapComputeSpectWeight( tSapChSelSpectInfo* pSpectInfoParams,
                     switch(pSpectCh->channelWidth)
                     {
                         case eHT_CHANNEL_WIDTH_40MHZ: //HT40
-                            switch( secondaryChannelOffset)
+                            if (secondaryChannelOffset == PHY_DOUBLE_CHANNEL_LOW_PRIMARY) // Above the Primary Channel
                             {
-                                tSapSpectChInfo *pExtSpectCh = NULL;
-                                case PHY_DOUBLE_CHANNEL_LOW_PRIMARY: // Above the Primary Channel
+                                    tSapSpectChInfo *pExtSpectCh = NULL;
                                     pExtSpectCh = (pSpectCh + 1);
                                     if(pExtSpectCh != NULL)
                                     {
@@ -1632,9 +1631,10 @@ void sapComputeSpectWeight( tSapChSelSpectInfo* pSpectInfoParams,
                                         if(pExtSpectCh->rssiAgr < SOFTAP_MIN_RSSI)
                                             pExtSpectCh->rssiAgr = SOFTAP_MIN_RSSI;
                                     }
-                                break;
-
-                                case PHY_DOUBLE_CHANNEL_HIGH_PRIMARY: // Below the Primary channel
+                            }
+                            else if (secondaryChannelOffset == PHY_DOUBLE_CHANNEL_HIGH_PRIMARY) // Below the Primary channel
+                            {
+                                    tSapSpectChInfo *pExtSpectCh = NULL;
                                     pExtSpectCh = (pSpectCh - 1);
                                     if(pExtSpectCh != NULL)
                                     {
@@ -1647,7 +1647,6 @@ void sapComputeSpectWeight( tSapChSelSpectInfo* pSpectInfoParams,
                                             pExtSpectCh->rssiAgr = SOFTAP_MIN_RSSI;
                                         ++pExtSpectCh->bssCount;
                                     }
-                                break;
                             }
                         break;
                         case eHT_CHANNEL_WIDTH_80MHZ: // VHT80
