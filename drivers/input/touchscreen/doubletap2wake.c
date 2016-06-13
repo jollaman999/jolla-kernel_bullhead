@@ -81,6 +81,7 @@ static DEFINE_MUTEX(pwrkeyworklock);
 static DEFINE_MUTEX(switchlock);
 static struct workqueue_struct *dt2w_input_wq;
 static struct work_struct dt2w_input_work;
+extern bool tomtom_mic_detected;
 
 static bool registered = false;
 static DEFINE_MUTEX(reg_lock);
@@ -446,9 +447,12 @@ static ssize_t dt2w_doubletap2wake_tmp_dump(struct device *dev,
 					dt2w_switch_tmp = buf[0] - '0';
 	}
 
-	if (sovc_switch && dt2w_switch_tmp && scr_suspended)
-		register_dt2w();
-	else if (!dt2w_switch)
+	if (sovc_switch && dt2w_switch_tmp && scr_suspended) {
+		if (tomtom_mic_detected && !dt2w_switch)
+			unregister_dt2w();
+		else
+			register_dt2w();
+	} else if (!dt2w_switch)
 		unregister_dt2w();
 
 	return count;
@@ -507,8 +511,13 @@ static int dt2w_fb_notifier_callback(struct notifier_block *self,
 			else if (sovc_force_off && !dt2w_switch)
 				unregister_dt2w();
 #else
-			if (dt2w_switch)
+			if (dt2w_switch) {
+				if (tomtom_mic_detected) {
+					unregister_dt2w();
+					break;
+				}
 				register_dt2w();
+			}
 #endif
 			break;
 		}
