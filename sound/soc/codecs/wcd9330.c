@@ -54,6 +54,11 @@ extern int synaptics_rmi4_touch_off_trigger(unsigned int delay);
 static DEFINE_MUTEX(sovc_lock);
 #endif
 
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+bool tomtom_mic_detected = false;
+EXPORT_SYMBOL(tomtom_mic_detected);
+#endif
+
 struct sound_control {
 	struct snd_soc_codec *snd_control_codec;
 	int default_hp_value;
@@ -5526,10 +5531,12 @@ static int tomtom_startup(struct snd_pcm_substream *substream,
 	pr_debug("%s(): substream = %s  stream = %d\n" , __func__,
 		 substream->name, substream->stream);
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 	if (!strcmp(dai->name, "tomtom_tx1"))
-		sovc_mic_detected = true;
+		tomtom_mic_detected = true;
+#endif
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	track_changed = false;
 	if (!sovc_switch)
 		return 0;
@@ -5551,10 +5558,12 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 	pr_debug("%s(): substream = %s  stream = %d\n" , __func__,
 		 substream->name, substream->stream);
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 	if (!strcmp(dai->name, "tomtom_tx1"))
-		sovc_mic_detected = false;
+		tomtom_mic_detected = false;
+#endif
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	mutex_lock(&sovc_lock);
 	sovc_tmp_onoff = 0;
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
