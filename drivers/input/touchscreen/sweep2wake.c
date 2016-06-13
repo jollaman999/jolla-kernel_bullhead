@@ -68,6 +68,7 @@ static struct input_dev * sweep2wake_pwrdev;
 static DEFINE_MUTEX(pwrkeyworklock);
 static struct workqueue_struct *s2w_input_wq;
 static struct work_struct s2w_input_work;
+extern bool tomtom_mic_detected;
 
 static bool registered = false;
 static DEFINE_MUTEX(reg_lock);
@@ -393,8 +394,13 @@ static int s2w_fb_notifier_callback(struct notifier_block *self,
 			break;
 		case FB_BLANK_POWERDOWN:
 			scr_suspended = true;
-			if (s2w_switch)
+			if (s2w_switch) {
+				if (tomtom_mic_detected) {
+					unregister_s2w();
+					break;
+				}
 				register_s2w();
+			}
 			break;
 		}
 	}
