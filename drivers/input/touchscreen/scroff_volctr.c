@@ -94,7 +94,6 @@ MODULE_LICENSE("GPLv2");
 int sovc_switch = SOVC_DEFAULT;
 int sovc_tmp_onoff = 0;
 bool sovc_force_off = false;
-bool sovc_mic_detected = false;
 bool track_changed = false;
 bool sovc_scr_suspended = false;
 static int sovc_auto_off_delay = SOVC_AUTO_OFF_DELAY;
@@ -109,6 +108,7 @@ static struct workqueue_struct *sovc_volume_input_wq;
 static struct workqueue_struct *sovc_track_input_wq;
 static struct work_struct sovc_volume_input_work;
 static struct work_struct sovc_track_input_work;
+extern bool tomtom_mic_detected;
 
 static bool registered = false;
 static DEFINE_MUTEX(reg_lock);
@@ -623,7 +623,7 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 
 	if (sovc_switch && sovc_scr_suspended) {
 		if (sovc_tmp_onoff) {
-			if (sovc_mic_detected)
+			if (tomtom_mic_detected)
 				unregister_sovc();
 			else
 				register_sovc();
@@ -709,7 +709,7 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 				unregister_sovc();
 
 			if (sovc_switch && (track_changed || sovc_tmp_onoff)) {
-				if (sovc_mic_detected) {
+				if (tomtom_mic_detected) {
 					unregister_sovc();
 					break;
 				}
