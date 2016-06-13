@@ -132,8 +132,13 @@ enum device_status {
 static bool irq_wake_enabled = false;
 static s64 wake_lock_start_time = 0;
 
+extern bool tomtom_mic_detected;
+
 static bool is_touch_on(void)
 {
+	if (tomtom_mic_detected)
+		return false;
+
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	if (s2w_switch)
 		return true;
@@ -146,11 +151,8 @@ static bool is_touch_on(void)
 	if (sovc_force_off)
 		return false;
 
-	if (sovc_switch && (track_changed || sovc_tmp_onoff)) {
-		if (sovc_mic_detected)
-			return false;
+	if (sovc_switch && (track_changed || sovc_tmp_onoff))
 		return true;
-	}
 #endif
 	return false;
 }
