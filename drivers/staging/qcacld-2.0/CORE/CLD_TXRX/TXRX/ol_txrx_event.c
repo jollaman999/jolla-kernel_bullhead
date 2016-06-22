@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -87,7 +87,7 @@ wdi_event_handler(
     /*
      * Input validation
      */
-    if (!event) {
+    if (event == 0) {
         VOS_TRACE(VOS_MODULE_ID_TXRX, VOS_TRACE_LEVEL_ERROR,
             "Invalid WDI event in %s\n", __FUNCTION__);
         return;
@@ -128,7 +128,7 @@ wdi_event_sub(
             "Invalid callback in %s", __FUNCTION__);
         return A_ERROR;
     }
-    if ((!event) || (event >= WDI_EVENT_LAST) || (event < WDI_EVENT_BASE)) {
+    if ((event == 0) || (event >= WDI_EVENT_LAST) || (event < WDI_EVENT_BASE)) {
         VOS_TRACE(VOS_MODULE_ID_TXRX, VOS_TRACE_LEVEL_ERROR,
             "Invalid event in %s", __FUNCTION__);
         return A_ERROR;

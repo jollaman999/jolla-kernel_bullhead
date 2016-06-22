@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2010 2013 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2004-2010 2013, 2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -93,6 +93,7 @@ PREPACK struct host_app_area_s {
 
 #define WMI_EP_APASS           0x0
 #define WMI_EP_LPASS           0x1
+#define WMI_EP_SENSOR          0x2
 
 /*
  * Control Path
@@ -164,6 +165,7 @@ typedef enum {
     WMI_11NG_CAPABILITY  = 5,
     WMI_11NAG_CAPABILITY = 6,
     WMI_11AC_CAPABILITY  = 7,
+    WMI_11AX_CAPABILITY  = 8,
     // END CAPABILITY
     WMI_11N_CAPABILITY_OFFSET = (WMI_11NA_CAPABILITY - WMI_11A_CAPABILITY),
 } WMI_PHY_CAPABILITY;

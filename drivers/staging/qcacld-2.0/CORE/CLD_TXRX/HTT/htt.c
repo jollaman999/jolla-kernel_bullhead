@@ -198,7 +198,6 @@ htt_attach(
     if (!pdev) {
         goto fail1;
     }
-    adf_os_mem_set(pdev, 0, sizeof(*pdev));
 
     pdev->osdev = osdev;
     pdev->ctrl_pdev = ctrl_pdev;
@@ -243,6 +242,7 @@ htt_attach(
 
     HTT_TX_MUTEX_INIT(&pdev->htt_tx_mutex);
     HTT_TX_NBUF_QUEUE_MUTEX_INIT(pdev);
+    HTT_TX_MUTEX_INIT(&pdev->credit_mutex);
 
     /* pre-allocate some HTC_PACKET objects */
     for (i = 0; i < HTT_HTC_PKT_POOL_INIT_SIZE; i++) {
@@ -400,6 +400,7 @@ htt_detach(htt_pdev_handle pdev)
 #endif
     HTT_TX_MUTEX_DESTROY(&pdev->htt_tx_mutex);
     HTT_TX_NBUF_QUEUE_MUTEX_DESTROY(pdev);
+    HTT_TX_MUTEX_DESTROY(&pdev->credit_mutex);
 #ifdef DEBUG_RX_RING_BUFFER
     if (pdev->rx_buff_list)
         adf_os_mem_free(pdev->rx_buff_list);
@@ -442,7 +443,20 @@ htt_htc_attach(struct htt_pdev_t *pdev)
     connect.MaxSendQueueDepth = HTT_MAX_SEND_QUEUE_DEPTH;
 
     /* disable flow control for HTT data message service */
-#ifndef HIF_SDIO
+#ifdef HIF_SDIO
+    /*
+     * HTC Credit mechanism is disabled based on
+     * default_tx_comp_req as throughput will be lower
+     * if we disable htc credit mechanism with default_tx_comp_req
+     * set since txrx download packet will be limited by ota
+     * completion.
+     * TODO:Conditional disabling will be removed once firmware
+     * with reduced tx completion is pushed into release builds.
+     */
+    if (!pdev->cfg.default_tx_comp_req) {
+       connect.ConnectionFlags |= HTC_CONNECT_FLAGS_DISABLE_CREDIT_FLOW_CTRL;
+    }
+#else
     connect.ConnectionFlags |= HTC_CONNECT_FLAGS_DISABLE_CREDIT_FLOW_CTRL;
 #endif
 
@@ -473,6 +487,8 @@ htt_htc_attach(struct htt_pdev_t *pdev)
 
         /* Should NOT support credit flow control. */
         connect.ConnectionFlags |= HTC_CONNECT_FLAGS_DISABLE_CREDIT_FLOW_CTRL;
+        /* Enable HTC schedule mechanism for TX HTT2 service. */
+        connect.ConnectionFlags |= HTC_CONNECT_FLAGS_ENABLE_HTC_SCHEDULE;
 
         connect.ServiceID = HTT_DATA2_MSG_SVC;
 
@@ -628,4 +644,17 @@ htt_ipa_uc_set_doorbell_paddr(htt_pdev_handle pdev,
    return 0;
 }
 #endif /* IPA_UC_OFFLOAD */
+
+#if defined(DEBUG_HL_LOGGING) && defined(CONFIG_HL_SUPPORT)
+
+void htt_dump_bundle_stats(htt_pdev_handle pdev)
+{
+    HTCDumpBundleStats(pdev->htc_pdev);
+}
+
+void htt_clear_bundle_stats(htt_pdev_handle pdev)
+{
+    HTCClearBundleStats(pdev->htc_pdev);
+}
+#endif
 

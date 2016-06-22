@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -277,6 +277,9 @@ typedef struct _HTC_ENDPOINT_STATS {
     A_UINT32  RxBundleIndFromHdr;     /* count of the number of bundle indications from the HTC header */
     A_UINT32  RxAllocThreshHit;       /* count of the number of times the recv allocation threshhold was hit */
     A_UINT32  RxAllocThreshBytes;     /* total number of bytes */
+
+    A_UINT32  HIFDSRCount;            /* total number of interrupts */
+
 } HTC_ENDPOINT_STATS;
 
 /* ------ Function Prototypes ------ */
@@ -620,6 +623,18 @@ A_STATUS    HTCAddReceivePktMultiple(HTC_HANDLE HTCHandle, HTC_PACKET_QUEUE *pPk
 A_BOOL      HTCIsEndpointActive(HTC_HANDLE      HTCHandle,
                                 HTC_ENDPOINT_ID Endpoint);
 
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  @desc: Set up nodrop pkt flag for mboxping nodrop pkt
+  @function name: HTCIsEndpointActive
+  @input:  HTCHandle - HTC handle
+           isNodropPkt - indicates whether it is nodrop pkt
+  @output:
+  @return:
+  @notes:
+  @example:
+  @see also:
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+void        HTCSetNodropPkt(HTC_HANDLE HTCHandle, A_BOOL isNodropPkt);
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   @desc: Get the number of recv buffers currently queued into an HTC endpoint
@@ -688,6 +703,11 @@ void HTCIpaGetCEResource(HTC_HANDLE htc_handle,
                       a_uint32_t *ce_sr_ring_size,
                       a_uint32_t *ce_reg_paddr);
 #endif/* IPA_UC_OFFLOAD */
+
+
+void HTCEndpointDumpCreditStats(HTC_HANDLE HTCHandle, HTC_ENDPOINT_ID Endpoint);
+void HTCDumpBundleStats(HTC_HANDLE HTCHandle);
+void HTCClearBundleStats(HTC_HANDLE HTCHandle);
 
 #ifdef FEATURE_RUNTIME_PM
 int htc_pm_runtime_get(HTC_HANDLE htc_handle);

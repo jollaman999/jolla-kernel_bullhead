@@ -96,8 +96,8 @@ htt_attach_target(htt_pdev_handle htt_pdev);
 /**
  * @brief modes that a virtual device can operate as
  * @details
- *  A virtual device can operate as an AP, an IBSS, or a STA (client).
- *  or in monitor mode
+ *  A virtual device can operate as an AP, an IBSS, a STA
+ *  (client), in monitor mode or in OCB mode
  */
 enum htt_op_mode {
    htt_op_mode_unknown,
@@ -105,6 +105,7 @@ enum htt_op_mode {
    htt_op_mode_ibss,
    htt_op_mode_sta,
    htt_op_mode_monitor,
+   htt_op_mode_ocb,
 };
 
 /* no-ops */
@@ -312,5 +313,24 @@ htt_ipa_uc_attach(struct htt_pdev_t *pdev);
 void
 htt_ipa_uc_detach(struct htt_pdev_t *pdev);
 #endif /* IPA_UC_OFFLOAD */
+
+#if defined(DEBUG_HL_LOGGING) && defined(CONFIG_HL_SUPPORT)
+void
+htt_dump_bundle_stats(struct htt_pdev_t *pdev);
+void
+htt_clear_bundle_stats(struct htt_pdev_t *pdev);
+#else
+
+#define htt_dump_bundle_stats(pdev) /*no-op*/
+#define htt_clear_bundle_stats(pdev) /*no-op*/
+
+#endif
+
+typedef void (*tp_rx_pkt_dump_cb)(adf_nbuf_t msdu, uint16_t peer_id,
+                                          uint8_t status);
+void htt_register_rx_pkt_dump_callback(struct htt_pdev_t *pdev,
+              tp_rx_pkt_dump_cb ol_rx_pkt_dump_call);
+void htt_deregister_rx_pkt_dump_callback(struct htt_pdev_t *pdev);
+void ol_rx_pkt_dump_call(adf_nbuf_t msdu, uint16_t peer_id, uint8_t status);
 
 #endif /* _OL_HTT_API__H_ */

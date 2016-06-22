@@ -31,6 +31,8 @@
 #include "athdefs.h"
 #include "a_types.h"
 #include "a_osapi.h"
+#include "adf_os_timer.h"
+#include "adf_os_atomic.h"
 #include "hif.h"
 #include "hif_sdio_common.h"
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
@@ -66,6 +68,15 @@ typedef struct bus_request {
     struct _HIF_SCATTER_REQ_PRIV *pScatterReq;      /* this request is a scatter request */
 } BUS_REQUEST;
 
+#ifdef HIF_MBOX_SLEEP_WAR
+typedef enum {
+    HIF_MBOX_UNKNOWN_STATE,
+    HIF_MBOX_REQUEST_TO_SLEEP_STATE,
+    HIF_MBOX_SLEEP_STATE,
+    HIF_MBOX_AWAKE_STATE
+} HIF_MBOX_STATE;
+#endif
+
 struct hif_device {
     struct sdio_func *func;
     spinlock_t asynclock;
@@ -75,6 +86,15 @@ struct hif_device {
     struct completion async_completion;          /* thread completion */
     BUS_REQUEST   *asyncreq;                    /* request for async tasklet */
     BUS_REQUEST *taskreq;                       /*  async tasklet data */
+#ifdef TX_COMPLETION_THREAD
+    struct task_struct *tx_completion_task;
+    struct semaphore sem_tx_completion;
+    int    tx_completion_shutdown;
+    struct completion tx_completion_exit;
+    spinlock_t tx_completion_lock;
+    BUS_REQUEST *tx_completion_req;
+    BUS_REQUEST **last_tx_completion;
+#endif
     spinlock_t lock;
     BUS_REQUEST *s_busRequestFreeQueue;         /* free list */
     BUS_REQUEST busRequest[BUS_REQUEST_MAX_NUM]; /* available bus requests */
@@ -88,12 +108,20 @@ struct hif_device {
     atomic_t   irqHandling;
     HIF_DEVICE_POWER_CHANGE_TYPE powerConfig;
     HIF_DEVICE_STATE DeviceState;
+#ifdef HIF_MBOX_SLEEP_WAR
+    adf_os_atomic_t   mbox_state;
+    adf_os_timer_t sleep_timer;
+    unsigned long sleep_ticks;
+    A_UINT32 init_sleep;
+#endif
     const struct sdio_device_id *id;
     struct mmc_host *host;
     void *htcContext;
+    /* mailbox swapping for control and data svc*/
+    A_BOOL swap_mailbox;
 };
 
-#define HIF_DMA_BUFFER_SIZE (32 * 1024)
+#define HIF_DMA_BUFFER_SIZE (4 * 1024)
 #define CMD53_FIXED_ADDRESS 1
 #define CMD53_INCR_ADDRESS  2
 

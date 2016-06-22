@@ -213,6 +213,22 @@
 #define DFS_FAST_CLOCK_MULTIPLIER       (800/11)
 #define DFS_NO_FAST_CLOCK_MULTIPLIER    (80)
 
+#define DFS_WAR_PLUS_30_MHZ_SEPARATION   30
+#define DFS_WAR_MINUS_30_MHZ_SEPARATION -30
+#define DFS_WAR_PEAK_INDEX_ZERO 0
+#define DFS_TYPE4_WAR_PULSE_DURATION_LOWER_LIMIT 11
+#define DFS_TYPE4_WAR_PULSE_DURATION_UPPER_LIMIT 33
+#define DFS_TYPE4_WAR_PRI_LOWER_LIMIT 200
+#define DFS_TYPE4_WAR_PRI_UPPER_LIMIT 500
+#define DFS_TYPE4_WAR_VALID_PULSE_DURATION 12
+#define DFS_ETSI_TYPE2_TYPE3_WAR_PULSE_DUR_LOWER_LIMIT 15
+#define DFS_ETSI_TYPE2_TYPE3_WAR_PULSE_DUR_UPPER_LIMIT 33
+#define DFS_ETSI_TYPE2_WAR_PRI_LOWER_LIMIT 625
+#define DFS_ETSI_TYPE2_WAR_PRI_UPPER_LIMIT 5000
+#define DFS_ETSI_TYPE3_WAR_PRI_LOWER_LIMIT 250
+#define DFS_ETSI_TYPE3_WAR_PRI_UPPER_LIMIT 435
+#define DFS_ETSI_WAR_VALID_PULSE_DURATION 15
+
 typedef  adf_os_spinlock_t  dfsq_lock_t;
 
 #ifdef WIN32
@@ -355,7 +371,7 @@ struct dfs_filter {
 #endif
 
 struct dfs_filtertype {
-    struct dfs_filter ft_filters[DFS_MAX_NUM_RADAR_FILTERS];
+    struct dfs_filter *ft_filters[DFS_MAX_NUM_RADAR_FILTERS];
     u_int32_t ft_filterdur;   /* Duration of pulse which specifies filter type*/
     u_int32_t ft_numfilters;  /* Num filters of this type */
     u_int64_t ft_last_ts;     /* Last timestamp this filtertype was used

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -42,6 +42,7 @@
 #include "cfgApi.h"
 #include "pmc.h"
 #include "smeQosInternal.h"
+#include "sme_Trace.h"
 #ifdef FEATURE_WLAN_DIAG_SUPPORT
 #include "vos_diag_core_event.h"
 #include "vos_diag_core_log.h"
@@ -72,48 +73,18 @@ VOS_STATUS btcOpen (tHalHandle hHal)
    VOS_STATUS vosStatus;
    int i;
 
-   /* Initialize BTC configuartion. */
+   /* Initialize BTC configuration. */
    pMac->btc.btcConfig.btcExecutionMode = BTC_SMART_COEXISTENCE;
-   pMac->btc.btcConfig.btcConsBtSlotsToBlockDuringDhcp = 0;
-   pMac->btc.btcConfig.btcA2DPBtSubIntervalsDuringDhcp = BTC_MAX_NUM_ACL_BT_SUB_INTS;
-   pMac->btc.btcConfig.btcBtIntervalMode1 = BTC_BT_INTERVAL_MODE1_DEFAULT;
-   pMac->btc.btcConfig.btcWlanIntervalMode1 = BTC_WLAN_INTERVAL_MODE1_DEFAULT;
-   pMac->btc.btcConfig.btcActionOnPmFail = BTC_START_NEXT;
-
-   pMac->btc.btcConfig.btcStaticLenInqBt = BTC_STATIC_BT_LEN_INQ_DEF;
-   pMac->btc.btcConfig.btcStaticLenPageBt = BTC_STATIC_BT_LEN_PAGE_DEF;
-   pMac->btc.btcConfig.btcStaticLenConnBt = BTC_STATIC_BT_LEN_CONN_DEF;
-   pMac->btc.btcConfig.btcStaticLenLeBt = BTC_STATIC_BT_LEN_LE_DEF;
-   pMac->btc.btcConfig.btcStaticLenInqWlan = BTC_STATIC_WLAN_LEN_INQ_DEF;
-   pMac->btc.btcConfig.btcStaticLenPageWlan = BTC_STATIC_WLAN_LEN_PAGE_DEF;
-   pMac->btc.btcConfig.btcStaticLenConnWlan = BTC_STATIC_WLAN_LEN_CONN_DEF;
-   pMac->btc.btcConfig.btcStaticLenLeWlan = BTC_STATIC_WLAN_LEN_LE_DEF;
-   pMac->btc.btcConfig.btcDynMaxLenBt = BTC_DYNAMIC_BT_LEN_MAX_DEF;
-   pMac->btc.btcConfig.btcDynMaxLenWlan = BTC_DYNAMIC_WLAN_LEN_MAX_DEF;
-   pMac->btc.btcConfig.btcMaxScoBlockPerc = BTC_SCO_BLOCK_PERC_DEF;
-   pMac->btc.btcConfig.btcDhcpProtOnA2dp = BTC_DHCP_ON_A2DP_DEF;
-   pMac->btc.btcConfig.btcDhcpProtOnSco = BTC_DHCP_ON_SCO_DEF;
 
    pMac->btc.btcReady = VOS_FALSE;
    pMac->btc.btcEventState = 0;
    pMac->btc.btcHBActive = VOS_TRUE;
    pMac->btc.btcScanCompromise = VOS_FALSE;
 
-   for (i = 0; i < MWS_COEX_MAX_VICTIM_TABLE; i++)
-   {
-      pMac->btc.btcConfig.mwsCoexVictimWANFreq[i] = 0;
-      pMac->btc.btcConfig.mwsCoexVictimWLANFreq[i] = 0;
-      pMac->btc.btcConfig.mwsCoexVictimConfig[i] = 0;
-      pMac->btc.btcConfig.mwsCoexVictimConfig2[i] = 0;
-   }
-
    for (i = 0; i < MWS_COEX_MAX_CONFIG; i++)
    {
       pMac->btc.btcConfig.mwsCoexConfig[i] = 0;
    }
-
-   pMac->btc.btcConfig.mwsCoexModemBackoff = 0;
-   pMac->btc.btcConfig.SARPowerBackoff = 0;
 
    vosStatus = vos_timer_init( &pMac->btc.restoreHBTimer,
                       VOS_TIMER_TYPE_SW,
@@ -202,9 +173,9 @@ VOS_STATUS btcClose (tHalHandle hHal)
     \fn btcReady
     \brief  fn to inform BTC that eWNI_SME_SYS_READY_IND has been sent to PE.
             This acts as a trigger to send a message to HAL to update the BTC
-            related conig to FW. Note that if HDD configures any power BTC
+            related config to FW. Note that if HDD configures any power BTC
             related stuff before this API is invoked, BTC will buffer all the
-            configutaion.
+            configuration.
     \param  hHal - The handle returned by macOpen.
     \return VOS_STATUS
   ---------------------------------------------------------------------------*/
@@ -291,6 +262,8 @@ static VOS_STATUS btcSendBTEvent(tpAniSirGlobal pMac, tpSmeBtEvent pBtEvent)
    msg.type = WDA_SIGNAL_BT_EVENT;
    msg.reserved = 0;
    msg.bodyptr = ptrSmeBtEvent;
+   MTRACE(vos_trace(VOS_MODULE_ID_SME, TRACE_CODE_SME_TX_WDA_MSG, NO_SESSION,
+                                                            msg.type));
    if(VOS_STATUS_SUCCESS != vos_mq_post_message(VOS_MODULE_ID_WDA, &msg))
    {
       VOS_TRACE(VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_ERROR, "%s: "
@@ -447,7 +420,7 @@ VOS_STATUS btcCheckHeartBeatMonitoring(tHalHandle hHal, tpSmeBtEvent pBtEvent)
 }
 /* ---------------------------------------------------------------------------
     \fn btcRestoreHeartBeatMonitoringHandle
-    \brief  Timer handler to handlet the timeout condition when a specific BT
+    \brief  Timer handler to handle the timeout condition when a specific BT
             stop event does not come back, in which case to restore back the
             heartbeat timer.
     \param  hHal - The handle returned by macOpen.
@@ -545,6 +518,8 @@ VOS_STATUS btcSendCfgMsg(tHalHandle hHal, tpSmeBtcConfig pSmeBtcConfig)
    msg.type = WDA_BTC_SET_CFG;
    msg.reserved = 0;
    msg.bodyptr = ptrSmeBtcConfig;
+   MTRACE(vos_trace(VOS_MODULE_ID_SME, TRACE_CODE_SME_TX_WDA_MSG, NO_SESSION,
+                                                             msg.type));
    if(VOS_STATUS_SUCCESS != vos_mq_post_message(VOS_MODULE_ID_WDA, &msg))
    {
       VOS_TRACE(VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_ERROR, "btcSendCfgMsg: "
@@ -580,7 +555,8 @@ VOS_STATUS btcGetConfig (tHalHandle hHal, tpSmeBtcConfig pSmeBtcConfig)
 /*
     btcFindAclEventHist find a suited ACL event buffer
     Param: bdAddr - NULL meaning not care.
-                    pointer to caller alocated buffer containing the BD address to find a match
+                    pointer to caller allocated buffer containing the BD
+                    address to find a match
            handle - BT_INVALID_CONN_HANDLE == not care
                     otherwise, a handle to match
     NOPTE: Either bdAddr or handle can be valid, if both of them are valid, use bdAddr only. If neither
@@ -639,7 +615,8 @@ static tpSmeBtAclEventHist btcFindAclEventHist( tpAniSirGlobal pMac, v_U8_t *bdA
 /*
     btcFindSyncEventHist find a suited SYNC event buffer
     Param: bdAddr - NULL meaning not care.
-                    pointer to caller alocated buffer containing the BD address to find a match
+                    pointer to caller allocated buffer containing the
+                    BD address to find a match
            handle - BT_INVALID_CONN_HANDLE == not care
                     otherwise, a handle to match
     NOPTE: Either bdAddr or handle can be valid, if both of them are valid, use bdAddr only. If neither
@@ -697,7 +674,7 @@ static tpSmeBtSyncEventHist btcFindSyncEventHist( tpAniSirGlobal pMac, v_U8_t *b
 
 /*
     btcFindDisconnEventHist find a slot for the deferred disconnect event
-    If handle is invlid, it returns a free slot, if any.
+    If handle is invalid, it returns a free slot, if any.
     If handle is valid, it tries to find a match first in case same disconnect event comes down again.
 */
 static tpSmeBtDisconnectEventHist btcFindDisconnEventHist( tpAniSirGlobal pMac, v_U16_t handle )
@@ -733,7 +710,7 @@ static tpSmeBtDisconnectEventHist btcFindDisconnEventHist( tpAniSirGlobal pMac, 
 }
 
 /*
-    btcFindModeChangeEventHist find a slot for the deferred mopde change event
+    btcFindModeChangeEventHist find a slot for the deferred mode change event
     If handle is invalid, it returns a free slot, if any.
     If handle is valid, it tries to find a match first in case same disconnect event comes down again.
 */
@@ -1085,12 +1062,13 @@ static VOS_STATUS btcDeferSyncCreate( tpAniSirGlobal pMac, tpSmeBtEvent pEvent )
     return status;
 }
 
-/*Defer a SYNC completion event
-  If there is cached event on this BD address, check completion status.
-  If status is fail and last cached event is creation, remove te creation event and drop
-  this completion event.
-  Otherwise, cache this completion event as the latest one.
-*/
+/*
+ * Defer a SYNC completion event
+ * If there is cached event on this BD address, check completion status.
+ * If status is fail and last cached event is creation, remove the
+ * creation event and drop this completion event.
+ * Otherwise, cache this completion event as the latest one.
+ */
 static VOS_STATUS btcDeferSyncComplete( tpAniSirGlobal pMac, tpSmeBtEvent pEvent )
 {
     VOS_STATUS status = VOS_STATUS_SUCCESS;
@@ -1187,7 +1165,7 @@ static VOS_STATUS btcDeferDisconnectEventForACL( tpAniSirGlobal pMac, tpSmeBtEve
             smsLog(pMac, LOGE, FL(" ACL event history index:%d overflow, resetting to BT_MAX_NUM_EVENT_ACL_DEFERRED"), pAclEventHist->bNextEventIdx);
             pAclEventHist->bNextEventIdx = BT_MAX_NUM_EVENT_ACL_DEFERRED;
         }
-        //Looking backwords
+        /* Looking back-words */
         for(i = pAclEventHist->bNextEventIdx - 1; i >= 0; i--)
         {
             if( BT_EVENT_ACL_CONNECTION_COMPLETE == pAclEventHist->btEventType[i] )
@@ -1242,10 +1220,12 @@ static VOS_STATUS btcDeferDisconnectEventForACL( tpAniSirGlobal pMac, tpSmeBtEve
     return status;
 }
 
-//This function works the same as btcDeferDisconnectEventForACL except it hanldes SYNC events
-//return VOS_STATUS_E_EXISTS if the event handle cannot be found
-//VOS_STATUS_SUCCESS if the event is processed
-//Other error status meaning it cannot continue due to other errors
+/*
+ * This function works the same as btcDeferDisconnectEventForACL except it
+ * handles SYNC events return VOS_STATUS_E_EXISTS if the event handle cannot be
+ * found VOS_STATUS_SUCCESS if the event is processed.
+ * Other error status meaning it cannot continue due to other errors
+ */
 /*
   Defer a disconnect event for SYNC
   Check if any SYNC history on this event handle.
@@ -1271,7 +1251,7 @@ static VOS_STATUS btcDeferDisconnectEventForSync( tpAniSirGlobal pMac, tpSmeBtEv
             smsLog(pMac, LOGE, FL(" SYNC event history index:%d overflow, resetting to BT_MAX_NUM_EVENT_SCO_DEFERRED"), pSyncEventHist->bNextEventIdx);
             pSyncEventHist->bNextEventIdx = BT_MAX_NUM_EVENT_SCO_DEFERRED;
         }
-        //Looking backwords
+        /* Looking back-words */
         for(i = pSyncEventHist->bNextEventIdx - 1; i >= 0; i--)
         {
             //if a mode change event exists, drop it
@@ -1894,7 +1874,7 @@ void btcUapsdCheck( tpAniSirGlobal pMac, tpSmeBtEvent pBtEvent )
        //Make sure it is a success
        if( BT_CONN_STATUS_FAIL != pBtEvent->uEventParam.btSyncConnection.status )
        {
-           //Save te handle for later use
+           /* Save the handle for later use */
            for( i = 0; i < BT_MAX_SCO_SUPPORT; i++)
            {
                VOS_ASSERT(BT_INVALID_CONN_HANDLE != pBtEvent->uEventParam.btSyncConnection.connectionHandle);

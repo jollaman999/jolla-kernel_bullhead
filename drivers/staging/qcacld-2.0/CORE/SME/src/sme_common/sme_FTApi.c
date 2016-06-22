@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2014, 2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -107,8 +107,6 @@ void sme_FTClose(tHalHandle hHal, tANI_U32 sessionId)
       }
 
       if (pSession->ftSmeContext.pUsrCtx != NULL) {
-          smsLog(pMac, LOG1,
-                 FL("Freeing ftSmeContext.pUsrCtx and setting to NULL"));
           vos_mem_free(pSession->ftSmeContext.pUsrCtx);
           pSession->ftSmeContext.pUsrCtx = NULL;
       }
@@ -136,7 +134,7 @@ v_BOOL_t sme_GetFTPreAuthState(tHalHandle hHal, tANI_U32 sessionId)
 
 /*--------------------------------------------------------------------------
   Each time the supplicant sends down the FT IEs to the driver.
-  This function is called in SME. This fucntion packages and sends
+  This function is called in SME. This function packages and sends
   the FT IEs to PE.
   ------------------------------------------------------------------------*/
 void sme_SetFTIEs(tHalHandle hHal, tANI_U32 sessionId, const tANI_U8 *ft_ies,

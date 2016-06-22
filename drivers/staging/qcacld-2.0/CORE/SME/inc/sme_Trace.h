@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -41,7 +41,6 @@
 #include "macTrace.h"
 
 #define NO_SESSION 0xFF
-#define TRACE_CODE_SME_COMMAND 0xFF
 enum {
     TRACE_CODE_SME_RX_HDD_MSG_SCAN_REQ,
     TRACE_CODE_SME_RX_HDD_MSG_SCAN_GET_RESULTS,
@@ -136,6 +135,30 @@ enum {
     TRACE_CODE_SME_RX_HDD_UPDATE_P2P_IE,
     TRACE_CODE_SME_RX_HDD_UPDATE_ROAM_SCAN_N_PROBES,
     TRACE_CODE_SME_RX_HDD_UPDATE_ROAM_SCAN_HOME_AWAY_TIME,
+    TRACE_CODE_SME_RX_HDD_STORE_JOIN_REQ,
+    TRACE_CODE_SME_RX_HDD_CLEAR_JOIN_REQ,
+    TRACE_CODE_SME_RX_HDD_ISSUE_JOIN_REQ,
+    TRACE_CODE_SME_RX_HDD_MSG_DEAUTH_STA,
+#ifdef FEATURE_WLAN_TDLS
+    TRACE_CODE_SME_RX_HDD_TDLS_LINK_ESTABLISH_PARAM,
+    TRACE_CODE_SME_RX_HDD_TDLS_CHAN_SWITCH_REQ,
+    TRACE_CODE_SME_RX_HDD_TDLS_SEND_MGMT_FRAME,
+    TRACE_CODE_SME_RX_HDD_TDLS_CHANGE_PEER_STA,
+    TRACE_CODE_SME_RX_HDD_TDLS_ADD_PEER_STA,
+    TRACE_CODE_SME_RX_HDD_TDLS_DEL_PEER_STA,
+#endif
+    TRACE_CODE_SME_RX_HDD_PREF_NET_LIST,
+#ifdef FEATURE_WLAN_LPHB
+    TRACE_CODE_SME_RX_HDD_LPHB_CONFIG_REQ,
+#endif /* FEATURE_WLAN_LPHB */
+    TRACE_CODE_SME_RX_HDD_ROAM_DEL_PMKIDCACHE,
+    /*
+     * New trace commands to be added before this comment not at the end
+     * Trace codes for SME commands
+     */
+    TRACE_CODE_SME_COMMAND = 250,
+    TRACE_CODE_SME_TX_WDA_MSG,
+    TRACE_CODE_SME_RX_WDA_MSG,
 };
 
 void smeTraceInit(tpAniSirGlobal pMac);

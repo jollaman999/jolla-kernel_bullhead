@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -46,6 +46,7 @@
 #define MANUFACTURER_ID_AR6004_BASE        0x400
 #define MANUFACTURER_ID_AR6320_BASE        0x500    /* AR6320_TBDXXX */
 #define MANUFACTURER_ID_QCA9377_BASE       0x700    /* QCA9377 */
+#define MANUFACTURER_ID_QCA9379_BASE       0x800    /* QCA9379 */
 #define MANUFACTURER_ID_AR6K_BASE_MASK     0xFF00
 #define MANUFACTURER_ID_AR6K_REV_MASK      0x00FF
 #define FUNCTION_CLASS                     0x0
@@ -103,8 +104,12 @@
 #define HIF_GMBOX_BASE_ADDR                0x7000
 #define HIF_GMBOX_WIDTH                    0x4000
 
-    /* for SDIO we recommend a 128-byte block size */
+/* for SDIO we recommend a 128-byte block size */
+#if defined(WITH_BACKPORTS)
 #define HIF_DEFAULT_IO_BLOCK_SIZE          128
+#else
+#define HIF_DEFAULT_IO_BLOCK_SIZE          256
+#endif
 
     /* set extended MBOX window information for SDIO interconnects */
 static INLINE void SetExtendedMboxWindowInfo(A_UINT16 Manfid, HIF_DEVICE_MBOX_INFO *pInfo)
@@ -165,6 +170,7 @@ static INLINE void SetExtendedMboxWindowInfo(A_UINT16 Manfid, HIF_DEVICE_MBOX_IN
             break;
         }
         case MANUFACTURER_ID_QCA9377_BASE :
+        case MANUFACTURER_ID_QCA9379_BASE :
             pInfo->MboxProp[0].ExtendedAddress = HIF_MBOX0_EXTENDED_BASE_ADDR_AR6320;
             pInfo->MboxProp[0].ExtendedSize = HIF_MBOX0_EXTENDED_WIDTH_AR6320_ROME_2_0;
             pInfo->MboxProp[1].ExtendedAddress = pInfo->MboxProp[0].ExtendedAddress +
@@ -179,6 +185,9 @@ static INLINE void SetExtendedMboxWindowInfo(A_UINT16 Manfid, HIF_DEVICE_MBOX_IN
     }
 }
 
+#define FIFO_TIMEOUT_AND_CHIP_CONTROL 0x00000868
+#define FIFO_TIMEOUT_AND_CHIP_CONTROL_DISABLE_SLEEP_OFF 0xFFFEFFFF
+#define FIFO_TIMEOUT_AND_CHIP_CONTROL_DISABLE_SLEEP_ON 0x10000
 /*
   In SDIO 2.0, asynchronous interrupt is not in SPEC requirement, but AR6003 support it, so the register
   is placed in vendor specific field 0xF0(bit0)
