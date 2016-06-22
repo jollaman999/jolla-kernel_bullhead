@@ -2533,7 +2533,6 @@ void vos_trigger_recovery(void)
 	pVosContextType vos_context;
 	tp_wma_handle wma_handle;
 	VOS_STATUS status = VOS_STATUS_SUCCESS;
-	void *runtime_context = NULL;
 
 	vos_context = vos_get_global_context(VOS_MODULE_ID_VOSS, NULL);
 	if (!vos_context) {
@@ -2550,8 +2549,7 @@ void vos_trigger_recovery(void)
 		return;
 	}
 
-	runtime_context = vos_runtime_pm_prevent_suspend_init("vos_recovery");
-	vos_runtime_pm_prevent_suspend(runtime_context);
+	vos_runtime_pm_prevent_suspend();
 
 	wma_crash_inject(wma_handle, RECOVERY_SIM_SELF_RECOVERY, 0);
 
@@ -2573,7 +2571,7 @@ void vos_trigger_recovery(void)
 	}
 
 out:
-	vos_runtime_pm_allow_suspend(runtime_context);
+	vos_runtime_pm_allow_suspend();
 }
 
 v_U64_t vos_get_monotonic_boottime(void)
