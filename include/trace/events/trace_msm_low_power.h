@@ -18,6 +18,24 @@
 
 #include <linux/tracepoint.h>
 
+TRACE_EVENT(cpu_power_select,
+
+	TP_PROTO(int index),
+
+	TP_ARGS(index),
+
+	TP_STRUCT__entry(
+		__field(int, index)
+	),
+
+	TP_fast_assign(
+		__entry->index = index;
+	),
+
+	TP_printk("idx:%d",
+		__entry->index)
+);
+
 TRACE_EVENT(cpu_idle_enter,
 
 	TP_PROTO(int index),
@@ -35,6 +53,7 @@ TRACE_EVENT(cpu_idle_enter,
 	TP_printk("idx:%d",
 		__entry->index)
 );
+
 TRACE_EVENT(cpu_idle_exit,
 
 	TP_PROTO(int index, bool success),
