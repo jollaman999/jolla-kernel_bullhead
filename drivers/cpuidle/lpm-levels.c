@@ -207,36 +207,40 @@ int set_l2_mode(struct low_power_ops *ops, int mode, bool notify_rpm)
 {
 	int lpm = mode;
 	int rc = 0;
+	struct low_power_ops *cpu_ops = per_cpu(cpu_cluster,
+			smp_processor_id())->lpm_dev;
 
-	if (ops->tz_flag == MSM_SCM_L2_OFF ||
-			ops->tz_flag == MSM_SCM_L2_GDHS)
+
+	if (cpu_ops->tz_flag & MSM_SCM_L2_OFF ||
+			cpu_ops->tz_flag & MSM_SCM_L2_GDHS)
 		coresight_cti_ctx_restore();
 
 
 	switch (mode) {
 	case MSM_SPM_MODE_POWER_COLLAPSE:
-		ops->tz_flag = MSM_SCM_L2_OFF;
+		cpu_ops->tz_flag = MSM_SCM_L2_OFF;
 		coresight_cti_ctx_save();
 		break;
 	case MSM_SPM_MODE_GDHS:
-		ops->tz_flag = MSM_SCM_L2_GDHS;
+		cpu_ops->tz_flag = MSM_SCM_L2_GDHS;
 		coresight_cti_ctx_save();
 		break;
 	case MSM_SPM_MODE_CLOCK_GATING:
 	case MSM_SPM_MODE_RETENTION:
 	case MSM_SPM_MODE_DISABLED:
-		ops->tz_flag = MSM_SCM_L2_ON;
+		cpu_ops->tz_flag = MSM_SCM_L2_ON;
 		break;
 	default:
-		ops->tz_flag = MSM_SCM_L2_ON;
+		cpu_ops->tz_flag = MSM_SCM_L2_ON;
 		lpm = MSM_SPM_MODE_DISABLED;
 		break;
 	}
-	/* Do not program L2 SPM. This will be set by TZ */
+	/* Do not program L2 SPM enable bit. This will be set by TZ */
 	if (lpm_wa_get_skip_l2_spm())
-		return 0;
-
-	rc = msm_spm_config_low_power_mode(ops->spm, lpm, notify_rpm);
+		rc = msm_spm_config_low_power_mode_addr(ops->spm, lpm,
+							notify_rpm);
+	else
+		rc = msm_spm_config_low_power_mode(ops->spm, lpm, notify_rpm);
 	if (rc)
 		pr_err("%s: Failed to set L2 low power mode %d, ERR %d",
 				__func__, lpm, rc);
@@ -244,7 +248,23 @@ int set_l2_mode(struct low_power_ops *ops, int mode, bool notify_rpm)
 	return rc;
 }
 
-int set_cci_mode(struct low_power_ops *ops, int mode, bool notify_rpm)
+int set_l3_mode(struct low_power_ops *ops, int mode, bool notify_rpm)
+{
+	struct low_power_ops *cpu_ops = per_cpu(cpu_cluster,
+			smp_processor_id())->lpm_dev;
+
+	switch (mode) {
+	case MSM_SPM_MODE_POWER_COLLAPSE:
+		cpu_ops->tz_flag |= MSM_SCM_L3_PC_OFF;
+		break;
+	default:
+		break;
+	}
+	return msm_spm_config_low_power_mode(ops->spm, mode, notify_rpm);
+}
+
+
+int set_system_mode(struct low_power_ops *ops, int mode, bool notify_rpm)
 {
 	if (mode == MSM_SPM_MODE_CLOCK_GATING)
 		mode = MSM_SPM_MODE_DISABLED;
@@ -344,7 +364,7 @@ static uint64_t get_cluster_sleep_time(struct lpm_cluster *cluster,
 	}
 
 	cpumask_and(&online_cpus_in_cluster,
-			&cluster->num_childs_in_sync, cpu_online_mask);
+			&cluster->num_children_in_sync, cpu_online_mask);
 
 	for_each_cpu(cpu, &online_cpus_in_cluster) {
 		td = &per_cpu(tick_cpu_device, cpu);
@@ -403,7 +423,7 @@ static int cluster_select(struct lpm_cluster *cluster, bool from_idle)
 			cpumask_weight(cpu_online_mask) > 1)
 			continue;
 
-		if (!cpumask_equal(&cluster->num_childs_in_sync,
+		if (!cpumask_equal(&cluster->num_children_in_sync,
 					&level->num_cpu_votes))
 			continue;
 
@@ -436,18 +456,18 @@ static int cluster_configure(struct lpm_cluster *cluster, int idx,
 
 	spin_lock(&cluster->sync_lock);
 
-	if (!cpumask_equal(&cluster->num_childs_in_sync, &cluster->child_cpus)
-			|| is_IPI_pending(&cluster->num_childs_in_sync)) {
+	if (!cpumask_equal(&cluster->num_children_in_sync, &cluster->child_cpus)
+			|| is_IPI_pending(&cluster->num_children_in_sync)) {
 		spin_unlock(&cluster->sync_lock);
 		return -EPERM;
 	}
 
 	if (idx != cluster->default_level) {
 		update_debug_pc_event(CLUSTER_ENTER, idx,
-			cluster->num_childs_in_sync.bits[0],
+			cluster->num_children_in_sync.bits[0],
 			cluster->child_cpus.bits[0], from_idle);
 		trace_cluster_enter(cluster->cluster_name, idx,
-			cluster->num_childs_in_sync.bits[0],
+			cluster->num_children_in_sync.bits[0],
 			cluster->child_cpus.bits[0], from_idle);
 		lpm_stats_cluster_enter(cluster->stats, idx);
 	}
@@ -468,7 +488,7 @@ static int cluster_configure(struct lpm_cluster *cluster, int idx,
 	}
 	if (level->notify_rpm) {
 		struct cpumask nextcpu, *cpumask;
-		uint32_t us;
+		uint64_t us;
 
 		us = get_cluster_sleep_time(cluster, &nextcpu, from_idle);
 		cpumask = level->disable_dynamic_routing ? NULL : &nextcpu;
@@ -480,7 +500,7 @@ static int cluster_configure(struct lpm_cluster *cluster, int idx,
 		}
 
 		do_div(us, USEC_PER_SEC/SCLK_HZ);
-		msm_mpm_enter_sleep((uint32_t)us, from_idle, cpumask);
+		msm_mpm_enter_sleep(us, from_idle, cpumask);
 	}
 	cluster->last_level = idx;
 	spin_unlock(&cluster->sync_lock);
@@ -511,8 +531,8 @@ static void cluster_prepare(struct lpm_cluster *cluster,
 		return;
 
 	spin_lock(&cluster->sync_lock);
-	cpumask_or(&cluster->num_childs_in_sync, cpu,
-			&cluster->num_childs_in_sync);
+	cpumask_or(&cluster->num_children_in_sync, cpu,
+			&cluster->num_children_in_sync);
 
 	for (i = 0; i < cluster->nlevels; i++) {
 		struct lpm_cluster_level *lvl = &cluster->levels[i];
@@ -529,7 +549,7 @@ static void cluster_prepare(struct lpm_cluster *cluster,
 	 * configuration process
 	 */
 
-	if (!cpumask_equal(&cluster->num_childs_in_sync,
+	if (!cpumask_equal(&cluster->num_children_in_sync,
 				&cluster->child_cpus)) {
 		spin_unlock(&cluster->sync_lock);
 		return;
@@ -544,7 +564,7 @@ static void cluster_prepare(struct lpm_cluster *cluster,
 	if (cluster_configure(cluster, i, from_idle))
 		return;
 
-	cluster_prepare(cluster->parent, &cluster->num_childs_in_sync, i,
+	cluster_prepare(cluster->parent, &cluster->num_children_in_sync, i,
 			from_idle);
 }
 
@@ -563,10 +583,10 @@ static void cluster_unprepare(struct lpm_cluster *cluster,
 
 	spin_lock(&cluster->sync_lock);
 	last_level = cluster->default_level;
-	first_cpu = cpumask_equal(&cluster->num_childs_in_sync,
+	first_cpu = cpumask_equal(&cluster->num_children_in_sync,
 				&cluster->child_cpus);
-	cpumask_andnot(&cluster->num_childs_in_sync,
-			&cluster->num_childs_in_sync, cpu);
+	cpumask_andnot(&cluster->num_children_in_sync,
+			&cluster->num_children_in_sync, cpu);
 
 	for (i = 0; i < cluster->nlevels; i++) {
 		struct lpm_cluster_level *lvl = &cluster->levels[i];
@@ -588,10 +608,10 @@ static void cluster_unprepare(struct lpm_cluster *cluster,
 	}
 
 	update_debug_pc_event(CLUSTER_EXIT, cluster->last_level,
-			cluster->num_childs_in_sync.bits[0],
+			cluster->num_children_in_sync.bits[0],
 			cluster->child_cpus.bits[0], from_idle);
 	trace_cluster_exit(cluster->cluster_name, cluster->last_level,
-			cluster->num_childs_in_sync.bits[0],
+			cluster->num_children_in_sync.bits[0],
 			cluster->child_cpus.bits[0], from_idle);
 
 	last_level = cluster->last_level;
@@ -821,10 +841,10 @@ static int cluster_cpuidle_register(struct lpm_cluster *cl)
 		while (p) {
 			int j;
 			spin_lock(&p->sync_lock);
-			cpumask_set_cpu(cpu, &p->num_childs_in_sync);
+			cpumask_set_cpu(cpu, &p->num_children_in_sync);
 			for (j = 0; j < p->nlevels; j++)
 				cpumask_copy(&p->levels[j].num_cpu_votes,
-						&p->num_childs_in_sync);
+						&p->num_children_in_sync);
 			spin_unlock(&p->sync_lock);
 			p = p->parent;
 		}
@@ -1080,7 +1100,8 @@ enum msm_pm_l2_scm_flag lpm_cpu_pre_pc_cb(unsigned int cpu)
 		goto unlock_and_return;
 	}
 
-	if (!cpumask_equal(&cluster->num_childs_in_sync, &cluster->child_cpus))
+	if (!cpumask_equal(&cluster->num_children_in_sync,
+						&cluster->child_cpus))
 		goto unlock_and_return;
 
 	if (cluster->lpm_dev)
@@ -1155,3 +1176,5 @@ void lpm_cpu_hotplug_enter(unsigned int cpu)
 
 	msm_cpu_pm_enter_sleep(mode, false);
 }
+
+
