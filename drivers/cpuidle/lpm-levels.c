@@ -314,9 +314,6 @@ static int cpu_power_select(struct cpuidle_device *dev,
 
 		lvl_overhead_energy = pwr_params->energy_overhead;
 
-		if (i > 0 && suspend_in_progress)
-			continue;
-
 		if (latency_us < lvl_latency_us)
 			continue;
 
@@ -930,7 +927,7 @@ static int lpm_suspend_prepare(void)
 	return 0;
 }
 
-static void lpm_suspend_end(void)
+static void lpm_suspend_wake(void)
 {
 	suspend_in_progress = false;
 	msm_mpm_suspend_wake();
@@ -967,7 +964,7 @@ static const struct platform_suspend_ops lpm_suspend_ops = {
 	.enter = lpm_suspend_enter,
 	.valid = suspend_valid_only_mem,
 	.prepare_late = lpm_suspend_prepare,
-	.end = lpm_suspend_end,
+	.wake = lpm_suspend_wake,
 };
 
 static int lpm_probe(struct platform_device *pdev)
