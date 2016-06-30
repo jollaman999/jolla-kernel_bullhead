@@ -736,15 +736,6 @@ static void msm_hotplug_resume_call(struct work_struct *msm_hotplug_resume_call_
 static DECLARE_WORK(msm_hotplug_resume_call_work, msm_hotplug_resume_call);
 #endif
 
-static bool sched_boost_set = false;
-
-static void sched_boost_rem(struct work_struct *sched_boost_rem_work)
-{
-	sched_set_boost(0);
-	sched_boost_set = false;
-}
-static DECLARE_DELAYED_WORK(sched_boost_rem_work, sched_boost_rem);
-
 static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 {
 	struct fpc1020_data *fpc1020 = handle;
@@ -756,14 +747,6 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 
 	if (fpc1020->wakeup_enabled) {
 		wake_lock_timeout(&fpc1020->ttw_wl, msecs_to_jiffies(FPC_TTW_HOLD_TIME));
-
-		if (!sched_boost_set) {
-			sched_set_boost(1);
-			schedule_delayed_work(&sched_boost_rem_work,
-					msecs_to_jiffies(FPC_TTW_HOLD_TIME));
-			sched_boost_set = true;
-		}
-
 #ifdef CONFIG_MSM_HOTPLUG
 		if (msm_enabled && msm_hotplug_scr_suspended &&
 		   !msm_hotplug_fingerprint_called) {
