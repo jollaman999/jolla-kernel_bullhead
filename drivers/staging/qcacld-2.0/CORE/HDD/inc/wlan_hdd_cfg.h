@@ -2543,7 +2543,7 @@ This feature requires the dependent cfg.ini "gRoamPrefer5GHz" set to 1 */
  * alloc_netdev_mq. Hence, we need to have a cpu mask for each of the rx queues.
  *
  * For example, if the NUM_TX_QUEUES is 4, a sample WLAN ini entry may look like
- * rpsRxQueueCpuMapList=a b c d
+ * rpsRxQueueCpuMapList=a.b.c.d
  * For a 4 CPU system (CPU0 - CPU3), this implies:
  * 0xa - (1010) use CPU1, CPU3 for rx queue 0
  * 0xb - (1011) use CPU0, CPU1 and CPU3 for rx queue 1
@@ -2567,7 +2567,7 @@ This feature requires the dependent cfg.ini "gRoamPrefer5GHz" set to 1 */
 /* Maximum length of string used to hold a list of cpu maps for various rx
  * queues. Considering a 16 core system with 5 rx queues, a RPS CPU map
  * list may look like -
- * rpsRxQueueCpuMapList = ffff ffff ffff ffff ffff
+ * rpsRxQueueCpuMapList = ffff.ffff.ffff.ffff.ffff
  * (all 5 rx queues can be processed on all 16 cores)
  * max string len = 24 + 1(for '\0'). Considering 30 to be on safe side.
  */

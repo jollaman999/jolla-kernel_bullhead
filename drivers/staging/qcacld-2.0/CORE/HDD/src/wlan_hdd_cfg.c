@@ -5678,7 +5678,7 @@ VOS_STATUS hdd_hex_string_to_u16_array(char *str,
 				s, val, *len, int_array[*len]);
 			*len += 1;
 		}
-		s = strpbrk(s, " ");
+		s = strpbrk(s, ".");
 		if (s)
 			s++;
 	}
