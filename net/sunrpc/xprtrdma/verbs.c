@@ -872,7 +872,7 @@ retry:
 	}
 
 /* XXX Tavor device performs badly with 2K MTU! */
-if (strnicmp(ia->ri_id->device->dma_device->bus->name, "pci", 3) == 0) {
+if (strncasecmp(ia->ri_id->device->dma_device->bus->name, "pci", 3) == 0) {
 	struct pci_dev *pcid = to_pci_dev(ia->ri_id->device->dma_device);
 	if (pcid->device == PCI_DEVICE_ID_MELLANOX_TAVOR &&
 	    (pcid->vendor == PCI_VENDOR_ID_MELLANOX ||
