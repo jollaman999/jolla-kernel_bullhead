@@ -1641,9 +1641,9 @@ ssize_t set_tx_power(struct device *dev, struct device_attribute *attr,
 
 	if (dev_context->dev_flags & DEV_FLAG_SHUTDOWN) {
 		status = -ENODEV;
-	} else if (strnicmp("on", buf, count - 1) == 0) {
+	} else if (strncasecmp("on", buf, count - 1) == 0) {
 		status = si_8620_power_control(true);
-	} else if (strnicmp("off", buf, count - 1) == 0) {
+	} else if (strncasecmp("off", buf, count - 1) == 0) {
 		status = si_8620_power_control(false);
 	} else {
 		MHL_TX_DBG_ERR("Invalid parameter %s received\n", buf);
@@ -1679,14 +1679,14 @@ ssize_t set_stark_ctl(struct device *dev, struct device_attribute *attr,
 	if (dev_context->dev_flags & DEV_FLAG_SHUTDOWN) {
 		status = -ENODEV;
 	} else {
-		if (strnicmp("on", buf, count - 1) == 0) {
+		if (strncasecmp("on", buf, count - 1) == 0) {
 			/*
 			 * Set MHL/USB switch to USB
 			 * NOTE: Switch control is implemented differently on
 			 * each version of the starter kit.
 			 */
 			set_pin(X02_USB_SW_CTRL, 1);
-		} else if (strnicmp("off", buf, count - 1) == 0) {
+		} else if (strncasecmp("off", buf, count - 1) == 0) {
 			/*
 			 * Set MHL/USB switch to USB
 			 * NOTE: Switch control is implemented differently on
