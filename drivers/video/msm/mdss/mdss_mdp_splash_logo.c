@@ -535,11 +535,11 @@ static int mdss_mdp_splash_thread(void *data)
 	mdp5_data = mfd_to_mdp5_data(mfd);
 	lock_fb_info(mfd->fbi);
 	ret = fb_blank(mfd->fbi, FB_BLANK_UNBLANK);
+	unlock_fb_info(mfd->fbi);
 	if (ret) {
 		pr_err("can't turn on fb!\n");
 		goto end;
 	}
-	unlock_fb_info(mfd->fbi);
 
 	mutex_lock(&mfd->bl_lock);
 	mfd->bl_updated = true;
