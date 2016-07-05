@@ -571,6 +571,7 @@ static bool exp_fn_inited;
 static struct mutex exp_fn_list_mutex;
 static struct list_head exp_fn_list;
 static struct mutex suspended_mutex;
+static struct mutex suspend_resume_lock;
 
 #if defined(CONFIG_SECURE_TOUCH)
 static int synaptics_secure_touch_clk_prepare_enable(
@@ -4062,6 +4063,7 @@ static int synaptics_rmi4_probe(struct i2c_client *client,
 		exp_fn_inited = 1;
 	}
 	mutex_init(&suspended_mutex);
+	mutex_init(&suspend_resume_lock);
 
 	rmi4_data->det_workqueue =
 			alloc_workqueue("rmi_det_workqueue",
@@ -4081,7 +4083,6 @@ static int synaptics_rmi4_probe(struct i2c_client *client,
 	INIT_DELAYED_WORK(&rmi4_data->touch_off_work,
 			synaptics_rmi4_touch_off);
 #endif
-	rmi4_data->touch_off_triggered = false;
 
 	INIT_WORK(&rmi4_data->recovery_work, synaptics_rmi4_recover_work);
 	INIT_WORK(&rmi4_data->init_work, synaptics_rmi4_init_work);
@@ -4671,10 +4672,7 @@ static int synaptics_rmi4_suspend_trigger(struct synaptics_rmi4_data *rmi4_data)
 {
 	int retval = 0;
 
-	if (rmi4_data->touch_off_triggered)
-		return 0;
-
-	rmi4_data->touch_off_triggered = true;
+	mutex_lock(&suspend_resume_lock);
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 	if (is_touch_on()) {
@@ -4774,7 +4772,7 @@ err_lpm_regulator:
 	}
 
 out:
-	rmi4_data->touch_off_triggered = false;
+	mutex_unlock(&suspend_resume_lock);
 	return retval;
 }
 
@@ -4784,7 +4782,7 @@ static void synaptics_rmi4_touch_off(struct work_struct *work)
 	struct synaptics_rmi4_data *rmi4_data =
 		container_of(work, struct synaptics_rmi4_data, touch_off_work.work);
 
-	if (!scr_suspended)
+	if (!scr_suspended || rmi4_data->suspended)
 		return;
 
 	synaptics_rmi4_suspend_trigger(rmi4_data);
@@ -4796,6 +4794,9 @@ static void synaptics_rmi4_touch_off(struct work_struct *work)
 
 void synaptics_rmi4_touch_off_trigger(unsigned int delay)
 {
+	if (!scr_suspended || rmi4_data_tmp->suspended)
+		return;
+
 	queue_delayed_work(rmi4_data_tmp->touch_off_workqueue,
 			&rmi4_data_tmp->touch_off_work,
 			msecs_to_jiffies(delay));
@@ -4838,6 +4839,8 @@ static int synaptics_rmi4_resume(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 
+	mutex_lock(&suspend_resume_lock);
+
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 	if (irq_wake_enabled) {
 		disable_irq_wake(rmi4_data->irq);
@@ -4846,20 +4849,23 @@ static int synaptics_rmi4_resume(struct device *dev)
 		mutex_lock(&suspended_mutex);
 		rmi4_data->suspended = false;
 		mutex_unlock(&suspended_mutex);
-		return 0;
+		goto out;
 	}
 #endif
 
 	if (rmi4_data->staying_awake)
-		return 0;
+		goto out;
 
 	flush_workqueue(rmi4_data->det_workqueue);
 	if (!rmi4_data->suspended) {
 		dev_info(dev, "Already in awake state\n");
-		return 0;
+		goto out;
 	}
 
 	queue_work(rmi4_data->det_workqueue, &rmi4_data->init_work);
+
+out:
+	mutex_unlock(&suspend_resume_lock);
 	return 0;
 }
 
