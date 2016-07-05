@@ -273,7 +273,6 @@ struct synaptics_rmi4_data {
 	bool stay_awake;
 	bool staying_awake;
 	bool check_build;
-	bool touch_off_triggered;
 	int (*i2c_read)(struct synaptics_rmi4_data *pdata, unsigned short addr,
 			unsigned char *data, unsigned short length);
 	int (*i2c_write)(struct synaptics_rmi4_data *pdata, unsigned short addr,
