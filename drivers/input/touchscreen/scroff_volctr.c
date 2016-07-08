@@ -443,7 +443,7 @@ static void sovc_track_input_event(struct input_handle *handle, unsigned int typ
 		case ABS_MT_POSITION_X:
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 			// Ignore to change track when S2W is enabled.
-			if (s2w_switch)
+			if (s2w_switch == 1)
 				break;
 #endif
 			touch_x = value;

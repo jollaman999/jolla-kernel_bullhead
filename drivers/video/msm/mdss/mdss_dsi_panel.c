@@ -381,7 +381,7 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 		}
 
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-		if (s2w_switch)
+		if (s2w_switch == 1)
 			goto end;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
@@ -758,7 +758,7 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-	if (s2w_switch)
+	if (s2w_switch == 1)
 		goto touch_on;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE

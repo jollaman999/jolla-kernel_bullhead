@@ -64,6 +64,7 @@ static int prev_x = 0;
 static bool is_new_touch = false;
 static bool is_touching = false;
 static bool scr_suspended = false;
+static bool is_s2s_range = false;
 static struct input_dev * sweep2wake_pwrdev;
 static DEFINE_MUTEX(pwrkeyworklock);
 static struct workqueue_struct *s2w_input_wq;
@@ -149,15 +150,12 @@ static void detect_sweep2wake(int x)
 		if (ktime_to_ms(ktime_get_real()) - tap_time_pre > S2W_TIME_GAP)
 			return;
 
-		// left->right
-		if (prev_x - x > S2W_FEATHER) {
-			pr_info(LOGTAG"ON\n");
-			is_touching = true;
-			sweep2wake_pwrtrigger();
-		}
-		// right->left
-		else if (x - prev_x > S2W_FEATHER) {
-			pr_info(LOGTAG"ON\n");
+		// left->right || right->left
+		if (prev_x - x > S2W_FEATHER || x - prev_x > S2W_FEATHER) {
+			if (scr_suspended)
+				pr_info(LOGTAG"ON\n");
+			else
+				pr_info(LOGTAG"OFF\n");
 			is_touching = true;
 			sweep2wake_pwrtrigger();
 		}
@@ -172,7 +170,10 @@ static void s2w_input_callback(struct work_struct *unused)
 static void s2w_input_event(struct input_handle *handle, unsigned int type,
 				unsigned int code, int value)
 {
-	if ((!scr_suspended) || (!s2w_switch))
+	if (!s2w_switch)
+		return;
+
+	if (scr_suspended && s2w_switch == 2)
 		return;
 
 	/* You can debug here with 'adb shell getevent -l' command. */
@@ -187,8 +188,22 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 			break;
 
 		case ABS_MT_POSITION_X:
+			if (!scr_suspended && !is_s2s_range) {
+				sweep2wake_reset();
+				break;
+			}
 			touch_x = value;
 			queue_work(s2w_input_wq, &s2w_input_work);
+			break;
+
+		case ABS_MT_POSITION_Y:
+			if (!scr_suspended) {
+				// Navigation bar position
+				if (value >= 0x00000700 && value <= 0x0000077f)
+					is_s2s_range = true;
+				else
+					is_s2s_range = false;
+			}
 			break;
 
 		default:
@@ -353,7 +368,7 @@ static ssize_t s2w_sweep2wake_dump(struct device *dev,
 	} else
 		return -EINVAL;
 
-	if (s2w_switch && scr_suspended)
+	if (s2w_switch == 1 || (s2w_switch == 2 && !scr_suspended))
 		register_s2w();
 	else
 		unregister_s2w();
@@ -398,17 +413,21 @@ static int s2w_fb_notifier_callback(struct notifier_block *self,
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
 			scr_suspended = false;
-			unregister_s2w();
+			if (s2w_switch)
+				register_s2w();
+			else
+				unregister_s2w();
 			break;
 		case FB_BLANK_POWERDOWN:
 			scr_suspended = true;
-			if (s2w_switch) {
+			if (s2w_switch == 1) {
 				if (tomtom_mic_detected) {
 					unregister_s2w();
 					break;
 				}
 				register_s2w();
-			}
+			} else if (s2w_switch == 2)
+				unregister_s2w();
 			break;
 		}
 	}

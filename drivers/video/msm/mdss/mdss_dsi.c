@@ -251,7 +251,7 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 	}
 
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-	if (s2w_switch)
+	if (s2w_switch == 1)
 		goto end;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE

@@ -142,7 +142,7 @@ static bool is_touch_on(void)
 		return false;
 
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-	if (s2w_switch)
+	if (s2w_switch == 1)
 		return true;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
