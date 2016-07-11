@@ -104,6 +104,7 @@ static bool is_new_touch_x = false, is_new_touch_y = false;
 static bool is_touching = false;
 static struct input_dev *sovc_input;
 static DEFINE_MUTEX(keyworklock);
+static DEFINE_MUTEX(touch_off_lock);
 static struct workqueue_struct *sovc_volume_input_wq;
 static struct workqueue_struct *sovc_track_input_wq;
 static struct work_struct sovc_volume_input_work;
@@ -273,8 +274,10 @@ static void exec_key(int key)
 /* Turn off the touch screen */
 static void touch_off(void)
 {
+	mutex_lock(&touch_off_lock);
+
 	if (sovc_force_off)
-		return;
+		goto out;
 
 	sovc_force_off = true;
 	synaptics_rmi4_touch_off_trigger(0);
@@ -285,6 +288,8 @@ static void touch_off(void)
 	msleep(50);
 	qpnp_hap_td_enable(SOVC_VIB_STRENGTH * 3);
 #endif
+out:
+	mutex_unlock(&touch_off_lock);
 }
 
 /* scroff_volctr volume function */
@@ -631,8 +636,11 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 				unregister_sovc();
 			else
 				register_sovc();
-		} else if (value_changed)
+		} else if (value_changed) {
+			mutex_lock(&touch_off_lock);
 			synaptics_rmi4_touch_off_trigger(0);
+			mutex_unlock(&touch_off_lock);
+		}
 	} else
 		unregister_sovc();
 
