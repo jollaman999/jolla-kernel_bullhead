@@ -292,20 +292,18 @@ static void sovc_volume_input_callback(struct work_struct *unused)
 {
 	s64 time;
 
-	if (!is_touching) {
-		if (!is_new_touch_y)
-			new_touch_y(touch_y);
+	if (!is_new_touch_y)
+		new_touch_y(touch_y);
 
-		time = ktime_to_ms(ktime_get()) - touch_time_pre_y;
+	time = ktime_to_ms(ktime_get()) - touch_time_pre_y;
 
-		if (time > 0 && time < SOVC_TIME_GAP) {
-			if (prev_y - touch_y > SOVC_VOL_FEATHER) // Volume Up (down->up)
-				exec_key(VOL_UP);
-			else if (touch_y - prev_y > SOVC_VOL_FEATHER) // Volume Down (up->down)
-				exec_key(VOL_DOWN);
-		} else if (time > sovc_auto_off_delay)
-			touch_off();
-	}
+	if (time > 0 && time < SOVC_TIME_GAP) {
+		if (prev_y - touch_y > SOVC_VOL_FEATHER) // Volume Up (down->up)
+			exec_key(VOL_UP);
+		else if (touch_y - prev_y > SOVC_VOL_FEATHER) // Volume Down (up->down)
+			exec_key(VOL_DOWN);
+	} else if (time > sovc_auto_off_delay)
+		touch_off();
 }
 
 /* scroff_volctr track function */
@@ -313,20 +311,18 @@ static void sovc_track_input_callback(struct work_struct *unused)
 {
 	s64 time;
 
-	if (!is_touching) {
-		if (!is_new_touch_x)
-			new_touch_x(touch_x);
+	if (!is_new_touch_x)
+		new_touch_x(touch_x);
 
-		time = ktime_to_ms(ktime_get()) - touch_time_pre_x;
+	time = ktime_to_ms(ktime_get()) - touch_time_pre_x;
 
-		if (time > 0 && time < SOVC_TIME_GAP) {
-			if (prev_x - touch_x > SOVC_TRACK_FEATHER) // Track Next (right->left)
-				exec_key(TRACK_NEXT);
-			else if (touch_x - prev_x > SOVC_TRACK_FEATHER) // Track Previous (left->right)
-				exec_key(TRACK_PREVIOUS);
-		} else if (time > sovc_auto_off_delay)
-			touch_off();
-	}
+	if (time > 0 && time < SOVC_TIME_GAP) {
+		if (prev_x - touch_x > SOVC_TRACK_FEATHER) // Track Next (right->left)
+			exec_key(TRACK_NEXT);
+		else if (touch_x - prev_x > SOVC_TRACK_FEATHER) // Track Previous (left->right)
+			exec_key(TRACK_PREVIOUS);
+	} else if (time > sovc_auto_off_delay)
+		touch_off();
 }
 
 static int sovc_input_common_event(struct input_handle *handle, unsigned int type,
@@ -365,6 +361,9 @@ static void sovc_volume_input_event(struct input_handle *handle, unsigned int ty
 	if (out)
 		return;
 
+	if (is_touching)
+		return;
+
 	/* You can debug here with 'adb shell getevent -l' command. */
 	switch(code) {
 		case ABS_MT_POSITION_Y:
@@ -384,6 +383,9 @@ static void sovc_track_input_event(struct input_handle *handle, unsigned int typ
 
 	out = sovc_input_common_event(handle, type, code, value);
 	if (out)
+		return;
+
+	if (is_touching)
 		return;
 
 	/* You can debug here with 'adb shell getevent -l' command. */
