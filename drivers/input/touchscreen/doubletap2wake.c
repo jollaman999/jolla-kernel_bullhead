@@ -169,9 +169,6 @@ static void detect_doubletap2wake(int x, int y)
 	pr_info(LOGTAG"x,y(%4d,%4d)\n", x, y);
 #endif
 
-	if (!scr_suspended)
-		return;
-
 	if (!is_touching) {
 		is_touching = true;
 
