@@ -281,7 +281,9 @@ static void touch_off(void)
 
 	// Vibrate when action performed
 #ifdef CONFIG_QPNP_HAPTIC
-	qpnp_hap_td_enable(SOVC_VIB_STRENGTH * 4);
+	qpnp_hap_td_enable(SOVC_VIB_STRENGTH * 3);
+	msleep(50);
+	qpnp_hap_td_enable(SOVC_VIB_STRENGTH * 3);
 #endif
 }
 
