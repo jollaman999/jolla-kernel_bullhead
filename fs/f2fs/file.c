@@ -2131,6 +2131,7 @@ static ssize_t f2fs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 {
 	struct file *file = iocb->ki_filp;
 	struct inode *inode = file_inode(file);
+	struct blk_plug plug;
 	size_t count;
 	ssize_t ret;
 
@@ -2148,9 +2149,12 @@ static ssize_t f2fs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 	if (!ret) {
 		ret = f2fs_preallocate_blocks(inode, pos, count,
 				iocb->ki_filp->f_flags & O_DIRECT);
-		if (!ret)
+		if (!ret) {
+			blk_start_plug(&plug);
 			ret = __generic_file_aio_write(iocb, iov, nr_segs,
 								&iocb->ki_pos);
+			blk_finish_plug(&plug);
+		}
 	}
 	inode_unlock(inode);
 
