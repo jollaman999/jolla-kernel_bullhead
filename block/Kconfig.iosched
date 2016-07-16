@@ -124,6 +124,10 @@ config IOSCHED_VR
 	  Requests are chosen according to SSTF with a penalty of rev_penalty
 	  for switching head direction.
 
+config IOSCHED_MAPLE
+	tristate "Maple I/O scheduler"
+	default y
+
 choice
 	prompt "Default I/O scheduler"
 	default DEFAULT_CFQ
@@ -175,6 +179,9 @@ choice
 	config DEFAULT_VR
 		bool "VR" if IOSCHED_ZEN=y
 
+	config DEFAULT_MAPLE
+		bool "Maple" if IOSCHED_MAPLE=y
+
 endchoice
 
 config DEFAULT_IOSCHED
@@ -189,6 +196,7 @@ config DEFAULT_IOSCHED
 	default "sioplus" if DEFAULT_SIOPLUS
 	default "zen" if DEFAULT_ZEN
 	default "vr" if DEFAULT_VR
+	default "maple" if DEFAULT_MAPLE
 
 endmenu
 
