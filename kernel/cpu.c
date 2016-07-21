@@ -24,18 +24,6 @@
 
 #include "smpboot.h"
 
-#ifdef CONFIG_MSM_HOTPLUG
-#include <linux/msm_hotplug.h>
-#endif
-
-#ifdef CONFIG_THERMAL_MONITOR
-#include <linux/msm_thermal.h>
-#endif
-
-#ifdef CONFIG_MSM_BCL_CTL
-#include <linux/msm_bcl.h>
-#endif
-
 #ifdef CONFIG_SMP
 /* Serializes the updates to cpu_online_mask, cpu_present_mask */
 static DEFINE_MUTEX(cpu_add_remove_lock);
@@ -459,23 +447,6 @@ int cpu_up(unsigned int cpu)
 #ifdef	CONFIG_MEMORY_HOTPLUG
 	int nid;
 	pg_data_t	*pgdat;
-#endif
-
-#ifdef CONFIG_MSM_HOTPLUG
-	if (msm_hotplug_scr_suspended && msm_enabled) {
-		if (cpu >= 4 && !msm_hotplug_fingerprint_called)
-			return 0;
-	}
-#endif
-
-#ifdef CONFIG_THERMAL_MONITOR
-	if (cpus_offlined & BIT(cpu))
-		return 0;
-#endif
-
-#ifdef CONFIG_MSM_BCL_CTL
-	if (bcl_hotplug_request & BIT(cpu))
-		return 0;
 #endif
 
 	if (!cpu_possible(cpu)) {
