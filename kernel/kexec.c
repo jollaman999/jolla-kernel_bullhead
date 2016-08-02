@@ -1555,7 +1555,7 @@ void vmcoreinfo_append_str(const char *fmt, ...)
 void __attribute__ ((weak)) arch_crash_save_vmcoreinfo(void)
 {}
 
-unsigned long __attribute__ ((weak)) paddr_vmcoreinfo_note(void)
+phys_addr_t __attribute__ ((weak)) paddr_vmcoreinfo_note(void)
 {
 	return __pa((unsigned long)(char *)&vmcoreinfo_note);
 }
