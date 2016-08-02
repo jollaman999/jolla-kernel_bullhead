@@ -2,6 +2,8 @@
 #ifndef LINUX_KEXEC_H
 #define LINUX_KEXEC_H
 
+#include <asm/io.h>
+
 #include <uapi/linux/kexec.h>
 
 #ifdef CONFIG_KEXEC
@@ -222,7 +224,45 @@ int crash_shrink_memory(unsigned long new_size);
 size_t crash_get_memory_size(void);
 void crash_free_reserved_phys_range(unsigned long begin, unsigned long end);
 
-#else /* !CONFIG_KEXEC */
+#ifndef page_to_boot_pfn
+static inline unsigned long page_to_boot_pfn(struct page *page)
+{
+	return page_to_pfn(page);
+}
+#endif
+
+#ifndef boot_pfn_to_page
+static inline struct page *boot_pfn_to_page(unsigned long boot_pfn)
+{
+	return pfn_to_page(boot_pfn);
+}
+#endif
+
+#ifndef phys_to_boot_phys
+static inline unsigned long phys_to_boot_phys(phys_addr_t phys)
+{
+	return phys;
+}
+#endif
+
+#ifndef boot_phys_to_phys
+static inline phys_addr_t boot_phys_to_phys(unsigned long boot_phys)
+{
+	return boot_phys;
+}
+#endif
+
+static inline unsigned long virt_to_boot_phys(void *addr)
+{
+	return phys_to_boot_phys(__pa((unsigned long)addr));
+}
+
+static inline void *boot_phys_to_virt(unsigned long entry)
+{
+	return phys_to_virt(boot_phys_to_phys(entry));
+}
+
+#else /* !CONFIG_KEXEC_CORE */
 struct pt_regs;
 struct task_struct;
 static inline void crash_kexec(struct pt_regs *regs) { }
