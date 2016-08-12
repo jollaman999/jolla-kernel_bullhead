@@ -21,6 +21,11 @@ static const int bypass_purgatory = 1;
 #include <asm/cacheflush.h>
 #include <asm/system_misc.h>
 
+#if defined(CONFIG_NANOHUB_SPI) && defined(CONFIG_SPI_CONTEXTHUB)
+extern void nanohub_cleanup(void);
+extern int register_spi_contexthub_driver(void);
+#endif
+
 /* Global variables for the relocate_kernel routine. */
 extern const unsigned char relocate_new_kernel[];
 extern const unsigned long relocate_new_kernel_size;
@@ -368,6 +373,11 @@ void machine_kexec(struct kimage *image)
 
 	/* Flush the kimage list. */
 	kexec_list_flush(image->head);
+
+#if defined(CONFIG_NANOHUB_SPI) && defined(CONFIG_SPI_CONTEXTHUB)
+	nanohub_cleanup();
+	register_spi_contexthub_driver();
+#endif
 
 #ifdef CONFIG_KEXEC_HARDBOOT
 	/* Run any final machine-specific shutdown code. */
