@@ -505,6 +505,11 @@ static int nanohub_spi_resume(struct device *dev)
 	return nanohub_resume(iio_dev);
 }
 
+static const struct of_device_id nanohub_spi_dt_ids[] = {
+	{.compatible = "nanohub,spi"},
+	{},
+};
+
 static struct spi_device_id nanohub_spi_id[] = {
 	{NANOHUB_NAME, 0},
 	{},
@@ -519,6 +524,7 @@ static struct spi_driver nanohub_spi_driver = {
 	.driver = {
 		   .name = NANOHUB_NAME,
 		   .owner = THIS_MODULE,
+		   .of_match_table = of_match_ptr(nanohub_spi_dt_ids),
 		   .pm = &nanohub_spi_pm_ops,
 		   },
 	.probe = nanohub_spi_probe,
