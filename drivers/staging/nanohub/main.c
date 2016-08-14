@@ -1593,7 +1593,7 @@ static int __init nanohub_init(void)
 	return ret;
 }
 
-void nanohub_cleanup(void)
+static void __exit nanohub_cleanup(void)
 {
 #ifdef CONFIG_NANOHUB_I2C
 	nanohub_i2c_cleanup();
@@ -1606,7 +1606,6 @@ void nanohub_cleanup(void)
 	major = 0;
 	sensor_class = 0;
 }
-EXPORT_SYMBOL(nanohub_cleanup);
 
 module_init(nanohub_init);
 module_exit(nanohub_cleanup);
