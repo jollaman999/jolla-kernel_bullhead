@@ -102,14 +102,18 @@ static int touch_x = 0, touch_y = 0;
 static int prev_x = 0, prev_y = 0;
 static bool is_new_touch_x = false, is_new_touch_y = false;
 static bool is_touching = false;
+static bool sovc_auto_off_scheduled = false;
 static struct input_dev *sovc_input;
 static DEFINE_MUTEX(keyworklock);
 static DEFINE_MUTEX(touch_off_lock);
+static DEFINE_MUTEX(auto_off_schedule_lock);
 static struct workqueue_struct *sovc_volume_input_wq;
 static struct workqueue_struct *sovc_track_input_wq;
 static struct work_struct sovc_volume_input_work;
 static struct work_struct sovc_track_input_work;
 extern bool tomtom_mic_detected;
+
+static void touch_off(void);
 
 static bool registered = false;
 static DEFINE_MUTEX(reg_lock);
@@ -245,7 +249,27 @@ static void scroff_volctr_reset(void)
 	is_touching = false;
 	is_new_touch_x = false;
 	is_new_touch_y = false;
+	sovc_auto_off_scheduled = false;
 	control = NO_CONTROL;
+}
+
+static void sovc_auto_off_check(struct work_struct *sovc_auto_off_check_work)
+{
+	if (!is_new_touch_x && !is_new_touch_y)
+		return;
+
+	touch_off();
+}
+static DECLARE_DELAYED_WORK(sovc_auto_off_check_work, sovc_auto_off_check);
+
+static void sovc_auto_off_schedule(void)
+{
+	if (sovc_auto_off_scheduled)
+		return;
+
+	sovc_auto_off_scheduled = true;
+	schedule_delayed_work(&sovc_auto_off_check_work,
+				msecs_to_jiffies(sovc_auto_off_delay));
 }
 
 /* init a new touch */
@@ -254,6 +278,11 @@ static void new_touch_x(int x)
 	touch_time_pre_x = ktime_to_ms(ktime_get());
 	is_new_touch_x = true;
 	prev_x = x;
+
+	mutex_lock(&auto_off_schedule_lock);
+	sovc_auto_off_schedule();
+	mutex_unlock(&auto_off_schedule_lock);
+
 }
 
 static void new_touch_y(int y)
@@ -261,6 +290,10 @@ static void new_touch_y(int y)
 	touch_time_pre_y = ktime_to_ms(ktime_get());
 	is_new_touch_y = true;
 	prev_y = y;
+
+	mutex_lock(&auto_off_schedule_lock);
+	sovc_auto_off_schedule();
+	mutex_unlock(&auto_off_schedule_lock);
 }
 
 /* exec key control */
@@ -307,8 +340,7 @@ static void sovc_volume_input_callback(struct work_struct *unused)
 			exec_key(VOL_UP);
 		else if (touch_y - prev_y > SOVC_VOL_FEATHER) // Volume Down (up->down)
 			exec_key(VOL_DOWN);
-	} else if (time > sovc_auto_off_delay)
-		touch_off();
+	}
 }
 
 /* scroff_volctr track function */
@@ -326,8 +358,7 @@ static void sovc_track_input_callback(struct work_struct *unused)
 			exec_key(TRACK_NEXT);
 		else if (touch_x - prev_x > SOVC_TRACK_FEATHER) // Track Previous (left->right)
 			exec_key(TRACK_PREVIOUS);
-	} else if (time > sovc_auto_off_delay)
-		touch_off();
+	}
 }
 
 static int sovc_input_common_event(struct input_handle *handle, unsigned int type,
@@ -346,8 +377,10 @@ static int sovc_input_common_event(struct input_handle *handle, unsigned int typ
 			break;
 
 		case ABS_MT_TRACKING_ID:
-			if (value == 0xffffffff)
+			if (value == 0xffffffff) {
+				cancel_delayed_work(&sovc_auto_off_check_work);
 				scroff_volctr_reset();
+			}
 			break;
 
 		default:
