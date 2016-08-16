@@ -86,7 +86,7 @@ MODULE_LICENSE("GPLv2");
 #define SOVC_TIME_GAP		250	// Ignore touch after this time (ms)
 #define SOVC_VOL_REEXEC_DELAY	250	// Re-exec delay for volume control (ms)
 #define SOVC_TRACK_REEXEC_DELAY	4000	// Re-exec delay for track control (ms)
-#define SOVC_AUTO_OFF_DELAY	4000	// Touch screen will be turned off when user pressing the screen (ms)
+#define SOVC_AUTO_OFF_DELAY	2500	// Touch screen will be turned off when user pressing the screen (ms)
 #define SOVC_KEY_PRESS_DUR	100	// Key press duration (ms)
 #define SOVC_VIB_STRENGTH	20	// Vibrator strength
 
