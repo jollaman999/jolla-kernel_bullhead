@@ -1118,7 +1118,7 @@ static struct spi_driver spich_spi_driver = {
 	.resume = spich_resume,
 };
 
-int register_spi_contexthub_driver(void)
+static int __init spich_init(void)
 {
 	pr_info(DRV_NAME ": %s\n", __func__);
 
@@ -1127,16 +1127,6 @@ int register_spi_contexthub_driver(void)
 		return -EINVAL;
 	}
 	return 0;
-}
-EXPORT_SYMBOL(register_spi_contexthub_driver);
-
-static int __init spich_init(void)
-{
-	int ret = 0;
-#ifndef CONFIG_NANOHUB
-	ret = register_spi_contexthub_driver();
-#endif
-	return ret;
 }
 
 static void __exit spich_exit(void)
