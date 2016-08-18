@@ -70,7 +70,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Screen Off Volume & Track Control for almost any device"
-#define DRIVER_VERSION "3.1"
+#define DRIVER_VERSION "3.2"
 #define LOGTAG "[scroff_volctr]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -152,6 +152,27 @@ static int __init read_sovc_cmdline(char *sovc)
 }
 __setup("sovc=", read_sovc_cmdline);
 
+/* Turn off the touch screen when user pressing the touch screen */
+static void sovc_auto_off_check(struct work_struct *sovc_auto_off_check_work)
+{
+	if (!is_new_touch_x && !is_new_touch_y)
+		return;
+
+	touch_off();
+}
+static DECLARE_DELAYED_WORK(sovc_auto_off_check_work, sovc_auto_off_check);
+
+/* Schedule delayed work of sovc_auto_off_check_work */
+static void sovc_auto_off_schedule(void)
+{
+	if (sovc_auto_off_scheduled)
+		return;
+
+	sovc_auto_off_scheduled = true;
+	schedule_delayed_work(&sovc_auto_off_check_work,
+				msecs_to_jiffies(sovc_auto_off_delay));
+}
+
 /* Key work func */
 static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 {
@@ -212,8 +233,11 @@ static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 #endif
 	mutex_unlock(&keyworklock);
 
-	if (is_touching)
+	if (is_touching) {
+		// It should be canceled to prevent to turn off the touchscreen.
+		cancel_delayed_work(&sovc_auto_off_check_work);
 		scroff_volctr_key_delayed_trigger();
+	}
 }
 static DECLARE_DELAYED_WORK(scroff_volctr_key_work, scroff_volctr_key);
 
@@ -251,25 +275,6 @@ static void scroff_volctr_reset(void)
 	is_new_touch_y = false;
 	sovc_auto_off_scheduled = false;
 	control = NO_CONTROL;
-}
-
-static void sovc_auto_off_check(struct work_struct *sovc_auto_off_check_work)
-{
-	if (!is_new_touch_x && !is_new_touch_y)
-		return;
-
-	touch_off();
-}
-static DECLARE_DELAYED_WORK(sovc_auto_off_check_work, sovc_auto_off_check);
-
-static void sovc_auto_off_schedule(void)
-{
-	if (sovc_auto_off_scheduled)
-		return;
-
-	sovc_auto_off_scheduled = true;
-	schedule_delayed_work(&sovc_auto_off_check_work,
-				msecs_to_jiffies(sovc_auto_off_delay));
 }
 
 /* init a new touch */
