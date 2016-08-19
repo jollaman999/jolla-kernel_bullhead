@@ -6,10 +6,10 @@
 		spi-cpol;
 		spi-cpha;
 
-		contexthub,ap2sh = <&msm_gpio 65 0x00>;
-		contexthub,sh2ap = <&msm_gpio 66 0x00>;
-		contexthub,nrst = <&msm_gpio 59 0x00>;
-		contexthub,boot0 = <&msm_gpio 60 0x00>;
+		sensorhub,wakeup-gpio = <&msm_gpio 65 0x00>;
+		sensorhub,irq1-gpio = <&msm_gpio 66 0x00>;
+		sensorhub,nreset-gpio = <&msm_gpio 59 0x00>;
+		sensorhub,boot0-gpio = <&msm_gpio 60 0x00>;
 
 		interrupt-parent = <&msm_gpio>;
 		interrupts = <66 0x2>;
