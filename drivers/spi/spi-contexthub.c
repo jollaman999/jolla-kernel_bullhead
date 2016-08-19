@@ -1001,13 +1001,13 @@ static int spich_probe(struct spi_device *spi)
 	mutex_init(&spich->buf_lock);
 
 	spich->gpio_array[GPIO_IDX_AP2SH].flags = GPIOF_OUT_INIT_HIGH;
-	spich->gpio_array[GPIO_IDX_AP2SH].label = "contexthub,ap2sh";
+	spich->gpio_array[GPIO_IDX_AP2SH].label = "sensorhub,wakeup-gpio";
 	spich->gpio_array[GPIO_IDX_SH2AP].flags = GPIOF_DIR_IN;
-	spich->gpio_array[GPIO_IDX_SH2AP].label = "contexthub,sh2ap";
+	spich->gpio_array[GPIO_IDX_SH2AP].label = "sensorhub,irq1-gpio";
 	spich->gpio_array[GPIO_IDX_BOOT0].flags = GPIOF_OUT_INIT_LOW;
-	spich->gpio_array[GPIO_IDX_BOOT0].label = "contexthub,boot0";
+	spich->gpio_array[GPIO_IDX_BOOT0].label = "sensorhub,boot0-gpio";
 	spich->gpio_array[GPIO_IDX_NRST].flags = GPIOF_OUT_INIT_HIGH;
-	spich->gpio_array[GPIO_IDX_NRST].label = "contexthub,nrst";
+	spich->gpio_array[GPIO_IDX_NRST].label = "sensorhub,nreset-gpio";
 
 	spich->class = class_create(THIS_MODULE, DRV_CLASS_NAME);
 	if (IS_ERR(spich->class)) {
