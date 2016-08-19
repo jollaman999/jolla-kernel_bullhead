@@ -1,6 +1,6 @@
 &spi_7 {
 	sensorhub@0 {
-		compatible = "nanohub";
+		compatible = "nanohub", "contexthub,spich";
 		reg = <0>;
 		spi-max-frequency = <25000000>;
 		spi-cpol;
