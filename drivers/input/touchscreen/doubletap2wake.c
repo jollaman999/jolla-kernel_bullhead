@@ -331,7 +331,8 @@ static int register_dt2w(void)
 		goto out;
 	}
 
-	dt2w_input_wq = create_workqueue("dt2wiwq");
+	dt2w_input_wq = alloc_workqueue("dt2wiwq", WQ_MEM_RECLAIM | WQ_HIGHPRI |
+						   WQ_POWER_EFFICIENT, 1);
 	if (!dt2w_input_wq) {
 		pr_err("%s: Failed to create dt2wiwq workqueue\n", __func__);
 		mutex_unlock(&reg_lock);
