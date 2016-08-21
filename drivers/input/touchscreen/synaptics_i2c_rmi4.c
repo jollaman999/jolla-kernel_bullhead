@@ -4067,11 +4067,13 @@ static int synaptics_rmi4_probe(struct i2c_client *client,
 
 	rmi4_data->det_workqueue =
 			alloc_workqueue("rmi_det_workqueue",
-				WQ_UNBOUND | WQ_HIGHPRI | __WQ_ORDERED, 1);
+				WQ_UNBOUND | WQ_HIGHPRI | __WQ_ORDERED |
+				WQ_POWER_EFFICIENT, 1);
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	rmi4_data->touch_off_workqueue =
 			alloc_workqueue("rmi_touch_off_workqueue",
-				WQ_UNBOUND | WQ_HIGHPRI | __WQ_ORDERED, 1);
+				WQ_UNBOUND | WQ_HIGHPRI | __WQ_ORDERED |
+				WQ_POWER_EFFICIENT, 1);
 #endif
 
 	INIT_DELAYED_WORK(&rmi4_data->det_work,
