@@ -169,7 +169,7 @@ static void sovc_auto_off_schedule(void)
 		return;
 
 	sovc_auto_off_scheduled = true;
-	schedule_delayed_work(&sovc_auto_off_check_work,
+	queue_delayed_work(system_power_efficient_wq, &sovc_auto_off_check_work,
 				msecs_to_jiffies(sovc_auto_off_delay));
 }
 
@@ -244,7 +244,7 @@ static DECLARE_DELAYED_WORK(scroff_volctr_key_work, scroff_volctr_key);
 /* Key trigger */
 static void scroff_volctr_key_trigger(void)
 {
-	schedule_delayed_work(&scroff_volctr_key_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &scroff_volctr_key_work, 0);
 }
 
 /* Key delayed trigger */
@@ -263,7 +263,7 @@ static void scroff_volctr_key_delayed_trigger(void)
 		break;
 	}
 
-	schedule_delayed_work(&scroff_volctr_key_work,
+	queue_delayed_work(system_power_efficient_wq, &scroff_volctr_key_work,
 				msecs_to_jiffies(delay));
 }
 
@@ -538,14 +538,16 @@ static int register_sovc(void)
 		goto out;
 	}
 
-	sovc_volume_input_wq = create_workqueue("sovc_volume_iwq");
+	sovc_volume_input_wq = alloc_workqueue("sovc_volume_iwq",
+				WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_POWER_EFFICIENT, 1);
 	if (!sovc_volume_input_wq) {
 		pr_err("%s: Failed to create sovc_volume_iwq workqueue\n", __func__);
 		mutex_unlock(&reg_lock);
 		return -EFAULT;
 	}
 	INIT_WORK(&sovc_volume_input_work, sovc_volume_input_callback);
-	sovc_track_input_wq = create_workqueue("sovc_track_iwq");
+	sovc_track_input_wq = alloc_workqueue("sovc_track_iwq",
+				WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_POWER_EFFICIENT, 1);
 	if (!sovc_track_input_wq) {
 		pr_err("%s: Failed to create sovc_track_iwq workqueue\n", __func__);
 		mutex_unlock(&reg_lock);
