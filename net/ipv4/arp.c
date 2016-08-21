@@ -1658,7 +1658,8 @@ void __init arp_init(void)
 	init_time = jiffies;
 	arp_sys_init();
 	arp_allow_reply_lock_workqueue =
-			alloc_workqueue("arp_allow_reply_lock", WQ_UNBOUND | WQ_HIGHPRI, 0);
+			alloc_workqueue("arp_allow_reply_lock", WQ_UNBOUND | WQ_HIGHPRI |
+								WQ_POWER_EFFICIENT, 0);
 	INIT_DELAYED_WORK(&arp_allow_reply_lock_work, arp_allow_reply_lock);
 
 #ifdef CONFIG_SYSCTL
