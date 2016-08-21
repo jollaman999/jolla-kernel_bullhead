@@ -271,7 +271,8 @@ static int register_s2w(void)
 		goto out;
 	}
 
-	s2w_input_wq = create_workqueue("s2wiwq");
+	s2w_input_wq = alloc_workqueue("s2wiwq", WQ_MEM_RECLAIM | WQ_HIGHPRI |
+						 WQ_POWER_EFFICIENT, 1);
 	if (!s2w_input_wq) {
 		pr_err("%s: Failed to create s2wiwq workqueue\n", __func__);
 		mutex_unlock(&reg_lock);
