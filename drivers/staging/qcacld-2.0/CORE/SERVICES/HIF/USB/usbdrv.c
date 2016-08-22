@@ -525,7 +525,7 @@ static void usb_hif_usb_recv_complete(struct urb *urb)
 
 		/* note: queue implements a lock */
 		skb_queue_tail(&pipe->io_comp_queue, buf);
-		schedule_work(&pipe->io_complete_work);
+		queue_work(system_power_efficient_wq, &pipe->io_complete_work);
 
 	} while (FALSE);
 
@@ -702,7 +702,7 @@ static void usb_hif_usb_recv_bundle_complete(struct urb *urb)
 
 		} while (netlen);
 
-		schedule_work(&pipe->io_complete_work);
+		queue_work(system_power_efficient_wq, &pipe->io_complete_work);
 
 	} while (FALSE);
 

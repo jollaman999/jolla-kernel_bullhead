@@ -656,7 +656,7 @@ int hdd_mon_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
           * this packet we need to call SME API. So to take care of this we will
           * schedule a work queue
           */
-         schedule_work(&pPgBkAdapter->monTxWorkQueue);
+         queue_work(system_power_efficient_wq, &pPgBkAdapter->monTxWorkQueue);
       }
       return NETDEV_TX_OK;
    }

@@ -230,7 +230,7 @@ static void usb_hif_usb_transmit_complete(struct urb *urb)
 
 	/* note: queue implements a lock */
 	skb_queue_tail(&pipe->io_comp_queue, buf);
-	schedule_work(&pipe->io_complete_work);
+	queue_work(system_power_efficient_wq, &pipe->io_complete_work);
 
 	AR_DEBUG_PRINTF(USB_HIF_DEBUG_BULK_OUT, ("-%s\n", __func__));
 }
@@ -267,7 +267,7 @@ static void usb_hif_usb_transmit_bundle_complete(struct urb *urb)
 
 	while ((tmp_buf = skb_dequeue(&urb_context->comp_queue)))
 		skb_queue_tail(&pipe->io_comp_queue, tmp_buf);
-	schedule_work(&pipe->io_complete_work);
+	queue_work(system_power_efficient_wq, &pipe->io_complete_work);
 
 	AR_DEBUG_PRINTF(USB_HIF_DEBUG_BULK_OUT, ("-%s\n", __func__));
 }

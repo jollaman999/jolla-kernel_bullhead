@@ -21198,7 +21198,7 @@ wma_data_tx_ack_comp_hdlr(void *wma_context,
 			ack_work->status = status;
 
 			/* Schedue the Work */
-			schedule_work(&ack_work->ack_cmp_work);
+			queue_work(system_power_efficient_wq, &ack_work->ack_cmp_work);
 		}
 	}
 
@@ -25684,7 +25684,7 @@ wma_mgmt_tx_ack_comp_hdlr(void *wma_context,
 				ack_work->status = status;
 
 				/* Schedue the Work */
-				schedule_work(&ack_work->ack_cmp_work);
+				queue_work(system_power_efficient_wq, &ack_work->ack_cmp_work);
 			}
 		}
 	}

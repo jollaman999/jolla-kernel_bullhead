@@ -1412,7 +1412,7 @@ static int hdd_ipa_rm_try_release(struct hdd_ipa_priv *hdd_ipa)
 	 * while there is healthy amount of data transfer going on by
 	 * releasing the wake_lock after some delay.
 	 */
-	schedule_delayed_work(&hdd_ipa->wake_lock_work,
+	queue_delayed_work(system_power_efficient_wq, &hdd_ipa->wake_lock_work,
 			msecs_to_jiffies(HDD_IPA_RX_INACTIVITY_MSEC_DELAY));
 
 	adf_os_spin_unlock_bh(&hdd_ipa->rm_lock);
@@ -1462,7 +1462,7 @@ static void hdd_ipa_rm_notify(void *user_data, enum ipa_rm_event event,
 		adf_os_spin_unlock_bh(&hdd_ipa->rm_lock);
 		hdd_ipa->stats.num_rm_grant++;
 
-		schedule_work(&hdd_ipa->rm_work);
+		queue_work(system_power_efficient_wq, &hdd_ipa->rm_work);
 		break;
 	case IPA_RM_RESOURCE_RELEASED:
 		HDD_IPA_LOG(VOS_TRACE_LEVEL_INFO, "RM Release");
@@ -2300,7 +2300,7 @@ int hdd_ipa_resume(hdd_context_t *hdd_ctx)
 	if (!hdd_ipa_is_enabled(hdd_ctx))
 		return 0;
 
-	schedule_work(&hdd_ipa->pm_work);
+	queue_work(system_power_efficient_wq, &hdd_ipa->pm_work);
 
 	adf_os_spin_lock_bh(&hdd_ipa->pm_lock);
 	hdd_ipa->suspended = false;

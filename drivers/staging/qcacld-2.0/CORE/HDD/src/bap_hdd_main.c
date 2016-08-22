@@ -4205,7 +4205,7 @@ static int BSL_Write(struct sk_buff *skb)
                   "%s: Scheduling work for skb %p, BT-AMP Client context %p, work %p",
                   __func__, skb, pctx, pHciContext);
 
-        status = schedule_work(&pHciContext->hciInterfaceProcessing);
+        status = queue_work(system_power_efficient_wq, &pHciContext->hciInterfaceProcessing);
 
         // Check result
         if ( 0 == status )

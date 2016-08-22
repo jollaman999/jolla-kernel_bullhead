@@ -13452,7 +13452,7 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
                                             wlan_hdd_cfg80211_scan_block_cb);
 #endif
 
-            schedule_work(&pAdapter->scan_block_work);
+            queue_work(system_power_efficient_wq, &pAdapter->scan_block_work);
             return 0;
         }
     }

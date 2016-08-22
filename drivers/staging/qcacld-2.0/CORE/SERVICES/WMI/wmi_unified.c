@@ -209,7 +209,7 @@ static u_int8_t* get_wmi_cmd_string(WMI_CMD_ID wmi_command)
 		CASE_RETURN_STRING(WMI_PDEV_GET_TPC_CONFIG_CMDID);
 
 		/** set the base MAC address for the physical device before a VDEV is created.
-		 *  For firmware that doesn’t support this feature and this command, the pdev
+		 *  For firmware that doesn't support this feature and this command, the pdev
 		 *  MAC address will not be changed. */
 		CASE_RETURN_STRING(WMI_PDEV_SET_BASE_MACADDR_CMDID);
 
@@ -734,7 +734,7 @@ dont_tag:
 		adf_os_atomic_dec(&wmi_handle->pending_cmds);
 		pr_err("%s: MAX 1024 WMI Pending cmds reached.\n", __func__);
 		vos_set_logp_in_progress(VOS_MODULE_ID_VOSS, TRUE);
-		schedule_work(&recovery_work);
+		queue_work(system_power_efficient_wq, &recovery_work);
 		return -EBUSY;
 	}
 
@@ -936,7 +936,7 @@ void wmi_control_rx(void *ctx, HTC_PACKET *htc_packet)
 	adf_os_spin_lock_bh(&wmi_handle->eventq_lock);
 	adf_nbuf_queue_add(&wmi_handle->event_queue, evt_buf);
 	adf_os_spin_unlock_bh(&wmi_handle->eventq_lock);
-	schedule_work(&wmi_handle->rx_event_work);
+	queue_work(system_power_efficient_wq, &wmi_handle->rx_event_work);
 }
 
 void __wmi_control_rx(struct wmi_unified *wmi_handle, wmi_buf_t evt_buf)
