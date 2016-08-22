@@ -1260,16 +1260,17 @@ static void wcnss_smd_notify_event(void *data, unsigned int event)
 			pr_err("wcnss: failed to read from smd %d\n", len);
 			return;
 		}
-		schedule_work(&penv->wcnssctrl_rx_work);
+		queue_work(system_power_efficient_wq, &penv->wcnssctrl_rx_work);
 		break;
 
 	case SMD_EVENT_OPEN:
 		pr_debug("wcnss: opening WCNSS SMD channel :%s",
 				WCNSS_CTRL_CHANNEL);
-		schedule_work(&penv->wcnssctrl_version_work);
-		schedule_work(&penv->wcnss_pm_config_work);
+		queue_work(system_power_efficient_wq, &penv->wcnssctrl_version_work);
+		queue_work(system_power_efficient_wq, &penv->wcnss_pm_config_work);
 		cancel_delayed_work(&penv->wcnss_pm_qos_del_req);
-		schedule_delayed_work(&penv->wcnss_pm_qos_del_req, 0);
+		queue_delayed_work(system_power_efficient_wq,
+				   &penv->wcnss_pm_qos_del_req, 0);
 
 		break;
 
@@ -1870,7 +1871,8 @@ static void wcnss_notify_vbat(enum qpnp_tm_state state, void *ctx)
 
 	qpnp_adc_tm_channel_measure(penv->adc_tm_dev,
 			&penv->vbat_monitor_params);
-	schedule_delayed_work(&penv->vbatt_work, msecs_to_jiffies(2000));
+	queue_delayed_work(system_power_efficient_wq,
+			   &penv->vbatt_work, msecs_to_jiffies(2000));
 	mutex_unlock(&penv->vbat_monitor_mutex);
 }
 
@@ -2139,7 +2141,8 @@ static void wcnssctrl_rx_handler(struct work_struct *worker)
 			/* supported only if riva major >= 1 and minor >= 4 */
 			if ((pversion->major >= 1) && (pversion->minor >= 4)) {
 				pr_info("wcnss: schedule dnld work for riva\n");
-				schedule_work(&penv->wcnssctrl_nvbin_dnld_work);
+				queue_work(system_power_efficient_wq,
+					   &penv->wcnssctrl_nvbin_dnld_work);
 			}
 			break;
 
@@ -2153,7 +2156,8 @@ static void wcnssctrl_rx_handler(struct work_struct *worker)
 			/* supported only if pronto major >= 1 and minor >= 4 */
 			if ((pversion->major >= 1) && (pversion->minor >= 4)) {
 				pr_info("wcnss: schedule dnld work for pronto\n");
-				schedule_work(&penv->wcnssctrl_nvbin_dnld_work);
+				queue_work(system_power_efficient_wq,
+					   &penv->wcnssctrl_nvbin_dnld_work);
 			}
 			break;
 
@@ -3144,8 +3148,8 @@ static int wcnss_notif_cb(struct notifier_block *this, unsigned long code,
 	} else if ((code == SUBSYS_BEFORE_SHUTDOWN && data && data->crashed) ||
 			code == SUBSYS_SOC_RESET) {
 		wcnss_disable_pc_add_req();
-		schedule_delayed_work(&penv->wcnss_pm_qos_del_req,
-				msecs_to_jiffies(WCNSS_PM_QOS_TIMEOUT));
+		queue_delayed_work(system_power_efficient_wq, &penv->wcnss_pm_qos_del_req,
+				   msecs_to_jiffies(WCNSS_PM_QOS_TIMEOUT));
 		wcnss_log_debug_regs_on_bite();
 	} else if (code == SUBSYS_POWERUP_FAILURE) {
 		if (pdev && pwlanconfig)
@@ -3155,8 +3159,8 @@ static int wcnss_notif_cb(struct notifier_block *this, unsigned long code,
 		wcnss_disable_pc_remove_req();
 	} else if (SUBSYS_BEFORE_SHUTDOWN == code) {
 		wcnss_disable_pc_add_req();
-		schedule_delayed_work(&penv->wcnss_pm_qos_del_req,
-				msecs_to_jiffies(WCNSS_PM_QOS_TIMEOUT));
+		queue_delayed_work(system_power_efficient_wq, &penv->wcnss_pm_qos_del_req,
+				   msecs_to_jiffies(WCNSS_PM_QOS_TIMEOUT));
 		penv->is_shutdown = 1;
 	} else if (SUBSYS_AFTER_POWERUP == code)
 		penv->is_shutdown = 0;
