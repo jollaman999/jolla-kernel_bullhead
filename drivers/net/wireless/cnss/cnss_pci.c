@@ -1574,7 +1574,7 @@ DECLARE_WORK(recovery_work, cnss_pci_recovery_work_handler);
 
 void cnss_schedule_recovery_work(void)
 {
-	schedule_work(&recovery_work);
+	queue_work(system_power_efficient_wq, &recovery_work);
 }
 EXPORT_SYMBOL(cnss_schedule_recovery_work);
 
@@ -1606,7 +1606,7 @@ void cnss_pci_events_cb(struct msm_pcie_notify *notify)
 
 		pr_err("PCI link down, schedule recovery\n");
 		__cnss_disable_irq(notify->user);
-		schedule_work(&recovery_work);
+		queue_work(system_power_efficient_wq, &recovery_work);
 		break;
 
 	case MSM_PCIE_EVENT_WAKEUP:
@@ -1637,7 +1637,7 @@ void cnss_wlan_pci_link_down(void)
 	spin_unlock_irqrestore(&pci_link_down_lock, flags);
 
 	pr_err("PCI link down detected by host driver, schedule recovery!\n");
-	schedule_work(&recovery_work);
+	queue_work(system_power_efficient_wq, &recovery_work);
 }
 EXPORT_SYMBOL(cnss_wlan_pci_link_down);
 
@@ -2136,7 +2136,7 @@ EXPORT_SYMBOL(cnss_release_pm_sem);
 
 void cnss_pci_schedule_recovery_work(void)
 {
-	schedule_work(&recovery_work);
+	queue_work(system_power_efficient_wq, &recovery_work);
 }
 
 void *cnss_pci_get_virt_ramdump_mem(unsigned long *size)
