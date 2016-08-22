@@ -800,7 +800,7 @@ wlan_tasklet(unsigned long data)
          */
         adf_os_atomic_set(&sc->ce_suspend, 1);
 #ifdef CONFIG_SLUB_DEBUG_ON
-        schedule_work(&reschedule_tasklet_work);
+        queue_work(system_power_efficient_wq, &reschedule_tasklet_work);
 #else
         tasklet_schedule(&sc->intr_tq);
 #endif
@@ -1280,7 +1280,7 @@ static int __hif_pci_runtime_resume(struct pci_dev *pdev)
 	hif_pm_runtime_mark_last_busy(sc->dev);
 	sc->pm_stats.resumed++;
 
-	schedule_work(&sc->pm_work);
+	queue_work(system_power_efficient_wq, &sc->pm_work);
 
 	return 0;
 out:

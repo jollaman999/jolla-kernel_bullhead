@@ -226,7 +226,7 @@ static void usb_hif_usb_transmit_complete(struct urb *urb)
 #ifdef HIF_USB_TASKLET
 	tasklet_schedule(&pipe->io_complete_tasklet);
 #else
-	schedule_work(&pipe->io_complete_work);
+	queue_work(system_power_efficient_wq, &pipe->io_complete_work);
 #endif
 
 	AR_DEBUG_PRINTF(USB_HIF_DEBUG_BULK_OUT, ("-%s\n", __func__));

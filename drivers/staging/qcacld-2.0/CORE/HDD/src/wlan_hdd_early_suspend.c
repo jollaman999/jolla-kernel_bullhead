@@ -597,7 +597,7 @@ static int __wlan_hdd_ipv6_changed(struct notifier_block *nb,
 		if (hdd_ctx->cfg_ini->nEnableSuspend ==
 			WLAN_MAP_SUSPEND_TO_MCAST_BCAST_FILTER &&
 			hdd_ctx->ns_offload_enable)
-			schedule_work(&adapter->ipv6NotifierWorkQueue);
+			queue_work(system_power_efficient_wq, &adapter->ipv6NotifierWorkQueue);
 		else
 			hddLog(LOG1, FL("Not scheduling ipv6 wq nEnableSuspend: %d"),
 				hdd_ctx->cfg_ini->nEnableSuspend);
@@ -1160,7 +1160,7 @@ static int __wlan_hdd_ipv4_changed(struct notifier_block *nb,
 	}
 
 	if (ifa && ifa->ifa_local)
-		schedule_work(&adapter->ipv4NotifierWorkQueue);
+		queue_work(system_power_efficient_wq, &adapter->ipv4NotifierWorkQueue);
 
 	return NOTIFY_DONE;
 }

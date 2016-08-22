@@ -9093,7 +9093,7 @@ static int kickstart_driver(bool load, bool mode_change)
 
 	/* Unload is requested */
 	if (!load && wlan_hdd_inited) {
-		schedule_work(&kickstart_driver_work);
+		queue_work(system_power_efficient_wq, &kickstart_driver_work);
 		return 0;
 	}
 

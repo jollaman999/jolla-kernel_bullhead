@@ -996,7 +996,7 @@ void wmi_control_rx(void *ctx, HTC_PACKET *htc_packet)
 	adf_os_spin_lock_bh(&wmi_handle->eventq_lock);
 	adf_nbuf_queue_add(&wmi_handle->event_queue, evt_buf);
 	adf_os_spin_unlock_bh(&wmi_handle->eventq_lock);
-	schedule_work(&wmi_handle->rx_event_work);
+	queue_work(system_power_efficient_wq, &wmi_handle->rx_event_work);
 }
 
 void __wmi_control_rx(struct wmi_unified *wmi_handle, wmi_buf_t evt_buf)
