@@ -2561,8 +2561,6 @@ void cpuset_print_task_mems_allowed(struct task_struct *tsk)
 
 	rcu_read_lock();
 
-	nodelist_scnprintf(cpuset_nodelist, CPUSET_NODELIST_LEN,
-			   tsk->mems_allowed);
 	printk(KERN_INFO "%s cpuset=%s mems_allowed=%*pbl\n",
 	       tsk->comm, cgroup_name(cgrp), nodemask_pr_args(&tsk->mems_allowed));
 

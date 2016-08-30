@@ -1132,15 +1132,12 @@ bool have_sched_same_pwr_cost_cpus;
 cpumask_var_t sched_same_pwr_cost_cpus;
 static int __init set_sched_same_power_cost_cpus(char *str)
 {
-	char buf[64];
-
 	alloc_bootmem_cpumask_var(&sched_same_pwr_cost_cpus);
 	if (cpulist_parse(str, sched_same_pwr_cost_cpus) < 0) {
 		pr_warn("sched: Incorrect sched_same_power_cost_cpus cpumask\n");
 		return -EINVAL;
 	}
 
-	cpulist_scnprintf(buf, sizeof(buf), sched_same_pwr_cost_cpus);
 	if (!cpumask_empty(sched_same_pwr_cost_cpus))
 		have_sched_same_pwr_cost_cpus = true;
 	return 0;
