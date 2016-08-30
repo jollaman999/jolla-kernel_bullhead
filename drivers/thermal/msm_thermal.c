@@ -425,14 +425,11 @@ uint32_t get_core_max_freq(uint32_t cpu)
 
 static void cpus_previously_online_update(void)
 {
-	char buf[CPU_BUF_SIZE];
-
 	get_online_cpus();
 	cpumask_or(cpus_previously_online, cpus_previously_online,
 		   cpu_online_mask);
 	put_online_cpus();
-	cpulist_scnprintf(buf, sizeof(buf), cpus_previously_online);
-	pr_debug("%s\n", buf);
+	pr_debug("%*pbl\n", cpumask_pr_args(cpus_previously_online));
 }
 
 uint32_t get_core_min_freq(uint32_t cpu)
@@ -1139,7 +1136,6 @@ static int __ref init_cluster_freq_table(void)
 {
 	uint32_t _cluster = 0, _cpu = 0, table_len = 0, idx = 0;
 	int ret = 0, cpu_set;
-	char buf[CPU_BUF_SIZE];
 	struct cluster_info *cluster_ptr = NULL;
 	struct cpufreq_policy *policy = NULL;
 	struct cpufreq_frequency_table *freq_table_ptr = NULL;
@@ -1182,10 +1178,8 @@ static int __ref init_cluster_freq_table(void)
 				if (!cpu_set) {
 					cpumask_clear_cpu(_cpu,
 						cpus_previously_online);
-					cpumask_scnprintf(buf, sizeof(buf),
-						cpus_previously_online);
-					pr_debug("Reset prev online to %s\n",
-						 buf);
+					pr_debug("Reset prev online to %*pb\n",
+						 cpumask_pr_args(cpus_previously_online));
 				}
 			}
 			freq_table_ptr = pending_freq_table_ptr;
