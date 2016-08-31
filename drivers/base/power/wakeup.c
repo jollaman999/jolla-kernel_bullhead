@@ -20,6 +20,10 @@
 
 #include "power.h"
 
+static bool enable_wlan_wow_wl_ws = true;
+module_param(enable_wlan_wow_wl_ws, bool, 0644);
+static bool enable_wlan_ws = true;
+module_param(enable_wlan_ws, bool, 0644);
 static bool enable_bluedroid_timer_ws = true;
 module_param(enable_bluedroid_timer_ws, bool, 0644);
 static bool enable_bluesleep_ws = true;
@@ -487,6 +491,8 @@ static void wakeup_source_activate(struct wakeup_source *ws)
 
 	if (((!enable_bluedroid_timer_ws &&
 			!strcmp(ws->name, "bluedroid_timer")) ||
+		(!enable_wlan_wow_wl_ws && !strcmp(ws->name, "wlan_wow_wl")) ||
+		(!enable_wlan_ws && !strcmp(ws->name, "wlan")) ||
 		(!enable_bluesleep_ws && !strcmp(ws->name, "bluesleep")))) {
 		/*
 		 * let's try and deactivate this wakeup source since the user
