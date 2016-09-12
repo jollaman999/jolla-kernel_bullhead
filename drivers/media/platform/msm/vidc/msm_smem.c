@@ -332,7 +332,7 @@ bool msm_smem_compare_buffers(void *clt, int fd, void *priv)
 	struct ion_handle *handle = NULL;
 	bool ret = false;
 	if (!clt || !priv) {
-		dprintk(VIDC_ERR, "Invalid params: %p, %p\n",
+		dprintk(VIDC_ERR, "Invalid params: %pK, %pK\n",
 			clt, priv);
 		return false;
 	}
