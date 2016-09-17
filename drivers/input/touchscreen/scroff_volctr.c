@@ -630,9 +630,17 @@ static ssize_t sovc_scroff_volctr_show(struct device *dev,
 static ssize_t sovc_scroff_volctr_dump(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
-	if ((buf[0] == '0' || buf[0] == '1') && buf[1] == '\n')
-		if (sovc_switch != buf[0] - '0')
-			sovc_switch = buf[0] - '0';
+	int rc, val;
+
+	rc = kstrtoint(buf, 10, &val);
+	if (rc)
+		return -EINVAL;
+
+	if (val == 0 || val == 1) {
+		if (sovc_switch != val)
+			sovc_switch = val;
+	} else
+		return -EINVAL;
 
 	if (!sovc_switch)
 		unregister_sovc();
@@ -657,13 +665,19 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
 	int value_changed = 0;
+	int rc, val;
 
-	if ((buf[0] == '0' || buf[0] == '1') && buf[1] == '\n') {
-		if (sovc_tmp_onoff != buf[0] - '0') {
+	rc = kstrtoint(buf, 10, &val);
+	if (rc)
+		return -EINVAL;
+
+	if (val == 0 || val == 1) {
+		if (sovc_tmp_onoff != val) {
 			value_changed = 1;
-			sovc_tmp_onoff = buf[0] - '0';
+			sovc_tmp_onoff = val;
 		}
-	}
+	} else
+		return -EINVAL;
 
 	if (sovc_tmp_onoff)
 		track_changed = false;
@@ -701,15 +715,16 @@ static ssize_t sovc_auto_off_delay_show(struct device *dev,
 static ssize_t sovc_auto_off_delay_dump(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
-	int ret;
-	int val;
+	int rc, val;
 
-	ret = sscanf(buf, "%d", &val);
-	if (ret != 1)
+	rc = kstrtoint(buf, 10, &val);
+	if (rc)
 		return -EINVAL;
 
 	if (val >= 1000 && val <= 60000)
 		sovc_auto_off_delay = val;
+	else
+		return -EINVAL;
 
 	return count;
 }
