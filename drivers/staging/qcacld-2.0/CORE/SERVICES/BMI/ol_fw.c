@@ -1157,7 +1157,7 @@ static DECLARE_WORK(ramdump_work, ramdump_work_handler);
 void ol_schedule_ramdump_work(struct ol_softc *scn)
 {
 	ramdump_scn = scn;
-	queue_work(system_power_efficient_wq, &ramdump_work);
+	schedule_work(&ramdump_work);
 }
 
 static void fw_indication_work_handler(struct work_struct *fw_indication)
@@ -1177,7 +1177,7 @@ static DECLARE_WORK(fw_indication_work, fw_indication_work_handler);
 
 void ol_schedule_fw_indication_work(struct ol_softc *scn)
 {
-	queue_work(system_power_efficient_wq, &fw_indication_work);
+	schedule_work(&fw_indication_work);
 }
 #endif
 

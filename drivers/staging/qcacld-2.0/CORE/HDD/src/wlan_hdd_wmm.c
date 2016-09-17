@@ -2071,7 +2071,7 @@ VOS_STATUS hdd_wmm_acquire_access( hdd_adapter_t* pAdapter,
              "%s: Scheduling work for AC %d, context %p",
              __func__, acType, pQosContext);
 
-   queue_work(system_power_efficient_wq, &pQosContext->wmmAcSetupImplicitQos);
+   schedule_work(&pQosContext->wmmAcSetupImplicitQos);
 
    // caller will need to wait until the work takes place and
    // TSPEC negotiation completes

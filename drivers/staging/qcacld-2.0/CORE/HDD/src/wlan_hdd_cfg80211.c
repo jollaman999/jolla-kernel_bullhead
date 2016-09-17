@@ -8299,8 +8299,8 @@ void wlan_hdd_cfg80211_acs_ch_select_evt(hdd_adapter_t *adapter)
 				      wlan_hdd_cfg80211_start_pending_acs);
 #endif
 		/* Lets give 500ms for OBSS + START_BSS to complete */
-		queue_delayed_work(system_power_efficient_wq,
-                           &con_sap_adapter->acs_pending_work, msecs_to_jiffies(500));
+		schedule_delayed_work(&con_sap_adapter->acs_pending_work,
+							msecs_to_jiffies(500));
 		clear_bit(ACS_PENDING, &con_sap_adapter->event_flags);
 	}
 
@@ -16457,7 +16457,7 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
             vos_init_work(&pAdapter->scan_block_work,
                                             wlan_hdd_cfg80211_scan_block_cb);
 
-            queue_work(system_power_efficient_wq, &pAdapter->scan_block_work);
+            schedule_work(&pAdapter->scan_block_work);
             return 0;
         }
     }

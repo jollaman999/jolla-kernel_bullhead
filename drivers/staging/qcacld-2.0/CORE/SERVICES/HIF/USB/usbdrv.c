@@ -494,7 +494,7 @@ static void usb_hif_usb_recv_prestart_complete(struct urb *urb)
 #ifdef HIF_USB_TASKLET
 		tasklet_schedule(&pipe->io_complete_tasklet);
 #else
-		queue_work(system_power_efficient_wq, &pipe->io_complete_work);
+		schedule_work(&pipe->io_complete_work);
 #endif
 	} while (FALSE);
 
@@ -576,7 +576,7 @@ static void usb_hif_usb_recv_complete(struct urb *urb)
 #ifdef HIF_USB_TASKLET
 		tasklet_schedule(&pipe->io_complete_tasklet);
 #else
-		queue_work(system_power_efficient_wq, &pipe->io_complete_work);
+		schedule_work(&pipe->io_complete_work);
 #endif
 	} while (FALSE);
 
@@ -726,7 +726,7 @@ static void usb_hif_usb_recv_bundle_complete(struct urb *urb)
 #ifdef HIF_USB_TASKLET
 		tasklet_schedule(&pipe->io_complete_tasklet);
 #else
-		queue_work(system_power_efficient_wq, &pipe->io_complete_work);
+		schedule_work(&pipe->io_complete_work);
 #endif
 	} while (FALSE);
 

@@ -1614,7 +1614,7 @@ void hdd_ipa_uc_loaded_uc_cb(void *priv_ctxt)
 		return;
 
 	uc_op_work->msg = msg;
-	queue_work(system_power_efficient_wq, &uc_op_work->work);
+	schedule_work(&uc_op_work->work);
 	return;
 }
 
@@ -1987,7 +1987,7 @@ static void hdd_ipa_uc_op_event_handler(v_U8_t *op_msg, void *hdd_ctx)
 		goto end;
 
 	uc_op_work->msg = msg;
-	queue_work(system_power_efficient_wq, &uc_op_work->work);
+	schedule_work(&uc_op_work->work);
 	return;
 
 end:
@@ -2367,7 +2367,7 @@ static int hdd_ipa_rm_try_release(struct hdd_ipa_priv *hdd_ipa)
 	 * while there is healthy amount of data transfer going on by
 	 * releasing the wake_lock after some delay.
 	 */
-	queue_delayed_work(system_power_efficient_wq, &hdd_ipa->wake_lock_work,
+	schedule_delayed_work(&hdd_ipa->wake_lock_work,
 			msecs_to_jiffies(HDD_IPA_RX_INACTIVITY_MSEC_DELAY));
 
 	adf_os_spin_unlock_bh(&hdd_ipa->rm_lock);
@@ -2507,7 +2507,7 @@ static void hdd_ipa_rm_notify(void *user_data, enum ipa_rm_event event,
 			 * it should be serialized into work queue to avoid
 			 * ISR sleep problem */
 			hdd_ipa->uc_rm_work.event = event;
-			queue_work(system_power_efficient_wq, &hdd_ipa->uc_rm_work.work);
+			schedule_work(&hdd_ipa->uc_rm_work.work);
 			break;
 		}
 #endif /* IPA_UC_OFFLOAD */
@@ -2516,7 +2516,7 @@ static void hdd_ipa_rm_notify(void *user_data, enum ipa_rm_event event,
 		adf_os_spin_unlock_bh(&hdd_ipa->rm_lock);
 		hdd_ipa->stats.num_rm_grant++;
 
-		queue_work(system_power_efficient_wq, &hdd_ipa->rm_work);
+		schedule_work(&hdd_ipa->rm_work);
 		break;
 	case IPA_RM_RESOURCE_RELEASED:
 		HDD_IPA_LOG(VOS_TRACE_LEVEL_INFO, "RM Release");
@@ -3391,7 +3391,7 @@ int hdd_ipa_resume(hdd_context_t *hdd_ctx)
 	if (!hdd_ipa_is_enabled(hdd_ctx))
 		return 0;
 
-	queue_work(system_power_efficient_wq, &hdd_ipa->pm_work);
+	schedule_work(&hdd_ipa->pm_work);
 
 	adf_os_spin_lock_bh(&hdd_ipa->pm_lock);
 	hdd_ipa->suspended = false;

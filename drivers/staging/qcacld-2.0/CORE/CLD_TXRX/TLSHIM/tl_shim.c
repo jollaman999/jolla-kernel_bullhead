@@ -253,7 +253,7 @@ tlshim_mgmt_over_data_rx_handler_non_interrupt_ctx(pVosContextType pVosGCtx,
         tl_shim->iapp_work.nbuf = nbuf;
         tl_shim->iapp_work.vdev = vdev;
         tl_shim->iapp_work.inUse = true;
-        queue_work(system_power_efficient_wq, &(tl_shim->iapp_work.deferred_work));
+        schedule_work(&(tl_shim->iapp_work.deferred_work));
         return;
     }
 
@@ -1785,7 +1785,7 @@ VOS_STATUS WLANTL_RegisterSTAClient(void *vos_ctx,
 	}
 
 	/* Schedule a worker to flush cached rx frames */
-	queue_work(system_power_efficient_wq, &tl_shim->cache_flush_work);
+	schedule_work(&tl_shim->cache_flush_work);
 
 	return VOS_STATUS_SUCCESS;
 }

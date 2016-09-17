@@ -122,7 +122,7 @@ static inline  a_status_t __adf_os_init_bh(adf_os_handle_t  hdl,
 static inline a_status_t
 __adf_os_sched_work(adf_os_handle_t hdl, __adf_os_work_t  * work)
 {
-    queue_work(system_power_efficient_wq, &work->work);
+    schedule_work(&work->work);
     return A_STATUS_OK;
 }
 
