@@ -401,15 +401,23 @@ static ssize_t dt2w_doubletap2wake_show(struct device *dev,
 static ssize_t dt2w_doubletap2wake_dump(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
+	int rc, val;
+
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	mutex_lock(&switchlock);
 #endif
+	rc = kstrtoint(buf, 10, &val);
+	if (rc)
+		return -EINVAL;
+
 	// Make enable to set touch counts (Max : 10) - by jollaman999
 	// You should tap 1 more from set number to wake your device.
-	if (buf[0] >= '0' && buf[0] <= '9' && buf[1] == '\n') {
-                if (dt2w_switch != buf[0] - '0')
-					dt2w_switch = buf[0] - '0';
-	}
+	if (val >= 0 || val <= 9) {
+		if (dt2w_switch != val)
+			dt2w_switch = val;
+	} else
+		return -EINVAL;
+
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	mutex_unlock(&switchlock);
 #endif
@@ -439,10 +447,17 @@ static ssize_t dt2w_doubletap2wake_tmp_show(struct device *dev,
 static ssize_t dt2w_doubletap2wake_tmp_dump(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
-	if ((buf[0] == '0' || buf[0] == '1') && buf[1] == '\n') {
-                if (dt2w_switch_tmp != buf[0] - '0')
-					dt2w_switch_tmp = buf[0] - '0';
-	}
+	int rc, val;
+
+	rc = kstrtoint(buf, 10, &val);
+	if (rc)
+		return -EINVAL;
+
+	if (val == 0 || val == 1) {
+		if (dt2w_switch_tmp != val)
+			dt2w_switch_tmp = val;
+	} else
+		return -EINVAL;
 
 	if (sovc_switch && dt2w_switch_tmp && scr_suspended) {
 		if (tomtom_mic_detected && !dt2w_switch)
