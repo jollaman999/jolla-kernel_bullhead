@@ -1764,7 +1764,7 @@ static ssize_t f2fs_direct_IO(int rw, struct kiocb *iocb,
 							get_data_block_dio);
 	up_read(&F2FS_I(inode)->dio_rwsem[rw]);
 
-	if (rw & WRITE) {
+	if (err < 0 && (rw & WRITE)) {
 		if (err > 0)
 			set_inode_flag(inode, FI_UPDATE_WRITE);
 		else if (err < 0)
