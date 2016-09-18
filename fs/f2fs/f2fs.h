@@ -153,11 +153,6 @@ static inline void inode_unlock(struct inode *inode)
 	mutex_unlock(&inode->i_mutex);
 }
 
-static inline int inode_trylock(struct inode *inode)
-{
-	return mutex_trylock(&inode->i_mutex);
-}
-
 /**
  * wq_has_sleeper - check if there are any waiting processes
  * @wq: wait queue head
