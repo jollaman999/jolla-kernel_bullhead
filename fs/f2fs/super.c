@@ -567,7 +567,7 @@ static int f2fs_drop_inode(struct inode *inode)
 			f2fs_destroy_extent_node(inode);
 
 			sb_start_intwrite(inode->i_sb);
-			f2fs_i_size_write(inode, 0);
+			i_size_write(inode, 0);
 
 			if (F2FS_HAS_BLOCKS(inode))
 				f2fs_truncate(inode, true);
