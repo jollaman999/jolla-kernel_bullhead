@@ -624,12 +624,8 @@ out:
 	if (err) {
 		bool invalidate = false;
 
-		if (test_opt(sbi, LFS)) {
-			update_meta_page(sbi, NULL, blkaddr);
+		if (discard_next_dnode(sbi, blkaddr))
 			invalidate = true;
-		} else if (discard_next_dnode(sbi, blkaddr)) {
-			invalidate = true;
-		}
 
 		/* Flush all the NAT/SIT pages */
 		while (get_pages(sbi, F2FS_DIRTY_META))
