@@ -186,13 +186,8 @@ static struct f2fs_dir_entry *find_in_level(struct inode *dir,
 		/* no need to allocate new dentry pages to all the indices */
 		dentry_page = find_data_page(dir, bidx);
 		if (IS_ERR(dentry_page)) {
-			if (PTR_ERR(dentry_page) == -ENOENT) {
-				room = true;
-				continue;
-			} else {
-				*res_page = dentry_page;
-				break;
-			}
+			room = true;
+			continue;
 		}
 
 		de = find_in_block(dentry_page, fname, namehash, &max_slots,
@@ -229,22 +224,19 @@ struct f2fs_dir_entry *f2fs_find_entry(struct inode *dir, struct qstr *child,
 	struct fscrypt_name fname;
 	int err;
 
+	*res_page = NULL;
+
 	err = fscrypt_setup_filename(dir, child, 1, &fname);
-	if (err) {
-		*res_page = ERR_PTR(-ENOMEM);
+	if (err)
 		return NULL;
-	}
 
 	if (f2fs_has_inline_dentry(dir)) {
-		*res_page = NULL;
 		de = find_in_inline_dir(dir, &fname, res_page);
 		goto out;
 	}
 
-	if (npages == 0) {
-		*res_page = NULL;
+	if (npages == 0)
 		goto out;
-	}
 
 	max_depth = F2FS_I(dir)->i_current_depth;
 	if (unlikely(max_depth > MAX_DIR_HASH_DEPTH)) {
@@ -256,9 +248,8 @@ struct f2fs_dir_entry *f2fs_find_entry(struct inode *dir, struct qstr *child,
 	}
 
 	for (level = 0; level < max_depth; level++) {
-		*res_page = NULL;
 		de = find_in_level(dir, level, &fname, res_page);
-		if (de || IS_ERR(*res_page))
+		if (de)
 			break;
 	}
 out:
