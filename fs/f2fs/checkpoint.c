@@ -794,12 +794,13 @@ void update_dirty_page(struct inode *inode, struct page *page)
 			!S_ISLNK(inode->i_mode))
 		return;
 
-	spin_lock(&sbi->inode_lock[type]);
-	if (type != FILE_INODE || test_opt(sbi, DATA_FLUSH))
+	if (type != FILE_INODE || test_opt(sbi, DATA_FLUSH)) {
+		spin_lock(&sbi->inode_lock[type]);
 		__add_dirty_inode(inode, type);
-	inode_inc_dirty_pages(inode);
-	spin_unlock(&sbi->inode_lock[type]);
+		spin_unlock(&sbi->inode_lock[type]);
+	}
 
+	inode_inc_dirty_pages(inode);
 	SetPagePrivate(page);
 	f2fs_trace_pid(page);
 }
