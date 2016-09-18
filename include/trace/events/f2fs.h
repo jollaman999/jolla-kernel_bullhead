@@ -714,7 +714,7 @@ DECLARE_EVENT_CLASS(f2fs__submit_page_bio,
 	),
 
 	TP_printk("dev = (%d,%d), ino = %lu, page_index = 0x%lx, "
-		"oldaddr = 0x%llx, newaddr = 0x%llx, rw = %s%s, type = %s",
+		"oldaddr = 0x%llx, newaddr = 0x%llx rw = %s%s, type = %s",
 		show_dev_ino(__entry),
 		(unsigned long)__entry->index,
 		(unsigned long long)__entry->old_blkaddr,
