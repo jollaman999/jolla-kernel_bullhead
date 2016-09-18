@@ -584,6 +584,8 @@ static struct inode *f2fs_alloc_inode(struct super_block *sb)
 
 static int f2fs_drop_inode(struct inode *inode)
 {
+	int ret;
+
 	/*
 	 * This is to avoid a deadlock condition like below.
 	 * writeback_single_inode(inode)
@@ -619,7 +621,19 @@ static int f2fs_drop_inode(struct inode *inode)
 		return 0;
 	}
 
-	return generic_drop_inode(inode);
+	ret = generic_drop_inode(inode);
+	if (is_inode_flag_set(inode, FI_DIRTY_INODE)) {
+		if (ret)
+			inode->i_state |= I_WILL_FREE;
+		spin_unlock(&inode->i_lock);
+
+		update_inode_page(inode);
+
+		spin_lock(&inode->i_lock);
+		if (ret)
+			inode->i_state &= ~I_WILL_FREE;
+	}
+	return ret;
 }
 
 /*
