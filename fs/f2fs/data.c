@@ -1326,9 +1326,10 @@ static int f2fs_write_cache_pages(struct address_space *mapping,
 	int cycled;
 	int range_whole = 0;
 	int tag;
+	int step = 0;
 
 	pagevec_init(&pvec, 0);
-
+next:
 	if (wbc->range_cyclic) {
 		writeback_index = mapping->writeback_index; /* prev offset */
 		index = writeback_index;
@@ -1383,6 +1384,9 @@ continue_unlock:
 				goto continue_unlock;
 			}
 
+			if (step == is_cold_data(page))
+				goto continue_unlock;
+
 			if (PageWriteback(page)) {
 				if (wbc->sync_mode != WB_SYNC_NONE)
 					f2fs_wait_on_page_writeback(page,
@@ -1415,6 +1419,11 @@ continue_unlock:
 		}
 		pagevec_release(&pvec);
 		cond_resched();
+	}
+
+	if (step < 1) {
+		step++;
+		goto next;
 	}
 
 	if (!cycled && !done) {
