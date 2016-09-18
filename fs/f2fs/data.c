@@ -99,13 +99,10 @@ static struct bio *__bio_alloc(struct f2fs_sb_info *sbi, block_t blk_addr,
 }
 
 static inline void __submit_bio(struct f2fs_sb_info *sbi, int rw,
-			struct bio *bio, enum page_type type)
+						struct bio *bio)
 {
-	if (!is_read_io(rw)) {
+	if (!is_read_io(rw))
 		atomic_inc(&sbi->nr_wb_bios);
-		if (current->plug && (type == DATA || type == NODE))
-			blk_finish_plug(current->plug);
-	}
 	submit_bio(rw, bio);
 }
 
@@ -121,7 +118,7 @@ static void __submit_merged_bio(struct f2fs_bio_info *io)
 	else
 		trace_f2fs_submit_write_bio(io->sbi->sb, fio, io->bio);
 
-	__submit_bio(io->sbi, fio->rw, io->bio, fio->type);
+	__submit_bio(io->sbi, fio->rw, io->bio);
 	io->bio = NULL;
 }
 
@@ -239,7 +236,7 @@ int f2fs_submit_page_bio(struct f2fs_io_info *fio)
 		return -EFAULT;
 	}
 
-	__submit_bio(fio->sbi, fio->rw, bio, fio->type);
+	__submit_bio(fio->sbi, fio->rw, bio);
 	return 0;
 }
 
@@ -1043,7 +1040,7 @@ got_it:
 		 */
 		if (bio && (last_block_in_bio != block_nr - 1)) {
 submit_and_realloc:
-			__submit_bio(F2FS_I_SB(inode), READ, bio, DATA);
+			__submit_bio(F2FS_I_SB(inode), READ, bio);
 			bio = NULL;
 		}
 		if (bio == NULL) {
@@ -1086,7 +1083,7 @@ set_error_page:
 		goto next_page;
 confused:
 		if (bio) {
-			__submit_bio(F2FS_I_SB(inode), READ, bio, DATA);
+			__submit_bio(F2FS_I_SB(inode), READ, bio);
 			bio = NULL;
 		}
 		unlock_page(page);
@@ -1096,7 +1093,7 @@ next_page:
 	}
 	BUG_ON(pages && !list_empty(pages));
 	if (bio)
-		__submit_bio(F2FS_I_SB(inode), READ, bio, DATA);
+		__submit_bio(F2FS_I_SB(inode), READ, bio);
 	return 0;
 }
 
