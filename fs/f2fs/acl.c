@@ -277,10 +277,8 @@ int f2fs_init_acl(struct inode *inode, struct inode *dir, struct page *ipage,
 			if (IS_ERR(acl))
 				return PTR_ERR(acl);
 		}
-		if (!acl) {
+		if (!acl)
 			inode->i_mode &= ~current_umask();
-			mark_inode_dirty_sync(inode);
-		}
 	}
 
 	if (!test_opt(sbi, POSIX_ACL) || !acl)
@@ -294,7 +292,6 @@ int f2fs_init_acl(struct inode *inode, struct inode *dir, struct page *ipage,
 	error = posix_acl_create(&acl, GFP_KERNEL, &inode->i_mode);
 	if (error < 0)
 		return error;
-	mark_inode_dirty_sync(inode);
 	if (error > 0)
 		error = f2fs_set_acl(inode, ACL_TYPE_ACCESS, acl, ipage);
 cleanup:
