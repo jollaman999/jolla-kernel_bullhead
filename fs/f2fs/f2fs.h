@@ -46,7 +46,6 @@ enum {
 	FAULT_ORPHAN,
 	FAULT_BLOCK,
 	FAULT_DIR_DEPTH,
-	FAULT_EVICT_INODE,
 	FAULT_MAX,
 };
 
@@ -75,8 +74,6 @@ static inline bool time_to_inject(int type)
 	else if (type == FAULT_BLOCK && !IS_FAULT_SET(type))
 		return false;
 	else if (type == FAULT_DIR_DEPTH && !IS_FAULT_SET(type))
-		return false;
-	else if (type == FAULT_EVICT_INODE && !IS_FAULT_SET(type))
 		return false;
 
 	atomic_inc(&f2fs_fault.inject_ops);
