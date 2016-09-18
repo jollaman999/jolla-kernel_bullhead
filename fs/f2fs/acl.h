@@ -45,13 +45,13 @@ extern int f2fs_init_acl(struct inode *, struct inode *, struct page *,
 #define f2fs_get_acl	NULL
 #define f2fs_set_acl	NULL
 
-static inline int f2fs_acl_chmod(struct inode *)
+static inline int f2fs_acl_chmod(struct inode *inode)
 {
 	return 0;
 }
 
-static inline int f2fs_init_acl(struct inode *, struct inode *,
-				struct page *, struct page *)
+static inline int f2fs_init_acl(struct inode *inode, struct inode *dir,
+				struct page *ipage, struct page *dpage)
 {
 	return 0;
 }
