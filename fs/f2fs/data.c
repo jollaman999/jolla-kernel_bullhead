@@ -48,8 +48,7 @@ static void f2fs_read_end_io(struct bio *bio, int err)
 		struct page *page = bvec->bv_page;
 
 		if (!err) {
-			if (!PageUptodate(page))
-				SetPageUptodate(page);
+			SetPageUptodate(page);
 		} else {
 			ClearPageUptodate(page);
 			SetPageError(page);
@@ -445,8 +444,7 @@ got_it:
 	 */
 	if (dn.data_blkaddr == NEW_ADDR) {
 		zero_user_segment(page, 0, PAGE_SIZE);
-		if (!PageUptodate(page))
-			SetPageUptodate(page);
+		SetPageUptodate(page);
 		unlock_page(page);
 		return page;
 	}
@@ -557,8 +555,7 @@ struct page *get_new_data_page(struct inode *inode,
 
 	if (dn.data_blkaddr == NEW_ADDR) {
 		zero_user_segment(page, 0, PAGE_SIZE);
-		if (!PageUptodate(page))
-			SetPageUptodate(page);
+		SetPageUptodate(page);
 	} else {
 		f2fs_put_page(page, 1);
 
@@ -1068,8 +1065,7 @@ got_it:
 			}
 		} else {
 			zero_user_segment(page, 0, PAGE_SIZE);
-			if (!PageUptodate(page))
-				SetPageUptodate(page);
+			SetPageUptodate(page);
 			unlock_page(page);
 			goto next_page;
 		}
@@ -1663,8 +1659,7 @@ repeat:
 		}
 	}
 out_update:
-	if (!PageUptodate(page))
-		SetPageUptodate(page);
+	SetPageUptodate(page);
 out_clear:
 	clear_cold_data(page);
 	return 0;
@@ -1845,8 +1840,7 @@ static int f2fs_set_data_page_dirty(struct page *page)
 
 	trace_f2fs_set_page_dirty(page, DATA);
 
-	if (!PageUptodate(page))
-		SetPageUptodate(page);
+	SetPageUptodate(page);
 
 	if (f2fs_is_atomic_file(inode)) {
 		if (!IS_ATOMIC_WRITTEN_PAGE(page)) {
