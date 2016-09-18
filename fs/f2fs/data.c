@@ -984,7 +984,7 @@ struct bio *f2fs_grab_bio(struct inode *inode, block_t blkaddr,
 		return ERR_PTR(-ENOMEM);
 	}
 	bio->bi_bdev = bdev;
-	bio->bi_sector = SECTOR_FROM_BLOCK(blkaddr);
+	bio->bi_iter.bi_sector = SECTOR_FROM_BLOCK(blkaddr);
 	bio->bi_end_io = f2fs_read_end_io;
 	bio->bi_private = ctx;
 
@@ -1822,6 +1822,7 @@ void f2fs_set_page_dirty_nobuffers(struct page *page)
 		return;
 
 	spin_lock(&mapping->private_lock);
+	lock_page_memcg(page);
 	SetPageDirty(page);
 	spin_unlock(&mapping->private_lock);
 
@@ -1831,6 +1832,7 @@ void f2fs_set_page_dirty_nobuffers(struct page *page)
 	radix_tree_tag_set(&mapping->page_tree,
 			page_index(page), PAGECACHE_TAG_DIRTY);
 	spin_unlock_irqrestore(&mapping->tree_lock, flags);
+	unlock_page_memcg(page);
 
 	__mark_inode_dirty(mapping->host, I_DIRTY_PAGES);
 	return;
