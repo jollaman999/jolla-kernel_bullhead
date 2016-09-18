@@ -1241,16 +1241,18 @@ write:
 			available_free_memory(sbi, BASE_CHECK))))
 		goto redirty_out;
 
+	/* Dentry blocks are controlled by checkpoint */
+	if (S_ISDIR(inode->i_mode)) {
+		if (unlikely(f2fs_cp_error(sbi)))
+			goto redirty_out;
+		err = do_write_data_page(&fio);
+		goto done;
+	}
+
 	/* we should bypass data pages to proceed the kworkder jobs */
 	if (unlikely(f2fs_cp_error(sbi))) {
 		SetPageError(page);
 		goto out;
-	}
-
-	/* Dentry blocks are controlled by checkpoint */
-	if (S_ISDIR(inode->i_mode)) {
-		err = do_write_data_page(&fio);
-		goto done;
 	}
 
 	if (!wbc->for_reclaim)
@@ -1292,8 +1294,16 @@ out:
 
 redirty_out:
 	redirty_page_for_writepage(wbc, page);
-	unlock_page(page);
-	return err;
+	return AOP_WRITEPAGE_ACTIVATE;
+}
+
+static int __f2fs_writepage(struct page *page, struct writeback_control *wbc,
+			void *data)
+{
+	struct address_space *mapping = data;
+	int ret = mapping->a_ops->writepage(page, wbc);
+	mapping_set_error(mapping, ret);
+	return ret;
 }
 
 /*
@@ -1302,7 +1312,8 @@ redirty_out:
  * warm/hot data page.
  */
 static int f2fs_write_cache_pages(struct address_space *mapping,
-					struct writeback_control *wbc)
+			struct writeback_control *wbc, writepage_t writepage,
+			void *data)
 {
 	int ret = 0;
 	int done = 0;
@@ -1384,11 +1395,16 @@ continue_unlock:
 			if (!clear_page_dirty_for_io(page))
 				goto continue_unlock;
 
-			ret = mapping->a_ops->writepage(page, wbc);
+			ret = (*writepage)(page, wbc, data);
 			if (unlikely(ret)) {
-				done_index = page->index + 1;
-				done = 1;
-				break;
+				if (ret == AOP_WRITEPAGE_ACTIVATE) {
+					unlock_page(page);
+					ret = 0;
+				} else {
+					done_index = page->index + 1;
+					done = 1;
+					break;
+				}
 			}
 
 			if (--wbc->nr_to_write <= 0 &&
@@ -1443,7 +1459,7 @@ static int f2fs_write_data_pages(struct address_space *mapping,
 
 	trace_f2fs_writepages(mapping->host, wbc, DATA);
 
-	ret = f2fs_write_cache_pages(mapping, wbc);
+	ret = f2fs_write_cache_pages(mapping, wbc, __f2fs_writepage, mapping);
 	/*
 	 * if some pages were truncated, we cannot guarantee its mapping->host
 	 * to detect pending bios.
