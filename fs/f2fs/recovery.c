@@ -68,20 +68,14 @@ static struct fsync_inode_entry *get_fsync_inode(struct list_head *head,
 	return NULL;
 }
 
-static struct fsync_inode_entry *add_fsync_inode(struct f2fs_sb_info *sbi,
-					struct list_head *head, nid_t ino)
+static struct fsync_inode_entry *add_fsync_inode(struct list_head *head,
+							struct inode *inode)
 {
-	struct inode *inode = f2fs_iget(sbi->sb, ino);
 	struct fsync_inode_entry *entry;
 
-	if (IS_ERR(inode))
-		return ERR_CAST(inode);
-
 	entry = kmem_cache_alloc(fsync_entry_slab, GFP_F2FS_ZERO);
-	if (!entry) {
-		iput(inode);
-		return ERR_PTR(-ENOMEM);
-	}
+	if (!entry)
+		return NULL;
 
 	entry->inode = inode;
 	list_add_tail(&entry->list, head);
@@ -111,10 +105,16 @@ static int recover_dentry(struct inode *inode, struct page *ipage,
 
 	entry = get_fsync_inode(dir_list, pino);
 	if (!entry) {
-		entry = add_fsync_inode(F2FS_I_SB(inode), dir_list, pino);
-		if (IS_ERR(entry)) {
-			dir = ERR_CAST(entry);
-			err = PTR_ERR(entry);
+		dir = f2fs_iget(inode->i_sb, pino);
+		if (IS_ERR(dir)) {
+			err = PTR_ERR(dir);
+			goto out;
+		}
+
+		entry = add_fsync_inode(dir_list, dir);
+		if (!entry) {
+			err = -ENOMEM;
+			iput(dir);
 			goto out;
 		}
 	}
@@ -228,6 +228,7 @@ static int find_fsync_dnodes(struct f2fs_sb_info *sbi, struct list_head *head)
 {
 	unsigned long long cp_ver = cur_cp_version(F2FS_CKPT(sbi));
 	struct curseg_info *curseg;
+	struct inode *inode;
 	struct page *page = NULL;
 	block_t blkaddr;
 	int err = 0;
@@ -265,13 +266,21 @@ static int find_fsync_dnodes(struct f2fs_sb_info *sbi, struct list_head *head)
 			 * CP | dnode(F) | inode(DF)
 			 * For this case, we should not give up now.
 			 */
-			entry = add_fsync_inode(sbi, head, ino_of_node(page));
-			if (IS_ERR(entry)) {
-				err = PTR_ERR(entry);
+			inode = f2fs_iget(sbi->sb, ino_of_node(page));
+			if (IS_ERR(inode)) {
+				err = PTR_ERR(inode);
 				if (err == -ENOENT) {
 					err = 0;
 					goto next;
 				}
+				break;
+			}
+
+			/* add this fsync inode to the list */
+			entry = add_fsync_inode(head, inode);
+			if (!entry) {
+				err = -ENOMEM;
+				iput(inode);
 				break;
 			}
 		}
