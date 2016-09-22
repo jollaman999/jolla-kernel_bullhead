@@ -256,10 +256,6 @@
 #define NUM_KPDBL_LEDS			4
 #define KPDBL_MASTER_BIT_INDEX		0
 
-#define LPG_LUT_OFFSET_BLUE 0
-#define LPG_LUT_OFFSET_GREEN 8
-#define LPG_LUT_OFFSET_RED 16
-
 /**
  * enum qpnp_leds - QPNP supported led ids
  * @QPNP_ID_WLED - White led backlight
@@ -1785,20 +1781,7 @@ static int rgb_duration_config(struct qpnp_led_data *led)
 	pwm_cfg->duty_cycles->num_duty_pcts = num_duty_pcts;
 	pwm_cfg->duty_cycles->start_idx = 0;
 	pwm_cfg->lut_params.ramp_step_ms = ramp_step_ms;
-
-	switch (led->id) {
-	case QPNP_ID_RGB_GREEN:
-		pwm_cfg->lut_params.start_idx = LPG_LUT_OFFSET_GREEN;
-		break;
-	case QPNP_ID_RGB_BLUE:
-		pwm_cfg->lut_params.start_idx = LPG_LUT_OFFSET_BLUE;
-		break;
-	case QPNP_ID_RGB_RED:
-	default:
-		pwm_cfg->lut_params.start_idx = LPG_LUT_OFFSET_RED;
-		break;
-	}
-
+	pwm_cfg->lut_params.start_idx = 0;
 	pwm_cfg->lut_params.idx_len = pwm_cfg->duty_cycles->num_duty_pcts;
 	pwm_cfg->lut_params.lut_pause_hi = off_ms;
 	pwm_cfg->lut_params.flags = PM_PWM_LUT_RAMP_UP |
