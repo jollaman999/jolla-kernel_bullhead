@@ -283,7 +283,7 @@ disp_en_gpio_err:
 	return rc;
 }
 
-static void mdss_dsi_panel_reset_dsvreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
+void mdss_dsi_panel_reset_dsvreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
 	if (ctrl_pdata->dsvreg && ctrl_pdata->dsvreg_pre_off)
 		if (regulator_disable(ctrl_pdata->dsvreg))
@@ -298,16 +298,6 @@ static void mdss_dsi_panel_reset_dsvreg_off_trigger(struct mdss_dsi_ctrl_pdata *
 
 	pr_info("%s: done", __func__);
 }
-
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-extern struct mdss_dsi_ctrl_pdata *ctrl_pdata_tmp;
-
-void mdss_dsi_panel_reset_dsvreg_off(void)
-{
-	mdss_dsi_panel_reset_dsvreg_off_trigger(ctrl_pdata_tmp);
-}
-EXPORT_SYMBOL(mdss_dsi_panel_vreg_off);
-#endif
 
 int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 {

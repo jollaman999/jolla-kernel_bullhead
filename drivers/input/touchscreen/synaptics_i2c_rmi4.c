@@ -47,6 +47,7 @@
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 #include <linux/input/scroff_volctr.h>
+#include <linux/wcd9330_notifier.h>
 #endif
 
 #define DRIVER_NAME "synaptics_rmi4_i2c"
@@ -129,6 +130,7 @@ enum device_status {
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 #define RMI4_WL_HOLD_TIME_MS 1000
 
+static bool scr_suspended = false;
 static bool irq_wake_enabled = false;
 static s64 wake_lock_start_time = 0;
 
@@ -159,15 +161,8 @@ static bool is_touch_on(void)
 #endif
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-static struct synaptics_rmi4_data *rmi4_data_tmp = NULL;
-
-static bool scr_suspended = false;
-extern bool mdss_turned_off;
-extern void mdss_dsi_panel_reset_dsvreg_off(void);
-extern void mdss_dsi_panel_vreg_off(void);
-#endif
-
 static void synaptics_rmi4_touch_off(struct work_struct *work);
+#endif
 
 static int synaptics_rmi4_i2c_read(struct synaptics_rmi4_data *rmi4_data,
 		unsigned short addr, unsigned char *data,
@@ -213,6 +208,11 @@ static int fb_notifier_callback(struct notifier_block *self,
 static void synaptics_rmi4_early_suspend(struct early_suspend *h);
 
 static void synaptics_rmi4_late_resume(struct early_suspend *h);
+#endif
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static int tomtom_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data);
 #endif
 
 static ssize_t synaptics_rmi4_f01_reset_store(struct device *dev,
@@ -863,6 +863,20 @@ static void configure_sleep(struct synaptics_rmi4_data *rmi4_data)
 #else
 static void configure_sleep(struct synaptics_rmi4_data *rmi4_data)
 {
+	return;
+}
+#endif
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static void configure_sleep_tomtom(struct synaptics_rmi4_data *rmi4_data)
+{
+	int retval = 0;
+
+	rmi4_data->tomtom_notif.notifier_call = tomtom_notifier_callback;
+
+	retval = tomtom_register_client(&rmi4_data->tomtom_notif);
+	if (retval)
+		pr_info("Unable to register tomtom_notifier: %d\n", retval);
 	return;
 }
 #endif
@@ -4056,6 +4070,9 @@ static int synaptics_rmi4_probe(struct i2c_client *client,
 	}
 
 	configure_sleep(rmi4_data);
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	configure_sleep_tomtom(rmi4_data);
+#endif
 
 	if (!exp_fn_inited) {
 		mutex_init(&exp_fn_list_mutex);
@@ -4249,6 +4266,12 @@ static int synaptics_rmi4_remove(struct i2c_client *client)
 				&attrs[attr_count].attr);
 	}
 
+#ifdef CONFIG_FB
+	fb_unregister_client(&rmi4_data->fb_notif);
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	tomtom_unregister_client(&rmi4_data->tomtom_notif);
+#endif
 	input_unregister_device(rmi4_data->input_dev);
 
 	mutex_lock(&rmi->support_fn_list_mutex);
@@ -4401,17 +4424,21 @@ static int fb_notifier_callback(struct notifier_block *self,
 			blank = evdata->data;
 			if ((*blank == FB_BLANK_UNBLANK) ||
 			    (*blank == FB_BLANK_VSYNC_SUSPEND)) {
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 				scr_suspended = false;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 				sovc_force_off = false;
-				if (rmi4_data_tmp)
-					cancel_delayed_work(&rmi4_data_tmp->touch_off_work);
+				cancel_delayed_work(&rmi4_data->touch_off_work);
 #endif
 				synaptics_rmi4_resume(
 					&(rmi4_data->input_dev->dev));
 			} else if (*blank == FB_BLANK_POWERDOWN) {
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 				scr_suspended = true;
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+				cancel_delayed_work(&rmi4_data->touch_off_work);
 #endif
 				synaptics_rmi4_suspend(
 					&(rmi4_data->input_dev->dev));
@@ -4485,6 +4512,31 @@ static void synaptics_rmi4_late_resume(struct early_suspend *h)
 	}
 
 	return;
+}
+#endif
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static int tomtom_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data)
+{
+	struct synaptics_rmi4_data *rmi4_data =
+		container_of(self, struct synaptics_rmi4_data, tomtom_notif);
+	unsigned int delay = SOVC_TOUCH_OFF_DELAY;
+
+	if (!sovc_switch)
+		return 0;
+
+	cancel_delayed_work(&rmi4_data->touch_off_work);
+
+	if (event == TOMTOM_EVENT_STOPPED) {
+		if (sovc_force_off)
+			delay = 0;
+		queue_delayed_work(rmi4_data->touch_off_workqueue,
+				&rmi4_data->touch_off_work,
+				msecs_to_jiffies(delay));
+	}
+
+	return 0;
 }
 #endif
 
@@ -4777,37 +4829,16 @@ out:
 }
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-static DEFINE_MUTEX(synaptics_rmi4_touch_off_lock);
-
 static void synaptics_rmi4_touch_off(struct work_struct *work)
 {
 	struct synaptics_rmi4_data *rmi4_data =
 		container_of(work, struct synaptics_rmi4_data, touch_off_work.work);
 
-	mutex_lock(&synaptics_rmi4_touch_off_lock);
-
 	if (!scr_suspended || rmi4_data->suspended)
-		goto out;
-
-	synaptics_rmi4_suspend_trigger(rmi4_data);
-	if (rmi4_data->suspended && !mdss_turned_off) {
-		mdss_dsi_panel_reset_dsvreg_off();
-		mdss_dsi_panel_vreg_off();
-	}
-out:
-	mutex_unlock(&synaptics_rmi4_touch_off_lock);
-}
-
-void synaptics_rmi4_touch_off_trigger(unsigned int delay)
-{
-	if (!scr_suspended || rmi4_data_tmp->suspended)
 		return;
 
-	queue_delayed_work(rmi4_data_tmp->touch_off_workqueue,
-			&rmi4_data_tmp->touch_off_work,
-			msecs_to_jiffies(delay));
+	synaptics_rmi4_suspend_trigger(rmi4_data);
 }
-EXPORT_SYMBOL(synaptics_rmi4_touch_off_trigger);
 #endif
 
  /**
@@ -4824,9 +4855,6 @@ EXPORT_SYMBOL(synaptics_rmi4_touch_off_trigger);
 static int synaptics_rmi4_suspend(struct device *dev)
 {
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	rmi4_data_tmp = rmi4_data;
-#endif
 
 	return synaptics_rmi4_suspend_trigger(rmi4_data);
 }
