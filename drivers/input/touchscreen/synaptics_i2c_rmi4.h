@@ -228,8 +228,10 @@ struct synaptics_rmi4_data {
 	struct mutex rmi4_io_ctrl_mutex;
 	struct delayed_work det_work;
 	struct workqueue_struct *det_workqueue;
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	struct delayed_work touch_off_work;
 	struct workqueue_struct *touch_off_workqueue;
+#endif
 	struct work_struct recovery_work;
 	struct work_struct init_work;
 #ifdef CONFIG_HAS_EARLYSUSPEND
@@ -285,6 +287,9 @@ struct synaptics_rmi4_data {
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	struct early_suspend early_suspend;
 #endif
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	struct notifier_block tomtom_notif;
 #endif
 	struct pinctrl *ts_pinctrl;
 	struct pinctrl_state *pinctrl_state_active;

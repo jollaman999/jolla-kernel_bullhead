@@ -41,17 +41,12 @@
 #include "wcd_cpe_core.h"
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-#include <linux/input/sweep2wake.h>
-#endif
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-#include <linux/input/doubletap2wake.h>
-#endif
 #include <linux/input/scroff_volctr.h>
-#define SOVC_TOUCH_OFF_DELAY	5000	// Touch off delay time (ms)
+#include <linux/wcd9330_notifier.h>
 
-extern int synaptics_rmi4_touch_off_trigger(unsigned int delay);
-static DEFINE_MUTEX(sovc_lock);
+static DEFINE_MUTEX(tomtom_state_lock);
+bool tomtom_playing = false;
+EXPORT_SYMBOL(tomtom_playing);
 #endif
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
@@ -5433,20 +5428,12 @@ static int tomtom_startup(struct snd_pcm_substream *substream,
 	if (!strcmp(dai->name, "tomtom_tx1"))
 		tomtom_mic_detected = true;
 #endif
-
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	track_changed = false;
-	if (!sovc_switch)
-		return 0;
-
-	mutex_lock(&sovc_lock);
-	sovc_tmp_onoff = 1;
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-	dt2w_switch_tmp = 1;
+	mutex_lock(&tomtom_state_lock);
+	tomtom_notifier_call_chain(TOMTOM_EVENT_PLAYING, NULL);
+	tomtom_playing = true;
+	mutex_unlock(&tomtom_state_lock);
 #endif
-	mutex_unlock(&sovc_lock);
-#endif
-
 	return 0;
 }
 
@@ -5460,17 +5447,11 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 	if (!strcmp(dai->name, "tomtom_tx1"))
 		tomtom_mic_detected = false;
 #endif
-
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mutex_lock(&sovc_lock);
-	sovc_tmp_onoff = 0;
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-	dt2w_switch_tmp = 0;
-#endif
-	mutex_unlock(&sovc_lock);
-
-	if (sovc_scr_suspended)
-		synaptics_rmi4_touch_off_trigger(SOVC_TOUCH_OFF_DELAY);
+	mutex_lock(&tomtom_state_lock);
+	tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
+	tomtom_playing = false;
+	mutex_unlock(&tomtom_state_lock);
 #endif
 }
 
