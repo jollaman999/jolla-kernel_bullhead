@@ -37,9 +37,17 @@
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 #include <linux/input/scroff_volctr.h>
+#include <linux/wcd9330_notifier.h>
 #endif
 
 #define XO_CLK_RATE	19200000
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static bool mdss_turned_off = false;
+
+static int tomtom_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data);
+#endif
 
 static struct dsi_drv_cm_data shared_ctrl_data;
 
@@ -161,11 +169,6 @@ static int mdss_dsi_regulator_init(struct platform_device *pdev)
 	return rc;
 }
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-bool mdss_turned_off = false;
-EXPORT_SYMBOL(mdss_turned_off);
-#endif
-
 static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
 	int ret = 0;
@@ -186,7 +189,9 @@ static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdat
 				__func__, __mdss_dsi_pm_name(i));
 	}
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	mdss_turned_off = true;
+#endif
 
 	pr_info("%s: done", __func__);
 
@@ -194,13 +199,23 @@ static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdat
 }
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-struct mdss_dsi_ctrl_pdata *ctrl_pdata_tmp = NULL;
-
-void mdss_dsi_panel_vreg_off(void)
+static void mdss_off(struct work_struct *work)
 {
-	mdss_dsi_panel_vreg_off_trigger(ctrl_pdata_tmp);
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata =
+		container_of(work, struct mdss_dsi_ctrl_pdata, mdss_off_work.work);
+
+	if (!sovc_scr_suspended)
+		return;
+
+	if (track_changed || sovc_tmp_onoff)
+		return;
+
+	if (mdss_turned_off)
+		return;
+
+	mdss_dsi_panel_reset_dsvreg_off_trigger(ctrl_pdata);
+	mdss_dsi_panel_vreg_off_trigger(ctrl_pdata);
 }
-EXPORT_SYMBOL(mdss_dsi_panel_vreg_off);
 #endif
 
 static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
@@ -235,10 +250,6 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 		udelay(2000);
 	}
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	ctrl_pdata_tmp = ctrl_pdata;
-#endif
-
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	if (s2w_switch)
 		goto end;
@@ -271,6 +282,10 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	cancel_delayed_work(&ctrl_pdata->mdss_off_work);
+#endif
 
 	for (i = 0; i < DSI_MAX_PM; i++) {
 		/*
@@ -316,7 +331,9 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 					__func__, ret);
 	}
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	mdss_turned_off = false;
+#endif
 
 error:
 	if (ret) {
@@ -1935,6 +1952,18 @@ static int mdss_dsi_ctrl_probe(struct platform_device *pdev)
 		goto error_pan_node;
 	}
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	ctrl_pdata->mdss_off_workqueue =
+			alloc_workqueue("mdss_off_workqueue",
+				WQ_UNBOUND | WQ_HIGHPRI, 1);
+	INIT_DELAYED_WORK(&ctrl_pdata->mdss_off_work, mdss_off);
+
+	ctrl_pdata->tomtom_notif.notifier_call = tomtom_notifier_callback;
+
+	if (tomtom_register_client(&ctrl_pdata->tomtom_notif))
+		pr_info("%s: tomtom_notifier register failed\n", __func__);
+#endif
+
 	ctrl_pdata->cmd_clk_ln_recovery_en =
 		of_property_read_bool(pdev->dev.of_node,
 			"qcom,dsi-clk-ln-recovery");
@@ -2095,6 +2124,31 @@ static int mdss_dsi_irq_init(struct device *dev, int irq_no,
 
 	return ret;
 }
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static int tomtom_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data)
+{
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata =
+		container_of(self, struct mdss_dsi_ctrl_pdata, tomtom_notif);
+	unsigned int delay = SOVC_TOUCH_OFF_DELAY;
+
+	if (!sovc_switch)
+		return 0;
+
+	cancel_delayed_work(&ctrl_pdata->mdss_off_work);
+
+	if (event == TOMTOM_EVENT_STOPPED) {
+		if (sovc_force_off)
+			delay = 0;
+		queue_delayed_work(ctrl_pdata->mdss_off_workqueue,
+				&ctrl_pdata->mdss_off_work,
+				msecs_to_jiffies(delay));
+	}
+
+	return 0;
+}
+#endif
 
 int dsi_panel_device_register(struct device_node *pan_node,
 				struct mdss_dsi_ctrl_pdata *ctrl_pdata)

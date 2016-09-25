@@ -1,8 +1,6 @@
 /*
  * drivers/input/touchscreen/doubletap2wake.c
  *
- *
- * Copyright (c) 2013, Dennis Rassmann <showp1984@gmail.com>
  * Copyright (c) 2016, jollaman999 <admin@jollaman999.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,9 +34,8 @@
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 #include <linux/input/scroff_volctr.h>
+#include <linux/wcd9330_notifier.h>
 #endif
-
-struct notifier_block dt2w_fb_notif;
 
 /* uncomment since no touchscreen defines android touch, do that here */
 //#define ANDROID_TOUCH_DECLARED
@@ -51,7 +48,7 @@ struct notifier_block dt2w_fb_notif;
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Doubletap2wake for almost any device"
-#define DRIVER_VERSION "2.0"
+#define DRIVER_VERSION "3.0"
 #define LOGTAG "[doubletap2wake]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -82,6 +79,9 @@ static DEFINE_MUTEX(switchlock);
 static struct workqueue_struct *dt2w_input_wq;
 static struct work_struct dt2w_input_work;
 extern bool tomtom_mic_detected;
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+extern bool tomtom_playing;
+#endif
 
 static bool registered = false;
 static DEFINE_MUTEX(reg_lock);
@@ -514,13 +514,21 @@ static int dt2w_fb_notifier_callback(struct notifier_block *self,
 		case FB_BLANK_UNBLANK:
 			scr_suspended = false;
 			unregister_dt2w();
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+			if (tomtom_playing)
+				dt2w_switch_tmp = 1;
+#endif
 			break;
 		case FB_BLANK_POWERDOWN:
 			scr_suspended = true;
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-			if (dt2w_switch || (sovc_switch && dt2w_switch_tmp))
+			if (dt2w_switch || (sovc_switch && dt2w_switch_tmp)) {
+				if (tomtom_mic_detected) {
+					unregister_dt2w();
+					break;
+				}
 				register_dt2w();
-			else if (sovc_force_off && !dt2w_switch)
+			} else if (sovc_force_off && !dt2w_switch)
 				unregister_dt2w();
 #else
 			if (dt2w_switch) {
@@ -541,6 +549,31 @@ static int dt2w_fb_notifier_callback(struct notifier_block *self,
 struct notifier_block dt2w_fb_notif = {
 	.notifier_call = dt2w_fb_notifier_callback,
 };
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static int dt2w_tomtom_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data)
+{
+	if (!sovc_switch)
+		return 0;
+
+	switch (event) {
+	case TOMTOM_EVENT_PLAYING:
+		dt2w_switch_tmp = 1;
+		break;
+	case TOMTOM_EVENT_STOPPED:
+		if (!(track_changed || tomtom_playing) || sovc_force_off)
+			dt2w_switch_tmp = 0;
+		break;
+	}
+
+	return 0;
+}
+
+struct notifier_block dt2w_tomtom_notif = {
+	.notifier_call = dt2w_tomtom_notifier_callback,
+};
+#endif
 
 /*
  * INIT / EXIT stuff below here
@@ -582,6 +615,12 @@ static int __init doubletap2wake_init(void)
 	if (rc) {
 		pr_warn("%s: fb register failed\n", __func__);
 	}
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	rc = tomtom_register_client(&dt2w_tomtom_notif);
+	if (rc) {
+		pr_warn("%s: tomtom register failed\n", __func__);
+	}
+#endif
 
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_doubletap2wake.attr);
 	if (rc) {
@@ -615,6 +654,9 @@ static void __exit doubletap2wake_exit(void)
 	input_unregister_device(doubletap2wake_pwrdev);
 	input_free_device(doubletap2wake_pwrdev);
 	fb_unregister_client(&dt2w_fb_notif);
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	tomtom_unregister_client(&dt2w_tomtom_notif);
+#endif
 }
 
 module_init(doubletap2wake_init);

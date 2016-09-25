@@ -27,6 +27,7 @@
 #include <linux/init.h>
 #include <linux/err.h>
 #include <linux/input/scroff_volctr.h>
+#include <linux/wcd9330_notifier.h>
 #include <linux/slab.h>
 #include <linux/workqueue.h>
 #include <linux/input.h>
@@ -70,7 +71,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Screen Off Volume & Track Control for almost any device"
-#define DRIVER_VERSION "3.2"
+#define DRIVER_VERSION "4.0"
 #define LOGTAG "[scroff_volctr]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -112,13 +113,12 @@ static struct workqueue_struct *sovc_track_input_wq;
 static struct work_struct sovc_volume_input_work;
 static struct work_struct sovc_track_input_work;
 extern bool tomtom_mic_detected;
+extern bool tomtom_playing;
 
 static void touch_off(void);
 
 static bool registered = false;
 static DEFINE_MUTEX(reg_lock);
-
-extern int synaptics_rmi4_touch_off_trigger(unsigned int delay);
 
 enum CONTROL {
 	NO_CONTROL,
@@ -318,7 +318,7 @@ static void touch_off(void)
 		goto out;
 
 	sovc_force_off = true;
-	synaptics_rmi4_touch_off_trigger(0);
+	tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
 
 	// Vibrate when action performed
 #ifdef CONFIG_QPNP_HAPTIC
@@ -690,7 +690,7 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 				register_sovc();
 		} else if (value_changed) {
 			mutex_lock(&touch_off_lock);
-			synaptics_rmi4_touch_off_trigger(0);
+			tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
 			mutex_unlock(&touch_off_lock);
 		}
 	} else
@@ -768,6 +768,8 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 			sovc_scr_suspended = false;
 			cancel_delayed_work(&sovc_auto_off_check_work);
 			unregister_sovc();
+			if (tomtom_playing)
+				sovc_tmp_onoff = 1;
 			break;
 		case FB_BLANK_POWERDOWN:
 			sovc_scr_suspended = true;
@@ -790,6 +792,30 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 
 struct notifier_block sovc_fb_notif = {
 	.notifier_call = sovc_fb_notifier_callback,
+};
+
+static int sovc_tomtom_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data)
+{
+	if (!sovc_switch)
+		return 0;
+
+	switch (event) {
+	case TOMTOM_EVENT_PLAYING:
+		track_changed = false;
+		sovc_tmp_onoff = 1;
+		break;
+	case TOMTOM_EVENT_STOPPED:
+		if (!(track_changed || tomtom_playing) || sovc_force_off)
+			sovc_tmp_onoff = 0;
+		break;
+	}
+
+	return 0;
+}
+
+struct notifier_block sovc_tomtom_notif = {
+	.notifier_call = sovc_tomtom_notifier_callback,
 };
 
 /*
@@ -835,6 +861,10 @@ static int __init scroff_volctr_init(void)
 	if (rc) {
 		pr_warn("%s: fb register failed\n", __func__);
 	}
+	rc = tomtom_register_client(&sovc_tomtom_notif);
+	if (rc) {
+		pr_warn("%s: tomtom register failed\n", __func__);
+	}
 
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_scroff_volctr.attr);
 	if (rc) {
@@ -870,6 +900,7 @@ static void __exit scroff_volctr_exit(void)
 	input_unregister_device(sovc_input);
 	input_free_device(sovc_input);
 	fb_unregister_client(&sovc_fb_notif);
+	tomtom_unregister_client(&sovc_tomtom_notif);
 }
 
 module_init(scroff_volctr_init);

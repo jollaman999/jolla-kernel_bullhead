@@ -426,6 +426,12 @@ struct mdss_dsi_ctrl_pdata {
 	struct regulator *dsvreg;
 	bool dfps_status;	/* dynamic refresh status */
 	struct platform_device *pdev;
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	struct delayed_work mdss_off_work;
+	struct workqueue_struct *mdss_off_workqueue;
+	struct notifier_block tomtom_notif;
+#endif
 };
 
 struct dsi_status_data {
@@ -478,6 +484,7 @@ void mdss_dsi_shadow_clk_deinit(struct mdss_dsi_ctrl_pdata *ctrl_pdata);
 int mdss_dsi_enable_bus_clocks(struct mdss_dsi_ctrl_pdata *ctrl_pdata);
 void mdss_dsi_disable_bus_clocks(struct mdss_dsi_ctrl_pdata *ctrl_pdata);
 int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable);
+void mdss_dsi_panel_reset_dsvreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdata);
 void mdss_dsi_phy_disable(struct mdss_dsi_ctrl_pdata *ctrl);
 void mdss_dsi_cmd_test_pattern(struct mdss_dsi_ctrl_pdata *ctrl);
 void mdss_dsi_video_test_pattern(struct mdss_dsi_ctrl_pdata *ctrl);
