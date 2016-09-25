@@ -1,5 +1,5 @@
 /*
- * include/linux/input/scroff_volctr.h
+ * include/linux/input/wcd9330_notifier.h
  *
  * Copyright (c) 2016, jollaman999 <admin@jollaman999.com>
  *
@@ -18,17 +18,16 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _LINUX_SCROFF_VOLCTR_H
-#define _LINUX_SCROFF_VOLCTR_H
+#ifndef __LINUX_WCD9330_NOTIFIER_H
+#define __LINUX_WCD9330_NOTIFIER_H
 
-#define SOVC_TOUCH_OFF_DELAY	5000	// Touch off delay time (ms)
+#include <linux/notifier.h>
 
-extern int sovc_switch;
-extern int sovc_tmp_onoff;
-extern bool sovc_force_off;
-extern bool track_changed;
-extern bool sovc_scr_suspended;
+#define TOMTOM_EVENT_PLAYING		0x01
+#define TOMTOM_EVENT_STOPPED		0x02
 
-extern void sovc_press_power_key_trigger(int delay);
+int tomtom_register_client(struct notifier_block *nb);
+int tomtom_unregister_client(struct notifier_block *nb);
+int tomtom_notifier_call_chain(unsigned long val, void *v);
 
-#endif	/* _LINUX_SCROFF_VOLCTR_H */
+#endif /* __LINUX_WCD9330_NOTIFIER_H */
