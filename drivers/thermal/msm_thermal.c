@@ -1282,6 +1282,7 @@ static void do_cluster_freq_ctrl(long temp)
 {
 	uint32_t _cluster = 0;
 	int _cpu = -1, freq_idx = 0;
+	int temp_diff;
 	int index;
 	struct cluster_info *cluster_ptr = NULL;
 
@@ -1295,11 +1296,15 @@ static void do_cluster_freq_ctrl(long temp)
 		}
 	}
 
-	index = (temp - temp_threshold) / temp_step + 1;
-	if (index == cur_index)
-		return;
+	temp_diff = temp - temp_threshold;
+	if (temp_diff > 0)
+		index = temp_diff / temp_step;
+	else
+		index = 1;
 	if (index > temp_count_max)
 		index = temp_count_max;
+	if (index == cur_index)
+		return;
 	cur_index = index;
 	restored = false;
 
@@ -1310,8 +1315,12 @@ freq_control:
 		if (!cluster_ptr->freq_table)
 			continue;
 
-		freq_idx = cluster_ptr->freq_idx
-			- msm_thermal_info.bootup_freq_step * index;
+		freq_idx = max_t(int, cluster_ptr->freq_idx_low,
+			cluster_ptr->freq_idx_high -
+			msm_thermal_info.bootup_freq_step * index);
+		if (freq_idx == cluster_ptr->freq_idx)
+			continue;
+		cluster_ptr->freq_idx = freq_idx;
 
 		for_each_cpu_mask(_cpu, cluster_ptr->cluster_cores) {
 			if (!(msm_thermal_info.bootup_freq_control_mask
