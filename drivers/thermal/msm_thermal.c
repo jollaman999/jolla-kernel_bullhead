@@ -100,6 +100,12 @@ module_param(temp_step, int, 0644);
 module_param(freq_step, int, 0644);
 module_param(temp_count_max, int, 0644);
 
+// Debug
+unsigned int debug_core_control = 0;
+unsigned int debug_freq_control = 0;
+module_param(debug_core_control, int, 0644);
+module_param(debug_freq_control, int, 0644);
+
 static struct msm_thermal_data msm_thermal_info;
 static struct delayed_work check_temp_work;
 static bool core_control_enabled;
@@ -1327,10 +1333,11 @@ freq_control:
 			if (!(msm_thermal_info.bootup_freq_control_mask
 				& BIT(_cpu)))
 				continue;
-			pr_info("Limiting CPU%d max frequency to %u. Temp:%ld\n"
-				, _cpu
-				, cluster_ptr->freq_table[freq_idx].frequency
-				, temp);
+			if (debug_freq_control)
+				pr_info("Limiting CPU%d max frequency to %u. Temp:%ld\n"
+					, _cpu
+					, cluster_ptr->freq_table[freq_idx].frequency
+					, temp);
 			cpus[_cpu].limited_max_freq =
 				cluster_ptr->freq_table[freq_idx].frequency;
 		}
@@ -2417,8 +2424,9 @@ static void __ref do_core_control(long temp)
 				continue;
 			if (cpus_offlined & BIT(i) && !cpu_online(i))
 				continue;
-			pr_info("Set Offline: CPU%d Temp: %ld\n",
-					i, temp);
+			if (debug_core_control)
+				pr_info("Set Offline: CPU%d Temp: %ld\n",
+						i, temp);
 			if (cpu_online(i)) {
 				trace_thermal_pre_core_offline(i);
 				ret = cpu_down(i);
@@ -2437,8 +2445,9 @@ static void __ref do_core_control(long temp)
 			if (!(cpus_offlined & BIT(i)))
 				continue;
 			cpus_offlined &= ~BIT(i);
-			pr_info("Allow Online CPU%d Temp: %ld\n",
-					i, temp);
+			if (debug_core_control)
+				pr_info("Allow Online CPU%d Temp: %ld\n",
+						i, temp);
 			/*
 			 * If this core is already online, then bring up the
 			 * next offlined core.
@@ -2949,8 +2958,9 @@ static void do_freq_control(long temp)
 	for_each_possible_cpu(cpu) {
 		if (!(msm_thermal_info.bootup_freq_control_mask & BIT(cpu)))
 			continue;
-		pr_info("Limiting CPU%d max frequency to %u. Temp:%ld\n",
-			cpu, max_freq, temp);
+		if (debug_freq_control)
+			pr_info("Limiting CPU%d max frequency to %u. Temp:%ld\n",
+				cpu, max_freq, temp);
 		cpus[cpu].limited_max_freq = max_freq;
 		if (!SYNC_CORE(cpu))
 			update_cpu_freq(cpu);
