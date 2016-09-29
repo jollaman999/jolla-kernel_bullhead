@@ -91,7 +91,7 @@ static int big_core_start;
 // Cluster thermal threshold for control frequency
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
-unsigned int temp_step = 2;
+unsigned int temp_step = 4;
 unsigned int freq_step = 1;
 unsigned int temp_count_max = 3;
 module_param(temp_threshold, int, 0644);
