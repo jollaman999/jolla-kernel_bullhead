@@ -92,10 +92,12 @@ static int big_core_start;
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
 unsigned int temp_step = 2;
+unsigned int freq_step = 1;
 unsigned int temp_count_max = 3;
 module_param(temp_threshold, int, 0644);
 module_param(temp_big_threshold, int, 0644);
 module_param(temp_step, int, 0644);
+module_param(freq_step, int, 0644);
 module_param(temp_count_max, int, 0644);
 
 static struct msm_thermal_data msm_thermal_info;
@@ -1316,8 +1318,7 @@ freq_control:
 			continue;
 
 		freq_idx = max_t(int, cluster_ptr->freq_idx_low,
-			cluster_ptr->freq_idx_high -
-			msm_thermal_info.bootup_freq_step * index);
+			cluster_ptr->freq_idx_high - freq_step * index);
 		if (freq_idx == cluster_ptr->freq_idx)
 			continue;
 		cluster_ptr->freq_idx = freq_idx;
@@ -2923,7 +2924,7 @@ static void do_freq_control(long temp)
 		if (limit_idx == limit_idx_low)
 			return;
 
-		limit_idx -= msm_thermal_info.bootup_freq_step;
+		limit_idx -= freq_step;
 		if (limit_idx < limit_idx_low)
 			limit_idx = limit_idx_low;
 		max_freq = table[limit_idx].frequency;
@@ -2932,7 +2933,7 @@ static void do_freq_control(long temp)
 		if (limit_idx == limit_idx_high)
 			return;
 
-		limit_idx += msm_thermal_info.bootup_freq_step;
+		limit_idx += freq_step;
 		if (limit_idx >= limit_idx_high) {
 			limit_idx = limit_idx_high;
 			max_freq = UINT_MAX;
@@ -5826,11 +5827,6 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 
 	key = "qcom,temp-hysteresis";
 	ret = of_property_read_u32(node, key, &data.temp_hysteresis_degC);
-	if (ret)
-		goto fail;
-
-	key = "qcom,freq-step";
-	ret = of_property_read_u32(node, key, &data.bootup_freq_step);
 	if (ret)
 		goto fail;
 
