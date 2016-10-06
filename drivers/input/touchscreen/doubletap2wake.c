@@ -515,7 +515,7 @@ static int dt2w_fb_notifier_callback(struct notifier_block *self,
 			scr_suspended = false;
 			unregister_dt2w();
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-			if (tomtom_playing)
+			if (tomtom_playing || a2dp_playing)
 				dt2w_switch_tmp = 1;
 #endif
 			break;

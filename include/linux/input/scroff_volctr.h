@@ -25,6 +25,7 @@
 
 extern int sovc_switch;
 extern int sovc_tmp_onoff;
+extern int a2dp_playing;
 extern bool sovc_force_off;
 extern bool track_changed;
 extern bool sovc_scr_suspended;
