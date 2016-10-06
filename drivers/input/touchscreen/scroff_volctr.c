@@ -94,6 +94,7 @@ MODULE_LICENSE("GPLv2");
 /* Resources */
 int sovc_switch = SOVC_DEFAULT;
 int sovc_tmp_onoff = 0;
+int a2dp_playing = 0;
 bool sovc_force_off = false;
 bool track_changed = false;
 bool sovc_scr_suspended = false;
@@ -672,6 +673,8 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 		return -EINVAL;
 
 	if (val == 0 || val == 1) {
+		a2dp_playing = val;
+
 		if (sovc_tmp_onoff != val) {
 			value_changed = 1;
 			sovc_tmp_onoff = val;
@@ -768,7 +771,7 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 			sovc_scr_suspended = false;
 			cancel_delayed_work(&sovc_auto_off_check_work);
 			unregister_sovc();
-			if (tomtom_playing)
+			if (tomtom_playing || a2dp_playing)
 				sovc_tmp_onoff = 1;
 			break;
 		case FB_BLANK_POWERDOWN:
