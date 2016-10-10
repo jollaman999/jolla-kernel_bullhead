@@ -1324,7 +1324,7 @@ static void do_cluster_freq_ctrl(long temp)
 
 	temp_diff = temp - temp_threshold;
 	if (temp_diff > 0)
-		index = temp_diff / temp_step;
+		index = temp_diff / temp_step + 1;
 	else
 		index = 1;
 	if (index > temp_count_max)
