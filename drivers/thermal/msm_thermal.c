@@ -1,4 +1,5 @@
 /* Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016, jollaman999 <admin@jollaman999.com>. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -88,7 +89,22 @@ struct notifier_block msm_thermal_fb_notif;
 
 static int big_core_start;
 
-// Cluster thermal threshold for control frequency
+/*
+ * Tunable options
+ *
+ * temp_threshold - Limit the frequency when temp is reached to 'temp_threshold'.
+ * temp_big_threshold - Turn off the big cores when temp is reached to 'temp_big_threshold'.
+ * temp_step - If 'temp_step = 4' and 'temp_threshold = 60', frequency will decrease like below.
+		temp = 60 --> Max frequency will decrease one time.
+		temp = 62 --> Max frequency will decrease one time.
+		temp = 63 --> Max frequency will decrease one time.
+		temp = 64 --> Max frequency will decrease two times.
+		temp = 65 --> Max frequency will decrease two times.
+		temp = 68 --> Max frequency will decrease three times.
+ * freq_step_little - Frequency decrease step for little.
+ * freq_step_big - Frequency decrease step for big.
+ * temp_count_max - If 'temp_count_max' is 3, max frequency will decrease 1 to 3 times.
+ */
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
 unsigned int temp_step = 4;
