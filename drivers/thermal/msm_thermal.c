@@ -92,12 +92,14 @@ static int big_core_start;
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
 unsigned int temp_step = 4;
-unsigned int freq_step = 1;
+unsigned int freq_step_little = 1;
+unsigned int freq_step_big = 2;
 unsigned int temp_count_max = 3;
 module_param(temp_threshold, int, 0644);
 module_param(temp_big_threshold, int, 0644);
 module_param(temp_step, int, 0644);
-module_param(freq_step, int, 0644);
+module_param(freq_step_little, int, 0644);
+module_param(freq_step_big, int, 0644);
 module_param(temp_count_max, int, 0644);
 
 // Debug
@@ -1291,7 +1293,7 @@ static void do_cluster_freq_ctrl(long temp)
 	uint32_t _cluster = 0;
 	int _cpu = -1, freq_idx = 0;
 	int temp_diff;
-	int index;
+	int index, step;
 	struct cluster_info *cluster_ptr = NULL;
 
 	if (temp < temp_threshold) {
@@ -1323,8 +1325,13 @@ freq_control:
 		if (!cluster_ptr->freq_table)
 			continue;
 
+		if (first_cpu(cluster_ptr->cluster_cores) >= big_core_start)
+			step = freq_step_big;
+		else
+			step = freq_step_little;
+
 		freq_idx = max_t(int, cluster_ptr->freq_idx_low,
-			cluster_ptr->freq_idx_high - freq_step * index);
+			cluster_ptr->freq_idx_high - step * index);
 		if (freq_idx == cluster_ptr->freq_idx)
 			continue;
 		cluster_ptr->freq_idx = freq_idx;
@@ -2933,7 +2940,7 @@ static void do_freq_control(long temp)
 		if (limit_idx == limit_idx_low)
 			return;
 
-		limit_idx -= freq_step;
+		limit_idx -= freq_step_little;
 		if (limit_idx < limit_idx_low)
 			limit_idx = limit_idx_low;
 		max_freq = table[limit_idx].frequency;
@@ -2942,7 +2949,7 @@ static void do_freq_control(long temp)
 		if (limit_idx == limit_idx_high)
 			return;
 
-		limit_idx += freq_step;
+		limit_idx += freq_step_little;
 		if (limit_idx >= limit_idx_high) {
 			limit_idx = limit_idx_high;
 			max_freq = UINT_MAX;
