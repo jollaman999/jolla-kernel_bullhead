@@ -665,7 +665,6 @@ static ssize_t sovc_scroff_volctr_temp_show(struct device *dev,
 static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
-	int value_changed = 0;
 	int rc, val;
 
 	rc = kstrtoint(buf, 10, &val);
@@ -674,11 +673,7 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 
 	if (val == 0 || val == 1) {
 		a2dp_playing = val;
-
-		if (sovc_tmp_onoff != val) {
-			value_changed = 1;
-			sovc_tmp_onoff = val;
-		}
+		sovc_tmp_onoff = val;
 	} else
 		return -EINVAL;
 
@@ -691,7 +686,7 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 				unregister_sovc();
 			else
 				register_sovc();
-		} else if (value_changed) {
+		} else {
 			mutex_lock(&touch_off_lock);
 			tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
 			mutex_unlock(&touch_off_lock);
