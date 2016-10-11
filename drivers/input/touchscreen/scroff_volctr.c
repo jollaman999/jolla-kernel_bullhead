@@ -764,6 +764,7 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
 			sovc_scr_suspended = false;
+			sovc_force_off = false;
 			cancel_delayed_work(&sovc_auto_off_check_work);
 			unregister_sovc();
 			if (tomtom_playing || a2dp_playing)
@@ -771,9 +772,6 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 			break;
 		case FB_BLANK_POWERDOWN:
 			sovc_scr_suspended = true;
-			if (sovc_force_off)
-				unregister_sovc();
-
 			if (sovc_switch && (track_changed || sovc_tmp_onoff)) {
 				if (tomtom_mic_detected) {
 					unregister_sovc();
@@ -804,7 +802,7 @@ static int sovc_tomtom_notifier_callback(struct notifier_block *self,
 		sovc_tmp_onoff = 1;
 		break;
 	case TOMTOM_EVENT_STOPPED:
-		if (!(track_changed || tomtom_playing) || sovc_force_off)
+		if (!track_changed && !tomtom_playing)
 			sovc_tmp_onoff = 0;
 		break;
 	}
