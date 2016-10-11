@@ -514,10 +514,6 @@ static int dt2w_fb_notifier_callback(struct notifier_block *self,
 		case FB_BLANK_UNBLANK:
 			scr_suspended = false;
 			unregister_dt2w();
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-			if (tomtom_playing || a2dp_playing)
-				dt2w_switch_tmp = 1;
-#endif
 			break;
 		case FB_BLANK_POWERDOWN:
 			scr_suspended = true;
@@ -555,7 +551,7 @@ static int dt2w_tomtom_notifier_callback(struct notifier_block *self,
 		dt2w_switch_tmp = 1;
 		break;
 	case TOMTOM_EVENT_STOPPED:
-		if (!track_changed && !tomtom_playing)
+		if (!track_changed && !tomtom_playing && !a2dp_playing)
 			dt2w_switch_tmp = 0;
 		break;
 	}
