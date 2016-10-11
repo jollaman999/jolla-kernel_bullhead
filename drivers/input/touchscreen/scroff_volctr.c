@@ -109,6 +109,7 @@ static struct input_dev *sovc_input;
 static DEFINE_MUTEX(keyworklock);
 static DEFINE_MUTEX(touch_off_lock);
 static DEFINE_MUTEX(auto_off_schedule_lock);
+static DEFINE_MUTEX(a2dp_lock);
 static struct workqueue_struct *sovc_volume_input_wq;
 static struct workqueue_struct *sovc_track_input_wq;
 static struct work_struct sovc_volume_input_work;
@@ -667,15 +668,17 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 {
 	int rc, val;
 
+	mutex_lock(&a2dp_lock);
+
 	rc = kstrtoint(buf, 10, &val);
 	if (rc)
-		return -EINVAL;
+		goto invalid_value;
 
 	if (val == 0 || val == 1) {
 		a2dp_playing = val;
 		sovc_tmp_onoff = val;
 	} else
-		return -EINVAL;
+		return invalid_value;
 
 	if (sovc_tmp_onoff)
 		track_changed = false;
@@ -694,7 +697,11 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 	} else
 		unregister_sovc();
 
+	mutex_unlock(&a2dp_lock);
 	return count;
+invalid_value:
+	mutex_unlock(&a2dp_lock);
+	return -EINVAL;
 }
 
 static DEVICE_ATTR(scroff_volctr_temp, (S_IWUSR|S_IRUGO),
