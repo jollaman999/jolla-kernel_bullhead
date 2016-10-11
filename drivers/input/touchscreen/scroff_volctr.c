@@ -678,7 +678,7 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 		a2dp_playing = val;
 		sovc_tmp_onoff = val;
 	} else
-		return invalid_value;
+		goto invalid_value;
 
 	if (sovc_tmp_onoff)
 		track_changed = false;
