@@ -4435,7 +4435,6 @@ static int fb_notifier_callback(struct notifier_block *self,
 				scr_suspended = false;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-				sovc_force_off = false;
 				cancel_delayed_work(&rmi4_data->touch_off_work);
 #endif
 				synaptics_rmi4_resume(
