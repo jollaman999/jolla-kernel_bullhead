@@ -523,22 +523,15 @@ static int dt2w_fb_notifier_callback(struct notifier_block *self,
 			scr_suspended = true;
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 			if (dt2w_switch || (sovc_switch && dt2w_switch_tmp)) {
-				if (tomtom_mic_detected) {
-					unregister_dt2w();
-					break;
-				}
-				register_dt2w();
-			} else if (sovc_force_off && !dt2w_switch)
-				unregister_dt2w();
 #else
 			if (dt2w_switch) {
+#endif
 				if (tomtom_mic_detected) {
 					unregister_dt2w();
 					break;
 				}
 				register_dt2w();
 			}
-#endif
 			break;
 		}
 	}
@@ -562,7 +555,7 @@ static int dt2w_tomtom_notifier_callback(struct notifier_block *self,
 		dt2w_switch_tmp = 1;
 		break;
 	case TOMTOM_EVENT_STOPPED:
-		if (!(track_changed || tomtom_playing) || sovc_force_off)
+		if (!track_changed && !tomtom_playing)
 			dt2w_switch_tmp = 0;
 		break;
 	}
