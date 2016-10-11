@@ -767,8 +767,6 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 			sovc_force_off = false;
 			cancel_delayed_work(&sovc_auto_off_check_work);
 			unregister_sovc();
-			if (tomtom_playing || a2dp_playing)
-				sovc_tmp_onoff = 1;
 			break;
 		case FB_BLANK_POWERDOWN:
 			sovc_scr_suspended = true;
@@ -802,7 +800,7 @@ static int sovc_tomtom_notifier_callback(struct notifier_block *self,
 		sovc_tmp_onoff = 1;
 		break;
 	case TOMTOM_EVENT_STOPPED:
-		if (!track_changed && !tomtom_playing)
+		if (!track_changed && !tomtom_playing && !a2dp_playing)
 			sovc_tmp_onoff = 0;
 		break;
 	}
