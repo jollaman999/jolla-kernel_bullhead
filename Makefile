@@ -1,7 +1,7 @@
 VERSION = 3
 PATCHLEVEL = 10
 SUBLEVEL = 103
-EXTRAVERSION = -jolla-kernel_bullhead_II-v8.1
+EXTRAVERSION = -jolla-kernel_bullhead_II-v8.2
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
