@@ -94,7 +94,6 @@ MODULE_LICENSE("GPLv2");
 /* Resources */
 int sovc_switch = SOVC_DEFAULT;
 int sovc_tmp_onoff = 0;
-int a2dp_playing = 0;
 bool sovc_force_off = false;
 bool track_changed = false;
 bool sovc_scr_suspended = false;
@@ -676,10 +675,9 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 	if (rc)
 		goto invalid_value;
 
-	if (val == 0 || val == 1) {
-		a2dp_playing = val;
+	if (val == 0 || val == 1)
 		sovc_tmp_onoff = val;
-	} else
+	else
 		goto invalid_value;
 
 	if (sovc_tmp_onoff)
@@ -810,7 +808,7 @@ static int sovc_tomtom_notifier_callback(struct notifier_block *self,
 		sovc_tmp_onoff = 1;
 		break;
 	case TOMTOM_EVENT_STOPPED:
-		if (!track_changed && !tomtom_playing && !a2dp_playing)
+		if (!track_changed && !sovc_force_off)
 			sovc_tmp_onoff = 0;
 		break;
 	}
