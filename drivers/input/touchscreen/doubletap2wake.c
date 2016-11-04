@@ -551,6 +551,8 @@ static int dt2w_tomtom_notifier_callback(struct notifier_block *self,
 		dt2w_switch_tmp = 1;
 		break;
 	case TOMTOM_EVENT_STOPPED:
+		if (!dt2w_switch && sovc_force_off)
+			unregister_dt2w();
 		if (!track_changed && !sovc_force_off)
 			dt2w_switch_tmp = 0;
 		break;
