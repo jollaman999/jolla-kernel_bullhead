@@ -118,6 +118,7 @@ extern bool tomtom_mic_detected;
 extern bool tomtom_playing;
 
 static void touch_off(void);
+static void unregister_sovc(void);
 
 static bool registered = false;
 static DEFINE_MUTEX(reg_lock);
@@ -320,6 +321,7 @@ static void touch_off(void)
 		goto out;
 
 	sovc_force_off = true;
+	unregister_sovc();
 	tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
 
 	// Vibrate when action performed
@@ -691,6 +693,7 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 				register_sovc();
 		} else {
 			mutex_lock(&touch_off_lock);
+			unregister_sovc();
 			tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
 			mutex_unlock(&touch_off_lock);
 		}
