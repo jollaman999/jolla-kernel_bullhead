@@ -551,7 +551,7 @@ static int dt2w_tomtom_notifier_callback(struct notifier_block *self,
 		dt2w_switch_tmp = 1;
 		break;
 	case TOMTOM_EVENT_STOPPED:
-		if (!track_changed && !tomtom_playing && !a2dp_playing)
+		if (!track_changed && !sovc_force_off)
 			dt2w_switch_tmp = 0;
 		break;
 	}
