@@ -35,6 +35,10 @@
 #include <linux/hrtimer.h>
 #include <asm-generic/cputime.h>
 
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+#include <linux/input/sweep2wake.h>
+#endif
+
 /* ******************* HOW TO WORK *******************
  * == For Volume Control ==
  *  If you swipe the touchscreen up or down in SOVC_TIME_GAP (ms)
@@ -71,7 +75,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Screen Off Volume & Track Control for almost any device"
-#define DRIVER_VERSION "4.0"
+#define DRIVER_VERSION "4.1"
 #define LOGTAG "[scroff_volctr]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -437,6 +441,11 @@ static void sovc_track_input_event(struct input_handle *handle, unsigned int typ
 	/* You can debug here with 'adb shell getevent -l' command. */
 	switch(code) {
 		case ABS_MT_POSITION_X:
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+			// Ignore to change track when S2W is enabled.
+			if (s2w_switch)
+				break;
+#endif
 			touch_x = value;
 			queue_work(sovc_track_input_wq, &sovc_track_input_work);
 			break;
