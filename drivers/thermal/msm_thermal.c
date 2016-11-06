@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
+/*
+ * Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
  * Copyright (c) 2016, jollaman999 <admin@jollaman999.com>. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -92,6 +93,7 @@ static int big_core_start;
 /*
  * Tunable options
  *
+ * poll_ms - msm_thermal will check device's temperature every this milli seconds.
  * temp_threshold - Limit the frequency when temp is reached to 'temp_threshold'.
  * temp_big_threshold - Turn off the big cores when temp is reached to 'temp_big_threshold'.
  * temp_step - If 'temp_step = 4' and 'temp_threshold = 60', frequency will decrease like below.
