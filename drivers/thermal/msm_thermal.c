@@ -105,12 +105,14 @@ static int big_core_start;
  * freq_step_big - Frequency decrease step for big.
  * temp_count_max - If 'temp_count_max' is 3, max frequency will decrease 1 to 3 times.
  */
+unsigned int poll_ms;
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
 unsigned int temp_step = 4;
 unsigned int freq_step_little = 1;
 unsigned int freq_step_big = 2;
 unsigned int temp_count_max = 3;
+module_param(poll_ms, int, 0644);
 module_param(temp_threshold, int, 0644);
 module_param(temp_big_threshold, int, 0644);
 module_param(temp_step, int, 0644);
@@ -3026,7 +3028,7 @@ static void check_temp(struct work_struct *work)
 reschedule:
 	if (polling_enabled)
 		schedule_delayed_work(&check_temp_work,
-				msecs_to_jiffies(msm_thermal_info.poll_ms));
+				msecs_to_jiffies(poll_ms));
 }
 
 static int __ref msm_thermal_cpu_callback(struct notifier_block *nfb,
@@ -5839,7 +5841,7 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 		goto fail;
 
 	key = "qcom,poll-ms";
-	ret = of_property_read_u32(node, key, &data.poll_ms);
+	ret = of_property_read_u32(node, key, &poll_ms);
 	if (ret)
 		goto fail;
 
