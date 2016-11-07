@@ -96,31 +96,42 @@ static int big_core_start;
  * poll_ms - msm_thermal will check device's temperature every this milli seconds.
  * temp_threshold - Limit the frequency when temp is reached to 'temp_threshold'.
  * temp_big_threshold - Turn off the big cores when temp is reached to 'temp_big_threshold'.
- * temp_step - If 'temp_step = 4' and 'temp_threshold = 60', frequency will decrease like below.
-		temp = 60 --> Max frequency will decrease one time.
-		temp = 62 --> Max frequency will decrease one time.
-		temp = 63 --> Max frequency will decrease one time.
-		temp = 64 --> Max frequency will decrease two times.
-		temp = 65 --> Max frequency will decrease two times.
-		temp = 68 --> Max frequency will decrease three times.
+ * temp_step_little - If 'temp_step_little = 4' and 'temp_threshold = 60', frequency will decrease like below.
+		temp = 60 --> Little's max frequency will decrease one time.
+		temp = 62 --> Little's max frequency will decrease one time.
+		temp = 63 --> Little's max frequency will decrease one time.
+		temp = 64 --> Little's max frequency will decrease two times.
+		temp = 65 --> Little's max frequency will decrease two times.
+		temp = 68 --> Little's max frequency will decrease three times.
+ * temp_step_big - If 'temp_step_big = 2' and 'temp_threshold = 60', frequency will decrease like below.
+		temp = 60 --> Big's max frequency will decrease one time.
+		temp = 61 --> Big's max frequency will decrease one time.
+		temp = 62 --> Big's max frequency will decrease two time.
+		temp = 63 --> Big's max frequency will decrease two times.
+		temp = 64 --> Big's max frequency will decrease three times.
  * freq_step_little - Frequency decrease step for little.
  * freq_step_big - Frequency decrease step for big.
- * temp_count_max - If 'temp_count_max' is 3, max frequency will decrease 1 to 3 times.
+ * temp_count_max_little - If this value is 3, little's max frequency will decrease 1 to 3 times.
+ * temp_count_max_big - If this value is 5, big's max frequency will decrease 1 to 5 times.
  */
 unsigned int poll_ms;
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
-unsigned int temp_step = 4;
+unsigned int temp_step_little = 4;
+unsigned int temp_step_big = 2;
 unsigned int freq_step_little = 1;
 unsigned int freq_step_big = 2;
-unsigned int temp_count_max = 3;
+unsigned int temp_count_max_little = 3;
+unsigned int temp_count_max_big = 5;
 module_param(poll_ms, int, 0644);
 module_param(temp_threshold, int, 0644);
 module_param(temp_big_threshold, int, 0644);
-module_param(temp_step, int, 0644);
+module_param(temp_step_little, int, 0644);
+module_param(temp_step_big, int, 0644);
 module_param(freq_step_little, int, 0644);
 module_param(freq_step_big, int, 0644);
-module_param(temp_count_max, int, 0644);
+module_param(temp_count_max_little, int, 0644);
+module_param(temp_count_max_big, int, 0644);
 
 // Debug
 unsigned int debug_core_control = 0;
@@ -1305,7 +1316,7 @@ static void update_cluster_freq(void)
 	}
 }
 
-static int cur_index = 0;
+static int cur_index_little = 0, cur_index_big = 0;
 static bool restored = true;
 
 static void do_cluster_freq_ctrl(long temp)
@@ -1314,28 +1325,42 @@ static void do_cluster_freq_ctrl(long temp)
 	int _cpu = -1, freq_idx = 0;
 	int temp_diff;
 	int index, step;
+	int index_little, index_big;
+	bool skip_little = false, skip_big = false;
 	struct cluster_info *cluster_ptr = NULL;
 
 	if (temp < temp_threshold) {
 		if (restored)
 			return;
 		else {
-			cur_index = index = 0;
+			index_little = index_big = 0;
+			cur_index_big = cur_index_little = 0;
 			restored = true;
 			goto freq_control;
 		}
 	}
 
 	temp_diff = temp - temp_threshold;
-	if (temp_diff > 0)
-		index = temp_diff / temp_step + 1;
+	if (temp_diff > 0) {
+		index_little = temp_diff / temp_step_little + 1;
+		index_big = temp_diff / temp_step_big + 1;
+		if (index_little > temp_count_max_little)
+			index_little = temp_count_max_little;
+		if (index_big > temp_count_max_big)
+			index_big = temp_count_max_big;
+	} else
+		index_big = index_little = 1;
+
+	if (index_little == cur_index_little)
+		skip_little = true;
 	else
-		index = 1;
-	if (index > temp_count_max)
-		index = temp_count_max;
-	if (index == cur_index)
-		return;
-	cur_index = index;
+		cur_index_little = index_little;
+
+	if (index_big == cur_index_big)
+		skip_big = true;
+	else
+		cur_index_big = index_big;
+
 	restored = false;
 
 freq_control:
@@ -1345,10 +1370,17 @@ freq_control:
 		if (!cluster_ptr->freq_table)
 			continue;
 
-		if (first_cpu(cluster_ptr->cluster_cores) >= big_core_start)
+		if (first_cpu(cluster_ptr->cluster_cores) >= big_core_start) {
+			if (skip_big)
+				continue;
+			index = index_big;
 			step = freq_step_big;
-		else
+		} else {
+			if (skip_little)
+				continue;
+			index = index_little;
 			step = freq_step_little;
+		}
 
 		freq_idx = max_t(int, cluster_ptr->freq_idx_low,
 			cluster_ptr->freq_idx_high - step * index);
