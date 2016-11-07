@@ -654,7 +654,9 @@ static ssize_t sovc_scroff_volctr_dump(struct device *dev,
 	} else
 		return -EINVAL;
 
-	if (!sovc_switch)
+	if (sovc_switch && sovc_tmp_onoff && sovc_scr_suspended && !tomtom_mic_detected)
+		register_sovc();
+	else
 		unregister_sovc();
 
 	return count;
