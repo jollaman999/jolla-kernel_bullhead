@@ -684,9 +684,11 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 	if (rc)
 		goto invalid_value;
 
-	if (val == 0 || val == 1)
+	if (val == 0 || val == 1) {
+		if (val == sovc_tmp_onoff)
+			goto out;
 		sovc_tmp_onoff = val;
-	else
+	} else
 		goto invalid_value;
 
 	if (sovc_tmp_onoff)
@@ -707,6 +709,7 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 	} else
 		unregister_sovc();
 
+out:
 	mutex_unlock(&a2dp_lock);
 	return count;
 invalid_value:
