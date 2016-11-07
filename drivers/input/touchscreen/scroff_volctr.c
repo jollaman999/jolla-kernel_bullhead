@@ -687,6 +687,8 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 	if (val == 0 || val == 1) {
 		if (val == sovc_tmp_onoff)
 			goto out;
+		if (val == 0 && track_changed)
+			goto out;
 		sovc_tmp_onoff = val;
 	} else
 		goto invalid_value;
