@@ -55,6 +55,8 @@ MODULE_LICENSE("GPLv2");
 #define S2W_FEATHER             500
 #define S2W_TIME_GAP		250
 #define S2W_VIB_STRENGTH	20	// Vibrator strength
+#define SCREEN_Y		1920
+#define NAVBAR_HEIGHT		128
 
 /* Resources */
 int s2w_switch = S2W_DEFAULT;
@@ -198,8 +200,8 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 
 		case ABS_MT_POSITION_Y:
 			if (!scr_suspended) {
-				// Navigation bar position
-				if (value >= 0x00000700 && value <= 0x0000077f)
+				// Navigation bar position - 0x00000700~0x0000077f
+				if (value > SCREEN_Y - NAVBAR_HEIGHT && value < SCREEN_Y)
 					is_s2s_range = true;
 				else
 					is_s2s_range = false;
