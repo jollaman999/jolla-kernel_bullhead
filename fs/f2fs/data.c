@@ -613,6 +613,12 @@ alloc:
 	return 0;
 }
 
+static inline bool __force_buffered_io(struct inode *inode, int rw)
+{
+	return ((f2fs_encrypted_inode(inode) && S_ISREG(inode->i_mode)) ||
+			(rw == WRITE && test_opt(F2FS_I_SB(inode), LFS)));
+}
+
 int f2fs_preallocate_blocks(struct inode *inode, loff_t pos, size_t count, bool dio)
 {
 	struct f2fs_map_blocks map;
@@ -631,7 +637,10 @@ int f2fs_preallocate_blocks(struct inode *inode, loff_t pos, size_t count, bool 
 		err = f2fs_convert_inline_inode(inode);
 		if (err)
 			return err;
-		return f2fs_map_blocks(inode, &map, 1, F2FS_GET_BLOCK_PRE_DIO);
+		return f2fs_map_blocks(inode, &map, 1,
+			__force_buffered_io(inode, WRITE) ?
+				F2FS_GET_BLOCK_PRE_AIO :
+				F2FS_GET_BLOCK_PRE_DIO);
 	}
 	if (pos + count > MAX_INLINE_DATA) {
 		err = f2fs_convert_inline_inode(inode);
@@ -1747,9 +1756,7 @@ static ssize_t f2fs_direct_IO(int rw, struct kiocb *iocb,
 	if (err)
 		return err;
 
-	if (f2fs_encrypted_inode(inode) && S_ISREG(inode->i_mode))
-		return 0;
-	if (rw == WRITE && test_opt(F2FS_I_SB(inode), LFS))
+	if (__force_buffered_io(inode, rw))
 		return 0;
 
 	trace_f2fs_direct_IO_enter(inode, offset, count, rw);
