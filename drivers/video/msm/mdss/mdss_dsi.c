@@ -42,6 +42,9 @@
 
 #define XO_CLK_RATE	19200000
 
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+extern bool tomtom_mic_detected;
+#endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 static bool mdss_turned_off = false;
 
@@ -250,6 +253,10 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 		udelay(2000);
 	}
 
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	if (tomtom_mic_detected)
+		goto off;
+#endif
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	if (s2w_switch == 1)
 		goto end;
@@ -262,10 +269,14 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 	if (sovc_switch && sovc_tmp_onoff)
 		goto end;
 #endif
-
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+off:
+#endif
 	ret = mdss_dsi_panel_vreg_off_trigger(ctrl_pdata);
 
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 end:
+#endif
 	return ret;
 }
 
