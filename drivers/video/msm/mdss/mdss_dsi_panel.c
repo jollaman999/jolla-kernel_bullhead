@@ -36,6 +36,7 @@
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 static int onboot = true;
+extern bool tomtom_mic_detected;
 #endif
 
 #define DT_CMD_HDR 6
@@ -387,6 +388,10 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			gpio_free(ctrl_pdata->disp_en_gpio);
 		}
 
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+		if (tomtom_mic_detected)
+			goto off;
+#endif
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 		if (s2w_switch == 1)
 			goto end;
@@ -399,7 +404,9 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 		if (sovc_switch && sovc_tmp_onoff)
 			goto end;
 #endif
-
+#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+off:
+#endif
 		mdss_dsi_panel_reset_dsvreg_off_trigger(ctrl_pdata);
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
@@ -766,24 +773,26 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 	}
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
+	if (tomtom_mic_detected)
+		goto touch_off;
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	if (s2w_switch == 1)
 		goto touch_on;
-#endif
+#endif /* S2W */
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
 	if (dt2w_switch)
 		goto touch_on;
-#endif
+#endif /* DT2W */
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	if (sovc_switch && sovc_tmp_onoff)
 		goto touch_on;
-#endif
+#endif /* SOVC */
 	goto touch_off;
 
 touch_on:
 	ctrl->off_cmds.cmds[1].payload[0] = 0x11;
 touch_off:
-#endif
+#endif /* S2W || DT2W || SOVC */
 	if (ctrl->off_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
 
