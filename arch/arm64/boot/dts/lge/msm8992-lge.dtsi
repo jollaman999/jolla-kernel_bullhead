@@ -13,14 +13,20 @@
 
 / {
 	memory {
+		/* Hardboot: reserve 1MB of space before ramoops */
+		hardboot_mem: hardboot_region@1fe00000 {
+			linux,reserve-contiguous-region;
+			linux,reserve-region;
+			linux,remove-completely;
+			reg = <0x0 0x1fe00000 0x0 0x100000>;
+			label = "hardboot_mem";
+		};
+
 		ramoops_mem: ramoops_region@1ff00000 {
 			linux,reserve-contiguous-region;
 			linux,reserve-region;
 			linux,remove-completely;
-			/* Hardboot: reserve 1MB of space
-			 * before ramoops address of 0x1ff00000
-			 */
-			reg = <0x0 0x1fe00000 0x0 0x140000>;
+			reg = <0x0 0x1ff00000 0x0 0x40000>;
 			label = "ramoops_mem";
 		};
 	};
