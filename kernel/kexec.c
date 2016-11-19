@@ -798,11 +798,13 @@ static struct page *kimage_alloc_page(struct kimage *image,
 	return page;
 }
 
+#ifdef CONFIG_KEXEC_HARDBOOT
 bool __weak arch_kexec_is_hardboot_buffer_range(unsigned long s,
 	unsigned long e)
 {
 	return false;
 }
+#endif
 
 static int kimage_load_normal_segment(struct kimage *image,
 					 struct kexec_segment *segment)
