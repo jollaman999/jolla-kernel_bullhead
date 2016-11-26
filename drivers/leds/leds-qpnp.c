@@ -1774,7 +1774,7 @@ static int rgb_duration_config(struct qpnp_led_data *led)
 	if (!off_ms) { // Charging
 		int *charging_led_duty_pcts;
 
-		if (mdss_backlight_value_percentage > 0 &&
+		if (mdss_backlight_value_percentage >= 0 &&
 				mdss_backlight_value_percentage < 20) {
 			charging_led_duty_pcts = charging_led_duty_pcts_low;
 			num_duty_pcts = CHARGING_LED_DUTY_PCTS_LOW_SIZE;
