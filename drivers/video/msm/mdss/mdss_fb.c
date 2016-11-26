@@ -265,9 +265,13 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	if (value > mfd->panel_info->brightness_max)
 		value = mfd->panel_info->brightness_max;
 
-	/* Get percentage of mdss backlight value */
-	mdss_backlight_value_percentage =
-		value * 100 / mfd->panel_info->brightness_max;
+	/*
+	 *  Get percentage of mdss backlight value and preserve
+	 * previous percentage when value is 0.
+	 */
+	if (value != 0)
+		mdss_backlight_value_percentage =
+			value * 100 / mfd->panel_info->brightness_max;
 
 	if (backlight_dimmer) {
 		MDSS_BRIGHT_TO_BL_DIMMER(bl_lvl, value);
