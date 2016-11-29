@@ -48,7 +48,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Doubletap2wake for almost any device"
-#define DRIVER_VERSION "3.0"
+#define DRIVER_VERSION "4.0"
 #define LOGTAG "[doubletap2wake]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -59,23 +59,26 @@ MODULE_LICENSE("GPLv2");
 /* Tuneables */
 #define DT2W_DEBUG		0
 #define DT2W_DEFAULT		0
+#define DT2S_DEFAULT		0
 
 #define DT2W_FEATHER		200
 #define DT2W_TIME_GAP		200
 #define DT2W_VIB_STRENGTH	20	// Vibrator strength
+
+#define NOTIBAR_HEIGHT		120
 
 /* Resources */
 int dt2w_switch = DT2W_DEFAULT;
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 int dt2w_switch_tmp = 0;
 #endif
+static int dt2s_switch = DT2S_DEFAULT;
 static s64 tap_time_pre = 0;
 static int touch_x = 0, touch_y = 0, touch_nr = 0, x_pre = 0, y_pre = 0;
 static bool is_touching = false;
 static bool scr_suspended = false;
 static struct input_dev * doubletap2wake_pwrdev;
 static DEFINE_MUTEX(pwrkeyworklock);
-static DEFINE_MUTEX(switchlock);
 static struct workqueue_struct *dt2w_input_wq;
 static struct work_struct dt2w_input_work;
 extern bool tomtom_mic_detected;
@@ -162,8 +165,7 @@ static void new_touch(int x, int y)
 /* Doubletap2wake main function */
 static void detect_doubletap2wake(int x, int y)
 {
-	int tmp;
-	bool change_switch = false;
+	int tap_n = dt2w_switch;
 
 #if DT2W_DEBUG
 	pr_info(LOGTAG"x,y(%4d,%4d)\n", x, y);
@@ -172,22 +174,26 @@ static void detect_doubletap2wake(int x, int y)
 	if (!is_touching) {
 		is_touching = true;
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-		if (dt2w_switch_tmp)
-			change_switch = true;
+		if (!scr_suspended) {
+			tap_n = 1;
 
-		mutex_lock(&switchlock);
-		if (change_switch) {
-			tmp = dt2w_switch;
-			dt2w_switch = 1;
+			/* Notification bar location - 0x00000000~0x00000078 */
+			if (y < 0 || y > NOTIBAR_HEIGHT) {
+				doubletap2wake_reset();
+				new_touch(x, y);
+				return;
+			}
+		}
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+		else {
+			if (dt2w_switch_tmp)
+				tap_n = 1;
 		}
 #endif
 
-		// Make enable to set touch counts (Max : 10) - by jollaman999
 		if (touch_nr == 0) {
 			new_touch(x, y);
-		// Make enable to set touch counts (Max : 10) - by jollaman999
-		} else if (touch_nr >= 1 && touch_nr <= dt2w_switch) {
+		} else if (touch_nr >= 1 && touch_nr <= tap_n) {
 			if (((calc_feather(x, x_pre) < DT2W_FEATHER) || (calc_feather(y, y_pre) < DT2W_FEATHER))
 			&& ((ktime_to_ms(ktime_get_real()) - tap_time_pre) < DT2W_TIME_GAP)) {
 				tap_time_pre = ktime_to_ms(ktime_get_real());
@@ -200,18 +206,16 @@ static void detect_doubletap2wake(int x, int y)
 			doubletap2wake_reset();
 			new_touch(x, y);
 		}
-		// Make enable to set touch counts (Max : 10) - by jollaman999
-		if (touch_nr > dt2w_switch) {
-			pr_info(LOGTAG"ON\n");
+
+		if (touch_nr > tap_n) {
+			if (scr_suspended)
+				pr_info(LOGTAG"ON\n");
+			else
+				pr_info(LOGTAG"OFF\n");
+
 			doubletap2wake_pwrtrigger();
 			doubletap2wake_reset();
 		}
-
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-		if (change_switch)
-			dt2w_switch = tmp;
-		mutex_unlock(&switchlock);
-#endif
 	}
 }
 
@@ -224,10 +228,18 @@ static void dt2w_input_event(struct input_handle *handle, unsigned int type,
 				unsigned int code, int value)
 {
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (!scr_suspended || (!dt2w_switch && !dt2w_switch_tmp))
+	if (!dt2w_switch && !dt2s_switch && !dt2w_switch_tmp)
+		return;
+
+	if ((!scr_suspended && (dt2w_switch || dt2w_switch_tmp) && !dt2s_switch) ||
+	    (scr_suspended && dt2s_switch && (!dt2w_switch && !dt2w_switch_tmp)))
 		return;
 #else
-	if (!scr_suspended || !dt2w_switch)
+	if (!dt2w_switch && !dt2s_switch)
+		return;
+
+	if ((!scr_suspended && dt2w_switch&& !dt2s_switch) ||
+	    (scr_suspended && dt2s_switch && !dt2w_switch))
 		return;
 #endif
 
@@ -405,14 +417,10 @@ static ssize_t dt2w_doubletap2wake_dump(struct device *dev,
 {
 	int rc, val;
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mutex_lock(&switchlock);
-#endif
 	rc = kstrtoint(buf, 10, &val);
 	if (rc)
 		return -EINVAL;
 
-	// Make enable to set touch counts (Max : 10) - by jollaman999
 	// You should tap 1 more from set number to wake your device.
 	if (val >= 0 || val <= 9) {
 		if (dt2w_switch != val)
@@ -420,11 +428,8 @@ static ssize_t dt2w_doubletap2wake_dump(struct device *dev,
 	} else
 		return -EINVAL;
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mutex_unlock(&switchlock);
-#endif
-
-	if (dt2w_switch && scr_suspended)
+	if ((dt2w_switch && scr_suspended) ||
+	    (dt2s_switch && !scr_suspended))
 		register_dt2w();
 	else
 		unregister_dt2w();
@@ -476,6 +481,43 @@ static DEVICE_ATTR(doubletap2wake_tmp, (S_IWUSR|S_IRUGO),
 	dt2w_doubletap2wake_tmp_show, dt2w_doubletap2wake_tmp_dump);
 #endif
 
+static ssize_t dt2w_doubletap2sleep_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+
+	count += sprintf(buf, "%d\n", dt2s_switch);
+
+	return count;
+}
+
+static ssize_t dt2w_doubletap2sleep_dump(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	int rc, val;
+
+	rc = kstrtoint(buf, 10, &val);
+	if (rc)
+		return -EINVAL;
+
+	if (val == 0 || val == 1) {
+		if (dt2s_switch != val)
+			dt2s_switch = val;
+	} else
+		return -EINVAL;
+
+	if ((dt2w_switch && scr_suspended) ||
+	    (dt2s_switch && !scr_suspended))
+		register_dt2w();
+	else
+		unregister_dt2w();
+
+	return count;
+}
+
+static DEVICE_ATTR(doubletap2sleep, (S_IWUSR|S_IRUGO),
+	dt2w_doubletap2sleep_show, dt2w_doubletap2sleep_dump);
+
 static ssize_t dt2w_version_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -502,10 +544,10 @@ static int dt2w_fb_notifier_callback(struct notifier_block *self,
 	int *blank;
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (!sovc_switch && !dt2w_switch)
+	if (!dt2w_switch && !dt2s_switch && !dt2w_switch_tmp)
 		return 0;
 #else
-	if (!dt2w_switch)
+	if (!dt2w_switch && !dt2s_switch)
 		return 0;
 #endif
 
@@ -515,7 +557,10 @@ static int dt2w_fb_notifier_callback(struct notifier_block *self,
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
 			scr_suspended = false;
-			unregister_dt2w();
+			if (dt2s_switch)
+				register_dt2w();
+			else
+				unregister_dt2w();
 			break;
 		case FB_BLANK_POWERDOWN:
 			scr_suspended = true;
@@ -625,6 +670,10 @@ static int __init doubletap2wake_init(void)
 		pr_warn("%s: sysfs_create_file failed for doubletap2wake_tmp\n", __func__);
 	}
 #endif
+	rc = sysfs_create_file(android_touch_kobj, &dev_attr_doubletap2sleep.attr);
+	if (rc) {
+		pr_warn("%s: sysfs_create_file failed for doubletap2sleep\n", __func__);
+	}
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_doubletap2wake_version.attr);
 	if (rc) {
 		pr_warn("%s: sysfs_create_file failed for doubletap2wake_version\n", __func__);
