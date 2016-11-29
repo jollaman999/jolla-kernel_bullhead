@@ -322,6 +322,8 @@ static int register_dt2w(void)
 {
 	int rc = 0;
 
+	doubletap2wake_reset();
+
 	mutex_lock(&reg_lock);
 
 	if (registered) {
