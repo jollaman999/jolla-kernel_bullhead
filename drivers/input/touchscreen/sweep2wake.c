@@ -178,7 +178,8 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 	if (!s2w_switch && !s2s_switch)
 		return;
 
-	if (scr_suspended && s2w_switch == 2)
+	if ((!scr_suspended && s2w_switch == 1) ||
+	    (scr_suspended && (s2s_switch || s2w_switch == 2)))
 		return;
 
 	/* You can debug here with 'adb shell getevent -l' command. */
