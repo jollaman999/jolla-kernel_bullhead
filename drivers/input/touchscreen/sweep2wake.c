@@ -199,7 +199,7 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 
 		case ABS_MT_POSITION_Y:
 			if (!scr_suspended) {
-				// Navigation bar position - 0x00000700~0x0000077f
+				/* Navigation bar location - 0x00000700~0x0000077f */
 				if (value < SCREEN_Y - NAVBAR_HEIGHT || value > SCREEN_Y)
 					sweep2wake_reset();
 			}
