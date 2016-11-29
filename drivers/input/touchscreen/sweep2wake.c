@@ -41,7 +41,7 @@ struct notifier_block s2w_fb_notif;
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Sweep2wake for almost any device"
-#define DRIVER_VERSION "2.1"
+#define DRIVER_VERSION "2.2"
 #define LOGTAG "[sweep2wake]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -69,7 +69,6 @@ static int prev_x = 0;
 static bool is_new_touch = false;
 static bool is_touching = false;
 static bool scr_suspended = false;
-static bool is_s2s_range = false;
 static struct input_dev * sweep2wake_pwrdev;
 static DEFINE_MUTEX(pwrkeyworklock);
 static struct workqueue_struct *s2w_input_wq;
@@ -194,10 +193,6 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 			break;
 
 		case ABS_MT_POSITION_X:
-			if (!scr_suspended && !is_s2s_range) {
-				sweep2wake_reset();
-				break;
-			}
 			touch_x = value;
 			queue_work(s2w_input_wq, &s2w_input_work);
 			break;
@@ -205,10 +200,8 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 		case ABS_MT_POSITION_Y:
 			if (!scr_suspended) {
 				// Navigation bar position - 0x00000700~0x0000077f
-				if (value > SCREEN_Y - NAVBAR_HEIGHT && value < SCREEN_Y)
-					is_s2s_range = true;
-				else
-					is_s2s_range = false;
+				if (value < SCREEN_Y - NAVBAR_HEIGHT || value > SCREEN_Y)
+					sweep2wake_reset();
 			}
 			break;
 
