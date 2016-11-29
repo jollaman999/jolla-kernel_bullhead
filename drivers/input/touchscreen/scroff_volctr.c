@@ -541,6 +541,8 @@ static int register_sovc(void)
 {
 	int rc = 0;
 
+	scroff_volctr_reset();
+
 	mutex_lock(&reg_lock);
 
 	if (registered) {
