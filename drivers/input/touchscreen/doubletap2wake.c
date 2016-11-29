@@ -469,10 +469,10 @@ static ssize_t dt2w_doubletap2wake_tmp_dump(struct device *dev,
 
 	return count;
 }
-#endif
 
 static DEVICE_ATTR(doubletap2wake_tmp, (S_IWUSR|S_IRUGO),
 	dt2w_doubletap2wake_tmp_show, dt2w_doubletap2wake_tmp_dump);
+#endif
 
 static ssize_t dt2w_version_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
