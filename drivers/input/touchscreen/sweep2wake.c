@@ -276,6 +276,8 @@ static int register_s2w(void)
 {
 	int rc = 0;
 
+	sweep2wake_reset();
+
 	mutex_lock(&reg_lock);
 
 	if (registered) {
