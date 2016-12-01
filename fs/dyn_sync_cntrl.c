@@ -32,8 +32,8 @@ struct notifier_block dyn_fsync_fb_notif;
  * transitions
  */
 static DEFINE_MUTEX(fsync_mutex);
-bool dyn_sync_scr_suspended = true;
-bool dyn_fsync_active __read_mostly = false;
+bool dyn_sync_scr_suspended = false;
+bool dyn_fsync_active __read_mostly = true;
 
 extern void dyn_fsync_suspend_actions(void);
 
