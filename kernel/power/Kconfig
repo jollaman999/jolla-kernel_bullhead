@@ -318,11 +318,7 @@ config SUSPEND_TIME_TIMEKEEPING
 
 config DEDUCE_WAKEUP_REASONS
 	bool
-
-config PM_SYNC_BEFORE_SUSPEND
-	bool "Sync file systems before suspend"
-	depends on PM
-	default y
+	default n
 
 config PARTIALRESUME
 	bool "Partial-resume framework"
