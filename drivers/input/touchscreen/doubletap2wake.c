@@ -466,13 +466,16 @@ static ssize_t dt2w_doubletap2wake_tmp_dump(struct device *dev,
 	} else
 		return -EINVAL;
 
-	if (sovc_switch && dt2w_switch_tmp && scr_suspended) {
-		if (tomtom_mic_detected && !dt2w_switch)
-			unregister_dt2w();
-		else
-			register_dt2w();
-	} else if (!dt2w_switch)
-		unregister_dt2w();
+	if (scr_suspended) {
+		if (dt2w_switch) {
+			return count;
+		} else if (sovc_switch && dt2w_switch_tmp) {
+			if (tomtom_mic_detected && !dt2w_switch)
+				unregister_dt2w();
+			else
+				register_dt2w();
+		}
+	}
 
 	return count;
 }
