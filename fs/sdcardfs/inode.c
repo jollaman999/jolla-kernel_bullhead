@@ -592,7 +592,8 @@ static int sdcardfs_permission(struct inode *inode, int mask)
 	struct inode *top = SDCARDFS_I(inode)->top;
 
 	/* Ensure owner is up to date */
-	if (from_kuid(&init_user_ns, inode->i_uid) != from_kuid(&init_user_ns, top->i_uid)) {
+	if (top &&
+	    from_kuid(&init_user_ns, inode->i_uid) != from_kuid(&init_user_ns, top->i_uid)) {
 		SDCARDFS_I(inode)->d_uid = SDCARDFS_I(top)->d_uid;
 		fix_derived_permission(inode);
 	}
