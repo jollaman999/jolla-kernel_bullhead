@@ -2604,8 +2604,7 @@ static int otg_oc_handler(struct smb135x_chg *chip, u8 rt_stat)
 	}
 
 	pr_debug("rt_stat = 0x%02x\n", rt_stat);
-	queue_delayed_work(system_power_efficient_wq,
-		&chip->reset_otg_oc_count_work,
+	schedule_delayed_work(&chip->reset_otg_oc_count_work,
 			msecs_to_jiffies(RESET_OTG_OC_COUNT_MS));
 	mutex_unlock(&chip->otg_oc_count_lock);
 	return 0;
@@ -2627,8 +2626,7 @@ static int handle_dc_removal(struct smb135x_chg *chip)
 static int handle_dc_insertion(struct smb135x_chg *chip)
 {
 	if (chip->dc_psy_type == POWER_SUPPLY_TYPE_WIRELESS)
-		queue_delayed_work(system_power_efficient_wq,
-			&chip->wireless_insertion_work,
+		schedule_delayed_work(&chip->wireless_insertion_work,
 			msecs_to_jiffies(DCIN_UNSUSPEND_DELAY_MS));
 	if (chip->dc_psy_type != -EINVAL)
 		power_supply_set_online(&chip->dc_psy,
