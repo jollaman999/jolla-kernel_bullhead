@@ -3061,9 +3061,8 @@ static void check_temp(struct work_struct *work)
 
 reschedule:
 	if (polling_enabled)
-		queue_delayed_work(system_power_efficient_wq,
-			&check_temp_work,
-			msecs_to_jiffies(poll_ms));
+		schedule_delayed_work(&check_temp_work,
+				msecs_to_jiffies(poll_ms));
 }
 
 static int __ref msm_thermal_cpu_callback(struct notifier_block *nfb,
@@ -4238,8 +4237,7 @@ static void msm_thermal_suspend(bool suspend)
 		disable_msm_thermal();
 		pr_info("suspended\n");
 	} else {
-		queue_delayed_work(system_power_efficient_wq,
-			&check_temp_work, 0);
+		schedule_delayed_work(&check_temp_work, 0);
 		pr_info("resumed\n");
 	}
 }
@@ -4666,8 +4664,7 @@ int msm_thermal_init(struct msm_thermal_data *pdata)
 	register_reboot_notifier(&msm_thermal_reboot_notifier);
 	pm_notifier(msm_thermal_suspend_callback, 0);
 	INIT_DELAYED_WORK(&check_temp_work, check_temp);
-	queue_delayed_work(system_power_efficient_wq,
-		&check_temp_work, 0);
+	schedule_delayed_work(&check_temp_work, 0);
 
 	if (num_possible_cpus() > 1) {
 		cpus_previously_online_update();
