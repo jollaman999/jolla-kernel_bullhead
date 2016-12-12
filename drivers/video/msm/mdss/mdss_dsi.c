@@ -50,6 +50,8 @@ static bool mdss_turned_off = false;
 
 static int tomtom_notifier_callback(struct notifier_block *self,
 				unsigned long event, void *data);
+static struct mutex mdss_off_lock;
+static struct mutex vreg_off_lock;
 #endif
 
 static struct dsi_drv_cm_data shared_ctrl_data;
@@ -177,6 +179,9 @@ static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdat
 	int ret = 0;
 	int i = 0;
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	mutex_lock(&vreg_off_lock);
+#endif
 	for (i = DSI_MAX_PM - 1; i >= 0; i--) {
 		/*
 		 * Core power module will be disabled when the
@@ -197,7 +202,9 @@ static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdat
 #endif
 
 	pr_info("%s: done", __func__);
-
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	mutex_unlock(&vreg_off_lock);
+#endif
 	return ret;
 }
 
@@ -207,17 +214,22 @@ static void mdss_off(struct work_struct *work)
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata =
 		container_of(work, struct mdss_dsi_ctrl_pdata, mdss_off_work.work);
 
+	mutex_lock(&mdss_off_lock);
+
 	if (!sovc_scr_suspended)
-		return;
+		goto out;
 
 	if (track_changed || sovc_tmp_onoff)
-		return;
+		goto out;
 
 	if (mdss_turned_off)
-		return;
+		goto out;
 
 	mdss_dsi_panel_reset_dsvreg_off_trigger(ctrl_pdata);
 	mdss_dsi_panel_vreg_off_trigger(ctrl_pdata);
+
+out:
+	mutex_unlock(&mdss_off_lock);
 }
 #endif
 
@@ -1973,6 +1985,9 @@ static int mdss_dsi_ctrl_probe(struct platform_device *pdev)
 
 	if (tomtom_register_client(&ctrl_pdata->tomtom_notif))
 		pr_info("%s: tomtom_notifier register failed\n", __func__);
+
+	mutex_init(&vreg_off_lock);
+	mutex_init(&mdss_off_lock);
 #endif
 
 	ctrl_pdata->cmd_clk_ln_recovery_en =
