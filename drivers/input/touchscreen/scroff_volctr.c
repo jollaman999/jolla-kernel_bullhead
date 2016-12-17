@@ -38,6 +38,9 @@
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 #include <linux/input/sweep2wake.h>
 #endif
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+#include <linux/input/doubletap2wake.h>
+#endif
 
 /* ******************* HOW TO WORK *******************
  * == For Volume Control ==
@@ -660,6 +663,11 @@ static ssize_t sovc_scroff_volctr_dump(struct device *dev,
 		register_sovc();
 	else
 		unregister_sovc();
+
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	if (!dt2w_switch && !dt2s_switch && !sovc_switch)
+		unregister_dt2w();
+#endif
 
 	return count;
 }

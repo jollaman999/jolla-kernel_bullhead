@@ -24,6 +24,8 @@
 extern int dt2w_switch;
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 extern int dt2w_switch_tmp;
+extern int dt2s_switch;
+extern void unregister_dt2w(void);
 #endif
 
 #endif	/* _LINUX_DOUBLETAP2WAKE_H */
