@@ -547,7 +547,7 @@ static int dt2w_fb_notifier_callback(struct notifier_block *self,
 	int *blank;
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (!dt2w_switch && !dt2s_switch && !dt2w_switch_tmp)
+	if (!dt2w_switch && !dt2s_switch && !sovc_switch)
 		return 0;
 #else
 	if (!dt2w_switch && !dt2s_switch)
