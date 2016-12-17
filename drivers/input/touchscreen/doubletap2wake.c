@@ -72,7 +72,10 @@ int dt2w_switch = DT2W_DEFAULT;
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 int dt2w_switch_tmp = 0;
 #endif
-static int dt2s_switch = DT2S_DEFAULT;
+#ifndef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static
+#endif
+int dt2s_switch = DT2S_DEFAULT;
 static s64 tap_time_pre = 0;
 static int touch_x = 0, touch_y = 0, touch_nr = 0, x_pre = 0, y_pre = 0;
 static bool is_touching = false;
@@ -375,7 +378,10 @@ err:
 	return rc;
 }
 
-static void unregister_dt2w(void)
+#ifndef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static
+#endif
+void unregister_dt2w(void)
 {
 	mutex_lock(&reg_lock);
 
