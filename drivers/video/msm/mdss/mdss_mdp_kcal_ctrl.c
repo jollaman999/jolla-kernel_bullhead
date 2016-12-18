@@ -23,15 +23,14 @@
 
 #include "mdss_mdp.h"
 
-#define DEF_PCC 0x100
-#define DEF_PA 0xff
+#define DEF_PCC 0x100	// 256
+#define DEF_PA 0xff	// 255
 #define PCC_ADJ 0x80
 
-// Fix bullhead's shit yellow screen! - by jollaman999
-#define KCAL_RED	0xE8	// 232
-#define KCAL_GREEN	0xF1	// 241
-#define KCAL_BLUE	DEF_PCC	// 256
-#define KCAL_SAT	0x102	// 258
+/* Fix bullhead's shit yellow screen! - by jollaman999 */
+#define KCAL_RED_OFFSET	-24	// 232
+#define KCAL_GREEN_OFFSET	-15	// 241
+#define KCAL_SAT_OFFSET	3	// 258
 
 static int kcal_fix_yellow = 1;
 
@@ -167,6 +166,11 @@ void kcal_ext_apply_values(int red, int green, int blue)
 	lut_data->green = green / 128;
 	lut_data->blue = blue / 128;
 
+	if (kcal_fix_yellow) {
+		lut_data->red += KCAL_RED_OFFSET;
+		lut_data->green += KCAL_GREEN_OFFSET;
+	}
+
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_display_commit();
 }
@@ -275,18 +279,19 @@ static ssize_t kcal_fix_yellow_store(struct device *dev,
 	if (rc || (val != 0 && val != 1))
 		return -EINVAL;
 
+	if (kcal_fix_yellow == val)
+		return count;
+
 	kcal_fix_yellow = val;
 
 	if (kcal_fix_yellow) {
-		lut_data->red = KCAL_RED;
-		lut_data->green = KCAL_GREEN;
-		lut_data->blue = KCAL_BLUE;
-		lut_data->sat = KCAL_SAT;
+		lut_data->red += KCAL_RED_OFFSET;
+		lut_data->green += KCAL_GREEN_OFFSET;
+		lut_data->sat += KCAL_SAT_OFFSET;
 	} else {
-		lut_data->red = DEF_PCC;
-		lut_data->green = DEF_PCC;
-		lut_data->blue = DEF_PCC;
-		lut_data->sat = DEF_PA;
+		lut_data->red -= KCAL_RED_OFFSET;
+		lut_data->green -= KCAL_GREEN_OFFSET;
+		lut_data->sat -= KCAL_SAT_OFFSET;
 	}
 
 	mdss_mdp_kcal_update_pcc(lut_data);
@@ -462,15 +467,21 @@ static int kcal_ctrl_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, lut_data);
 
 	lut_data->enable = 0x1;
-	lut_data->red = KCAL_RED;
-	lut_data->green = KCAL_GREEN;
-	lut_data->blue = KCAL_BLUE;
+	lut_data->red = DEF_PCC;
+	lut_data->green = DEF_PCC;
+	lut_data->blue = DEF_PCC;
 	lut_data->minimum = 0x23;
 	lut_data->invert = 0x0;
 	lut_data->hue = 0x0;
-	lut_data->sat = KCAL_SAT;
+	lut_data->sat = DEF_PA;
 	lut_data->val = DEF_PA;
 	lut_data->cont = DEF_PA;
+
+	if (kcal_fix_yellow) {
+		lut_data->red += KCAL_RED_OFFSET;
+		lut_data->green += KCAL_GREEN_OFFSET;
+		lut_data->sat += KCAL_SAT_OFFSET;
+	}
 
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_update_pa(lut_data);
