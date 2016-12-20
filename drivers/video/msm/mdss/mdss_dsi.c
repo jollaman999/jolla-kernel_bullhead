@@ -211,8 +211,7 @@ static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdat
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 static void mdss_off(struct work_struct *work)
 {
-	struct mdss_dsi_ctrl_pdata *ctrl_pdata =
-		container_of(work, struct mdss_dsi_ctrl_pdata, mdss_off_work.work);
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 
 	mutex_lock(&mdss_off_lock);
 
@@ -224,6 +223,9 @@ static void mdss_off(struct work_struct *work)
 
 	if (mdss_turned_off)
 		goto out;
+
+	ctrl_pdata = container_of(work, struct mdss_dsi_ctrl_pdata,
+				mdss_off_work.work);
 
 	mdss_dsi_panel_reset_dsvreg_off_trigger(ctrl_pdata);
 	mdss_dsi_panel_vreg_off_trigger(ctrl_pdata);
