@@ -2161,7 +2161,7 @@ static int tomtom_notifier_callback(struct notifier_block *self,
 		container_of(self, struct mdss_dsi_ctrl_pdata, tomtom_notif);
 	unsigned int delay = SOVC_TOUCH_OFF_DELAY;
 
-	if (!sovc_switch)
+	if (!sovc_switch || !sovc_scr_suspended)
 		return 0;
 
 	cancel_delayed_work(&ctrl_pdata->mdss_off_work);
