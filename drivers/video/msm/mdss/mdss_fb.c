@@ -789,11 +789,11 @@ static ssize_t mdss_set_rgb(struct device *dev,
 
 	sscanf(buf, "%d %d %d", &r, &g, &b);
 
-	if (r < 0 || r > 32768)
+	if (r < 128 || r > 32768)
 		return -EINVAL;
-	if (g < 0 || g > 32768)
+	if (g < 128 || g > 32768)
 		return -EINVAL;
-	if (b < 0 || b > 32768)
+	if (b < 128 || b > 32768)
 		return -EINVAL;
 
 	kcal_ext_apply_values(r, g, b);
