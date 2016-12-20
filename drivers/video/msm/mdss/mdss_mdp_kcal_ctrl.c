@@ -58,6 +58,7 @@ static int mdss_mdp_kcal_display_commit(void)
 static void mdss_mdp_kcal_update_pcc(struct kcal_lut_data *lut_data)
 {
 	u32 copyback = 0;
+	int red, green;
 	struct mdp_pcc_cfg_data pcc_config;
 
 	memset(&pcc_config, 0, sizeof(struct mdp_pcc_cfg_data));
@@ -73,8 +74,22 @@ static void mdss_mdp_kcal_update_pcc(struct kcal_lut_data *lut_data)
 	pcc_config.ops = lut_data->enable ?
 		MDP_PP_OPS_WRITE | MDP_PP_OPS_ENABLE :
 			MDP_PP_OPS_WRITE | MDP_PP_OPS_DISABLE;
-	pcc_config.r.r = lut_data->red * PCC_ADJ;
-	pcc_config.g.g = lut_data->green * PCC_ADJ;
+
+	if (kcal_fix_yellow) {
+		red = lut_data->red + KCAL_RED_OFFSET;
+		green = lut_data->green + KCAL_GREEN_OFFSET;
+
+		red = red < lut_data->minimum ?
+			lut_data->minimum : red;
+		green = green < lut_data->minimum ?
+			lut_data->minimum : green;
+
+		pcc_config.r.r = red * PCC_ADJ;
+		pcc_config.g.g = green * PCC_ADJ;
+	} else {
+		pcc_config.r.r = lut_data->red * PCC_ADJ;
+		pcc_config.g.g = lut_data->green * PCC_ADJ;
+	}
 	pcc_config.b.b = lut_data->blue * PCC_ADJ;
 
 	if (lut_data->invert) {
@@ -126,7 +141,12 @@ static void mdss_mdp_kcal_update_pa(struct kcal_lut_data *lut_data)
 			MDP_PP_OPS_WRITE | MDP_PP_OPS_ENABLE :
 				MDP_PP_OPS_WRITE | MDP_PP_OPS_DISABLE;
 		pa_config.pa_data.hue_adj = lut_data->hue;
-		pa_config.pa_data.sat_adj = lut_data->sat;
+		if (kcal_fix_yellow) {
+			pa_config.pa_data.sat_adj =
+					lut_data->sat + KCAL_SAT_OFFSET;
+		} else {
+			pa_config.pa_data.sat_adj = lut_data->sat;
+		}
 		pa_config.pa_data.val_adj = lut_data->val;
 		pa_config.pa_data.cont_adj = lut_data->cont;
 
@@ -165,11 +185,6 @@ void kcal_ext_apply_values(int red, int green, int blue)
 	lut_data->red = red / 128;
 	lut_data->green = green / 128;
 	lut_data->blue = blue / 128;
-
-	if (kcal_fix_yellow) {
-		lut_data->red += KCAL_RED_OFFSET;
-		lut_data->green += KCAL_GREEN_OFFSET;
-	}
 
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_display_commit();
@@ -273,7 +288,7 @@ static ssize_t kcal_fix_yellow_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
 	int val, rc;
-	struct kcal_lut_data *lut_data = dev_get_drvdata(dev);
+	struct kcal_lut_data *lut_data = NULL;
 
 	rc = kstrtoint(buf, 10, &val);
 	if (rc || (val != 0 && val != 1))
@@ -284,15 +299,7 @@ static ssize_t kcal_fix_yellow_store(struct device *dev,
 
 	kcal_fix_yellow = val;
 
-	if (kcal_fix_yellow) {
-		lut_data->red += KCAL_RED_OFFSET;
-		lut_data->green += KCAL_GREEN_OFFSET;
-		lut_data->sat += KCAL_SAT_OFFSET;
-	} else {
-		lut_data->red -= KCAL_RED_OFFSET;
-		lut_data->green -= KCAL_GREEN_OFFSET;
-		lut_data->sat -= KCAL_SAT_OFFSET;
-	}
+	lut_data = dev_get_drvdata(dev);
 
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_update_pa(lut_data);
@@ -476,12 +483,6 @@ static int kcal_ctrl_probe(struct platform_device *pdev)
 	lut_data->sat = DEF_PA;
 	lut_data->val = DEF_PA;
 	lut_data->cont = DEF_PA;
-
-	if (kcal_fix_yellow) {
-		lut_data->red += KCAL_RED_OFFSET;
-		lut_data->green += KCAL_GREEN_OFFSET;
-		lut_data->sat += KCAL_SAT_OFFSET;
-	}
 
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_update_pa(lut_data);
