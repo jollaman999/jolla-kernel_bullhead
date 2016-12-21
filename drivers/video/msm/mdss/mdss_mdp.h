@@ -88,6 +88,8 @@ struct kcal_lut_data {
 	int hue;
 	int val;
 	int cont;
+
+	struct mutex lock;
 };
 
 void kcal_ext_apply_values(int red, int green, int blue);
