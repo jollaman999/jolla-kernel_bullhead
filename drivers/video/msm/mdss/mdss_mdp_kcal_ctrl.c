@@ -182,12 +182,16 @@ void kcal_ext_apply_values(int red, int green, int blue)
 	struct kcal_lut_data *lut_data =
 				platform_get_drvdata(&kcal_ctrl_device);
 
+	mutex_lock(&lut_data->lock);
+
 	lut_data->red = red / 128;
 	lut_data->green = green / 128;
 	lut_data->blue = blue / 128;
 
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 }
 
 struct kcal_lut_data kcal_ext_show_values(void)
@@ -209,12 +213,16 @@ static ssize_t kcal_store(struct device *dev, struct device_attribute *attr,
 		(kcal_g < 1 || kcal_g > 256) || (kcal_b < 1 || kcal_b > 256))
 		return -EINVAL;
 
+	mutex_lock(&lut_data->lock);
+
 	lut_data->red = kcal_r;
 	lut_data->green = kcal_g;
 	lut_data->blue = kcal_b;
 
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 
 	return count;
 }
@@ -224,7 +232,11 @@ static ssize_t kcal_show(struct device *dev, struct device_attribute *attr,
 {
 	struct kcal_lut_data *lut_data = dev_get_drvdata(dev);
 
+	mutex_lock(&lut_data->lock);
+
 	mdss_mdp_kcal_read_pcc(lut_data);
+
+	mutex_unlock(&lut_data->lock);
 
 	return scnprintf(buf, PAGE_SIZE, "%d %d %d\n",
 		lut_data->red, lut_data->green, lut_data->blue);
@@ -240,10 +252,14 @@ static ssize_t kcal_min_store(struct device *dev,
 	if ((r) || (kcal_min < 1 || kcal_min > 256))
 		return -EINVAL;
 
+	mutex_lock(&lut_data->lock);
+
 	lut_data->minimum = kcal_min;
 
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 
 	return count;
 }
@@ -267,11 +283,15 @@ static ssize_t kcal_enable_store(struct device *dev,
 		(lut_data->enable == kcal_enable))
 		return -EINVAL;
 
+	mutex_lock(&lut_data->lock);
+
 	lut_data->enable = kcal_enable;
 
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_update_pa(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 
 	return count;
 }
@@ -301,9 +321,13 @@ static ssize_t kcal_fix_yellow_store(struct device *dev,
 
 	lut_data = dev_get_drvdata(dev);
 
+	mutex_lock(&lut_data->lock);
+
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_update_pa(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 
 	return count;
 }
@@ -325,10 +349,14 @@ static ssize_t kcal_invert_store(struct device *dev,
 		(lut_data->invert == kcal_invert))
 		return -EINVAL;
 
+	mutex_lock(&lut_data->lock);
+
 	lut_data->invert = kcal_invert;
 
 	mdss_mdp_kcal_update_pcc(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 
 	return count;
 }
@@ -351,10 +379,14 @@ static ssize_t kcal_sat_store(struct device *dev,
 	if ((r) || ((kcal_sat < 224 || kcal_sat > 383) && kcal_sat != 128))
 		return -EINVAL;
 
+	mutex_lock(&lut_data->lock);
+
 	lut_data->sat = kcal_sat;
 
 	mdss_mdp_kcal_update_pa(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 
 	return count;
 }
@@ -377,10 +409,14 @@ static ssize_t kcal_hue_store(struct device *dev,
 	if ((r) || (kcal_hue < 0 || kcal_hue > 1536))
 		return -EINVAL;
 
+	mutex_lock(&lut_data->lock);
+
 	lut_data->hue = kcal_hue;
 
 	mdss_mdp_kcal_update_pa(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 
 	return count;
 }
@@ -403,10 +439,14 @@ static ssize_t kcal_val_store(struct device *dev,
 	if ((r) || (kcal_val < 128 || kcal_val > 383))
 		return -EINVAL;
 
+	mutex_lock(&lut_data->lock);
+
 	lut_data->val = kcal_val;
 
 	mdss_mdp_kcal_update_pa(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 
 	return count;
 }
@@ -429,10 +469,14 @@ static ssize_t kcal_cont_store(struct device *dev,
 	if ((r) || (kcal_cont < 128 || kcal_cont > 383))
 		return -EINVAL;
 
+	mutex_lock(&lut_data->lock);
+
 	lut_data->cont = kcal_cont;
 
 	mdss_mdp_kcal_update_pa(lut_data);
 	mdss_mdp_kcal_display_commit();
+
+	mutex_unlock(&lut_data->lock);
 
 	return count;
 }
@@ -472,6 +516,8 @@ static int kcal_ctrl_probe(struct platform_device *pdev)
 	}
 
 	platform_set_drvdata(pdev, lut_data);
+
+	mutex_init(&lut_data->lock);
 
 	lut_data->enable = 0x1;
 	lut_data->red = DEF_PCC;
