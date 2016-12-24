@@ -419,7 +419,6 @@ static int parse_options(struct super_block *sb, char *options)
 			break;
 		case Opt_nodiscard:
 			clear_opt(sbi, DISCARD);
-			break;
 		case Opt_noheap:
 			set_opt(sbi, NOHEAP);
 			break;
@@ -558,9 +557,13 @@ static struct inode *f2fs_alloc_inode(struct super_block *sb)
 
 	init_once((void *) fi);
 
+	if (percpu_counter_init(&fi->dirty_pages, 0)) {
+		kmem_cache_free(f2fs_inode_cachep, fi);
+		return NULL;
+	}
+
 	/* Initialize f2fs-specific inode info */
 	fi->vfs_inode.i_version = 1;
-	atomic_set(&fi->dirty_pages, 0);
 	fi->i_current_depth = 1;
 	fi->i_advise = 0;
 	init_rwsem(&fi->i_sem);
@@ -616,25 +619,24 @@ static int f2fs_drop_inode(struct inode *inode)
 	return generic_drop_inode(inode);
 }
 
-int f2fs_inode_dirtied(struct inode *inode, bool sync)
+int f2fs_inode_dirtied(struct inode *inode)
 {
 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
-	int ret = 0;
 
 	spin_lock(&sbi->inode_lock[DIRTY_META]);
 	if (is_inode_flag_set(inode, FI_DIRTY_INODE)) {
-		ret = 1;
-	} else {
-		set_inode_flag(inode, FI_DIRTY_INODE);
-		stat_inc_dirty_inode(sbi, DIRTY_META);
+		spin_unlock(&sbi->inode_lock[DIRTY_META]);
+		return 1;
 	}
-	if (sync && list_empty(&F2FS_I(inode)->gdirty_list)) {
-		list_add_tail(&F2FS_I(inode)->gdirty_list,
+
+	set_inode_flag(inode, FI_DIRTY_INODE);
+	list_add_tail(&F2FS_I(inode)->gdirty_list,
 				&sbi->inode_list[DIRTY_META]);
-		inc_page_count(sbi, F2FS_DIRTY_IMETA);
-	}
+	inc_page_count(sbi, F2FS_DIRTY_IMETA);
+	stat_inc_dirty_inode(sbi, DIRTY_META);
 	spin_unlock(&sbi->inode_lock[DIRTY_META]);
-	return ret;
+
+	return 0;
 }
 
 void f2fs_inode_synced(struct inode *inode)
@@ -646,12 +648,10 @@ void f2fs_inode_synced(struct inode *inode)
 		spin_unlock(&sbi->inode_lock[DIRTY_META]);
 		return;
 	}
-	if (!list_empty(&F2FS_I(inode)->gdirty_list)) {
-		list_del_init(&F2FS_I(inode)->gdirty_list);
-		dec_page_count(sbi, F2FS_DIRTY_IMETA);
-	}
+	list_del_init(&F2FS_I(inode)->gdirty_list);
 	clear_inode_flag(inode, FI_DIRTY_INODE);
 	clear_inode_flag(inode, FI_AUTO_RECOVER);
+	dec_page_count(sbi, F2FS_DIRTY_IMETA);
 	stat_dec_dirty_inode(F2FS_I_SB(inode), DIRTY_META);
 	spin_unlock(&sbi->inode_lock[DIRTY_META]);
 }
@@ -675,7 +675,7 @@ static void f2fs_dirty_inode(struct inode *inode, int flags)
 	if (is_inode_flag_set(inode, FI_AUTO_RECOVER))
 		clear_inode_flag(inode, FI_AUTO_RECOVER);
 
-	f2fs_inode_dirtied(inode, false);
+	f2fs_inode_dirtied(inode);
 }
 
 static void f2fs_i_callback(struct rcu_head *head)
@@ -686,11 +686,16 @@ static void f2fs_i_callback(struct rcu_head *head)
 
 static void f2fs_destroy_inode(struct inode *inode)
 {
+	percpu_counter_destroy(&F2FS_I(inode)->dirty_pages);
 	call_rcu(&inode->i_rcu, f2fs_i_callback);
 }
 
 static void destroy_percpu_info(struct f2fs_sb_info *sbi)
 {
+	int i;
+
+	for (i = 0; i < NR_COUNT_TYPE; i++)
+		percpu_counter_destroy(&sbi->nr_pages[i]);
 	percpu_counter_destroy(&sbi->alloc_valid_block_count);
 	percpu_counter_destroy(&sbi->total_valid_inode_count);
 }
@@ -783,17 +788,13 @@ int f2fs_sync_fs(struct super_block *sb, int sync)
 
 static int f2fs_freeze(struct super_block *sb)
 {
+	int err;
+
 	if (f2fs_readonly(sb))
 		return 0;
 
-	/* IO error happened before */
-	if (unlikely(f2fs_cp_error(F2FS_SB(sb))))
-		return -EIO;
-
-	/* must be clean, since sync_filesystem() was already called */
-	if (is_sbi_flag_set(F2FS_SB(sb), SBI_IS_DIRTY))
-		return -EINVAL;
-	return 0;
+	err = f2fs_sync_fs(sb, 1);
+	return err;
 }
 
 static int f2fs_unfreeze(struct super_block *sb)
@@ -820,8 +821,7 @@ static int f2fs_statfs(struct dentry *dentry, struct kstatfs *buf)
 	buf->f_bavail = user_block_count - valid_user_blocks(sbi);
 
 	buf->f_files = sbi->total_node_count - F2FS_RESERVED_NODE_NUM;
-	buf->f_ffree = min(buf->f_files - valid_node_count(sbi),
-							buf->f_bavail);
+	buf->f_ffree = buf->f_files - valid_inode_count(sbi);
 
 	buf->f_namelen = F2FS_NAME_LEN;
 	buf->f_fsid.val[0] = (u32)id;
@@ -1077,9 +1077,8 @@ static int f2fs_remount(struct super_block *sb, int *flags, char *data)
 	 * or if flush_merge is not passed in mount option.
 	 */
 	if ((*flags & MS_RDONLY) || !test_opt(sbi, FLUSH_MERGE)) {
-		clear_opt(sbi, FLUSH_MERGE);
-		destroy_flush_cmd_control(sbi, false);
-	} else {
+		destroy_flush_cmd_control(sbi);
+	} else if (!SM_I(sbi)->cmd_control_info) {
 		err = create_flush_cmd_control(sbi);
 		if (err)
 			goto restore_gc;
@@ -1428,7 +1427,6 @@ int sanity_check_ckpt(struct f2fs_sb_info *sbi)
 	unsigned int total, fsmeta;
 	struct f2fs_super_block *raw_super = F2FS_RAW_SUPER(sbi);
 	struct f2fs_checkpoint *ckpt = F2FS_CKPT(sbi);
-	unsigned int ovp_segments, reserved_segments;
 
 	total = le32_to_cpu(raw_super->segment_count);
 	fsmeta = le32_to_cpu(raw_super->segment_count_ckpt);
@@ -1440,16 +1438,6 @@ int sanity_check_ckpt(struct f2fs_sb_info *sbi)
 	if (unlikely(fsmeta >= total))
 		return 1;
 
-	ovp_segments = le32_to_cpu(ckpt->overprov_segment_count);
-	reserved_segments = le32_to_cpu(ckpt->rsvd_segment_count);
-
-	if (unlikely(fsmeta < F2FS_MIN_SEGMENTS ||
-			ovp_segments == 0 || reserved_segments == 0)) {
-		f2fs_msg(sbi->sb, KERN_ERR,
-			"Wrong layout: check mkfs.f2fs version");
-		return 1;
-	}
-
 	if (unlikely(f2fs_cp_error(sbi))) {
 		f2fs_msg(sbi->sb, KERN_ERR, "A bug case: need to run fsck");
 		return 1;
@@ -1460,7 +1448,6 @@ int sanity_check_ckpt(struct f2fs_sb_info *sbi)
 static void init_sb_info(struct f2fs_sb_info *sbi)
 {
 	struct f2fs_super_block *raw_super = sbi->raw_super;
-	int i;
 
 	sbi->log_sectors_per_block =
 		le32_to_cpu(raw_super->log_sectors_per_block);
@@ -1485,9 +1472,6 @@ static void init_sb_info(struct f2fs_sb_info *sbi)
 	sbi->interval_time[REQ_TIME] = DEF_IDLE_INTERVAL;
 	clear_sbi_flag(sbi, SBI_NEED_FSCK);
 
-	for (i = 0; i < NR_COUNT_TYPE; i++)
-		atomic_set(&sbi->nr_pages[i], 0);
-
 	INIT_LIST_HEAD(&sbi->s_list);
 	mutex_init(&sbi->umount_mutex);
 	mutex_init(&sbi->wio_mutex[NODE]);
@@ -1503,7 +1487,13 @@ static void init_sb_info(struct f2fs_sb_info *sbi)
 
 static int init_percpu_info(struct f2fs_sb_info *sbi)
 {
-	int err;
+	int i, err;
+
+	for (i = 0; i < NR_COUNT_TYPE; i++) {
+		err = percpu_counter_init(&sbi->nr_pages[i], 0);
+		if (err)
+			return err;
+	}
 
 	err = percpu_counter_init(&sbi->alloc_valid_block_count, 0);
 	if (err)
@@ -1903,13 +1893,6 @@ free_node_inode:
 	mutex_lock(&sbi->umount_mutex);
 	release_ino_entry(sbi, true);
 	f2fs_leave_shrinker(sbi);
-	/*
-	 * Some dirty meta pages can be produced by recover_orphan_inodes()
-	 * failed by EIO. Then, iput(node_inode) can trigger balance_fs_bg()
-	 * followed by write_checkpoint() through f2fs_write_node_pages(), which
-	 * falls into an infinite loop in sync_meta_pages().
-	 */
-	truncate_inode_pages_final(META_MAPPING(sbi));
 	iput(sbi->node_inode);
 	mutex_unlock(&sbi->umount_mutex);
 free_nm:
@@ -2058,4 +2041,3 @@ module_exit(exit_f2fs_fs)
 MODULE_AUTHOR("Samsung Electronics's Praesto Team");
 MODULE_DESCRIPTION("Flash Friendly File System");
 MODULE_LICENSE("GPL");
-
