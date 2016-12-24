@@ -4745,12 +4745,12 @@ static int synaptics_rmi4_suspend_trigger(struct synaptics_rmi4_data *rmi4_data)
 
 		goto out;
 	}
-#endif
 
 	if (irq_wake_enabled) {
 		disable_irq_wake(rmi4_data->irq);
 		irq_wake_enabled = false;
 	}
+#endif
 
 	if (rmi4_data->stay_awake) {
 		rmi4_data->staying_awake = true;
