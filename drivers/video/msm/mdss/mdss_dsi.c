@@ -292,9 +292,7 @@ off:
 #endif
 	ret = mdss_dsi_panel_vreg_off_trigger(ctrl_pdata);
 
-#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
 end:
-#endif
 	return ret;
 }
 
