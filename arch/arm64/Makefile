@@ -46,7 +46,7 @@ core-$(CONFIG_CRYPTO) += arch/arm64/crypto/
 libs-y		:= arch/arm64/lib/ $(libs-y)
 
 # Default target when executing plain make
-ifeq ($(CONFIG_BUILD_ARM64_APPENDED_DTB_IMAGE),y)
+ifeq ($(CONFIG_BUILD_ARM64_COMPRESSED_APPENDED_DTB_IMAGE),y)
 ifeq ($(CONFIG_BUILD_ARM64_LZ4_COMPRESSED_APPENDED_DTB_IMAGE),y)
 KBUILD_IMAGE	:= Image.lz4-dtb
 else
