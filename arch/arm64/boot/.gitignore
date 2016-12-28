@@ -1,4 +1,6 @@
 Image
+Image.wrapper
+Image-dtb
 Image.gz
 Image.gz-dtb
 Image.lz4
