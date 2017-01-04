@@ -151,8 +151,7 @@ static u32 __extract_hwseed(void)
 {
 	unsigned int val = 0;
 
-	(void)(arch_get_random_seed_int(&val) ||
-	       arch_get_random_int(&val));
+	(void)(arch_get_random_int(&val));
 
 	return val;
 }
@@ -221,7 +220,7 @@ static void __prandom_timer(unsigned long dontcare)
 	u32 entropy;
 	unsigned long expires;
 
-	get_random_bytes(&entropy, sizeof(entropy));
+	erandom_get_random_bytes((char *)&entropy, sizeof(entropy));
 	prandom_seed(entropy);
 
 	/* reseed every ~60 seconds, in [40 .. 80) interval with slack */
@@ -271,7 +270,7 @@ static void __prandom_reseed(bool late)
 		struct rnd_state *state = &per_cpu(net_rand_state,i);
 		u32 seeds[4];
 
-		get_random_bytes(&seeds, sizeof(seeds));
+		erandom_get_random_bytes((char *)&seeds, sizeof(seeds));
 		state->s1 = __seed(seeds[0],   2U);
 		state->s2 = __seed(seeds[1],   8U);
 		state->s3 = __seed(seeds[2],  16U);
