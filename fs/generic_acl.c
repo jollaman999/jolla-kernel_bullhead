@@ -82,14 +82,19 @@ generic_acl_set(struct dentry *dentry, const char *name, const void *value,
 			return PTR_ERR(acl);
 	}
 	if (acl) {
+		struct posix_acl *old_acl;
+
 		error = posix_acl_valid(acl);
 		if (error)
 			goto failed;
 		switch (type) {
 		case ACL_TYPE_ACCESS:
+			old_acl = acl;
 			error = posix_acl_update_mode(inode, &inode->i_mode, &acl);
 			if (error)
 				goto failed;
+			if (!acl)
+				posix_acl_release(old_acl);
 			inode->i_ctime = CURRENT_TIME;
 			break;
 		case ACL_TYPE_DEFAULT:
