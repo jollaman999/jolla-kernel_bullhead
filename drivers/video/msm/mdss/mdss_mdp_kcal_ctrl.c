@@ -34,6 +34,21 @@
 
 static int kcal_fix_yellow = 1;
 
+struct kcal_lut_data {
+	int red;
+	int green;
+	int blue;
+	int minimum;
+	int enable;
+	int invert;
+	int sat;
+	int hue;
+	int val;
+	int cont;
+
+	struct mutex lock;
+};
+
 static int mdss_mdp_kcal_display_commit(void)
 {
 	int i;
@@ -173,33 +188,6 @@ static void mdss_mdp_kcal_update_pa(struct kcal_lut_data *lut_data)
 
 		mdss_mdp_pa_v2_config(&pa_v2_config, &copyback);
 	}
-}
-
-static struct platform_device kcal_ctrl_device;
-
-void kcal_ext_apply_values(int red, int green, int blue)
-{
-	struct kcal_lut_data *lut_data =
-				platform_get_drvdata(&kcal_ctrl_device);
-
-	mutex_lock(&lut_data->lock);
-
-	lut_data->red = red / 128;
-	lut_data->green = green / 128;
-	lut_data->blue = blue / 128;
-
-	mdss_mdp_kcal_update_pcc(lut_data);
-	mdss_mdp_kcal_display_commit();
-
-	mutex_unlock(&lut_data->lock);
-}
-
-struct kcal_lut_data kcal_ext_show_values(void)
-{
-	struct kcal_lut_data *lut_data =
-				platform_get_drvdata(&kcal_ctrl_device);
-
-	return *lut_data;
 }
 
 static ssize_t kcal_store(struct device *dev, struct device_attribute *attr,
