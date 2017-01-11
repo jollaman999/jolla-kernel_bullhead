@@ -957,7 +957,7 @@ static int mdss_mdp_cmd_enable_cmd_autorefresh(struct mdss_mdp_ctl *ctl,
  * for left+right case, pingpong_done is enabled for both and
  * only the last pingpong_done should trigger the notification
  */
-int mdss_mdp_cmd_kickoff(struct mdss_mdp_ctl *ctl, void *arg)
+static int mdss_mdp_cmd_kickoff(struct mdss_mdp_ctl *ctl, void *arg)
 {
 	struct mdss_mdp_ctl *sctl = NULL;
 	struct mdss_mdp_cmd_ctx *ctx, *sctx = NULL;
@@ -1059,7 +1059,7 @@ int mdss_mdp_cmd_kickoff(struct mdss_mdp_ctl *ctl, void *arg)
 	return 0;
 }
 
-int mdss_mdp_cmd_restore(struct mdss_mdp_ctl *ctl)
+static int mdss_mdp_cmd_restore(struct mdss_mdp_ctl *ctl)
 {
 	pr_debug("%s: called for ctl%d\n", __func__, ctl->num);
 	mdss_mdp_clk_ctrl(MDP_BLOCK_POWER_ON);
@@ -1073,7 +1073,7 @@ int mdss_mdp_cmd_restore(struct mdss_mdp_ctl *ctl)
 	return 0;
 }
 
-int mdss_mdp_cmd_ctx_stop(struct mdss_mdp_ctl *ctl,
+static int mdss_mdp_cmd_ctx_stop(struct mdss_mdp_ctl *ctl,
 		struct mdss_mdp_cmd_ctx *ctx, int panel_power_state,
 		bool pend_switch)
 {
@@ -1153,7 +1153,7 @@ int mdss_mdp_cmd_ctx_stop(struct mdss_mdp_ctl *ctl,
 	return 0;
 }
 
-int mdss_mdp_cmd_intfs_stop(struct mdss_mdp_ctl *ctl, int session,
+static int mdss_mdp_cmd_intfs_stop(struct mdss_mdp_ctl *ctl, int session,
 	int panel_power_state, bool pend_switch)
 {
 	struct mdss_mdp_cmd_ctx *ctx;
@@ -1210,7 +1210,7 @@ static int mdss_mdp_cmd_stop_sub(struct mdss_mdp_ctl *ctl,
 			pend_switch);
 }
 
-int mdss_mdp_cmd_stop(struct mdss_mdp_ctl *ctl, int panel_power_state)
+static int mdss_mdp_cmd_stop(struct mdss_mdp_ctl *ctl, int panel_power_state)
 {
 	struct mdss_mdp_cmd_ctx *ctx = ctl->intf_ctx[MASTER_CTX];
 	struct mdss_mdp_cmd_ctx *sctx;
