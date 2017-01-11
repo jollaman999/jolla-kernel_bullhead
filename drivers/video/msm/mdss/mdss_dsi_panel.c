@@ -39,7 +39,7 @@ static int onboot = true;
 extern bool tomtom_mic_detected;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-static struct mutex reset_dsvreg_off_lock;
+static DEFINE_MUTEX(reset_dsvreg_onoff_lock);
 #endif
 
 #define DT_CMD_HDR 6
@@ -283,7 +283,7 @@ disp_en_gpio_err:
 void mdss_dsi_panel_reset_dsvreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mutex_lock(&reset_dsvreg_off_lock);
+	mutex_lock(&reset_dsvreg_onoff_lock);
 #endif
 
 	if (ctrl_pdata->dsvreg && ctrl_pdata->dsvreg_pre_off)
@@ -300,7 +300,7 @@ void mdss_dsi_panel_reset_dsvreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pd
 	pr_info("%s: done", __func__);
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mutex_unlock(&reset_dsvreg_off_lock);
+	mutex_unlock(&reset_dsvreg_onoff_lock);
 #endif
 }
 
@@ -347,6 +347,9 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			return rc;
 		}
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+		mutex_lock(&reset_dsvreg_onoff_lock);
+#endif
 		if (ctrl_pdata->dsvreg && ctrl_pdata->dsvreg_pre_on)
 			if (regulator_enable(ctrl_pdata->dsvreg))
 				pr_err("%s: failed to pre-on dsv\n",
@@ -369,6 +372,9 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			if (regulator_enable(ctrl_pdata->dsvreg))
 				pr_err("%s: failed to post-on dsv\n",
 							__func__);
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+		mutex_unlock(&reset_dsvreg_onoff_lock);
+#endif
 
 		if (gpio_is_valid(ctrl_pdata->mode_gpio)) {
 			if (pinfo->mode_gpio_state == MODE_GPIO_HIGH)
@@ -2001,10 +2007,6 @@ int mdss_dsi_panel_init(struct device_node *node,
 		pr_err("%s:%d panel dt parse failed\n", __func__, __LINE__);
 		return rc;
 	}
-
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mutex_init(&reset_dsvreg_off_lock);
-#endif
 
 	if (!cmd_cfg_cont_splash)
 		pinfo->cont_splash_enabled = false;
