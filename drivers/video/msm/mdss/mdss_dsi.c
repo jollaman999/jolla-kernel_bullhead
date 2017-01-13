@@ -46,6 +46,7 @@
 extern bool tomtom_mic_detected;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+extern bool sovc_do_not_turn_off_mdss;
 static bool mdss_vreg_off_end = false;
 
 static int tomtom_notifier_callback(struct notifier_block *self,
@@ -223,6 +224,13 @@ static void mdss_off(struct work_struct *work)
 
 	if (track_changed || sovc_tmp_onoff)
 		goto out;
+
+	if (sovc_do_not_turn_off_mdss) {
+		pr_info("%s: mdss turned on or entered low power state.\n",
+				__func__);
+		pr_info("%s: Ignoring to turn off mdss.\n", __func__);
+		goto out;
+	}
 
 	ctrl_pdata = container_of(work, struct mdss_dsi_ctrl_pdata,
 				mdss_off_work.work);
