@@ -46,7 +46,7 @@
 extern bool tomtom_mic_detected;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-static bool mdss_turned_off = false;
+static bool mdss_vreg_off_end = false;
 
 static int tomtom_notifier_callback(struct notifier_block *self,
 				unsigned long event, void *data);
@@ -181,6 +181,10 @@ static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdat
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	mutex_lock(&vreg_onoff_lock);
+	if (mdss_vreg_off_end) {
+		pr_info("%s: Already proceeded", __func__);
+		goto out;
+	}
 #endif
 
 	for (i = DSI_MAX_PM - 1; i >= 0; i--) {
@@ -198,12 +202,10 @@ static int mdss_dsi_panel_vreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pdat
 				__func__, __mdss_dsi_pm_name(i));
 	}
 
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mdss_turned_off = true;
-#endif
-
 	pr_info("%s: done", __func__);
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	mdss_vreg_off_end = true;
+out:
 	mutex_unlock(&vreg_onoff_lock);
 #endif
 	return ret;
@@ -220,9 +222,6 @@ static void mdss_off(struct work_struct *work)
 		goto out;
 
 	if (track_changed || sovc_tmp_onoff)
-		goto out;
-
-	if (mdss_turned_off)
 		goto out;
 
 	ctrl_pdata = container_of(work, struct mdss_dsi_ctrl_pdata,
@@ -337,6 +336,7 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 		}
 	}
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	mdss_vreg_off_end = false;
 	mutex_unlock(&vreg_onoff_lock);
 #endif
 
@@ -367,10 +367,6 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 			pr_err("%s: Panel reset failed. rc=%d\n",
 					__func__, ret);
 	}
-
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mdss_turned_off = false;
-#endif
 
 error:
 	if (ret) {
