@@ -77,6 +77,10 @@
 bool backlight_dimmer = true;
 module_param(backlight_dimmer, bool, 0755);
 
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+bool sovc_do_not_turn_off_mdss = false;
+#endif
+
 static struct fb_info *fbi_list[MAX_FBI_LIST];
 static int fbi_list_index;
 
@@ -1601,6 +1605,13 @@ static int mdss_fb_blank_sub(int blank_mode, struct fb_info *info,
 		ret = mdss_fb_blank_blank(mfd, req_power_state);
 		break;
 	}
+
+#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	if (req_power_state != MDSS_PANEL_POWER_OFF)
+		sovc_do_not_turn_off_mdss = true;
+	else
+		sovc_do_not_turn_off_mdss = false;
+#endif
 
 	/* Notify listeners */
 	sysfs_notify(&mfd->fbi->dev->kobj, NULL, "show_blank_event");
