@@ -39,6 +39,7 @@ static int onboot = true;
 extern bool tomtom_mic_detected;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+static bool mdss_reset_dsvreg_off_end;
 static DEFINE_MUTEX(reset_dsvreg_onoff_lock);
 #endif
 
@@ -291,6 +292,10 @@ void mdss_dsi_panel_reset_dsvreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pd
 {
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 	mutex_lock(&reset_dsvreg_onoff_lock);
+	if (mdss_reset_dsvreg_off_end) {
+		pr_info("%s: Already proceeded", __func__);
+		goto out;
+	}
 #endif
 
 	if (ctrl_pdata->dsvreg && ctrl_pdata->dsvreg_pre_off)
@@ -307,6 +312,8 @@ void mdss_dsi_panel_reset_dsvreg_off_trigger(struct mdss_dsi_ctrl_pdata *ctrl_pd
 	pr_info("%s: done", __func__);
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	mdss_reset_dsvreg_off_end = true;
+out:
 	mutex_unlock(&reset_dsvreg_onoff_lock);
 #endif
 }
@@ -380,6 +387,7 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 				pr_err("%s: failed to post-on dsv\n",
 							__func__);
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+		mdss_reset_dsvreg_off_end = false;
 		mutex_unlock(&reset_dsvreg_onoff_lock);
 #endif
 
