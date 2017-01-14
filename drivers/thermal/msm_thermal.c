@@ -6041,6 +6041,7 @@ static int msm_thermal_fb_notifier_callback(struct notifier_block *self,
 
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
+		case FB_BLANK_VSYNC_SUSPEND:
 			msm_thermal_suspend(false);
 			break;
 		case FB_BLANK_POWERDOWN:
