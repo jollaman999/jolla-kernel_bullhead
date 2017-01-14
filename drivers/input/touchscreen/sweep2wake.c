@@ -41,7 +41,7 @@ struct notifier_block s2w_fb_notif;
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Sweep2wake for almost any device"
-#define DRIVER_VERSION "2.2"
+#define DRIVER_VERSION "2.3"
 #define LOGTAG "[sweep2wake]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -456,6 +456,7 @@ static int s2w_fb_notifier_callback(struct notifier_block *self,
 
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
+		case FB_BLANK_VSYNC_SUSPEND:
 			scr_suspended = false;
 			if (s2s_switch)
 				register_s2w();
