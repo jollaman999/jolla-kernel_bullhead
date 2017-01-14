@@ -2521,6 +2521,7 @@ static int ksm_fb_notifier_callback(struct notifier_block *self,
 
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
+		case FB_BLANK_VSYNC_SUSPEND:
 			ksm_run = ksm_run_stored;
 			if (ksm_run & KSM_RUN_UNMERGE) {
 				set_current_oom_origin();
