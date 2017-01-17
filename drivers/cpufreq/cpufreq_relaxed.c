@@ -135,7 +135,7 @@ static void cs_check_cpu(int cpu, unsigned int load)
 		if (cs_tuners->boost_enabled && boost_counter >= cs_tuners->boost_count) {
 			int boost_level = cs_tuners->boost_ceiling - boost_counter;
 			dbs_info->requested_freq = policy->max - boost_level;
-			if (boost_level = 0)
+			if (boost_level == 0)
 				boost_counter = 0;
 		} else {
 			dbs_info->requested_freq += get_freq_target(cs_tuners, policy);
