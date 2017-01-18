@@ -281,7 +281,7 @@ int drm_err(const char *func, const char *format, ...);
 do {										\
 	if (!_DRM_LOCK_IS_HELD(_file_priv->master->lock.hw_lock->lock) ||	\
 	    _file_priv->master->lock.file_priv != _file_priv)	{		\
-		DRM_ERROR( "%s called without lock held, held  %d owner %p %p\n",\
+		DRM_ERROR( "%s called without lock held, held  %d owner %pK %pK\n",\
 			   __func__, _DRM_LOCK_IS_HELD(_file_priv->master->lock.hw_lock->lock),\
 			   _file_priv->master->lock.file_priv, _file_priv);	\
 		return -EINVAL;							\

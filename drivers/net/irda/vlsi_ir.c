@@ -140,14 +140,14 @@ static void vlsi_ring_debug(struct vlsi_ring *r)
 	struct ring_descr *rd;
 	unsigned i;
 
-	printk(KERN_DEBUG "%s - ring %p / size %u / mask 0x%04x / len %u / dir %d / hw %p\n",
+	printk(KERN_DEBUG "%s - ring %pK / size %u / mask 0x%04x / len %u / dir %d / hw %pK\n",
 		__func__, r, r->size, r->mask, r->len, r->dir, r->rd[0].hw);
 	printk(KERN_DEBUG "%s - head = %d / tail = %d\n", __func__,
 		atomic_read(&r->head) & r->mask, atomic_read(&r->tail) & r->mask);
 	for (i = 0; i < r->size; i++) {
 		rd = &r->rd[i];
 		printk(KERN_DEBUG "%s - ring descr %u: ", __func__, i);
-		printk("skb=%p data=%p hw=%p\n", rd->skb, rd->buf, rd->hw);
+		printk("skb=%pK data=%pK hw=%pK\n", rd->skb, rd->buf, rd->hw);
 		printk(KERN_DEBUG "%s - hw: status=%02x count=%u addr=0x%08x\n",
 			__func__, (unsigned) rd_get_status(rd),
 			(unsigned) rd_get_count(rd), (unsigned) rd_get_addr(rd));
@@ -309,7 +309,7 @@ static void vlsi_proc_ring(struct seq_file *seq, struct vlsi_ring *r)
 	unsigned i, j;
 	int h, t;
 
-	seq_printf(seq, "size %u / mask 0x%04x / len %u / dir %d / hw %p\n",
+	seq_printf(seq, "size %u / mask 0x%04x / len %u / dir %d / hw %pK\n",
 		r->size, r->mask, r->len, r->dir, r->rd[0].hw);
 	h = atomic_read(&r->head) & r->mask;
 	t = atomic_read(&r->tail) & r->mask;
@@ -337,7 +337,7 @@ static void vlsi_proc_ring(struct seq_file *seq, struct vlsi_ring *r)
 	for (i = 0; i < r->size; i++) {
 		rd = &r->rd[i];
 		seq_printf(seq, "> ring descr %u: ", i);
-		seq_printf(seq, "skb=%p data=%p hw=%p\n", rd->skb, rd->buf, rd->hw);
+		seq_printf(seq, "skb=%pK data=%pK hw=%pK\n", rd->skb, rd->buf, rd->hw);
 		seq_printf(seq, "  hw: status=%02x count=%u busaddr=0x%08x\n",
 			(unsigned) rd_get_status(rd),
 			(unsigned) rd_get_count(rd), (unsigned) rd_get_addr(rd));
@@ -435,7 +435,7 @@ static struct vlsi_ring *vlsi_alloc_ring(struct pci_dev *pdev, struct ring_descr
 		if (rd->buf == NULL ||
 		    !(busaddr = pci_map_single(pdev, rd->buf, len, dir))) {
 			if (rd->buf) {
-				IRDA_ERROR("%s: failed to create PCI-MAP for %p",
+				IRDA_ERROR("%s: failed to create PCI-MAP for %pK",
 					   __func__, rd->buf);
 				kfree(rd->buf);
 				rd->buf = NULL;

@@ -153,7 +153,7 @@ static void h5_timed_event(unsigned long arg)
 		goto wakeup;
 	}
 
-	BT_DBG("hu %p retransmitting %u pkts", hu, h5->unack.qlen);
+	BT_DBG("hu %pK retransmitting %u pkts", hu, h5->unack.qlen);
 
 	spin_lock_irqsave_nested(&h5->unack.lock, flags, SINGLE_DEPTH_NESTING);
 
@@ -173,7 +173,7 @@ static int h5_open(struct hci_uart *hu)
 	struct h5 *h5;
 	const unsigned char sync[] = { 0x01, 0x7e };
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	h5 = kzalloc(sizeof(*h5), GFP_KERNEL);
 	if (!h5)
@@ -716,7 +716,7 @@ unlock:
 
 static int h5_flush(struct hci_uart *hu)
 {
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 	return 0;
 }
 

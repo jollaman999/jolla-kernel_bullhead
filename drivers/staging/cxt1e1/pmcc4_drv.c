@@ -574,7 +574,7 @@ c4_init (ci_t * ci, u_char *func0, u_char *func1)
             pi->p.portnum = portnum;
             pi->openchans = 0;
 #ifdef SBE_MAP_DEBUG
-            pr_info("Comet-%d: addr = %p\n", portnum, pi->cometbase);
+            pr_info("Comet-%d: addr = %pK\n", portnum, pi->cometbase);
 #endif
         }
         pmsk = c4_get_portcfg (ci);
@@ -872,11 +872,11 @@ c4_musycc_rw (ci_t * ci, struct c4_musycc_param * mcp)
     if (ramread)
     {
         data = *dpr;
-        //pr_info("c4_musycc_rw: RAM addr %p  read data %x (portno %x offset %x RAM ramread %x)\n", dpr, data, portnum, offset, ramread); /* RLD DEBUG */
+        //pr_info("c4_musycc_rw: RAM addr %pK  read data %x (portno %x offset %x RAM ramread %x)\n", dpr, data, portnum, offset, ramread); /* RLD DEBUG */
     } else
     {
         data = pci_read_32 ((u_int32_t *) dph);
-        //pr_info("c4_musycc_rw: REG addr %p  read data %x (portno %x offset %x RAM ramread %x)\n", dph, data, portnum, offset, ramread); /* RLD DEBUG */
+        //pr_info("c4_musycc_rw: REG addr %pK  read data %x (portno %x offset %x RAM ramread %x)\n", dph, data, portnum, offset, ramread); /* RLD DEBUG */
     }
 
 

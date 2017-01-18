@@ -97,7 +97,7 @@ static inline int ehca_write_rwqe(struct ipz_queue *ipz_rqueue,
 	}
 
 	if (ehca_debug_level >= 3) {
-		ehca_gen_dbg("RECEIVE WQE written into ipz_rqueue=%p",
+		ehca_gen_dbg("RECEIVE WQE written into ipz_rqueue=%pK",
 			     ipz_rqueue);
 		ehca_dmp(wqe_p, 16*(6 + wqe_p->nr_of_data_seg), "recv wqe");
 	}
@@ -136,7 +136,7 @@ static void trace_send_wr_ud(const struct ib_send_wr *send_wr)
 		}
 		for (j = 0; j < send_wr->num_sge; j++) {
 			u8 *data = __va(sge->addr);
-			ehca_gen_dbg("send_wr#%x sge#%x addr=%p length=%x "
+			ehca_gen_dbg("send_wr#%x sge#%x addr=%pK length=%x "
 				     "lkey=%x",
 				     idx, j, data, sge->length, sge->lkey);
 			/* assume length is n*16 */
@@ -229,7 +229,7 @@ static inline int ehca_write_swqe(struct ehca_qp *qp,
 		wqe_p->destination_qp_number = send_wr->wr.ud.remote_qpn << 8;
 		wqe_p->local_ee_context_qkey = remote_qkey;
 		if (unlikely(!send_wr->wr.ud.ah)) {
-			ehca_gen_err("wr.ud.ah is NULL. qp=%p", qp);
+			ehca_gen_err("wr.ud.ah is NULL. qp=%pK", qp);
 			return -EINVAL;
 		}
 		if (unlikely(send_wr->wr.ud.remote_qpn == 0)) {
@@ -305,7 +305,7 @@ static inline int ehca_write_swqe(struct ehca_qp *qp,
 	}
 
 	if (ehca_debug_level >= 3) {
-		ehca_gen_dbg("SEND WQE written into queue qp=%p ", qp);
+		ehca_gen_dbg("SEND WQE written into queue qp=%pK ", qp);
 		ehca_dmp( wqe_p, 16*(6 + wqe_p->nr_of_data_seg), "send wqe");
 	}
 	return 0;
@@ -490,7 +490,7 @@ post_send_exit0:
 	iosync(); /* serialize GAL register access */
 	hipz_update_sqa(my_qp, wqe_cnt);
 	if (unlikely(ret || ehca_debug_level >= 2))
-		ehca_dbg(qp->device, "ehca_qp=%p qp_num=%x wqe_cnt=%d ret=%i",
+		ehca_dbg(qp->device, "ehca_qp=%pK qp_num=%x wqe_cnt=%d ret=%i",
 			 my_qp, qp->qp_num, wqe_cnt, ret);
 	my_qp->message_count += wqe_cnt;
 	spin_unlock_irqrestore(&my_qp->spinlock_s, flags);
@@ -514,7 +514,7 @@ static int internal_post_recv(struct ehca_qp *my_qp,
 	struct ehca_qmap_entry *qmap_entry;
 
 	if (unlikely(!HAS_RQ(my_qp))) {
-		ehca_err(dev, "QP has no RQ  ehca_qp=%p qp_num=%x ext_type=%d",
+		ehca_err(dev, "QP has no RQ  ehca_qp=%pK qp_num=%x ext_type=%d",
 			 my_qp, my_qp->real_qp_num, my_qp->ext_type);
 		ret = -ENODEV;
 		goto out;
@@ -569,7 +569,7 @@ post_recv_exit0:
 	iosync(); /* serialize GAL register access */
 	hipz_update_rqa(my_qp, wqe_cnt);
 	if (unlikely(ret || ehca_debug_level >= 2))
-	    ehca_dbg(dev, "ehca_qp=%p qp_num=%x wqe_cnt=%d ret=%i",
+	    ehca_dbg(dev, "ehca_qp=%pK qp_num=%x wqe_cnt=%d ret=%i",
 		     my_qp, my_qp->real_qp_num, wqe_cnt, ret);
 	spin_unlock_irqrestore(&my_qp->spinlock_r, flags);
 
@@ -639,7 +639,7 @@ repoll:
 		ret = -EAGAIN;
 		if (ehca_debug_level >= 3)
 			ehca_dbg(cq->device, "Completion queue is empty  "
-				 "my_cq=%p cq_num=%x", my_cq, my_cq->cq_number);
+				 "my_cq=%pK cq_num=%x", my_cq, my_cq->cq_number);
 		goto poll_cq_one_exit0;
 	}
 
@@ -688,12 +688,12 @@ repoll:
 	/* trace error CQEs if debug_level >= 1, trace all CQEs if >= 3 */
 	if (unlikely(ehca_debug_level >= 3 || (ehca_debug_level && is_error))) {
 		ehca_dbg(cq->device,
-			 "Received %sCOMPLETION ehca_cq=%p cq_num=%x -----",
+			 "Received %sCOMPLETION ehca_cq=%pK cq_num=%x -----",
 			 is_error ? "ERROR " : "", my_cq, my_cq->cq_number);
-		ehca_dmp(cqe, 64, "ehca_cq=%p cq_num=%x",
+		ehca_dmp(cqe, 64, "ehca_cq=%pK cq_num=%x",
 			 my_cq, my_cq->cq_number);
 		ehca_dbg(cq->device,
-			 "ehca_cq=%p cq_num=%x -------------------------",
+			 "ehca_cq=%pK cq_num=%x -------------------------",
 			 my_cq, my_cq->cq_number);
 	}
 
@@ -758,10 +758,10 @@ repoll:
 	wc->opcode = ib_wc_opcode[cqe->optype]-1;
 	if (unlikely(wc->opcode == -1)) {
 		ehca_err(cq->device, "Invalid cqe->OPType=%x cqe->status=%x "
-			 "ehca_cq=%p cq_num=%x",
+			 "ehca_cq=%pK cq_num=%x",
 			 cqe->optype, cqe->status, my_cq, my_cq->cq_number);
 		/* dump cqe for other infos */
-		ehca_dmp(cqe, 64, "ehca_cq=%p cq_num=%x",
+		ehca_dmp(cqe, 64, "ehca_cq=%pK cq_num=%x",
 			 my_cq, my_cq->cq_number);
 		/* update also queue adder to throw away this entry!!! */
 		goto repoll;
@@ -880,7 +880,7 @@ int ehca_poll_cq(struct ib_cq *cq, int num_entries, struct ib_wc *wc)
 	int entries_left = num_entries;
 
 	if (num_entries < 1) {
-		ehca_err(cq->device, "Invalid num_entries=%d ehca_cq=%p "
+		ehca_err(cq->device, "Invalid num_entries=%d ehca_cq=%pK "
 			 "cq_num=%x", num_entries, my_cq, my_cq->cq_number);
 		ret = -EINVAL;
 		goto poll_cq_exit0;

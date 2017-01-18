@@ -79,7 +79,7 @@ static int print_format1(struct dlm_rsb *res, struct seq_file *s)
 
 	lock_rsb(res);
 
-	rv = seq_printf(s, "\nResource %p Name (len=%d) \"",
+	rv = seq_printf(s, "\nResource %pK Name (len=%d) \"",
 			res, res->res_length);
 	if (rv)
 		goto out;
@@ -275,7 +275,7 @@ static int print_format3(struct dlm_rsb *r, struct seq_file *s)
 
 	lock_rsb(r);
 
-	rv = seq_printf(s, "rsb %p %d %x %lx %d %d %u %d ",
+	rv = seq_printf(s, "rsb %pK %d %x %lx %d %d %u %d ",
 			r,
 			r->res_nodeid,
 			r->res_first_lkid,
@@ -352,7 +352,7 @@ static int print_format4(struct dlm_rsb *r, struct seq_file *s)
 
 	lock_rsb(r);
 
-	rv = seq_printf(s, "rsb %p %d %d %d %d %lu %lx %d ",
+	rv = seq_printf(s, "rsb %pK %d %d %d %d %lu %lx %d ",
 			r,
 			r->res_nodeid,
 			r->res_master_nodeid,

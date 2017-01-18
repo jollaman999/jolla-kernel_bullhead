@@ -125,7 +125,7 @@ static void remove_ticket_handler(struct ceph_auth_client *ac,
 {
 	struct ceph_x_info *xi = ac->private;
 
-	dout("remove_ticket_handler %p %d\n", th, th->service);
+	dout("remove_ticket_handler %pK %d\n", th, th->service);
 	rb_erase(&th->node, &xi->ticket_handlers);
 	ceph_crypto_key_destroy(&th->session_key);
 	if (th->ticket_blob)
@@ -295,7 +295,7 @@ static int ceph_x_build_authorizer(struct ceph_auth_client *ac,
 	int ticket_blob_len =
 		(th->ticket_blob ? th->ticket_blob->vec.iov_len : 0);
 
-	dout("build_authorizer for %s %p\n",
+	dout("build_authorizer for %s %pK\n",
 	     ceph_entity_type_name(th->service), au);
 
 	maxlen = sizeof(*msg_a) + sizeof(msg_b) +
@@ -324,7 +324,7 @@ static int ceph_x_build_authorizer(struct ceph_auth_client *ac,
 		memcpy(msg_a->ticket_blob.blob, th->ticket_blob->vec.iov_base,
 		       th->ticket_blob->vec.iov_len);
 	}
-	dout(" th %p secret_id %lld %lld\n", th, th->secret_id,
+	dout(" th %pK secret_id %lld %lld\n", th, th->secret_id,
 	     le64_to_cpu(msg_a->ticket_blob.secret_id));
 
 	p = msg_a + 1;
@@ -642,7 +642,7 @@ static void ceph_x_destroy(struct ceph_auth_client *ac)
 	struct ceph_x_info *xi = ac->private;
 	struct rb_node *p;
 
-	dout("ceph_x_destroy %p\n", ac);
+	dout("ceph_x_destroy %pK\n", ac);
 	ceph_crypto_key_destroy(&xi->secret);
 
 	while ((p = rb_first(&xi->ticket_handlers)) != NULL) {
@@ -690,7 +690,7 @@ int ceph_x_init(struct ceph_auth_client *ac)
 	struct ceph_x_info *xi;
 	int ret;
 
-	dout("ceph_x_init %p\n", ac);
+	dout("ceph_x_init %pK\n", ac);
 	ret = -ENOMEM;
 	xi = kzalloc(sizeof(*xi), GFP_NOFS);
 	if (!xi)

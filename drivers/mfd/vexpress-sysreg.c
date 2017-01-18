@@ -209,7 +209,7 @@ static void *vexpress_sysreg_config_func_get(struct device *dev,
 	config_func->template |= SYS_CFGCTRL_POSITION(position);
 	config_func->device |= func_device[1];
 
-	dev_dbg(vexpress_sysreg_dev, "func 0x%p = 0x%x, %d\n", config_func,
+	dev_dbg(vexpress_sysreg_dev, "func 0x%pK = 0x%x, %d\n", config_func,
 			config_func->template, config_func->device);
 
 	return config_func;

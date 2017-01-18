@@ -32,7 +32,7 @@ static int find_vdso_map(void **start, void **end)
 		int m = -1;
 
 		/* We care only about private r-x mappings. */
-		if (2 != sscanf(line, "%p-%p r-xp %*x %*x:%*x %*u %n",
+		if (2 != sscanf(line, "%pK-%pK r-xp %*x %*x:%*x %*u %n",
 				start, end, &m))
 			continue;
 		if (m < 0)

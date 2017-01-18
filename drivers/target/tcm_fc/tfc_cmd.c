@@ -56,15 +56,15 @@ static void _ft_dump_cmd(struct ft_cmd *cmd, const char *caller)
 	int count;
 
 	se_cmd = &cmd->se_cmd;
-	pr_debug("%s: cmd %p sess %p seq %p se_cmd %p\n",
+	pr_debug("%s: cmd %pK sess %pK seq %pK se_cmd %pK\n",
 		caller, cmd, cmd->sess, cmd->seq, se_cmd);
 
-	pr_debug("%s: cmd %p data_nents %u len %u se_cmd_flags <0x%x>\n",
+	pr_debug("%s: cmd %pK data_nents %u len %u se_cmd_flags <0x%x>\n",
 		caller, cmd, se_cmd->t_data_nents,
 	       se_cmd->data_length, se_cmd->se_cmd_flags);
 
 	for_each_sg(se_cmd->t_data_sg, sg, se_cmd->t_data_nents, count)
-		pr_debug("%s: cmd %p sg %p page %p "
+		pr_debug("%s: cmd %pK sg %pK page %pK "
 			"len 0x%x off 0x%x\n",
 			caller, cmd, sg,
 			sg_page(sg), sg->length, sg->offset);
@@ -72,7 +72,7 @@ static void _ft_dump_cmd(struct ft_cmd *cmd, const char *caller)
 	sp = cmd->seq;
 	if (sp) {
 		ep = fc_seq_exch(sp);
-		pr_debug("%s: cmd %p sid %x did %x "
+		pr_debug("%s: cmd %pK sid %x did %x "
 			"ox_id %x rx_id %x seq_id %x e_stat %x\n",
 			caller, cmd, ep->sid, ep->did, ep->oxid, ep->rxid,
 			sp->id, ep->esb_stat);

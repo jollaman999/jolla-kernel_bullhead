@@ -83,7 +83,7 @@ static int buffer_activate(struct saa7134_dev *dev,
 {
 	unsigned long control,base;
 
-	dprintk("buffer_activate [%p]\n",buf);
+	dprintk("buffer_activate [%pK]\n",buf);
 	buf->vb.state = VIDEOBUF_ACTIVE;
 	buf->top_seen = 0;
 

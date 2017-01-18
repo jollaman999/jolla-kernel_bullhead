@@ -837,7 +837,7 @@ const char *qlogicpti_info(struct Scsi_Host *host)
 	static char buf[80];
 	struct qlogicpti *qpti = (struct qlogicpti *) host->hostdata;
 
-	sprintf(buf, "PTI Qlogic,ISP SBUS SCSI irq %d regs at %p",
+	sprintf(buf, "PTI Qlogic,ISP SBUS SCSI irq %d regs at %pK",
 		qpti->qhost->irq, qpti->qregs);
 	return buf;
 }

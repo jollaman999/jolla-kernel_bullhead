@@ -549,7 +549,7 @@ static void apic_update_ppr(struct kvm_lapic *apic)
 	else
 		ppr = isrv & 0xf0;
 
-	apic_debug("vlapic %p, ppr 0x%x, isr 0x%x, isrv 0x%x",
+	apic_debug("vlapic %pK, ppr 0x%x, isr 0x%x, isrv 0x%x",
 		   apic, ppr, isr, isrv);
 
 	if (old_ppr != ppr) {
@@ -607,7 +607,7 @@ int kvm_apic_match_dest(struct kvm_vcpu *vcpu, struct kvm_lapic *source,
 	int result = 0;
 	struct kvm_lapic *target = vcpu->arch.apic;
 
-	apic_debug("target %p, source %p, dest 0x%x, "
+	apic_debug("target %pK, source %pK, dest 0x%x, "
 		   "dest_mode 0x%x, short_hand 0x%x\n",
 		   target, source, dest, dest_mode, short_hand);
 
@@ -1486,7 +1486,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu)
 	vcpu->arch.apic_arb_prio = 0;
 	vcpu->arch.apic_attention = 0;
 
-	apic_debug(KERN_INFO "%s: vcpu=%p, id=%d, base_msr="
+	apic_debug(KERN_INFO "%s: vcpu=%pK, id=%d, base_msr="
 		   "0x%016" PRIx64 ", base_address=0x%0lx.\n", __func__,
 		   vcpu, kvm_apic_id(apic),
 		   vcpu->arch.apic_base, apic->base_address);

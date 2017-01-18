@@ -504,7 +504,7 @@ static int bfin_adv7393_fb_probe(struct i2c_client *client,
 
 	dev_info(&client->dev, "fb%d: %s frame buffer device\n",
 	       fbdev->info.node, fbdev->info.fix.id);
-	dev_info(&client->dev, "fb memory address : 0x%p\n", fbdev->fb_mem);
+	dev_info(&client->dev, "fb memory address : 0x%pK\n", fbdev->fb_mem);
 
 	entry = proc_create_data("driver/adv7393", 0, NULL, &fops, fbdev);
 	if (!entry) {

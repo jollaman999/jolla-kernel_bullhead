@@ -138,7 +138,7 @@ static void s3c_adc_try(struct adc_device *adc)
 		adc->ts_pend = NULL;
 
 	if (next) {
-		adc_dbg(adc, "new client is %p\n", next);
+		adc_dbg(adc, "new client is %pK\n", next);
 		adc->cur = next;
 		s3c_adc_select(adc, next);
 		s3c_adc_convert(adc);

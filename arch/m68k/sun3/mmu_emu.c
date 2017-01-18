@@ -369,7 +369,7 @@ int mmu_emu_handle_fault (unsigned long vaddr, int read_flag, int kernel_fault)
 	}
 
 #ifdef DEBUG_MMU_EMU
-	printk ("mmu_emu_handle_fault: vaddr=%lx type=%s crp=%p\n",
+	printk ("mmu_emu_handle_fault: vaddr=%lx type=%s crp=%pK\n",
 		vaddr, read_flag ? "read" : "write", crp);
 #endif
 
@@ -416,7 +416,7 @@ int mmu_emu_handle_fault (unsigned long vaddr, int read_flag, int kernel_fault)
 		pte_val (*pte) |= SUN3_PAGE_ACCESSED;
 
 #ifdef DEBUG_MMU_EMU
-	printk ("seg:%d crp:%p ->", get_fs().seg, crp);
+	printk ("seg:%d crp:%pK ->", get_fs().seg, crp);
 	print_pte_vaddr (vaddr);
 	printk ("\n");
 #endif

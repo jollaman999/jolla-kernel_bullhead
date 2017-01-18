@@ -258,7 +258,7 @@ static inline void dump_handler(const char *symbol, const u32 *handler, int coun
 	pr_debug("\t.set noreorder\n");
 
 	for (i = 0; i < count; i++)
-		pr_debug("\t.word\t0x%08x\t\t# %p\n", handler[i], &handler[i]);
+		pr_debug("\t.word\t0x%08x\t\t# %pK\n", handler[i], &handler[i]);
 
 	pr_debug("\t.set\tpop\n");
 

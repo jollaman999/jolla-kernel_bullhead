@@ -563,7 +563,7 @@ static int imxdma_xfer_desc(struct imxdma_desc *d)
 			imx_dmav1_writel(imxdma, imxdmac->ccr_from_device,
 					 DMA_CCR(imxdmac->channel));
 
-			dev_dbg(imxdma->dev, "%s channel: %d sg=%p sgcount=%d "
+			dev_dbg(imxdma->dev, "%s channel: %d sg=%pK sgcount=%d "
 				"total length=%d dev_addr=0x%08x (dev2mem)\n",
 				__func__, imxdmac->channel, d->sg, d->sgcount,
 				d->len, imxdmac->per_address);
@@ -573,7 +573,7 @@ static int imxdma_xfer_desc(struct imxdma_desc *d)
 			imx_dmav1_writel(imxdma, imxdmac->ccr_to_device,
 					 DMA_CCR(imxdmac->channel));
 
-			dev_dbg(imxdma->dev, "%s channel: %d sg=%p sgcount=%d "
+			dev_dbg(imxdma->dev, "%s channel: %d sg=%pK sgcount=%d "
 				"total length=%d dev_addr=0x%08x (mem2dev)\n",
 				__func__, imxdmac->channel, d->sg, d->sgcount,
 				d->len, imxdmac->per_address);

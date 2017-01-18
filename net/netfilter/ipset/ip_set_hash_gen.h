@@ -530,7 +530,7 @@ mtype_resize(struct ip_set *set, bool retried)
 retry:
 	ret = 0;
 	htable_bits++;
-	pr_debug("attempt to resize set %s from %u to %u, t %p\n",
+	pr_debug("attempt to resize set %s from %u to %u, t %pK\n",
 		 set->name, orig->htable_bits, htable_bits, orig);
 	if (!htable_bits) {
 		/* In case we have plenty of memory :-) */
@@ -579,7 +579,7 @@ retry:
 	/* Give time to other readers of the set */
 	synchronize_rcu_bh();
 
-	pr_debug("set %s resized from %u (%p) to %u (%p)\n", set->name,
+	pr_debug("set %s resized from %u (%pK) to %u (%pK)\n", set->name,
 		 orig->htable_bits, orig, t->htable_bits, t);
 	ahash_destroy(orig);
 
@@ -872,13 +872,13 @@ mtype_list(const struct ip_set *set,
 	for (; cb->args[2] < jhash_size(t->htable_bits); cb->args[2]++) {
 		incomplete = skb_tail_pointer(skb);
 		n = hbucket(t, cb->args[2]);
-		pr_debug("cb->args[2]: %lu, t %p n %p\n", cb->args[2], t, n);
+		pr_debug("cb->args[2]: %lu, t %pK n %pK\n", cb->args[2], t, n);
 		for (i = 0; i < n->pos; i++) {
 			e = ahash_data(n, i, h->dsize);
 			if (SET_WITH_TIMEOUT(set) &&
 			    ip_set_timeout_expired(ext_timeout(e, h)))
 				continue;
-			pr_debug("list hash %lu hbucket %p i %u, data %p\n",
+			pr_debug("list hash %lu hbucket %pK i %u, data %pK\n",
 				 cb->args[2], n, i, e);
 			nested = ipset_nest_start(skb, IPSET_ATTR_DATA);
 			if (!nested) {
@@ -1095,7 +1095,7 @@ TOKEN(HTYPE, _create)(struct ip_set *set, struct nlattr *tb[], u32 flags)
 			h->dsize = sizeof(struct TOKEN(HTYPE, 6_elem));
 	}
 
-	pr_debug("create %s hashsize %u (%u) maxelem %u: %p(%p)\n",
+	pr_debug("create %s hashsize %u (%u) maxelem %u: %pK(%pK)\n",
 		 set->name, jhash_size(h->table->htable_bits),
 		 h->table->htable_bits, h->maxelem, set->data, h->table);
 

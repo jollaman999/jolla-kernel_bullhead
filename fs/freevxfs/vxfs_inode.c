@@ -151,7 +151,7 @@ __vxfs_iget(ino_t ino, struct inode *ilistp)
 		return (vip);
 	}
 
-	printk(KERN_WARNING "vxfs: error on page %p\n", pp);
+	printk(KERN_WARNING "vxfs: error on page %pK\n", pp);
 	return ERR_CAST(pp);
 
 fail:

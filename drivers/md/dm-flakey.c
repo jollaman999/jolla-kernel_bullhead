@@ -262,7 +262,7 @@ static void corrupt_bio_data(struct bio *bio, struct flakey_c *fc)
 	if (data && bio_bytes >= fc->corrupt_bio_byte) {
 		data[fc->corrupt_bio_byte - 1] = fc->corrupt_bio_value;
 
-		DMDEBUG("Corrupting data bio=%p by writing %u to byte %u "
+		DMDEBUG("Corrupting data bio=%pK by writing %u to byte %u "
 			"(rw=%c bi_rw=%lu bi_sector=%llu cur_bytes=%u)\n",
 			bio, fc->corrupt_bio_value, fc->corrupt_bio_byte,
 			(bio_data_dir(bio) == WRITE) ? 'w' : 'r',

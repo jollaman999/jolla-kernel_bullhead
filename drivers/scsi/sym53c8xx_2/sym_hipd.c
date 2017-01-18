@@ -2509,7 +2509,7 @@ static void sym_int_ma (struct sym_hcb *np)
 	 *  log the information
 	 */
 	if (DEBUG_FLAGS & DEBUG_PHASE) {
-		printf ("\nCP=%p DSP=%x NXT=%x VDSP=%p CMD=%x ",
+		printf ("\nCP=%pK DSP=%x NXT=%x VDSP=%pK CMD=%x ",
 			cp, (unsigned)dsp, (unsigned)nxtdsp, vdsp, cmd);
 	}
 
@@ -2540,7 +2540,7 @@ static void sym_int_ma (struct sym_hcb *np)
 	}
 
 	if (DEBUG_FLAGS & DEBUG_PHASE) {
-		printf ("OCMD=%x\nTBLP=%p OLEN=%x OADR=%x\n",
+		printf ("OCMD=%x\nTBLP=%pK OLEN=%x OADR=%x\n",
 			(unsigned) (scr_to_cpu(vdsp[0]) >> 24),
 			tblp,
 			(unsigned) olen,
@@ -3232,7 +3232,7 @@ int sym_clear_tasks(struct sym_hcb *np, int cam_status, int target, int lun, int
 			sym_set_cam_status(cmd, cam_status);
 		++i;
 #if 0
-printf("XXXX TASK @%p CLEARED\n", cp);
+printf("XXXX TASK @%pK CLEARED\n", cp);
 #endif
 	}
 	return i;
@@ -4761,7 +4761,7 @@ struct sym_ccb *sym_get_ccb (struct sym_hcb *np, struct scsi_cmnd *cmd, u_char t
 	cp->lun    = ln;
 
 	if (DEBUG_FLAGS & DEBUG_TAGS) {
-		sym_print_addr(cmd, "ccb @%p using tag %d.\n", cp, tag);
+		sym_print_addr(cmd, "ccb @%pK using tag %d.\n", cp, tag);
 	}
 
 out:
@@ -4780,7 +4780,7 @@ void sym_free_ccb (struct sym_hcb *np, struct sym_ccb *cp)
 	struct sym_lcb *lp = sym_lp(tp, cp->lun);
 
 	if (DEBUG_FLAGS & DEBUG_TAGS) {
-		sym_print_addr(cp->cmd, "ccb @%p freeing tag %d.\n",
+		sym_print_addr(cp->cmd, "ccb @%pK freeing tag %d.\n",
 				cp, cp->tag);
 	}
 
@@ -5375,7 +5375,7 @@ void sym_complete_error(struct sym_hcb *np, struct sym_ccb *cp)
 	cmd = cp->cmd;
 	sdev = cmd->device;
 	if (DEBUG_FLAGS & (DEBUG_TINY|DEBUG_RESULT)) {
-		dev_info(&sdev->sdev_gendev, "CCB=%p STAT=%x/%x/%x\n", cp,
+		dev_info(&sdev->sdev_gendev, "CCB=%pK STAT=%x/%x/%x\n", cp,
 			cp->host_status, cp->ssss_status, cp->host_flags);
 	}
 

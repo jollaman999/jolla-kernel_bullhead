@@ -702,7 +702,7 @@ static int SetArea(DEVICE_EXTENSION * pdx, int nArea, char __user * puBuf,
 		iReturn = U14ERR_NOMEMORY;
 		goto error;
 	}
-	dev_dbg(&pdx->interface->dev, "%s %p, length=%06x, circular %d",
+	dev_dbg(&pdx->interface->dev, "%s %pK, length=%06x, circular %d",
 		__func__, puBuf, dwLength, bCircular);
 
 	// To pin down user pages we must first acquire the mapping semaphore.

@@ -1594,8 +1594,8 @@ static void snd_emu10k1_fx8010_playback_tram_poke1(unsigned short *dst_left,
 						   unsigned int tram_shift)
 {
 	/*
-	printk(KERN_DEBUG "tram_poke1: dst_left = 0x%p, dst_right = 0x%p, "
-	       "src = 0x%p, count = 0x%x\n",
+	printk(KERN_DEBUG "tram_poke1: dst_left = 0x%pK, dst_right = 0x%pK, "
+	       "src = 0x%pK, count = 0x%x\n",
 	       dst_left, dst_right, src, count);
 	*/
 	if ((tram_shift & 1) == 0) {
@@ -1675,7 +1675,7 @@ static int snd_emu10k1_fx8010_playback_prepare(struct snd_pcm_substream *substre
 	unsigned int i;
 	
 	/*
-	printk(KERN_DEBUG "prepare: etram_pages = 0x%p, dma_area = 0x%x, "
+	printk(KERN_DEBUG "prepare: etram_pages = 0x%pK, dma_area = 0x%x, "
 	       "buffer_size = 0x%x (0x%x)\n",
 	       emu->fx8010.etram_pages, runtime->dma_area,
 	       runtime->buffer_size, runtime->buffer_size << 2);

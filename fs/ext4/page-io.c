@@ -171,8 +171,8 @@ static int ext4_end_io(ext4_io_end_t *io)
 	handle_t *handle = io->handle;
 	int ret = 0;
 
-	ext4_debug("ext4_end_io_nolock: io 0x%p from inode %lu,list->next 0x%p,"
-		   "list->prev 0x%p\n",
+	ext4_debug("ext4_end_io_nolock: io 0x%pK from inode %lu,list->next 0x%pK,"
+		   "list->prev 0x%pK\n",
 		   io, inode->i_ino, io->list.next, io->list.prev);
 
 	io->handle = NULL;	/* Following call will use up the handle */
@@ -206,7 +206,7 @@ static void dump_completed_IO(struct inode *inode, struct list_head *head)
 		after = cur->next;
 		io1 = container_of(after, ext4_io_end_t, list);
 
-		ext4_debug("io 0x%p from inode %lu,prev 0x%p,next 0x%p\n",
+		ext4_debug("io 0x%pK from inode %lu,prev 0x%pK,next 0x%pK\n",
 			    io, inode->i_ino, io0, io1);
 	}
 #endif

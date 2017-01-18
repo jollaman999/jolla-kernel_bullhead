@@ -434,7 +434,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
 	rc = kvm_vcpu_init(vcpu, kvm, id);
 	if (rc)
 		goto out_free_sie_block;
-	VM_EVENT(kvm, 3, "create cpu %d at %p, sie block at %p", id, vcpu,
+	VM_EVENT(kvm, 3, "create cpu %d at %pK, sie block at %pK", id, vcpu,
 		 vcpu->arch.sie_block);
 	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
 

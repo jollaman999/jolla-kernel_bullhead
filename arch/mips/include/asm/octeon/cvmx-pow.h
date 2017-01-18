@@ -1420,8 +1420,8 @@ static inline void cvmx_pow_tag_sw_full_nocheck(cvmx_wqe_t *wqp, uint32_t tag,
 			     __func__);
 		if (wqp != cvmx_phys_to_ptr(0x80))
 			if (wqp != cvmx_pow_get_current_wqp())
-				pr_warning("%s passed WQE(%p) doesn't match "
-					   "the address in the POW(%p)\n",
+				pr_warning("%s passed WQE(%pK) doesn't match "
+					   "the address in the POW(%pK)\n",
 				     __func__, wqp,
 				     cvmx_pow_get_current_wqp());
 	}

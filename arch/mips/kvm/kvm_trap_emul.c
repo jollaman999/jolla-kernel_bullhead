@@ -87,7 +87,7 @@ static int kvm_trap_emul_handle_tlb_mod(struct kvm_vcpu *vcpu)
 	    || KVM_GUEST_KSEGX(badvaddr) == KVM_GUEST_KSEG23) {
 #ifdef DEBUG
 		kvm_debug
-		    ("USER/KSEG23 ADDR TLB MOD fault: cause %#lx, PC: %p, BadVaddr: %#lx\n",
+		    ("USER/KSEG23 ADDR TLB MOD fault: cause %#lx, PC: %pK, BadVaddr: %#lx\n",
 		     cause, opc, badvaddr);
 #endif
 		er = kvm_mips_handle_tlbmod(cause, opc, run, vcpu);
@@ -103,7 +103,7 @@ static int kvm_trap_emul_handle_tlb_mod(struct kvm_vcpu *vcpu)
 		 * using HIGHMEM. Need to address this in a HIGHMEM kernel
 		 */
 		printk
-		    ("TLB MOD fault not handled, cause %#lx, PC: %p, BadVaddr: %#lx\n",
+		    ("TLB MOD fault not handled, cause %#lx, PC: %pK, BadVaddr: %#lx\n",
 		     cause, opc, badvaddr);
 		kvm_mips_dump_host_tlbs();
 		kvm_arch_vcpu_dump_regs(vcpu);
@@ -111,7 +111,7 @@ static int kvm_trap_emul_handle_tlb_mod(struct kvm_vcpu *vcpu)
 		ret = RESUME_HOST;
 	} else {
 		printk
-		    ("Illegal TLB Mod fault address , cause %#lx, PC: %p, BadVaddr: %#lx\n",
+		    ("Illegal TLB Mod fault address , cause %#lx, PC: %pK, BadVaddr: %#lx\n",
 		     cause, opc, badvaddr);
 		kvm_mips_dump_host_tlbs();
 		kvm_arch_vcpu_dump_regs(vcpu);
@@ -140,7 +140,7 @@ static int kvm_trap_emul_handle_tlb_st_miss(struct kvm_vcpu *vcpu)
 		   || KVM_GUEST_KSEGX(badvaddr) == KVM_GUEST_KSEG23) {
 #ifdef DEBUG
 		kvm_debug
-		    ("USER ADDR TLB LD fault: cause %#lx, PC: %p, BadVaddr: %#lx\n",
+		    ("USER ADDR TLB LD fault: cause %#lx, PC: %pK, BadVaddr: %#lx\n",
 		     cause, opc, badvaddr);
 #endif
 		er = kvm_mips_handle_tlbmiss(cause, opc, run, vcpu);
@@ -161,7 +161,7 @@ static int kvm_trap_emul_handle_tlb_st_miss(struct kvm_vcpu *vcpu)
 		}
 	} else {
 		kvm_err
-		    ("Illegal TLB LD fault address , cause %#lx, PC: %p, BadVaddr: %#lx\n",
+		    ("Illegal TLB LD fault address , cause %#lx, PC: %pK, BadVaddr: %#lx\n",
 		     cause, opc, badvaddr);
 		kvm_mips_dump_host_tlbs();
 		kvm_arch_vcpu_dump_regs(vcpu);
@@ -215,7 +215,7 @@ static int kvm_trap_emul_handle_tlb_ld_miss(struct kvm_vcpu *vcpu)
 		}
 	} else {
 		printk
-		    ("Illegal TLB ST fault address , cause %#lx, PC: %p, BadVaddr: %#lx\n",
+		    ("Illegal TLB ST fault address , cause %#lx, PC: %pK, BadVaddr: %#lx\n",
 		     cause, opc, badvaddr);
 		kvm_mips_dump_host_tlbs();
 		kvm_arch_vcpu_dump_regs(vcpu);
@@ -250,7 +250,7 @@ static int kvm_trap_emul_handle_addr_err_st(struct kvm_vcpu *vcpu)
 		}
 	} else {
 		printk
-		    ("Address Error (STORE): cause %#lx, PC: %p, BadVaddr: %#lx\n",
+		    ("Address Error (STORE): cause %#lx, PC: %pK, BadVaddr: %#lx\n",
 		     cause, opc, badvaddr);
 		run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
 		ret = RESUME_HOST;
@@ -282,7 +282,7 @@ static int kvm_trap_emul_handle_addr_err_ld(struct kvm_vcpu *vcpu)
 		}
 	} else {
 		printk
-		    ("Address Error (LOAD): cause %#lx, PC: %p, BadVaddr: %#lx\n",
+		    ("Address Error (LOAD): cause %#lx, PC: %pK, BadVaddr: %#lx\n",
 		     cause, opc, badvaddr);
 		run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
 		ret = RESUME_HOST;

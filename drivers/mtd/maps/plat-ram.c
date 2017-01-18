@@ -160,7 +160,7 @@ static int platram_probe(struct platform_device *pdev)
 		goto exit_free;
 	}
 
-	dev_dbg(&pdev->dev, "got platform resource %p (0x%llx)\n", res,
+	dev_dbg(&pdev->dev, "got platform resource %pK (0x%llx)\n", res,
 		(unsigned long long)res->start);
 
 	/* setup map parameters */
@@ -183,7 +183,7 @@ static int platram_probe(struct platform_device *pdev)
 	/* remap the memory area */
 
 	info->map.virt = ioremap(res->start, info->map.size);
-	dev_dbg(&pdev->dev, "virt %p, %lu bytes\n", info->map.virt, info->map.size);
+	dev_dbg(&pdev->dev, "virt %pK, %lu bytes\n", info->map.virt, info->map.size);
 
 	if (info->map.virt == NULL) {
 		dev_err(&pdev->dev, "failed to ioremap() region\n");

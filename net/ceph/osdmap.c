@@ -55,7 +55,7 @@ static void calc_pg_masks(struct ceph_pg_pool_info *pi)
 static int crush_decode_uniform_bucket(void **p, void *end,
 				       struct crush_bucket_uniform *b)
 {
-	dout("crush_decode_uniform_bucket %p to %p\n", *p, end);
+	dout("crush_decode_uniform_bucket %pK to %pK\n", *p, end);
 	ceph_decode_need(p, end, (1+b->h.size) * sizeof(u32), bad);
 	b->item_weight = ceph_decode_32(p);
 	return 0;
@@ -67,7 +67,7 @@ static int crush_decode_list_bucket(void **p, void *end,
 				    struct crush_bucket_list *b)
 {
 	int j;
-	dout("crush_decode_list_bucket %p to %p\n", *p, end);
+	dout("crush_decode_list_bucket %pK to %pK\n", *p, end);
 	b->item_weights = kcalloc(b->h.size, sizeof(u32), GFP_NOFS);
 	if (b->item_weights == NULL)
 		return -ENOMEM;
@@ -88,7 +88,7 @@ static int crush_decode_tree_bucket(void **p, void *end,
 				    struct crush_bucket_tree *b)
 {
 	int j;
-	dout("crush_decode_tree_bucket %p to %p\n", *p, end);
+	dout("crush_decode_tree_bucket %pK to %pK\n", *p, end);
 	ceph_decode_8_safe(p, end, b->num_nodes, bad);
 	b->node_weights = kcalloc(b->num_nodes, sizeof(u32), GFP_NOFS);
 	if (b->node_weights == NULL)
@@ -105,7 +105,7 @@ static int crush_decode_straw_bucket(void **p, void *end,
 				     struct crush_bucket_straw *b)
 {
 	int j;
-	dout("crush_decode_straw_bucket %p to %p\n", *p, end);
+	dout("crush_decode_straw_bucket %pK to %pK\n", *p, end);
 	b->item_weights = kcalloc(b->h.size, sizeof(u32), GFP_NOFS);
 	if (b->item_weights == NULL)
 		return -ENOMEM;
@@ -147,7 +147,7 @@ static struct crush_map *crush_decode(void *pbyval, void *end)
 	u32 magic;
 	u32 num_name_maps;
 
-	dout("crush_decode %p to %p len %d\n", *p, end, (int)(end - *p));
+	dout("crush_decode %pK to %pK len %d\n", *p, end, (int)(end - *p));
 
 	c = kzalloc(sizeof(*c), GFP_NOFS);
 	if (c == NULL)
@@ -188,7 +188,7 @@ static struct crush_map *crush_decode(void *pbyval, void *end)
 			c->buckets[i] = NULL;
 			continue;
 		}
-		dout("crush_decode bucket %d off %x %p to %p\n",
+		dout("crush_decode bucket %d off %x %pK to %pK\n",
 		     i, (int)(*p-start), *p, end);
 
 		switch (alg) {
@@ -221,7 +221,7 @@ static struct crush_map *crush_decode(void *pbyval, void *end)
 		b->weight = ceph_decode_32(p);
 		b->size = ceph_decode_32(p);
 
-		dout("crush_decode bucket size %d off %x %p to %p\n",
+		dout("crush_decode bucket size %d off %x %pK to %pK\n",
 		     b->size, (int)(*p-start), *p, end);
 
 		b->items = kcalloc(b->size, sizeof(__s32), GFP_NOFS);
@@ -265,20 +265,20 @@ static struct crush_map *crush_decode(void *pbyval, void *end)
 	}
 
 	/* rules */
-	dout("rule vec is %p\n", c->rules);
+	dout("rule vec is %pK\n", c->rules);
 	for (i = 0; i < c->max_rules; i++) {
 		u32 yes;
 		struct crush_rule *r;
 
 		ceph_decode_32_safe(p, end, yes, bad);
 		if (!yes) {
-			dout("crush_decode NO rule %d off %x %p to %p\n",
+			dout("crush_decode NO rule %d off %x %pK to %pK\n",
 			     i, (int)(*p-start), *p, end);
 			c->rules[i] = NULL;
 			continue;
 		}
 
-		dout("crush_decode rule %d off %x %p to %p\n",
+		dout("crush_decode rule %d off %x %pK to %pK\n",
 		     i, (int)(*p-start), *p, end);
 
 		/* len */
@@ -294,7 +294,7 @@ static struct crush_map *crush_decode(void *pbyval, void *end)
 					  GFP_NOFS);
 		if (r == NULL)
 			goto badmem;
-		dout(" rule %d is at %p\n", i, r);
+		dout(" rule %d is at %pK\n", i, r);
 		r->len = yes;
 		ceph_decode_copy_safe(p, end, &r->mask, 4, bad); /* 4 u8's */
 		ceph_decode_need(p, end, r->len*3*sizeof(u32), bad);
@@ -366,7 +366,7 @@ static int __insert_pg_mapping(struct ceph_pg_mapping *new,
 	struct ceph_pg_mapping *pg = NULL;
 	int c;
 
-	dout("__insert_pg_mapping %llx %p\n", *(u64 *)&new->pgid, new);
+	dout("__insert_pg_mapping %llx %pK\n", *(u64 *)&new->pgid, new);
 	while (*p) {
 		parent = *p;
 		pg = rb_entry(parent, struct ceph_pg_mapping, node);
@@ -399,7 +399,7 @@ static struct ceph_pg_mapping *__lookup_pg_mapping(struct rb_root *root,
 		} else if (c > 0) {
 			n = n->rb_right;
 		} else {
-			dout("__lookup_pg_mapping %lld.%x got %p\n",
+			dout("__lookup_pg_mapping %lld.%x got %pK\n",
 			     pgid.pool, pgid.seed, pg);
 			return pg;
 		}
@@ -412,7 +412,7 @@ static int __remove_pg_mapping(struct rb_root *root, struct ceph_pg pgid)
 	struct ceph_pg_mapping *pg = __lookup_pg_mapping(root, pgid);
 
 	if (pg) {
-		dout("__remove_pg_mapping %lld.%x %p\n", pgid.pool, pgid.seed,
+		dout("__remove_pg_mapping %lld.%x %pK\n", pgid.pool, pgid.seed,
 		     pg);
 		rb_erase(&pg->node, root);
 		kfree(pg);
@@ -596,7 +596,7 @@ bad:
  */
 void ceph_osdmap_destroy(struct ceph_osdmap *map)
 {
-	dout("osdmap_destroy %p\n", map);
+	dout("osdmap_destroy %pK\n", map);
 	if (map->crush)
 		crush_destroy(map->crush);
 	while (!RB_EMPTY_ROOT(&map->pg_temp)) {
@@ -666,7 +666,7 @@ struct ceph_osdmap *osdmap_decode(void **p, void *end)
 	void *start = *p;
 	struct ceph_pg_pool_info *pi;
 
-	dout("osdmap_decode %p to %p len %d\n", *p, end, (int)(end - *p));
+	dout("osdmap_decode %pK to %pK len %d\n", *p, end, (int)(end - *p));
 
 	map = kzalloc(sizeof(*map), GFP_NOFS);
 	if (map == NULL)
@@ -788,7 +788,7 @@ struct ceph_osdmap *osdmap_decode(void **p, void *end)
 	/* ignore the rest of the map */
 	*p = end;
 
-	dout("osdmap_decode done %p %p\n", *p, end);
+	dout("osdmap_decode done %pK %pK\n", *p, end);
 	return map;
 
 bad:
@@ -938,7 +938,7 @@ struct ceph_osdmap *osdmap_apply_incremental(void **p, void *end,
 	/* full map? */
 	ceph_decode_32_safe(p, end, len, bad);
 	if (len > 0) {
-		dout("apply_incremental full map len %d, %p to %p\n",
+		dout("apply_incremental full map len %d, %pK to %pK\n",
 		     len, *p, end);
 		return osdmap_decode(p, min(*p+len, end));
 	}
@@ -946,7 +946,7 @@ struct ceph_osdmap *osdmap_apply_incremental(void **p, void *end,
 	/* new crush? */
 	ceph_decode_32_safe(p, end, len, bad);
 	if (len > 0) {
-		dout("apply_incremental new crush map len %d, %p to %p\n",
+		dout("apply_incremental new crush map len %d, %pK to %pK\n",
 		     len, *p, end);
 		newcrush = crush_decode(*p, min(*p+len, end));
 		if (IS_ERR(newcrush))
@@ -1070,7 +1070,7 @@ struct ceph_osdmap *osdmap_apply_incremental(void **p, void *end,
 	return map;
 
 bad:
-	pr_err("corrupt inc osdmap epoch %d off %d (%p of %p-%p)\n",
+	pr_err("corrupt inc osdmap epoch %d off %d (%pK of %pK-%pK)\n",
 	       epoch, (int)(*p - start), *p, start, end);
 	print_hex_dump(KERN_DEBUG, "osdmap: ",
 		       DUMP_PREFIX_OFFSET, 16, 1,

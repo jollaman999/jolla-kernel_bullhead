@@ -55,7 +55,7 @@ int install_user_keyrings(void)
 	user = cred->user;
 	uid = from_kuid(cred->user_ns, user->uid);
 
-	kenter("%p{%u}", user, uid);
+	kenter("%pK{%u}", user, uid);
 
 	if (user->uid_keyring && user->session_keyring) {
 		kleave(" = 0 [exist]");

@@ -233,7 +233,7 @@ static int wil_pcie_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto err_release_reg;
 	}
 	/* rollback to err_iounmap */
-	dev_info(&pdev->dev, "CSR at %pR -> 0x%p\n", &pdev->resource[0], csr);
+	dev_info(&pdev->dev, "CSR at %pR -> 0x%pK\n", &pdev->resource[0], csr);
 
 	wil = wil_if_alloc(dev, csr);
 	if (IS_ERR(wil)) {

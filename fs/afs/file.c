@@ -111,7 +111,7 @@ static void afs_file_readpage_read_complete(struct page *page,
 					    void *data,
 					    int error)
 {
-	_enter("%p,%p,%d", page, data, error);
+	_enter("%pK,%pK,%d", page, data, error);
 
 	/* if the read completes with an error, we just unlock the page and let
 	 * the VM reissue the readpage */

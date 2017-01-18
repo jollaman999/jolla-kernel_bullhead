@@ -124,7 +124,7 @@ static int smp_ppc47x_kick_cpu(int cpu)
 	 * XXX: Is there any reason to assume differently?
 	 */
 	spin_table = (u32 *)__va(*spin_table_addr_prop);
-	pr_debug("CPU%d: Spin table mapped at %p\n", cpu, spin_table);
+	pr_debug("CPU%d: Spin table mapped at %pK\n", cpu, spin_table);
 
 	spin_table[3] = cpu;
 	smp_wmb();

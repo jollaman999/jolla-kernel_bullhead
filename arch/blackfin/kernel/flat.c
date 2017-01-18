@@ -67,7 +67,7 @@ void bfin_put_addr_at_rp(unsigned long *ptr, unsigned long addr,
 	switch (type) {
 	case FLAT_BFIN_RELOC_TYPE_16_BIT:
 		put_unaligned(addr, usptr);
-		pr_debug("new value %x at %p", get_unaligned(usptr), usptr);
+		pr_debug("new value %x at %pK", get_unaligned(usptr), usptr);
 		break;
 
 	case FLAT_BFIN_RELOC_TYPE_16H_BIT:

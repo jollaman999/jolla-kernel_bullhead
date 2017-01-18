@@ -219,7 +219,7 @@ mptfc_block_error_handler(struct scsi_cmnd *SCpnt,
 	 || ioc->active == 0) {
 		dfcprintk (ioc, printk(MYIOC_s_DEBUG_FMT
 			"%s.%d: %d:%d, failing recovery, "
-			"port state %x, active %d, vdevice %p.\n", caller,
+			"port state %x, active %d, vdevice %pK.\n", caller,
 			ioc->name, ioc->sh->host_no,
 			SCpnt->device->id, SCpnt->device->lun, ready,
 			ioc->active, SCpnt->device->hostdata));
@@ -1226,7 +1226,7 @@ mptfc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	if (!ioc_cap) {
 		printk(MYIOC_s_WARN_FMT
-			"Skipping ioc=%p because SCSI Initiator mode is NOT enabled!\n",
+			"Skipping ioc=%pK because SCSI Initiator mode is NOT enabled!\n",
 			ioc->name, ioc);
 		return 0;
 	}
@@ -1309,7 +1309,7 @@ mptfc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 	spin_lock_init(&ioc->scsi_lookup_lock);
 
-	dprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ScsiLookup @ %p\n",
+	dprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ScsiLookup @ %pK\n",
 		 ioc->name, ioc->ScsiLookup));
 
 	hd->last_queue_full = 0;

@@ -903,7 +903,7 @@ int arc_unwind(struct unwind_frame_info *frame)
 		unsigned long *sptr = (unsigned long *)UNW_SP(frame);
 		unw_debug("\nStack Dump:\n");
 		for (i = 0; i < 20; i++, sptr++)
-			unw_debug("0x%p:  0x%lx\n", sptr, *sptr);
+			unw_debug("0x%pK:  0x%lx\n", sptr, *sptr);
 		unw_debug("\n");
 	}
 #endif

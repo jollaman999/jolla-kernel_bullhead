@@ -1499,7 +1499,7 @@ static int snd_riptide_prepare(struct snd_pcm_substream *substream)
 			lbuspath = data->paths.stereo;
 		break;
 	}
-	snd_printdd("use sgdlist at 0x%p\n",
+	snd_printdd("use sgdlist at 0x%pK\n",
 		    data->sgdlist.area);
 	if (data->sgdlist.area) {
 		unsigned int i, j, size, pages, f, pt, period;
@@ -1573,7 +1573,7 @@ snd_riptide_hw_params(struct snd_pcm_substream *substream,
 	struct snd_dma_buffer *sgdlist = &data->sgdlist;
 	int err;
 
-	snd_printdd("hw params id %d (sgdlist: 0x%p 0x%lx %d)\n", data->id,
+	snd_printdd("hw params id %d (sgdlist: 0x%pK 0x%lx %d)\n", data->id,
 		    sgdlist->area, (unsigned long)sgdlist->addr,
 		    (int)sgdlist->bytes);
 	if (sgdlist->area)

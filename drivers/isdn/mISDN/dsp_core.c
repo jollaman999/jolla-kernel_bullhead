@@ -1079,7 +1079,7 @@ dspcreate(struct channel_req *crq)
 		printk(KERN_WARNING "%s:cannot get module\n",
 		       __func__);
 
-	sprintf(ndsp->name, "DSP_C%x(0x%p)",
+	sprintf(ndsp->name, "DSP_C%x(0x%pK)",
 		ndsp->up->st->dev->id + 1, ndsp);
 	/* set frame size to start */
 	ndsp->features.hfc_id = -1; /* current PCM id */

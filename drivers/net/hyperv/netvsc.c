@@ -557,7 +557,7 @@ int netvsc_send(struct hv_device *device,
 			ret = -ENOSPC;
 		}
 	} else {
-		netdev_err(ndev, "Unable to send packet %p ret %d\n",
+		netdev_err(ndev, "Unable to send packet %pK ret %d\n",
 			   packet, ret);
 	}
 

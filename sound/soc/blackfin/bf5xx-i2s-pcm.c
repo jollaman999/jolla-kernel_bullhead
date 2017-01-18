@@ -230,7 +230,7 @@ static int bf5xx_pcm_preallocate_dma_buffer(struct snd_pcm *pcm, int stream)
 	}
 	buf->bytes = size;
 
-	pr_debug("%s, area:%p, size:0x%08lx\n", __func__,
+	pr_debug("%s, area:%pK, size:0x%08lx\n", __func__,
 		buf->area, buf->bytes);
 
 	return 0;

@@ -79,7 +79,7 @@ static void pvr2_context_set_notify(struct pvr2_context *mp, int fl)
 
 static void pvr2_context_destroy(struct pvr2_context *mp)
 {
-	pvr2_trace(PVR2_TRACE_CTXT,"pvr2_context %p (destroy)",mp);
+	pvr2_trace(PVR2_TRACE_CTXT,"pvr2_context %pK (destroy)",mp);
 	if (mp->hdw) pvr2_hdw_destroy(mp->hdw);
 	pvr2_context_set_notify(mp, 0);
 	mutex_lock(&pvr2_context_mutex);
@@ -113,11 +113,11 @@ static void pvr2_context_check(struct pvr2_context *mp)
 {
 	struct pvr2_channel *ch1, *ch2;
 	pvr2_trace(PVR2_TRACE_CTXT,
-		   "pvr2_context %p (notify)", mp);
+		   "pvr2_context %pK (notify)", mp);
 	if (!mp->initialized_flag && !mp->disconnect_flag) {
 		mp->initialized_flag = !0;
 		pvr2_trace(PVR2_TRACE_CTXT,
-			   "pvr2_context %p (initialize)", mp);
+			   "pvr2_context %pK (initialize)", mp);
 		/* Finish hardware initialization */
 		if (pvr2_hdw_initialize(mp->hdw,
 					(void (*)(void *))pvr2_context_notify,
@@ -130,7 +130,7 @@ static void pvr2_context_check(struct pvr2_context *mp)
 			if (mp->setup_func) mp->setup_func(mp);
 		} else {
 			pvr2_trace(PVR2_TRACE_CTXT,
-				   "pvr2_context %p (thread skipping setup)",
+				   "pvr2_context %pK (thread skipping setup)",
 				   mp);
 			/* Even though initialization did not succeed,
 			   we're still going to continue anyway.  We need
@@ -219,7 +219,7 @@ struct pvr2_context *pvr2_context_create(
 	struct pvr2_context *mp = NULL;
 	mp = kzalloc(sizeof(*mp),GFP_KERNEL);
 	if (!mp) goto done;
-	pvr2_trace(PVR2_TRACE_CTXT,"pvr2_context %p (create)",mp);
+	pvr2_trace(PVR2_TRACE_CTXT,"pvr2_context %pK (create)",mp);
 	mp->setup_func = setup_func;
 	mutex_init(&mp->mutex);
 	mutex_lock(&pvr2_context_mutex);

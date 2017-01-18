@@ -771,7 +771,7 @@ static struct inode *pft_bio_get_inode(struct bio *bio)
 
 		/* Using direct-io (O_DIRECT) without page cache */
 		inode = dio_bio_get_inode(bio);
-		pr_debug("inode on direct-io, inode = 0x%p.\n", inode);
+		pr_debug("inode on direct-io, inode = 0x%pK.\n", inode);
 
 		return inode;
 	}

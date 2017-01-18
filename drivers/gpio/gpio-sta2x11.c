@@ -171,7 +171,7 @@ static void gsta_set_config(struct gsta_gpio *chip, int nr, unsigned cfg)
 	u32 val;
 	int err = 0;
 
-	pr_info("%s: %p %i %i\n", __func__, chip, nr, cfg);
+	pr_info("%s: %pK %i %i\n", __func__, chip, nr, cfg);
 
 	if (cfg == PINMUX_TYPE_NONE)
 		return;
@@ -221,7 +221,7 @@ static void gsta_set_config(struct gsta_gpio *chip, int nr, unsigned cfg)
 	}
 	spin_unlock_irqrestore(&chip->lock, flags);
 	if (err)
-		pr_err("%s: chip %p, pin %i, cfg %i is invalid\n",
+		pr_err("%s: chip %pK, pin %i, cfg %i is invalid\n",
 		       __func__, chip, nr, cfg);
 }
 
@@ -366,7 +366,7 @@ static int gsta_probe(struct platform_device *dev)
 
 	if (gpio_pdata == NULL)
 		dev_err(&dev->dev, "no gpio config\n");
-	pr_debug("gpio config: %p\n", gpio_pdata);
+	pr_debug("gpio config: %pK\n", gpio_pdata);
 
 	res = platform_get_resource(dev, IORESOURCE_MEM, 0);
 

@@ -101,7 +101,7 @@ int p9_idpool_get(struct p9_idpool *p)
 	if (i < 0)
 		return -1;
 
-	p9_debug(P9_DEBUG_MUX, " id %d pool %p\n", i, p);
+	p9_debug(P9_DEBUG_MUX, " id %d pool %pK\n", i, p);
 	return i;
 }
 EXPORT_SYMBOL(p9_idpool_get);
@@ -119,7 +119,7 @@ void p9_idpool_put(int id, struct p9_idpool *p)
 {
 	unsigned long flags;
 
-	p9_debug(P9_DEBUG_MUX, " id %d pool %p\n", id, p);
+	p9_debug(P9_DEBUG_MUX, " id %d pool %pK\n", id, p);
 
 	spin_lock_irqsave(&p->lock, flags);
 	idr_remove(&p->pool, id);

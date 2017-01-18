@@ -453,7 +453,7 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 					  &walk_state->arg_types,
 					  &walk_state->arg_count);
 			ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
-					  "Popped scope, Op=%p\n", op));
+					  "Popped scope, Op=%pK\n", op));
 		} else if (walk_state->prev_op) {
 
 			/* We were in the middle of an op */
@@ -494,7 +494,7 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 
 			if (walk_state->op_info) {
 				ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
-						  "Opcode %4.4X [%s] Op %p Aml %p AmlOffset %5.5X\n",
+						  "Opcode %4.4X [%s] Op %pK Aml %pK AmlOffset %5.5X\n",
 						  (u32) op->common.aml_opcode,
 						  walk_state->op_info->name, op,
 						  parser_state->aml,

@@ -611,7 +611,7 @@ enum MHI_STATUS mhi_init_event_ring(struct mhi_device_ctxt *mhi_dev_ctxt,
 
 	spin_lock_irqsave(lock, flags);
 
-	mhi_log(MHI_MSG_INFO, "mmio_addr = 0x%p, mmio_len = 0x%llx\n",
+	mhi_log(MHI_MSG_INFO, "mmio_addr = 0x%pK, mmio_len = 0x%llx\n",
 			mhi_dev_ctxt->mmio_addr, mhi_dev_ctxt->mmio_len);
 	mhi_log(MHI_MSG_INFO,
 			"Initializing event ring %d\n", event_ring_index);

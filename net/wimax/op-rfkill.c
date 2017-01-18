@@ -97,7 +97,7 @@ void wimax_report_rfkill_hw(struct wimax_dev *wimax_dev,
 	struct device *dev = wimax_dev_to_dev(wimax_dev);
 	enum wimax_st wimax_state;
 
-	d_fnstart(3, dev, "(wimax_dev %p state %u)\n", wimax_dev, state);
+	d_fnstart(3, dev, "(wimax_dev %pK state %u)\n", wimax_dev, state);
 	BUG_ON(state == WIMAX_RF_QUERY);
 	BUG_ON(state != WIMAX_RF_ON && state != WIMAX_RF_OFF);
 
@@ -121,7 +121,7 @@ void wimax_report_rfkill_hw(struct wimax_dev *wimax_dev,
 	}
 error_not_ready:
 	mutex_unlock(&wimax_dev->mutex);
-	d_fnend(3, dev, "(wimax_dev %p state %u) = void [%d]\n",
+	d_fnend(3, dev, "(wimax_dev %pK state %u) = void [%d]\n",
 		wimax_dev, state, result);
 }
 EXPORT_SYMBOL_GPL(wimax_report_rfkill_hw);
@@ -153,7 +153,7 @@ void wimax_report_rfkill_sw(struct wimax_dev *wimax_dev,
 	struct device *dev = wimax_dev_to_dev(wimax_dev);
 	enum wimax_st wimax_state;
 
-	d_fnstart(3, dev, "(wimax_dev %p state %u)\n", wimax_dev, state);
+	d_fnstart(3, dev, "(wimax_dev %pK state %u)\n", wimax_dev, state);
 	BUG_ON(state == WIMAX_RF_QUERY);
 	BUG_ON(state != WIMAX_RF_ON && state != WIMAX_RF_OFF);
 
@@ -174,7 +174,7 @@ void wimax_report_rfkill_sw(struct wimax_dev *wimax_dev,
 	}
 error_not_ready:
 	mutex_unlock(&wimax_dev->mutex);
-	d_fnend(3, dev, "(wimax_dev %p state %u) = void [%d]\n",
+	d_fnend(3, dev, "(wimax_dev %pK state %u) = void [%d]\n",
 		wimax_dev, state, result);
 }
 EXPORT_SYMBOL_GPL(wimax_report_rfkill_sw);
@@ -211,7 +211,7 @@ int __wimax_rf_toggle_radio(struct wimax_dev *wimax_dev,
 	enum wimax_st wimax_state;
 
 	might_sleep();
-	d_fnstart(3, dev, "(wimax_dev %p state %u)\n", wimax_dev, state);
+	d_fnstart(3, dev, "(wimax_dev %pK state %u)\n", wimax_dev, state);
 	if (wimax_dev->rf_sw == state)
 		goto out_no_change;
 	if (wimax_dev->op_rfkill_sw_toggle != NULL)
@@ -228,7 +228,7 @@ int __wimax_rf_toggle_radio(struct wimax_dev *wimax_dev,
 		__wimax_state_change(wimax_dev, wimax_state);
 	}
 out_no_change:
-	d_fnend(3, dev, "(wimax_dev %p state %u) = %d\n",
+	d_fnend(3, dev, "(wimax_dev %pK state %u) = %d\n",
 		wimax_dev, state, result);
 	return result;
 }
@@ -253,7 +253,7 @@ static int wimax_rfkill_set_radio_block(void *data, bool blocked)
 	struct device *dev = wimax_dev_to_dev(wimax_dev);
 	enum wimax_rf_state rf_state;
 
-	d_fnstart(3, dev, "(wimax_dev %p blocked %u)\n", wimax_dev, blocked);
+	d_fnstart(3, dev, "(wimax_dev %pK blocked %u)\n", wimax_dev, blocked);
 	rf_state = WIMAX_RF_ON;
 	if (blocked)
 		rf_state = WIMAX_RF_OFF;
@@ -263,7 +263,7 @@ static int wimax_rfkill_set_radio_block(void *data, bool blocked)
 	else
 		result = __wimax_rf_toggle_radio(wimax_dev, rf_state);
 	mutex_unlock(&wimax_dev->mutex);
-	d_fnend(3, dev, "(wimax_dev %p blocked %u) = %d\n",
+	d_fnend(3, dev, "(wimax_dev %pK blocked %u) = %d\n",
 		wimax_dev, blocked, result);
 	return result;
 }
@@ -303,7 +303,7 @@ int wimax_rfkill(struct wimax_dev *wimax_dev, enum wimax_rf_state state)
 	int result;
 	struct device *dev = wimax_dev_to_dev(wimax_dev);
 
-	d_fnstart(3, dev, "(wimax_dev %p state %u)\n", wimax_dev, state);
+	d_fnstart(3, dev, "(wimax_dev %pK state %u)\n", wimax_dev, state);
 	mutex_lock(&wimax_dev->mutex);
 	result = wimax_dev_is_ready(wimax_dev);
 	if (result < 0) {
@@ -333,7 +333,7 @@ int wimax_rfkill(struct wimax_dev *wimax_dev, enum wimax_rf_state state)
 error:
 error_not_ready:
 	mutex_unlock(&wimax_dev->mutex);
-	d_fnend(3, dev, "(wimax_dev %p state %u) = %d\n",
+	d_fnend(3, dev, "(wimax_dev %pK state %u) = %d\n",
 		wimax_dev, state, result);
 	return result;
 }
@@ -351,7 +351,7 @@ int wimax_rfkill_add(struct wimax_dev *wimax_dev)
 	struct rfkill *rfkill;
 	struct device *dev = wimax_dev_to_dev(wimax_dev);
 
-	d_fnstart(3, dev, "(wimax_dev %p)\n", wimax_dev);
+	d_fnstart(3, dev, "(wimax_dev %pK)\n", wimax_dev);
 	/* Initialize RF Kill */
 	result = -ENOMEM;
 	rfkill = rfkill_alloc(wimax_dev->name, dev, RFKILL_TYPE_WIMAX,
@@ -359,7 +359,7 @@ int wimax_rfkill_add(struct wimax_dev *wimax_dev)
 	if (rfkill == NULL)
 		goto error_rfkill_allocate;
 
-	d_printf(1, dev, "rfkill %p\n", rfkill);
+	d_printf(1, dev, "rfkill %pK\n", rfkill);
 
 	wimax_dev->rfkill = rfkill;
 
@@ -372,13 +372,13 @@ int wimax_rfkill_add(struct wimax_dev *wimax_dev)
 	if (wimax_dev->op_rfkill_sw_toggle == NULL)
 		wimax_dev->rf_sw = WIMAX_RF_ON;
 
-	d_fnend(3, dev, "(wimax_dev %p) = 0\n", wimax_dev);
+	d_fnend(3, dev, "(wimax_dev %pK) = 0\n", wimax_dev);
 	return 0;
 
 error_rfkill_register:
 	rfkill_destroy(wimax_dev->rfkill);
 error_rfkill_allocate:
-	d_fnend(3, dev, "(wimax_dev %p) = %d\n", wimax_dev, result);
+	d_fnend(3, dev, "(wimax_dev %pK) = %d\n", wimax_dev, result);
 	return result;
 }
 
@@ -394,10 +394,10 @@ error_rfkill_allocate:
 void wimax_rfkill_rm(struct wimax_dev *wimax_dev)
 {
 	struct device *dev = wimax_dev_to_dev(wimax_dev);
-	d_fnstart(3, dev, "(wimax_dev %p)\n", wimax_dev);
+	d_fnstart(3, dev, "(wimax_dev %pK)\n", wimax_dev);
 	rfkill_unregister(wimax_dev->rfkill);
 	rfkill_destroy(wimax_dev->rfkill);
-	d_fnend(3, dev, "(wimax_dev %p)\n", wimax_dev);
+	d_fnend(3, dev, "(wimax_dev %pK)\n", wimax_dev);
 }
 
 
@@ -429,7 +429,7 @@ int wimax_gnl_doit_rfkill(struct sk_buff *skb, struct genl_info *info)
 	struct device *dev;
 	enum wimax_rf_state new_state;
 
-	d_fnstart(3, NULL, "(skb %p info %p)\n", skb, info);
+	d_fnstart(3, NULL, "(skb %pK info %pK)\n", skb, info);
 	result = -ENODEV;
 	if (info->attrs[WIMAX_GNL_RFKILL_IFIDX] == NULL) {
 		printk(KERN_ERR "WIMAX_GNL_OP_RFKILL: can't find IFIDX "
@@ -454,7 +454,7 @@ int wimax_gnl_doit_rfkill(struct sk_buff *skb, struct genl_info *info)
 error_no_pid:
 	dev_put(wimax_dev->net_dev);
 error_no_wimax_dev:
-	d_fnend(3, NULL, "(skb %p info %p) = %d\n", skb, info, result);
+	d_fnend(3, NULL, "(skb %pK info %pK) = %d\n", skb, info, result);
 	return result;
 }
 

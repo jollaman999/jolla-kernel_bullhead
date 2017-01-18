@@ -527,7 +527,7 @@ static void gelic_wl_parse_ie(u8 *data, size_t len,
 	u8 item_len;
 	u8 item_id;
 
-	pr_debug("%s: data=%p len=%ld\n", __func__,
+	pr_debug("%s: data=%pK len=%ld\n", __func__,
 		 data, len);
 	memset(ie_info, 0, sizeof(struct ie_info));
 
@@ -561,7 +561,7 @@ static void gelic_wl_parse_ie(u8 *data, size_t len,
 		pos += item_len;
 		data_left -= item_len;
 	}
-	pr_debug("%s: wpa=%p,%d wpa2=%p,%d\n", __func__,
+	pr_debug("%s: wpa=%pK,%d wpa2=%pK,%d\n", __func__,
 		 ie_info->wpa.data, ie_info->wpa.len,
 		 ie_info->rsn.data, ie_info->rsn.len);
 }
@@ -1102,7 +1102,7 @@ static int gelic_wl_get_encode(struct net_device *netdev,
 
 	pr_debug("%s: <-\n", __func__);
 	key_index = enc->flags & IW_ENCODE_INDEX;
-	pr_debug("%s: flag=%#x point=%p len=%d extra=%p\n", __func__,
+	pr_debug("%s: flag=%#x point=%pK len=%d extra=%pK\n", __func__,
 		 enc->flags, enc->pointer, enc->length, extra);
 	if (GELIC_WEP_KEYS < key_index)
 		return -EINVAL;
@@ -1573,7 +1573,7 @@ static void gelic_wl_scan_complete_event(struct gelic_wl_info *wl)
 	     scan_info_size < data_len;
 	     i++, scan_info_size += be16_to_cpu(scan_info->size),
 	     scan_info = (void *)scan_info + be16_to_cpu(scan_info->size)) {
-		pr_debug("%s:size=%d bssid=%pM scan_info=%p\n", __func__,
+		pr_debug("%s:size=%d bssid=%pM scan_info=%pK\n", __func__,
 			 be16_to_cpu(scan_info->size),
 			 &scan_info->bssid[2], scan_info);
 
@@ -1682,7 +1682,7 @@ struct gelic_wl_scan_info *gelic_wl_find_best_bss(struct gelic_wl_info *wl)
 	best_weight = 0;
 
 	list_for_each_entry(scan_info, &wl->network_list, list) {
-		pr_debug("%s: station %p\n", __func__, scan_info);
+		pr_debug("%s: station %pK\n", __func__, scan_info);
 
 		if (!scan_info->valid) {
 			pr_debug("%s: station invalid\n", __func__);
@@ -1742,7 +1742,7 @@ struct gelic_wl_scan_info *gelic_wl_find_best_bss(struct gelic_wl_info *wl)
 	}
 
 #ifdef DEBUG
-	pr_debug("%s: -> bss=%p\n", __func__, best_bss);
+	pr_debug("%s: -> bss=%pK\n", __func__, best_bss);
 	if (best_bss) {
 		pr_debug("%s:addr=%pM\n", __func__,
 			 &best_bss->hwinfo->bssid[2]);
@@ -2315,7 +2315,7 @@ static struct net_device *gelic_wl_alloc(struct gelic_card *card)
 	pr_debug("%s:start\n", __func__);
 	netdev = alloc_etherdev(sizeof(struct gelic_port) +
 				sizeof(struct gelic_wl_info));
-	pr_debug("%s: netdev =%p card=%p\n", __func__, netdev, card);
+	pr_debug("%s: netdev =%pK card=%pK\n", __func__, netdev, card);
 	if (!netdev)
 		return NULL;
 
@@ -2327,7 +2327,7 @@ static struct net_device *gelic_wl_alloc(struct gelic_card *card)
 	port->type = GELIC_PORT_WIRELESS;
 
 	wl = port_wl(port);
-	pr_debug("%s: wl=%p port=%p\n", __func__, wl, port);
+	pr_debug("%s: wl=%pK port=%pK\n", __func__, wl, port);
 
 	/* allocate scan list */
 	wl->networks = kzalloc(sizeof(struct gelic_wl_scan_info) *
@@ -2460,7 +2460,7 @@ static int gelic_wl_open(struct net_device *netdev)
 {
 	struct gelic_card *card = netdev_card(netdev);
 
-	pr_debug("%s:->%p\n", __func__, netdev);
+	pr_debug("%s:->%pK\n", __func__, netdev);
 
 	gelic_card_up(card);
 

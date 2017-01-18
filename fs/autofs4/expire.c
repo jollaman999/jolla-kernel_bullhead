@@ -47,7 +47,7 @@ static int autofs4_mount_busy(struct vfsmount *mnt, struct dentry *dentry)
 	struct path path = {.mnt = mnt, .dentry = dentry};
 	int status = 1;
 
-	DPRINTK("dentry %p %.*s",
+	DPRINTK("dentry %pK %.*s",
 		dentry, (int)dentry->d_name.len, dentry->d_name.name);
 
 	path_get(&path);
@@ -198,7 +198,7 @@ static int autofs4_direct_busy(struct vfsmount *mnt,
 				unsigned long timeout,
 				int do_now)
 {
-	DPRINTK("top %p %.*s",
+	DPRINTK("top %pK %.*s",
 		top, (int) top->d_name.len, top->d_name.name);
 
 	/* If it's busy update the expiry counters */
@@ -227,7 +227,7 @@ static int autofs4_tree_busy(struct vfsmount *mnt,
 	struct autofs_info *top_ino = autofs4_dentry_ino(top);
 	struct dentry *p;
 
-	DPRINTK("top %p %.*s",
+	DPRINTK("top %pK %.*s",
 		top, (int)top->d_name.len, top->d_name.name);
 
 	/* Negative dentry - give up */
@@ -236,7 +236,7 @@ static int autofs4_tree_busy(struct vfsmount *mnt,
 
 	p = NULL;
 	while ((p = get_next_positive_dentry(p, top))) {
-		DPRINTK("dentry %p %.*s",
+		DPRINTK("dentry %pK %.*s",
 			p, (int) p->d_name.len, p->d_name.name);
 
 		/*
@@ -289,12 +289,12 @@ static struct dentry *autofs4_check_leaves(struct vfsmount *mnt,
 {
 	struct dentry *p;
 
-	DPRINTK("parent %p %.*s",
+	DPRINTK("parent %pK %.*s",
 		parent, (int)parent->d_name.len, parent->d_name.name);
 
 	p = NULL;
 	while ((p = get_next_positive_dentry(p, parent))) {
-		DPRINTK("dentry %p %.*s",
+		DPRINTK("dentry %pK %.*s",
 			p, (int) p->d_name.len, p->d_name.name);
 
 		if (d_mountpoint(p)) {
@@ -387,7 +387,7 @@ struct dentry *autofs4_expire_indirect(struct super_block *sb,
 		 *	   offset (autofs-5.0+).
 		 */
 		if (d_mountpoint(dentry)) {
-			DPRINTK("checking mountpoint %p %.*s",
+			DPRINTK("checking mountpoint %pK %.*s",
 				dentry, (int)dentry->d_name.len, dentry->d_name.name);
 
 			/* Can we umount this guy */
@@ -438,7 +438,7 @@ next:
 	return NULL;
 
 found:
-	DPRINTK("returning %p %.*s",
+	DPRINTK("returning %pK %.*s",
 		expired, (int)expired->d_name.len, expired->d_name.name);
 	ino = autofs4_dentry_ino(expired);
 	ino->flags |= AUTOFS_INF_EXPIRING;
@@ -465,7 +465,7 @@ int autofs4_expire_wait(struct dentry *dentry)
 	if (ino->flags & AUTOFS_INF_EXPIRING) {
 		spin_unlock(&sbi->fs_lock);
 
-		DPRINTK("waiting for expire %p name=%.*s",
+		DPRINTK("waiting for expire %pK name=%.*s",
 			 dentry, dentry->d_name.len, dentry->d_name.name);
 
 		status = autofs4_wait(sbi, dentry, NFY_NONE);

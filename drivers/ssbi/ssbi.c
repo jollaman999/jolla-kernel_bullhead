@@ -496,7 +496,7 @@ static int ssbi_probe(struct platform_device *pdev)
 
 	ssbi->base = ioremap(mem_res->start, resource_size(mem_res));
 	if (!ssbi->base) {
-		pr_err("ioremap of 0x%p failed\n", (void *)mem_res->start);
+		pr_err("ioremap of 0x%pK failed\n", (void *)mem_res->start);
 		ret = -EINVAL;
 		goto err_ioremap;
 	}

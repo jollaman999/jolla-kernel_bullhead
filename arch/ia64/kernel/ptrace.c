@@ -841,7 +841,7 @@ ptrace_getregs (struct task_struct *child, struct pt_all_user_regs __user *ppr)
 	}
 
 	if (((unsigned long) ppr & 0x7) != 0) {
-		dprintk("ptrace:unaligned register address %p\n", ppr);
+		dprintk("ptrace:unaligned register address %pK\n", ppr);
 		return -EIO;
 	}
 
@@ -986,7 +986,7 @@ ptrace_setregs (struct task_struct *child, struct pt_all_user_regs __user *ppr)
 	}
 
 	if (((unsigned long) ppr & 0x7) != 0) {
-		dprintk("ptrace:unaligned register address %p\n", ppr);
+		dprintk("ptrace:unaligned register address %pK\n", ppr);
 		return -EIO;
 	}
 

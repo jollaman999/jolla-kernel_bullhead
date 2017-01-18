@@ -56,7 +56,7 @@ int tm6000_read_write_usb(struct tm6000_core *dev, u8 req_type, u8 req,
 	}
 
 	if (tm6000_debug & V4L2_DEBUG_I2C) {
-		printk(KERN_DEBUG "(dev %p, pipe %08x): ", dev->udev, pipe);
+		printk(KERN_DEBUG "(dev %pK, pipe %08x): ", dev->udev, pipe);
 
 		printk(KERN_CONT "%s: %02x %02x %02x %02x %02x %02x %02x %02x ",
 			(req_type & USB_DIR_IN) ? " IN" : "OUT",

@@ -675,7 +675,7 @@ int wil_reset(struct wil6210_priv *wil)
 	bitmap_zero(wil->status, wil_status_last);
 
 	if (wil->scan_request) {
-		wil_dbg_misc(wil, "Abort scan_request 0x%p\n",
+		wil_dbg_misc(wil, "Abort scan_request 0x%pK\n",
 			     wil->scan_request);
 		del_timer_sync(&wil->scan_timer);
 		cfg80211_scan_done(wil->scan_request, true);
@@ -853,7 +853,7 @@ int __wil_down(struct wil6210_priv *wil)
 	wil_enable_irq(wil);
 
 	if (wil->scan_request) {
-		wil_dbg_misc(wil, "Abort scan_request 0x%p\n",
+		wil_dbg_misc(wil, "Abort scan_request 0x%pK\n",
 			     wil->scan_request);
 		del_timer_sync(&wil->scan_timer);
 		cfg80211_scan_done(wil->scan_request, true);

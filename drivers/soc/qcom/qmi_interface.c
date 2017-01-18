@@ -414,7 +414,7 @@ static void qmi_event_notify(unsigned event, void *oob_data,
 	notify_work = kmalloc(sizeof(struct qmi_notify_event_work),
 			      GFP_KERNEL);
 	if (!notify_work) {
-		pr_err("%s: Couldn't notify %d event to %p\n",
+		pr_err("%s: Couldn't notify %d event to %pK\n",
 			__func__, event, priv);
 		return;
 	}
@@ -422,7 +422,7 @@ static void qmi_event_notify(unsigned event, void *oob_data,
 	if (oob_data) {
 		notify_work->oob_data = kmalloc(oob_data_len, GFP_KERNEL);
 		if (!notify_work->oob_data) {
-			pr_err("%s: Couldn't allocate oob_data @ %d to %p\n",
+			pr_err("%s: Couldn't allocate oob_data @ %d to %pK\n",
 				__func__, event, priv);
 			kfree(notify_work);
 			return;

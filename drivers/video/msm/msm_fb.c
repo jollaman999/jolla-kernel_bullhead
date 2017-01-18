@@ -363,7 +363,7 @@ static int msm_fb_probe(struct platform_device *pdev)
 		iclient = msm_ion_client_create(pdev->name);
 		if (IS_ERR_OR_NULL(iclient)) {
 			pr_err("msm_ion_client_create() return"
-				" error, val %p\n", iclient);
+				" error, val %pK\n", iclient);
 			iclient = NULL;
 		}
 

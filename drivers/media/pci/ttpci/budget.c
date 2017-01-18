@@ -62,7 +62,7 @@ DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr);
 static void Set22K (struct budget *budget, int state)
 {
 	struct saa7146_dev *dev=budget->dev;
-	dprintk(2, "budget: %p\n", budget);
+	dprintk(2, "budget: %pK\n", budget);
 	saa7146_setgpio(dev, 3, (state ? SAA7146_GPIO_OUTHI : SAA7146_GPIO_OUTLO));
 }
 
@@ -73,7 +73,7 @@ static void Set22K (struct budget *budget, int state)
 static void DiseqcSendBit (struct budget *budget, int data)
 {
 	struct saa7146_dev *dev=budget->dev;
-	dprintk(2, "budget: %p\n", budget);
+	dprintk(2, "budget: %pK\n", budget);
 
 	saa7146_setgpio(dev, 3, SAA7146_GPIO_OUTHI);
 	udelay(data ? 500 : 1000);
@@ -85,7 +85,7 @@ static void DiseqcSendByte (struct budget *budget, int data)
 {
 	int i, par=1, d;
 
-	dprintk(2, "budget: %p\n", budget);
+	dprintk(2, "budget: %pK\n", budget);
 
 	for (i=7; i>=0; i--) {
 		d = (data>>i)&1;
@@ -101,7 +101,7 @@ static int SendDiSEqCMsg (struct budget *budget, int len, u8 *msg, unsigned long
 	struct saa7146_dev *dev=budget->dev;
 	int i;
 
-	dprintk(2, "budget: %p\n", budget);
+	dprintk(2, "budget: %pK\n", budget);
 
 	saa7146_setgpio(dev, 3, SAA7146_GPIO_OUTLO);
 	mdelay(16);
@@ -136,7 +136,7 @@ static int SetVoltage_Activy (struct budget *budget, fe_sec_voltage_t voltage)
 {
 	struct saa7146_dev *dev=budget->dev;
 
-	dprintk(2, "budget: %p\n", budget);
+	dprintk(2, "budget: %pK\n", budget);
 
 	switch (voltage) {
 		case SEC_VOLTAGE_13:
@@ -778,7 +778,7 @@ static int budget_attach (struct saa7146_dev* dev, struct saa7146_pci_extension_
 		return -ENOMEM;
 	}
 
-	dprintk(2, "dev:%p, info:%p, budget:%p\n", dev, info, budget);
+	dprintk(2, "dev:%pK, info:%pK, budget:%pK\n", dev, info, budget);
 
 	dev->ext_priv = budget;
 

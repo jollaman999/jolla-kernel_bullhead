@@ -251,7 +251,7 @@ restart:
 			h->action(h);
 			trace_softirq_exit(vec_nr);
 			if (unlikely(prev_count != preempt_count())) {
-				printk(KERN_ERR "huh, entered softirq %u %s %p"
+				printk(KERN_ERR "huh, entered softirq %u %s %pK"
 				       "with preempt_count %08x,"
 				       " exited with %08x?\n", vec_nr,
 				       softirq_to_name[vec_nr], h->action,

@@ -650,7 +650,7 @@ static struct cmd_ctrl_node *__lbtf_cmd_async(struct lbtf_private *priv,
 	queue_work(lbtf_wq, &priv->cmd_work);
 
  done:
-	lbtf_deb_leave_args(LBTF_DEB_HOST, "ret %p", cmdnode);
+	lbtf_deb_leave_args(LBTF_DEB_HOST, "ret %pK", cmdnode);
 	return cmdnode;
 }
 

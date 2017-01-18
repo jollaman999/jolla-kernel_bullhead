@@ -3126,7 +3126,7 @@ void update_dir_checksum_with_entry_set(struct super_block *sb, ENTRY_SET_CACHE_
 
 	ep = (DENTRY_T *)&(es->__buf);
 	for (i = 0; i < es->num_entries; i++) {
-		DPRINTK("update_dir_checksum_with_entry_set ep %p\n", ep);
+		DPRINTK("update_dir_checksum_with_entry_set ep %pK\n", ep);
 		chksum = calc_checksum_2byte((void *) ep, DENTRY_SIZE, chksum, chksum_type);
 		ep++;
 		chksum_type = CS_DEFAULT;
@@ -3374,12 +3374,12 @@ ENTRY_SET_CACHE_T *get_entry_set_in_dir(struct super_block *sb, CHAIN_T *p_dir, 
 	if (file_ep)
 		*file_ep = (DENTRY_T *)&(es->__buf);
 
-	DPRINTK("es sec %u offset %d flags %d, num_entries %u buf ptr %p\n",
+	DPRINTK("es sec %u offset %d flags %d, num_entries %u buf ptr %pK\n",
 		   es->sector, es->offset, es->alloc_flag, es->num_entries, &(es->__buf));
-	DPRINTK("get_entry_set_in_dir exited %p\n", es);
+	DPRINTK("get_entry_set_in_dir exited %pK\n", es);
 	return es;
 err_out:
-	DPRINTK("get_entry_set_in_dir exited NULL (es %p)\n", es);
+	DPRINTK("get_entry_set_in_dir exited NULL (es %pK)\n", es);
 	if (es)
 		kfree(es);
 	return NULL;
@@ -3387,7 +3387,7 @@ err_out:
 
 void release_entry_set(ENTRY_SET_CACHE_T *es)
 {
-	DPRINTK("release_entry_set %p\n", es);
+	DPRINTK("release_entry_set %pK\n", es);
 	if (es)
 		kfree(es);
 }
@@ -3403,7 +3403,7 @@ static s32 __write_partial_entries_in_entry_set(struct super_block *sb, ENTRY_SE
 	u8 *buf, *esbuf = (u8 *)&(es->__buf);
 
 	DPRINTK("__write_partial_entries_in_entry_set entered\n");
-	DPRINTK("es %p sec %u off %d count %d\n", es, sec, off, count);
+	DPRINTK("es %pK sec %u off %d count %d\n", es, sec, off, count);
 	num_entries = count;
 
 	while (num_entries) {
@@ -3413,8 +3413,8 @@ static s32 __write_partial_entries_in_entry_set(struct super_block *sb, ENTRY_SE
 		buf = buf_getblk(sb, sec);
 		if (buf == NULL)
 			goto err_out;
-		DPRINTK("es->buf %p buf_off %u\n", esbuf, buf_off);
-		DPRINTK("copying %d entries from %p to sector %u\n", copy_entries, (esbuf + buf_off), sec);
+		DPRINTK("es->buf %pK buf_off %u\n", esbuf, buf_off);
+		DPRINTK("copying %d entries from %pK to sector %u\n", copy_entries, (esbuf + buf_off), sec);
 		memcpy(buf + off, esbuf + buf_off, copy_entries << DENTRY_SIZE_BITS);
 		buf_modify(sb, sec);
 		num_entries -= copy_entries;

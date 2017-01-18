@@ -112,7 +112,7 @@ static int mvumi_map_pci_addr(struct pci_dev *dev, void **addr_array)
 		} else
 			addr_array[i] = NULL;
 
-		dev_dbg(&dev->dev, "Bar %d : %p.\n", i, addr_array[i]);
+		dev_dbg(&dev->dev, "Bar %d : %pK.\n", i, addr_array[i]);
 	}
 
 	return 0;

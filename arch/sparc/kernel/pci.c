@@ -210,7 +210,7 @@ static void pci_parse_of_addrs(struct platform_device *op,
 	if (!addrs)
 		return;
 	if (ofpci_verbose)
-		printk("    parse addresses (%d bytes) @ %p\n",
+		printk("    parse addresses (%d bytes) @ %pK\n",
 		       proplen, addrs);
 	op_res = &op->resource[0];
 	for (; proplen >= 20; proplen -= 20, addrs += 5, op_res++) {

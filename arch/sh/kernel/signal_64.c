@@ -465,7 +465,7 @@ static int setup_frame(int sig, struct k_sigaction *ka,
 	set_fs(USER_DS);
 
 	/* Broken %016Lx */
-	pr_debug("SIG deliver (#%d,%s:%d): sp=%p pc=%08Lx%08Lx link=%08Lx%08Lx\n",
+	pr_debug("SIG deliver (#%d,%s:%d): sp=%pK pc=%08Lx%08Lx link=%08Lx%08Lx\n",
 		 signal, current->comm, current->pid, frame,
 		 regs->pc >> 32, regs->pc & 0xffffffff,
 		 DEREF_REG_PR >> 32, DEREF_REG_PR & 0xffffffff);
@@ -558,7 +558,7 @@ static int setup_rt_frame(int sig, struct k_sigaction *ka, siginfo_t *info,
 
 	set_fs(USER_DS);
 
-	pr_debug("SIG deliver (#%d,%s:%d): sp=%p pc=%08Lx%08Lx link=%08Lx%08Lx\n",
+	pr_debug("SIG deliver (#%d,%s:%d): sp=%pK pc=%08Lx%08Lx link=%08Lx%08Lx\n",
 		 signal, current->comm, current->pid, frame,
 		 regs->pc >> 32, regs->pc & 0xffffffff,
 		 DEREF_REG_PR >> 32, DEREF_REG_PR & 0xffffffff);

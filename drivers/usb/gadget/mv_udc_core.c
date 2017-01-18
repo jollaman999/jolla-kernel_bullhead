@@ -242,7 +242,7 @@ static void done(struct mv_ep *ep, struct mv_req *req, int status)
 	usb_gadget_unmap_request(&udc->gadget, &req->req, ep_dir(ep));
 
 	if (status && (status != -ESHUTDOWN))
-		dev_info(&udc->dev->dev, "complete %s req %p stat %d len %u/%u",
+		dev_info(&udc->dev->dev, "complete %s req %pK stat %d len %u/%u",
 			ep->ep.name, &req->req, status,
 			req->req.actual, req->req.length);
 

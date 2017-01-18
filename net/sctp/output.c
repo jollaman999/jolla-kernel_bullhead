@@ -93,7 +93,7 @@ struct sctp_packet *sctp_packet_config(struct sctp_packet *packet,
 {
 	struct sctp_chunk *chunk = NULL;
 
-	SCTP_DEBUG_PRINTK("%s: packet:%p vtag:0x%x\n", __func__,
+	SCTP_DEBUG_PRINTK("%s: packet:%pK vtag:0x%x\n", __func__,
 			  packet, vtag);
 
 	packet->vtag = vtag;
@@ -119,7 +119,7 @@ struct sctp_packet *sctp_packet_init(struct sctp_packet *packet,
 	struct sctp_association *asoc = transport->asoc;
 	size_t overhead;
 
-	SCTP_DEBUG_PRINTK("%s: packet:%p transport:%p\n", __func__,
+	SCTP_DEBUG_PRINTK("%s: packet:%pK transport:%pK\n", __func__,
 			  packet, transport);
 
 	packet->transport = transport;
@@ -145,7 +145,7 @@ void sctp_packet_free(struct sctp_packet *packet)
 {
 	struct sctp_chunk *chunk, *tmp;
 
-	SCTP_DEBUG_PRINTK("%s: packet:%p\n", __func__, packet);
+	SCTP_DEBUG_PRINTK("%s: packet:%pK\n", __func__, packet);
 
 	list_for_each_entry_safe(chunk, tmp, &packet->chunk_list, list) {
 		list_del_init(&chunk->list);
@@ -167,7 +167,7 @@ sctp_xmit_t sctp_packet_transmit_chunk(struct sctp_packet *packet,
 	sctp_xmit_t retval;
 	int error = 0;
 
-	SCTP_DEBUG_PRINTK("%s: packet:%p chunk:%p\n", __func__,
+	SCTP_DEBUG_PRINTK("%s: packet:%pK chunk:%pK\n", __func__,
 			  packet, chunk);
 
 	switch ((retval = (sctp_packet_append_chunk(packet, chunk)))) {
@@ -334,7 +334,7 @@ sctp_xmit_t sctp_packet_append_chunk(struct sctp_packet *packet,
 {
 	sctp_xmit_t retval = SCTP_XMIT_OK;
 
-	SCTP_DEBUG_PRINTK("%s: packet:%p chunk:%p\n", __func__, packet,
+	SCTP_DEBUG_PRINTK("%s: packet:%pK chunk:%pK\n", __func__, packet,
 			  chunk);
 
 	/* Data chunks are special.  Before seeing what else we can
@@ -402,7 +402,7 @@ int sctp_packet_transmit(struct sctp_packet *packet)
 	unsigned char *auth = NULL;	/* pointer to auth in skb data */
 	__u32 cksum_buf_len = sizeof(struct sctphdr);
 
-	SCTP_DEBUG_PRINTK("%s: packet:%p\n", __func__, packet);
+	SCTP_DEBUG_PRINTK("%s: packet:%pK\n", __func__, packet);
 
 	/* Do NOT generate a chunkless packet. */
 	if (list_empty(&packet->chunk_list))
@@ -505,7 +505,7 @@ int sctp_packet_transmit(struct sctp_packet *packet)
 		memcpy(skb_put(nskb, chunk->skb->len),
 			       chunk->skb->data, chunk->skb->len);
 
-		SCTP_DEBUG_PRINTK("%s %p[%s] %s 0x%x, %s %d, %s %d, %s %d\n",
+		SCTP_DEBUG_PRINTK("%s %pK[%s] %s 0x%x, %s %d, %s %d, %s %d\n",
 				  "*** Chunk", chunk,
 				  sctp_cname(SCTP_ST_CHUNK(
 					  chunk->chunk_hdr->type)),

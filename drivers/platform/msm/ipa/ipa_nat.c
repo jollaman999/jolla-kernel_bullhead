@@ -516,22 +516,22 @@ int ipa_nat_init_cmd(struct ipa_ioc_v4_nat_init *init)
 
 	ipa_ctx->nat_mem.ipv4_rules_addr =
 	 (char *)ipa_ctx->nat_mem.nat_base_address + init->ipv4_rules_offset;
-	IPADBG("ipv4_rules_addr: 0x%p\n",
+	IPADBG("ipv4_rules_addr: 0x%pK\n",
 				 ipa_ctx->nat_mem.ipv4_rules_addr);
 
 	ipa_ctx->nat_mem.ipv4_expansion_rules_addr =
 	 (char *)ipa_ctx->nat_mem.nat_base_address + init->expn_rules_offset;
-	IPADBG("ipv4_expansion_rules_addr: 0x%p\n",
+	IPADBG("ipv4_expansion_rules_addr: 0x%pK\n",
 				 ipa_ctx->nat_mem.ipv4_expansion_rules_addr);
 
 	ipa_ctx->nat_mem.index_table_addr =
 		 (char *)ipa_ctx->nat_mem.nat_base_address + init->index_offset;
-	IPADBG("index_table_addr: 0x%p\n",
+	IPADBG("index_table_addr: 0x%pK\n",
 				 ipa_ctx->nat_mem.index_table_addr);
 
 	ipa_ctx->nat_mem.index_table_expansion_addr =
 	 (char *)ipa_ctx->nat_mem.nat_base_address + init->index_expn_offset;
-	IPADBG("index_table_expansion_addr: 0x%p\n",
+	IPADBG("index_table_expansion_addr: 0x%pK\n",
 				 ipa_ctx->nat_mem.index_table_expansion_addr);
 
 	IPADBG("size_base_tables: %d\n", init->table_entries);

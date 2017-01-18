@@ -1828,7 +1828,7 @@ static int do_lookup_nm(struct ubifs_info *c, const union ubifs_key *key,
 	ubifs_assert(n >= 0);
 
 	err = resolve_collision(c, key, &znode, &n, nm);
-	dbg_tnc("rc returned %d, znode %p, n %d", err, znode, n);
+	dbg_tnc("rc returned %d, znode %pK, n %d", err, znode, n);
 	if (unlikely(err < 0))
 		goto out_unlock;
 	if (err == 0) {
@@ -2246,7 +2246,7 @@ int ubifs_tnc_replace(struct ubifs_info *c, const union ubifs_key *key,
 		} else if (is_hash_key(c, key)) {
 			found = resolve_collision_directly(c, key, &znode, &n,
 							   old_lnum, old_offs);
-			dbg_tnc("rc returned %d, znode %p, n %d, LEB %d:%d",
+			dbg_tnc("rc returned %d, znode %pK, n %d, LEB %d:%d",
 				found, znode, n, old_lnum, old_offs);
 			if (found < 0) {
 				err = found;
@@ -2319,7 +2319,7 @@ int ubifs_tnc_add_nm(struct ubifs_info *c, const union ubifs_key *key,
 							   nm, 1);
 		else
 			found = resolve_collision(c, key, &znode, &n, nm);
-		dbg_tnc("rc returned %d, znode %p, n %d", found, znode, n);
+		dbg_tnc("rc returned %d, znode %pK, n %d", found, znode, n);
 		if (found < 0) {
 			err = found;
 			goto out_unlock;
@@ -2551,7 +2551,7 @@ int ubifs_tnc_remove_nm(struct ubifs_info *c, const union ubifs_key *key,
 							 nm, 0);
 		else
 			err = resolve_collision(c, key, &znode, &n, nm);
-		dbg_tnc("rc returned %d, znode %p, n %d", err, znode, n);
+		dbg_tnc("rc returned %d, znode %pK, n %d", err, znode, n);
 		if (err < 0)
 			goto out_unlock;
 		if (err) {
@@ -2787,7 +2787,7 @@ struct ubifs_dent_node *ubifs_tnc_next_ent(struct ubifs_info *c,
 		if (err) {
 			/* Handle collisions */
 			err = resolve_collision(c, key, &znode, &n, nm);
-			dbg_tnc("rc returned %d, znode %p, n %d",
+			dbg_tnc("rc returned %d, znode %pK, n %d",
 				err, znode, n);
 			if (unlikely(err < 0))
 				goto out_unlock;

@@ -438,7 +438,7 @@ char *gru_get_cb_exception_detail_str(int ret, void *cb,
 	if (ret > 0 && gen->istatus == CBS_EXCEPTION) {
 		gru_get_cb_exception_detail(cb, &excdet);
 		snprintf(buf, size,
-			"GRU:%d exception: cb %p, opc %d, exopc %d, ecause 0x%x,"
+			"GRU:%d exception: cb %pK, opc %d, exopc %d, ecause 0x%x,"
 			"excdet0 0x%lx, excdet1 0x%x", smp_processor_id(),
 			gen, excdet.opc, excdet.exopc, excdet.ecause,
 			excdet.exceptdet0, excdet.exceptdet1);
@@ -1031,7 +1031,7 @@ static int quicktest1(unsigned long arg)
 		gru_free_message(&mqd, m);
 	}
 	if (i != 4) {
-		printk(KERN_DEBUG "GRU:%d quicktest2: bad message, i %d, m %p, m8 %d\n",
+		printk(KERN_DEBUG "GRU:%d quicktest2: bad message, i %d, m %pK, m8 %d\n",
 			smp_processor_id(), i, m, m ? m[8] : -1);
 		goto done;
 	}

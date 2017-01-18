@@ -86,7 +86,7 @@ static enum MHI_STATUS mhi_process_event_ring(
 	if (unlikely(MHI_STATUS_SUCCESS != validate_ev_el_addr(local_ev_ctxt,
 				(uintptr_t)device_rp)))
 		mhi_log(MHI_MSG_ERROR,
-				"Failed to validate event ring element 0x%p\n",
+				"Failed to validate event ring element 0x%pK\n",
 				device_rp);
 
 	while ((local_rp != device_rp) && (event_quota > 0) &&

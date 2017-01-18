@@ -94,7 +94,7 @@ u32 rds_tcp_snd_una(struct rds_tcp_connection *tc)
 void rds_tcp_restore_callbacks(struct socket *sock,
 			       struct rds_tcp_connection *tc)
 {
-	rdsdebug("restoring sock %p callbacks from tc %p\n", sock, tc);
+	rdsdebug("restoring sock %pK callbacks from tc %pK\n", sock, tc);
 	write_lock_bh(&sock->sk->sk_callback_lock);
 
 	/* done under the callback_lock to serialize with write_space */
@@ -122,7 +122,7 @@ void rds_tcp_set_callbacks(struct socket *sock, struct rds_connection *conn)
 {
 	struct rds_tcp_connection *tc = conn->c_transport_data;
 
-	rdsdebug("setting sock %p callbacks to tc %p\n", sock, tc);
+	rdsdebug("setting sock %pK callbacks to tc %pK\n", sock, tc);
 	write_lock_bh(&sock->sk->sk_callback_lock);
 
 	/* done under the callback_lock to serialize with write_space */
@@ -215,7 +215,7 @@ static int rds_tcp_conn_alloc(struct rds_connection *conn, gfp_t gfp)
 	list_add_tail(&tc->t_tcp_node, &rds_tcp_conn_list);
 	spin_unlock_irq(&rds_tcp_conn_lock);
 
-	rdsdebug("alloced tc %p\n", conn->c_transport_data);
+	rdsdebug("alloced tc %pK\n", conn->c_transport_data);
 	return 0;
 }
 
@@ -223,7 +223,7 @@ static void rds_tcp_conn_free(void *arg)
 {
 	struct rds_tcp_connection *tc = arg;
 	unsigned long flags;
-	rdsdebug("freeing tc %p\n", tc);
+	rdsdebug("freeing tc %pK\n", tc);
 
 	spin_lock_irqsave(&rds_tcp_conn_lock, flags);
 	list_del(&tc->t_tcp_node);

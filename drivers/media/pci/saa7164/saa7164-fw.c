@@ -85,7 +85,7 @@ static int saa7164_downloadimage(struct saa7164_dev *dev, u8 *src, u32 srcsize,
 	u32 bleflag = drflag_ack + 4;
 
 	dprintk(DBGLVL_FW,
-		"%s(image=%p, size=%d, flags=0x%x, dst=%p, dstsize=0x%x)\n",
+		"%s(image=%pK, size=%d, flags=0x%x, dst=%pK, dstsize=0x%x)\n",
 		__func__, src, srcsize, dlflags, dst, dstsize);
 
 	if ((src == NULL) || (dst == NULL)) {

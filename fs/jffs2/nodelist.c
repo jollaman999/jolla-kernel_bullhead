@@ -135,7 +135,7 @@ static void jffs2_fragtree_insert(struct jffs2_node_frag *newfrag, struct jffs2_
 		else if (newfrag->ofs < base->ofs)
 			link = &base->rb.rb_left;
 		else {
-			JFFS2_ERROR("duplicate frag at %08x (%p,%p)\n", newfrag->ofs, newfrag, base);
+			JFFS2_ERROR("duplicate frag at %08x (%pK,%pK)\n", newfrag->ofs, newfrag, base);
 			BUG();
 		}
 	}
@@ -221,7 +221,7 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 	this = jffs2_lookup_node_frag(root, newfrag->node->ofs);
 
 	if (this) {
-		dbg_fragtree2("lookup gave frag 0x%04x-0x%04x; phys 0x%08x (*%p)\n",
+		dbg_fragtree2("lookup gave frag 0x%04x-0x%04x; phys 0x%08x (*%pK)\n",
 			  this->ofs, this->ofs+this->size, this->node?(ref_offset(this->node->raw)):0xffffffff, this);
 		lastend = this->ofs + this->size;
 	} else {
@@ -311,13 +311,13 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 	} else {
 		/* New frag starts at the same point as 'this' used to. Replace
 		   it in the tree without doing a delete and insertion */
-		dbg_fragtree2("inserting newfrag (*%p),%d-%d in before 'this' (*%p),%d-%d\n",
+		dbg_fragtree2("inserting newfrag (*%pK),%d-%d in before 'this' (*%pK),%d-%d\n",
 			  newfrag, newfrag->ofs, newfrag->ofs+newfrag->size, this, this->ofs, this->ofs+this->size);
 
 		rb_replace_node(&this->rb, &newfrag->rb, root);
 
 		if (newfrag->ofs + newfrag->size >= this->ofs+this->size) {
-			dbg_fragtree2("obsoleting node frag %p (%x-%x)\n", this, this->ofs, this->ofs+this->size);
+			dbg_fragtree2("obsoleting node frag %pK (%x-%x)\n", this, this->ofs, this->ofs+this->size);
 			jffs2_obsolete_node_frag(c, this);
 		} else {
 			this->ofs += newfrag->size;
@@ -333,7 +333,7 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 	*/
 	while ((this = frag_next(newfrag)) && newfrag->ofs + newfrag->size >= this->ofs + this->size) {
 		/* 'this' frag is obsoleted completely. */
-		dbg_fragtree2("obsoleting node frag %p (%x-%x) and removing from tree\n",
+		dbg_fragtree2("obsoleting node frag %pK (%x-%x) and removing from tree\n",
 			this, this->ofs, this->ofs+this->size);
 		rb_erase(&this->rb, root);
 		jffs2_obsolete_node_frag(c, this);
@@ -373,7 +373,7 @@ int jffs2_add_full_dnode_to_inode(struct jffs2_sb_info *c, struct jffs2_inode_in
 		return -ENOMEM;
 	newfrag->node->frags = 1;
 
-	dbg_fragtree("adding node %#04x-%#04x @0x%08x on flash, newfrag *%p\n",
+	dbg_fragtree("adding node %#04x-%#04x @0x%08x on flash, newfrag *%pK\n",
 		  fn->ofs, fn->ofs+fn->size, ref_offset(fn->raw), newfrag);
 
 	ret = jffs2_add_frag_to_fragtree(c, &f->fragtree, newfrag);
@@ -441,7 +441,7 @@ void jffs2_add_ino_cache (struct jffs2_sb_info *c, struct jffs2_inode_cache *new
 	if (!new->ino)
 		new->ino = ++c->highest_ino;
 
-	dbg_inocache("add %p (ino #%u)\n", new, new->ino);
+	dbg_inocache("add %pK (ino #%u)\n", new, new->ino);
 
 	prev = &c->inocache_list[new->ino % c->inocache_hashsize];
 
@@ -461,7 +461,7 @@ void jffs2_del_ino_cache(struct jffs2_sb_info *c, struct jffs2_inode_cache *old)
 #ifdef CONFIG_JFFS2_FS_XATTR
 	BUG_ON(old->xref);
 #endif
-	dbg_inocache("del %p (ino #%u)\n", old, old->ino);
+	dbg_inocache("del %pK (ino #%u)\n", old, old->ino);
 	spin_lock(&c->inocache_lock);
 
 	prev = &c->inocache_list[old->ino % c->inocache_hashsize];
@@ -529,7 +529,7 @@ struct jffs2_node_frag *jffs2_lookup_node_frag(struct rb_root *fragtree, uint32_
 	struct jffs2_node_frag *prev = NULL;
 	struct jffs2_node_frag *frag = NULL;
 
-	dbg_fragtree2("root %p, offset %d\n", fragtree, offset);
+	dbg_fragtree2("root %pK, offset %d\n", fragtree, offset);
 
 	next = fragtree->rb_node;
 
@@ -618,7 +618,7 @@ struct jffs2_raw_node_ref *jffs2_link_node_ref(struct jffs2_sb_info *c,
 
 	ref = jeb->last_node;
 
-	dbg_noderef("Last node at %p is (%08x,%p)\n", ref, ref->flash_offset,
+	dbg_noderef("Last node at %pK is (%08x,%pK)\n", ref, ref->flash_offset,
 		    ref->next_in_ino);
 
 	while (ref->flash_offset != REF_EMPTY_NODE) {
@@ -628,7 +628,7 @@ struct jffs2_raw_node_ref *jffs2_link_node_ref(struct jffs2_sb_info *c,
 			ref++;
 	}
 
-	dbg_noderef("New ref is %p (%08x becomes %08x,%p) len 0x%x\n", ref, 
+	dbg_noderef("New ref is %pK (%08x becomes %08x,%pK) len 0x%x\n", ref, 
 		    ref->flash_offset, ofs, ref->next_in_ino, len);
 
 	ref->flash_offset = ofs;
@@ -639,7 +639,7 @@ struct jffs2_raw_node_ref *jffs2_link_node_ref(struct jffs2_sb_info *c,
 	} else if (unlikely(ref_offset(ref) != jeb->offset + c->sector_size - jeb->free_size)) {
 		uint32_t last_len = ref_totlen(c, jeb, jeb->last_node);
 
-		JFFS2_ERROR("Adding new ref %p at (0x%08x-0x%08x) not immediately after previous (0x%08x-0x%08x)\n",
+		JFFS2_ERROR("Adding new ref %pK at (0x%08x-0x%08x) not immediately after previous (0x%08x-0x%08x)\n",
 			    ref, ref_offset(ref), ref_offset(ref)+len,
 			    ref_offset(jeb->last_node), 
 			    ref_offset(jeb->last_node)+last_len);
@@ -728,7 +728,7 @@ static inline uint32_t __ref_totlen(struct jffs2_sb_info *c,
 
 		/* Last node in block. Use free_space */
 		if (unlikely(ref != jeb->last_node)) {
-			pr_crit("ref %p @0x%08x is not jeb->last_node (%p @0x%08x)\n",
+			pr_crit("ref %pK @0x%08x is not jeb->last_node (%pK @0x%08x)\n",
 				ref, ref_offset(ref), jeb->last_node,
 				jeb->last_node ?
 				ref_offset(jeb->last_node) : 0);
@@ -751,15 +751,15 @@ uint32_t __jffs2_ref_totlen(struct jffs2_sb_info *c, struct jffs2_eraseblock *je
 		if (!jeb)
 			jeb = &c->blocks[ref->flash_offset / c->sector_size];
 
-		pr_crit("Totlen for ref at %p (0x%08x-0x%08x) miscalculated as 0x%x instead of %x\n",
+		pr_crit("Totlen for ref at %pK (0x%08x-0x%08x) miscalculated as 0x%x instead of %x\n",
 			ref, ref_offset(ref), ref_offset(ref) + ref->__totlen,
 			ret, ref->__totlen);
 		if (ref_next(ref)) {
-			pr_crit("next %p (0x%08x-0x%08x)\n",
+			pr_crit("next %pK (0x%08x-0x%08x)\n",
 				ref_next(ref), ref_offset(ref_next(ref)),
 				ref_offset(ref_next(ref)) + ref->__totlen);
 		} else 
-			pr_crit("No next ref. jeb->last_node is %p\n",
+			pr_crit("No next ref. jeb->last_node is %pK\n",
 				jeb->last_node);
 
 		pr_crit("jeb->wasted_size %x, dirty_size %x, used_size %x, free_size %x\n",

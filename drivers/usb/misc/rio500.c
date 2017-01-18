@@ -484,7 +484,7 @@ static int probe_rio(struct usb_interface *intf,
 		usb_deregister_dev(intf, &usb_rio_class);
 		return -ENOMEM;
 	}
-	dev_dbg(&intf->dev, "obuf address:%p\n", rio->obuf);
+	dev_dbg(&intf->dev, "obuf address:%pK\n", rio->obuf);
 
 	if (!(rio->ibuf = kmalloc(IBUF_SIZE, GFP_KERNEL))) {
 		dev_err(&dev->dev,
@@ -493,7 +493,7 @@ static int probe_rio(struct usb_interface *intf,
 		kfree(rio->obuf);
 		return -ENOMEM;
 	}
-	dev_dbg(&intf->dev, "ibuf address:%p\n", rio->ibuf);
+	dev_dbg(&intf->dev, "ibuf address:%pK\n", rio->ibuf);
 
 	mutex_init(&(rio->lock));
 

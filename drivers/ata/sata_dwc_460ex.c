@@ -580,7 +580,7 @@ static int map_sg_to_lli(struct scatterlist *sg, int num_elems,
 
 	sms_val = 0;
 	dms_val = 1 + host_pvt.dma_channel;
-	dev_dbg(host_pvt.dwc_dev, "%s: sg=%p nelem=%d lli=%p dma_lli=0x%08x"
+	dev_dbg(host_pvt.dwc_dev, "%s: sg=%pK nelem=%d lli=%pK dma_lli=0x%08x"
 		" dmadr=0x%08x\n", __func__, sg, num_elems, lli, (u32)dma_lli,
 		(u32)dmadr_addr);
 
@@ -740,8 +740,8 @@ static int dma_dwc_xfer_setup(struct scatterlist *sg, int num_elems,
 	/* Convert SG list to linked list of items (LLIs) for AHB DMA */
 	num_lli = map_sg_to_lli(sg, num_elems, lli, dma_lli, addr, dir);
 
-	dev_dbg(host_pvt.dwc_dev, "%s sg: 0x%p, count: %d lli: %p dma_lli:"
-		" 0x%0xlx addr: %p lli count: %d\n", __func__, sg, num_elems,
+	dev_dbg(host_pvt.dwc_dev, "%s sg: 0x%pK, count: %d lli: %pK dma_lli:"
+		" 0x%0xlx addr: %pK lli count: %d\n", __func__, sg, num_elems,
 		 lli, (u32)dma_lli, addr, num_lli);
 
 	clear_chan_interrupts(dma_ch);
@@ -804,7 +804,7 @@ static int dma_dwc_init(struct sata_dwc_device *hsdev, int irq)
 	out_le32(&(host_pvt.sata_dma_regs->dma_cfg.low), DMA_EN);
 
 	dev_notice(host_pvt.dwc_dev, "DMA initialized\n");
-	dev_dbg(host_pvt.dwc_dev, "SATA DMA registers=0x%p\n", host_pvt.\
+	dev_dbg(host_pvt.dwc_dev, "SATA DMA registers=0x%pK\n", host_pvt.\
 		sata_dma_regs);
 
 	return 0;
@@ -993,7 +993,7 @@ static irqreturn_t sata_dwc_isr(int irq, void *dev_instance)
 		/* DEV interrupt w/ no active qc? */
 		if (unlikely(!qc || (qc->tf.flags & ATA_TFLAG_POLLING))) {
 			dev_err(ap->dev, "%s interrupt with no active qc "
-				"qc=%p\n", __func__, qc);
+				"qc=%pK\n", __func__, qc);
 			ap->ops->sff_check_status(ap);
 			handled = 1;
 			goto DONE;
@@ -1453,7 +1453,7 @@ static void sata_dwc_bmdma_start_by_tag(struct ata_queued_cmd *qc, u8 tag)
 		start_dma = 0;
 	}
 
-	dev_dbg(ap->dev, "%s qc=%p tag: %x cmd: 0x%02x dma_dir: %s "
+	dev_dbg(ap->dev, "%s qc=%pK tag: %x cmd: 0x%02x dma_dir: %s "
 		"start_dma? %x\n", __func__, qc, tag, qc->tf.command,
 		get_dma_dir_descript(qc->dma_dir), start_dma);
 	sata_dwc_tf_dump(&(qc->tf));

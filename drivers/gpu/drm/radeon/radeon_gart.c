@@ -875,7 +875,7 @@ int radeon_vm_bo_set_addr(struct radeon_device *rdev,
 		}
 		if (eoffset > tmp->soffset && soffset < tmp->eoffset) {
 			/* bo and tmp overlap, invalid offset */
-			dev_err(rdev->dev, "bo %p va 0x%08X conflict with (bo %p 0x%08X 0x%08X)\n",
+			dev_err(rdev->dev, "bo %pK va 0x%08X conflict with (bo %pK 0x%08X 0x%08X)\n",
 				bo_va->bo, (unsigned)bo_va->soffset, tmp->bo,
 				(unsigned)tmp->soffset, (unsigned)tmp->eoffset);
 			mutex_unlock(&vm->mutex);
@@ -1100,12 +1100,12 @@ int radeon_vm_bo_update_pte(struct radeon_device *rdev,
 
 	bo_va = radeon_vm_bo_find(vm, bo);
 	if (bo_va == NULL) {
-		dev_err(rdev->dev, "bo %p not in vm %p\n", bo, vm);
+		dev_err(rdev->dev, "bo %pK not in vm %pK\n", bo, vm);
 		return -EINVAL;
 	}
 
 	if (!bo_va->soffset) {
-		dev_err(rdev->dev, "bo %p don't has a mapping in vm %p\n",
+		dev_err(rdev->dev, "bo %pK don't has a mapping in vm %pK\n",
 			bo, vm);
 		return -EINVAL;
 	}

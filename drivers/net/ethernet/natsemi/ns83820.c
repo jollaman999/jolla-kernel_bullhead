@@ -560,7 +560,7 @@ static inline int rx_refill(struct net_device *ndev, gfp_t gfp)
 	if (unlikely(nr_rx_empty(dev) <= 2))
 		return 0;
 
-	dprintk("rx_refill(%p)\n", ndev);
+	dprintk("rx_refill(%pK)\n", ndev);
 	if (gfp == GFP_ATOMIC)
 		spin_lock_irqsave(&dev->rx_info.lock, flags);
 	for (i=0; i<NR_RX_DESC; i++) {
@@ -723,7 +723,7 @@ static int ns83820_setup_rx(struct net_device *ndev)
 	unsigned i;
 	int ret;
 
-	dprintk("ns83820_setup_rx(%p)\n", ndev);
+	dprintk("ns83820_setup_rx(%pK)\n", ndev);
 
 	dev->rx_info.idle = 1;
 	dev->rx_info.next_rx = 0;
@@ -780,7 +780,7 @@ static void ns83820_cleanup_rx(struct ns83820 *dev)
 	unsigned i;
 	unsigned long flags;
 
-	dprintk("ns83820_cleanup_rx(%p)\n", dev);
+	dprintk("ns83820_cleanup_rx(%pK)\n", dev);
 
 	/* disable receive interrupts */
 	spin_lock_irqsave(&dev->misc_lock, flags);
@@ -839,8 +839,8 @@ static void rx_irq(struct net_device *ndev)
 	unsigned long flags;
 	int nr = 0;
 
-	dprintk("rx_irq(%p)\n", ndev);
-	dprintk("rxdp: %08x, descs: %08lx next_rx[%d]: %p next_empty[%d]: %p\n",
+	dprintk("rx_irq(%pK)\n", ndev);
+	dprintk("rxdp: %08x, descs: %08lx next_rx[%d]: %pK next_empty[%d]: %pK\n",
 		readl(dev->base + RXDP),
 		(long)(dev->rx_info.phy_descs),
 		(int)dev->rx_info.next_rx,
@@ -958,7 +958,7 @@ static void rx_action(unsigned long _dev)
  */
 static inline void kick_tx(struct ns83820 *dev)
 {
-	dprintk("kick_tx(%p): tx_idx=%d free_idx=%d\n",
+	dprintk("kick_tx(%pK): tx_idx=%d free_idx=%d\n",
 		dev, dev->tx_idx, dev->tx_free_idx);
 	writel(CR_TXE, dev->base + CR);
 }
@@ -972,7 +972,7 @@ static void do_tx_done(struct net_device *ndev)
 	u32 cmdsts, tx_done_idx;
 	__le32 *desc;
 
-	dprintk("do_tx_done(%p)\n", ndev);
+	dprintk("do_tx_done(%pK)\n", ndev);
 	tx_done_idx = dev->tx_done_idx;
 	desc = dev->tx_descs + (tx_done_idx * DESC_SIZE);
 
@@ -995,7 +995,7 @@ static void do_tx_done(struct net_device *ndev)
 			tx_done_idx, dev->tx_free_idx, cmdsts);
 		skb = dev->tx_skbs[tx_done_idx];
 		dev->tx_skbs[tx_done_idx] = NULL;
-		dprintk("done(%p)\n", skb);
+		dprintk("done(%pK)\n", skb);
 
 		len = cmdsts & CMDSTS_LEN_MASK;
 		addr = desc_addr_get(desc + DESC_BUFPTR);
@@ -1023,7 +1023,7 @@ static void do_tx_done(struct net_device *ndev)
 	 * finished transmitting at least 1/4 of the packets in the queue.
 	 */
 	if (netif_queue_stopped(ndev) && start_tx_okay(dev)) {
-		dprintk("start_queue(%p)\n", ndev);
+		dprintk("start_queue(%pK)\n", ndev);
 		netif_start_queue(ndev);
 		netif_wake_queue(ndev);
 	}
@@ -1086,12 +1086,12 @@ again:
 	nr_free = (tx_done_idx + NR_TX_DESC-2 - free_idx) % NR_TX_DESC;
 	nr_free -= 1;
 	if (nr_free <= nr_frags) {
-		dprintk("stop_queue - not enough(%p)\n", ndev);
+		dprintk("stop_queue - not enough(%pK)\n", ndev);
 		netif_stop_queue(ndev);
 
 		/* Check again: we may have raced with a tx done irq */
 		if (dev->tx_done_idx != tx_done_idx) {
-			dprintk("restart queue(%p)\n", ndev);
+			dprintk("restart queue(%pK)\n", ndev);
 			netif_start_queue(ndev);
 			goto again;
 		}
@@ -1105,7 +1105,7 @@ again:
 
 	nr_free -= nr_frags;
 	if (nr_free < MIN_TX_DESC_FREE) {
-		dprintk("stop_queue - last entry(%p)\n", ndev);
+		dprintk("stop_queue - last entry(%pK)\n", ndev);
 		netif_stop_queue(ndev);
 		stopped = 1;
 	}
@@ -1404,7 +1404,7 @@ static irqreturn_t ns83820_irq(int foo, void *data)
 	struct net_device *ndev = data;
 	struct ns83820 *dev = PRIV(ndev);
 	u32 isr;
-	dprintk("ns83820_irq(%p)\n", ndev);
+	dprintk("ns83820_irq(%pK)\n", ndev);
 
 	dev->ihr = 0;
 
@@ -1996,7 +1996,7 @@ static int ns83820_init_one(struct pci_dev *pci_dev,
 	if (!dev->base || !dev->tx_descs || !dev->rx_info.descs)
 		goto out_disable;
 
-	dprintk("%p: %08lx  %p: %08lx\n",
+	dprintk("%pK: %08lx  %pK: %08lx\n",
 		dev->tx_descs, (long)dev->tx_phy_descs,
 		dev->rx_info.descs, (long)dev->rx_info.phy_descs);
 

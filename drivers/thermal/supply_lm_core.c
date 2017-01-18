@@ -1800,7 +1800,7 @@ static int supply_lm_devm_ioremap(struct platform_device *pdev,
 			(ulong) resource_size(supply_lm_res));
 		return -ENOMEM;
 	}
-	pr_debug("%s ioremap(phy:0x%lx vir:0x%p len:0x%lx)\n", res_name,
+	pr_debug("%s ioremap(phy:0x%lx vir:0x%pK len:0x%lx)\n", res_name,
 		(ulong) supply_lm_res->start, *virt,
 		(ulong) resource_size(supply_lm_res));
 

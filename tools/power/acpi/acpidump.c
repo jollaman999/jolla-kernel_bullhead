@@ -189,7 +189,7 @@ static void acpi_show_data(int fd, u8 * data, int size)
 static void acpi_show_table(int fd, struct acpi_table_header *table, unsigned long addr)
 {
 	char buff[80];
-	int len = snprintf(buff, 80, "%.4s @ %p\n", table->signature, (void *)addr);
+	int len = snprintf(buff, 80, "%.4s @ %pK\n", table->signature, (void *)addr);
 	write(fd, buff, len);
 	acpi_show_data(fd, (u8 *) table, table->length);
 	buff[0] = '\n';
@@ -540,7 +540,7 @@ int main(int argc, char **argv)
 			ACPI_RSDP_CHECKSUM_LENGTH : ACPI_RSDP_XCHECKSUM_LENGTH);
 	} else if (!select_sig[0] || !memcmp("RSD PTR ", select_sig, 4)) {
 		addr += (long)x - (long)raw;
-		length = snprintf(buff, 80, "RSD PTR @ %p\n", (void *)addr);
+		length = snprintf(buff, 80, "RSD PTR @ %pK\n", (void *)addr);
 		write(fd, buff, length);
 		acpi_show_data(fd, (u8 *) & rsdpx, (rsdpx.revision < 2) ?
 				ACPI_RSDP_CHECKSUM_LENGTH : ACPI_RSDP_XCHECKSUM_LENGTH);

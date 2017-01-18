@@ -327,7 +327,7 @@ int setup_telespci(struct IsdnCard *card)
 	/* writel(0x00800000, cs->hw.teles0.membase + 0x200); */
 
 	printk(KERN_INFO
-	       "HiSax: Teles PCI config irq:%d mem:%p\n",
+	       "HiSax: Teles PCI config irq:%d mem:%pK\n",
 	       cs->irq,
 	       cs->hw.teles0.membase);
 

@@ -392,7 +392,7 @@ void asd_invalidate_edb(struct asd_ascb *ascb, int edb_id)
 
 	if (escb->num_valid == 0) {
 		int i;
-		/* ASD_DPRINTK("reposting escb: vaddr: 0x%p, "
+		/* ASD_DPRINTK("reposting escb: vaddr: 0x%pK, "
 			    "dma_handle: 0x%08llx, next: 0x%08llx, "
 			    "index:%d, opcode:0x%02x\n",
 			    ascb->dma_scb.vaddr,
@@ -428,7 +428,7 @@ static void escb_tasklet_complete(struct asd_ascb *ascb,
 			    edb, dl->opcode);
 		ASD_DPRINTK("sb_opcode : 0x%x, phy_id: 0x%x\n",
 			    sb_opcode, phy_id);
-		ASD_DPRINTK("escb: vaddr: 0x%p, "
+		ASD_DPRINTK("escb: vaddr: 0x%pK, "
 			    "dma_handle: 0x%llx, next: 0x%llx, "
 			    "index:%d, opcode:0x%02x\n",
 			    ascb->dma_scb.vaddr,
@@ -594,7 +594,7 @@ static void escb_tasklet_complete(struct asd_ascb *ascb,
 			    edb, dl->opcode);
 		ASD_DPRINTK("sb_opcode : 0x%x, phy_id: 0x%x\n",
 			    sb_opcode, phy_id);
-		ASD_DPRINTK("escb: vaddr: 0x%p, "
+		ASD_DPRINTK("escb: vaddr: 0x%pK, "
 			    "dma_handle: 0x%llx, next: 0x%llx, "
 			    "index:%d, opcode:0x%02x\n",
 			    ascb->dma_scb.vaddr,

@@ -71,17 +71,17 @@ void saa7164_buffer_display(struct saa7164_buffer *buf)
 	struct saa7164_dev *dev = buf->port->dev;
 	int i;
 
-	dprintk(DBGLVL_BUF, "%s()   buffer @ 0x%p nr=%d\n",
+	dprintk(DBGLVL_BUF, "%s()   buffer @ 0x%pK nr=%d\n",
 		__func__, buf, buf->idx);
-	dprintk(DBGLVL_BUF, "  pci_cpu @ 0x%p    dma @ 0x%08llx len = 0x%x\n",
+	dprintk(DBGLVL_BUF, "  pci_cpu @ 0x%pK    dma @ 0x%08llx len = 0x%x\n",
 		buf->cpu, (long long)buf->dma, buf->pci_size);
-	dprintk(DBGLVL_BUF, "   pt_cpu @ 0x%p pt_dma @ 0x%08llx len = 0x%x\n",
+	dprintk(DBGLVL_BUF, "   pt_cpu @ 0x%pK pt_dma @ 0x%08llx len = 0x%x\n",
 		buf->pt_cpu, (long long)buf->pt_dma, buf->pt_size);
 
 	/* Format the Page Table Entries to point into the data buffer */
 	for (i = 0 ; i < SAA7164_PT_ENTRIES; i++) {
 
-		dprintk(DBGLVL_BUF, "    pt[%02d] = 0x%p -> 0x%llx\n",
+		dprintk(DBGLVL_BUF, "    pt[%02d] = 0x%pK -> 0x%llx\n",
 			i, buf->pt_cpu, (u64)*(buf->pt_cpu));
 
 	}
@@ -134,18 +134,18 @@ struct saa7164_buffer *saa7164_buffer_alloc(struct saa7164_port *port,
 	buf->crc = crc32(0, buf->cpu, buf->actual_size);
 	memset_io(buf->pt_cpu, 0xff, buf->pt_size);
 
-	dprintk(DBGLVL_BUF, "%s()   allocated buffer @ 0x%p (%d pageptrs)\n",
+	dprintk(DBGLVL_BUF, "%s()   allocated buffer @ 0x%pK (%d pageptrs)\n",
 		__func__, buf, params->numpagetables);
-	dprintk(DBGLVL_BUF, "  pci_cpu @ 0x%p    dma @ 0x%08lx len = 0x%x\n",
+	dprintk(DBGLVL_BUF, "  pci_cpu @ 0x%pK    dma @ 0x%08lx len = 0x%x\n",
 		buf->cpu, (long)buf->dma, buf->pci_size);
-	dprintk(DBGLVL_BUF, "   pt_cpu @ 0x%p pt_dma @ 0x%08lx len = 0x%x\n",
+	dprintk(DBGLVL_BUF, "   pt_cpu @ 0x%pK pt_dma @ 0x%08lx len = 0x%x\n",
 		buf->pt_cpu, (long)buf->pt_dma, buf->pt_size);
 
 	/* Format the Page Table Entries to point into the data buffer */
 	for (i = 0 ; i < params->numpagetables; i++) {
 
 		*(buf->pt_cpu + i) = buf->dma + (i * 0x1000); /* TODO */
-		dprintk(DBGLVL_BUF, "    pt[%02d] = 0x%p -> 0x%llx\n",
+		dprintk(DBGLVL_BUF, "    pt[%02d] = 0x%pK -> 0x%llx\n",
 			i, buf->pt_cpu, (u64)*(buf->pt_cpu));
 
 	}
@@ -170,7 +170,7 @@ int saa7164_buffer_dealloc(struct saa7164_buffer *buf)
 		return SAA_ERR_BAD_PARAMETER;
 	dev = buf->port->dev;
 
-	dprintk(DBGLVL_BUF, "%s() deallocating buffer @ 0x%p\n",
+	dprintk(DBGLVL_BUF, "%s() deallocating buffer @ 0x%pK\n",
 		__func__, buf);
 
 	if (buf->flags != SAA7164_BUFFER_FREE)
@@ -247,7 +247,7 @@ int saa7164_buffer_cfg_port(struct saa7164_port *port)
 	saa7164_writel(port->bufsize, params->pitch * params->numberoflines);
 
 	dprintk(DBGLVL_BUF, " configured:\n");
-	dprintk(DBGLVL_BUF, "   lmmio       0x%p\n", dev->lmmio);
+	dprintk(DBGLVL_BUF, "   lmmio       0x%pK\n", dev->lmmio);
 	dprintk(DBGLVL_BUF, "   bufcounter  0x%x = 0x%x\n", port->bufcounter,
 		saa7164_readl(port->bufcounter));
 
@@ -303,7 +303,7 @@ struct saa7164_user_buffer *saa7164_buffer_alloc_user(struct saa7164_dev *dev,
 	buf->pos = 0;
 	buf->crc = 0;
 
-	dprintk(DBGLVL_BUF, "%s()   allocated user buffer @ 0x%p\n",
+	dprintk(DBGLVL_BUF, "%s()   allocated user buffer @ 0x%pK\n",
 		__func__, buf);
 
 	return buf;

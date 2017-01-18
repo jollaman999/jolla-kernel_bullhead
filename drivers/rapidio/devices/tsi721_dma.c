@@ -81,7 +81,7 @@ static int tsi721_bdma_ch_init(struct tsi721_bdma_chan *bdma_chan)
 	bdma_chan->bd_phys = bd_phys;
 	bdma_chan->bd_base = bd_ptr;
 
-	dev_dbg(dev, "DMA descriptors @ %p (phys = %llx)\n",
+	dev_dbg(dev, "DMA descriptors @ %pK (phys = %llx)\n",
 		bd_ptr, (unsigned long long)bd_phys);
 
 	/* Allocate space for descriptor status FIFO */
@@ -105,7 +105,7 @@ static int tsi721_bdma_ch_init(struct tsi721_bdma_chan *bdma_chan)
 	bdma_chan->sts_size = sts_size;
 
 	dev_dbg(dev,
-		"desc status FIFO @ %p (phys = %llx) size=0x%x\n",
+		"desc status FIFO @ %pK (phys = %llx) size=0x%x\n",
 		sts_ptr, (unsigned long long)sts_phys, sts_size);
 
 	/* Initialize DMA descriptors ring */
@@ -243,7 +243,7 @@ static void tsi721_start_dma(struct tsi721_bdma_chan *bdma_chan)
 	}
 
 	dev_dbg(bdma_chan->dchan.device->dev,
-		"tx_chan: %p, chan: %d, regs: %p\n",
+		"tx_chan: %pK, chan: %d, regs: %pK\n",
 		bdma_chan, bdma_chan->dchan.chan_id, bdma_chan->regs);
 
 	iowrite32(bdma_chan->wr_count_next,
@@ -257,7 +257,7 @@ static void tsi721_desc_put(struct tsi721_bdma_chan *bdma_chan,
 			    struct tsi721_tx_desc *desc)
 {
 	dev_dbg(bdma_chan->dchan.device->dev,
-		"Put desc: %p into free list\n", desc);
+		"Put desc: %pK into free list\n", desc);
 
 	if (desc) {
 		spin_lock_bh(&bdma_chan->lock);
@@ -284,7 +284,7 @@ struct tsi721_tx_desc *tsi721_desc_get(struct tsi721_bdma_chan *bdma_chan)
 			break;
 		}
 		dev_dbg(bdma_chan->dchan.device->dev,
-			"desc %p not ACKed\n", tx_desc);
+			"desc %pK not ACKed\n", tx_desc);
 	}
 
 	if (ret == NULL) {
@@ -329,7 +329,7 @@ tsi721_fill_desc(struct tsi721_bdma_chan *bdma_chan,
 		sg_dma_len(sg));
 
 	dev_dbg(bdma_chan->dchan.device->dev,
-		"bd_ptr = %p did=%d raddr=0x%llx\n",
+		"bd_ptr = %pK did=%d raddr=0x%llx\n",
 		bd_ptr, desc->destid, desc->rio_addr);
 
 	/* Initialize DMA descriptor */

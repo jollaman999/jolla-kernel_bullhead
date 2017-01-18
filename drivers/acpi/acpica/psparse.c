@@ -443,7 +443,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE(ps_parse_aml);
 
 	ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
-			  "Entered with WalkState=%p Aml=%p size=%X\n",
+			  "Entered with WalkState=%pK Aml=%pK size=%X\n",
 			  walk_state, walk_state->parser_state.aml,
 			  walk_state->parser_state.aml_size));
 
@@ -491,7 +491,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 	 * Execute the walk loop as long as there is a valid Walk State. This
 	 * handles nested control method invocations without recursion.
 	 */
-	ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "State=%p\n", walk_state));
+	ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "State=%pK\n", walk_state));
 
 	status = AE_OK;
 	while (walk_state) {
@@ -504,7 +504,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 		}
 
 		ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
-				  "Completed one call to walk loop, %s State=%p\n",
+				  "Completed one call to walk loop, %s State=%pK\n",
 				  acpi_format_exception(status), walk_state));
 
 		if (status == AE_CTRL_TRANSFER) {
@@ -578,7 +578,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 		previous_walk_state = walk_state;
 
 		ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
-				  "ReturnValue=%p, ImplicitValue=%p State=%p\n",
+				  "ReturnValue=%pK, ImplicitValue=%pK State=%pK\n",
 				  walk_state->return_desc,
 				  walk_state->implicit_return_obj, walk_state));
 

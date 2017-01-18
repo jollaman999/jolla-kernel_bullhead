@@ -3145,7 +3145,7 @@ aic7xxx_reset_device(struct aic7xxx_host *p, int target, int channel,
   list_for_each_entry(aic_dev, &p->aic_devs, list)
   {
     if (aic7xxx_verbose & (VERBOSE_RESET_PROCESS | VERBOSE_ABORT_PROCESS))
-      printk(INFO_LEAD "processing aic_dev %p\n", p->host_no, channel, target,
+      printk(INFO_LEAD "processing aic_dev %pK\n", p->host_no, channel, target,
 		    lun, aic_dev);
     sd = aic_dev->SDptr;
 
@@ -4814,7 +4814,7 @@ aic7xxx_handle_seqint(struct aic7xxx_host *p, unsigned char intstat)
       if(!(scb->flags & SCB_ACTIVE) || (scb->cmd == NULL))
       {
         printk(WARN_LEAD "invalid scb during SEQ_SG_FIXUP flags:0x%x "
-               "scb->cmd:0x%p\n", p->host_no, CTL_OF_SCB(scb),
+               "scb->cmd:0x%pK\n", p->host_no, CTL_OF_SCB(scb),
                scb->flags, scb->cmd);
         printk(INFO_LEAD "SCSISIGI 0x%x, SEQADDR 0x%x, SSTAT0 0x%x, SSTAT1 "
            "0x%x\n", p->host_no, CTL_OF_SCB(scb),
@@ -7946,7 +7946,7 @@ aic7xxx_register(struct scsi_host_template *template, struct aic7xxx_host *p,
     printk(KERN_INFO "(scsi%d) BIOS %sabled, IO Port 0x%lx, IRQ %d\n",
       p->host_no, (p->flags & AHC_BIOS_ENABLED) ? "en" : "dis",
       p->base, p->irq);
-    printk(KERN_INFO "(scsi%d) IO Memory at 0x%lx, MMAP Memory at %p\n",
+    printk(KERN_INFO "(scsi%d) IO Memory at 0x%lx, MMAP Memory at %pK\n",
       p->host_no, p->mbase, p->maddr);
   }
 

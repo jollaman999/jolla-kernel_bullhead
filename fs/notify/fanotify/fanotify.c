@@ -11,7 +11,7 @@
 
 static bool should_merge(struct fsnotify_event *old, struct fsnotify_event *new)
 {
-	pr_debug("%s: old=%p new=%p\n", __func__, old, new);
+	pr_debug("%s: old=%pK new=%pK\n", __func__, old, new);
 
 	if (old->to_tell == new->to_tell &&
 	    old->data_type == new->data_type &&
@@ -45,7 +45,7 @@ static struct fsnotify_event *fanotify_merge(struct list_head *list,
 	struct fsnotify_event *test_event = NULL;
 	struct fsnotify_event *new_event;
 
-	pr_debug("%s: list=%p event=%p\n", __func__, list, event);
+	pr_debug("%s: list=%pK event=%pK\n", __func__, list, event);
 
 
 	list_for_each_entry_reverse(test_holder, list, event_list) {
@@ -97,7 +97,7 @@ static int fanotify_get_response_from_access(struct fsnotify_group *group,
 {
 	int ret;
 
-	pr_debug("%s: group=%p event=%p\n", __func__, group, event);
+	pr_debug("%s: group=%pK event=%pK\n", __func__, group, event);
 
 	wait_event(group->fanotify_data.access_waitq, event->response ||
 				atomic_read(&group->fanotify_data.bypass_perm));
@@ -118,7 +118,7 @@ static int fanotify_get_response_from_access(struct fsnotify_group *group,
 	event->response = 0;
 	spin_unlock(&event->lock);
 
-	pr_debug("%s: group=%p event=%p about to return ret=%d\n", __func__,
+	pr_debug("%s: group=%pK event=%pK about to return ret=%d\n", __func__,
 		 group, event, ret);
 	
 	return ret;
@@ -144,7 +144,7 @@ static int fanotify_handle_event(struct fsnotify_group *group,
 	BUILD_BUG_ON(FAN_ACCESS_PERM != FS_ACCESS_PERM);
 	BUILD_BUG_ON(FAN_ONDIR != FS_ISDIR);
 
-	pr_debug("%s: group=%p event=%p\n", __func__, group, event);
+	pr_debug("%s: group=%pK event=%pK\n", __func__, group, event);
 
 	notify_event = fsnotify_add_notify_event(group, event, NULL, fanotify_merge);
 	if (IS_ERR(notify_event))
@@ -174,8 +174,8 @@ static bool fanotify_should_send_event(struct fsnotify_group *group,
 	__u32 marks_mask, marks_ignored_mask;
 	struct path *path = data;
 
-	pr_debug("%s: group=%p to_tell=%p inode_mark=%p vfsmnt_mark=%p "
-		 "mask=%x data=%p data_type=%d\n", __func__, group, to_tell,
+	pr_debug("%s: group=%pK to_tell=%pK inode_mark=%pK vfsmnt_mark=%pK "
+		 "mask=%x data=%pK data_type=%d\n", __func__, group, to_tell,
 		 inode_mark, vfsmnt_mark, event_mask, data, data_type);
 
 	/* if we don't have enough info to send an event to userspace say no */

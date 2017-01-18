@@ -249,7 +249,7 @@ static int setup_frame(int sig, struct k_sigaction *ka, sigset_t *set)
 	__frame->gr8  = sig;
 
 #if DEBUG_SIG
-	printk("SIG deliver %d (%s:%d): sp=%p pc=%lx ra=%p\n",
+	printk("SIG deliver %d (%s:%d): sp=%pK pc=%lx ra=%pK\n",
 	       sig, current->comm, current->pid, frame, __frame->pc,
 	       frame->pretcode);
 #endif
@@ -345,7 +345,7 @@ static int setup_rt_frame(int sig, struct k_sigaction *ka, siginfo_t *info,
 	__frame->gr9 = (unsigned long) &frame->info;
 
 #if DEBUG_SIG
-	printk("SIG deliver %d (%s:%d): sp=%p pc=%lx ra=%p\n",
+	printk("SIG deliver %d (%s:%d): sp=%pK pc=%lx ra=%pK\n",
 	       sig, current->comm, current->pid, frame, __frame->pc,
 	       frame->pretcode);
 #endif

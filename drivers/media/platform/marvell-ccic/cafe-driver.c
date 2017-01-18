@@ -559,7 +559,7 @@ static void cafe_pci_remove(struct pci_dev *pdev)
 	struct cafe_camera *cam = to_cam(v4l2_dev);
 
 	if (cam == NULL) {
-		printk(KERN_WARNING "pci_remove on unknown pdev %p\n", pdev);
+		printk(KERN_WARNING "pci_remove on unknown pdev %pK\n", pdev);
 		return;
 	}
 	cafe_shutdown(cam);

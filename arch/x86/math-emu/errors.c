@@ -41,7 +41,7 @@ void Un_impl(void)
 
 	RE_ENTRANT_CHECK_OFF;
 	/* No need to check access_ok(), we have previously fetched these bytes. */
-	printk("Unimplemented FPU Opcode at eip=%p : ", (void __user *)address);
+	printk("Unimplemented FPU Opcode at eip=%pK : ", (void __user *)address);
 	if (FPU_CS == __USER_CS) {
 		while (1) {
 			FPU_get_user(byte1, (u_char __user *) address);
@@ -89,7 +89,7 @@ void FPU_printall(void)
 
 	RE_ENTRANT_CHECK_OFF;
 	/* No need to check access_ok(), we have previously fetched these bytes. */
-	printk("At %p:", (void *)address);
+	printk("At %pK:", (void *)address);
 	if (FPU_CS == __USER_CS) {
 #define MAX_PRINTED_BYTES 20
 		for (i = 0; i < MAX_PRINTED_BYTES; i++) {

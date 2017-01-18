@@ -143,7 +143,7 @@ success:
 	       afs_voltypes[volume->type], volume->vid);
 	up_write(&params->cell->vl_sem);
 	afs_put_vlocation(vlocation);
-	_leave(" = %p", volume);
+	_leave(" = %pK", volume);
 	return volume;
 
 	/* clean up */
@@ -177,7 +177,7 @@ void afs_put_volume(struct afs_volume *volume)
 	if (!volume)
 		return;
 
-	_enter("%p", volume);
+	_enter("%pK", volume);
 
 	ASSERTCMP(atomic_read(&volume->usage), >, 0);
 
@@ -227,7 +227,7 @@ struct afs_server *afs_volume_pick_fileserver(struct afs_vnode *vnode)
 	/* stick with the server we're already using if we can */
 	if (vnode->server && vnode->server->fs_state == 0) {
 		afs_get_server(vnode->server);
-		_leave(" = %p [current]", vnode->server);
+		_leave(" = %pK [current]", vnode->server);
 		return vnode->server;
 	}
 
@@ -255,7 +255,7 @@ struct afs_server *afs_volume_pick_fileserver(struct afs_vnode *vnode)
 		case 0:
 			afs_get_server(server);
 			up_read(&volume->server_sem);
-			_leave(" = %p (picked %08x)",
+			_leave(" = %pK (picked %08x)",
 			       server, ntohl(server->addr.s_addr));
 			return server;
 

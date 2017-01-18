@@ -394,7 +394,7 @@ static void p9_tag_cleanup(struct p9_client *c)
 static void p9_free_req(struct p9_client *c, struct p9_req_t *r)
 {
 	int tag = r->tc->tag;
-	p9_debug(P9_DEBUG_MUX, "clnt %p req %p tag: %d\n", c, r, tag);
+	p9_debug(P9_DEBUG_MUX, "clnt %pK req %pK tag: %d\n", c, r, tag);
 
 	r->status = REQ_STATUS_IDLE;
 	if (tag != P9_NOTAG && p9_idpool_check(tag, c->tagpool))
@@ -666,7 +666,7 @@ static struct p9_req_t *p9_client_prepare_req(struct p9_client *c,
 	int tag, err;
 	struct p9_req_t *req;
 
-	p9_debug(P9_DEBUG_MUX, "client %p op %d\n", c, type);
+	p9_debug(P9_DEBUG_MUX, "client %pK op %d\n", c, type);
 
 	/* we allow for any status other than disconnected */
 	if (c->status == Disconnected)
@@ -870,7 +870,7 @@ static struct p9_fid *p9_fid_create(struct p9_client *clnt)
 	struct p9_fid *fid;
 	unsigned long flags;
 
-	p9_debug(P9_DEBUG_FID, "clnt %p\n", clnt);
+	p9_debug(P9_DEBUG_FID, "clnt %pK\n", clnt);
 	fid = kmalloc(sizeof(struct p9_fid), GFP_KERNEL);
 	if (!fid)
 		return ERR_PTR(-ENOMEM);
@@ -1012,7 +1012,7 @@ struct p9_client *p9_client_create(const char *dev_name, char *options)
 		goto put_trans;
 	}
 
-	p9_debug(P9_DEBUG_MUX, "clnt %p trans %p msize %d protocol %d\n",
+	p9_debug(P9_DEBUG_MUX, "clnt %pK trans %pK msize %d protocol %d\n",
 		 clnt, clnt->trans_mod, clnt->msize, clnt->proto_version);
 
 	err = clnt->trans_mod->create(clnt, dev_name, options);
@@ -1046,7 +1046,7 @@ void p9_client_destroy(struct p9_client *clnt)
 {
 	struct p9_fid *fid, *fidptr;
 
-	p9_debug(P9_DEBUG_MUX, "clnt %p\n", clnt);
+	p9_debug(P9_DEBUG_MUX, "clnt %pK\n", clnt);
 
 	if (clnt->trans_mod)
 		clnt->trans_mod->close(clnt);
@@ -1069,14 +1069,14 @@ EXPORT_SYMBOL(p9_client_destroy);
 
 void p9_client_disconnect(struct p9_client *clnt)
 {
-	p9_debug(P9_DEBUG_9P, "clnt %p\n", clnt);
+	p9_debug(P9_DEBUG_9P, "clnt %pK\n", clnt);
 	clnt->status = Disconnected;
 }
 EXPORT_SYMBOL(p9_client_disconnect);
 
 void p9_client_begin_disconnect(struct p9_client *clnt)
 {
-	p9_debug(P9_DEBUG_9P, "clnt %p\n", clnt);
+	p9_debug(P9_DEBUG_9P, "clnt %pK\n", clnt);
 	clnt->status = BeginDisconnect;
 }
 EXPORT_SYMBOL(p9_client_begin_disconnect);

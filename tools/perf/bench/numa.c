@@ -1045,7 +1045,7 @@ static void *worker_thread(void *__tdata)
 		first_task = 1;
 
 	if (details >= 2) {
-		printf("#  thread %2d / %2d global mem: %p, process mem: %p, thread mem: %p\n",
+		printf("#  thread %2d / %2d global mem: %pK, process mem: %pK, thread mem: %pK\n",
 			process_nr, thread_nr, global_data, process_data, thread_data);
 	}
 
@@ -1216,7 +1216,7 @@ static void worker_process(int process_nr)
 	process_data = setup_private_data(g->p.bytes_process);
 
 	if (g->p.show_details >= 3) {
-		printf(" # process %2d global mem: %p, process mem: %p\n",
+		printf(" # process %2d global mem: %pK, process mem: %pK\n",
 			process_nr, g->data, process_data);
 	}
 

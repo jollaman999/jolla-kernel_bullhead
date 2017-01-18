@@ -72,7 +72,7 @@ restore_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile 
 	/* When loading 32-bit values into 64-bit registers make
 	   sure to clear the upper 32-bits */
 	DBG(2,"restore_sigcontext32: PER_LINUX32 process\n");
-	DBG(2,"restore_sigcontext32: sc = 0x%p, rf = 0x%p, regs = 0x%p\n", sc, rf, regs);
+	DBG(2,"restore_sigcontext32: sc = 0x%pK, rf = 0x%pK, regs = 0x%pK\n", sc, rf, regs);
 	DBG(2,"restore_sigcontext32: compat_sigcontext is %#lx bytes\n", sizeof(*sc));
 	for(regn=0; regn < 32; regn++){
 		err |= __get_user(compat_reg,&sc->sc_gr[regn]);
@@ -83,7 +83,7 @@ restore_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile 
 		DBG(3,"restore_sigcontext32: gr%02d = %#lx (%#x / %#x)\n", 
 				regn, regs->gr[regn], compat_regt, compat_reg);
 	}
-	DBG(2,"restore_sigcontext32: sc->sc_fr = 0x%p (%#lx)\n",sc->sc_fr, sizeof(sc->sc_fr));
+	DBG(2,"restore_sigcontext32: sc->sc_fr = 0x%pK (%#lx)\n",sc->sc_fr, sizeof(sc->sc_fr));
 	/* XXX: BE WARNED FR's are 64-BIT! */
 	err |= __copy_from_user(regs->fr, sc->sc_fr, sizeof(regs->fr));
 		
@@ -95,7 +95,7 @@ restore_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile 
 	err |= __get_user(compat_regt, &rf->rf_iaoq[0]);
 	regs->iaoq[0] = ((u64)compat_regt << 32) | (u64)compat_reg;
 	DBG(2,"restore_sigcontext32: upper half of iaoq[0] = %#lx\n", compat_regt);
-	DBG(2,"restore_sigcontext32: sc->sc_iaoq[0] = %p => %#x\n", 
+	DBG(2,"restore_sigcontext32: sc->sc_iaoq[0] = %pK => %#x\n", 
 			&sc->sc_iaoq[0], compat_reg);
 
 	err |= __get_user(compat_reg, &sc->sc_iaoq[1]);
@@ -103,7 +103,7 @@ restore_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile 
 	err |= __get_user(compat_regt, &rf->rf_iaoq[1]);
 	regs->iaoq[1] = ((u64)compat_regt << 32) | (u64)compat_reg;
 	DBG(2,"restore_sigcontext32: upper half of iaoq[1] = %#lx\n", compat_regt);
-	DBG(2,"restore_sigcontext32: sc->sc_iaoq[1] = %p => %#x\n", 
+	DBG(2,"restore_sigcontext32: sc->sc_iaoq[1] = %pK => %#x\n", 
 			&sc->sc_iaoq[1],compat_reg);	
 	DBG(2,"restore_sigcontext32: iaoq is %#lx / %#lx\n", 
 			regs->iaoq[0],regs->iaoq[1]);		
@@ -161,7 +161,7 @@ setup_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile __
 		compat_reg = (compat_uint_t)(regs->gr[31]);
 		/* regs->iaoq is undefined in the syscall return path */
 		err |= __put_user(compat_reg, &sc->sc_iaoq[0]);
-		DBG(2,"setup_sigcontext32: sc->sc_iaoq[0] = %p <= %#x\n",
+		DBG(2,"setup_sigcontext32: sc->sc_iaoq[0] = %pK <= %#x\n",
 				&sc->sc_iaoq[0], compat_reg);
 		
 		/* Store upper half */
@@ -172,7 +172,7 @@ setup_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile __
 		
 		compat_reg = (compat_uint_t)(regs->gr[31]+4);
 		err |= __put_user(compat_reg, &sc->sc_iaoq[1]);
-		DBG(2,"setup_sigcontext32: sc->sc_iaoq[1] = %p <= %#x\n",
+		DBG(2,"setup_sigcontext32: sc->sc_iaoq[1] = %pK <= %#x\n",
 				&sc->sc_iaoq[1], compat_reg);
 		/* Store upper half */
 		compat_reg = (compat_uint_t)((regs->gr[31]+4) >> 32);
@@ -198,7 +198,7 @@ setup_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile __
 		
 		compat_reg = (compat_uint_t)(regs->iaoq[0]);
 		err |= __put_user(compat_reg, &sc->sc_iaoq[0]);
-		DBG(2,"setup_sigcontext32: sc->sc_iaoq[0] = %p <= %#x\n",
+		DBG(2,"setup_sigcontext32: sc->sc_iaoq[0] = %pK <= %#x\n",
 				&sc->sc_iaoq[0], compat_reg);
 		/* Store upper half */
 		compat_reg = (compat_uint_t)(regs->iaoq[0] >> 32);
@@ -207,7 +207,7 @@ setup_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile __
 		
 		compat_reg = (compat_uint_t)(regs->iaoq[1]);
 		err |= __put_user(compat_reg, &sc->sc_iaoq[1]);
-		DBG(2,"setup_sigcontext32: sc->sc_iaoq[1] = %p <= %#x\n",
+		DBG(2,"setup_sigcontext32: sc->sc_iaoq[1] = %pK <= %#x\n",
 				&sc->sc_iaoq[1], compat_reg);
 		/* Store upper half */
 		compat_reg = (compat_uint_t)(regs->iaoq[1] >> 32);
@@ -217,7 +217,7 @@ setup_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile __
 		
 		compat_reg = (compat_uint_t)(regs->iasq[0]);
 		err |= __put_user(compat_reg, &sc->sc_iasq[0]);
-		DBG(2,"setup_sigcontext32: sc->sc_iasq[0] = %p <= %#x\n",
+		DBG(2,"setup_sigcontext32: sc->sc_iasq[0] = %pK <= %#x\n",
 				&sc->sc_iasq[0], compat_reg);
 		/* Store upper half */
 		compat_reg = (compat_uint_t)(regs->iasq[0] >> 32);
@@ -227,7 +227,7 @@ setup_sigcontext32(struct compat_sigcontext __user *sc, struct compat_regfile __
 		
 		compat_reg = (compat_uint_t)(regs->iasq[1]);
 		err |= __put_user(compat_reg, &sc->sc_iasq[1]);
-		DBG(2,"setup_sigcontext32: sc->sc_iasq[1] = %p <= %#x\n",
+		DBG(2,"setup_sigcontext32: sc->sc_iasq[1] = %pK <= %#x\n",
 				&sc->sc_iasq[1], compat_reg);
 		/* Store upper half */
 		compat_reg = (compat_uint_t)(regs->iasq[1] >> 32);

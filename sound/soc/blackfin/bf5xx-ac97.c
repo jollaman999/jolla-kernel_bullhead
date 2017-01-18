@@ -108,7 +108,7 @@ static void enqueue_cmd(struct snd_ac97 *ac97, __u16 addr, __u16 data)
 
 	nextwrite = (struct ac97_frame *)(sport->tx_buf +
 			nextfrag * sport->tx_fragsize);
-	pr_debug("sport->tx_buf:%p, nextfrag:0x%x nextwrite:%p, cmd_count:%d\n",
+	pr_debug("sport->tx_buf:%pK, nextfrag:0x%x nextwrite:%pK, cmd_count:%d\n",
 		sport->tx_buf, nextfrag, nextwrite, cmd_count[nextfrag]);
 	nextwrite[cmd_count[nextfrag]].ac97_tag |= TAG_CMD;
 	nextwrite[cmd_count[nextfrag]].ac97_addr = addr;

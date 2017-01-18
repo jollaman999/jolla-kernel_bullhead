@@ -889,7 +889,7 @@ static int arasan_cf_probe(struct platform_device *pdev)
 	ap->ioaddr.altstatus_addr = acdev->vbase + ATA_ASTS_DCTR;
 	ap->ioaddr.ctl_addr = acdev->vbase + ATA_ASTS_DCTR;
 
-	ata_port_desc(ap, "phy_addr %llx virt_addr %p",
+	ata_port_desc(ap, "phy_addr %llx virt_addr %pK",
 		      (unsigned long long) res->start, acdev->vbase);
 
 	ret = cf_init(acdev);

@@ -166,7 +166,7 @@ static void irttp_todo_expired(unsigned long data)
 	if (!self || self->magic != TTP_TSAP_MAGIC)
 		return;
 
-	IRDA_DEBUG(4, "%s(instance=%p)\n", __func__, self);
+	IRDA_DEBUG(4, "%s(instance=%pK)\n", __func__, self);
 
 	/* Try to make some progress, especially on Tx side - Jean II */
 	irttp_run_rx_queue(self);
@@ -1032,7 +1032,7 @@ static void irttp_flow_indication(void *instance, void *sap, LOCAL_FLOW flow)
 	IRDA_ASSERT(self != NULL, return;);
 	IRDA_ASSERT(self->magic == TTP_TSAP_MAGIC, return;);
 
-	IRDA_DEBUG(4, "%s(instance=%p)\n", __func__, self);
+	IRDA_DEBUG(4, "%s(instance=%pK)\n", __func__, self);
 
 	/* We are "polled" directly from LAP, and the LAP want to fill
 	 * its Tx window. We want to do our best to send it data, so that

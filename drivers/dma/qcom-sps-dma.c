@@ -413,7 +413,7 @@ static int qbam_slave_cfg(struct qbam_channel *qbam_chan,
 	ret = sps_get_config(qbam_chan->bam_pipe.handle,
 						&qbam_chan->bam_pipe.cfg);
 	if (ret) {
-		qbam_err(qbam_dev, "error:%d sps_get_config(0x%p)\n",
+		qbam_err(qbam_dev, "error:%d sps_get_config(0x%pK)\n",
 			 ret, qbam_chan->bam_pipe.handle);
 		return ret;
 	}

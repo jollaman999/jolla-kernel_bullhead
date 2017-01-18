@@ -281,7 +281,7 @@ static void sci_controller_sdma_completion(struct isci_host *ihost, u32 ent)
 	case SCU_CONTEXT_COMMAND_REQUEST_TYPE_POST_TC:
 	case SCU_CONTEXT_COMMAND_REQUEST_TYPE_DUMP_TC:
 		ireq = ihost->reqs[index];
-		dev_warn(&ihost->pdev->dev, "%s: %x for io request %p\n",
+		dev_warn(&ihost->pdev->dev, "%s: %x for io request %pK\n",
 			 __func__, ent, ireq);
 		/* @todo For a post TC operation we need to fail the IO
 		 * request
@@ -291,7 +291,7 @@ static void sci_controller_sdma_completion(struct isci_host *ihost, u32 ent)
 	case SCU_CONTEXT_COMMAND_REQUEST_TYPE_OTHER_RNC:
 	case SCU_CONTEXT_COMMAND_REQUEST_TYPE_POST_RNC:
 		idev = ihost->device_table[index];
-		dev_warn(&ihost->pdev->dev, "%s: %x for device %p\n",
+		dev_warn(&ihost->pdev->dev, "%s: %x for device %pK\n",
 			 __func__, ent, idev);
 		/* @todo For a port RNC operation we need to fail the
 		 * device
@@ -378,7 +378,7 @@ static void sci_controller_event_completion(struct isci_host *ihost, u32 ent)
 	case SCU_EVENT_TYPE_SMU_COMMAND_ERROR:
 		/* / @todo The driver did something wrong and we need to fix the condtion. */
 		dev_err(&ihost->pdev->dev,
-			"%s: SCIC Controller 0x%p received SMU command error "
+			"%s: SCIC Controller 0x%pK received SMU command error "
 			"0x%x\n",
 			__func__,
 			ihost,
@@ -392,7 +392,7 @@ static void sci_controller_event_completion(struct isci_host *ihost, u32 ent)
 		 * / @todo This is a hardware failure and its likely that we want to
 		 * /       reset the controller. */
 		dev_err(&ihost->pdev->dev,
-			"%s: SCIC Controller 0x%p received fatal controller "
+			"%s: SCIC Controller 0x%pK received fatal controller "
 			"event  0x%x\n",
 			__func__,
 			ihost,
@@ -413,7 +413,7 @@ static void sci_controller_event_completion(struct isci_host *ihost, u32 ent)
 				sci_io_request_event_handler(ireq, ent);
 			else
 				dev_warn(&ihost->pdev->dev,
-					 "%s: SCIC Controller 0x%p received "
+					 "%s: SCIC Controller 0x%pK received "
 					 "event 0x%x for io request object "
 					 "that doesnt exist.\n",
 					 __func__,
@@ -428,7 +428,7 @@ static void sci_controller_event_completion(struct isci_host *ihost, u32 ent)
 				sci_remote_device_event_handler(idev, ent);
 			else
 				dev_warn(&ihost->pdev->dev,
-					 "%s: SCIC Controller 0x%p received "
+					 "%s: SCIC Controller 0x%pK received "
 					 "event 0x%x for remote device object "
 					 "that doesnt exist.\n",
 					 __func__,
@@ -463,7 +463,7 @@ static void sci_controller_event_completion(struct isci_host *ihost, u32 ent)
 				sci_remote_device_event_handler(idev, ent);
 		} else
 			dev_err(&ihost->pdev->dev,
-				"%s: SCIC Controller 0x%p received event 0x%x "
+				"%s: SCIC Controller 0x%pK received event 0x%x "
 				"for remote device object 0x%0x that doesnt "
 				"exist.\n",
 				__func__,
@@ -1084,13 +1084,13 @@ void ireq_done(struct isci_host *ihost, struct isci_request *ireq, struct sas_ta
 		if (test_bit(IREQ_COMPLETE_IN_TARGET, &ireq->flags)) {
 			/* Normal notification (task_done) */
 			dev_dbg(&ihost->pdev->dev,
-				"%s: Normal - ireq/task = %p/%p\n",
+				"%s: Normal - ireq/task = %pK/%pK\n",
 				__func__, ireq, task);
 			task->lldd_task = NULL;
 			task->task_done(task);
 		} else {
 			dev_dbg(&ihost->pdev->dev,
-				"%s: Error - ireq/task = %p/%p\n",
+				"%s: Error - ireq/task = %pK/%pK\n",
 				__func__, ireq, task);
 			if (sas_protocol_ata(task->task_proto))
 				task->lldd_task = NULL;
@@ -1510,7 +1510,7 @@ static enum sci_status sci_controller_stop_devices(struct isci_host *ihost)
 			    (device_status != SCI_FAILURE_INVALID_STATE)) {
 				dev_warn(&ihost->pdev->dev,
 					 "%s: Controller stop operation failed "
-					 "to stop device 0x%p because of "
+					 "to stop device 0x%pK because of "
 					 "status %d.\n",
 					 __func__,
 					 ihost->device_table[index], device_status);
@@ -2438,8 +2438,8 @@ void sci_controller_remote_device_stopped(struct isci_host *ihost,
 {
 	if (ihost->sm.current_state_id != SCIC_STOPPING) {
 		dev_dbg(&ihost->pdev->dev,
-			"SCIC Controller 0x%p remote device stopped event "
-			"from device 0x%p in unexpected state %d\n",
+			"SCIC Controller 0x%pK remote device stopped event "
+			"from device 0x%pK in unexpected state %d\n",
 			ihost, idev,
 			ihost->sm.current_state_id);
 		return;
@@ -2639,7 +2639,7 @@ enum sci_status sci_controller_terminate_request(struct isci_host *ihost,
 	}
 	status = sci_io_request_terminate(ireq);
 
-	dev_dbg(&ihost->pdev->dev, "%s: status=%d; ireq=%p; flags=%lx\n",
+	dev_dbg(&ihost->pdev->dev, "%s: status=%d; ireq=%pK; flags=%lx\n",
 		__func__, status, ireq, ireq->flags);
 
 	if ((status == SCI_SUCCESS) &&

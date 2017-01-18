@@ -402,7 +402,7 @@ static int get_max_bus_speed(struct slot *slot)
 	enum pci_bus_speed speed;
 	struct pci_bus *bus = slot->hotplug_slot->pci_slot->bus;
 
-	debug("%s - Entry slot[%p]\n", __func__, slot);
+	debug("%s - Entry slot[%pK]\n", __func__, slot);
 
 	ibmphp_lock_operations();
 	mode = slot->supported_bus_mode;

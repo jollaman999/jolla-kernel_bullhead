@@ -330,7 +330,7 @@ static int __init init_axis_flash(void)
 		ptable_ok = (csum == ptable_head->checksum);
 
 		/* Read the entries and use/show the info.  */
-		printk(KERN_INFO " Found a%s partition table at 0x%p-0x%p.\n",
+		printk(KERN_INFO " Found a%s partition table at 0x%pK-0x%pK.\n",
 		       (ptable_ok ? " valid" : "n invalid"), ptable_head,
 		       max_addr);
 

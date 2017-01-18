@@ -1246,7 +1246,7 @@ static void mv_dump_mem(void __iomem *start, unsigned bytes)
 {
 	int b, w;
 	for (b = 0; b < bytes; ) {
-		DPRINTK("%p: ", start + b);
+		DPRINTK("%pK: ", start + b);
 		for (w = 0; b < bytes && w < 4; w++) {
 			printk("%08x ", readl(start + b));
 			b += sizeof(u32);

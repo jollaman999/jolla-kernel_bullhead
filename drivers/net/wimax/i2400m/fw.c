@@ -457,7 +457,7 @@ ssize_t __i2400m_bm_ack_verify(struct i2400m *i2400m, int opcode,
 	ssize_t result = -ENOMEM;
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(8, dev, "(i2400m %p opcode %d ack %p size %zu)\n",
+	d_fnstart(8, dev, "(i2400m %pK opcode %d ack %pK size %zu)\n",
 		  i2400m, opcode, ack, ack_size);
 	if (ack_size < sizeof(*ack)) {
 		result = -EIO;
@@ -528,7 +528,7 @@ out_raw:
 error_reboot_ack:
 error_reboot:
 error_ack_short:
-	d_fnend(8, dev, "(i2400m %p opcode %d ack %p size %zu) = %d\n",
+	d_fnend(8, dev, "(i2400m %pK opcode %d ack %pK size %zu) = %d\n",
 		i2400m, opcode, ack, ack_size, (int) result);
 	return result;
 }
@@ -589,7 +589,7 @@ ssize_t i2400m_bm_cmd(struct i2400m *i2400m,
 	struct device *dev = i2400m_dev(i2400m);
 	int opcode = cmd == NULL ? -1 : i2400m_brh_get_opcode(cmd);
 
-	d_fnstart(6, dev, "(i2400m %p cmd %p size %zu ack %p size %zu)\n",
+	d_fnstart(6, dev, "(i2400m %pK cmd %pK size %zu ack %pK size %zu)\n",
 		  i2400m, cmd, cmd_size, ack, ack_size);
 	BUG_ON(ack_size < sizeof(*ack));
 	BUG_ON(i2400m->boot_mode == 0);
@@ -627,7 +627,7 @@ ssize_t i2400m_bm_cmd(struct i2400m *i2400m,
 error_bad_ack:
 error_wait_for_ack:
 error_cmd_send:
-	d_fnend(6, dev, "(i2400m %p cmd %p size %zu ack %p size %zu) = %d\n",
+	d_fnend(6, dev, "(i2400m %pK cmd %pK size %zu ack %pK size %zu) = %d\n",
 		i2400m, cmd, cmd_size, ack, ack_size, (int) result);
 	return result;
 }
@@ -656,7 +656,7 @@ static int i2400m_download_chunk(struct i2400m *i2400m, const void *chunk,
 	} __packed *buf;
 	struct i2400m_bootrom_header ack;
 
-	d_fnstart(5, dev, "(i2400m %p chunk %p __chunk_len %zu addr 0x%08lx "
+	d_fnstart(5, dev, "(i2400m %pK chunk %pK __chunk_len %zu addr 0x%08lx "
 		  "direct %u do_csum %u)\n", i2400m, chunk, __chunk_len,
 		  addr, direct, do_csum);
 	buf = i2400m->bm_cmd_buf;
@@ -672,7 +672,7 @@ static int i2400m_download_chunk(struct i2400m *i2400m, const void *chunk,
 			    &ack, sizeof(ack), 0);
 	if (ret >= 0)
 		ret = 0;
-	d_fnend(5, dev, "(i2400m %p chunk %p __chunk_len %zu addr 0x%08lx "
+	d_fnend(5, dev, "(i2400m %pK chunk %pK __chunk_len %zu addr 0x%08lx "
 		"direct %u do_csum %u) = %d\n", i2400m, chunk, __chunk_len,
 		addr, direct, do_csum, ret);
 	return ret;
@@ -710,7 +710,7 @@ ssize_t i2400m_dnload_bcf(struct i2400m *i2400m,
 	const struct i2400m_bootrom_header *bh;
 	struct i2400m_bootrom_header ack;
 
-	d_fnstart(3, dev, "(i2400m %p bcf %p bcf_len %zu)\n",
+	d_fnstart(3, dev, "(i2400m %pK bcf %pK bcf_len %zu)\n",
 		  i2400m, bcf, bcf_len);
 	/* Iterate over the command blocks in the BCF file that start
 	 * after the header */
@@ -757,7 +757,7 @@ ssize_t i2400m_dnload_bcf(struct i2400m *i2400m,
 	ret = offset;
 error_section_beyond_eof:
 error_send:
-	d_fnend(3, dev, "(i2400m %p bcf %p bcf_len %zu) = %d\n",
+	d_fnend(3, dev, "(i2400m %pK bcf %pK bcf_len %zu) = %d\n",
 		i2400m, bcf, bcf_len, (int) ret);
 	return ret;
 }
@@ -893,7 +893,7 @@ int i2400m_bootrom_init(struct i2400m *i2400m, enum i2400m_bri flags)
 	BUILD_BUG_ON(sizeof(*cmd) != sizeof(i2400m_barker_db[0].data));
 	BUILD_BUG_ON(sizeof(ack) != sizeof(i2400m_ACK_BARKER));
 
-	d_fnstart(4, dev, "(i2400m %p flags 0x%08x)\n", i2400m, flags);
+	d_fnstart(4, dev, "(i2400m %pK flags 0x%08x)\n", i2400m, flags);
 	result = -ENOMEM;
 	cmd = i2400m->bm_cmd_buf;
 	if (flags & I2400M_BRI_SOFT)
@@ -1002,7 +1002,7 @@ do_reboot_ack:
 	result = 0;
 exit_timeout:
 error_dev_gone:
-	d_fnend(4, dev, "(i2400m %p flags 0x%08x) = %d\n",
+	d_fnend(4, dev, "(i2400m %pK flags 0x%08x) = %d\n",
 		i2400m, flags, result);
 	return result;
 
@@ -1033,7 +1033,7 @@ int i2400m_read_mac_addr(struct i2400m *i2400m)
 		u8 ack_pl[16];
 	} __packed ack_buf;
 
-	d_fnstart(5, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(5, dev, "(i2400m %pK)\n", i2400m);
 	cmd = i2400m->bm_cmd_buf;
 	cmd->command = i2400m_brh_command(I2400M_BRH_READ, 0, 1);
 	cmd->target_addr = cpu_to_le32(0x00203fe8);
@@ -1057,7 +1057,7 @@ int i2400m_read_mac_addr(struct i2400m *i2400m)
 	net_dev->addr_len = ETH_ALEN;
 	memcpy(net_dev->dev_addr, ack_buf.ack_pl, ETH_ALEN);
 error_read_mac:
-	d_fnend(5, dev, "(i2400m %p) = %d\n", i2400m, result);
+	d_fnend(5, dev, "(i2400m %pK) = %d\n", i2400m, result);
 	return result;
 }
 
@@ -1075,7 +1075,7 @@ int i2400m_dnload_init_nonsigned(struct i2400m *i2400m)
 	unsigned i = 0;
 	int ret = 0;
 	struct device *dev = i2400m_dev(i2400m);
-	d_fnstart(5, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(5, dev, "(i2400m %pK)\n", i2400m);
 	if (i2400m->bus_bm_pokes_table) {
 		while (i2400m->bus_bm_pokes_table[i].address) {
 			ret = i2400m_download_chunk(
@@ -1088,7 +1088,7 @@ int i2400m_dnload_init_nonsigned(struct i2400m *i2400m)
 			i++;
 		}
 	}
-	d_fnend(5, dev, "(i2400m %p) = %d\n", i2400m, ret);
+	d_fnend(5, dev, "(i2400m %pK) = %d\n", i2400m, ret);
 	return ret;
 }
 
@@ -1119,7 +1119,7 @@ int i2400m_dnload_init_signed(struct i2400m *i2400m,
 	} __packed *cmd_buf;
 	struct i2400m_bootrom_header ack;
 
-	d_fnstart(5, dev, "(i2400m %p bcf_hdr %p)\n", i2400m, bcf_hdr);
+	d_fnstart(5, dev, "(i2400m %pK bcf_hdr %pK)\n", i2400m, bcf_hdr);
 	cmd_buf = i2400m->bm_cmd_buf;
 	cmd_buf->cmd.command =
 		i2400m_brh_command(I2400M_BRH_HASH_PAYLOAD_ONLY, 0, 0);
@@ -1130,7 +1130,7 @@ int i2400m_dnload_init_signed(struct i2400m *i2400m,
 			    &ack, sizeof(ack), 0);
 	if (ret >= 0)
 		ret = 0;
-	d_fnend(5, dev, "(i2400m %p bcf_hdr %p) = %d\n", i2400m, bcf_hdr, ret);
+	d_fnend(5, dev, "(i2400m %pK bcf_hdr %pK) = %d\n", i2400m, bcf_hdr, ret);
 	return ret;
 }
 
@@ -1391,7 +1391,7 @@ int i2400m_fw_dnload(struct i2400m *i2400m, const struct i2400m_bcf_hdr *bcf,
 	const struct i2400m_bcf_hdr *bcf_hdr;
 	size_t bcf_size;
 
-	d_fnstart(5, dev, "(i2400m %p bcf %p fw size %zu)\n",
+	d_fnstart(5, dev, "(i2400m %pK bcf %pK fw size %zu)\n",
 		  i2400m, bcf, fw_size);
 	i2400m->boot_mode = 1;
 	wmb();		/* Make sure other readers see it */
@@ -1465,7 +1465,7 @@ error_dnload_init:
 error_bcf_hdr_find:
 error_bootrom_init:
 error_too_many_reboots:
-	d_fnend(5, dev, "(i2400m %p bcf %p size %zu) = %d\n",
+	d_fnend(5, dev, "(i2400m %pK bcf %pK size %zu) = %d\n",
 		i2400m, bcf, fw_size, ret);
 	return ret;
 
@@ -1484,7 +1484,7 @@ int i2400m_fw_bootstrap(struct i2400m *i2400m, const struct firmware *fw,
 	struct device *dev = i2400m_dev(i2400m);
 	const struct i2400m_bcf_hdr *bcf;	/* Firmware data */
 
-	d_fnstart(5, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(5, dev, "(i2400m %pK)\n", i2400m);
 	bcf = (void *) fw->data;
 	ret = i2400m_fw_check(i2400m, bcf, fw->size);
 	if (ret >= 0)
@@ -1494,7 +1494,7 @@ int i2400m_fw_bootstrap(struct i2400m *i2400m, const struct firmware *fw,
 			i2400m->fw_name, ret);
 	kfree(i2400m->fw_hdrs);
 	i2400m->fw_hdrs = NULL;
-	d_fnend(5, dev, "(i2400m %p) = %d\n", i2400m, ret);
+	d_fnend(5, dev, "(i2400m %pK) = %d\n", i2400m, ret);
 	return ret;
 }
 
@@ -1556,7 +1556,7 @@ int i2400m_dev_bootstrap(struct i2400m *i2400m, enum i2400m_bri flags)
 	const struct firmware *fw;
 	const char *fw_name;
 
-	d_fnstart(5, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(5, dev, "(i2400m %pK)\n", i2400m);
 
 	ret = -ENODEV;
 	spin_lock(&i2400m->rx_lock);
@@ -1595,7 +1595,7 @@ int i2400m_dev_bootstrap(struct i2400m *i2400m, enum i2400m_bri flags)
 		i2400m->fw_name = NULL;
 	}
 out:
-	d_fnend(5, dev, "(i2400m %p) = %d\n", i2400m, ret);
+	d_fnend(5, dev, "(i2400m %pK) = %d\n", i2400m, ret);
 	return ret;
 }
 EXPORT_SYMBOL_GPL(i2400m_dev_bootstrap);

@@ -35,7 +35,7 @@ static const struct rpc_credops	unix_credops;
 static struct rpc_auth *
 unx_create(struct rpc_clnt *clnt, rpc_authflavor_t flavor)
 {
-	dprintk("RPC:       creating UNIX authenticator for client %p\n",
+	dprintk("RPC:       creating UNIX authenticator for client %pK\n",
 			clnt);
 	atomic_inc(&unix_auth.au_count);
 	return &unix_auth;
@@ -44,7 +44,7 @@ unx_create(struct rpc_clnt *clnt, rpc_authflavor_t flavor)
 static void
 unx_destroy(struct rpc_auth *auth)
 {
-	dprintk("RPC:       destroying UNIX authenticator %p\n", auth);
+	dprintk("RPC:       destroying UNIX authenticator %pK\n", auth);
 	rpcauth_clear_credcache(auth->au_credcache);
 }
 
@@ -91,7 +91,7 @@ unx_create_cred(struct rpc_auth *auth, struct auth_cred *acred, int flags)
 static void
 unx_free_cred(struct unx_cred *unx_cred)
 {
-	dprintk("RPC:       unx_free_cred %p\n", unx_cred);
+	dprintk("RPC:       unx_free_cred %pK\n", unx_cred);
 	kfree(unx_cred);
 }
 

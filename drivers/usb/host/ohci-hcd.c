@@ -263,7 +263,7 @@ static int ohci_urb_enqueue (
 						ed->interval);
 				if (urb_priv->td_cnt >= urb_priv->length) {
 					++urb_priv->td_cnt;	/* Mark it */
-					ohci_dbg(ohci, "iso underrun %p (%u+%u < %u)\n",
+					ohci_dbg(ohci, "iso underrun %pK (%u+%u < %u)\n",
 							urb, frame, length,
 							next);
 				}
@@ -388,7 +388,7 @@ sanitize:
 		/* caller was supposed to have unlinked any requests;
 		 * that's not our job.  can't recover; must leak ed.
 		 */
-		ohci_err (ohci, "leak ed %p (#%02x) state %d%s\n",
+		ohci_err (ohci, "leak ed %pK (#%02x) state %d%s\n",
 			ed, ep->desc.bEndpointAddress, ed->state,
 			list_empty (&ed->td_list) ? "" : " (has tds)");
 		td_free (ohci, ed->dummy);
@@ -882,7 +882,7 @@ static irqreturn_t ohci_irq (struct usb_hcd *hcd)
 						ed->td_list.next,
 						struct td, td_list);
 					ohci_warn(ohci,
-						  "Reclaiming orphan TD %p\n",
+						  "Reclaiming orphan TD %pK\n",
 						  td);
 					takeback_td(ohci, td);
 					ohci->ed_to_check = NULL;
@@ -984,7 +984,7 @@ static int ohci_restart (struct ohci_hcd *ohci)
 		case ED_UNLINK:
 			break;
 		default:
-			ohci_dbg(ohci, "bogus ed %p state %d\n",
+			ohci_dbg(ohci, "bogus ed %pK state %d\n",
 					ed, ed->state);
 		}
 

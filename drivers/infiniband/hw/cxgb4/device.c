@@ -352,7 +352,7 @@ static int dump_ep(int id, void *p, void *data)
 		return 1;
 
 	cc = snprintf(epd->buf + epd->pos, space,
-			"ep %p cm_id %p qp %p state %d flags 0x%lx history 0x%lx "
+			"ep %pK cm_id %pK qp %pK state %d flags 0x%lx history 0x%lx "
 			"hwtid %d atid %d %pI4:%d <-> %pI4:%d\n",
 			ep, ep->com.cm_id, ep->com.qp, (int)ep->com.state,
 			ep->com.flags, ep->com.history, ep->hwtid, ep->atid,
@@ -377,7 +377,7 @@ static int dump_listen_ep(int id, void *p, void *data)
 		return 1;
 
 	cc = snprintf(epd->buf + epd->pos, space,
-			"ep %p cm_id %p state %d flags 0x%lx stid %d backlog %d "
+			"ep %pK cm_id %pK state %d flags 0x%lx stid %d backlog %d "
 			"%pI4:%d\n", ep, ep->com.cm_id, (int)ep->com.state,
 			ep->com.flags, ep->stid, ep->backlog,
 			&ep->com.local_addr.sin_addr.s_addr,
@@ -540,7 +540,7 @@ static int c4iw_rdev_open(struct c4iw_rdev *rdev)
 	     rdev->lldi.vr->qp.size,
 	     rdev->lldi.vr->cq.start,
 	     rdev->lldi.vr->cq.size);
-	PDBG("udb len 0x%x udb base %p db_reg %p gts_reg %p qpshift %lu "
+	PDBG("udb len 0x%x udb base %pK db_reg %pK gts_reg %pK qpshift %lu "
 	     "qpmask 0x%x cqshift %lu cqmask 0x%x\n",
 	     (unsigned)pci_resource_len(rdev->lldi.pdev, 2),
 	     (void *)(unsigned long)pci_resource_start(rdev->lldi.pdev, 2),
@@ -615,7 +615,7 @@ static void c4iw_dealloc(struct uld_ctx *ctx)
 
 static void c4iw_remove(struct uld_ctx *ctx)
 {
-	PDBG("%s c4iw_dev %p\n", __func__,  ctx->dev);
+	PDBG("%s c4iw_dev %pK\n", __func__,  ctx->dev);
 	c4iw_unregister_device(ctx->dev);
 	c4iw_dealloc(ctx);
 }
@@ -667,7 +667,7 @@ static struct c4iw_dev *c4iw_alloc(const struct cxgb4_lld_info *infop)
 					       devp->rdev.lldi.vr->ocq.size);
 
 	PDBG(KERN_INFO MOD "ocq memory: "
-	       "hw_start 0x%x size %u mw_pa 0x%lx mw_kva %p\n",
+	       "hw_start 0x%x size %u mw_pa 0x%lx mw_kva %pK\n",
 	       devp->rdev.lldi.vr->ocq.start, devp->rdev.lldi.vr->ocq.size,
 	       devp->rdev.oc_mw_pa, devp->rdev.oc_mw_kva);
 
@@ -819,7 +819,7 @@ static int c4iw_uld_rx_handler(void *handle, const __be64 *rsp,
 		if (recv_rx_pkt(dev, gl, rsp))
 			return 0;
 
-		pr_info("%s: unexpected FL contents at %p, " \
+		pr_info("%s: unexpected FL contents at %pK, " \
 		       "RSS %#llx, FL %#llx, len %u\n",
 		       pci_name(ctx->lldi.pdev), gl->va,
 		       (unsigned long long)be64_to_cpu(*rsp),

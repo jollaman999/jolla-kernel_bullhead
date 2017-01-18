@@ -149,7 +149,7 @@ static CsrResult send_signal(card_t *card, const u8 *sigptr, u32 siglen,
                 if (datalen > data_slot_size)
                 {
                     unifi_error(card->ospriv,
-                                "send_signal - Invalid data length %u (@%p), "
+                                "send_signal - Invalid data length %u (@%pK), "
                                 "truncating\n",
                                 datalen, bulkdata->d[i].os_data_ptr);
                     datalen = data_slot_size;
@@ -174,7 +174,7 @@ static CsrResult send_signal(card_t *card, const u8 *sigptr, u32 siglen,
 
 		unifi_error(card->ospriv, "Signal(%d): %*ph\n", siglen,
 					  16, sig);
-        unifi_error(card->ospriv, "Bulkdata pointer %p(%d), %p(%d)\n",
+        unifi_error(card->ospriv, "Bulkdata pointer %pK(%d), %pK(%d)\n",
                     bulkdata != NULL?bulkdata->d[0].os_data_ptr : NULL,
                     bulkdata != NULL?bulkdata->d[0].data_length : 0,
                     bulkdata != NULL?bulkdata->d[1].os_data_ptr : NULL,
@@ -334,7 +334,7 @@ CsrResult unifi_send_signal(card_t *card, const u8 *sigptr, u32 siglen,
         /* Sanity check: MA-PACKET.req must have a valid bulk data */
         if ((bulkdata->d[0].data_length == 0) || (bulkdata->d[0].os_data_ptr == NULL))
         {
-            unifi_error(card->ospriv, "MA-PACKET.req with empty bulk data (%d bytes in %p)\n",
+            unifi_error(card->ospriv, "MA-PACKET.req with empty bulk data (%d bytes in %pK)\n",
                         bulkdata->d[0].data_length, bulkdata->d[0].os_data_ptr);
             dump((void *)sigptr, siglen);
             return CSR_RESULT_FAILURE;

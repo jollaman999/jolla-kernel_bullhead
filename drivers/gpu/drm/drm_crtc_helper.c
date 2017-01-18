@@ -937,7 +937,7 @@ int drm_helper_resume_force_mode(struct drm_device *dev)
 					       crtc->x, crtc->y, crtc->fb);
 
 		if (ret == false)
-			DRM_ERROR("failed to set mode on crtc %p\n", crtc);
+			DRM_ERROR("failed to set mode on crtc %pK\n", crtc);
 
 		/* Turn off outputs that were already powered off */
 		if (drm_helper_choose_crtc_dpms(crtc)) {

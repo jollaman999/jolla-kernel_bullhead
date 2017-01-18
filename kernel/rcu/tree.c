@@ -2034,7 +2034,7 @@ static void rcu_cleanup_dead_cpu(int cpu, struct rcu_state *rsp)
 	if (need_report & RCU_OFL_TASKS_EXP_GP)
 		rcu_report_exp_rnp(rsp, rnp, true);
 	WARN_ONCE(rdp->qlen != 0 || rdp->nxtlist != NULL,
-		  "rcu_cleanup_dead_cpu: Callbacks on offline CPU %d: qlen=%lu, nxtlist=%p\n",
+		  "rcu_cleanup_dead_cpu: Callbacks on offline CPU %d: qlen=%lu, nxtlist=%pK\n",
 		  cpu, rdp->qlen, rdp->nxtlist);
 	init_callback_list(rdp);
 	/* Disallow further callbacks on this CPU. */

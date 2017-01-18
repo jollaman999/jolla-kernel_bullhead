@@ -113,7 +113,7 @@ static const struct unwind_idx *search_index(unsigned long addr,
 {
 	unsigned long addr_prel31;
 
-	pr_debug("%s(%08lx, %p, %p, %p)\n",
+	pr_debug("%s(%08lx, %pK, %pK, %pK)\n",
 			__func__, addr, start, origin, stop);
 
 	/*
@@ -159,7 +159,7 @@ static const struct unwind_idx *search_index(unsigned long addr,
 static const struct unwind_idx *unwind_find_origin(
 		const struct unwind_idx *start, const struct unwind_idx *stop)
 {
-	pr_debug("%s(%p, %p)\n", __func__, start, stop);
+	pr_debug("%s(%pK, %pK)\n", __func__, start, stop);
 	while (start < stop) {
 		const struct unwind_idx *mid = start + ((stop - start) >> 1);
 
@@ -170,7 +170,7 @@ static const struct unwind_idx *unwind_find_origin(
 			/* positive offset */
 			stop = mid;
 	}
-	pr_debug("%s -> %p\n", __func__, stop);
+	pr_debug("%s -> %pK\n", __func__, stop);
 	return stop;
 }
 
@@ -210,7 +210,7 @@ static const struct unwind_idx *unwind_find_idx(unsigned long addr)
 		spin_unlock_irqrestore(&unwind_lock, flags);
 	}
 
-	pr_debug("%s: idx = %p\n", __func__, idx);
+	pr_debug("%s: idx = %pK\n", __func__, idx);
 	return idx;
 }
 
@@ -364,7 +364,7 @@ int unwind_frame(struct stackframe *frame)
 		/* only personality routine 0 supported in the index */
 		ctrl.insn = &idx->insn;
 	else {
-		pr_warning("unwind: Unsupported personality routine %08lx in the index at %p\n",
+		pr_warning("unwind: Unsupported personality routine %08lx in the index at %pK\n",
 			   idx->insn, idx);
 		return -URC_FAILURE;
 	}
@@ -377,7 +377,7 @@ int unwind_frame(struct stackframe *frame)
 		ctrl.byte = 1;
 		ctrl.entries = 1 + ((*ctrl.insn & 0x00ff0000) >> 16);
 	} else {
-		pr_warning("unwind: Unsupported personality routine %08lx at %p\n",
+		pr_warning("unwind: Unsupported personality routine %08lx at %pK\n",
 			   *ctrl.insn, ctrl.insn);
 		return -URC_FAILURE;
 	}
@@ -410,7 +410,7 @@ void unwind_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 	struct stackframe frame;
 	register unsigned long current_sp asm ("sp");
 
-	pr_debug("%s(regs = %p tsk = %p)\n", __func__, regs, tsk);
+	pr_debug("%s(regs = %pK tsk = %pK)\n", __func__, regs, tsk);
 
 	if (!tsk)
 		tsk = current;

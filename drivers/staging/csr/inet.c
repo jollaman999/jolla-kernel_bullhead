@@ -38,7 +38,7 @@ static int uf_inetaddr_event(struct notifier_block *notif, unsigned long event, 
     netInterface_priv_t *InterfacePriv = (netInterface_priv_t *)NULL;
 
     if (!ifa || !((struct in_ifaddr *)ifa)->ifa_dev) {
-        unifi_trace(NULL, UDBG1, "uf_inetaddr_event (%lu) ifa=%p\n", event, ifa);
+        unifi_trace(NULL, UDBG1, "uf_inetaddr_event (%lu) ifa=%pK\n", event, ifa);
         return NOTIFY_DONE;
     }
 
@@ -49,13 +49,13 @@ static int uf_inetaddr_event(struct notifier_block *notif, unsigned long event, 
      * Therefore check the netdev_priv to make sure it's a known UniFi one.
      */
     if (uf_find_netdev_priv(InterfacePriv) == -1) {
-        unifi_trace(NULL, UDBG1, "uf_inetaddr_event (%lu) ndev=%p, other netdev_priv=%p\n",
+        unifi_trace(NULL, UDBG1, "uf_inetaddr_event (%lu) ndev=%pK, other netdev_priv=%pK\n",
                     event, ndev, InterfacePriv);
         return NOTIFY_DONE;
     }
 
     if (!InterfacePriv->privPtr) {
-        unifi_error(NULL, "uf_inetaddr_event null priv (%lu) ndev=%p, InterfacePriv=%p\n",
+        unifi_error(NULL, "uf_inetaddr_event null priv (%lu) ndev=%pK, InterfacePriv=%pK\n",
                     event, ndev, InterfacePriv);
         return NOTIFY_DONE;
     }

@@ -262,7 +262,7 @@ static int ecryptfs_open(struct inode *inode, struct file *file)
 	rc = read_or_initialize_metadata(ecryptfs_dentry);
 	if (rc)
 		goto out_put;
-	ecryptfs_printk(KERN_DEBUG, "inode w/ addr = [0x%p], i_ino = "
+	ecryptfs_printk(KERN_DEBUG, "inode w/ addr = [0x%pK], i_ino = "
 			"[0x%.16lx] size: [0x%.16llx]\n", inode, inode->i_ino,
 			(unsigned long long)i_size_read(inode));
 	goto out;

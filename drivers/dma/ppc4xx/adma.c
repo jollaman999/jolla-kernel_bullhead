@@ -151,7 +151,7 @@ static void print_cb(struct ppc440spe_adma_chan *chan, void *block)
 	case 1:
 		cdb = block;
 
-		pr_debug("CDB at %p [%d]:\n"
+		pr_debug("CDB at %pK [%d]:\n"
 			"\t attr 0x%02x opc 0x%02x cnt 0x%08x\n"
 			"\t sg1u 0x%08x sg1l 0x%08x\n"
 			"\t sg2u 0x%08x sg2l 0x%08x\n"
@@ -166,7 +166,7 @@ static void print_cb(struct ppc440spe_adma_chan *chan, void *block)
 	case 2:
 		cb = block;
 
-		pr_debug("CB at %p [%d]:\n"
+		pr_debug("CB at %pK [%d]:\n"
 			"\t cbc 0x%08x cbbc 0x%08x cbs 0x%08x\n"
 			"\t cbtah 0x%08x cbtal 0x%08x\n"
 			"\t cblah 0x%08x cblal 0x%08x\n",
@@ -741,7 +741,7 @@ static void ppc440spe_xor_set_link(struct ppc440spe_adma_desc_slot *prev_desc,
 	struct xor_cb *xor_hw_desc = prev_desc->hw_desc;
 
 	if (unlikely(!next_desc || !(next_desc->phys))) {
-		printk(KERN_ERR "%s: next_desc=0x%p; next_desc->phys=0x%llx\n",
+		printk(KERN_ERR "%s: next_desc=0x%pK; next_desc->phys=0x%llx\n",
 			__func__, next_desc,
 			next_desc ? next_desc->phys : 0);
 		BUG();
@@ -770,8 +770,8 @@ static void ppc440spe_desc_set_link(struct ppc440spe_adma_chan *chan,
 		 * though we may refetch from append to initiate list
 		 * processing; in this case - it's ok.
 		 */
-		printk(KERN_ERR "%s: prev_desc=0x%p; next_desc=0x%p; "
-			"prev->hw_next=0x%p\n", __func__, prev_desc,
+		printk(KERN_ERR "%s: prev_desc=0x%pK; next_desc=0x%pK; "
+			"prev->hw_next=0x%pK\n", __func__, prev_desc,
 			next_desc, prev_desc ? prev_desc->hw_next : 0);
 		BUG();
 	}
@@ -2243,7 +2243,7 @@ static dma_cookie_t ppc440spe_adma_tx_submit(struct dma_async_tx_descriptor *tx)
 	spin_unlock_bh(&chan->lock);
 
 	dev_dbg(chan->device->common.dev,
-		"ppc440spe adma%d: %s cookie: %d slot: %d tx %p\n",
+		"ppc440spe adma%d: %s cookie: %d slot: %d tx %pK\n",
 		chan->device->id, __func__,
 		sw_desc->async_tx.cookie, sw_desc->idx, sw_desc);
 
@@ -4446,7 +4446,7 @@ static int ppc440spe_adma_probe(struct platform_device *ofdev)
 		ret = -ENOMEM;
 		goto err_dma_alloc;
 	}
-	dev_dbg(&ofdev->dev, "allocated descriptor pool virt 0x%p phys 0x%llx\n",
+	dev_dbg(&ofdev->dev, "allocated descriptor pool virt 0x%pK phys 0x%llx\n",
 		adev->dma_desc_pool_virt, (u64)adev->dma_desc_pool);
 
 	regs = ioremap(res.start, resource_size(&res));

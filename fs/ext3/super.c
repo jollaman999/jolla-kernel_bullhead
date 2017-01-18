@@ -393,7 +393,7 @@ static void dump_orphan_list(struct super_block *sb, struct ext3_sb_info *sbi)
 	list_for_each(l, &sbi->s_orphan) {
 		struct inode *inode = orphan_list_entry(l);
 		ext3_msg(sb, KERN_ERR, "  "
-		       "inode %s:%lu at %p: mode %o, nlink %d, next %d\n",
+		       "inode %s:%lu at %pK: mode %o, nlink %d, next %d\n",
 		       inode->i_sb->s_id, inode->i_ino, inode,
 		       inode->i_mode, inode->i_nlink,
 		       NEXT_ORPHAN(inode));
@@ -493,7 +493,7 @@ static void ext3_i_callback(struct rcu_head *head)
 static void ext3_destroy_inode(struct inode *inode)
 {
 	if (!list_empty(&(EXT3_I(inode)->i_orphan))) {
-		printk("EXT3 Inode %p: orphan list check failed!\n",
+		printk("EXT3 Inode %pK: orphan list check failed!\n",
 			EXT3_I(inode));
 		print_hex_dump(KERN_INFO, "", DUMP_PREFIX_ADDRESS, 16, 4,
 				EXT3_I(inode), sizeof(struct ext3_inode_info),
@@ -2139,7 +2139,7 @@ static journal_t *ext3_get_journal(struct super_block *sb,
 		return NULL;
 	}
 
-	jbd_debug(2, "Journal inode found at %p: %Ld bytes\n",
+	jbd_debug(2, "Journal inode found at %pK: %Ld bytes\n",
 		  journal_inode, journal_inode->i_size);
 	if (!S_ISREG(journal_inode->i_mode)) {
 		ext3_msg(sb, KERN_ERR, "error: invalid journal inode");

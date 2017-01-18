@@ -146,7 +146,7 @@ static ssize_t bfin_otp_write(struct file *filp, const char __user *buff, size_t
 	page = *pos / (sizeof(u64) * 2);
 	while (bytes_done < count) {
 		flags = base_flags | (*pos % (sizeof(u64) * 2) ? OTP_UPPER_HALF : OTP_LOWER_HALF);
-		stamp("processing page %i (0x%x:%s) from %p", page, flags,
+		stamp("processing page %i (0x%x:%s) from %pK", page, flags,
 			(flags & OTP_UPPER_HALF ? "upper" : "lower"), buff + bytes_done);
 		if (copy_from_user(&content, buff + bytes_done, sizeof(content))) {
 			bytes_done = -EFAULT;

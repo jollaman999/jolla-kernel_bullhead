@@ -654,11 +654,11 @@ void __init mem_init(void)
 
 #ifdef CONFIG_DEBUG_KERNEL /* double-sanity-check paranoia */
 	printk("virtual kernel memory layout:\n"
-	       "    vmalloc : 0x%p - 0x%p   (%4ld MB)\n"
-	       "    memory  : 0x%p - 0x%p   (%4ld MB)\n"
-	       "      .init : 0x%p - 0x%p   (%4ld kB)\n"
-	       "      .data : 0x%p - 0x%p   (%4ld kB)\n"
-	       "      .text : 0x%p - 0x%p   (%4ld kB)\n",
+	       "    vmalloc : 0x%pK - 0x%pK   (%4ld MB)\n"
+	       "    memory  : 0x%pK - 0x%pK   (%4ld MB)\n"
+	       "      .init : 0x%pK - 0x%pK   (%4ld kB)\n"
+	       "      .data : 0x%pK - 0x%pK   (%4ld kB)\n"
+	       "      .text : 0x%pK - 0x%pK   (%4ld kB)\n",
 
 	       (void*)VMALLOC_START, (void*)VMALLOC_END,
 	       (VMALLOC_END - VMALLOC_START) >> 20,

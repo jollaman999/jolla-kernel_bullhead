@@ -119,7 +119,7 @@ rpcrdma_qp_async_error_upcall(struct ib_event *event, void *context)
 {
 	struct rpcrdma_ep *ep = context;
 
-	dprintk("RPC:       %s: QP error %X on device %s ep %p\n",
+	dprintk("RPC:       %s: QP error %X on device %s ep %pK\n",
 		__func__, event->event, event->device->name, context);
 	if (ep->rep_connected == 1) {
 		ep->rep_connected = -EIO;
@@ -133,7 +133,7 @@ rpcrdma_cq_async_error_upcall(struct ib_event *event, void *context)
 {
 	struct rpcrdma_ep *ep = context;
 
-	dprintk("RPC:       %s: CQ error %X on device %s ep %p\n",
+	dprintk("RPC:       %s: CQ error %X on device %s ep %pK\n",
 		__func__, event->event, event->device->name, context);
 	if (ep->rep_connected == 1) {
 		ep->rep_connected = -EIO;
@@ -149,7 +149,7 @@ void rpcrdma_event_process(struct ib_wc *wc)
 	struct rpcrdma_rep *rep =
 			(struct rpcrdma_rep *)(unsigned long) wc->wr_id;
 
-	dprintk("RPC:       %s: event rep %p status %X opcode %X length %u\n",
+	dprintk("RPC:       %s: event rep %pK status %X opcode %X length %u\n",
 		__func__, rep, wc->status, wc->opcode, wc->byte_len);
 
 	if (!rep) /* send or bind completion that we don't care about */
@@ -302,13 +302,13 @@ rpcrdma_conn_upcall(struct rdma_cm_id *id, struct rdma_cm_event *event)
 		break;
 	case RDMA_CM_EVENT_ADDR_ERROR:
 		ia->ri_async_rc = -EHOSTUNREACH;
-		dprintk("RPC:       %s: CM address resolution error, ep 0x%p\n",
+		dprintk("RPC:       %s: CM address resolution error, ep 0x%pK\n",
 			__func__, ep);
 		complete(&ia->ri_done);
 		break;
 	case RDMA_CM_EVENT_ROUTE_ERROR:
 		ia->ri_async_rc = -ENETUNREACH;
-		dprintk("RPC:       %s: CM route resolution error, ep 0x%p\n",
+		dprintk("RPC:       %s: CM route resolution error, ep 0x%pK\n",
 			__func__, ep);
 		complete(&ia->ri_done);
 		break;
@@ -336,7 +336,7 @@ rpcrdma_conn_upcall(struct rdma_cm_id *id, struct rdma_cm_event *event)
 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
 		connstate = -ENODEV;
 connected:
-		dprintk("RPC:       %s: %s: %pI4:%u (ep 0x%p event 0x%x)\n",
+		dprintk("RPC:       %s: %s: %pI4:%u (ep 0x%pK event 0x%x)\n",
 			__func__,
 			(event->event <= 11) ? conn[event->event] :
 						"unknown connection error",
@@ -1461,7 +1461,7 @@ rpcrdma_map_one(struct rpcrdma_ia *ia, struct rpcrdma_mr_seg *seg, int writing)
 				seg->mr_offset,
 				seg->mr_dmalen, seg->mr_dir);
 	if (ib_dma_mapping_error(ia->ri_id->device, seg->mr_dma)) {
-		dprintk("RPC:       %s: mr_dma %llx mr_offset %p mr_dma_len %zu\n",
+		dprintk("RPC:       %s: mr_dma %llx mr_offset %pK mr_dma_len %zu\n",
 			__func__,
 			(unsigned long long)seg->mr_dma,
 			seg->mr_offset, seg->mr_dmalen);
@@ -1516,7 +1516,7 @@ rpcrdma_register_frmr_external(struct rpcrdma_mr_seg *seg,
 		    offset_in_page((seg-1)->mr_offset + (seg-1)->mr_len))
 			break;
 	}
-	dprintk("RPC:       %s: Using frmr %p to map %d segments\n",
+	dprintk("RPC:       %s: Using frmr %pK to map %d segments\n",
 		__func__, seg1->mr_chunk.rl_mw, i);
 
 	if (unlikely(seg1->mr_chunk.rl_mw->r.frmr.state == FRMR_IS_VALID)) {

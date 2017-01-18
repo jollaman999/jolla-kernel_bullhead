@@ -1241,7 +1241,7 @@ static void complete_scsi_command(struct CommandList *cp)
 				 * Not Supported condition,
 				 */
 				if ((asc == 0x25) && (ascq == 0x0)) {
-					dev_warn(&h->pdev->dev, "cp %p "
+					dev_warn(&h->pdev->dev, "cp %pK "
 						"has check condition\n", cp);
 					break;
 				}
@@ -1253,7 +1253,7 @@ static void complete_scsi_command(struct CommandList *cp)
 				 * required
 				 */
 				if ((asc == 0x04) && (ascq == 0x03)) {
-					dev_warn(&h->pdev->dev, "cp %p "
+					dev_warn(&h->pdev->dev, "cp %pK "
 						"has check condition: unit "
 						"not ready, manual "
 						"intervention required\n", cp);
@@ -1262,7 +1262,7 @@ static void complete_scsi_command(struct CommandList *cp)
 			}
 			if (sense_key == ABORTED_COMMAND) {
 				/* Aborted command is retryable */
-				dev_warn(&h->pdev->dev, "cp %p "
+				dev_warn(&h->pdev->dev, "cp %pK "
 					"has check condition: aborted command: "
 					"ASC: 0x%x, ASCQ: 0x%x\n",
 					cp, asc, ascq);
@@ -1270,7 +1270,7 @@ static void complete_scsi_command(struct CommandList *cp)
 				break;
 			}
 			/* Must be some other type of check condition */
-			dev_dbg(&h->pdev->dev, "cp %p has check condition: "
+			dev_dbg(&h->pdev->dev, "cp %pK has check condition: "
 					"unknown type: "
 					"Sense: 0x%x, ASC: 0x%x, ASCQ: 0x%x, "
 					"Returning result: 0x%x, "
@@ -1295,14 +1295,14 @@ static void complete_scsi_command(struct CommandList *cp)
 		 * Pass it up to the upper layers...
 		 */
 		if (ei->ScsiStatus) {
-			dev_warn(&h->pdev->dev, "cp %p has status 0x%x "
+			dev_warn(&h->pdev->dev, "cp %pK has status 0x%x "
 				"Sense: 0x%x, ASC: 0x%x, ASCQ: 0x%x, "
 				"Returning result: 0x%x\n",
 				cp, ei->ScsiStatus,
 				sense_key, asc, ascq,
 				cmd->result);
 		} else {  /* scsi status is zero??? How??? */
-			dev_warn(&h->pdev->dev, "cp %p SCSI status was 0. "
+			dev_warn(&h->pdev->dev, "cp %pK SCSI status was 0. "
 				"Returning no connection.\n", cp),
 
 			/* Ordinarily, this case should never happen,
@@ -1324,7 +1324,7 @@ static void complete_scsi_command(struct CommandList *cp)
 	case CMD_DATA_UNDERRUN: /* let mid layer handle it. */
 		break;
 	case CMD_DATA_OVERRUN:
-		dev_warn(&h->pdev->dev, "cp %p has"
+		dev_warn(&h->pdev->dev, "cp %pK has"
 			" completed with data overrun "
 			"reported\n", cp);
 		break;
@@ -1342,34 +1342,34 @@ static void complete_scsi_command(struct CommandList *cp)
 		break;
 	case CMD_PROTOCOL_ERR:
 		cmd->result = DID_ERROR << 16;
-		dev_warn(&h->pdev->dev, "cp %p has "
+		dev_warn(&h->pdev->dev, "cp %pK has "
 			"protocol error\n", cp);
 		break;
 	case CMD_HARDWARE_ERR:
 		cmd->result = DID_ERROR << 16;
-		dev_warn(&h->pdev->dev, "cp %p had  hardware error\n", cp);
+		dev_warn(&h->pdev->dev, "cp %pK had  hardware error\n", cp);
 		break;
 	case CMD_CONNECTION_LOST:
 		cmd->result = DID_ERROR << 16;
-		dev_warn(&h->pdev->dev, "cp %p had connection lost\n", cp);
+		dev_warn(&h->pdev->dev, "cp %pK had connection lost\n", cp);
 		break;
 	case CMD_ABORTED:
 		cmd->result = DID_ABORT << 16;
-		dev_warn(&h->pdev->dev, "cp %p was aborted with status 0x%x\n",
+		dev_warn(&h->pdev->dev, "cp %pK was aborted with status 0x%x\n",
 				cp, ei->ScsiStatus);
 		break;
 	case CMD_ABORT_FAILED:
 		cmd->result = DID_ERROR << 16;
-		dev_warn(&h->pdev->dev, "cp %p reports abort failed\n", cp);
+		dev_warn(&h->pdev->dev, "cp %pK reports abort failed\n", cp);
 		break;
 	case CMD_UNSOLICITED_ABORT:
 		cmd->result = DID_SOFT_ERROR << 16; /* retry the command */
-		dev_warn(&h->pdev->dev, "cp %p aborted due to an unsolicited "
+		dev_warn(&h->pdev->dev, "cp %pK aborted due to an unsolicited "
 			"abort\n", cp);
 		break;
 	case CMD_TIMEOUT:
 		cmd->result = DID_TIME_OUT << 16;
-		dev_warn(&h->pdev->dev, "cp %p timedout\n", cp);
+		dev_warn(&h->pdev->dev, "cp %pK timedout\n", cp);
 		break;
 	case CMD_UNABORTABLE:
 		cmd->result = DID_ERROR << 16;
@@ -1377,7 +1377,7 @@ static void complete_scsi_command(struct CommandList *cp)
 		break;
 	default:
 		cmd->result = DID_ERROR << 16;
-		dev_warn(&h->pdev->dev, "cp %p returned unknown status %x\n",
+		dev_warn(&h->pdev->dev, "cp %pK returned unknown status %x\n",
 				cp, ei->CommandStatus);
 	}
 	cmd_free(h, cp);
@@ -1484,8 +1484,8 @@ static void hpsa_scsi_interpret_error(struct CommandList *cp)
 	ei = cp->err_info;
 	switch (ei->CommandStatus) {
 	case CMD_TARGET_STATUS:
-		dev_warn(d, "cmd %p has completed with errors\n", cp);
-		dev_warn(d, "cmd %p has SCSI Status = %x\n", cp,
+		dev_warn(d, "cmd %pK has completed with errors\n", cp);
+		dev_warn(d, "cmd %pK has SCSI Status = %x\n", cp,
 				ei->ScsiStatus);
 		if (ei->ScsiStatus == 0)
 			dev_warn(d, "SCSI status is abnormally zero.  "
@@ -1497,45 +1497,45 @@ static void hpsa_scsi_interpret_error(struct CommandList *cp)
 			dev_info(d, "UNDERRUN\n");
 		break;
 	case CMD_DATA_OVERRUN:
-		dev_warn(d, "cp %p has completed with data overrun\n", cp);
+		dev_warn(d, "cp %pK has completed with data overrun\n", cp);
 		break;
 	case CMD_INVALID: {
 		/* controller unfortunately reports SCSI passthru's
 		 * to non-existent targets as invalid commands.
 		 */
-		dev_warn(d, "cp %p is reported invalid (probably means "
+		dev_warn(d, "cp %pK is reported invalid (probably means "
 			"target device no longer present)\n", cp);
 		/* print_bytes((unsigned char *) cp, sizeof(*cp), 1, 0);
 		print_cmd(cp);  */
 		}
 		break;
 	case CMD_PROTOCOL_ERR:
-		dev_warn(d, "cp %p has protocol error \n", cp);
+		dev_warn(d, "cp %pK has protocol error \n", cp);
 		break;
 	case CMD_HARDWARE_ERR:
 		/* cmd->result = DID_ERROR << 16; */
-		dev_warn(d, "cp %p had hardware error\n", cp);
+		dev_warn(d, "cp %pK had hardware error\n", cp);
 		break;
 	case CMD_CONNECTION_LOST:
-		dev_warn(d, "cp %p had connection lost\n", cp);
+		dev_warn(d, "cp %pK had connection lost\n", cp);
 		break;
 	case CMD_ABORTED:
-		dev_warn(d, "cp %p was aborted\n", cp);
+		dev_warn(d, "cp %pK was aborted\n", cp);
 		break;
 	case CMD_ABORT_FAILED:
-		dev_warn(d, "cp %p reports abort failed\n", cp);
+		dev_warn(d, "cp %pK reports abort failed\n", cp);
 		break;
 	case CMD_UNSOLICITED_ABORT:
-		dev_warn(d, "cp %p aborted due to an unsolicited abort\n", cp);
+		dev_warn(d, "cp %pK aborted due to an unsolicited abort\n", cp);
 		break;
 	case CMD_TIMEOUT:
-		dev_warn(d, "cp %p timed out\n", cp);
+		dev_warn(d, "cp %pK timed out\n", cp);
 		break;
 	case CMD_UNABORTABLE:
 		dev_warn(d, "Command unabortable\n");
 		break;
 	default:
-		dev_warn(d, "cp %p returned unknown status %x\n", cp,
+		dev_warn(d, "cp %pK returned unknown status %x\n", cp,
 				ei->CommandStatus);
 	}
 }

@@ -659,7 +659,7 @@ replay_wakeup_event(struct perf_sched *sched,
 	struct task_desc *waker, *wakee;
 
 	if (verbose) {
-		printf("sched_wakeup event %p\n", evsel);
+		printf("sched_wakeup event %pK\n", evsel);
 
 		printf(" ... pid %d woke up %s/%d\n", sample->tid, comm, pid);
 	}
@@ -687,7 +687,7 @@ static int replay_switch_event(struct perf_sched *sched,
 	s64 delta;
 
 	if (verbose)
-		printf("sched_switch event %p\n", evsel);
+		printf("sched_switch event %pK\n", evsel);
 
 	if (cpu >= MAX_CPUS || cpu < 0)
 		return 0;
@@ -726,7 +726,7 @@ static int replay_fork_event(struct perf_sched *sched, struct perf_evsel *evsel,
 		  child_pid  = perf_evsel__intval(evsel, sample, "child_pid");
 
 	if (verbose) {
-		printf("sched_fork event %p\n", evsel);
+		printf("sched_fork event %pK\n", evsel);
 		printf("... parent: %s/%d\n", parent_comm, parent_pid);
 		printf("...  child: %s/%d\n", child_comm, child_pid);
 	}
@@ -1397,7 +1397,7 @@ static int process_sched_exit_event(struct perf_tool *tool __maybe_unused,
 				    struct perf_sample *sample __maybe_unused,
 				    struct machine *machine __maybe_unused)
 {
-	pr_debug("sched_exit event %p\n", evsel);
+	pr_debug("sched_exit event %pK\n", evsel);
 	return 0;
 }
 

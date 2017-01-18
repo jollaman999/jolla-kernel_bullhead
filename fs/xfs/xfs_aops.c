@@ -871,7 +871,7 @@ xfs_aops_discard_page(
 		goto out_invalidate;
 
 	xfs_alert(ip->i_mount,
-		"page discard on page %p, inode 0x%llx, offset %llu.",
+		"page discard on page %pK, inode 0x%llx, offset %llu.",
 			page, ip->i_ino, offset);
 
 	xfs_ilock(ip, XFS_ILOCK_EXCL);

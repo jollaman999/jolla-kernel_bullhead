@@ -585,7 +585,7 @@ int rndis_ipa_init(struct ipa_usb_init_params *params)
 		goto fail_netdev_priv;
 	}
 	memset(rndis_ipa_ctx, 0, sizeof(*rndis_ipa_ctx));
-	RNDIS_IPA_DEBUG("rndis_ipa_ctx (private)=%p\n", rndis_ipa_ctx);
+	RNDIS_IPA_DEBUG("rndis_ipa_ctx (private)=%pK\n", rndis_ipa_ctx);
 
 	rndis_ipa_ctx->net = net;
 	rndis_ipa_ctx->tx_filter = false;
@@ -741,7 +741,7 @@ int rndis_ipa_pipe_connect_notify(u32 usb_to_ipa_hdl,
 
 	NULL_CHECK_RETVAL(private);
 
-	RNDIS_IPA_DEBUG("usb_to_ipa_hdl=%d, ipa_to_usb_hdl=%d, private=0x%p\n",
+	RNDIS_IPA_DEBUG("usb_to_ipa_hdl=%d, ipa_to_usb_hdl=%d, private=0x%pK\n",
 				usb_to_ipa_hdl, ipa_to_usb_hdl, private);
 	RNDIS_IPA_DEBUG("max_xfer_sz_to_dev=%d, max_pkt_num_to_dev=%d\n",
 			max_xfer_size_bytes_to_dev,
@@ -1232,7 +1232,7 @@ int rndis_ipa_pipe_disconnect_notify(void *private)
 	RNDIS_IPA_LOG_ENTRY();
 
 	NULL_CHECK_RETVAL(rndis_ipa_ctx);
-	RNDIS_IPA_DEBUG("private=0x%p\n", private);
+	RNDIS_IPA_DEBUG("private=0x%pK\n", private);
 
 	next_state = rndis_ipa_next_state(rndis_ipa_ctx->state,
 		RNDIS_IPA_DISCONNECT);
@@ -1313,7 +1313,7 @@ void rndis_ipa_cleanup(void *private)
 
 	RNDIS_IPA_LOG_ENTRY();
 
-	RNDIS_IPA_DEBUG("private=0x%p\n", private);
+	RNDIS_IPA_DEBUG("private=0x%pK\n", private);
 
 	if (!rndis_ipa_ctx) {
 		RNDIS_IPA_ERROR("rndis_ipa_ctx NULL pointer\n");
@@ -1893,7 +1893,7 @@ static struct sk_buff *rndis_encapsulate_skb(struct sk_buff *skb)
 			RNDIS_IPA_ERROR("no memory for skb expand\n");
 			return skb;
 		}
-		RNDIS_IPA_DEBUG("skb expanded. old %p new %p\n", skb, new_skb);
+		RNDIS_IPA_DEBUG("skb expanded. old %pK new %pK\n", skb, new_skb);
 		dev_kfree_skb_any(skb);
 		skb = new_skb;
 	}

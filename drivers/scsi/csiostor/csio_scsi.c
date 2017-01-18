@@ -784,11 +784,11 @@ csio_scsis_uninit(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		 *   Print a message for now, and return INVAL either way.
 		 */
 		req->drv_status = -EINVAL;
-		csio_warn(hw, "Trying to abort/close completed IO:%p!\n", req);
+		csio_warn(hw, "Trying to abort/close completed IO:%pK!\n", req);
 		break;
 
 	default:
-		csio_dbg(hw, "Unhandled event:%d sent to req:%p\n", evt, req);
+		csio_dbg(hw, "Unhandled event:%d sent to req:%pK\n", evt, req);
 		CSIO_DB_ASSERT(0);
 	}
 }
@@ -860,7 +860,7 @@ csio_scsis_io_active(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		break;
 
 	default:
-		csio_dbg(hw, "Unhandled event:%d sent to req:%p\n", evt, req);
+		csio_dbg(hw, "Unhandled event:%d sent to req:%pK\n", evt, req);
 		CSIO_DB_ASSERT(0);
 	}
 }
@@ -903,7 +903,7 @@ csio_scsis_tm_active(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		break;
 
 	default:
-		csio_dbg(hw, "Unhandled event:%d sent to req:%p\n", evt, req);
+		csio_dbg(hw, "Unhandled event:%d sent to req:%pK\n", evt, req);
 		CSIO_DB_ASSERT(0);
 	}
 }
@@ -917,7 +917,7 @@ csio_scsis_aborting(struct csio_ioreq *req, enum csio_scsi_ev evt)
 	switch (evt) {
 	case CSIO_SCSIE_COMPLETED:
 		csio_dbg(hw,
-			 "ioreq %p recvd cmpltd (wr_status:%d) "
+			 "ioreq %pK recvd cmpltd (wr_status:%d) "
 			 "in aborting st\n", req, req->wr_status);
 		/*
 		 * Use -ECANCELED to explicitly tell the ABORTED event that
@@ -937,7 +937,7 @@ csio_scsis_aborting(struct csio_ioreq *req, enum csio_scsi_ev evt)
 
 	case CSIO_SCSIE_ABORTED:
 
-		csio_dbg(hw, "abort of %p return status:0x%x drv_status:%x\n",
+		csio_dbg(hw, "abort of %pK return status:0x%x drv_status:%x\n",
 			 req, req->wr_status, req->drv_status);
 		/*
 		 * Check if original I/O WR completed before the Abort
@@ -946,7 +946,7 @@ csio_scsis_aborting(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		if (req->drv_status != -ECANCELED) {
 			csio_warn(hw,
 				  "Abort completed before original I/O,"
-				   " req:%p\n", req);
+				   " req:%pK\n", req);
 			CSIO_DB_ASSERT(0);
 		}
 
@@ -1000,7 +1000,7 @@ csio_scsis_aborting(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		break;
 
 	default:
-		csio_dbg(hw, "Unhandled event:%d sent to req:%p\n", evt, req);
+		csio_dbg(hw, "Unhandled event:%d sent to req:%pK\n", evt, req);
 		CSIO_DB_ASSERT(0);
 	}
 }
@@ -1014,7 +1014,7 @@ csio_scsis_closing(struct csio_ioreq *req, enum csio_scsi_ev evt)
 	switch (evt) {
 	case CSIO_SCSIE_COMPLETED:
 		csio_dbg(hw,
-			 "ioreq %p recvd cmpltd (wr_status:%d) "
+			 "ioreq %pK recvd cmpltd (wr_status:%d) "
 			 "in closing st\n", req, req->wr_status);
 		/*
 		 * Use -ECANCELED to explicitly tell the CLOSED event that
@@ -1036,7 +1036,7 @@ csio_scsis_closing(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		if (req->drv_status != -ECANCELED) {
 			csio_fatal(hw,
 				   "Close completed before original I/O,"
-				   " req:%p\n", req);
+				   " req:%pK\n", req);
 			CSIO_DB_ASSERT(0);
 		}
 
@@ -1064,7 +1064,7 @@ csio_scsis_closing(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		break;
 
 	default:
-		csio_dbg(hw, "Unhandled event:%d sent to req:%p\n", evt, req);
+		csio_dbg(hw, "Unhandled event:%d sent to req:%pK\n", evt, req);
 		CSIO_DB_ASSERT(0);
 	}
 }
@@ -1097,7 +1097,7 @@ csio_scsis_shost_cmpl_await(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		csio_set_state(&req->sm, csio_scsis_uninit);
 		break;
 	default:
-		csio_dbg(req->lnode->hwp, "Unhandled event:%d sent to req:%p\n",
+		csio_dbg(req->lnode->hwp, "Unhandled event:%d sent to req:%pK\n",
 			 evt, req);
 		CSIO_DB_ASSERT(0);
 	}
@@ -1346,7 +1346,7 @@ csio_scsim_cleanup_io_lnode(struct csio_scsim *scm, struct csio_lnode *ln)
 	int rv;
 	int count = DIV_ROUND_UP(60 * 1000, CSIO_SCSI_ABORT_Q_POLL_MS);
 
-	csio_dbg(hw, "Gathering all SCSI I/Os on lnode %p\n", ln);
+	csio_dbg(hw, "Gathering all SCSI I/Os on lnode %pK\n", ln);
 
 	sld.level = CSIO_LEV_LNODE;
 	sld.lnode = ln;
@@ -1368,7 +1368,7 @@ csio_scsim_cleanup_io_lnode(struct csio_scsim *scm, struct csio_lnode *ln)
 	if (list_empty(&ln->cmpl_q))
 		return 0;
 
-	csio_dbg(hw, "Some I/Os pending on ln:%p, aborting them..\n", ln);
+	csio_dbg(hw, "Some I/Os pending on ln:%pK, aborting them..\n", ln);
 
 	/* I/Os are pending, abort them */
 	rv = csio_scsi_abort_io_q(scm, &ln->cmpl_q, 30000);
@@ -1551,12 +1551,12 @@ csio_scsi_copy_to_sgl(struct csio_hw *hw, struct csio_ioreq *req)
 
 		sg_addr = kmap_atomic(sg_page(sg) + (sg_off >> PAGE_SHIFT));
 		if (!sg_addr) {
-			csio_err(hw, "failed to kmap sg:%p of ioreq:%p\n",
+			csio_err(hw, "failed to kmap sg:%pK of ioreq:%pK\n",
 				sg, req);
 			break;
 		}
 
-		csio_dbg(hw, "copy_to_sgl:sg_addr %p sg_off %d buf %p len %d\n",
+		csio_dbg(hw, "copy_to_sgl:sg_addr %pK sg_off %d buf %pK len %d\n",
 				sg_addr, sg_off, buf_addr, bytes_copy);
 		memcpy(sg_addr + (sg_off & ~PAGE_MASK), buf_addr, bytes_copy);
 		kunmap_atomic(sg_addr);
@@ -1668,7 +1668,7 @@ csio_scsi_err_handler(struct csio_hw *hw, struct csio_ioreq *req)
 	case FW_SCSI_ABORT_REQUESTED:
 	case FW_SCSI_ABORTED:
 	case FW_SCSI_CLOSE_REQUESTED:
-		csio_dbg(hw, "Req %p cmd:%p op:%x %s\n", req, cmnd,
+		csio_dbg(hw, "Req %pK cmd:%pK op:%x %s\n", req, cmnd,
 			     cmnd->cmnd[0],
 			    (req->wr_status == FW_SCSI_CLOSE_REQUESTED) ?
 			    "closed" : "aborted");
@@ -1685,7 +1685,7 @@ csio_scsi_err_handler(struct csio_hw *hw, struct csio_ioreq *req)
 
 	case FW_SCSI_ABORT_TIMEDOUT:
 		/* FW timed out the abort itself */
-		csio_dbg(hw, "FW timed out abort req:%p cmnd:%p status:%x\n",
+		csio_dbg(hw, "FW timed out abort req:%pK cmnd:%pK status:%x\n",
 			 req, cmnd, req->wr_status);
 		host_status = DID_ERROR;
 		CSIO_INC_STATS(scm, n_abrt_timedout);
@@ -1727,7 +1727,7 @@ csio_scsi_err_handler(struct csio_hw *hw, struct csio_ioreq *req)
 		break;
 
 	default:
-		csio_err(hw, "Unknown SCSI FW WR status:%d req:%p cmnd:%p\n",
+		csio_err(hw, "Unknown SCSI FW WR status:%d req:%pK cmnd:%pK\n",
 			    req->wr_status, req, cmnd);
 		CSIO_DB_ASSERT(0);
 
@@ -1886,7 +1886,7 @@ csio_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmnd)
 	spin_unlock_irqrestore(&hw->lock, flags);
 
 	if (retval != 0) {
-		csio_err(hw, "ioreq: %p couldnt be started, status:%d\n",
+		csio_err(hw, "ioreq: %pK couldnt be started, status:%d\n",
 			 ioreq, retval);
 		CSIO_INC_STATS(scsim, n_busy_error);
 		goto err_put_req;
@@ -1956,7 +1956,7 @@ csio_eh_abort_handler(struct scsi_cmnd *cmnd)
 		return FAILED;
 
 	csio_dbg(hw,
-		 "Request to abort ioreq:%p cmd:%p cdb:%08llx"
+		 "Request to abort ioreq:%pK cmd:%pK cdb:%08llx"
 		 " ssni:0x%x lun:%d iq:0x%x\n",
 		ioreq, cmnd, *((uint64_t *)cmnd->cmnd), rn->flowid,
 		cmnd->device->lun, csio_q_physiqid(hw, ioreq->iq_idx));
@@ -1995,7 +1995,7 @@ csio_eh_abort_handler(struct scsi_cmnd *cmnd)
 	/* FW didnt respond to abort within our timeout */
 	if (((struct scsi_cmnd *)csio_scsi_cmnd(ioreq)) == cmnd) {
 
-		csio_err(hw, "Abort timed out -- req: %p\n", ioreq);
+		csio_err(hw, "Abort timed out -- req: %pK\n", ioreq);
 		CSIO_INC_STATS(scsim, n_abrt_timedout);
 
 inval_scmnd:
@@ -2046,7 +2046,7 @@ csio_tm_cbfn(struct csio_hw *hw, struct csio_ioreq *req)
 	struct fcp_resp_with_ext *fcp_resp;
 	struct fcp_resp_rsp_info *rsp_info;
 
-	csio_dbg(hw, "req: %p in csio_tm_cbfn status: %d\n",
+	csio_dbg(hw, "req: %pK in csio_tm_cbfn status: %d\n",
 		      req, req->wr_status);
 
 	/* Cache FW return status */
@@ -2176,7 +2176,7 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
 	spin_unlock_irqrestore(&hw->lock, flags);
 
 	if (retval != 0) {
-		csio_err(hw, "Failed to issue LUN reset, req:%p, status:%d\n",
+		csio_err(hw, "Failed to issue LUN reset, req:%pK, status:%d\n",
 			    ioreq, retval);
 		goto fail_ret_ioreq;
 	}

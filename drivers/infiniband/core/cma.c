@@ -3252,7 +3252,7 @@ static int cma_netdev_change(struct net_device *ndev, struct rdma_id_private *id
 
 	if ((dev_addr->bound_dev_if == ndev->ifindex) &&
 	    memcmp(dev_addr->src_dev_addr, ndev->dev_addr, ndev->addr_len)) {
-		printk(KERN_INFO "RDMA CM addr change for ndev %s used by id %p\n",
+		printk(KERN_INFO "RDMA CM addr change for ndev %s used by id %pK\n",
 		       ndev->name, &id_priv->id);
 		work = kzalloc(sizeof *work, GFP_KERNEL);
 		if (!work)

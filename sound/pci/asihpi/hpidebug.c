@@ -68,7 +68,7 @@ void hpi_debug_data(u16 *pdata, u32 len)
 		lines = 8;
 
 	for (i = 0, j = 0; j < lines; j++) {
-		printk(KERN_DEBUG "%p:", (pdata + i));
+		printk(KERN_DEBUG "%pK:", (pdata + i));
 
 		for (k = 0; k < cols && i < len; i++, k++)
 			printk("%s%04x", k == 0 ? "" : " ", pdata[i]);

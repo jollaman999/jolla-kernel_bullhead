@@ -390,7 +390,7 @@ static void free_plci(capidrv_contr *card, capidrv_plci *plcip)
 			return;
 		}
 	}
-	printk(KERN_ERR "capidrv-%d: free_plci %p (0x%x) not found, Huh?\n",
+	printk(KERN_ERR "capidrv-%d: free_plci %pK (0x%x) not found, Huh?\n",
 	       card->contrnr, plcip, plcip->plci);
 }
 
@@ -1857,7 +1857,7 @@ static int if_sendbuf(int id, int channel, int doack, struct sk_buff *skb)
 		return 0;
 	}
 	if (debugmode > 4)
-		printk(KERN_DEBUG "capidrv-%d: sendbuf len=%d skb=%p doack=%d\n",
+		printk(KERN_DEBUG "capidrv-%d: sendbuf len=%d skb=%pK doack=%d\n",
 		       card->contrnr, len, skb, doack);
 	bchan = &card->bchans[channel % card->nbchan];
 	nccip = bchan->nccip;

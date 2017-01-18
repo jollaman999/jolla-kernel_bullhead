@@ -724,7 +724,7 @@ void cluster_dt_walkthrough(struct lpm_cluster *cluster)
 		struct lpm_cluster_level *l = &cluster->levels[i];
 		pr_info("%d ndevices:%d\n", __LINE__, cluster->ndevices);
 		for (j = 0; j < cluster->ndevices; j++)
-			pr_info("%sDevice: %p id:%p\n", str,
+			pr_info("%sDevice: %pK id:%pK\n", str,
 					&cluster->name[j], &l->mode[i]);
 	}
 

@@ -668,7 +668,7 @@ void tty_ldisc_hangup(struct tty_struct *tty)
 	int reset = tty->driver->flags & TTY_DRIVER_RESET_TERMIOS;
 	int err = 0;
 
-	tty_ldisc_debug(tty, "closing ldisc: %p\n", tty->ldisc);
+	tty_ldisc_debug(tty, "closing ldisc: %pK\n", tty->ldisc);
 
 	ld = tty_ldisc_ref(tty);
 	if (ld != NULL) {
@@ -721,7 +721,7 @@ void tty_ldisc_hangup(struct tty_struct *tty)
 	if (reset)
 		tty_reset_termios(tty);
 
-	tty_ldisc_debug(tty, "re-opened ldisc: %p\n", tty->ldisc);
+	tty_ldisc_debug(tty, "re-opened ldisc: %pK\n", tty->ldisc);
 }
 
 /**
@@ -784,7 +784,7 @@ void tty_ldisc_release(struct tty_struct *tty, struct tty_struct *o_tty)
 	 * it does not race with the set_ldisc code path.
 	 */
 
-	tty_ldisc_debug(tty, "closing ldisc: %p\n", tty->ldisc);
+	tty_ldisc_debug(tty, "closing ldisc: %pK\n", tty->ldisc);
 
 	tty_ldisc_lock_pair(tty, o_tty);
 	tty_lock_pair(tty, o_tty);

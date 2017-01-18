@@ -1290,7 +1290,7 @@ static int snd_korg1212_silence(struct snd_korg1212 *korg1212, int pos, int coun
 #if K1212_DEBUG_LEVEL > 0
 		if ( (void *) dst < (void *) korg1212->playDataBufsPtr ||
 		     (void *) dst > (void *) korg1212->playDataBufsPtr[8].bufferData ) {
-			printk(KERN_DEBUG "K1212_DEBUG: snd_korg1212_silence KERNEL EFAULT dst=%p iter=%d\n",
+			printk(KERN_DEBUG "K1212_DEBUG: snd_korg1212_silence KERNEL EFAULT dst=%pK iter=%d\n",
 			       dst, i);
 			return -EFAULT;
 		}
@@ -1316,13 +1316,13 @@ static int snd_korg1212_copy_to(struct snd_korg1212 *korg1212, void __user *dst,
 #if K1212_DEBUG_LEVEL > 0
 		if ( (void *) src < (void *) korg1212->recordDataBufsPtr ||
 		     (void *) src > (void *) korg1212->recordDataBufsPtr[8].bufferData ) {
-			printk(KERN_DEBUG "K1212_DEBUG: snd_korg1212_copy_to KERNEL EFAULT, src=%p dst=%p iter=%d\n", src, dst, i);
+			printk(KERN_DEBUG "K1212_DEBUG: snd_korg1212_copy_to KERNEL EFAULT, src=%pK dst=%pK iter=%d\n", src, dst, i);
 			return -EFAULT;
 		}
 #endif
 		rc = copy_to_user(dst + offset, src, size);
 		if (rc) {
-			K1212_DEBUG_PRINTK("K1212_DEBUG: snd_korg1212_copy_to USER EFAULT src=%p dst=%p iter=%d\n", src, dst, i);
+			K1212_DEBUG_PRINTK("K1212_DEBUG: snd_korg1212_copy_to USER EFAULT src=%pK dst=%pK iter=%d\n", src, dst, i);
 			return -EFAULT;
 		}
 		src++;
@@ -1347,13 +1347,13 @@ static int snd_korg1212_copy_from(struct snd_korg1212 *korg1212, void __user *sr
 #if K1212_DEBUG_LEVEL > 0
 		if ( (void *) dst < (void *) korg1212->playDataBufsPtr ||
 		     (void *) dst > (void *) korg1212->playDataBufsPtr[8].bufferData ) {
-			printk(KERN_DEBUG "K1212_DEBUG: snd_korg1212_copy_from KERNEL EFAULT, src=%p dst=%p iter=%d\n", src, dst, i);
+			printk(KERN_DEBUG "K1212_DEBUG: snd_korg1212_copy_from KERNEL EFAULT, src=%pK dst=%pK iter=%d\n", src, dst, i);
 			return -EFAULT;
 		}
 #endif
 		rc = copy_from_user((void*) dst + offset, src, size);
 		if (rc) {
-			K1212_DEBUG_PRINTK("K1212_DEBUG: snd_korg1212_copy_from USER EFAULT src=%p dst=%p iter=%d\n", src, dst, i);
+			K1212_DEBUG_PRINTK("K1212_DEBUG: snd_korg1212_copy_from USER EFAULT src=%pK dst=%pK iter=%d\n", src, dst, i);
 			return -EFAULT;
 		}
 		dst++;
@@ -2265,16 +2265,16 @@ static int snd_korg1212_create(struct snd_card *card, struct pci_dev *pci,
         korg1212->idRegPtr = (u32 __iomem *) (korg1212->iobase + DEV_VEND_ID_OFFSET);
 
         K1212_DEBUG_PRINTK("K1212_DEBUG: card registers:\n"
-                   "    Status register = 0x%p\n"
-                   "    OutDoorbell     = 0x%p\n"
-                   "    InDoorbell      = 0x%p\n"
-                   "    Mailbox0        = 0x%p\n"
-                   "    Mailbox1        = 0x%p\n"
-                   "    Mailbox2        = 0x%p\n"
-                   "    Mailbox3        = 0x%p\n"
-                   "    ControlReg      = 0x%p\n"
-                   "    SensReg         = 0x%p\n"
-                   "    IDReg           = 0x%p\n"
+                   "    Status register = 0x%pK\n"
+                   "    OutDoorbell     = 0x%pK\n"
+                   "    InDoorbell      = 0x%pK\n"
+                   "    Mailbox0        = 0x%pK\n"
+                   "    Mailbox1        = 0x%pK\n"
+                   "    Mailbox2        = 0x%pK\n"
+                   "    Mailbox3        = 0x%pK\n"
+                   "    ControlReg      = 0x%pK\n"
+                   "    SensReg         = 0x%pK\n"
+                   "    IDReg           = 0x%pK\n"
 		   "    [%s]\n",
                    korg1212->statusRegPtr,
 		   korg1212->outDoorbellPtr,
@@ -2297,7 +2297,7 @@ static int snd_korg1212_create(struct snd_card *card, struct pci_dev *pci,
         korg1212->sharedBufferPtr = (struct KorgSharedBuffer *)korg1212->dma_shared.area;
         korg1212->sharedBufferPhy = korg1212->dma_shared.addr;
 
-        K1212_DEBUG_PRINTK("K1212_DEBUG: Shared Buffer Area = 0x%p (0x%08lx), %d bytes\n", korg1212->sharedBufferPtr, korg1212->sharedBufferPhy, sizeof(struct KorgSharedBuffer));
+        K1212_DEBUG_PRINTK("K1212_DEBUG: Shared Buffer Area = 0x%pK (0x%08lx), %d bytes\n", korg1212->sharedBufferPtr, korg1212->sharedBufferPhy, sizeof(struct KorgSharedBuffer));
 
 #ifndef K1212_LARGEALLOC
 
@@ -2312,7 +2312,7 @@ static int snd_korg1212_create(struct snd_card *card, struct pci_dev *pci,
 	korg1212->playDataBufsPtr = (struct KorgAudioBuffer *)korg1212->dma_play.area;
 	korg1212->PlayDataPhy = korg1212->dma_play.addr;
 
-        K1212_DEBUG_PRINTK("K1212_DEBUG: Play Data Area = 0x%p (0x%08x), %d bytes\n",
+        K1212_DEBUG_PRINTK("K1212_DEBUG: Play Data Area = 0x%pK (0x%08x), %d bytes\n",
 		korg1212->playDataBufsPtr, korg1212->PlayDataPhy, korg1212->DataBufsSize);
 
 	if (snd_dma_alloc_pages(SNDRV_DMA_TYPE_DEV, snd_dma_pci_data(pci),
@@ -2324,7 +2324,7 @@ static int snd_korg1212_create(struct snd_card *card, struct pci_dev *pci,
         korg1212->recordDataBufsPtr = (struct KorgAudioBuffer *)korg1212->dma_rec.area;
         korg1212->RecDataPhy = korg1212->dma_rec.addr;
 
-        K1212_DEBUG_PRINTK("K1212_DEBUG: Record Data Area = 0x%p (0x%08x), %d bytes\n",
+        K1212_DEBUG_PRINTK("K1212_DEBUG: Record Data Area = 0x%pK (0x%08x), %d bytes\n",
 		korg1212->recordDataBufsPtr, korg1212->RecDataPhy, korg1212->DataBufsSize);
 
 #else // K1212_LARGEALLOC
@@ -2359,7 +2359,7 @@ static int snd_korg1212_create(struct snd_card *card, struct pci_dev *pci,
                 return -ENOMEM;
         }
 
-        K1212_DEBUG_PRINTK("K1212_DEBUG: DSP Code area = 0x%p (0x%08x) %d bytes [%s]\n",
+        K1212_DEBUG_PRINTK("K1212_DEBUG: DSP Code area = 0x%pK (0x%08x) %d bytes [%s]\n",
 		   korg1212->dma_dsp.area, korg1212->dma_dsp.addr, dsp_code->size,
 		   stateName[korg1212->cardState]);
 

@@ -133,8 +133,8 @@ int i2400m_op_msg_from_user(struct wimax_dev *wimax_dev,
 	struct device *dev = i2400m_dev(i2400m);
 	struct sk_buff *ack_skb;
 
-	d_fnstart(4, dev, "(wimax_dev %p [i2400m %p] msg_buf %p "
-		  "msg_len %zu genl_info %p)\n", wimax_dev, i2400m,
+	d_fnstart(4, dev, "(wimax_dev %pK [i2400m %pK] msg_buf %pK "
+		  "msg_len %zu genl_info %pK)\n", wimax_dev, i2400m,
 		  msg_buf, msg_len, genl_info);
 	ack_skb = i2400m_msg_to_dev(i2400m, msg_buf, msg_len);
 	result = PTR_ERR(ack_skb);
@@ -142,8 +142,8 @@ int i2400m_op_msg_from_user(struct wimax_dev *wimax_dev,
 		goto error_msg_to_dev;
 	result = wimax_msg_send(&i2400m->wimax_dev, ack_skb);
 error_msg_to_dev:
-	d_fnend(4, dev, "(wimax_dev %p [i2400m %p] msg_buf %p msg_len %zu "
-		"genl_info %p) = %d\n", wimax_dev, i2400m, msg_buf, msg_len,
+	d_fnend(4, dev, "(wimax_dev %pK [i2400m %pK] msg_buf %pK msg_len %zu "
+		"genl_info %pK) = %d\n", wimax_dev, i2400m, msg_buf, msg_len,
 		genl_info, result);
 	return result;
 }
@@ -185,7 +185,7 @@ int i2400m_op_reset(struct wimax_dev *wimax_dev)
 		.result = 0,
 	};
 
-	d_fnstart(4, dev, "(wimax_dev %p)\n", wimax_dev);
+	d_fnstart(4, dev, "(wimax_dev %pK)\n", wimax_dev);
 	mutex_lock(&i2400m->init_mutex);
 	i2400m->reset_ctx = &ctx;
 	mutex_unlock(&i2400m->init_mutex);
@@ -202,7 +202,7 @@ int i2400m_op_reset(struct wimax_dev *wimax_dev)
 	i2400m->reset_ctx = NULL;
 	mutex_unlock(&i2400m->init_mutex);
 out:
-	d_fnend(4, dev, "(wimax_dev %p) = %d\n", wimax_dev, result);
+	d_fnend(4, dev, "(wimax_dev %pK) = %d\n", wimax_dev, result);
 	return result;
 }
 
@@ -223,7 +223,7 @@ int i2400m_check_mac_addr(struct i2400m *i2400m)
 	const struct i2400m_tlv_detailed_device_info *ddi;
 	struct net_device *net_dev = i2400m->wimax_dev.net_dev;
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	skb = i2400m_get_device_info(i2400m);
 	if (IS_ERR(skb)) {
 		result = PTR_ERR(skb);
@@ -256,7 +256,7 @@ ok:
 	result = 0;
 	kfree_skb(skb);
 error:
-	d_fnend(3, dev, "(i2400m %p) = %d\n", i2400m, result);
+	d_fnend(3, dev, "(i2400m %pK) = %d\n", i2400m, result);
 	return result;
 }
 
@@ -289,7 +289,7 @@ int __i2400m_dev_start(struct i2400m *i2400m, enum i2400m_bri flags)
 	struct device *dev = i2400m_dev(i2400m);
 	int times = i2400m->bus_bm_retries;
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 retry:
 	result = i2400m_dev_bootstrap(i2400m, flags);
 	if (result < 0) {
@@ -339,7 +339,7 @@ retry:
 
 	/* At this point, reports will come for the device and set it
 	 * to the right state if it is different than UNINITIALIZED */
-	d_fnend(3, dev, "(net_dev %p [i2400m %p]) = %d\n",
+	d_fnend(3, dev, "(net_dev %pK [i2400m %pK]) = %d\n",
 		net_dev, i2400m, result);
 	return result;
 
@@ -363,7 +363,7 @@ error_bootstrap:
 		flags = I2400M_BRI_SOFT|I2400M_BRI_MAC_REINIT;
 		goto retry;
 	}
-	d_fnend(3, dev, "(net_dev %p [i2400m %p]) = %d\n",
+	d_fnend(3, dev, "(net_dev %pK [i2400m %pK]) = %d\n",
 		net_dev, i2400m, result);
 	return result;
 }
@@ -404,7 +404,7 @@ void __i2400m_dev_stop(struct i2400m *i2400m)
 	struct wimax_dev *wimax_dev = &i2400m->wimax_dev;
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	wimax_state_change(wimax_dev, __WIMAX_ST_QUIESCING);
 	i2400m_msg_to_dev_cancel_wait(i2400m, -EL3RST);
 	complete(&i2400m->msg_completion);
@@ -424,7 +424,7 @@ void __i2400m_dev_stop(struct i2400m *i2400m)
 	i2400m_rx_release(i2400m);
 	i2400m_tx_release(i2400m);
 	wimax_state_change(wimax_dev, WIMAX_ST_DOWN);
-	d_fnend(3, dev, "(i2400m %p) = 0\n", i2400m);
+	d_fnend(3, dev, "(i2400m %pK) = 0\n", i2400m);
 }
 
 
@@ -469,7 +469,7 @@ int i2400m_pm_notifier(struct notifier_block *notifier,
 		container_of(notifier, struct i2400m, pm_notifier);
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(i2400m %p pm_event %lx)\n", i2400m, pm_event);
+	d_fnstart(3, dev, "(i2400m %pK pm_event %lx)\n", i2400m, pm_event);
 	switch (pm_event) {
 	case PM_HIBERNATION_PREPARE:
 	case PM_SUSPEND_PREPARE:
@@ -487,7 +487,7 @@ int i2400m_pm_notifier(struct notifier_block *notifier,
 	default:
 		break;
 	}
-	d_fnend(3, dev, "(i2400m %p pm_event %lx) = void\n", i2400m, pm_event);
+	d_fnend(3, dev, "(i2400m %pK pm_event %lx) = void\n", i2400m, pm_event);
 	return NOTIFY_DONE;
 }
 
@@ -503,7 +503,7 @@ int i2400m_pre_reset(struct i2400m *i2400m)
 	int result;
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	d_printf(1, dev, "pre-reset shut down\n");
 
 	result = 0;
@@ -518,7 +518,7 @@ int i2400m_pre_reset(struct i2400m *i2400m)
 	mutex_unlock(&i2400m->init_mutex);
 	if (i2400m->bus_release)
 		i2400m->bus_release(i2400m);
-	d_fnend(3, dev, "(i2400m %p) = %d\n", i2400m, result);
+	d_fnend(3, dev, "(i2400m %pK) = %d\n", i2400m, result);
 	return result;
 }
 EXPORT_SYMBOL_GPL(i2400m_pre_reset);
@@ -537,7 +537,7 @@ int i2400m_post_reset(struct i2400m *i2400m)
 	int result = 0;
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	d_printf(1, dev, "post-reset start\n");
 	if (i2400m->bus_setup) {
 		result = i2400m->bus_setup(i2400m);
@@ -555,7 +555,7 @@ int i2400m_post_reset(struct i2400m *i2400m)
 			goto error_dev_start;
 	}
 	mutex_unlock(&i2400m->init_mutex);
-	d_fnend(3, dev, "(i2400m %p) = %d\n", i2400m, result);
+	d_fnend(3, dev, "(i2400m %pK) = %d\n", i2400m, result);
 	return result;
 
 error_dev_start:
@@ -567,7 +567,7 @@ error_dev_start:
 	wmb();		/* see i2400m->updown's documentation  */
 	mutex_unlock(&i2400m->init_mutex);
 error_bus_setup:
-	d_fnend(3, dev, "(i2400m %p) = %d\n", i2400m, result);
+	d_fnend(3, dev, "(i2400m %pK) = %d\n", i2400m, result);
 	return result;
 }
 EXPORT_SYMBOL_GPL(i2400m_post_reset);
@@ -605,7 +605,7 @@ void __i2400m_dev_reset_handle(struct work_struct *ws)
 	struct i2400m_reset_ctx *ctx = i2400m->reset_ctx;
 	int result;
 
-	d_fnstart(3, dev, "(ws %p i2400m %p reason %s)\n", ws, i2400m, reason);
+	d_fnstart(3, dev, "(ws %pK i2400m %pK reason %s)\n", ws, i2400m, reason);
 
 	i2400m->boot_mode = 1;
 	wmb();		/* Make sure i2400m_msg_to_dev() sees boot_mode */
@@ -678,7 +678,7 @@ void __i2400m_dev_reset_handle(struct work_struct *ws)
 		}
 	}
 out:
-	d_fnend(3, dev, "(ws %p i2400m %p reason %s) = void\n",
+	d_fnend(3, dev, "(ws %pK i2400m %pK reason %s) = void\n",
 		ws, i2400m, reason);
 }
 
@@ -866,7 +866,7 @@ int i2400m_setup(struct i2400m *i2400m, enum i2400m_bri bm_flags)
 	struct wimax_dev *wimax_dev = &i2400m->wimax_dev;
 	struct net_device *net_dev = i2400m->wimax_dev.net_dev;
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 
 	snprintf(wimax_dev->name, sizeof(wimax_dev->name),
 		 "i2400m-%s:%s", dev->bus->name, dev_name(dev));
@@ -932,7 +932,7 @@ int i2400m_setup(struct i2400m *i2400m, enum i2400m_bri bm_flags)
 	result = i2400m_dev_start(i2400m, bm_flags);
 	if (result < 0)
 		goto error_dev_start;
-	d_fnend(3, dev, "(i2400m %p) = %d\n", i2400m, result);
+	d_fnend(3, dev, "(i2400m %pK) = %d\n", i2400m, result);
 	return result;
 
 error_dev_start:
@@ -953,7 +953,7 @@ error_bootrom_init:
 error_bus_setup:
 	i2400m_bm_buf_free(i2400m);
 error_bm_buf_alloc:
-	d_fnend(3, dev, "(i2400m %p) = %d\n", i2400m, result);
+	d_fnend(3, dev, "(i2400m %pK) = %d\n", i2400m, result);
 	return result;
 }
 EXPORT_SYMBOL_GPL(i2400m_setup);
@@ -968,7 +968,7 @@ void i2400m_release(struct i2400m *i2400m)
 {
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	netif_stop_queue(i2400m->wimax_dev.net_dev);
 
 	i2400m_dev_stop(i2400m);
@@ -985,7 +985,7 @@ void i2400m_release(struct i2400m *i2400m)
 	if (i2400m->bus_release)
 		i2400m->bus_release(i2400m);
 	i2400m_bm_buf_free(i2400m);
-	d_fnend(3, dev, "(i2400m %p) = void\n", i2400m);
+	d_fnend(3, dev, "(i2400m %pK) = void\n", i2400m);
 }
 EXPORT_SYMBOL_GPL(i2400m_release);
 

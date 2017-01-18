@@ -416,7 +416,7 @@ int hermes_apply_pda_with_defaults(struct hermes *hw,
 
 		pdi = hermes_find_pdi(first_pdi, record_id, pda_end);
 		if (pdi)
-			pr_debug(PFX "Found record 0x%04x at %p\n",
+			pr_debug(PFX "Found record 0x%04x at %pK\n",
 				 record_id, pdi);
 
 		switch (record_id) {
@@ -428,7 +428,7 @@ int hermes_apply_pda_with_defaults(struct hermes *hw,
 			if (outdoor_pdi) {
 				pdi = outdoor_pdi;
 				pr_debug(PFX
-					 "Using outdoor record 0x%04x at %p\n",
+					 "Using outdoor record 0x%04x at %pK\n",
 					 record_id + 1, pdi);
 			}
 			break;
@@ -457,7 +457,7 @@ int hermes_apply_pda_with_defaults(struct hermes *hw,
 		if (!pdi && default_pdi) {
 			/* Use default */
 			pdi = default_pdi;
-			pr_debug(PFX "Using default record 0x%04x at %p\n",
+			pr_debug(PFX "Using default record 0x%04x at %pK\n",
 				 record_id, pdi);
 		}
 

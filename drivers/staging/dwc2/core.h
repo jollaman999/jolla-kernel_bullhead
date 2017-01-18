@@ -44,7 +44,7 @@
 static inline void do_write(u32 value, void *addr)
 {
 	writel(value, addr);
-	pr_info("INFO:: wrote %08x to %p\n", value, addr);
+	pr_info("INFO:: wrote %08x to %pK\n", value, addr);
 }
 
 #undef writel

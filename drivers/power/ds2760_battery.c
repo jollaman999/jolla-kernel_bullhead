@@ -139,7 +139,7 @@ static int ds2760_battery_read_status(struct ds2760_device_info *di)
 
 	ret = w1_ds2760_read(di->w1_dev, di->raw + start, start, count);
 	if (ret != count) {
-		dev_warn(di->dev, "call to w1_ds2760_read failed (0x%p)\n",
+		dev_warn(di->dev, "call to w1_ds2760_read failed (0x%pK)\n",
 			 di->w1_dev);
 		return 1;
 	}

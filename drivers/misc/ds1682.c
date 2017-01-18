@@ -147,7 +147,7 @@ static ssize_t ds1682_eeprom_read(struct file *filp, struct kobject *kobj,
 	struct i2c_client *client = kobj_to_i2c_client(kobj);
 	int rc;
 
-	dev_dbg(&client->dev, "ds1682_eeprom_read(p=%p, off=%lli, c=%zi)\n",
+	dev_dbg(&client->dev, "ds1682_eeprom_read(p=%pK, off=%lli, c=%zi)\n",
 		buf, off, count);
 
 	if (off >= DS1682_EEPROM_SIZE)
@@ -170,7 +170,7 @@ static ssize_t ds1682_eeprom_write(struct file *filp, struct kobject *kobj,
 {
 	struct i2c_client *client = kobj_to_i2c_client(kobj);
 
-	dev_dbg(&client->dev, "ds1682_eeprom_write(p=%p, off=%lli, c=%zi)\n",
+	dev_dbg(&client->dev, "ds1682_eeprom_write(p=%pK, off=%lli, c=%zi)\n",
 		buf, off, count);
 
 	if (off >= DS1682_EEPROM_SIZE)

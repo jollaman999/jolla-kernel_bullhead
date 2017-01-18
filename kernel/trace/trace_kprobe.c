@@ -379,7 +379,7 @@ static int __register_trace_probe(struct trace_probe *tp)
 				   "target module is loaded. Continue.\n");
 			ret = 0;
 		} else if (ret == -EILSEQ) {
-			pr_warning("Probing address(0x%p) is not an "
+			pr_warning("Probing address(0x%pK) is not an "
 				   "instruction boundary.\n",
 				   tp->rp.kp.addr);
 			ret = -EINVAL;
@@ -610,7 +610,7 @@ static int create_trace_probe(int argc, char **argv)
 			snprintf(buf, MAX_EVENT_NAME_LEN, "%c_%s_%ld",
 				 is_return ? 'r' : 'p', symbol, offset);
 		else
-			snprintf(buf, MAX_EVENT_NAME_LEN, "%c_0x%p",
+			snprintf(buf, MAX_EVENT_NAME_LEN, "%c_0x%pK",
 				 is_return ? 'r' : 'p', addr);
 		event = buf;
 	}
@@ -733,7 +733,7 @@ static int probes_seq_show(struct seq_file *m, void *v)
 	seq_printf(m, ":%s/%s", tp->call.class->system, tp->call.name);
 
 	if (!tp->symbol)
-		seq_printf(m, " 0x%p", tp->rp.kp.addr);
+		seq_printf(m, " 0x%pK", tp->rp.kp.addr);
 	else if (tp->rp.kp.offset)
 		seq_printf(m, " %s+%u", trace_probe_symbol(tp),
 			   tp->rp.kp.offset);

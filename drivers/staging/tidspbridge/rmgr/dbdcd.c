@@ -637,8 +637,8 @@ int dcd_get_library_name(struct dcd_manager *hdcd_mgr,
 	int status = 0;
 	struct dcd_key_elem *dcd_key = NULL;
 
-	dev_dbg(bridge, "%s: hdcd_mgr %p, uuid_obj %p, str_lib_name %p,"
-		" buff_size %p\n", __func__, hdcd_mgr, uuid_obj, str_lib_name,
+	dev_dbg(bridge, "%s: hdcd_mgr %pK, uuid_obj %pK, str_lib_name %pK,"
+		" buff_size %pK\n", __func__, hdcd_mgr, uuid_obj, str_lib_name,
 		buff_size);
 
 	/*
@@ -783,7 +783,7 @@ int dcd_register_object(struct dsp_uuid *uuid_obj,
 	char sz_obj_type[MAX_INT2CHAR_LENGTH];	/* str. rep. of obj_type. */
 	struct dcd_key_elem *dcd_key = NULL;
 
-	dev_dbg(bridge, "%s: object UUID %p, obj_type %d, szPathName %s\n",
+	dev_dbg(bridge, "%s: object UUID %pK, obj_type %d, szPathName %s\n",
 		__func__, uuid_obj, obj_type, psz_path_name);
 
 	/*

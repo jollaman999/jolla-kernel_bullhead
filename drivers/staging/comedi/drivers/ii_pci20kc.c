@@ -213,11 +213,11 @@ static int pci20xxx_attach(struct comedi_device *dev,
 	/* Check PCI-20001 C-2A Carrier Board ID */
 	if ((readb(devpriv->ioaddr) & PCI20000_ID) != PCI20000_ID) {
 		dev_warn(dev->class_dev,
-			 "PCI-20001 C-2A Carrier Board at base=0x%p not found !\n",
+			 "PCI-20001 C-2A Carrier Board at base=0x%pK not found !\n",
 			 devpriv->ioaddr);
 		return -EINVAL;
 	}
-	dev_info(dev->class_dev, "PCI-20001 C-2A at base=0x%p\n",
+	dev_info(dev->class_dev, "PCI-20001 C-2A at base=0x%pK\n",
 		 devpriv->ioaddr);
 
 	for (i = 0; i < PCI20000_MODULES; i++) {

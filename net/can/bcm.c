@@ -734,7 +734,7 @@ static void bcm_rx_unreg(struct net_device *dev, struct bcm_op *op)
 		op->rx_reg_dev = NULL;
 	} else
 		printk(KERN_ERR "can-bcm: bcm_rx_unreg: registered device "
-		       "mismatch %p %p\n", op->rx_reg_dev, dev);
+		       "mismatch %pK %pK\n", op->rx_reg_dev, dev);
 }
 
 /*

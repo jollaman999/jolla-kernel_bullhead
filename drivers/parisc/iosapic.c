@@ -350,7 +350,7 @@ iosapic_load_irt(unsigned long cell_num, struct irt_entry **irt)
 	int i;
 
 	printk(MODULE_NAME " Interrupt Routing Table (cell %ld)\n", cell_num);
-	printk(MODULE_NAME " start = 0x%p num_entries %ld entry_size %d\n",
+	printk(MODULE_NAME " start = 0x%pK num_entries %ld entry_size %d\n",
 		table,
 		num_entries,
 		(int) sizeof(struct irt_entry));
@@ -419,17 +419,17 @@ irt_find_irqline(struct iosapic_info *isi, u8 slot, u8 intr_pin)
 		** on current platforms.
 		*/
 		if (i->entry_type != IRT_IOSAPIC_TYPE) {
-			DBG_IRT(KERN_WARNING MODULE_NAME ":find_irqline(0x%p): skipping entry %d type %d\n", i, cnt, i->entry_type);
+			DBG_IRT(KERN_WARNING MODULE_NAME ":find_irqline(0x%pK): skipping entry %d type %d\n", i, cnt, i->entry_type);
 			continue;
 		}
 		
 		if (i->entry_length != IRT_IOSAPIC_LENGTH) {
-			DBG_IRT(KERN_WARNING MODULE_NAME ":find_irqline(0x%p): skipping entry %d  length %d\n", i, cnt, i->entry_length);
+			DBG_IRT(KERN_WARNING MODULE_NAME ":find_irqline(0x%pK): skipping entry %d  length %d\n", i, cnt, i->entry_length);
 			continue;
 		}
 
 		if (i->interrupt_type != IRT_VECTORED_INTR) {
-			DBG_IRT(KERN_WARNING MODULE_NAME ":find_irqline(0x%p): skipping entry  %d interrupt_type %d\n", i, cnt, i->interrupt_type);
+			DBG_IRT(KERN_WARNING MODULE_NAME ":find_irqline(0x%pK): skipping entry  %d interrupt_type %d\n", i, cnt, i->interrupt_type);
 			continue;
 		}
 
@@ -641,7 +641,7 @@ static void iosapic_unmask_irq(struct irq_data *d)
 #ifdef DEBUG_IOSAPIC_IRT
 {
 	u32 *t = (u32 *) ((ulong) vi->eoi_addr & ~0xffUL);
-	printk("iosapic_enable_irq(): regs %p", vi->eoi_addr);
+	printk("iosapic_enable_irq(): regs %pK", vi->eoi_addr);
 	for ( ; t < vi->eoi_addr; t++)
 		printk(" %x", readl(t));
 	printk("\n");
@@ -665,7 +665,7 @@ printk("\n");
 	 * enables their IRQ. It can lead to "interesting" race conditions
 	 * in the driver initialization sequence.
 	 */
-	DBG(KERN_DEBUG "enable_irq(%d): eoi(%p, 0x%x)\n", d->irq,
+	DBG(KERN_DEBUG "enable_irq(%d): eoi(%pK, 0x%x)\n", d->irq,
 			vi->eoi_addr, vi->eoi_data);
 	iosapic_eoi(vi->eoi_addr, vi->eoi_data);
 }
@@ -756,7 +756,7 @@ int iosapic_fixup_irq(void *isi_obj, struct pci_dev *pcidev)
 				pci_name(pcidev));
 		return -1;
 	}
-	DBG_IRT("iosapic_fixup_irq(): irte %p %x %x %x %x %x %x %x %x\n",
+	DBG_IRT("iosapic_fixup_irq(): irte %pK %x %x %x %x %x %x %x %x\n",
 		irte,
 		irte->entry_type,
 		irte->entry_length,
@@ -770,7 +770,7 @@ int iosapic_fixup_irq(void *isi_obj, struct pci_dev *pcidev)
 
 	/* get vector info for this input line */
 	vi = isi->isi_vector + isi_line;
-	DBG_IRT("iosapic_fixup_irq:  line %d vi 0x%p\n", isi_line, vi);
+	DBG_IRT("iosapic_fixup_irq:  line %d vi 0x%pK\n", isi_line, vi);
 
 	/* If this IRQ line has already been setup, skip it */
 	if (vi->irte)
@@ -834,7 +834,7 @@ int iosapic_serial_irq(struct parisc_device *dev)
 	if (cnt >= irt_num_entry)
 		return 0; /* no irq found, force polling */
 
-	DBG_IRT("iosapic_serial_irq(): irte %p %x %x %x %x %x %x %x %x\n",
+	DBG_IRT("iosapic_serial_irq(): irte %pK %x %x %x %x %x %x %x %x\n",
 		irte,
 		irte->entry_type,
 		irte->entry_length,
@@ -854,7 +854,7 @@ int iosapic_serial_irq(struct parisc_device *dev)
 
 	/* get vector info for this input line */
 	vi = isi->isi_vector + intin;
-	DBG_IRT("iosapic_serial_irq:  line %d vi 0x%p\n", iosapic_intin, vi);
+	DBG_IRT("iosapic_serial_irq:  line %d vi 0x%pK\n", iosapic_intin, vi);
 
 	/* If this IRQ line has already been setup, skip it */
 	if (vi->irte)
@@ -974,7 +974,7 @@ iosapic_prt_irt(void *irt, long num_entry)
 	printk(KERN_DEBUG MODULE_NAME ": Interrupt Routing Table (%lx entries)\n", num_entry);
 
 	for (i=0; i<num_entry; i++, irp += 4) {
-		printk(KERN_DEBUG "%p : %2d %.8x %.8x %.8x %.8x\n",
+		printk(KERN_DEBUG "%pK : %2d %.8x %.8x %.8x %.8x\n",
 					irp, i, irp[0], irp[1], irp[2], irp[3]);
 	}
 }
@@ -983,12 +983,12 @@ iosapic_prt_irt(void *irt, long num_entry)
 static void
 iosapic_prt_vi(struct vector_info *vi)
 {
-	printk(KERN_DEBUG MODULE_NAME ": vector_info[%d] is at %p\n", vi->irqline, vi);
+	printk(KERN_DEBUG MODULE_NAME ": vector_info[%d] is at %pK\n", vi->irqline, vi);
 	printk(KERN_DEBUG "\t\tstatus:	 %.4x\n", vi->status);
 	printk(KERN_DEBUG "\t\ttxn_irq:  %d\n",  vi->txn_irq);
 	printk(KERN_DEBUG "\t\ttxn_addr: %lx\n", vi->txn_addr);
 	printk(KERN_DEBUG "\t\ttxn_data: %lx\n", vi->txn_data);
-	printk(KERN_DEBUG "\t\teoi_addr: %p\n",  vi->eoi_addr);
+	printk(KERN_DEBUG "\t\teoi_addr: %pK\n",  vi->eoi_addr);
 	printk(KERN_DEBUG "\t\teoi_data: %x\n",  vi->eoi_data);
 }
 
@@ -996,10 +996,10 @@ iosapic_prt_vi(struct vector_info *vi)
 static void
 iosapic_prt_isi(struct iosapic_info *isi)
 {
-	printk(KERN_DEBUG MODULE_NAME ": io_sapic_info at %p\n", isi);
+	printk(KERN_DEBUG MODULE_NAME ": io_sapic_info at %pK\n", isi);
 	printk(KERN_DEBUG "\t\tisi_hpa:       %lx\n", isi->isi_hpa);
 	printk(KERN_DEBUG "\t\tisi_status:    %x\n", isi->isi_status);
 	printk(KERN_DEBUG "\t\tisi_version:   %x\n", isi->isi_version);
-	printk(KERN_DEBUG "\t\tisi_vector:    %p\n", isi->isi_vector);
+	printk(KERN_DEBUG "\t\tisi_vector:    %pK\n", isi->isi_vector);
 }
 #endif /* DEBUG_IOSAPIC */

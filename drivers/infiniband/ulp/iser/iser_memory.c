@@ -255,7 +255,7 @@ static int iser_data_buf_aligned_len(struct iser_data_buf *data,
 			break;
 	}
 	ret_len = (next_sg) ? i : i+1;
-	iser_dbg("Found %d aligned entries out of %d in sg:0x%p\n",
+	iser_dbg("Found %d aligned entries out of %d in sg:0x%pK\n",
 		 ret_len, data->dma_nents, data);
 	return ret_len;
 }
@@ -271,7 +271,7 @@ static void iser_data_buf_dump(struct iser_data_buf *data,
 		return;
 
 	for_each_sg(sgl, sg, data->dma_nents, i)
-		iser_warn("sg[%d] dma_addr:0x%lX page:0x%p "
+		iser_warn("sg[%d] dma_addr:0x%lX page:0x%pK "
 			 "off:0x%x sz:0x%x dma_len:0x%x\n",
 			 i, (unsigned long)ib_sg_dma_address(ibdev, sg),
 			 sg_page(sg), sg->offset,

@@ -351,7 +351,7 @@ static void smux_write_done(void *dev, const void *meta_data)
 	spin_lock_irqsave(&p->tx_queue_lock, flags);
 	if (netif_queue_stopped(dev) &&
 		msm_smux_is_ch_low(p->ch_id)) {
-		DBG0("%s: Low WM hit, waking queue=%p\n",
+		DBG0("%s: Low WM hit, waking queue=%pK\n",
 			 __func__, skb);
 		netif_wake_queue(dev);
 	}

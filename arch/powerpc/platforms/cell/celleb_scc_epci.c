@@ -124,7 +124,7 @@ static PCI_IO_ADDR celleb_epci_make_config_addr(struct pci_bus *bus,
 		addr = celleb_epci_get_epci_cfg(hose) +
 		       (((devfn & 0xff) << 8) | (where & 0xff));
 
-	pr_debug("EPCI: config_addr = 0x%p\n", addr);
+	pr_debug("EPCI: config_addr = 0x%pK\n", addr);
 
 	return addr;
 }
@@ -183,7 +183,7 @@ static int celleb_epci_read_config(struct pci_bus *bus,
 	}
 
 	pr_debug("EPCI: "
-		 "addr=0x%p, devfn=0x%x, where=0x%x, size=0x%x, val=0x%x\n",
+		 "addr=0x%pK, devfn=0x%x, where=0x%x, size=0x%x, val=0x%x\n",
 		 addr, devfn, where, size, *val);
 
 	return celleb_epci_check_abort(hose, NULL);

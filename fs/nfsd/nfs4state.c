@@ -1400,7 +1400,7 @@ move_to_confirmed(struct nfs4_client *clp)
 	unsigned int idhashval = clientid_hashval(clp->cl_clientid.cl_id);
 	struct nfsd_net *nn = net_generic(clp->net, nfsd_net_id);
 
-	dprintk("NFSD: move_to_confirm nfs4_client %p\n", clp);
+	dprintk("NFSD: move_to_confirm nfs4_client %pK\n", clp);
 	list_move(&clp->cl_idhash, &nn->conf_id_hashtbl[idhashval]);
 	rb_erase(&clp->cl_namenode, &nn->unconf_name_tree);
 	add_clp_to_name_tree(clp, &nn->conf_name_tree);
@@ -1510,7 +1510,7 @@ nfsd4_store_cache_entry(struct nfsd4_compoundres *resp)
 	struct nfsd4_slot *slot = resp->cstate.slot;
 	unsigned int base;
 
-	dprintk("--> %s slot %p\n", __func__, slot);
+	dprintk("--> %s slot %pK\n", __func__, slot);
 
 	slot->sl_opcnt = resp->opcnt;
 	slot->sl_status = resp->cstate.status;
@@ -1567,7 +1567,7 @@ nfsd4_replay_cache_entry(struct nfsd4_compoundres *resp,
 	struct nfsd4_slot *slot = resp->cstate.slot;
 	__be32 status;
 
-	dprintk("--> %s slot %p\n", __func__, slot);
+	dprintk("--> %s slot %pK\n", __func__, slot);
 
 	/* Either returns 0 or nfserr_retry_uncached */
 	status = nfsd4_enc_sequence_replay(resp->rqstp->rq_argp, resp);
@@ -1627,7 +1627,7 @@ nfsd4_exchange_id(struct svc_rqst *rqstp,
 	struct nfsd_net		*nn = net_generic(SVC_NET(rqstp), nfsd_net_id);
 
 	rpc_ntop(sa, addr_str, sizeof(addr_str));
-	dprintk("%s rqstp=%p exid=%p clname.len=%u clname.data=%p "
+	dprintk("%s rqstp=%pK exid=%pK clname.len=%u clname.data=%pK "
 		"ip_addr=%s flags %x, spa_how %d\n",
 		__func__, rqstp, exid, exid->clname.len, exid->clname.data,
 		addr_str, exid->flags, exid->spa_how);
@@ -2542,7 +2542,7 @@ move_to_close_lru(struct nfs4_openowner *oo, struct net *net)
 {
 	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
 
-	dprintk("NFSD: move_to_close_lru nfs4_openowner %p\n", oo);
+	dprintk("NFSD: move_to_close_lru nfs4_openowner %pK\n", oo);
 
 	list_move_tail(&oo->oo_close_lru, &nn->close_lru);
 	oo->oo_time = get_seconds();
@@ -2654,11 +2654,11 @@ static void nfsd_break_deleg_cb(struct file_lock *fl)
 	struct nfs4_delegation *dp;
 
 	if (!fp) {
-		WARN(1, "(%p)->fl_owner NULL\n", fl);
+		WARN(1, "(%pK)->fl_owner NULL\n", fl);
 		return;
 	}
 	if (fp->fi_had_conflict) {
-		WARN(1, "duplicate break on %p\n", fp);
+		WARN(1, "duplicate break on %pK\n", fp);
 		return;
 	}
 	/*
@@ -5014,7 +5014,7 @@ nfs4_state_start_net(struct net *net)
 	nn->boot_time = get_seconds();
 	locks_start_grace(net, &nn->nfsd4_manager);
 	nn->grace_ended = false;
-	printk(KERN_INFO "NFSD: starting %ld-second grace period (net %p)\n",
+	printk(KERN_INFO "NFSD: starting %ld-second grace period (net %pK)\n",
 	       nn->nfsd4_grace, net);
 	queue_delayed_work(laundry_wq, &nn->laundromat_work, nn->nfsd4_grace * HZ);
 	return 0;

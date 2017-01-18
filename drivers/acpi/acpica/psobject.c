@@ -528,7 +528,7 @@ acpi_ps_complete_op(struct acpi_walk_state *walk_state,
 		acpi_ps_pop_scope(&(walk_state->parser_state), op,
 				  &walk_state->arg_types,
 				  &walk_state->arg_count);
-		ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "Popped scope, Op=%p\n", *op));
+		ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "Popped scope, Op=%pK\n", *op));
 	} else {
 		*op = NULL;
 	}
@@ -565,7 +565,7 @@ acpi_ps_complete_final_op(struct acpi_walk_state *walk_state,
 	 * of open scopes (such as when several ASL blocks are closed with
 	 * sequential closing braces). We want to terminate each one cleanly.
 	 */
-	ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "AML package complete at Op %p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "AML package complete at Op %pK\n",
 			  op));
 	do {
 		if (op) {

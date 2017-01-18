@@ -2785,7 +2785,7 @@ static void ppp_destroy_interface(struct ppp *ppp)
 
 	if (!ppp->file.dead || ppp->n_channels) {
 		/* "can't happen" */
-		netdev_err(ppp->dev, "ppp: destroying ppp struct %p "
+		netdev_err(ppp->dev, "ppp: destroying ppp struct %pK "
 			   "but dead=%d n_channels=%d !\n",
 			   ppp, ppp->file.dead, ppp->n_channels);
 		return;
@@ -2929,7 +2929,7 @@ static void ppp_destroy_channel(struct channel *pch)
 
 	if (!pch->file.dead) {
 		/* "can't happen" */
-		pr_err("ppp: destroying undead channel %p !\n", pch);
+		pr_err("ppp: destroying undead channel %pK !\n", pch);
 		return;
 	}
 	skb_queue_purge(&pch->file.xq);

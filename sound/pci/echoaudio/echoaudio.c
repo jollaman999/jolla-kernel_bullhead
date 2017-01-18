@@ -1966,7 +1966,7 @@ static int snd_echo_create(struct snd_card *card,
 			pci_disable_device(pci);
 			return -ENOMEM;
 		}
-		DE_INIT(("chip=%p\n", chip));
+		DE_INIT(("chip=%pK\n", chip));
 		spin_lock_init(&chip->lock);
 		chip->card = card;
 		chip->pci = pci;
@@ -2003,7 +2003,7 @@ static int snd_echo_create(struct snd_card *card,
 		return -EBUSY;
 	}
 	chip->irq = pci->irq;
-	DE_INIT(("pci=%p irq=%d subdev=%04x Init hardware...\n",
+	DE_INIT(("pci=%pK irq=%d subdev=%04x Init hardware...\n",
 		 chip->pci, chip->irq, chip->pci->subsystem_device));
 
 	/* Create the DSP comm page - this is the area of memory used for most

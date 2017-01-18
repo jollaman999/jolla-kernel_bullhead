@@ -79,14 +79,14 @@
 #if (NDEBUG & NDEBUG_LISTS)
 #define LIST(x, y)						\
 	do {							\
-		printk("LINE:%d   Adding %p to %p\n",		\
+		printk("LINE:%d   Adding %pK to %pK\n",		\
 		       __LINE__, (void*)(x), (void*)(y));	\
 		if ((x) == (y))					\
 			udelay(5);				\
 	} while (0)
 #define REMOVE(w, x, y, z)					\
 	do {							\
-		printk("LINE:%d   Removing: %p->%p  %p->%p \n",	\
+		printk("LINE:%d   Removing: %pK->%pK  %pK->%pK \n",	\
 		       __LINE__, (void*)(w), (void*)(x),	\
 		       (void*)(y), (void*)(z));			\
 		if ((x) == (y))					\
@@ -478,7 +478,7 @@ static void merge_contiguous_buffers(Scsi_Cmnd *cmd)
 	for (endaddr = virt_to_phys(cmd->SCp.ptr + cmd->SCp.this_residual - 1) + 1;
 	     cmd->SCp.buffers_residual &&
 	     virt_to_phys(sg_virt(&cmd->SCp.buffer[1])) == endaddr;) {
-		MER_PRINTK("VTOP(%p) == %08lx -> merging\n",
+		MER_PRINTK("VTOP(%pK) == %08lx -> merging\n",
 			   page_address(sg_page(&cmd->SCp.buffer[1])), endaddr);
 #if (NDEBUG & NDEBUG_MERGING)
 		++cnt;
@@ -490,7 +490,7 @@ static void merge_contiguous_buffers(Scsi_Cmnd *cmd)
 	}
 #if (NDEBUG & NDEBUG_MERGING)
 	if (oldlen != cmd->SCp.this_residual)
-		MER_PRINTK("merged %d buffers from %p, new length %08x\n",
+		MER_PRINTK("merged %d buffers from %pK, new length %08x\n",
 			   cnt, cmd->SCp.ptr, cmd->SCp.this_residual);
 #endif
 }
@@ -1063,7 +1063,7 @@ static void NCR5380_main(struct work_struct *work)
 			for (tmp = (Scsi_Cmnd *) hostdata->issue_queue, prev = NULL;
 			     tmp && (tmp != prev); prev = tmp, tmp = NEXT(tmp))
 				;
-			/*printk("%p  ", tmp);*/
+			/*printk("%pK  ", tmp);*/
 			if ((tmp == prev) && tmp)
 				printk(" LOOP\n");
 			/* else printk("\n"); */
@@ -1073,7 +1073,7 @@ static void NCR5380_main(struct work_struct *work)
 
 #if (NDEBUG & NDEBUG_LISTS)
 				if (prev != tmp)
-					printk("MAIN tmp=%p   target=%d   busy=%d lun=%d\n",
+					printk("MAIN tmp=%pK   target=%d   busy=%d lun=%d\n",
 					       tmp, tmp->device->id, hostdata->busy[tmp->device->id],
 					       tmp->device->lun);
 #endif
@@ -1917,7 +1917,7 @@ static int NCR5380_transfer_dma(struct Scsi_Host *instance,
 	if (atari_read_overruns && (p & SR_IO))
 		c -= atari_read_overruns;
 
-	DMA_PRINTK("scsi%d: initializing DMA for %s, %d bytes %s %p\n",
+	DMA_PRINTK("scsi%d: initializing DMA for %s, %d bytes %s %pK\n",
 		   HOSTNO, (p & SR_IO) ? "reading" : "writing",
 		   c, (p & SR_IO) ? "to" : "from", d);
 

@@ -242,7 +242,7 @@ static int setup_rt_frame(int sig, struct k_sigaction *ka, siginfo_t *info,
 	set_fs(USER_DS);
 
 #ifdef DEBUG_SIG
-	pr_info("SIG deliver (%s:%d): sp=%p pc=%08lx\n",
+	pr_info("SIG deliver (%s:%d): sp=%pK pc=%08lx\n",
 		current->comm, current->pid, frame, regs->pc);
 #endif
 
@@ -317,7 +317,7 @@ static void do_signal(struct pt_regs *regs, int in_syscall)
 	int signr;
 	struct k_sigaction ka;
 #ifdef DEBUG_SIG
-	pr_info("do signal: %p %d\n", regs, in_syscall);
+	pr_info("do signal: %pK %d\n", regs, in_syscall);
 	pr_info("do signal2: %lx %lx %ld [%lx]\n", regs->pc, regs->r1,
 			regs->r12, current_thread_info()->flags);
 #endif

@@ -1001,12 +1001,12 @@ static void samsung_pinctrl_suspend_dev(
 			/* Some banks have two config registers */
 			bank->pm_save[PINCFG_TYPE_NUM] =
 				readl(reg + offs[PINCFG_TYPE_FUNC] + 4);
-			pr_debug("Save %s @ %p (con %#010x %08x)\n",
+			pr_debug("Save %s @ %pK (con %#010x %08x)\n",
 				 bank->name, reg,
 				 bank->pm_save[PINCFG_TYPE_FUNC],
 				 bank->pm_save[PINCFG_TYPE_NUM]);
 		} else {
-			pr_debug("Save %s @ %p (con %#010x)\n", bank->name,
+			pr_debug("Save %s @ %pK (con %#010x)\n", bank->name,
 				 reg, bank->pm_save[PINCFG_TYPE_FUNC]);
 		}
 	}
@@ -1046,7 +1046,7 @@ static void samsung_pinctrl_resume_dev(struct samsung_pinctrl_drv_data *drvdata)
 
 		if (widths[PINCFG_TYPE_FUNC] * bank->nr_pins > 32) {
 			/* Some banks have two config registers */
-			pr_debug("%s @ %p (con %#010x %08x => %#010x %08x)\n",
+			pr_debug("%s @ %pK (con %#010x %08x => %#010x %08x)\n",
 				 bank->name, reg,
 				 readl(reg + offs[PINCFG_TYPE_FUNC]),
 				 readl(reg + offs[PINCFG_TYPE_FUNC] + 4),
@@ -1055,7 +1055,7 @@ static void samsung_pinctrl_resume_dev(struct samsung_pinctrl_drv_data *drvdata)
 			writel(bank->pm_save[PINCFG_TYPE_NUM],
 			       reg + offs[PINCFG_TYPE_FUNC] + 4);
 		} else {
-			pr_debug("%s @ %p (con %#010x => %#010x)\n", bank->name,
+			pr_debug("%s @ %pK (con %#010x => %#010x)\n", bank->name,
 				 reg, readl(reg + offs[PINCFG_TYPE_FUNC]),
 				 bank->pm_save[PINCFG_TYPE_FUNC]);
 		}

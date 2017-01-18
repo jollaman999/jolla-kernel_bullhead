@@ -2376,7 +2376,7 @@ static void nfs4_xdr_enc_readdir(struct rpc_rqst *req, struct xdr_stream *xdr,
 
 	xdr_inline_pages(&req->rq_rcv_buf, hdr.replen << 2, args->pages,
 			 args->pgbase, args->count);
-	dprintk("%s: inlined page args = (%u, %p, %u, %u)\n",
+	dprintk("%s: inlined page args = (%u, %pK, %u, %u)\n",
 			__func__, hdr.replen << 2, args->pages,
 			args->pgbase, args->count);
 	encode_nops(&hdr);

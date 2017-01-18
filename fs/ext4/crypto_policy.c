@@ -149,7 +149,7 @@ int ext4_is_child_context_consistent_with_parent(struct inode *parent,
 	int res;
 
 	if ((parent == NULL) || (child == NULL)) {
-		pr_err("parent %p child %p\n", parent, child);
+		pr_err("parent %pK child %pK\n", parent, child);
 		WARN_ON(1);	/* Should never happen */
 		return 0;
 	}

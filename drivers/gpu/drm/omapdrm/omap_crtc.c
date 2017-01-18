@@ -314,7 +314,7 @@ static int omap_crtc_page_flip_locked(struct drm_crtc *crtc,
 	struct omap_crtc *omap_crtc = to_omap_crtc(crtc);
 	struct drm_gem_object *bo;
 
-	DBG("%d -> %d (event=%p)", crtc->fb ? crtc->fb->base.id : -1,
+	DBG("%d -> %d (event=%pK)", crtc->fb ? crtc->fb->base.id : -1,
 			fb->base.id, event);
 
 	if (omap_crtc->old_fb) {

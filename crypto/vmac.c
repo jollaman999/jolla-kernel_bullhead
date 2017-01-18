@@ -345,13 +345,13 @@ static u64 l3hash(u64 p1, u64 p2, u64 k1, u64 k2, u64 len)
 	p1 += (t >> 32);
 	p2 += (p1 << 32);
 
-	/* compute (p1+k1)%p64 and (p2+k2)%p64 */
+	/* compute (p1+k1)%pK64 and (p2+k2)%pK64 */
 	p1 += k1;
 	p1 += (0 - (p1 < k1)) & 257;
 	p2 += k2;
 	p2 += (0 - (p2 < k2)) & 257;
 
-	/* compute (p1+k1)*(p2+k2)%p64 */
+	/* compute (p1+k1)*(p2+k2)%pK64 */
 	MUL64(rh, rl, p1, p2);
 	t = rh >> 56;
 	ADD128(t, rl, z, rh);

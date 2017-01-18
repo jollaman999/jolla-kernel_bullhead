@@ -699,7 +699,7 @@ static void write_raw(struct BCState *bcs, u_int *buf, int cnt) {
 		}
 		bcs->hw.tiger.s_tot += s_cnt;
 		if (bcs->cs->debug & L1_DEB_HSCX)
-			debugl1(bcs->cs, "tiger write_raw: c%d %p-%p %d/%d %d %x", bcs->channel,
+			debugl1(bcs->cs, "tiger write_raw: c%d %pK-%pK %d/%d %d %x", bcs->channel,
 				buf, p, s_cnt, cnt,
 				bcs->hw.tiger.sendcnt, bcs->cs->hw.njet.irqstat0);
 		if (bcs->cs->debug & L1_DEB_HSCX_FIFO)
@@ -925,7 +925,7 @@ inittiger(struct IsdnCardState *cs)
 	cs->bcs[1].hw.tiger.s_end = cs->bcs[0].hw.tiger.s_end;
 
 	memset(cs->bcs[0].hw.tiger.send, 0xff, NETJET_DMA_TXSIZE * sizeof(unsigned int));
-	debugl1(cs, "tiger: send buf %p - %p", cs->bcs[0].hw.tiger.send,
+	debugl1(cs, "tiger: send buf %pK - %pK", cs->bcs[0].hw.tiger.send,
 		cs->bcs[0].hw.tiger.send + NETJET_DMA_TXSIZE - 1);
 	outl(virt_to_bus(cs->bcs[0].hw.tiger.send),
 	     cs->hw.njet.base + NETJET_DMA_READ_START);
@@ -939,7 +939,7 @@ inittiger(struct IsdnCardState *cs)
 		       "HiSax: No memory for tiger.rec\n");
 		return;
 	}
-	debugl1(cs, "tiger: rec buf %p - %p", cs->bcs[0].hw.tiger.rec,
+	debugl1(cs, "tiger: rec buf %pK - %pK", cs->bcs[0].hw.tiger.rec,
 		cs->bcs[0].hw.tiger.rec + NETJET_DMA_RXSIZE - 1);
 	cs->bcs[1].hw.tiger.rec = cs->bcs[0].hw.tiger.rec;
 	memset(cs->bcs[0].hw.tiger.rec, 0xff, NETJET_DMA_RXSIZE * sizeof(unsigned int));

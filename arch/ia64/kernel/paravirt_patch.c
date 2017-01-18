@@ -189,7 +189,7 @@ paravirt_print_bundle(const bundle_t *bundle)
 	ia64_inst_t slot2 = paravirt_read_slot2(bundle);
 
 	printk(KERN_DEBUG
-	       "bundle 0x%p 0x%016lx 0x%016lx\n", bundle, quad[0], quad[1]);
+	       "bundle 0x%pK 0x%016lx 0x%016lx\n", bundle, quad[0], quad[1]);
 	printk(KERN_DEBUG
 	       "bundle template 0x%x\n",
 	       bundle->quad0.template);

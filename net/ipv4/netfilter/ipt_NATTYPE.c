@@ -78,7 +78,7 @@ static DEFINE_SPINLOCK(nattype_lock);
 static void nattype_nte_debug_print(const struct ipt_nattype *nte,
 				const char *s)
 {
-	DEBUGP("%p:%s-proto[%d],src[%pI4:%d],nat[%d],dest[%pI4:%d]\n",
+	DEBUGP("%pK:%s-proto[%d],src[%pI4:%d],nat[%d],dest[%pI4:%d]\n",
 		nte, s, nte->proto,
 		&nte->range.min_addr.ip, ntohs(nte->range.min_proto.all),
 		ntohs(nte->nat_port),
@@ -323,7 +323,7 @@ static unsigned int nattype_nat(struct sk_buff *skb,
 		/*
 		 * Expand the ingress conntrack to include the reply as source
 		 */
-		DEBUGP("Expand ingress conntrack=%p, type=%d, src[%pI4:%d]\n",
+		DEBUGP("Expand ingress conntrack=%pK, type=%d, src[%pI4:%d]\n",
 			ct, ctinfo, &newrange.min_addr.ip,
 			ntohs(newrange.min_proto.all));
 		ct->nattype_entry = (unsigned long)nte;
@@ -594,7 +594,7 @@ drain:
 			goto drain;
 		}
 
-		DEBUGP("%p: removing from list\n", nte);
+		DEBUGP("%pK: removing from list\n", nte);
 		list_del(&nte->list);
 		spin_unlock_bh(&nattype_lock);
 		nattype_free(nte);

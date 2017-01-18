@@ -146,8 +146,8 @@ setup_memory_node(int nid, void *kernel_end)
 	printk(" Detected node memory:   start %8lu, end %8lu\n",
 	       node_min_pfn, node_max_pfn);
 
-	DBGDCONT(" DISCONTIG: node_data[%d]   is at 0x%p\n", nid, NODE_DATA(nid));
-	DBGDCONT(" DISCONTIG: NODE_DATA(%d)->bdata is at 0x%p\n", nid, NODE_DATA(nid)->bdata);
+	DBGDCONT(" DISCONTIG: node_data[%d]   is at 0x%pK\n", nid, NODE_DATA(nid));
+	DBGDCONT(" DISCONTIG: NODE_DATA(%d)->bdata is at 0x%pK\n", nid, NODE_DATA(nid)->bdata);
 
 	/* Find the bounds of kernel memory.  */
 	start_kernel_pfn = PFN_DOWN(KERNEL_START_PHYS);
@@ -269,13 +269,13 @@ setup_memory(void *kernel_end)
 		extern void *move_initrd(unsigned long);
 
 		initrd_end = initrd_start+INITRD_SIZE;
-		printk("Initial ramdisk at: 0x%p (%lu bytes)\n",
+		printk("Initial ramdisk at: 0x%pK (%lu bytes)\n",
 		       (void *) initrd_start, INITRD_SIZE);
 
 		if ((void *)initrd_end > phys_to_virt(PFN_PHYS(max_low_pfn))) {
 			if (!move_initrd(PFN_PHYS(max_low_pfn)))
 				printk("initrd extends beyond end of memory "
-				       "(0x%08lx > 0x%p)\ndisabling initrd\n",
+				       "(0x%08lx > 0x%pK)\ndisabling initrd\n",
 				       initrd_end,
 				       phys_to_virt(PFN_PHYS(max_low_pfn)));
 		} else {

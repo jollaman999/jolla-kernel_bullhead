@@ -134,7 +134,7 @@ static int psb_gem_create(struct drm_file *file,
 	/* Give the object a handle so we can carry it more easily */
 	ret = drm_gem_handle_create(file, &r->gem, &handle);
 	if (ret) {
-		dev_err(dev->dev, "GEM handle failed for %p, %lld\n",
+		dev_err(dev->dev, "GEM handle failed for %pK, %lld\n",
 							&r->gem, size);
 		drm_gem_object_release(&r->gem);
 		psb_gtt_free_range(dev, r);

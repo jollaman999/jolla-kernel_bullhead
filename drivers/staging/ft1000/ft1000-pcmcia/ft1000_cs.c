@@ -90,7 +90,7 @@ static int ft1000_config(struct pcmcia_device *link)
 {
 	int ret;
 
-	dev_dbg(&link->dev, "ft1000_cs: ft1000_config(0x%p)\n", link);
+	dev_dbg(&link->dev, "ft1000_cs: ft1000_config(0x%pK)\n", link);
 
 	/* setup IO window */
 	ret = pcmcia_loop_config(link, ft1000_confcheck, NULL);

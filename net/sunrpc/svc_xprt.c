@@ -370,7 +370,7 @@ void svc_xprt_enqueue(struct svc_xprt *xprt)
 	 */
 	if (test_and_set_bit(XPT_BUSY, &xprt->xpt_flags)) {
 		/* Don't enqueue transport while already enqueued */
-		dprintk("svc: transport %p busy, not enqueued\n", xprt);
+		dprintk("svc: transport %pK busy, not enqueued\n", xprt);
 		goto out_unlock;
 	}
 
@@ -378,19 +378,19 @@ void svc_xprt_enqueue(struct svc_xprt *xprt)
 		rqstp = list_entry(pool->sp_threads.next,
 				   struct svc_rqst,
 				   rq_list);
-		dprintk("svc: transport %p served by daemon %p\n",
+		dprintk("svc: transport %pK served by daemon %pK\n",
 			xprt, rqstp);
 		svc_thread_dequeue(pool, rqstp);
 		if (rqstp->rq_xprt)
 			printk(KERN_ERR
-				"svc_xprt_enqueue: server %p, rq_xprt=%p!\n",
+				"svc_xprt_enqueue: server %pK, rq_xprt=%pK!\n",
 				rqstp, rqstp->rq_xprt);
 		rqstp->rq_xprt = xprt;
 		svc_xprt_get(xprt);
 		pool->sp_stats.threads_woken++;
 		wake_up(&rqstp->rq_wait);
 	} else {
-		dprintk("svc: transport %p put into queue\n", xprt);
+		dprintk("svc: transport %pK put into queue\n", xprt);
 		list_add_tail(&xprt->xpt_ready, &pool->sp_sockets);
 		pool->sp_stats.sockets_queued++;
 	}
@@ -414,7 +414,7 @@ static struct svc_xprt *svc_xprt_dequeue(struct svc_pool *pool)
 			  struct svc_xprt, xpt_ready);
 	list_del_init(&xprt->xpt_ready);
 
-	dprintk("svc: transport %p dequeued, inuse=%d\n",
+	dprintk("svc: transport %pK dequeued, inuse=%d\n",
 		xprt, atomic_read(&xprt->xpt_ref.refcount));
 
 	return xprt;
@@ -493,7 +493,7 @@ void svc_wake_up(struct svc_serv *serv)
 			rqstp = list_entry(pool->sp_threads.next,
 					   struct svc_rqst,
 					   rq_list);
-			dprintk("svc: daemon %p woken up.\n", rqstp);
+			dprintk("svc: daemon %pK woken up.\n", rqstp);
 			/*
 			svc_thread_dequeue(pool, rqstp);
 			rqstp->rq_xprt = NULL;
@@ -680,7 +680,7 @@ struct svc_xprt *svc_get_next_xprt(struct svc_rqst *rqstp, long timeout)
 		if (!xprt) {
 			svc_thread_dequeue(pool, rqstp);
 			spin_unlock_bh(&pool->sp_lock);
-			dprintk("svc: server %p, no data yet\n", rqstp);
+			dprintk("svc: server %pK, no data yet\n", rqstp);
 			if (signalled() || kthread_should_stop())
 				return ERR_PTR(-EINTR);
 			else
@@ -734,7 +734,7 @@ static int svc_handle_xprt(struct svc_rqst *rqstp, struct svc_xprt *xprt)
 			module_put(xprt->xpt_class->xcl_owner);
 	} else if (xprt->xpt_ops->xpo_has_wspace(xprt)) {
 		/* XPT_DATA|XPT_DEFERRED case: */
-		dprintk("svc: server %p, pool %u, transport %p, inuse=%d\n",
+		dprintk("svc: server %pK, pool %u, transport %pK, inuse=%d\n",
 			rqstp, rqstp->rq_pool->sp_id, xprt,
 			atomic_read(&xprt->xpt_ref.refcount));
 		rqstp->rq_deferred = svc_deferred_dequeue(xprt);
@@ -762,16 +762,16 @@ int svc_recv(struct svc_rqst *rqstp, long timeout)
 	struct svc_serv		*serv = rqstp->rq_server;
 	int			len, err;
 
-	dprintk("svc: server %p waiting for data (to = %ld)\n",
+	dprintk("svc: server %pK waiting for data (to = %ld)\n",
 		rqstp, timeout);
 
 	if (rqstp->rq_xprt)
 		printk(KERN_ERR
-			"svc_recv: service %p, transport not NULL!\n",
+			"svc_recv: service %pK, transport not NULL!\n",
 			 rqstp);
 	if (waitqueue_active(&rqstp->rq_wait))
 		printk(KERN_ERR
-			"svc_recv: service %p, wait queue active!\n",
+			"svc_recv: service %pK, wait queue active!\n",
 			 rqstp);
 
 	err = svc_alloc_arg(rqstp);
@@ -813,7 +813,7 @@ EXPORT_SYMBOL_GPL(svc_recv);
  */
 void svc_drop(struct svc_rqst *rqstp)
 {
-	dprintk("svc: xprt %p dropped request\n", rqstp->rq_xprt);
+	dprintk("svc: xprt %pK dropped request\n", rqstp->rq_xprt);
 	svc_xprt_release(rqstp);
 }
 EXPORT_SYMBOL_GPL(svc_drop);
@@ -888,7 +888,7 @@ static void svc_age_temp_xprts(unsigned long closure)
 		list_del_init(le);
 		set_bit(XPT_CLOSE, &xprt->xpt_flags);
 		set_bit(XPT_DETACHED, &xprt->xpt_flags);
-		dprintk("queuing xprt %p for closing\n", xprt);
+		dprintk("queuing xprt %pK for closing\n", xprt);
 
 		/* a thread will dequeue and close it soon */
 		svc_xprt_enqueue(xprt);
@@ -923,7 +923,7 @@ static void svc_delete_xprt(struct svc_xprt *xprt)
 	if (test_and_set_bit(XPT_DEAD, &xprt->xpt_flags))
 		BUG();
 
-	dprintk("svc: svc_delete_xprt(%p)\n", xprt);
+	dprintk("svc: svc_delete_xprt(%pK)\n", xprt);
 	xprt->xpt_ops->xpo_detach(xprt);
 
 	spin_lock_bh(&serv->sv_lock);

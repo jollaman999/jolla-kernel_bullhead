@@ -29,7 +29,7 @@ TRACE_EVENT(lock_acquire,
 		__entry->lockdep_addr = lock;
 	),
 
-	TP_printk("%p %s%s%s", __entry->lockdep_addr,
+	TP_printk("%pK %s%s%s", __entry->lockdep_addr,
 		  (__entry->flags & 1) ? "try " : "",
 		  (__entry->flags & 2) ? "read " : "",
 		  __get_str(name))
@@ -51,7 +51,7 @@ DECLARE_EVENT_CLASS(lock,
 		__entry->lockdep_addr = lock;
 	),
 
-	TP_printk("%p %s",  __entry->lockdep_addr, __get_str(name))
+	TP_printk("%pK %s",  __entry->lockdep_addr, __get_str(name))
 );
 
 DEFINE_EVENT(lock, lock_release,

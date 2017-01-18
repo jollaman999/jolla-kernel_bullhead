@@ -377,7 +377,7 @@ void sctp_transport_update_rto(struct sctp_transport *tp, __u32 rtt)
 	 */
 	tp->rto_pending = 0;
 
-	SCTP_DEBUG_PRINTK("%s: transport: %p, rtt: %d, srtt: %d "
+	SCTP_DEBUG_PRINTK("%s: transport: %pK, rtt: %d, srtt: %d "
 			  "rttvar: %d, rto: %ld\n", __func__,
 			  tp, rtt, tp->srtt, tp->rttvar, tp->rto);
 }
@@ -433,7 +433,7 @@ void sctp_transport_raise_cwnd(struct sctp_transport *transport,
 			cwnd += pmtu;
 		else
 			cwnd += bytes_acked;
-		SCTP_DEBUG_PRINTK("%s: SLOW START: transport: %p, "
+		SCTP_DEBUG_PRINTK("%s: SLOW START: transport: %pK, "
 				  "bytes_acked: %d, cwnd: %d, ssthresh: %d, "
 				  "flight_size: %d, pba: %d\n",
 				  __func__,
@@ -460,7 +460,7 @@ void sctp_transport_raise_cwnd(struct sctp_transport *transport,
 			pba = ((cwnd < pba) ? (pba - cwnd) : 0);
 		}
 		SCTP_DEBUG_PRINTK("%s: CONGESTION AVOIDANCE: "
-				  "transport: %p, bytes_acked: %d, cwnd: %d, "
+				  "transport: %pK, bytes_acked: %d, cwnd: %d, "
 				  "ssthresh: %d, flight_size: %d, pba: %d\n",
 				  __func__,
 				  transport, bytes_acked, cwnd,
@@ -558,7 +558,7 @@ void sctp_transport_lower_cwnd(struct sctp_transport *transport,
 	}
 
 	transport->partial_bytes_acked = 0;
-	SCTP_DEBUG_PRINTK("%s: transport: %p reason: %d cwnd: "
+	SCTP_DEBUG_PRINTK("%s: transport: %pK reason: %d cwnd: "
 			  "%d ssthresh: %d\n", __func__,
 			  transport, reason,
 			  transport->cwnd, transport->ssthresh);

@@ -410,7 +410,7 @@ static void crystalhd_rx_pkt_rel_call_back(void *context, void *data)
 	struct crystalhd_rx_dma_pkt *pkt = (struct crystalhd_rx_dma_pkt *)data;
 
 	if (!pkt || !hw) {
-		BCMLOG_ERR("Invalid arg - %p %p\n", hw, pkt);
+		BCMLOG_ERR("Invalid arg - %pK %pK\n", hw, pkt);
 		return;
 	}
 

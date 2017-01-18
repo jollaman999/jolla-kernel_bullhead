@@ -540,7 +540,7 @@ int sirdev_receive(struct sir_dev *dev, const unsigned char *cp, size_t count)
 	}
 
 	if (!dev->irlap) {
-		IRDA_WARNING("%s - too early: %p / %zd!\n",
+		IRDA_WARNING("%s - too early: %pK / %zd!\n",
 			     __func__, cp, count);
 		return -1;
 	}

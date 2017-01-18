@@ -225,7 +225,7 @@ void glink_pkt_notify_rx(void *handle, const void *priv,
 	struct glink_pkt_dev *devp = (struct glink_pkt_dev *)priv;
 	unsigned long flags;
 
-	GLINK_PKT_INFO("%s(): priv[%p] data[%p] size[%zu]\n",
+	GLINK_PKT_INFO("%s(): priv[%pK] data[%pK] size[%zu]\n",
 		   __func__, pkt_priv, (char *)ptr, size);
 
 	pkt = kzalloc(sizeof(struct glink_rx_pkt), GFP_KERNEL);
@@ -263,7 +263,7 @@ void glink_pkt_notify_rx(void *handle, const void *priv,
 void glink_pkt_notify_tx_done(void *handle, const void *priv,
 				const void *pkt_priv, const void *ptr)
 {
-	GLINK_PKT_INFO("%s(): priv[%p] pkt_priv[%p] ptr[%p]\n",
+	GLINK_PKT_INFO("%s(): priv[%pK] pkt_priv[%pK] ptr[%pK]\n",
 					__func__, priv, pkt_priv, ptr);
 /* Free Tx buffer allocated in glink_pkt_write */
 	kfree(ptr);

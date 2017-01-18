@@ -177,7 +177,7 @@ static int sja1000_ofp_probe(struct platform_device *ofdev)
 	dev->irq = irq;
 
 	dev_info(&ofdev->dev,
-		 "reg_base=0x%p irq=%d clock=%d ocr=0x%02x cdr=0x%02x\n",
+		 "reg_base=0x%pK irq=%d clock=%d ocr=0x%02x cdr=0x%02x\n",
 		 priv->reg_base, dev->irq, priv->can.clock.freq,
 		 priv->ocr, priv->cdr);
 

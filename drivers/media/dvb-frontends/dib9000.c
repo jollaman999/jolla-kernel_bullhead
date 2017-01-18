@@ -1529,7 +1529,7 @@ static int dib9000_fw_set_output_mode(struct dvb_frontend *fe, int mode)
 	struct dib9000_state *state = fe->demodulator_priv;
 	u16 outreg, smo_mode;
 
-	dprintk("setting output mode for demod %p to %d", fe, mode);
+	dprintk("setting output mode for demod %pK to %d", fe, mode);
 
 	switch (mode) {
 	case OUTMODE_MPEG2_PAR_GATED_CLK:
@@ -1551,7 +1551,7 @@ static int dib9000_fw_set_output_mode(struct dvb_frontend *fe, int mode)
 		outreg = 0;
 		break;
 	default:
-		dprintk("Unhandled output_mode passed to be set for demod %p", &state->fe[0]);
+		dprintk("Unhandled output_mode passed to be set for demod %pK", &state->fe[0]);
 		return -EINVAL;
 	}
 
@@ -2439,7 +2439,7 @@ int dib9000_set_slave_frontend(struct dvb_frontend *fe, struct dvb_frontend *fe_
 	while ((index_frontend < MAX_NUMBER_OF_FRONTENDS) && (state->fe[index_frontend] != NULL))
 		index_frontend++;
 	if (index_frontend < MAX_NUMBER_OF_FRONTENDS) {
-		dprintk("set slave fe %p to index %i", fe_slave, index_frontend);
+		dprintk("set slave fe %pK to index %i", fe_slave, index_frontend);
 		state->fe[index_frontend] = fe_slave;
 		return 0;
 	}
@@ -2457,7 +2457,7 @@ int dib9000_remove_slave_frontend(struct dvb_frontend *fe)
 	while ((index_frontend < MAX_NUMBER_OF_FRONTENDS) && (state->fe[index_frontend] != NULL))
 		index_frontend++;
 	if (index_frontend != 1) {
-		dprintk("remove slave fe %p (index %i)", state->fe[index_frontend - 1], index_frontend - 1);
+		dprintk("remove slave fe %pK (index %i)", state->fe[index_frontend - 1], index_frontend - 1);
 		state->fe[index_frontend] = NULL;
 		return 0;
 	}

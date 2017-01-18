@@ -218,17 +218,17 @@ static void dwc2_update_frame_list(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 	u16 i, j, inc;
 
 	if (!hsotg) {
-		pr_err("hsotg = %p\n", hsotg);
+		pr_err("hsotg = %pK\n", hsotg);
 		return;
 	}
 
 	if (!qh->channel) {
-		dev_err(hsotg->dev, "qh->channel = %p\n", qh->channel);
+		dev_err(hsotg->dev, "qh->channel = %pK\n", qh->channel);
 		return;
 	}
 
 	if (!hsotg->frame_list) {
-		dev_err(hsotg->dev, "hsotg->frame_list = %p\n",
+		dev_err(hsotg->dev, "hsotg->frame_list = %pK\n",
 			hsotg->frame_list);
 		return;
 	}
@@ -661,7 +661,7 @@ static void dwc2_init_non_isoc_dma_desc(struct dwc2_hsotg *hsotg,
 	struct dwc2_host_chan *chan = qh->channel;
 	int n_desc = 0;
 
-	dev_vdbg(hsotg->dev, "%s(): qh=%p dma=%08lx len=%d\n", __func__, qh,
+	dev_vdbg(hsotg->dev, "%s(): qh=%pK dma=%08lx len=%d\n", __func__, qh,
 		 (unsigned long)chan->xfer_dma, chan->xfer_len);
 
 	/*
@@ -672,7 +672,7 @@ static void dwc2_init_non_isoc_dma_desc(struct dwc2_hsotg *hsotg,
 	 */
 
 	list_for_each_entry(qtd, &qh->qtd_list, qtd_list_entry) {
-		dev_vdbg(hsotg->dev, "qtd=%p\n", qtd);
+		dev_vdbg(hsotg->dev, "qtd=%pK\n", qtd);
 
 		if (n_desc) {
 			/* SG request - more than 1 QTD */
@@ -689,13 +689,13 @@ static void dwc2_init_non_isoc_dma_desc(struct dwc2_hsotg *hsotg,
 			if (n_desc > 1) {
 				qh->desc_list[n_desc - 1].status |= HOST_DMA_A;
 				dev_vdbg(hsotg->dev,
-					 "set A bit in desc %d (%p)\n",
+					 "set A bit in desc %d (%pK)\n",
 					 n_desc - 1,
 					 &qh->desc_list[n_desc - 1]);
 			}
 			dwc2_fill_host_dma_desc(hsotg, chan, qtd, qh, n_desc);
 			dev_vdbg(hsotg->dev,
-				 "desc %d (%p) buf=%08x status=%08x\n",
+				 "desc %d (%pK) buf=%08x status=%08x\n",
 				 n_desc, &qh->desc_list[n_desc],
 				 qh->desc_list[n_desc].buf,
 				 qh->desc_list[n_desc].status);
@@ -715,11 +715,11 @@ static void dwc2_init_non_isoc_dma_desc(struct dwc2_hsotg *hsotg,
 	if (n_desc) {
 		qh->desc_list[n_desc - 1].status |=
 				HOST_DMA_IOC | HOST_DMA_EOL | HOST_DMA_A;
-		dev_vdbg(hsotg->dev, "set IOC/EOL/A bits in desc %d (%p)\n",
+		dev_vdbg(hsotg->dev, "set IOC/EOL/A bits in desc %d (%pK)\n",
 			 n_desc - 1, &qh->desc_list[n_desc - 1]);
 		if (n_desc > 1) {
 			qh->desc_list[0].status |= HOST_DMA_A;
-			dev_vdbg(hsotg->dev, "set A bit in desc 0 (%p)\n",
+			dev_vdbg(hsotg->dev, "set A bit in desc 0 (%pK)\n",
 				 &qh->desc_list[0]);
 		}
 		chan->ntd = n_desc;
@@ -932,7 +932,7 @@ static int dwc2_update_non_isoc_urb_state_ddma(struct dwc2_hsotg *hsotg,
 		remain = dma_desc->status >> HOST_DMA_NBYTES_SHIFT &
 			 HOST_DMA_NBYTES_MASK >> HOST_DMA_NBYTES_SHIFT;
 
-	dev_vdbg(hsotg->dev, "remain=%d dwc2_urb=%p\n", remain, urb);
+	dev_vdbg(hsotg->dev, "remain=%d dwc2_urb=%pK\n", remain, urb);
 
 	if (halt_status == DWC2_HC_XFER_AHB_ERR) {
 		dev_err(hsotg->dev, "EIO\n");
@@ -1018,7 +1018,7 @@ static int dwc2_process_non_isoc_desc(struct dwc2_hsotg *hsotg,
 	dma_desc = &qh->desc_list[desc_num];
 	n_bytes = qh->n_bytes[desc_num];
 	dev_vdbg(hsotg->dev,
-		 "qtd=%p dwc2_urb=%p desc_num=%d desc=%p n_bytes=%d\n",
+		 "qtd=%pK dwc2_urb=%pK desc_num=%d desc=%pK n_bytes=%d\n",
 		 qtd, urb, desc_num, dma_desc, n_bytes);
 	failed = dwc2_update_non_isoc_urb_state_ddma(hsotg, chan, qtd, dma_desc,
 						     halt_status, n_bytes,

@@ -376,7 +376,7 @@ nouveau_fbcon_create(struct drm_fb_helper *helper,
 	nouveau_fbcon_zfill(dev, fbcon);
 
 	/* To allow resizeing without swapping buffers */
-	NV_INFO(drm, "allocated %dx%d fb: 0x%lx, bo %p\n",
+	NV_INFO(drm, "allocated %dx%d fb: 0x%lx, bo %pK\n",
 		nouveau_fb->base.width, nouveau_fb->base.height,
 		nvbo->bo.offset, nvbo);
 

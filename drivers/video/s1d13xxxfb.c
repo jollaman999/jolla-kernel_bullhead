@@ -340,7 +340,7 @@ s1d13xxxfb_blank(int blank_mode, struct fb_info *info)
 {
 	struct s1d13xxxfb_par *par = info->par;
 
-	dbg("s1d13xxxfb_blank: blank=%d, info=%p\n", blank_mode, info);
+	dbg("s1d13xxxfb_blank: blank=%d, info=%pK\n", blank_mode, info);
 
 	switch (blank_mode) {
 		case FB_BLANK_UNBLANK:
@@ -772,7 +772,7 @@ static int s1d13xxxfb_probe(struct platform_device *pdev)
 	int i;
 	u8 revision, prod_id;
 
-	dbg("probe called: device is %p\n", pdev);
+	dbg("probe called: device is %pK\n", pdev);
 
 	printk(KERN_INFO "Epson S1D13XXX FB Driver\n");
 
@@ -872,7 +872,7 @@ static int s1d13xxxfb_probe(struct platform_device *pdev)
 	info->fix.smem_start = pdev->resource[0].start;
 	info->fix.smem_len = pdev->resource[0].end - pdev->resource[0].start + 1;
 
-	printk(KERN_INFO PFX "regs mapped at 0x%p, fb %d KiB mapped at 0x%p\n",
+	printk(KERN_INFO PFX "regs mapped at 0x%pK, fb %d KiB mapped at 0x%pK\n",
 	       default_par->regs, info->fix.smem_len / 1024, info->screen_base);
 
 	info->par = default_par;

@@ -1197,7 +1197,7 @@ int mdss_misr_set(struct mdss_data_type *mdata,
 	bool use_mdp_up_misr = false;
 
 	if (!mdata || !req || !ctl) {
-		pr_err("Invalid input params: mdata = %p req = %p ctl = %p",
+		pr_err("Invalid input params: mdata = %pK req = %pK ctl = %pK",
 			mdata, req, ctl);
 		return -EINVAL;
 	}

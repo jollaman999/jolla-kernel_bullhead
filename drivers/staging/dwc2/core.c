@@ -372,7 +372,7 @@ int dwc2_core_init(struct dwc2_hsotg *hsotg, bool select_phy, int irq)
 	u32 usbcfg, otgctl;
 	int retval;
 
-	dev_dbg(hsotg->dev, "%s(%p)\n", __func__, hsotg);
+	dev_dbg(hsotg->dev, "%s(%pK)\n", __func__, hsotg);
 
 	usbcfg = readl(hsotg->regs + GUSBCFG);
 
@@ -578,7 +578,7 @@ void dwc2_core_host_init(struct dwc2_hsotg *hsotg)
 {
 	u32 hcfg, hfir, otgctl;
 
-	dev_dbg(hsotg->dev, "%s(%p)\n", __func__, hsotg);
+	dev_dbg(hsotg->dev, "%s(%pK)\n", __func__, hsotg);
 
 	/* Restart the Phy Clock */
 	writel(0, hsotg->regs + PCGCTL);
@@ -1725,7 +1725,7 @@ void dwc2_read_packet(struct dwc2_hsotg *hsotg, u8 *dest, u16 bytes)
 	 * moving it into the data buffer.
 	 */
 
-	dev_vdbg(hsotg->dev, "%s(%p,%p,%d)\n", __func__, hsotg, dest, bytes);
+	dev_vdbg(hsotg->dev, "%s(%pK,%pK,%d)\n", __func__, hsotg, dest, bytes);
 
 	for (i = 0; i < word_count; i++, data_buf++)
 		*data_buf = readl(fifo);

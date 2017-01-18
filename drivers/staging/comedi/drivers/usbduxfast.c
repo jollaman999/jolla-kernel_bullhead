@@ -537,7 +537,7 @@ static int usbduxfastsub_submit_InURBs(struct usbduxfastsub_s *udfs)
 
 #ifdef CONFIG_COMEDI_DEBUG
 	printk(KERN_DEBUG "comedi%d: usbduxfast: submitting in-urb: "
-	       "0x%p,0x%p\n", udfs->comedidev->minor, udfs->urbIn->context,
+	       "0x%pK,0x%pK\n", udfs->comedidev->minor, udfs->urbIn->context,
 	       udfs->urbIn->dev);
 #endif
 	ret = usb_submit_urb(udfs->urbIn, GFP_ATOMIC);
@@ -1252,7 +1252,7 @@ static int usbduxfast_ai_insn_read(struct comedi_device *dev,
 	}
 #ifdef CONFIG_COMEDI_DEBUG
 	printk(KERN_DEBUG "comedi%d: usbduxfast: submitting in-urb: "
-	       "0x%p,0x%p\n", udfs->comedidev->minor, udfs->urbIn->context,
+	       "0x%pK,0x%pK\n", udfs->comedidev->minor, udfs->urbIn->context,
 	       udfs->urbIn->dev);
 #endif
 	for (i = 0; i < PACKETS_TO_IGNORE; i++) {

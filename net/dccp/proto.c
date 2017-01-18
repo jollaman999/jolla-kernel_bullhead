@@ -78,7 +78,7 @@ void dccp_set_state(struct sock *sk, const int state)
 {
 	const int oldstate = sk->sk_state;
 
-	dccp_pr_debug("%s(%p)  %s  -->  %s\n", dccp_role(sk), sk,
+	dccp_pr_debug("%s(%pK)  %s  -->  %s\n", dccp_role(sk), sk,
 		      dccp_state_name(oldstate), dccp_state_name(state));
 	WARN_ON(state == oldstate);
 
@@ -963,7 +963,7 @@ static void dccp_terminate_connection(struct sock *sk)
 		dccp_finish_passive_close(sk);
 		break;
 	case DCCP_PARTOPEN:
-		dccp_pr_debug("Stop PARTOPEN timer (%p)\n", sk);
+		dccp_pr_debug("Stop PARTOPEN timer (%pK)\n", sk);
 		inet_csk_clear_xmit_timer(sk, ICSK_TIME_DACK);
 		/* fall through */
 	case DCCP_OPEN:

@@ -540,7 +540,7 @@ static int zr364xx_got_frame(struct zr364xx_camera *cam, int jpgsize)
 	unsigned long flags = 0;
 	int rc = 0;
 
-	DBG("wakeup: %p\n", &dma_q);
+	DBG("wakeup: %pK\n", &dma_q);
 	spin_lock_irqsave(&cam->slock, flags);
 
 	if (list_empty(&dma_q->active)) {
@@ -558,10 +558,10 @@ static int zr364xx_got_frame(struct zr364xx_camera *cam, int jpgsize)
 	}
 	list_del(&buf->vb.queue);
 	v4l2_get_timestamp(&buf->vb.ts);
-	DBG("[%p/%d] wakeup\n", buf, buf->vb.i);
+	DBG("[%pK/%d] wakeup\n", buf, buf->vb.i);
 	zr364xx_fillbuff(cam, buf, jpgsize);
 	wake_up(&buf->vb.done);
-	DBG("wakeup [buf/i] [%p/%d]\n", buf, buf->vb.i);
+	DBG("wakeup [buf/i] [%pK/%d]\n", buf, buf->vb.i);
 unlock:
 	spin_unlock_irqrestore(&cam->slock, flags);
 	return rc;
@@ -981,7 +981,7 @@ static void read_pipe_completion(struct urb *purb)
 	int pipe;
 
 	pipe_info = purb->context;
-	_DBG("%s %p, status %d\n", __func__, purb, purb->status);
+	_DBG("%s %pK, status %d\n", __func__, purb, purb->status);
 	if (pipe_info == NULL) {
 		printk(KERN_ERR KBUILD_MODNAME ": no context!\n");
 		return;
@@ -1060,7 +1060,7 @@ static int zr364xx_start_readpipe(struct zr364xx_camera *cam)
 			  pipe_info->transfer_size,
 			  read_pipe_completion, pipe_info);
 
-	DBG("submitting URB %p\n", pipe_info->stream_urb);
+	DBG("submitting URB %pK\n", pipe_info->stream_urb);
 	retval = usb_submit_urb(pipe_info->stream_urb, GFP_KERNEL);
 	if (retval) {
 		printk(KERN_ERR KBUILD_MODNAME ": start read pipe failed\n");
@@ -1225,7 +1225,7 @@ static void zr364xx_release(struct v4l2_device *v4l2_dev)
 	/* release sys buffers */
 	for (i = 0; i < FRAMES; i++) {
 		if (cam->buffer.frame[i].lpvbits) {
-			DBG("vfree %p\n", cam->buffer.frame[i].lpvbits);
+			DBG("vfree %pK\n", cam->buffer.frame[i].lpvbits);
 			vfree(cam->buffer.frame[i].lpvbits);
 		}
 		cam->buffer.frame[i].lpvbits = NULL;
@@ -1355,7 +1355,7 @@ static int zr364xx_board_init(struct zr364xx_camera *cam)
 	struct zr364xx_pipeinfo *pipe = cam->pipe;
 	unsigned long i;
 
-	DBG("board init: %p\n", cam);
+	DBG("board init: %pK\n", cam);
 	memset(pipe, 0, sizeof(*pipe));
 	pipe->cam = cam;
 	pipe->transfer_size = BUFFER_SIZE;
@@ -1375,7 +1375,7 @@ static int zr364xx_board_init(struct zr364xx_camera *cam)
 		/* always allocate maximum size for system buffers */
 		cam->buffer.frame[i].lpvbits = vmalloc(MAX_FRAME_SIZE);
 
-		DBG("valloc %p, idx %lu, pdata %p\n",
+		DBG("valloc %pK, idx %lu, pdata %pK\n",
 			&cam->buffer.frame[i], i,
 			cam->buffer.frame[i].lpvbits);
 		if (cam->buffer.frame[i].lpvbits == NULL) {
@@ -1507,7 +1507,7 @@ static int zr364xx_probe(struct usb_interface *intf,
 
 	cam->nb = 0;
 
-	DBG("dev: %p, udev %p interface %p\n", cam, cam->udev, intf);
+	DBG("dev: %pK, udev %pK interface %pK\n", cam, cam->udev, intf);
 
 	/* set up the endpoint information  */
 	iface_desc = intf->cur_altsetting;

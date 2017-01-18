@@ -215,7 +215,7 @@ static int ath3k_load_firmware(struct usb_device *udev,
 	int err, pipe, len, size, sent = 0;
 	int count = firmware->size;
 
-	BT_DBG("udev %p", udev);
+	BT_DBG("udev %pK", udev);
 
 	pipe = usb_sndctrlpipe(udev, 0);
 
@@ -637,7 +637,7 @@ static int ath3k_probe(struct usb_interface *intf,
 	int ret;
 	struct ath3k_version version;
 
-	BT_DBG("intf %p id %p", intf, id);
+	BT_DBG("intf %pK id %pK", intf, id);
 
 	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
 		return -ENODEV;
@@ -701,7 +701,7 @@ static int ath3k_probe(struct usb_interface *intf,
 
 static void ath3k_disconnect(struct usb_interface *intf)
 {
-	BT_DBG("ath3k_disconnect intf %p", intf);
+	BT_DBG("ath3k_disconnect intf %pK", intf);
 }
 
 static struct usb_driver ath3k_driver = {

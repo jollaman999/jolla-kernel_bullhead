@@ -1063,7 +1063,7 @@ saa7164_user_buffer *saa7164_vbi_next_buf(struct saa7164_port *port)
 		if (crc_checking) {
 			crc = crc32(0, ubuf->data, ubuf->actual_size);
 			if (crc != ubuf->crc) {
-				printk(KERN_ERR "%s() ubuf %p crc became invalid, was 0x%x became 0x%x\n",
+				printk(KERN_ERR "%s() ubuf %pK crc became invalid, was 0x%x became 0x%x\n",
 					__func__,
 					ubuf, ubuf->crc, crc);
 			}
@@ -1072,7 +1072,7 @@ saa7164_user_buffer *saa7164_vbi_next_buf(struct saa7164_port *port)
 	}
 	mutex_unlock(&port->dmaqueue_lock);
 
-	dprintk(DBGLVL_VBI, "%s() returns %p\n", __func__, ubuf);
+	dprintk(DBGLVL_VBI, "%s() returns %pK\n", __func__, ubuf);
 
 	return ubuf;
 }
@@ -1135,7 +1135,7 @@ static ssize_t fops_read(struct file *file, char __user *buffer,
 		p = ubuf->data + ubuf->pos;
 
 		dprintk(DBGLVL_VBI,
-			"%s() count=%d cnt=%d rem=%d buf=%p buf->pos=%d\n",
+			"%s() count=%d cnt=%d rem=%d buf=%pK buf->pos=%d\n",
 			__func__, (int)count, cnt, rem, ubuf, ubuf->pos);
 
 		if (copy_to_user(buffer, p, cnt)) {

@@ -85,7 +85,7 @@ void msg_delete(struct msg_mgr *hmsg_mgr)
 		/* Let Bridge message module destroy the msg_mgr: */
 		(*intf_fxns->msg_delete) (hmsg_mgr);
 	} else {
-		dev_dbg(bridge, "%s: Error hmsg_mgr handle: %p\n",
+		dev_dbg(bridge, "%s: Error hmsg_mgr handle: %pK\n",
 			__func__, hmsg_mgr);
 	}
 }

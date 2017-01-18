@@ -119,7 +119,7 @@ mwifiex_wmm_allocate_ralist_node(struct mwifiex_adapter *adapter, u8 *ra)
 
 	ra_list->total_pkts_size = 0;
 
-	dev_dbg(adapter->dev, "info: allocated ra_list %p\n", ra_list);
+	dev_dbg(adapter->dev, "info: allocated ra_list %pK\n", ra_list);
 
 	return ra_list;
 }
@@ -166,7 +166,7 @@ mwifiex_ralist_add(struct mwifiex_private *priv, u8 *ra)
 
 	for (i = 0; i < MAX_NUM_TID; ++i) {
 		ra_list = mwifiex_wmm_allocate_ralist_node(adapter, ra);
-		dev_dbg(adapter->dev, "info: created ra_list %p\n", ra_list);
+		dev_dbg(adapter->dev, "info: created ra_list %pK\n", ra_list);
 
 		if (!ra_list)
 			break;
@@ -181,7 +181,7 @@ mwifiex_ralist_add(struct mwifiex_private *priv, u8 *ra)
 				ra_list->max_amsdu = node->max_amsdu;
 		}
 
-		dev_dbg(adapter->dev, "data: ralist %p: is_11n_enabled=%d\n",
+		dev_dbg(adapter->dev, "data: ralist %pK: is_11n_enabled=%d\n",
 			ra_list, ra_list->is_11n_enabled);
 
 		if (ra_list->is_11n_enabled) {
@@ -1033,7 +1033,7 @@ mwifiex_send_single_packet(struct mwifiex_private *priv,
 	skb = skb_dequeue(&ptr->skb_head);
 
 	tx_info = MWIFIEX_SKB_TXCB(skb);
-	dev_dbg(adapter->dev, "data: dequeuing the packet %p %p\n", ptr, skb);
+	dev_dbg(adapter->dev, "data: dequeuing the packet %pK %pK\n", ptr, skb);
 
 	ptr->total_pkts_size -= skb->len;
 

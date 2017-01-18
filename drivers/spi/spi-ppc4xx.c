@@ -146,7 +146,7 @@ static int spi_ppc4xx_txrx(struct spi_device *spi, struct spi_transfer *t)
 	struct ppc4xx_spi *hw;
 	u8 data;
 
-	dev_dbg(&spi->dev, "txrx: tx %p, rx %p, len %d\n",
+	dev_dbg(&spi->dev, "txrx: tx %pK, rx %pK, len %d\n",
 		t->tx_buf, t->rx_buf, t->len);
 
 	hw = spi_master_get_devdata(spi->master);

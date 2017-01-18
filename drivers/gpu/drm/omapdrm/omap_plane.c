@@ -89,7 +89,7 @@ static int update_pin(struct drm_plane *plane, struct drm_framebuffer *fb)
 	if (pinned_fb != fb) {
 		int ret;
 
-		DBG("%p -> %p", pinned_fb, fb);
+		DBG("%pK -> %pK", pinned_fb, fb);
 
 		if (fb)
 			drm_framebuffer_reference(fb);
@@ -100,7 +100,7 @@ static int update_pin(struct drm_plane *plane, struct drm_framebuffer *fb)
 			drm_framebuffer_unreference(pinned_fb);
 
 		if (ret) {
-			dev_err(plane->dev->dev, "could not swap %p -> %p\n",
+			dev_err(plane->dev->dev, "could not swap %pK -> %pK\n",
 					omap_plane->pinned_fb, fb);
 			if (fb)
 				drm_framebuffer_unreference(fb);

@@ -512,7 +512,7 @@ static int atmel_abdac_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, card);
 
-	dev_info(&pdev->dev, "Atmel ABDAC at 0x%p using %s\n",
+	dev_info(&pdev->dev, "Atmel ABDAC at 0x%pK using %s\n",
 			dac->regs, dev_name(&dac->dma.chan->dev->device));
 
 	return retval;

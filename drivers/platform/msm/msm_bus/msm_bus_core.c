@@ -35,7 +35,7 @@ int msm_bus_device_match(struct device *dev, void *id)
 	struct msm_bus_fabric_device *fabdev = to_msm_bus_fabric_device(dev);
 
 	if (!fabdev) {
-		MSM_BUS_WARN("Fabric %p returning 0\n", fabdev);
+		MSM_BUS_WARN("Fabric %pK returning 0\n", fabdev);
 		return 0;
 	}
 	return fabdev->id == *(int *)id;

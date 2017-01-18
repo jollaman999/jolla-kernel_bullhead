@@ -729,7 +729,7 @@ static int omap2_onenand_probe(struct platform_device *pdev)
 	}
 
 	dev_info(&pdev->dev, "initializing on CS%d, phys base 0x%08lx, virtual "
-		 "base %p, freq %d MHz\n", c->gpmc_cs, c->phys_base,
+		 "base %pK, freq %d MHz\n", c->gpmc_cs, c->phys_base,
 		 c->onenand.base, c->freq);
 
 	c->pdev = pdev;

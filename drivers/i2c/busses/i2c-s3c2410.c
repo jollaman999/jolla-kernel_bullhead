@@ -1076,7 +1076,7 @@ static int s3c24xx_i2c_probe(struct platform_device *pdev)
 		return -ENOENT;
 	}
 
-	dev_dbg(&pdev->dev, "clock source %p\n", i2c->clk);
+	dev_dbg(&pdev->dev, "clock source %pK\n", i2c->clk);
 
 
 	/* map the registers */
@@ -1087,7 +1087,7 @@ static int s3c24xx_i2c_probe(struct platform_device *pdev)
 	if (IS_ERR(i2c->regs))
 		return PTR_ERR(i2c->regs);
 
-	dev_dbg(&pdev->dev, "registers %p (%p)\n",
+	dev_dbg(&pdev->dev, "registers %pK (%pK)\n",
 		i2c->regs, res);
 
 	/* setup info block for the i2c core */

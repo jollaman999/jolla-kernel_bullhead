@@ -163,7 +163,7 @@ irqreturn_t snd_emu10k1_interrupt(int irq, void *dev_id)
 					if(pvoice->use) {
 						snd_pcm_period_elapsed(pvoice->epcm->substream);
 					} else { 
-						snd_printk(KERN_ERR "p16v: status: 0x%08x, mask=0x%08x, pvoice=%p, use=%d\n", status2, mask, pvoice, pvoice->use);
+						snd_printk(KERN_ERR "p16v: status: 0x%08x, mask=0x%08x, pvoice=%pK, use=%d\n", status2, mask, pvoice, pvoice->use);
 					}
 				}
 				if(status2 & 0x110000) {

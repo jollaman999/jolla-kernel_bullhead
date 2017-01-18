@@ -1291,7 +1291,7 @@ struct sctp_chunk *sctp_chunkify(struct sk_buff *skb,
 		goto nodata;
 
 	if (!sk) {
-		SCTP_DEBUG_PRINTK("chunkifying skb %p w/o an sk\n", skb);
+		SCTP_DEBUG_PRINTK("chunkifying skb %pK w/o an sk\n", skb);
 	}
 
 	INIT_LIST_HEAD(&retval->list);
@@ -2672,7 +2672,7 @@ fall_through:
 		 * called prior to this routine.  Simply log the error
 		 * here.
 		 */
-		SCTP_DEBUG_PRINTK("Ignoring param: %d for association %p.\n",
+		SCTP_DEBUG_PRINTK("Ignoring param: %d for association %pK.\n",
 				  ntohs(param.p->type), asoc);
 		break;
 	}

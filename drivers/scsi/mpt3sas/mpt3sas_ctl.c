@@ -1452,7 +1452,7 @@ _ctl_diag_register_2(struct MPT3SAS_ADAPTER *ioc,
 	mpi_request->VP_ID = 0;
 
 	dctlprintk(ioc, pr_info(MPT3SAS_FMT
-		"%s: diag_buffer(0x%p), dma(0x%llx), sz(%d)\n",
+		"%s: diag_buffer(0x%pK), dma(0x%llx), sz(%d)\n",
 		ioc->name, __func__, request_data,
 	    (unsigned long long)request_data_dma,
 	    le32_to_cpu(mpi_request->BufferLength)));
@@ -1740,7 +1740,7 @@ _ctl_diag_query(struct MPT3SAS_ADAPTER *ioc, void __user *arg)
 
 	if (copy_to_user(arg, &karg, sizeof(struct mpt3_diag_query))) {
 		pr_err(MPT3SAS_FMT
-			"%s: unable to write mpt3_diag_query data @ %p\n",
+			"%s: unable to write mpt3_diag_query data @ %pK\n",
 			ioc->name, __func__, arg);
 		return -EFAULT;
 	}
@@ -2010,7 +2010,7 @@ _ctl_diag_read_buffer(struct MPT3SAS_ADAPTER *ioc, void __user *arg)
 
 	diag_data = (void *)(request_data + karg.starting_offset);
 	dctlprintk(ioc, pr_info(MPT3SAS_FMT
-		"%s: diag_buffer(%p), offset(%d), sz(%d)\n",
+		"%s: diag_buffer(%pK), offset(%d), sz(%d)\n",
 		ioc->name, __func__,
 	    diag_data, karg.starting_offset, karg.bytes_to_read));
 
@@ -2024,7 +2024,7 @@ _ctl_diag_read_buffer(struct MPT3SAS_ADAPTER *ioc, void __user *arg)
 	if (copy_to_user((void __user *)uarg->diagnostic_data,
 	    diag_data, copy_size)) {
 		pr_err(MPT3SAS_FMT
-			"%s: Unable to write mpt_diag_read_buffer_t data @ %p\n",
+			"%s: Unable to write mpt_diag_read_buffer_t data @ %pK\n",
 			ioc->name, __func__, diag_data);
 		return -EFAULT;
 	}

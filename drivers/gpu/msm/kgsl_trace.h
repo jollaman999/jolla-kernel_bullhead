@@ -1122,7 +1122,7 @@ TRACE_EVENT(kgsl_page_pool_alloc_pages_end,
 			   __entry->page  = page;
 	    ),
 	    TP_printk(
-		      "order=%u, page=%p", __entry->order, __entry->page
+		      "order=%u, page=%pK", __entry->order, __entry->page
 	    )
 );
 

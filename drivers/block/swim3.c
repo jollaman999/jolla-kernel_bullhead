@@ -261,7 +261,7 @@ static bool swim3_end_request(struct floppy_state *fs, int err, unsigned int nr_
 	struct request *req = fs->cur_req;
 	int rc;
 
-	swim3_dbg("  end request, err=%d nr_bytes=%d, cur_req=%p\n",
+	swim3_dbg("  end request, err=%d nr_bytes=%d, cur_req=%pK\n",
 		  err, nr_bytes, req);
 
 	if (err)
@@ -321,10 +321,10 @@ static void start_request(struct floppy_state *fs)
 		return;
 	}
 	while (fs->state == idle) {
-		swim3_dbg("start request, idle loop, cur_req=%p\n", fs->cur_req);
+		swim3_dbg("start request, idle loop, cur_req=%pK\n", fs->cur_req);
 		if (!fs->cur_req) {
 			fs->cur_req = blk_fetch_request(disks[fs->index]->queue);
-			swim3_dbg("  fetched request %p\n", fs->cur_req);
+			swim3_dbg("  fetched request %pK\n", fs->cur_req);
 			if (!fs->cur_req)
 				break;
 		}
@@ -338,7 +338,7 @@ static void start_request(struct floppy_state *fs)
 		}
 
 #if 0 /* This is really too verbose */
-		swim3_dbg("do_fd_req: dev=%s cmd=%d sec=%ld nr_sec=%u buf=%p\n",
+		swim3_dbg("do_fd_req: dev=%s cmd=%d sec=%ld nr_sec=%u buf=%pK\n",
 			  req->rq_disk->disk_name, req->cmd,
 			  (long)blk_rq_pos(req), blk_rq_sectors(req),
 			  req->buffer);

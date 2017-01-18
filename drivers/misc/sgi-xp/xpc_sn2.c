@@ -1732,14 +1732,14 @@ xpc_notify_senders_sn2(struct xpc_channel *ch, enum xp_retval reason, s64 put)
 		atomic_dec(&ch->n_to_notify);
 
 		if (notify->func != NULL) {
-			dev_dbg(xpc_chan, "notify->func() called, notify=0x%p "
+			dev_dbg(xpc_chan, "notify->func() called, notify=0x%pK "
 				"msg_number=%lld partid=%d channel=%d\n",
 				(void *)notify, get, ch->partid, ch->number);
 
 			notify->func(reason, ch->partid, ch->number,
 				     notify->key);
 
-			dev_dbg(xpc_chan, "notify->func() returned, notify=0x%p"
+			dev_dbg(xpc_chan, "notify->func() returned, notify=0x%pK"
 				" msg_number=%lld partid=%d channel=%d\n",
 				(void *)notify, get, ch->partid, ch->number);
 		}
@@ -2150,7 +2150,7 @@ xpc_allocate_msg_sn2(struct xpc_channel *ch, u32 flags,
 	DBUG_ON(msg->flags != 0);
 	msg->number = put;
 
-	dev_dbg(xpc_chan, "w_local_GP.put changed to %lld; msg=0x%p, "
+	dev_dbg(xpc_chan, "w_local_GP.put changed to %lld; msg=0x%pK, "
 		"msg_number=%lld, partid=%d, channel=%d\n", put + 1,
 		(void *)msg, msg->number, ch->partid, ch->number);
 
@@ -2326,7 +2326,7 @@ xpc_received_payload_sn2(struct xpc_channel *ch, void *payload)
 	msg = container_of(payload, struct xpc_msg_sn2, payload);
 	msg_number = msg->number;
 
-	dev_dbg(xpc_chan, "msg=0x%p, msg_number=%lld, partid=%d, channel=%d\n",
+	dev_dbg(xpc_chan, "msg=0x%pK, msg_number=%lld, partid=%d, channel=%d\n",
 		(void *)msg, msg_number, ch->partid, ch->number);
 
 	DBUG_ON((((u64)msg - (u64)ch->sn.sn2.remote_msgqueue) / ch->entry_size) !=

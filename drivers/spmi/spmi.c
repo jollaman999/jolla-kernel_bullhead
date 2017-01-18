@@ -71,7 +71,7 @@ int spmi_add_controller(struct spmi_controller *ctrl)
 	if (!ctrl)
 		return -EINVAL;
 
-	pr_debug("adding controller for bus %d (0x%p)\n", ctrl->nr, ctrl);
+	pr_debug("adding controller for bus %d (0x%pK)\n", ctrl->nr, ctrl);
 
 	mutex_lock(&board_lock);
 	id = idr_alloc(&ctrl_idr, ctrl, ctrl->nr, ctrl->nr + 1, GFP_KERNEL);
@@ -805,7 +805,7 @@ static int spmi_register_controller(struct spmi_controller *ctrl)
 	if (ret)
 		goto exit;
 
-	dev_dbg(&ctrl->dev, "Bus spmi-%d registered: dev:0x%p\n",
+	dev_dbg(&ctrl->dev, "Bus spmi-%d registered: dev:0x%pK\n",
 					ctrl->nr, &ctrl->dev);
 
 	spmi_dfs_add_controller(ctrl);

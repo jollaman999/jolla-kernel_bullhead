@@ -99,12 +99,12 @@ void amiga_chip_free(void *ptr)
 	res = lookup_resource(&chipram_res, start);
 	if (!res) {
 		pr_err("amiga_chip_free: trying to free nonexistent region at "
-		       "%p\n", ptr);
+		       "%pK\n", ptr);
 		return;
 	}
 
 	size = resource_size(res);
-	pr_debug("amiga_chip_free: free %lu bytes at %p\n", size, ptr);
+	pr_debug("amiga_chip_free: free %lu bytes at %pK\n", size, ptr);
 	atomic_add(size, &chipavail);
 	release_resource(res);
 	kfree(res);

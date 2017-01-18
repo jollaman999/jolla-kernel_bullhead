@@ -155,7 +155,7 @@ ext2_xattr_get(struct inode *inode, int name_index, const char *name,
 	char *end;
 	int error;
 
-	ea_idebug(inode, "name=%d.%s, buffer=%p, buffer_size=%ld",
+	ea_idebug(inode, "name=%d.%s, buffer=%pK, buffer_size=%ld",
 		  name_index, name, buffer, (long)buffer_size);
 
 	if (name == NULL)
@@ -250,7 +250,7 @@ ext2_xattr_list(struct dentry *dentry, char *buffer, size_t buffer_size)
 	size_t rest = buffer_size;
 	int error;
 
-	ea_idebug(inode, "buffer=%p, buffer_size=%ld",
+	ea_idebug(inode, "buffer=%pK, buffer_size=%ld",
 		  buffer, (long)buffer_size);
 
 	down_read(&EXT2_I(inode)->xattr_sem);
@@ -378,7 +378,7 @@ ext2_xattr_set(struct inode *inode, int name_index, const char *name,
 	 * end -- Points right after the block pointed to by header.
 	 */
 	
-	ea_idebug(inode, "name=%d.%s, value=%p, value_len=%ld",
+	ea_idebug(inode, "name=%d.%s, value=%pK, value_len=%ld",
 		  name_index, name, value, (long)value_len);
 
 	if (value == NULL)

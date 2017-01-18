@@ -156,7 +156,7 @@ static void iommu_table_iobmap_setup(void)
 
 static void pci_dma_bus_setup_pasemi(struct pci_bus *bus)
 {
-	pr_debug("pci_dma_bus_setup, bus %p, bus->self %p\n", bus, bus->self);
+	pr_debug("pci_dma_bus_setup, bus %pK, bus->self %pK\n", bus, bus->self);
 
 	if (!iommu_table_iobmap_inited) {
 		iommu_table_iobmap_inited = 1;
@@ -167,7 +167,7 @@ static void pci_dma_bus_setup_pasemi(struct pci_bus *bus)
 
 static void pci_dma_dev_setup_pasemi(struct pci_dev *dev)
 {
-	pr_debug("pci_dma_dev_setup, dev %p (%s)\n", dev, pci_name(dev));
+	pr_debug("pci_dma_dev_setup, dev %pK (%s)\n", dev, pci_name(dev));
 
 #if !defined(CONFIG_PPC_PASEMI_IOMMU_DMA_FORCE)
 	/* For non-LPAR environment, don't translate anything for the DMA
@@ -260,5 +260,5 @@ void __init alloc_iobmap_l2(void)
 	/* For 2G space, 8x64 pages (2^21 bytes) is max total l2 size */
 	iob_l2_base = (u32 *)__va(memblock_alloc_base(1UL<<21, 1UL<<21, 0x80000000));
 
-	printk(KERN_INFO "IOBMAP L2 allocated at: %p\n", iob_l2_base);
+	printk(KERN_INFO "IOBMAP L2 allocated at: %pK\n", iob_l2_base);
 }

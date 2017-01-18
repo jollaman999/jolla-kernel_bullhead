@@ -108,7 +108,7 @@ acpi_ds_init_one_object(acpi_handle obj_handle,
 		status = acpi_ds_initialize_region(obj_handle);
 		if (ACPI_FAILURE(status)) {
 			ACPI_EXCEPTION((AE_INFO, status,
-					"During Region initialization %p [%4.4s]",
+					"During Region initialization %pK [%4.4s]",
 					obj_handle,
 					acpi_ut_get_node_name(obj_handle)));
 		}

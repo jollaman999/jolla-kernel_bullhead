@@ -685,7 +685,7 @@ static void dsp_halt(struct file *file)
 		chk_send_dsp_cmd(&dev, HDEX_RECORD_STOP);
 		msnd_disable_irq(&dev);
 		if (file) {
-			printk(KERN_DEBUG LOGNAME ": Stopping read for %p\n", file);
+			printk(KERN_DEBUG LOGNAME ": Stopping read for %pK\n", file);
 			dev.mode &= ~FMODE_READ;
 		}
 		clear_bit(F_AUDIO_READ_INUSE, &dev.flags);
@@ -697,7 +697,7 @@ static void dsp_halt(struct file *file)
 		}
 		msnd_disable_irq(&dev);
 		if (file) {
-			printk(KERN_DEBUG LOGNAME ": Stopping write for %p\n", file);
+			printk(KERN_DEBUG LOGNAME ": Stopping write for %pK\n", file);
 			dev.mode &= ~FMODE_WRITE;
 		}
 		clear_bit(F_AUDIO_WRITE_INUSE, &dev.flags);
@@ -718,7 +718,7 @@ static int dsp_open(struct file *file)
 		msnd_fifo_make_empty(&dev.DAPF);
 		reset_play_queue();
 		if (file) {
-			printk(KERN_DEBUG LOGNAME ": Starting write for %p\n", file);
+			printk(KERN_DEBUG LOGNAME ": Starting write for %pK\n", file);
 			dev.mode |= FMODE_WRITE;
 		}
 		msnd_enable_irq(&dev);
@@ -729,7 +729,7 @@ static int dsp_open(struct file *file)
 		msnd_fifo_make_empty(&dev.DARF);
 		reset_record_queue();
 		if (file) {
-			printk(KERN_DEBUG LOGNAME ": Starting read for %p\n", file);
+			printk(KERN_DEBUG LOGNAME ": Starting read for %pK\n", file);
 			dev.mode |= FMODE_READ;
 		}
 		msnd_enable_irq(&dev);
@@ -1187,7 +1187,7 @@ static int __init probe_multisound(void)
 	}
 	printk(KERN_INFO LOGNAME ": %s revision %s, Xilinx version %s, "
 #endif /* MSND_CLASSIC */
-	       "I/O 0x%x-0x%x, IRQ %d, memory mapped to %p-%p\n",
+	       "I/O 0x%x-0x%x, IRQ %d, memory mapped to %pK-%pK\n",
 	       dev.name,
 #ifndef MSND_CLASSIC
 	       rev, xv,

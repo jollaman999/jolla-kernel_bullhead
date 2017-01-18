@@ -1883,7 +1883,7 @@ static int initMatrox2(struct matrox_fb_info *minfo, struct board *b)
 	printk(KERN_INFO "matroxfb: %dx%dx%dbpp (virtual: %dx%d)\n",
 		vesafb_defined.xres, vesafb_defined.yres, vesafb_defined.bits_per_pixel,
 		vesafb_defined.xres_virtual, vesafb_defined.yres_virtual);
-	printk(KERN_INFO "matroxfb: framebuffer at 0x%lX, mapped to 0x%p, size %d\n",
+	printk(KERN_INFO "matroxfb: framebuffer at 0x%lX, mapped to 0x%pK, size %d\n",
 		minfo->video.base, vaddr_va(minfo->video.vbase), minfo->video.len);
 
 /* We do not have to set currcon to 0... register_framebuffer do it for us on first console

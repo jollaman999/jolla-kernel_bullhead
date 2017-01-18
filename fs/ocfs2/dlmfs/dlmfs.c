@@ -381,7 +381,7 @@ static void dlmfs_evict_inode(struct inode *inode)
 		goto clear_fields;
 	}
 
-	mlog(0, "we're a directory, ip->ip_conn = 0x%p\n", ip->ip_conn);
+	mlog(0, "we're a directory, ip->ip_conn = 0x%pK\n", ip->ip_conn);
 	/* we must be a directory. If required, lets unregister the
 	 * dlm context now. */
 	if (ip->ip_conn)

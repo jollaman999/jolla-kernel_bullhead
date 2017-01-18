@@ -163,7 +163,7 @@ int fscrypt_has_permitted_context(struct inode *parent, struct inode *child)
 	int res;
 
 	if ((parent == NULL) || (child == NULL)) {
-		printk(KERN_ERR	"parent %p child %p\n", parent, child);
+		printk(KERN_ERR	"parent %pK child %pK\n", parent, child);
 		BUG_ON(1);
 	}
 

@@ -274,7 +274,7 @@ static int __rds_rdma_map(struct rds_sock *rs, struct rds_get_mr_args *args,
 
 	mr->r_trans_private = trans_private;
 
-	rdsdebug("RDS: get_mr put_user key is %x cookie_addr %p\n",
+	rdsdebug("RDS: get_mr put_user key is %x cookie_addr %pK\n",
 	       mr->r_key, (void *)(unsigned long) args->cookie_addr);
 
 	/* The user may pass us an unaligned address, but we can only

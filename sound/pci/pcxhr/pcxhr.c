@@ -643,7 +643,7 @@ static int pcxhr_update_r_buffer(struct pcxhr_stream *stream)
 	stream_num = is_capture ? 0 : subs->number;
 
 	snd_printdd("pcxhr_update_r_buffer(pcm%c%d) : "
-		    "addr(%p) bytes(%zx) subs(%d)\n",
+		    "addr(%pK) bytes(%zx) subs(%d)\n",
 		    is_capture ? 'c' : 'p',
 		    chip->chip_idx, (void *)(long)subs->runtime->dma_addr,
 		    subs->runtime->dma_bytes, subs->number);

@@ -146,7 +146,7 @@ static sctp_disposition_t jsctp_sf_eat_sack(struct net *net,
 		printl("%lu.%06lu ", (unsigned long) now.tv_sec,
 		       (unsigned long) now.tv_nsec / NSEC_PER_USEC);
 
-		printl("%p %5d %5d %5d %8d %5d ", asoc,
+		printl("%pK %5d %5d %5d %8d %5d ", asoc,
 		       ep->base.bind_addr.port, asoc->peer.port,
 		       asoc->pathmtu, asoc->peer.rwnd, asoc->unack_data);
 

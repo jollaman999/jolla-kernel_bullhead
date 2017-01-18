@@ -115,7 +115,7 @@ acpi_ex_resolve_to_value(union acpi_operand_object **stack_ptr,
 		}
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Resolved object %p\n", *stack_ptr));
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Resolved object %pK\n", *stack_ptr));
 	return_ACPI_STATUS(AE_OK);
 }
 
@@ -171,7 +171,7 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 			}
 
 			ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-					  "[Arg/Local %X] ValueObj is %p\n",
+					  "[Arg/Local %X] ValueObj is %pK\n",
 					  stack_desc->reference.value,
 					  obj_desc));
 
@@ -219,7 +219,7 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 					 * the package, can't dereference it
 					 */
 					ACPI_ERROR((AE_INFO,
-						    "Attempt to dereference an Index to NULL package element Idx=%p",
+						    "Attempt to dereference an Index to NULL package element Idx=%pK",
 						    stack_desc));
 					status = AE_AML_UNINITIALIZED_ELEMENT;
 				}
@@ -230,7 +230,7 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 				/* Invalid reference object */
 
 				ACPI_ERROR((AE_INFO,
-					    "Unknown TargetType 0x%X in Index/Reference object %p",
+					    "Unknown TargetType 0x%X in Index/Reference object %pK",
 					    stack_desc->reference.target_type,
 					    stack_desc));
 				status = AE_AML_INTERNAL;
@@ -272,7 +272,7 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 		default:
 
 			ACPI_ERROR((AE_INFO,
-				    "Unknown Reference type 0x%X in %p",
+				    "Unknown Reference type 0x%X in %pK",
 				    ref_type, stack_desc));
 			status = AE_AML_INTERNAL;
 			break;
@@ -295,7 +295,7 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 	case ACPI_TYPE_LOCAL_INDEX_FIELD:
 
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "FieldRead SourceDesc=%p Type=%X\n",
+				  "FieldRead SourceDesc=%pK Type=%X\n",
 				  stack_desc, stack_desc->common.type));
 
 		status =
@@ -403,7 +403,7 @@ acpi_ex_resolve_multiple(struct acpi_walk_state *walk_state,
 			if (ACPI_GET_DESCRIPTOR_TYPE(node) !=
 			    ACPI_DESC_TYPE_NAMED) {
 				ACPI_ERROR((AE_INFO,
-					    "Not a namespace node %p [%s]",
+					    "Not a namespace node %pK [%s]",
 					    node,
 					    acpi_ut_get_descriptor_name(node)));
 				return_ACPI_STATUS(AE_AML_INTERNAL);

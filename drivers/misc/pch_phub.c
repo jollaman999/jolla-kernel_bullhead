@@ -705,7 +705,7 @@ static int pch_phub_probe(struct pci_dev *pdev,
 		goto err_pci_iomap;
 	}
 	dev_dbg(&pdev->dev, "%s : pci_iomap SUCCESS and value "
-		"in pch_phub_base_address variable is %p\n", __func__,
+		"in pch_phub_base_address variable is %pK\n", __func__,
 		chip->pch_phub_base_address);
 
 	chip->pdev = pdev; /* Save pci device struct */

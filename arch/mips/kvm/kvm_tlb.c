@@ -203,7 +203,7 @@ unsigned long kvm_mips_translate_guest_kseg0_to_hpa(struct kvm_vcpu *vcpu,
 	struct kvm *kvm = vcpu->kvm;
 
 	if (KVM_GUEST_KSEGX(gva) != KVM_GUEST_KSEG0) {
-		kvm_err("%s/%p: Invalid gva: %#lx\n", __func__,
+		kvm_err("%s/%pK: Invalid gva: %#lx\n", __func__,
 			__builtin_return_address(0), gva);
 		return KVM_INVALID_PAGE;
 	}
@@ -797,7 +797,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 	int newasid = 0;
 
 #ifdef DEBUG
-	kvm_debug("%s: vcpu %p, cpu: %d\n", __func__, vcpu, cpu);
+	kvm_debug("%s: vcpu %pK, cpu: %d\n", __func__, vcpu, cpu);
 #endif
 
 	/* Alocate new kernel and user ASIDs if needed */
@@ -920,7 +920,7 @@ uint32_t kvm_get_inst(uint32_t *opc, struct kvm_vcpu *vcpu)
 						       (cop0) & ASID_MASK));
 			if (index < 0) {
 				kvm_err
-				    ("%s: get_user_failed for %p, vcpu: %p, ASID: %#lx\n",
+				    ("%s: get_user_failed for %pK, vcpu: %pK, ASID: %#lx\n",
 				     __func__, opc, vcpu, read_c0_entryhi());
 				kvm_mips_dump_host_tlbs();
 				local_irq_restore(flags);
@@ -929,7 +929,7 @@ uint32_t kvm_get_inst(uint32_t *opc, struct kvm_vcpu *vcpu)
 			if (kvm_mips_handle_mapped_seg_tlb_fault(vcpu,
 						&vcpu->arch.guest_tlb[index],
 						NULL, NULL)) {
-				kvm_err("%s: handling mapped seg tlb fault failed for %p, index: %u, vcpu: %p, ASID: %#lx\n",
+				kvm_err("%s: handling mapped seg tlb fault failed for %pK, index: %u, vcpu: %pK, ASID: %#lx\n",
 					__func__, opc, index, vcpu,
 					read_c0_entryhi());
 				kvm_mips_dump_guest_tlbs(vcpu);
@@ -945,7 +945,7 @@ uint32_t kvm_get_inst(uint32_t *opc, struct kvm_vcpu *vcpu)
 							 (unsigned long) opc);
 		inst = *(uint32_t *) CKSEG0ADDR(paddr);
 	} else {
-		kvm_err("%s: illegal address: %p\n", __func__, opc);
+		kvm_err("%s: illegal address: %pK\n", __func__, opc);
 		return KVM_INVALID_INST;
 	}
 

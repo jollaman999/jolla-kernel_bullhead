@@ -375,7 +375,7 @@ static void mhi_xprt_read_data(struct work_struct *work)
 		rc = mhi_poll_inbound(mhi_xprtp->ch_hndl.in_handle, &result);
 		if (rc || !result.payload_buf || !result.bytes_xferd) {
 			if (rc != MHI_STATUS_RING_EMPTY)
-				IPC_RTR_ERR("%s: Poll failed %s:%d:%p:%zu\n",
+				IPC_RTR_ERR("%s: Poll failed %s:%d:%pK:%zu\n",
 					__func__, mhi_xprtp->xprt_name, rc,
 					(void *)result.payload_buf,
 					result.bytes_xferd);

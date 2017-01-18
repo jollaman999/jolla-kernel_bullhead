@@ -1154,7 +1154,7 @@ static void pcibios_allocate_bus_resources(struct pci_bus *bus)
 			 bus->number, i,
 			 (unsigned long long)res->start,
 			 (unsigned long long)res->end);
-		pr_debug("[0x%x], parent %p (%s)\n",
+		pr_debug("[0x%x], parent %pK (%s)\n",
 			 (unsigned int)res->flags,
 			 pr, (pr && pr->name) ? pr->name : "nil");
 
@@ -1195,7 +1195,7 @@ static inline void alloc_resource(struct pci_dev *dev, int idx)
 		pr_warn("PCI: Cannot allocate resource region %d ", idx);
 		pr_cont("of device %s, will remap\n", pci_name(dev));
 		if (pr)
-			pr_debug("PCI:  parent is %p: %016llx-%016llx [%x]\n",
+			pr_debug("PCI:  parent is %pK: %016llx-%016llx [%x]\n",
 				 pr,
 				 (unsigned long long)pr->start,
 				 (unsigned long long)pr->end,

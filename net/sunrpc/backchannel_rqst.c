@@ -58,7 +58,7 @@ static void xprt_free_allocation(struct rpc_rqst *req)
 {
 	struct xdr_buf *xbufp;
 
-	dprintk("RPC:        free allocations for req= %p\n", req);
+	dprintk("RPC:        free allocations for req= %pK\n", req);
 	WARN_ON_ONCE(test_bit(RPC_BC_PA_IN_USE, &req->rq_bc_pa_state));
 	xbufp = &req->rq_rcv_buf;
 	free_page((unsigned long)xbufp->head[0].iov_base);
@@ -114,7 +114,7 @@ int xprt_setup_backchannel(struct rpc_xprt *xprt, unsigned int min_reqs)
 		}
 
 		/* Add the allocated buffer to the tmp list */
-		dprintk("RPC:       adding req= %p\n", req);
+		dprintk("RPC:       adding req= %pK\n", req);
 		list_add(&req->rq_bc_pa_list, &tmp_list);
 
 		req->rq_xprt = xprt;
@@ -197,7 +197,7 @@ void xprt_destroy_backchannel(struct rpc_xprt *xprt, unsigned int max_reqs)
 	spin_lock_bh(&xprt->bc_pa_lock);
 	xprt_dec_alloc_count(xprt, max_reqs);
 	list_for_each_entry_safe(req, tmp, &xprt->bc_pa_list, rq_bc_pa_list) {
-		dprintk("RPC:        req=%p\n", req);
+		dprintk("RPC:        req=%pK\n", req);
 		xprt_free_allocation(req);
 		if (--max_reqs == 0)
 			break;
@@ -243,7 +243,7 @@ struct rpc_rqst *xprt_alloc_bc_request(struct rpc_xprt *xprt)
 		memcpy(&req->rq_private_buf, &req->rq_rcv_buf,
 			sizeof(req->rq_private_buf));
 	}
-	dprintk("RPC:       backchannel req=%p\n", req);
+	dprintk("RPC:       backchannel req=%pK\n", req);
 	return req;
 }
 
@@ -255,7 +255,7 @@ void xprt_free_bc_request(struct rpc_rqst *req)
 {
 	struct rpc_xprt *xprt = req->rq_xprt;
 
-	dprintk("RPC:       free backchannel req=%p\n", req);
+	dprintk("RPC:       free backchannel req=%pK\n", req);
 
 	smp_mb__before_atomic();
 	WARN_ON_ONCE(!test_bit(RPC_BC_PA_IN_USE, &req->rq_bc_pa_state));
@@ -269,7 +269,7 @@ void xprt_free_bc_request(struct rpc_rqst *req)
 		 * to add back to the list because there is no need to
 		 * have anymore preallocated entries.
 		 */
-		dprintk("RPC:       Last session removed req=%p\n", req);
+		dprintk("RPC:       Last session removed req=%pK\n", req);
 		xprt_free_allocation(req);
 		return;
 	}

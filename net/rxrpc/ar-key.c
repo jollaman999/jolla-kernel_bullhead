@@ -631,7 +631,7 @@ static int rxrpc_instantiate_xdr(struct key *key, const void *data, size_t datal
 		sec_ix = ntohl(*xdr++);
 		toklen -= 4;
 
-		_debug("TOKEN type=%u [%p-%p]", sec_ix, xdr, token);
+		_debug("TOKEN type=%u [%pK-%pK]", sec_ix, xdr, token);
 
 		switch (sec_ix) {
 		case RXRPC_SECURITY_RXKAD:

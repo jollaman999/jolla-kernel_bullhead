@@ -477,7 +477,7 @@ static void atari_scsi_fetch_restbytes(void)
 			   nr, phys_dst);
 		/* The content of the DMA pointer is a physical address!  */
 		dst = phys_to_virt(phys_dst);
-		DMA_PRINTK(" = virt addr %p\n", dst);
+		DMA_PRINTK(" = virt addr %pK\n", dst);
 		for (src = (char *)&tt_scsi_dma.dma_restdata; nr != 0; --nr)
 			*dst++ = *src++;
 	}
@@ -877,7 +877,7 @@ static unsigned long atari_scsi_dma_setup(struct Scsi_Host *instance,
 {
 	unsigned long addr = virt_to_phys(data);
 
-	DMA_PRINTK("scsi%d: setting up dma, data = %p, phys = %lx, count = %ld, "
+	DMA_PRINTK("scsi%d: setting up dma, data = %pK, phys = %lx, count = %ld, "
 		   "dir = %d\n", instance->host_no, data, addr, count, dir);
 
 	if (!IS_A_TT() && !STRAM_ADDR(addr)) {

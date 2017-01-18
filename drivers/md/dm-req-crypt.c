@@ -725,7 +725,7 @@ static void req_cryptd_crypt(struct work_struct *work)
 		else
 			req_cryptd_crypt_read_plain(io);
 	} else {
-		DMERR("%s received non-write request for Clone 0x%p\n",
+		DMERR("%s received non-write request for Clone 0x%pK\n",
 				__func__, io->cloned_request);
 	}
 }

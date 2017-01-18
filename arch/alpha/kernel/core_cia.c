@@ -95,7 +95,7 @@ mk_conf_addr(struct pci_bus *bus_dev, unsigned int device_fn, int where,
 	*pci_addr = (bus << 16) | (device_fn << 8) | where;
 
 	DBGC(("mk_conf_addr(bus=%d ,device_fn=0x%x, where=0x%x,"
-	      " returning address 0x%p\n"
+	      " returning address 0x%pK\n"
 	      bus, device_fn, where, *pci_addr));
 
 	return 0;

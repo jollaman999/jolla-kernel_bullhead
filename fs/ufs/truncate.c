@@ -178,7 +178,7 @@ static int ufs_trunc_indirect(struct inode *inode, u64 offset, void *p)
 	unsigned free_count;
 	int retry;
 
-	UFSD("ENTER: ino %lu, offset %llu, p: %p\n",
+	UFSD("ENTER: ino %lu, offset %llu, p: %pK\n",
 	     inode->i_ino, (unsigned long long)offset, p);
 
 	BUG_ON(!p);

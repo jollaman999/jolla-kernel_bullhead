@@ -221,7 +221,7 @@ on_hca_fail:
 	if (0) {
 		int j;
 
-		mthca_dbg(dev, "Created UDAV at %p/%08lx:\n",
+		mthca_dbg(dev, "Created UDAV at %pK/%08lx:\n",
 			  av, (unsigned long) ah->avdma);
 		for (j = 0; j < 8; ++j)
 			printk(KERN_DEBUG "  [%2x] %08x\n",

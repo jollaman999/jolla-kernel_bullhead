@@ -744,7 +744,7 @@ static int prism2_download(local_info_t *local,
 	dl->num_areas = param->num_areas;
 	for (i = 0; i < param->num_areas; i++) {
 		PDEBUG(DEBUG_EXTRA2,
-		       "  area %d: addr=0x%08x len=%d ptr=0x%p\n",
+		       "  area %d: addr=0x%08x len=%d ptr=0x%pK\n",
 		       i, param->data[i].addr, param->data[i].len,
 		       param->data[i].ptr);
 

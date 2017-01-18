@@ -25,7 +25,7 @@ int snd_imx_pcm_mmap(struct snd_pcm_substream *substream,
 	ret = dma_mmap_writecombine(substream->pcm->card->dev, vma,
 		runtime->dma_area, runtime->dma_addr, runtime->dma_bytes);
 
-	pr_debug("%s: ret: %d %p 0x%08x 0x%08x\n", __func__, ret,
+	pr_debug("%s: ret: %d %pK 0x%08x 0x%08x\n", __func__, ret,
 			runtime->dma_area,
 			runtime->dma_addr,
 			runtime->dma_bytes);

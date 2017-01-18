@@ -1027,7 +1027,7 @@ static irqreturn_t ioc4_intr(int irq, void *arg)
 		unsigned long flag;
 
 		spin_lock_irqsave(&soft->is_ir_lock, flag);
-		printk ("%s : %d : mem 0x%p sio_ir 0x%x sio_ies 0x%x "
+		printk ("%s : %d : mem 0x%pK sio_ir 0x%x sio_ies 0x%x "
 				"other_ir 0x%x other_ies 0x%x mask 0x%x\n",
 		     __func__, __LINE__,
 		     (void *)mem, readl(&mem->sio_ir.raw),
@@ -1154,26 +1154,26 @@ static int inline ioc4_attach_local(struct ioc4_driver_data *idd)
 			}
 			BUG_ON(!((((int64_t)port->ip_dma_ringbuf) &
 				(TOTAL_RING_BUF_SIZE - 1)) == 0));
-			DPRINT_CONFIG(("%s : ip_cpu_ringbuf 0x%p "
-						"ip_dma_ringbuf 0x%p\n",
+			DPRINT_CONFIG(("%s : ip_cpu_ringbuf 0x%pK "
+						"ip_dma_ringbuf 0x%pK\n",
 					__func__,
 					(void *)port->ip_cpu_ringbuf,
 					(void *)port->ip_dma_ringbuf));
 			port->ip_inring = RING(port, RX_0_OR_2);
 			port->ip_outring = RING(port, TX_0_OR_2);
 		}
-		DPRINT_CONFIG(("%s : port %d [addr 0x%p] control 0x%p",
+		DPRINT_CONFIG(("%s : port %d [addr 0x%pK] control 0x%pK",
 				__func__,
 				port_number, (void *)port, (void *)control));
-		DPRINT_CONFIG((" ip_serial_regs 0x%p ip_uart_regs 0x%p\n",
+		DPRINT_CONFIG((" ip_serial_regs 0x%pK ip_uart_regs 0x%pK\n",
 				(void *)port->ip_serial_regs,
 				(void *)port->ip_uart_regs));
 
 		/* Initialize the hardware for IOC4 */
 		port_init(port);
 
-		DPRINT_CONFIG(("%s: port_number %d port 0x%p inring 0x%p "
-						"outring 0x%p\n",
+		DPRINT_CONFIG(("%s: port_number %d port 0x%pK inring 0x%pK "
+						"outring 0x%pK\n",
 				__func__,
 				port_number, (void *)port,
 				(void *)port->ip_inring,
@@ -1764,7 +1764,7 @@ ioc4_change_speed(struct uart_port *the_port,
 	writel(port->ip_sscr, &port->ip_serial_regs->sscr);
 
 	/* Set the configuration and proper notification call */
-	DPRINT_CONFIG(("%s : port 0x%p cflag 0%o "
+	DPRINT_CONFIG(("%s : port 0x%pK cflag 0%o "
 		"config_port(baud %d data %d stop %d p enable %d parity %d),"
 		" notification 0x%x\n",
 	     __func__, (void *)port, cflag, baud, new_data, new_stop,
@@ -2714,7 +2714,7 @@ ioc4_serial_core_attach(struct pci_dev *pdev, int port_type)
 	struct uart_driver *u_driver;
 
 
-	DPRINT_CONFIG(("%s: attach pdev 0x%p - control 0x%p\n",
+	DPRINT_CONFIG(("%s: attach pdev 0x%pK - control 0x%pK\n",
 			__func__, pdev, (void *)control));
 
 	if (!control)
@@ -2733,7 +2733,7 @@ ioc4_serial_core_attach(struct pci_dev *pdev, int port_type)
 		port = control->ic_port[port_num].icp_port;
 		port->ip_all_ports[port_type_idx] = the_port;
 
-		DPRINT_CONFIG(("%s: attach the_port 0x%p / port 0x%p : type %s\n",
+		DPRINT_CONFIG(("%s: attach the_port 0x%pK / port 0x%pK : type %s\n",
 				__func__, (void *)the_port,
 				(void *)port,
 				port_type == PROTO_RS232 ? "rs232" : "rs422"));
@@ -2777,7 +2777,7 @@ ioc4_serial_attach_one(struct ioc4_driver_data *idd)
 	int ret = 0;
 
 
-	DPRINT_CONFIG(("%s (0x%p, 0x%p)\n", __func__, idd->idd_pdev,
+	DPRINT_CONFIG(("%s (0x%pK, 0x%pK)\n", __func__, idd->idd_pdev,
 							idd->idd_pci_id));
 
 	/* PCI-RT does not bring out serial connections.
@@ -2792,7 +2792,7 @@ ioc4_serial_attach_one(struct ioc4_driver_data *idd)
 	if (!request_mem_region(tmp_addr1, sizeof(struct ioc4_serial),
 					"sioc4_uart")) {
 		printk(KERN_WARNING
-			"ioc4 (%p): unable to get request region for "
+			"ioc4 (%pK): unable to get request region for "
 				"uart space\n", (void *)idd->idd_pdev);
 		ret = -ENODEV;
 		goto out1;
@@ -2800,12 +2800,12 @@ ioc4_serial_attach_one(struct ioc4_driver_data *idd)
 	serial = ioremap(tmp_addr1, sizeof(struct ioc4_serial));
 	if (!serial) {
 		printk(KERN_WARNING
-			 "ioc4 (%p) : unable to remap ioc4 serial register\n",
+			 "ioc4 (%pK) : unable to remap ioc4 serial register\n",
 				(void *)idd->idd_pdev);
 		ret = -ENODEV;
 		goto out2;
 	}
-	DPRINT_CONFIG(("%s : mem 0x%p, serial 0x%p\n",
+	DPRINT_CONFIG(("%s : mem 0x%pK, serial 0x%pK\n",
 				__func__, (void *)idd->idd_misc_regs,
 				(void *)serial));
 
@@ -2824,7 +2824,7 @@ ioc4_serial_attach_one(struct ioc4_driver_data *idd)
 	soft = kzalloc(sizeof(struct ioc4_soft), GFP_KERNEL);
 	if (!soft) {
 		printk(KERN_WARNING
-		       "ioc4 (%p): unable to get memory for the soft struct\n",
+		       "ioc4 (%pK): unable to get memory for the soft struct\n",
 		       (void *)idd->idd_pdev);
 		ret = -ENOMEM;
 		goto out3;

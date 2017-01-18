@@ -109,7 +109,7 @@ int acpi_bus_get_device(acpi_handle handle, struct acpi_device **device)
 
 	status = acpi_get_data(handle, acpi_bus_data_handler, (void **)device);
 	if (ACPI_FAILURE(status) || !*device) {
-		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "No context for object [%p]\n",
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "No context for object [%pK]\n",
 				  handle));
 		return -ENODEV;
 	}
@@ -177,7 +177,7 @@ int acpi_bus_get_private_data(acpi_handle handle, void **data)
 
 	status = acpi_get_data(handle, acpi_bus_private_data_handler, data);
 	if (ACPI_FAILURE(status) || !*data) {
-		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "No context for object [%p]\n",
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "No context for object [%pK]\n",
 				handle));
 		return -ENODEV;
 	}
@@ -531,7 +531,7 @@ static void acpi_bus_notify(acpi_handle handle, u32 type, void *data)
 	struct acpi_device *device = NULL;
 	struct acpi_driver *driver;
 
-	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Notification %#02x to handle %p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Notification %#02x to handle %pK\n",
 			  type, handle));
 
 	blocking_notifier_call_chain(&acpi_bus_notify_list,

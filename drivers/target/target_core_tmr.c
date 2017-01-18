@@ -234,7 +234,7 @@ static void core_tmr_drain_tmr_list(
 		list_del_init(&tmr_p->tmr_list);
 		cmd = tmr_p->task_cmd;
 
-		pr_debug("LUN_RESET: %s releasing TMR %p Function: 0x%02x,"
+		pr_debug("LUN_RESET: %s releasing TMR %pK Function: 0x%02x,"
 			" Response: 0x%02x, t_state: %d\n",
 			(preempt_and_abort_list) ? "Preempt" : "", tmr_p,
 			tmr_p->function, tmr_p->response, cmd->t_state);
@@ -301,7 +301,7 @@ static void core_tmr_drain_state_list(
 		cmd = list_entry(drain_task_list.next, struct se_cmd, state_list);
 		list_del(&cmd->state_list);
 
-		pr_debug("LUN_RESET: %s cmd: %p"
+		pr_debug("LUN_RESET: %s cmd: %pK"
 			" ITT/CmdSN: 0x%08x/0x%08x, i_state: %d, t_state: %d"
 			"cdb: 0x%02x\n",
 			(preempt_and_abort_list) ? "Preempt" : "", cmd,

@@ -455,7 +455,7 @@ static int s3c_rtc_probe(struct platform_device *pdev)
 	int ret;
 	int tmp;
 
-	dev_dbg(&pdev->dev, "%s: probe=%p\n", __func__, pdev);
+	dev_dbg(&pdev->dev, "%s: probe=%pK\n", __func__, pdev);
 
 	/* find the IRQs */
 

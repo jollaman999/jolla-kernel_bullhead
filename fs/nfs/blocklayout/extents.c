@@ -95,7 +95,7 @@ static int _add_entry(struct my_tree *tree, u64 s, int32_t tag,
 	int found = 0;
 	struct pnfs_inval_tracking *pos;
 
-	dprintk("%s(%llu, %i, %p) enter\n", __func__, s, tag, storage);
+	dprintk("%s(%llu, %i, %pK) enter\n", __func__, s, tag, storage);
 	list_for_each_entry_reverse(pos, &tree->mtt_stub, it_link) {
 		if (pos->it_sector > s)
 			continue;
@@ -275,7 +275,7 @@ static int mark_written_sectors(struct pnfs_inval_markings *marks,
 
 static void print_short_extent(struct pnfs_block_short_extent *be)
 {
-	dprintk("PRINT SHORT EXTENT extent %p\n", be);
+	dprintk("PRINT SHORT EXTENT extent %pK\n", be);
 	if (be) {
 		dprintk("        be_f_offset %llu\n", (u64)be->bse_f_offset);
 		dprintk("        be_length   %llu\n", (u64)be->bse_length);
@@ -417,7 +417,7 @@ int bl_mark_for_commit(struct pnfs_block_extent *be,
 
 static void print_bl_extent(struct pnfs_block_extent *be)
 {
-	dprintk("PRINT EXTENT extent %p\n", be);
+	dprintk("PRINT EXTENT extent %pK\n", be);
 	if (be) {
 		dprintk("        be_f_offset %llu\n", (u64)be->be_f_offset);
 		dprintk("        be_length   %llu\n", (u64)be->be_length);
@@ -432,7 +432,7 @@ destroy_extent(struct kref *kref)
 	struct pnfs_block_extent *be;
 
 	be = container_of(kref, struct pnfs_block_extent, be_refcnt);
-	dprintk("%s be=%p\n", __func__, be);
+	dprintk("%s be=%pK\n", __func__, be);
 	kfree(be);
 }
 
@@ -440,7 +440,7 @@ void
 bl_put_extent(struct pnfs_block_extent *be)
 {
 	if (be) {
-		dprintk("%s enter %p (%i)\n", __func__, be,
+		dprintk("%s enter %pK (%i)\n", __func__, be,
 			atomic_read(&be->be_refcnt.refcount));
 		kref_put(&be->be_refcnt, destroy_extent);
 	}
@@ -499,7 +499,7 @@ bl_add_merge_extent(struct pnfs_block_layout *bl,
 	sector_t end = new->be_f_offset + new->be_length;
 	struct list_head *list;
 
-	dprintk("%s enter with be=%p\n", __func__, new);
+	dprintk("%s enter with be=%pK\n", __func__, new);
 	print_bl_extent(new);
 	list = &bl->bl_extents[bl_choose_list(new->be_state)];
 	print_elist(list);
@@ -530,7 +530,7 @@ bl_add_merge_extent(struct pnfs_block_layout *bl,
 						be->be_f_offset;
 					new->be_f_offset = be->be_f_offset;
 					new->be_v_offset = be->be_v_offset;
-					dprintk("%s: removing %p\n", __func__, be);
+					dprintk("%s: removing %pK\n", __func__, be);
 					list_del(&be->be_node);
 					bl_put_extent(be);
 				} else {
@@ -541,7 +541,7 @@ bl_add_merge_extent(struct pnfs_block_layout *bl,
 			/* new extent overlap existing be */
 			if (extents_consistent(be, new)) {
 				/* extend new to fully replace be */
-				dprintk("%s: removing %p\n", __func__, be);
+				dprintk("%s: removing %pK\n", __func__, be);
 				list_del(&be->be_node);
 				bl_put_extent(be);
 			} else {
@@ -554,7 +554,7 @@ bl_add_merge_extent(struct pnfs_block_layout *bl,
 				/* extend new to fully replace be */
 				new->be_length += be->be_f_offset + be->be_length -
 					new->be_f_offset - new->be_length;
-				dprintk("%s: removing %p\n", __func__, be);
+				dprintk("%s: removing %pK\n", __func__, be);
 				list_del(&be->be_node);
 				bl_put_extent(be);
 			} else {
@@ -602,7 +602,7 @@ bl_find_get_extent(struct pnfs_block_layout *bl, sector_t isect,
 				break;
 			if (isect >= be->be_f_offset) {
 				/* We have found an extent */
-				dprintk("%s Get %p (%i)\n", __func__, be,
+				dprintk("%s Get %pK (%i)\n", __func__, be,
 					atomic_read(&be->be_refcnt.refcount));
 				kref_get(&be->be_refcnt);
 				if (!ret)
@@ -641,7 +641,7 @@ bl_find_get_extent_locked(struct pnfs_block_layout *bl, sector_t isect)
 				break;
 			if (isect >= be->be_f_offset) {
 				/* We have found an extent */
-				dprintk("%s Get %p (%i)\n", __func__, be,
+				dprintk("%s Get %pK (%i)\n", __func__, be,
 					atomic_read(&be->be_refcnt.refcount));
 				kref_get(&be->be_refcnt);
 				ret = be;

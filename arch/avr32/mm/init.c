@@ -52,7 +52,7 @@ void __init paging_init(void)
 	 * paging. Not that we should ever _get_ any exceptions this
 	 * early, but you never know...
 	 */
-	printk("Exception vectors start at %p\n", &_evba);
+	printk("Exception vectors start at %pK\n", &_evba);
 	sysreg_write(EVBA, (unsigned long)&_evba);
 
 	/*
@@ -88,7 +88,7 @@ void __init paging_init(void)
 
 		free_area_init_node(nid, zones_size, start_pfn, NULL);
 
-		printk("Node %u: mem_map starts at %p\n",
+		printk("Node %u: mem_map starts at %pK\n",
 		       pgdat->node_id, pgdat->node_mem_map);
 	}
 

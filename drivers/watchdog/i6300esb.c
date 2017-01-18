@@ -453,7 +453,7 @@ static int esb_probe(struct pci_dev *pdev,
 		       WATCHDOG_MINOR, ret);
 		goto err_unmap;
 	}
-	pr_info("initialized (0x%p). heartbeat=%d sec (nowayout=%d)\n",
+	pr_info("initialized (0x%pK). heartbeat=%d sec (nowayout=%d)\n",
 		BASEADDR, heartbeat, nowayout);
 	return 0;
 

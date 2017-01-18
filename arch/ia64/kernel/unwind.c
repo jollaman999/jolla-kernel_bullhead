@@ -338,7 +338,7 @@ unw_access_gr (struct unw_frame_info *info, int regnum, unsigned long *val, char
 					if ((unsigned long) addr < info->regstk.limit
 					    || (unsigned long) addr >= info->regstk.top)
 					{
-						UNW_DPRINT(0, "unwind.%s: %p outside of regstk "
+						UNW_DPRINT(0, "unwind.%s: %pK outside of regstk "
 							"[0x%lx-0x%lx)\n",
 							__func__, (void *) addr,
 							info->regstk.limit,
@@ -2152,7 +2152,7 @@ unw_remove_unwind_table (void *handle)
 			if (prev->next == table)
 				break;
 		if (!prev) {
-			UNW_DPRINT(0, "unwind.%s: failed to find unwind table %p\n",
+			UNW_DPRINT(0, "unwind.%s: failed to find unwind table %pK\n",
 				   __func__, (void *) table);
 			spin_unlock_irqrestore(&unw.lock, flags);
 			return;

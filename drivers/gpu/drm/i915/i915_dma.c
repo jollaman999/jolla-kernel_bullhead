@@ -248,7 +248,7 @@ static int i915_dma_resume(struct drm_device * dev)
 		DRM_ERROR("Can not find hardware status page\n");
 		return -EINVAL;
 	}
-	DRM_DEBUG_DRIVER("hw status page @ %p\n",
+	DRM_DEBUG_DRIVER("hw status page @ %pK\n",
 				ring->status_page.page_addr);
 	if (ring->status_page.gfx_addr != 0)
 		intel_ring_setup_status_page(ring);
@@ -689,7 +689,7 @@ static int i915_cmdbuffer(struct drm_device *dev, void *data,
 	void *batch_data;
 	int ret;
 
-	DRM_DEBUG_DRIVER("i915 cmdbuffer, buf %p sz %d cliprects %d\n",
+	DRM_DEBUG_DRIVER("i915 cmdbuffer, buf %pK sz %d cliprects %d\n",
 			cmdbuf->buf, cmdbuf->sz, cmdbuf->num_cliprects);
 
 	if (drm_core_check_feature(dev, DRIVER_MODESET))
@@ -1098,7 +1098,7 @@ static int i915_set_status_page(struct drm_device *dev, void *data,
 
 	DRM_DEBUG_DRIVER("load hws HWS_PGA with gfx mem 0x%x\n",
 			 ring->status_page.gfx_addr);
-	DRM_DEBUG_DRIVER("load hws at %p\n",
+	DRM_DEBUG_DRIVER("load hws at %pK\n",
 			 ring->status_page.page_addr);
 	return 0;
 }

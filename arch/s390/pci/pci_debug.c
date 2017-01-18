@@ -49,7 +49,7 @@ static int pci_perf_show(struct seq_file *m, void *v)
 		return seq_printf(m, "FMB statistics disabled\n");
 
 	/* header */
-	seq_printf(m, "FMB @ %p\n", zdev->fmb);
+	seq_printf(m, "FMB @ %pK\n", zdev->fmb);
 	seq_printf(m, "Update interval: %u ms\n", zdev->fmb_update);
 	seq_printf(m, "Samples: %u\n", zdev->fmb->samples);
 	seq_printf(m, "Last update TOD: %Lx\n", zdev->fmb->last_update);

@@ -130,7 +130,7 @@ static int s3c2410fb_check_var(struct fb_var_screeninfo *var,
 	int type = default_display->type;
 	unsigned i;
 
-	dprintk("check_var(var=%p, info=%p)\n", var, info);
+	dprintk("check_var(var=%pK, info=%pK)\n", var, info);
 
 	/* validate x/y resolution */
 	/* choose default mode if possible */
@@ -569,7 +569,7 @@ static int s3c2410fb_blank(int blank_mode, struct fb_info *info)
 	struct s3c2410fb_info *fbi = info->par;
 	void __iomem *tpal_reg = fbi->io;
 
-	dprintk("blank(mode=%d, info=%p)\n", blank_mode, info);
+	dprintk("blank(mode=%d, info=%pK)\n", blank_mode, info);
 
 	tpal_reg += is_s3c2412(fbi) ? S3C2412_TPAL : S3C2410_TPAL;
 
@@ -643,20 +643,20 @@ static int s3c2410fb_map_video_memory(struct fb_info *info)
 	dma_addr_t map_dma;
 	unsigned map_size = PAGE_ALIGN(info->fix.smem_len);
 
-	dprintk("map_video_memory(fbi=%p) map_size %u\n", fbi, map_size);
+	dprintk("map_video_memory(fbi=%pK) map_size %u\n", fbi, map_size);
 
 	info->screen_base = dma_alloc_writecombine(fbi->dev, map_size,
 						   &map_dma, GFP_KERNEL);
 
 	if (info->screen_base) {
 		/* prevent initial garbage on screen */
-		dprintk("map_video_memory: clear %p:%08x\n",
+		dprintk("map_video_memory: clear %pK:%08x\n",
 			info->screen_base, map_size);
 		memset(info->screen_base, 0x00, map_size);
 
 		info->fix.smem_start = map_dma;
 
-		dprintk("map_video_memory: dma=%08lx cpu=%p size=%08x\n",
+		dprintk("map_video_memory: dma=%08lx cpu=%pK size=%08x\n",
 			info->fix.smem_start, info->screen_base, map_size);
 	}
 

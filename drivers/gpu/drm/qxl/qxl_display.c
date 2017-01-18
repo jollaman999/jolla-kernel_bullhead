@@ -685,14 +685,14 @@ static void qxl_write_monitors_config_for_encoder(struct qxl_device *qdev,
 	if (!qdev->monitors_config ||
 	    qdev->monitors_config->max_allowed <= i) {
 		DRM_ERROR(
-		"head number too large or missing monitors config: %p, %d",
+		"head number too large or missing monitors config: %pK, %d",
 		qdev->monitors_config,
 		qdev->monitors_config ?
 			qdev->monitors_config->max_allowed : -1);
 		return;
 	}
 	if (!encoder->crtc) {
-		DRM_ERROR("missing crtc on encoder %p\n", encoder);
+		DRM_ERROR("missing crtc on encoder %pK\n", encoder);
 		return;
 	}
 	if (i != 0)
@@ -742,7 +742,7 @@ static int qxl_conn_get_modes(struct drm_connector *connector)
 	int ret = 0;
 	struct qxl_device *qdev = connector->dev->dev_private;
 
-	DRM_DEBUG_KMS("monitors_config=%p\n", qdev->monitors_config);
+	DRM_DEBUG_KMS("monitors_config=%pK\n", qdev->monitors_config);
 	/* TODO: what should we do here? only show the configured modes for the
 	 * device, or allow the full list, or both? */
 	if (qdev->monitors_config && qdev->monitors_config->count) {

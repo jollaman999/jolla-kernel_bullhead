@@ -56,8 +56,8 @@ void HTUpdateDefaultSetting(struct ieee80211_device* ieee)
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
 	//const typeof( ((struct ieee80211_device *)0)->pHTInfo ) *__mptr = &pHTInfo;
 
-	//printk("pHTinfo:%p, &pHTinfo:%p, mptr:%p,  offsetof:%x\n", pHTInfo, &pHTInfo, __mptr, offsetof(struct ieee80211_device, pHTInfo));
-	//printk("===>ieee:%p,\n", ieee);
+	//printk("pHTinfo:%pK, &pHTinfo:%pK, mptr:%pK,  offsetof:%x\n", pHTInfo, &pHTInfo, __mptr, offsetof(struct ieee80211_device, pHTInfo));
+	//printk("===>ieee:%pK,\n", ieee);
 	// ShortGI support
 	pHTInfo->bRegShortGI20MHz= 1;
 	pHTInfo->bRegShortGI40MHz= 1;

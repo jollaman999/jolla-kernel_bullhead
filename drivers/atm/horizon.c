@@ -1029,7 +1029,7 @@ static void rx_schedule (hrz_dev * dev, int irq) {
 	
 	dump_skb ("<<<", dev->rx_channel, skb);
 	
-	PRINTD (DBG_RX|DBG_SKB, "push %p %u", skb->data, skb->len);
+	PRINTD (DBG_RX|DBG_SKB, "push %pK %u", skb->data, skb->len);
 	
 	{
 	  struct atm_vcc * vcc = ATM_SKB(skb)->vcc;
@@ -1059,7 +1059,7 @@ static void rx_schedule (hrz_dev * dev, int irq) {
       // allow another RX thread to start
       YELLOW_LED_ON(dev);
       clear_bit (rx_busy, &dev->flags);
-      PRINTD (DBG_RX, "cleared rx_busy for dev %p", dev);
+      PRINTD (DBG_RX, "cleared rx_busy for dev %pK", dev);
     }
     
 #ifdef TAILRECURSIONWORKS
@@ -1091,12 +1091,12 @@ static void rx_bus_master_complete_handler (hrz_dev * dev) {
 /********** (queue to) become the next TX thread **********/
 
 static int tx_hold (hrz_dev * dev) {
-  PRINTD (DBG_TX, "sleeping at tx lock %p %lu", dev, dev->flags);
+  PRINTD (DBG_TX, "sleeping at tx lock %pK %lu", dev, dev->flags);
   wait_event_interruptible(dev->tx_queue, (!test_and_set_bit(tx_busy, &dev->flags)));
-  PRINTD (DBG_TX, "woken at tx lock %p %lu", dev, dev->flags);
+  PRINTD (DBG_TX, "woken at tx lock %pK %lu", dev, dev->flags);
   if (signal_pending (current))
     return -1;
-  PRINTD (DBG_TX, "set tx_busy for dev %p", dev);
+  PRINTD (DBG_TX, "set tx_busy for dev %pK", dev);
   return 0;
 }
 
@@ -1104,7 +1104,7 @@ static int tx_hold (hrz_dev * dev) {
 
 static inline void tx_release (hrz_dev * dev) {
   clear_bit (tx_busy, &dev->flags);
-  PRINTD (DBG_TX, "cleared tx_busy for dev %p", dev);
+  PRINTD (DBG_TX, "cleared tx_busy for dev %pK", dev);
   wake_up_interruptible (&dev->tx_queue);
 }
 
@@ -1284,7 +1284,7 @@ static void rx_data_av_handler (hrz_dev * dev) {
     PRINTD (DBG_RX, "locked out of rx lock");
     return;
   }
-  PRINTD (DBG_RX, "set rx_busy for dev %p", dev);
+  PRINTD (DBG_RX, "set rx_busy for dev %pK", dev);
   // lock is cleared if we fail now, o/w after bus master completion
   
   YELLOW_LED_OFF(dev);
@@ -1342,7 +1342,7 @@ static void rx_data_av_handler (hrz_dev * dev) {
 	    // dev->rx_iovec = 0;
 	    dev->rx_bytes = rx_len;
 	    dev->rx_addr = skb->data;
-	    PRINTD (DBG_RX, "RX start simple transfer (addr %p, len %d)",
+	    PRINTD (DBG_RX, "RX start simple transfer (addr %pK, len %d)",
 		    skb->data, rx_len);
 	    
 	    // do the business
@@ -1389,7 +1389,7 @@ static irqreturn_t interrupt_handler(int irq, void *dev_id)
   u32 int_source;
   unsigned int irq_ok;
   
-  PRINTD (DBG_FLOW, "interrupt_handler: %p", dev_id);
+  PRINTD (DBG_FLOW, "interrupt_handler: %pK", dev_id);
   
   // definitely for us
   irq_ok = 0;
@@ -1433,7 +1433,7 @@ static irqreturn_t interrupt_handler(int irq, void *dev_id)
     PRINTD (DBG_IRQ|DBG_WARN, "spurious interrupt source: %#x", int_source);
   }
   
-  PRINTD (DBG_IRQ|DBG_FLOW, "interrupt_handler done: %p", dev_id);
+  PRINTD (DBG_IRQ|DBG_FLOW, "interrupt_handler done: %pK", dev_id);
   if (irq_ok)
 	return IRQ_HANDLED;
   return IRQ_NONE;
@@ -1463,7 +1463,7 @@ static short setup_idle_tx_channel (hrz_dev * dev, hrz_vcc * vcc) {
   unsigned short idle_channels;
   short tx_channel = -1;
   unsigned int spin_count;
-  PRINTD (DBG_FLOW|DBG_TX, "setup_idle_tx_channel %p", dev);
+  PRINTD (DBG_FLOW|DBG_TX, "setup_idle_tx_channel %pK", dev);
   
   // better would be to fail immediately, the caller can then decide whether
   // to wait or drop (depending on whether this is UBR etc.)
@@ -1595,7 +1595,7 @@ static int hrz_send (struct atm_vcc * atm_vcc, struct sk_buff * skb) {
   /* signed for error return */
   short tx_channel;
   
-  PRINTD (DBG_FLOW|DBG_TX, "hrz_send vc %x data %p len %u",
+  PRINTD (DBG_FLOW|DBG_TX, "hrz_send vc %x data %pK len %u",
 	  channel, skb->data, skb->len);
   
   dump_skb (">>>", channel, skb);
@@ -1730,7 +1730,7 @@ static int hrz_send (struct atm_vcc * atm_vcc, struct sk_buff * skb) {
       dev->tx_regions = tx_iovcnt;
       dev->tx_iovec = NULL;		/* @@@ needs rewritten */
       dev->tx_bytes = 0;
-      PRINTD (DBG_TX|DBG_BUS, "TX start scatter-gather transfer (iovec %p, len %d)",
+      PRINTD (DBG_TX|DBG_BUS, "TX start scatter-gather transfer (iovec %pK, len %d)",
 	      skb->data, tx_len);
       tx_release (dev);
       hrz_kfree_skb (skb);
@@ -1741,7 +1741,7 @@ static int hrz_send (struct atm_vcc * atm_vcc, struct sk_buff * skb) {
       dev->tx_iovec = NULL;
       dev->tx_bytes = tx_len;
       dev->tx_addr = skb->data;
-      PRINTD (DBG_TX|DBG_BUS, "TX start simple transfer (addr %p, len %d)",
+      PRINTD (DBG_TX|DBG_BUS, "TX start simple transfer (addr %pK, len %d)",
 	      skb->data, tx_len);
     }
     
@@ -2545,7 +2545,7 @@ static void hrz_close (struct atm_vcc * atm_vcc) {
     hrz_close_rx (dev, channel);
     // forget the vcc - no more skbs will be pushed
     if (atm_vcc != dev->rxer[channel])
-      PRINTK (KERN_ERR, "%s atm_vcc=%p rxer[channel]=%p",
+      PRINTK (KERN_ERR, "%s atm_vcc=%pK rxer[channel]=%pK",
 	      "arghhh! we're going to die!",
 	      atm_vcc, dev->rxer[channel]);
     dev->rxer[channel] = NULL;
@@ -2727,7 +2727,7 @@ static int hrz_probe(struct pci_dev *pci_dev,
 		goto out_free;
 	}
 
-	PRINTD(DBG_INFO, "found Madge ATM adapter (hrz) at: IO %x, IRQ %u, MEM %p",
+	PRINTD(DBG_INFO, "found Madge ATM adapter (hrz) at: IO %x, IRQ %u, MEM %pK",
 	       iobase, irq, membase);
 
 	dev->atm_dev = atm_dev_register(DEV_LABEL, &pci_dev->dev, &hrz_ops, -1,
@@ -2738,7 +2738,7 @@ static int hrz_probe(struct pci_dev *pci_dev,
 		goto out_free_irq;
 	}
 
-	PRINTD(DBG_INFO, "registered Madge ATM adapter (no. %d) (%p) at %p",
+	PRINTD(DBG_INFO, "registered Madge ATM adapter (no. %d) (%pK) at %pK",
 	       dev->atm_dev->number, dev, dev->atm_dev);
 	dev->atm_dev->dev_data = (void *) dev;
 	dev->pci_dev = pci_dev; 
@@ -2844,7 +2844,7 @@ static void hrz_remove_one(struct pci_dev *pci_dev)
 
 	dev = pci_get_drvdata(pci_dev);
 
-	PRINTD(DBG_INFO, "closing %p (atm_dev = %p)", dev, dev->atm_dev);
+	PRINTD(DBG_INFO, "closing %pK (atm_dev = %pK)", dev, dev->atm_dev);
 	del_timer_sync(&dev->housekeeping);
 	hrz_reset(dev);
 	atm_dev_deregister(dev->atm_dev);

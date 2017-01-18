@@ -275,7 +275,7 @@ static int cc770_isa_probe(struct platform_device *pdev)
 		goto exit_unmap;
 	}
 
-	dev_info(&pdev->dev, "device registered (reg_base=0x%p, irq=%d)\n",
+	dev_info(&pdev->dev, "device registered (reg_base=0x%pK, irq=%d)\n",
 		 priv->reg_base, dev->irq);
 	return 0;
 

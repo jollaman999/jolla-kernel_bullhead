@@ -490,7 +490,7 @@ int VL6180x_AlsGetLux(VL6180xDev_t dev, lux_t *pLux)
 	#endif
 	const uint32_t LuxResxIntIme = (uint32_t)(0.56f * DEF_INT_PEFRIOD * (1 << LUXRES_FIX_PREC));
 
-	LOG_FUNCTION_START("%p", pLux);
+	LOG_FUNCTION_START("%pK", pLux);
 
 	status = VL6180x_RdWord(dev, RESULT_ALS_VAL, &RawAls);
 	if (!status) {
@@ -516,7 +516,7 @@ int VL6180x_AlsGetMeasurement(VL6180xDev_t dev, VL6180x_AlsData_t *pAlsData)
 	int status;
 	uint8_t ErrStatus;
 
-	LOG_FUNCTION_START("%p", pAlsData);
+	LOG_FUNCTION_START("%pK", pAlsData);
 
 	status = VL6180x_AlsGetLux(dev, &pAlsData->lux);
 	if (!status) {
@@ -535,7 +535,7 @@ int VL6180x_AlsPollMeasurement(VL6180xDev_t dev, VL6180x_AlsData_t *pAlsData)
 	int ClrStatus;
 	uint8_t IntStatus;
 
-	LOG_FUNCTION_START("%p", pAlsData);
+	LOG_FUNCTION_START("%pK", pAlsData);
 	#if VL6180X_SAFE_POLLING_ENTER
 	/* if device get stopped with left interrupt uncleared , it is required to clear them now or poll for new condition will never occur*/
 	status = VL6180x_AlsClearInterrupt(dev);
@@ -585,7 +585,7 @@ int VL6180x_AlsGetInterruptStatus(VL6180xDev_t dev, uint8_t *pIntStatus)
 {
 	int status;
 	uint8_t IntStatus;
-	LOG_FUNCTION_START("%p", pIntStatus);
+	LOG_FUNCTION_START("%pK", pIntStatus);
 
 	status = VL6180x_RdByte(dev, RESULT_INTERRUPT_STATUS_GPIO, &IntStatus);
 	*pIntStatus = (IntStatus >> 3) & 0x07;
@@ -1006,7 +1006,7 @@ int VL6180x_RangeGetResult(VL6180xDev_t dev, int32_t *pRange_mm)
 	uint8_t RawRange;
 	int32_t Upscale;
 
-	LOG_FUNCTION_START("%p", pRange_mm);
+	LOG_FUNCTION_START("%pK", pRange_mm);
 
 	status = VL6180x_GetCachedByte(dev, RESULT_RANGE_VAL, &RawRange);
 	if (!status) {
@@ -1071,7 +1071,7 @@ int VL6180x_RangeGetThresholds(VL6180xDev_t dev, uint16_t *low, uint16_t *high)
 	uint8_t RawLow, RawHigh;
 	int scale;
 
-	LOG_FUNCTION_START("%p %p", low , high);
+	LOG_FUNCTION_START("%pK %pK", low , high);
 
 	scale = _GetUpscale(dev, UpscaleFactor);
 	do {
@@ -1101,7 +1101,7 @@ int VL6180x_RangeGetInterruptStatus(VL6180xDev_t dev, uint8_t *pIntStatus)
 {
 	int status;
 	uint8_t IntStatus;
-	LOG_FUNCTION_START("%p", pIntStatus);
+	LOG_FUNCTION_START("%pK", pIntStatus);
 	/* FIXME we are grouping "error" with over status the user must check implicitly for it
 	 * not just new sample or over status , that will nevr show up in case of error*/
 	status = VL6180x_GetCachedByte(dev, RESULT_INTERRUPT_STATUS_GPIO, &IntStatus);
@@ -1115,7 +1115,7 @@ int VL6180x_RangeGetInterruptStatus(VL6180xDev_t dev, uint8_t *pIntStatus)
 int VL6180x_GetInterruptStatus(VL6180xDev_t dev, uint8_t *IntStatus)
 {
 	int status;
-	LOG_FUNCTION_START("%p" , IntStatus);
+	LOG_FUNCTION_START("%pK" , IntStatus);
 	status = VL6180x_RdByte(dev, RESULT_INTERRUPT_STATUS_GPIO, IntStatus);
 	LOG_FUNCTION_END_FMT(status, "%d", (int)*IntStatus);
 	return status;
@@ -1580,7 +1580,7 @@ int VL6180x_RangeGetDeviceReady(VL6180xDev_t dev, int *Ready)
 {
 	int status;
 	uint8_t u8;
-	LOG_FUNCTION_START("%p", (int)Ready);
+	LOG_FUNCTION_START("%pK", (int)Ready);
 	status = VL6180x_RdByte(dev, RESULT_RANGE_STATUS, &u8);
 	if (!status)
 		*Ready = u8&RANGE_DEVICE_READY_MASK;

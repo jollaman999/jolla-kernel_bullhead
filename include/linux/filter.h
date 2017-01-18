@@ -59,7 +59,7 @@ extern void bpf_jit_free(struct sk_filter *fp);
 static inline void bpf_jit_dump(unsigned int flen, unsigned int proglen,
 				u32 pass, void *image)
 {
-	pr_err("flen=%u proglen=%u pass=%u image=%p\n",
+	pr_err("flen=%u proglen=%u pass=%u image=%pK\n",
 	       flen, proglen, pass, image);
 	if (image)
 		print_hex_dump(KERN_ERR, "JIT code: ", DUMP_PREFIX_ADDRESS,

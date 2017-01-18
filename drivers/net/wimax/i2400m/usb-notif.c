@@ -86,7 +86,7 @@ int i2400mu_notification_grok(struct i2400mu *i2400mu, const void *buf,
 	struct device *dev = &i2400mu->usb_iface->dev;
 	struct i2400m *i2400m = &i2400mu->i2400m;
 
-	d_fnstart(4, dev, "(i2400m %p buf %p buf_len %zu)\n",
+	d_fnstart(4, dev, "(i2400m %pK buf %pK buf_len %zu)\n",
 		  i2400mu, buf, buf_len);
 	ret = -EIO;
 	if (buf_len < sizeof(i2400m_ZERO_BARKER))
@@ -104,7 +104,7 @@ int i2400mu_notification_grok(struct i2400mu *i2400mu, const void *buf,
 		i2400m_unknown_barker(i2400m, buf, buf_len);
 error_bad_size:
 out:
-	d_fnend(4, dev, "(i2400m %p buf %p buf_len %zu) = %d\n",
+	d_fnend(4, dev, "(i2400m %pK buf %pK buf_len %zu) = %d\n",
 		i2400mu, buf, buf_len, ret);
 	return ret;
 }
@@ -126,7 +126,7 @@ void i2400mu_notification_cb(struct urb *urb)
 	struct i2400mu *i2400mu = urb->context;
 	struct device *dev = &i2400mu->usb_iface->dev;
 
-	d_fnstart(4, dev, "(urb %p status %d actual_length %d)\n",
+	d_fnstart(4, dev, "(urb %pK status %d actual_length %d)\n",
 		  urb, urb->status, urb->actual_length);
 	ret = urb->status;
 	switch (ret) {
@@ -166,7 +166,7 @@ void i2400mu_notification_cb(struct urb *urb)
 		dev_err(dev, "notification: cannot submit URB: %d\n", ret);
 		goto error_submit;
 	}
-	d_fnend(4, dev, "(urb %p status %d actual_length %d) = void\n",
+	d_fnend(4, dev, "(urb %pK status %d actual_length %d) = void\n",
 		urb, urb->status, urb->actual_length);
 	return;
 
@@ -176,7 +176,7 @@ error_exceeded:
 error_submit:
 	usb_queue_reset_device(i2400mu->usb_iface);
 out:
-	d_fnend(4, dev, "(urb %p status %d actual_length %d) = void\n",
+	d_fnend(4, dev, "(urb %pK status %d actual_length %d) = void\n",
 		urb, urb->status, urb->actual_length);
 }
 
@@ -196,7 +196,7 @@ int i2400mu_notification_setup(struct i2400mu *i2400mu)
 	struct usb_endpoint_descriptor *epd;
 	char *buf;
 
-	d_fnstart(4, dev, "(i2400m %p)\n", i2400mu);
+	d_fnstart(4, dev, "(i2400m %pK)\n", i2400mu);
 	buf = kmalloc(I2400MU_MAX_NOTIFICATION_LEN, GFP_KERNEL | GFP_DMA);
 	if (buf == NULL) {
 		ret = -ENOMEM;
@@ -220,7 +220,7 @@ int i2400mu_notification_setup(struct i2400mu *i2400mu)
 		dev_err(dev, "notification: cannot submit URB: %d\n", ret);
 		goto error_submit;
 	}
-	d_fnend(4, dev, "(i2400m %p) = %d\n", i2400mu, ret);
+	d_fnend(4, dev, "(i2400m %pK) = %d\n", i2400mu, ret);
 	return ret;
 
 error_submit:
@@ -228,7 +228,7 @@ error_submit:
 error_alloc_urb:
 	kfree(buf);
 error_buf_alloc:
-	d_fnend(4, dev, "(i2400m %p) = %d\n", i2400mu, ret);
+	d_fnend(4, dev, "(i2400m %pK) = %d\n", i2400mu, ret);
 	return ret;
 }
 
@@ -248,12 +248,12 @@ void i2400mu_notification_release(struct i2400mu *i2400mu)
 {
 	struct device *dev = &i2400mu->usb_iface->dev;
 
-	d_fnstart(4, dev, "(i2400mu %p)\n", i2400mu);
+	d_fnstart(4, dev, "(i2400mu %pK)\n", i2400mu);
 	if (i2400mu->notif_urb != NULL) {
 		usb_kill_urb(i2400mu->notif_urb);
 		kfree(i2400mu->notif_urb->transfer_buffer);
 		usb_free_urb(i2400mu->notif_urb);
 		i2400mu->notif_urb = NULL;
 	}
-	d_fnend(4, dev, "(i2400mu %p)\n", i2400mu);
+	d_fnend(4, dev, "(i2400mu %pK)\n", i2400mu);
 }

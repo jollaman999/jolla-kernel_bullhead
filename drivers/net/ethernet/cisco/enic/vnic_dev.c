@@ -728,7 +728,7 @@ int vnic_dev_notify_set(struct vnic_dev *vdev, u16 intr)
 	dma_addr_t notify_pa;
 
 	if (vdev->notify || vdev->notify_pa) {
-		pr_err("notify block %p still allocated", vdev->notify);
+		pr_err("notify block %pK still allocated", vdev->notify);
 		return -EINVAL;
 	}
 

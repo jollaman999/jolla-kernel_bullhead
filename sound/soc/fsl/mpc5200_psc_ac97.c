@@ -146,7 +146,7 @@ static int psc_ac97_hw_analog_params(struct snd_pcm_substream *substream,
 	struct psc_dma *psc_dma = snd_soc_dai_get_drvdata(cpu_dai);
 	struct psc_dma_stream *s = to_psc_dma_stream(substream, psc_dma);
 
-	dev_dbg(psc_dma->dev, "%s(substream=%p) p_size=%i p_bytes=%i"
+	dev_dbg(psc_dma->dev, "%s(substream=%pK) p_size=%i p_bytes=%i"
 		" periods=%i buffer_size=%i  buffer_bytes=%i channels=%i"
 		" rate=%i format=%i\n",
 		__func__, substream, params_period_size(params),
@@ -168,7 +168,7 @@ static int psc_ac97_hw_digital_params(struct snd_pcm_substream *substream,
 {
 	struct psc_dma *psc_dma = snd_soc_dai_get_drvdata(cpu_dai);
 
-	dev_dbg(psc_dma->dev, "%s(substream=%p)\n", __func__, substream);
+	dev_dbg(psc_dma->dev, "%s(substream=%pK)\n", __func__, substream);
 
 	if (params_channels(params) == 1)
 		out_be32(&psc_dma->psc_regs->ac97_slots, 0x01000000);

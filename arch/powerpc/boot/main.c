@@ -63,7 +63,7 @@ static struct addr_range prep_kernel(void)
 		 */
 		if ((unsigned long)_start < ei.loadsize)
 			fatal("Insufficient memory for kernel at address 0!"
-			       " (_start=%p, uncompressed size=%08lx)\n\r",
+			       " (_start=%pK, uncompressed size=%08lx)\n\r",
 			       _start, ei.loadsize);
 
 		if ((unsigned long)_end < ei.memsize)
@@ -72,7 +72,7 @@ static struct addr_range prep_kernel(void)
 	}
 
 	/* Finally, gunzip the kernel */
-	printf("gunzipping (0x%p <- 0x%p:0x%p)...", addr,
+	printf("gunzipping (0x%pK <- 0x%pK:0x%pK)...", addr,
 	       vmlinuz_addr, vmlinuz_addr+vmlinuz_size);
 	/* discard up to the actual load data */
 	gunzip_discard(&gzstate, ei.elfoffset - sizeof(elfheader));
@@ -94,7 +94,7 @@ static struct addr_range prep_initrd(struct addr_range vmlinux, void *chosen,
 	/* If we have an image attached to us, it overrides anything
 	 * supplied by the loader. */
 	if (_initrd_end > _initrd_start) {
-		printf("Attached initrd image at 0x%p-0x%p\n\r",
+		printf("Attached initrd image at 0x%pK-0x%pK\n\r",
 		       _initrd_start, _initrd_end);
 		initrd_addr = (unsigned long)_initrd_start;
 		initrd_size = _initrd_end - _initrd_start;
@@ -121,7 +121,7 @@ static struct addr_range prep_initrd(struct addr_range vmlinux, void *chosen,
 		if (! initrd_addr)
 			fatal("Can't allocate memory for initial "
 			       "ramdisk !\n\r");
-		printf("Relocating initrd 0x%lx <- 0x%p (0x%lx bytes)\n\r",
+		printf("Relocating initrd 0x%lx <- 0x%pK (0x%lx bytes)\n\r",
 		       initrd_addr, old_addr, initrd_size);
 		memmove((void *)initrd_addr, old_addr, initrd_size);
 	}
@@ -181,7 +181,7 @@ void start(void)
 	if (platform_ops.fixups)
 		platform_ops.fixups();
 
-	printf("\n\rzImage starting: loaded at 0x%p (sp: 0x%p)\n\r",
+	printf("\n\rzImage starting: loaded at 0x%pK (sp: 0x%pK)\n\r",
 	       _start, get_sp());
 
 	/* Ensure that the device tree has a /chosen node */
@@ -200,7 +200,7 @@ void start(void)
 	if (ft_addr)
 		printf(" flat tree at 0x%lx\n\r", ft_addr);
 	else
-		printf(" using OF tree (promptr=%p)\n\r", loader_info.promptr);
+		printf(" using OF tree (promptr=%pK)\n\r", loader_info.promptr);
 
 	if (console_ops.close)
 		console_ops.close();

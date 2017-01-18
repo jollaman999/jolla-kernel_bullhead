@@ -89,7 +89,7 @@ struct pvr2_ioread *pvr2_ioread_create(void)
 	struct pvr2_ioread *cp;
 	cp = kzalloc(sizeof(*cp),GFP_KERNEL);
 	if (!cp) return NULL;
-	pvr2_trace(PVR2_TRACE_STRUCT,"pvr2_ioread_create id=%p",cp);
+	pvr2_trace(PVR2_TRACE_STRUCT,"pvr2_ioread_create id=%pK",cp);
 	if (pvr2_ioread_init(cp) < 0) {
 		kfree(cp);
 		return NULL;
@@ -101,7 +101,7 @@ void pvr2_ioread_destroy(struct pvr2_ioread *cp)
 {
 	if (!cp) return;
 	pvr2_ioread_done(cp);
-	pvr2_trace(PVR2_TRACE_STRUCT,"pvr2_ioread_destroy id=%p",cp);
+	pvr2_trace(PVR2_TRACE_STRUCT,"pvr2_ioread_destroy id=%pK",cp);
 	if (cp->sync_key_ptr) {
 		kfree(cp->sync_key_ptr);
 		cp->sync_key_ptr = NULL;
@@ -141,7 +141,7 @@ static void pvr2_ioread_stop(struct pvr2_ioread *cp)
 {
 	if (!(cp->enabled)) return;
 	pvr2_trace(PVR2_TRACE_START_STOP,
-		   "/*---TRACE_READ---*/ pvr2_ioread_stop id=%p",cp);
+		   "/*---TRACE_READ---*/ pvr2_ioread_stop id=%pK",cp);
 	pvr2_stream_kill(cp->stream);
 	cp->c_buf = NULL;
 	cp->c_data_ptr = NULL;
@@ -164,13 +164,13 @@ static int pvr2_ioread_start(struct pvr2_ioread *cp)
 	if (cp->enabled) return 0;
 	if (!(cp->stream)) return 0;
 	pvr2_trace(PVR2_TRACE_START_STOP,
-		   "/*---TRACE_READ---*/ pvr2_ioread_start id=%p",cp);
+		   "/*---TRACE_READ---*/ pvr2_ioread_start id=%pK",cp);
 	while ((bp = pvr2_stream_get_idle_buffer(cp->stream)) != NULL) {
 		stat = pvr2_buffer_queue(bp);
 		if (stat < 0) {
 			pvr2_trace(PVR2_TRACE_DATA_FLOW,
 				   "/*---TRACE_READ---*/"
-				   " pvr2_ioread_start id=%p"
+				   " pvr2_ioread_start id=%pK"
 				   " error=%d",
 				   cp,stat);
 			pvr2_ioread_stop(cp);
@@ -209,7 +209,7 @@ int pvr2_ioread_setup(struct pvr2_ioread *cp,struct pvr2_stream *sp)
 		if (cp->stream) {
 			pvr2_trace(PVR2_TRACE_START_STOP,
 				   "/*---TRACE_READ---*/"
-				   " pvr2_ioread_setup (tear-down) id=%p",cp);
+				   " pvr2_ioread_setup (tear-down) id=%pK",cp);
 			pvr2_ioread_stop(cp);
 			pvr2_stream_kill(cp->stream);
 			if (pvr2_stream_get_buffer_count(cp->stream)) {
@@ -220,7 +220,7 @@ int pvr2_ioread_setup(struct pvr2_ioread *cp,struct pvr2_stream *sp)
 		if (sp) {
 			pvr2_trace(PVR2_TRACE_START_STOP,
 				   "/*---TRACE_READ---*/"
-				   " pvr2_ioread_setup (setup) id=%p",cp);
+				   " pvr2_ioread_setup (setup) id=%pK",cp);
 			pvr2_stream_kill(sp);
 			ret = pvr2_stream_set_buffer_count(sp,BUFFER_COUNT);
 			if (ret < 0) {
@@ -267,7 +267,7 @@ static int pvr2_ioread_get_buffer(struct pvr2_ioread *cp)
 				// Streaming error...
 				pvr2_trace(PVR2_TRACE_DATA_FLOW,
 					   "/*---TRACE_READ---*/"
-					   " pvr2_ioread_read id=%p"
+					   " pvr2_ioread_read id=%pK"
 					   " queue_error=%d",
 					   cp,stat);
 				pvr2_ioread_stop(cp);
@@ -289,7 +289,7 @@ static int pvr2_ioread_get_buffer(struct pvr2_ioread *cp)
 				// Streaming error...
 				pvr2_trace(PVR2_TRACE_DATA_FLOW,
 					   "/*---TRACE_READ---*/"
-					   " pvr2_ioread_read id=%p"
+					   " pvr2_ioread_read id=%pK"
 					   " buffer_error=%d",
 					   cp,stat);
 				pvr2_ioread_stop(cp);
@@ -412,7 +412,7 @@ int pvr2_ioread_read(struct pvr2_ioread *cp,void __user *buf,unsigned int cnt)
 
 	if (!cnt) {
 		pvr2_trace(PVR2_TRACE_TRAP,
-			   "/*---TRACE_READ---*/ pvr2_ioread_read id=%p"
+			   "/*---TRACE_READ---*/ pvr2_ioread_read id=%pK"
 			   " ZERO Request? Returning zero.",cp);
 		return 0;
 	}
@@ -495,7 +495,7 @@ int pvr2_ioread_read(struct pvr2_ioread *cp,void __user *buf,unsigned int cnt)
 
 	pvr2_trace(PVR2_TRACE_DATA_FLOW,
 		   "/*---TRACE_READ---*/ pvr2_ioread_read"
-		   " id=%p request=%d result=%d",
+		   " id=%pK request=%d result=%d",
 		   cp,req_cnt,ret);
 	return ret;
 }

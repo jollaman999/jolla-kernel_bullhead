@@ -22,7 +22,7 @@ int hfs_find_init(struct hfs_btree *tree, struct hfs_find_data *fd)
 		return -ENOMEM;
 	fd->search_key = ptr;
 	fd->key = ptr + tree->max_key_len + 2;
-	hfs_dbg(BNODE_REFS, "find_init: %d (%p)\n",
+	hfs_dbg(BNODE_REFS, "find_init: %d (%pK)\n",
 		tree->cnid, __builtin_return_address(0));
 	mutex_lock(&tree->tree_lock);
 	return 0;
@@ -32,7 +32,7 @@ void hfs_find_exit(struct hfs_find_data *fd)
 {
 	hfs_bnode_put(fd->bnode);
 	kfree(fd->search_key);
-	hfs_dbg(BNODE_REFS, "find_exit: %d (%p)\n",
+	hfs_dbg(BNODE_REFS, "find_exit: %d (%pK)\n",
 		fd->tree->cnid, __builtin_return_address(0));
 	mutex_unlock(&fd->tree->tree_lock);
 	fd->tree = NULL;

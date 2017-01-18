@@ -55,7 +55,7 @@ int ath6kl_hif_rw_comp_handler(void *context, int status)
 {
 	struct htc_packet *packet = context;
 
-	ath6kl_dbg(ATH6KL_DBG_HIF, "hif rw completion pkt 0x%p status %d\n",
+	ath6kl_dbg(ATH6KL_DBG_HIF, "hif rw completion pkt 0x%pK status %d\n",
 		   packet, status);
 
 	packet->status = status;
@@ -398,7 +398,7 @@ static int proc_pending_irqs(struct ath6kl_device *dev, bool *done)
 	u32 lk_ahd = 0;
 	u8 htc_mbox = 1 << HTC_MAILBOX;
 
-	ath6kl_dbg(ATH6KL_DBG_IRQ, "proc_pending_irqs: (dev: 0x%p)\n", dev);
+	ath6kl_dbg(ATH6KL_DBG_IRQ, "proc_pending_irqs: (dev: 0x%pK)\n", dev);
 
 	/*
 	 * NOTE: HIF implementation guarantees that the context of this

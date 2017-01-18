@@ -297,7 +297,7 @@ static int btsdio_probe(struct sdio_func *func,
 	struct sdio_func_tuple *tuple = func->tuples;
 	int err;
 
-	BT_DBG("func %p id %p class 0x%04x", func, id, func->class);
+	BT_DBG("func %pK id %pK class 0x%04x", func, id, func->class);
 
 	while (tuple) {
 		BT_DBG("code 0x%x size %d", tuple->code, tuple->size);
@@ -351,7 +351,7 @@ static void btsdio_remove(struct sdio_func *func)
 	struct btsdio_data *data = sdio_get_drvdata(func);
 	struct hci_dev *hdev;
 
-	BT_DBG("func %p", func);
+	BT_DBG("func %pK", func);
 
 	if (!data)
 		return;

@@ -612,14 +612,14 @@ enum c4iw_mmid_state {
 #define MPA_V2_IRD_ORD_MASK             0x3FFF
 
 #define c4iw_put_ep(ep) { \
-	PDBG("put_ep (via %s:%u) ep %p refcnt %d\n", __func__, __LINE__,  \
+	PDBG("put_ep (via %s:%u) ep %pK refcnt %d\n", __func__, __LINE__,  \
 	     ep, atomic_read(&((ep)->kref.refcount))); \
 	WARN_ON(atomic_read(&((ep)->kref.refcount)) < 1); \
 	kref_put(&((ep)->kref), _c4iw_free_ep); \
 }
 
 #define c4iw_get_ep(ep) { \
-	PDBG("get_ep (via %s:%u) ep %p, refcnt %d\n", __func__, __LINE__, \
+	PDBG("get_ep (via %s:%u) ep %pK, refcnt %d\n", __func__, __LINE__, \
 	     ep, atomic_read(&((ep)->kref.refcount))); \
 	kref_get(&((ep)->kref));  \
 }

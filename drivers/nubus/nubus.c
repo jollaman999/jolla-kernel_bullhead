@@ -474,7 +474,7 @@ static struct nubus_dev* __init
 		dir.base += 1;
 	
 	if (console_loglevel >= 10)
-		printk(KERN_DEBUG "nubus_get_functional_resource: parent is 0x%p, dir is 0x%p\n",
+		printk(KERN_DEBUG "nubus_get_functional_resource: parent is 0x%pK, dir is 0x%pK\n",
 		       parent->base, dir.base);
 
 	/* Actually we should probably panic if this fails */
@@ -515,7 +515,7 @@ static struct nubus_dev* __init
 			nubus_get_subdir(&ent, &drvr_dir);
 			nubus_readdir(&drvr_dir, &drvr_ent);
 			dev->driver = nubus_dirptr(&drvr_ent);
-			printk(KERN_INFO "    driver at: 0x%p\n",
+			printk(KERN_INFO "    driver at: 0x%pK\n",
 			       dev->driver);
 			break;
 		}
@@ -569,7 +569,7 @@ static int __init nubus_get_vidnames(struct nubus_board* board,
 	printk(KERN_INFO "    video modes supported:\n");
 	nubus_get_subdir(parent, &dir);
 	if (console_loglevel >= 10)
-		printk(KERN_DEBUG "nubus_get_vidnames: parent is 0x%p, dir is 0x%p\n",
+		printk(KERN_DEBUG "nubus_get_vidnames: parent is 0x%pK, dir is 0x%pK\n",
 		       parent->base, dir.base);
 
 	while(nubus_readdir(&dir, &ent) != -1)
@@ -630,7 +630,7 @@ static int __init nubus_get_vendorinfo(struct nubus_board* board,
 	printk(KERN_INFO "    vendor info:\n");
 	nubus_get_subdir(parent, &dir);
 	if (console_loglevel >= 10)
-		printk(KERN_DEBUG "nubus_get_vendorinfo: parent is 0x%p, dir is 0x%p\n",
+		printk(KERN_DEBUG "nubus_get_vendorinfo: parent is 0x%pK, dir is 0x%pK\n",
 		       parent->base, dir.base);
 
 	while(nubus_readdir(&dir, &ent) != -1)
@@ -655,7 +655,7 @@ static int __init nubus_get_board_resource(struct nubus_board* board, int slot,
 	
 	nubus_get_subdir(parent, &dir);
 	if (console_loglevel >= 10)
-		printk(KERN_DEBUG "nubus_get_board_resource: parent is 0x%p, dir is 0x%p\n",
+		printk(KERN_DEBUG "nubus_get_board_resource: parent is 0x%pK, dir is 0x%pK\n",
 		       parent->base, dir.base);
 
 	while(nubus_readdir(&dir, &ent) != -1)
@@ -818,7 +818,7 @@ static struct nubus_board* __init nubus_add_board(int slot, int bytelanes)
 	/* Dump the format block for debugging purposes */
 	if (console_loglevel >= 10) {
 		int i;
-		printk(KERN_DEBUG "Slot %X, format block at 0x%p\n",
+		printk(KERN_DEBUG "Slot %X, format block at 0x%pK\n",
 		       slot, rp);
 		printk(KERN_DEBUG "Format block: ");
 		for (i = 0; i < FORMAT_BLOCK_SIZE; i += 4) {
@@ -931,7 +931,7 @@ void __init nubus_probe_slot(int slot)
 		if (!card_present)
 			continue;
 
-		printk(KERN_DEBUG "Now probing slot %X at %p\n", slot, rp);
+		printk(KERN_DEBUG "Now probing slot %X at %pK\n", slot, rp);
 		dp = *rp;
 		if(dp == 0)
 			continue;

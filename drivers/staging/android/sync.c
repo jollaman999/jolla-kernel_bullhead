@@ -643,7 +643,7 @@ void _sync_fence_log(struct sync_fence *fence, bool pt_callback)
 	struct list_head *pos;
 	unsigned long flags;
 
-	pr_info("[%p] %s: %s\n", fence, fence->name,
+	pr_info("[%pK] %s: %s\n", fence, fence->name,
 		sync_status_str(fence->status));
 
 	pr_info("waiters:\n");

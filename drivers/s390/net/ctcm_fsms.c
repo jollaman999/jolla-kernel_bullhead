@@ -560,7 +560,7 @@ static void ctcm_chx_setmode(fsm_instance *fi, int event, void *arg)
 	fsm_deltimer(&ch->timer);
 	if (IS_MPC(ch)) {
 		timeout = 1500;
-		CTCM_PR_DEBUG("enter %s: cp=%i ch=0x%p id=%s\n",
+		CTCM_PR_DEBUG("enter %s: cp=%i ch=0x%pK id=%s\n",
 				__func__, smp_processor_id(), ch, ch->id);
 	}
 	fsm_addtimer(&ch->timer, timeout, CTC_EVENT_TIMER, ch);
@@ -998,7 +998,7 @@ static void ctcm_chx_txretry(fsm_instance *fi, int event, void *arg)
 	struct ctcm_priv *priv = dev->ml_priv;
 	struct sk_buff *skb;
 
-	CTCM_PR_DEBUG("Enter: %s: cp=%i ch=0x%p id=%s\n",
+	CTCM_PR_DEBUG("Enter: %s: cp=%i ch=0x%pK id=%s\n",
 			__func__, smp_processor_id(), ch, ch->id);
 
 	fsm_deltimer(&ch->timer);
@@ -1340,7 +1340,7 @@ static void ctcmpc_chx_txdone(fsm_instance *fi, int event, void *arg)
 	spin_unlock(&ch->collect_lock);
 	clear_normalized_cda(&ch->ccw[1]);
 
-	CTCM_PR_DBGDATA("ccwcda=0x%p data=0x%p\n",
+	CTCM_PR_DBGDATA("ccwcda=0x%pK data=0x%pK\n",
 			(void *)(unsigned long)ch->ccw[1].cda,
 			ch->trans_skb->data);
 	ch->ccw[1].count = ch->max_bufsize;
@@ -1355,7 +1355,7 @@ static void ctcmpc_chx_txdone(fsm_instance *fi, int event, void *arg)
 		return;
 	}
 
-	CTCM_PR_DBGDATA("ccwcda=0x%p data=0x%p\n",
+	CTCM_PR_DBGDATA("ccwcda=0x%pK data=0x%pK\n",
 			(void *)(unsigned long)ch->ccw[1].cda,
 			ch->trans_skb->data);
 
@@ -1477,7 +1477,7 @@ again:
 		break;
 	}
 
-	CTCM_PR_DEBUG("Exit %s: %s, ch=0x%p, id=%s\n",
+	CTCM_PR_DEBUG("Exit %s: %s, ch=0x%pK, id=%s\n",
 			__func__, dev->name, ch, ch->id);
 
 }
@@ -1496,7 +1496,7 @@ static void ctcmpc_chx_firstio(fsm_instance *fi, int event, void *arg)
 	struct ctcm_priv	*priv = dev->ml_priv;
 	struct mpc_group	*gptr = priv->mpcg;
 
-	CTCM_PR_DEBUG("Enter %s: id=%s, ch=0x%p\n",
+	CTCM_PR_DEBUG("Enter %s: id=%s, ch=0x%pK\n",
 				__func__, ch->id, ch);
 
 	CTCM_DBF_TEXT_(MPC_TRACE, CTC_DBF_INFO,
@@ -1529,7 +1529,7 @@ static void ctcmpc_chx_firstio(fsm_instance *fi, int event, void *arg)
 		     ? CTC_STATE_RXINIT : CTC_STATE_TXINIT);
 
 done:
-	CTCM_PR_DEBUG("Exit %s: id=%s, ch=0x%p\n",
+	CTCM_PR_DEBUG("Exit %s: id=%s, ch=0x%pK\n",
 				__func__, ch->id, ch);
 	return;
 }
@@ -1605,7 +1605,7 @@ static void ctcmpc_chx_attn(fsm_instance *fsm, int event, void *arg)
 	struct ctcm_priv  *priv   = dev->ml_priv;
 	struct mpc_group  *grp = priv->mpcg;
 
-	CTCM_PR_DEBUG("%s(%s): %s(ch=0x%p), cp=%i, ChStat:%s, GrpStat:%s\n",
+	CTCM_PR_DEBUG("%s(%s): %s(ch=0x%pK), cp=%i, ChStat:%s, GrpStat:%s\n",
 		__func__, dev->name, ch->id, ch, smp_processor_id(),
 			fsm_getstate_str(ch->fsm), fsm_getstate_str(grp->fsm));
 
@@ -1771,7 +1771,7 @@ static void ctcmpc_chx_send_sweep(fsm_instance *fsm, int event, void *arg)
 	int rc = 0;
 	unsigned long saveflags = 0;
 
-	CTCM_PR_DEBUG("ctcmpc enter: %s(): cp=%i ch=0x%p id=%s\n",
+	CTCM_PR_DEBUG("ctcmpc enter: %s(): cp=%i ch=0x%pK id=%s\n",
 			__func__, smp_processor_id(), ach, ach->id);
 
 	if (grp->in_sweep == 0)
@@ -2156,7 +2156,7 @@ static void dev_action_chup(fsm_instance *fi, int event, void *arg)
 	int dev_stat = fsm_getstate(fi);
 
 	CTCM_DBF_TEXT_(SETUP, CTC_DBF_NOTICE,
-			"%s(%s): priv = %p [%d,%d]\n ",	CTCM_FUNTAIL,
+			"%s(%s): priv = %pK [%d,%d]\n ",	CTCM_FUNTAIL,
 				dev->name, dev->ml_priv, dev_stat, event);
 
 	switch (fsm_getstate(fi)) {

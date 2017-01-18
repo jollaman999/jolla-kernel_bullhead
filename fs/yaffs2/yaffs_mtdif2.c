@@ -48,7 +48,7 @@ int nandmtd2_write_chunk_tags(struct yaffs_dev *dev, int nand_chunk,
 	    dev->param.no_tags_ecc ? (void *)&pt.t : (void *)&pt;
 
 	yaffs_trace(YAFFS_TRACE_MTD,
-		"nandmtd2_write_chunk_tags chunk %d data %p tags %p",
+		"nandmtd2_write_chunk_tags chunk %d data %pK tags %pK",
 		nand_chunk, data, tags);
 
 	addr = ((loff_t) nand_chunk) * dev->param.total_bytes_per_chunk;
@@ -104,7 +104,7 @@ int nandmtd2_read_chunk_tags(struct yaffs_dev *dev, int nand_chunk,
 	    dev->param.no_tags_ecc ? (void *)&pt.t : (void *)&pt;
 
 	yaffs_trace(YAFFS_TRACE_MTD,
-		"nandmtd2_read_chunk_tags chunk %d data %p tags %p",
+		"nandmtd2_read_chunk_tags chunk %d data %pK tags %pK",
 		nand_chunk, data, tags);
 
 	if (dev->param.inband_tags) {

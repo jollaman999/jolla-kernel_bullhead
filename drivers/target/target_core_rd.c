@@ -350,7 +350,7 @@ rd_execute_rw(struct se_cmd *cmd)
 
 		sg_miter_next(&m);
 		if (!(u32)m.length) {
-			pr_debug("RD[%u]: invalid sgl %p len %zu\n",
+			pr_debug("RD[%u]: invalid sgl %pK len %zu\n",
 				 dev->rd_dev_id, m.addr, m.length);
 			sg_miter_stop(&m);
 			return TCM_INCORRECT_AMOUNT_OF_DATA;

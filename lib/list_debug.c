@@ -26,14 +26,14 @@ void __list_add(struct list_head *new,
 {
 	WARN(next->prev != prev,
 		"list_add corruption. next->prev should be "
-		"prev (%p), but was %p. (next=%p).\n",
+		"prev (%pK), but was %pK. (next=%pK).\n",
 		prev, next->prev, next);
 	WARN(prev->next != next,
 		"list_add corruption. prev->next should be "
-		"next (%p), but was %p. (prev=%p).\n",
+		"next (%pK), but was %pK. (prev=%pK).\n",
 		next, prev->next, prev);
 	WARN(new == prev || new == next,
-	     "list_add double add: new=%p, prev=%p, next=%p.\n",
+	     "list_add double add: new=%pK, prev=%pK, next=%pK.\n",
 	     new, prev, next);
 
 	BUG_ON((prev->next != next || next->prev != prev ||
@@ -54,17 +54,17 @@ void __list_del_entry(struct list_head *entry)
 	next = entry->next;
 
 	if (WARN(next == LIST_POISON1,
-		"list_del corruption, %p->next is LIST_POISON1 (%p)\n",
+		"list_del corruption, %pK->next is LIST_POISON1 (%pK)\n",
 		entry, LIST_POISON1) ||
 	    WARN(prev == LIST_POISON2,
-		"list_del corruption, %p->prev is LIST_POISON2 (%p)\n",
+		"list_del corruption, %pK->prev is LIST_POISON2 (%pK)\n",
 		entry, LIST_POISON2) ||
 	    WARN(prev->next != entry,
-		"list_del corruption. prev->next should be %p, "
-		"but was %p\n", entry, prev->next) ||
+		"list_del corruption. prev->next should be %pK, "
+		"but was %pK\n", entry, prev->next) ||
 	    WARN(next->prev != entry,
-		"list_del corruption. next->prev should be %p, "
-		"but was %p\n", entry, next->prev)) {
+		"list_del corruption. next->prev should be %pK, "
+		"but was %pK\n", entry, next->prev)) {
 		BUG_ON(PANIC_CORRUPTION);
 		return;
 	}
@@ -94,10 +94,10 @@ void __list_add_rcu(struct list_head *new,
 		    struct list_head *prev, struct list_head *next)
 {
 	WARN(next->prev != prev,
-		"list_add_rcu corruption. next->prev should be prev (%p), but was %p. (next=%p).\n",
+		"list_add_rcu corruption. next->prev should be prev (%pK), but was %pK. (next=%pK).\n",
 		prev, next->prev, next);
 	WARN(prev->next != next,
-		"list_add_rcu corruption. prev->next should be next (%p), but was %p. (prev=%p).\n",
+		"list_add_rcu corruption. prev->next should be next (%pK), but was %pK. (prev=%pK).\n",
 		next, prev->next, prev);
 	new->next = next;
 	new->prev = prev;

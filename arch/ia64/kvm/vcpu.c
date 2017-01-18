@@ -2144,7 +2144,7 @@ static void kvm_show_registers(struct kvm_pt_regs *regs)
 
 	struct kvm_vcpu *vcpu = current_vcpu;
 	if (vcpu != NULL)
-		printk("vcpu 0x%p vcpu %d\n",
+		printk("vcpu 0x%pK vcpu %d\n",
 		       vcpu, vcpu->vcpu_id);
 
 	printk("psr : %016lx ifs : %016lx ip  : [<%016lx>]\n",

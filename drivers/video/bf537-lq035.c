@@ -560,7 +560,7 @@ static int bfin_lq035_fb_check_var(struct fb_var_screeninfo *var,
  */
 static void bfin_lq035_fb_rotate(struct fb_info *fbi, int angle)
 {
-	pr_debug("%s: %p %d", __func__, fbi, angle);
+	pr_debug("%s: %pK %d", __func__, fbi, angle);
 #if (defined(UD) && defined(LBR))
 	switch (angle) {
 

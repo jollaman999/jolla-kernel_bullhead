@@ -264,7 +264,7 @@ static int iser_create_ib_conn_res(struct iser_conn *ib_conn)
 			min_index = index;
 	device->cq_active_qps[min_index]++;
 	mutex_unlock(&ig.connlist_mutex);
-	iser_info("cq index %d used for ib_conn %p\n", min_index, ib_conn);
+	iser_info("cq index %d used for ib_conn %pK\n", min_index, ib_conn);
 
 	init_attr.event_handler = iser_qp_event_callback;
 	init_attr.qp_context	= (void *)ib_conn;
@@ -282,7 +282,7 @@ static int iser_create_ib_conn_res(struct iser_conn *ib_conn)
 		goto out_err;
 
 	ib_conn->qp = ib_conn->cma_id->qp;
-	iser_info("setting conn %p cma_id %p: fmr_pool %p qp %p\n",
+	iser_info("setting conn %pK cma_id %pK: fmr_pool %pK qp %pK\n",
 		  ib_conn, ib_conn->cma_id,
 		  ib_conn->fmr_pool, ib_conn->cma_id->qp);
 	return ret;
@@ -301,7 +301,7 @@ static int iser_free_ib_conn_res(struct iser_conn *ib_conn)
 	int cq_index;
 	BUG_ON(ib_conn == NULL);
 
-	iser_info("freeing conn %p cma_id %p fmr pool %p qp %p\n",
+	iser_info("freeing conn %pK cma_id %pK fmr pool %pK qp %pK\n",
 		  ib_conn, ib_conn->cma_id,
 		  ib_conn->fmr_pool, ib_conn->qp);
 
@@ -377,7 +377,7 @@ static void iser_device_try_release(struct iser_device *device)
 {
 	mutex_lock(&ig.device_list_mutex);
 	device->refcount--;
-	iser_info("device %p refcount %d\n", device, device->refcount);
+	iser_info("device %pK refcount %d\n", device, device->refcount);
 	if (!device->refcount) {
 		iser_free_device_ib_res(device);
 		list_del(&device->ig_list);
@@ -454,7 +454,7 @@ void iser_conn_terminate(struct iser_conn *ib_conn)
 	iser_conn_state_comp_exch(ib_conn, ISER_CONN_UP, ISER_CONN_TERMINATING);
 	err = rdma_disconnect(ib_conn->cma_id);
 	if (err)
-		iser_err("Failed to disconnect, conn: 0x%p err %d\n",
+		iser_err("Failed to disconnect, conn: 0x%pK err %d\n",
 			 ib_conn,err);
 
 	wait_event_interruptible(ib_conn->wait,
@@ -568,7 +568,7 @@ static int iser_cma_handler(struct rdma_cm_id *cma_id, struct rdma_cm_event *eve
 {
 	int ret = 0;
 
-	iser_info("event %d status %d conn %p id %p\n",
+	iser_info("event %d status %d conn %pK id %pK\n",
 		  event->event, event->status, cma_id->context, cma_id);
 
 	switch (event->event) {
@@ -715,9 +715,9 @@ int iser_reg_page_vec(struct iser_conn     *ib_conn,
 	mem_reg->va   += page_vec->offset;
 	mem_reg->len   = page_vec->data_size;
 
-	iser_dbg("PHYSICAL Mem.register, [PHYS p_array: 0x%p, sz: %d, "
+	iser_dbg("PHYSICAL Mem.register, [PHYS p_array: 0x%pK, sz: %d, "
 		 "entry[0]: (0x%08lx,%ld)] -> "
-		 "[lkey: 0x%08X mem_h: 0x%p va: 0x%08lX sz: %ld]\n",
+		 "[lkey: 0x%08X mem_h: 0x%pK va: 0x%08lX sz: %ld]\n",
 		 page_vec, page_vec->length,
 		 (unsigned long)page_vec->pages[0],
 		 (unsigned long)page_vec->data_size,
@@ -733,7 +733,7 @@ void iser_unreg_mem(struct iser_mem_reg *reg)
 {
 	int ret;
 
-	iser_dbg("PHYSICAL Mem.Unregister mem_h %p\n",reg->mem_h);
+	iser_dbg("PHYSICAL Mem.Unregister mem_h %pK\n",reg->mem_h);
 
 	ret = ib_fmr_pool_unmap((struct ib_pool_fmr *)reg->mem_h);
 	if (ret)

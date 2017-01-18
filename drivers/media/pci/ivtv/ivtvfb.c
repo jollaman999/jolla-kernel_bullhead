@@ -1128,7 +1128,7 @@ static int ivtvfb_init_io(struct ivtv *itv)
 		return -EIO;
 	}
 
-	IVTVFB_INFO("Framebuffer at 0x%lx, mapped to 0x%p, size %dk\n",
+	IVTVFB_INFO("Framebuffer at 0x%lx, mapped to 0x%pK, size %dk\n",
 			oi->video_pbase, oi->video_vbase,
 			oi->video_buffer_size / 1024);
 

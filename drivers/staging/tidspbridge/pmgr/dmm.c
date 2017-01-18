@@ -217,8 +217,8 @@ int dmm_map_memory(struct dmm_object *dmm_mgr, u32 addr, u32 size)
 		status = -ENOENT;
 	spin_unlock(&dmm_obj->dmm_lock);
 
-	dev_dbg(bridge, "%s dmm_mgr %p, addr %x, size %x\n\tstatus %x, "
-		"chunk %p", __func__, dmm_mgr, addr, size, status, chunk);
+	dev_dbg(bridge, "%s dmm_mgr %pK, addr %x, size %x\n\tstatus %x, "
+		"chunk %pK", __func__, dmm_mgr, addr, size, status, chunk);
 
 	return status;
 }
@@ -268,7 +268,7 @@ int dmm_reserve_memory(struct dmm_object *dmm_mgr, u32 size,
 
 	spin_unlock(&dmm_obj->dmm_lock);
 
-	dev_dbg(bridge, "%s dmm_mgr %p, size %x, prsv_addr %p\n\tstatus %x, "
+	dev_dbg(bridge, "%s dmm_mgr %pK, size %x, prsv_addr %pK\n\tstatus %x, "
 		"rsv_addr %x, rsv_size %x\n", __func__, dmm_mgr, size,
 		prsv_addr, status, rsv_addr, rsv_size);
 
@@ -299,8 +299,8 @@ int dmm_un_map_memory(struct dmm_object *dmm_mgr, u32 addr, u32 *psize)
 	}
 	spin_unlock(&dmm_obj->dmm_lock);
 
-	dev_dbg(bridge, "%s: dmm_mgr %p, addr %x, psize %p\n\tstatus %x, "
-		"chunk %p\n", __func__, dmm_mgr, addr, psize, status, chunk);
+	dev_dbg(bridge, "%s: dmm_mgr %pK, addr %x, psize %pK\n\tstatus %x, "
+		"chunk %pK\n", __func__, dmm_mgr, addr, psize, status, chunk);
 
 	return status;
 }
@@ -348,7 +348,7 @@ int dmm_un_reserve_memory(struct dmm_object *dmm_mgr, u32 rsv_addr)
 	}
 	spin_unlock(&dmm_obj->dmm_lock);
 
-	dev_dbg(bridge, "%s: dmm_mgr %p, rsv_addr %x\n\tstatus %x chunk %p",
+	dev_dbg(bridge, "%s: dmm_mgr %pK, rsv_addr %x\n\tstatus %x chunk %pK",
 		__func__, dmm_mgr, rsv_addr, status, chunk);
 
 	return status;
@@ -371,7 +371,7 @@ static struct map_page *get_region(u32 addr)
 			curr_region = virtual_mapping_table + i;
 	}
 
-	dev_dbg(bridge, "%s: curr_region %p, free_region %d, free_size %d\n",
+	dev_dbg(bridge, "%s: curr_region %pK, free_region %d, free_size %d\n",
 		__func__, curr_region, free_region, free_size);
 	return curr_region;
 }

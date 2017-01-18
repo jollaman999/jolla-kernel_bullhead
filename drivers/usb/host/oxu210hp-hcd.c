@@ -950,7 +950,7 @@ __acquires(oxu->lock)
 	}
 
 #ifdef OXU_URB_TRACE
-	oxu_dbg(oxu, "%s %s urb %p ep%d%s status %d len %d/%d\n",
+	oxu_dbg(oxu, "%s %s urb %pK ep%d%s status %d len %d/%d\n",
 		__func__, urb->dev->devpath, urb,
 		usb_pipeendpoint(urb->pipe),
 		usb_pipein(urb->pipe) ? "in" : "out",
@@ -1471,7 +1471,7 @@ static struct ehci_qh *qh_make(struct oxu_hcd *oxu,
 		}
 		break;
 	default:
-		oxu_dbg(oxu, "bogus dev %p speed %d\n", urb->dev, urb->dev->speed);
+		oxu_dbg(oxu, "bogus dev %pK speed %d\n", urb->dev, urb->dev->speed);
 done:
 		qh_put(qh);
 		return NULL;
@@ -1624,7 +1624,7 @@ static int submit_async(struct oxu_hcd	*oxu, struct urb *urb,
 	epnum = urb->ep->desc.bEndpointAddress;
 
 #ifdef OXU_URB_TRACE
-	oxu_dbg(oxu, "%s %s urb %p ep%d%s len %d, qtd %p [qh %p]\n",
+	oxu_dbg(oxu, "%s %s urb %pK ep%d%s len %d, qtd %pK [qh %pK]\n",
 		__func__, urb->dev->devpath, urb,
 		epnum & 0x0f, (epnum & USB_DIR_IN) ? "in" : "out",
 		urb->transfer_buffer_length,
@@ -1933,7 +1933,7 @@ static int qh_link_periodic(struct oxu_hcd *oxu, struct ehci_qh *qh)
 	unsigned period = qh->period;
 
 	dev_dbg(&qh->dev->dev,
-		"link qh%d-%04x/%p start %d [%d/%d us]\n",
+		"link qh%d-%04x/%pK start %d [%d/%d us]\n",
 		period, le32_to_cpup(&qh->hw_info2) & (QH_CMASK | QH_SMASK),
 		qh, qh->start, qh->usecs, qh->c_usecs);
 
@@ -2019,7 +2019,7 @@ static void qh_unlink_periodic(struct oxu_hcd *oxu, struct ehci_qh *qh)
 		: (qh->usecs * 8);
 
 	dev_dbg(&qh->dev->dev,
-		"unlink qh%d-%04x/%p start %d [%d/%d us]\n",
+		"unlink qh%d-%04x/%pK start %d [%d/%d us]\n",
 		qh->period,
 		le32_to_cpup(&qh->hw_info2) & (QH_CMASK | QH_SMASK),
 		qh, qh->start, qh->usecs, qh->c_usecs);
@@ -2179,7 +2179,7 @@ static int qh_schedule(struct oxu_hcd *oxu, struct ehci_qh *qh)
 			: cpu_to_le32(QH_SMASK);
 		qh->hw_info2 |= c_mask;
 	} else
-		oxu_dbg(oxu, "reused qh %p schedule\n", qh);
+		oxu_dbg(oxu, "reused qh %pK schedule\n", qh);
 
 	/* stuff into the periodic schedule */
 	status = qh_link_periodic(oxu, qh);
@@ -2307,7 +2307,7 @@ restart:
 				qh_put(temp.qh);
 				break;
 			default:
-				oxu_dbg(oxu, "corrupt type %d frame %d shadow %p\n",
+				oxu_dbg(oxu, "corrupt type %d frame %d shadow %pK\n",
 					type, frame, q.ptr);
 				q.ptr = NULL;
 			}
@@ -2975,7 +2975,7 @@ static int oxu_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 			qh_completions(oxu, qh);
 			break;
 		default:
-			oxu_dbg(oxu, "bogus qh %p state %d\n",
+			oxu_dbg(oxu, "bogus qh %pK state %d\n",
 					qh, qh->qh_state);
 			goto done;
 		}
@@ -2993,7 +2993,7 @@ static int oxu_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 				 * FIXME kill those tds' urbs
 				 */
 				dev_err(hcd->self.controller,
-					"can't reschedule qh %p, err %d\n", qh,
+					"can't reschedule qh %pK, err %d\n", qh,
 					status);
 			}
 			return status;
@@ -3059,7 +3059,7 @@ nogood:
 		/* caller was supposed to have unlinked any requests;
 		 * that's not our job.  just leak this memory.
 		 */
-		oxu_err(oxu, "qh %p (#%02x) state %d%s\n",
+		oxu_err(oxu, "qh %pK (#%02x) state %d%s\n",
 			qh, ep->desc.bEndpointAddress, qh->qh_state,
 			list_empty(&qh->qtd_list) ? "" : "(has tds)");
 		break;

@@ -620,7 +620,7 @@ static void bfin_spi_pump_transfers(unsigned long data)
 	if (transfer->tx_buf != NULL) {
 		drv_data->tx = (void *)transfer->tx_buf;
 		drv_data->tx_end = drv_data->tx + transfer->len;
-		dev_dbg(&drv_data->pdev->dev, "tx_buf is %p, tx_end is %p\n",
+		dev_dbg(&drv_data->pdev->dev, "tx_buf is %pK, tx_end is %pK\n",
 			transfer->tx_buf, drv_data->tx_end);
 	} else {
 		drv_data->tx = NULL;
@@ -630,7 +630,7 @@ static void bfin_spi_pump_transfers(unsigned long data)
 		full_duplex = transfer->tx_buf != NULL;
 		drv_data->rx = transfer->rx_buf;
 		drv_data->rx_end = drv_data->rx + transfer->len;
-		dev_dbg(&drv_data->pdev->dev, "rx_buf is %p, rx_end is %p\n",
+		dev_dbg(&drv_data->pdev->dev, "rx_buf is %pK, rx_end is %pK\n",
 			transfer->rx_buf, drv_data->rx_end);
 	} else {
 		drv_data->rx = NULL;
@@ -664,7 +664,7 @@ static void bfin_spi_pump_transfers(unsigned long data)
 	bfin_write(&drv_data->regs->ctl, cr);
 
 	dev_dbg(&drv_data->pdev->dev,
-		"transfer: drv_data->ops is %p, chip->ops is %p, u8_ops is %p\n",
+		"transfer: drv_data->ops is %pK, chip->ops is %pK, u8_ops is %pK\n",
 		drv_data->ops, chip->ops, &bfin_bfin_spi_transfer_ops_u8);
 
 	message->state = RUNNING_STATE;
@@ -740,7 +740,7 @@ static void bfin_spi_pump_transfers(unsigned long data)
 		dma_config = (RESTART | dma_width | DI_EN);
 		if (drv_data->rx != NULL) {
 			/* set transfer mode, and enable SPI */
-			dev_dbg(&drv_data->pdev->dev, "doing DMA in to %p (size %zx)\n",
+			dev_dbg(&drv_data->pdev->dev, "doing DMA in to %pK (size %zx)\n",
 				drv_data->rx, drv_data->len_in_bytes);
 
 			/* invalidate caches, if needed */
@@ -1369,7 +1369,7 @@ static int bfin_spi_probe(struct platform_device *pdev)
 		goto out_error_queue_alloc;
 	}
 
-	dev_info(dev, "%s, Version %s, regs@%p, dma channel@%d\n",
+	dev_info(dev, "%s, Version %s, regs@%pK, dma channel@%d\n",
 		DRV_DESC, DRV_VERSION, drv_data->regs,
 		drv_data->dma_channel);
 	return status;

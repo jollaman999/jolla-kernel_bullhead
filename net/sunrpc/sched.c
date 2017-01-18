@@ -184,7 +184,7 @@ static void __rpc_add_wait_queue(struct rpc_wait_queue *queue,
 	smp_wmb();
 	rpc_set_queued(task);
 
-	dprintk("RPC: %5u added to queue %p \"%s\"\n",
+	dprintk("RPC: %5u added to queue %pK \"%s\"\n",
 			task->tk_pid, queue, rpc_qname(queue));
 }
 
@@ -213,7 +213,7 @@ static void __rpc_remove_wait_queue(struct rpc_wait_queue *queue, struct rpc_tas
 		__rpc_remove_wait_queue_priority(task);
 	list_del(&task->u.tk_wait.list);
 	queue->qlen--;
-	dprintk("RPC: %5u removed from queue %p \"%s\"\n",
+	dprintk("RPC: %5u removed from queue %pK \"%s\"\n",
 			task->tk_pid, queue, rpc_qname(queue));
 }
 
@@ -420,7 +420,7 @@ static void __rpc_do_wake_up_task(struct rpc_wait_queue *queue, struct rpc_task 
 
 	/* Has the task been executed yet? If not, we cannot wake it up! */
 	if (!RPC_IS_ACTIVATED(task)) {
-		printk(KERN_ERR "RPC: Inactive task (%p) being woken up!\n", task);
+		printk(KERN_ERR "RPC: Inactive task (%pK) being woken up!\n", task);
 		return;
 	}
 
@@ -537,7 +537,7 @@ struct rpc_task *rpc_wake_up_first(struct rpc_wait_queue *queue,
 {
 	struct rpc_task	*task = NULL;
 
-	dprintk("RPC:       wake_up_first(%p \"%s\")\n",
+	dprintk("RPC:       wake_up_first(%pK \"%s\")\n",
 			queue, rpc_qname(queue));
 	spin_lock_bh(&queue->lock);
 	task = __rpc_find_next_queued(queue);
@@ -872,7 +872,7 @@ void *rpc_malloc(struct rpc_task *task, size_t size)
 		return NULL;
 
 	buf->len = size;
-	dprintk("RPC: %5u allocated buffer of size %zu at %p\n",
+	dprintk("RPC: %5u allocated buffer of size %zu at %pK\n",
 			task->tk_pid, size, buf);
 	return &buf->data;
 }
@@ -894,7 +894,7 @@ void rpc_free(void *buffer)
 	buf = container_of(buffer, struct rpc_buffer, data);
 	size = buf->len;
 
-	dprintk("RPC:       freeing buffer of size %zu at %p\n",
+	dprintk("RPC:       freeing buffer of size %zu at %pK\n",
 			size, buf);
 
 	if (size <= RPC_BUFFER_MAXSIZE)
@@ -957,7 +957,7 @@ struct rpc_task *rpc_new_task(const struct rpc_task_setup *setup_data)
 
 	rpc_init_task(task, setup_data);
 	task->tk_flags |= flags;
-	dprintk("RPC:       allocated task %p\n", task);
+	dprintk("RPC:       allocated task %pK\n", task);
 	return task;
 }
 

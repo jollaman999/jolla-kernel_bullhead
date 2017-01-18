@@ -80,7 +80,7 @@ void __iounmap(void __iomem *addr)
 
 	p = remove_vm_area((void *)(PAGE_MASK & (unsigned long __force)addr));
 	if (unlikely(!p)) {
-		pr_err("iounmap: bad address %p\n", addr);
+		pr_err("iounmap: bad address %pK\n", addr);
 		return;
 	}
 

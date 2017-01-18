@@ -763,7 +763,7 @@ ccio_map_single(struct device *dev, void *addr, size_t size,
 
 	pdir_start = &(ioc->pdir_base[idx]);
 
-	DBG_RUN("%s() 0x%p -> 0x%lx size: %0x%x\n",
+	DBG_RUN("%s() 0x%pK -> 0x%lx size: %0x%x\n",
 		__func__, addr, (long)iovp | offset, size);
 
 	/* If not cacheline aligned, force SAFE_DMA on the whole mess */
@@ -773,7 +773,7 @@ ccio_map_single(struct device *dev, void *addr, size_t size,
 	while(size > 0) {
 		ccio_io_pdir_entry(pdir_start, KERNEL_SPACE, (unsigned long)addr, hint);
 
-		DBG_RUN(" pdir %p %08x%08x\n",
+		DBG_RUN(" pdir %pK %08x%08x\n",
 			pdir_start,
 			(u32) (((u32 *) pdir_start)[0]),
 			(u32) (((u32 *) pdir_start)[1]));
@@ -1304,7 +1304,7 @@ ccio_ioc_init(struct ioc *ioc)
 	/* Verify it's a power of two */
 	BUG_ON((1 << get_order(ioc->pdir_size)) != (ioc->pdir_size >> PAGE_SHIFT));
 
-	DBG_INIT("%s() hpa 0x%p mem %luMB IOV %dMB (%d bits)\n",
+	DBG_INIT("%s() hpa 0x%pK mem %luMB IOV %dMB (%d bits)\n",
 			__func__, ioc->ioc_regs,
 			(unsigned long) totalram_pages >> (20 - PAGE_SHIFT),
 			iova_space_size>>20,
@@ -1318,7 +1318,7 @@ ccio_ioc_init(struct ioc *ioc)
 	memset(ioc->pdir_base, 0, ioc->pdir_size);
 
 	BUG_ON((((unsigned long)ioc->pdir_base) & PAGE_MASK) != (unsigned long)ioc->pdir_base);
-	DBG_INIT(" base %p\n", ioc->pdir_base);
+	DBG_INIT(" base %pK\n", ioc->pdir_base);
 
 	/* resource map size dictated by pdir_size */
  	ioc->res_size = (ioc->pdir_size / sizeof(u64)) >> 3;

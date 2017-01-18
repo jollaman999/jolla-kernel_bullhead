@@ -91,7 +91,7 @@ dik_show_regs(struct pt_regs *regs, unsigned long *r9_15)
 	       regs->r22, regs->r23, regs->r24);
 	printk("t11= %016lx  pv = %016lx  at = %016lx\n",
 	       regs->r25, regs->r27, regs->r28);
-	printk("gp = %016lx  sp = %p\n", regs->gp, regs+1);
+	printk("gp = %016lx  sp = %pK\n", regs->gp, regs+1);
 #if 0
 __halt();
 #endif
@@ -616,7 +616,7 @@ do_entUna(void * va, unsigned long opcode, unsigned long reg,
 		return;
 	}
 
-	printk("Bad unaligned kernel access at %016lx: %p %lx %lu\n",
+	printk("Bad unaligned kernel access at %016lx: %pK %lx %lu\n",
 		pc, va, opcode, reg);
 	do_exit(SIGSEGV);
 
@@ -663,7 +663,7 @@ got_exception:
 	       una_reg(22), una_reg(23), una_reg(24));
 	printk("r25= %016lx  r27= %016lx  r28= %016lx\n",
 	       una_reg(25), una_reg(27), una_reg(28));
-	printk("gp = %016lx  sp = %p\n", regs->gp, regs+1);
+	printk("gp = %016lx  sp = %pK\n", regs->gp, regs+1);
 
 	dik_show_code((unsigned int *)pc);
 	dik_show_trace((unsigned long *)(regs+1));
@@ -775,7 +775,7 @@ do_entUnaUser(void __user * va, unsigned long opcode,
 
 	if (!(current_thread_info()->status & TS_UAC_NOPRINT)) {
 		if (__ratelimit(&ratelimit)) {
-			printk("%s(%d): unaligned trap at %016lx: %p %lx %ld\n",
+			printk("%s(%d): unaligned trap at %016lx: %pK %lx %ld\n",
 			       current->comm, task_pid_nr(current),
 			       regs->pc - 4, va, opcode, reg);
 		}

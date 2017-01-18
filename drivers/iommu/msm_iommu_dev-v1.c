@@ -392,7 +392,7 @@ static int msm_iommu_probe(struct platform_device *pdev)
 		return ret;
 
 	dev_info(&pdev->dev,
-		"device %s (model: %d) mapped at %p, with %d ctx banks\n",
+		"device %s (model: %d) mapped at %pK, with %d ctx banks\n",
 		drvdata->name, drvdata->model, drvdata->base, drvdata->ncb);
 
 	platform_set_drvdata(pdev, drvdata);

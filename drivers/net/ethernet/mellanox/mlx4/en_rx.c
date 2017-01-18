@@ -134,7 +134,7 @@ static int mlx4_en_init_allocator(struct mlx4_en_priv *priv,
 			goto out;
 		}
 		page_alloc->offset = priv->frag_info[i].frag_align;
-		en_dbg(DRV, priv, "Initialized allocator:%d with page:%p\n",
+		en_dbg(DRV, priv, "Initialized allocator:%d with page:%pK\n",
 		       i, page_alloc->page);
 	}
 	return 0;
@@ -305,7 +305,7 @@ int mlx4_en_create_rx_ring(struct mlx4_en_priv *priv,
 	if (!ring->rx_info)
 		return -ENOMEM;
 
-	en_dbg(DRV, priv, "Allocated rx_info ring at addr:%p size:%d\n",
+	en_dbg(DRV, priv, "Allocated rx_info ring at addr:%pK size:%d\n",
 		 ring->rx_info, tmp);
 
 	err = mlx4_alloc_hwq_res(mdev->dev, &ring->wqres,

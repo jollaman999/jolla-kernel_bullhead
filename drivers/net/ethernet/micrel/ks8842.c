@@ -480,7 +480,7 @@ static int ks8842_tx_frame(struct sk_buff *skb, struct net_device *netdev)
 	struct ks8842_adapter *adapter = netdev_priv(netdev);
 	int len = skb->len;
 
-	netdev_dbg(netdev, "%s: len %u head %p data %p tail %p end %p\n",
+	netdev_dbg(netdev, "%s: len %u head %pK data %pK tail %pK end %pK\n",
 		__func__, skb->len, skb->head, skb->data,
 		skb_tail_pointer(skb), skb_end_pointer(skb));
 

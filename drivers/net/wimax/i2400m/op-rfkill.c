@@ -94,7 +94,7 @@ int i2400m_op_rfkill_sw_toggle(struct wimax_dev *wimax_dev,
 	} __packed *cmd;
 	char strerr[32];
 
-	d_fnstart(4, dev, "(wimax_dev %p state %d)\n", wimax_dev, state);
+	d_fnstart(4, dev, "(wimax_dev %pK state %d)\n", wimax_dev, state);
 
 	result = -ENOMEM;
 	cmd = kzalloc(sizeof(*cmd), GFP_KERNEL);
@@ -145,7 +145,7 @@ error_cmd:
 	kfree_skb(ack_skb);
 error_msg_to_dev:
 error_alloc:
-	d_fnend(4, dev, "(wimax_dev %p state %d) = %d\n",
+	d_fnend(4, dev, "(wimax_dev %pK state %d) = %d\n",
 		wimax_dev, state, result);
 	return result;
 }
@@ -173,7 +173,7 @@ void i2400m_report_tlv_rf_switches_status(
 	sw = le32_to_cpu(rfss->sw_rf_switch);
 	hw = le32_to_cpu(rfss->hw_rf_switch);
 
-	d_fnstart(3, dev, "(i2400m %p rfss %p [hw %u sw %u])\n",
+	d_fnstart(3, dev, "(i2400m %pK rfss %pK [hw %u sw %u])\n",
 		  i2400m, rfss, hw, sw);
 	/* We only process rw switch evens when the device has been
 	 * fully initialized */
@@ -205,6 +205,6 @@ void i2400m_report_tlv_rf_switches_status(
 		dev_err(dev, "HW BUG? Unknown RF HW state 0x%x\n", hw);
 	}
 out:
-	d_fnend(3, dev, "(i2400m %p rfss %p [hw %u sw %u]) = void\n",
+	d_fnend(3, dev, "(i2400m %pK rfss %pK [hw %u sw %u]) = void\n",
 		i2400m, rfss, hw, sw);
 }

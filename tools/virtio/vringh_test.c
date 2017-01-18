@@ -550,7 +550,7 @@ int main(int argc, char *argv[])
 	__kfree_ignore_end = __kfree_ignore_start + 1;
 	ret = virtqueue_get_buf(vq, &i);
 	if (ret != &err)
-		errx(1, "virtqueue_get_buf: %p", ret);
+		errx(1, "virtqueue_get_buf: %pK", ret);
 	assert(i == 2);
 
 	/* Guest puts in a huge descriptor. */
@@ -612,7 +612,7 @@ int main(int argc, char *argv[])
 	/* Free up those descriptors. */
 	ret = virtqueue_get_buf(vq, &i);
 	if (ret != &err)
-		errx(1, "virtqueue_get_buf: %p", ret);
+		errx(1, "virtqueue_get_buf: %pK", ret);
 
 	/* Add lots of descriptors. */
 	sg_init_table(guest_sg, 1);

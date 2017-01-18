@@ -1584,7 +1584,7 @@ isar_bctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	int ret = -EINVAL;
 	u_long flags;
 
-	pr_debug("%s: %s cmd:%x %p\n", ich->is->name, __func__, cmd, arg);
+	pr_debug("%s: %s cmd:%x %pK\n", ich->is->name, __func__, cmd, arg);
 	switch (cmd) {
 	case CLOSE_CHANNEL:
 		test_and_clear_bit(FLG_OPEN, &bch->Flags);

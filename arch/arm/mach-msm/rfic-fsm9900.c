@@ -924,7 +924,7 @@ static int ftr_probe(struct platform_device *pdev)
 	int ret;
 	u8 version = 0;
 
-	pr_debug("%s: me = %p, parent = %p\n",
+	pr_debug("%s: me = %pK, parent = %pK\n",
 		__func__, pdev, pdev->dev.parent);
 
 	mutex_lock(&rficlock);

@@ -2004,7 +2004,7 @@ static void option_instat_callback(struct urb *urb)
 	struct usb_wwan_port_private *portdata =
 					usb_get_serial_port_data(port);
 
-	dev_dbg(dev, "%s: urb %p port %p has data %p\n", __func__, urb, port, portdata);
+	dev_dbg(dev, "%s: urb %pK port %pK has data %pK\n", __func__, urb, port, portdata);
 
 	if (status == 0) {
 		struct usb_ctrlrequest *req_pkt =

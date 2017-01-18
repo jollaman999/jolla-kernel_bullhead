@@ -76,9 +76,9 @@ unsigned edac_dimm_info_location(struct dimm_info *dimm, char *buf,
 static void edac_mc_dump_channel(struct rank_info *chan)
 {
 	edac_dbg(4, "  channel->chan_idx = %d\n", chan->chan_idx);
-	edac_dbg(4, "    channel = %p\n", chan);
-	edac_dbg(4, "    channel->csrow = %p\n", chan->csrow);
-	edac_dbg(4, "    channel->dimm = %p\n", chan->dimm);
+	edac_dbg(4, "    channel = %pK\n", chan);
+	edac_dbg(4, "    channel->csrow = %pK\n", chan->csrow);
+	edac_dbg(4, "    channel->dimm = %pK\n", chan->dimm);
 }
 
 static void edac_mc_dump_dimm(struct dimm_info *dimm, int number)
@@ -90,7 +90,7 @@ static void edac_mc_dump_dimm(struct dimm_info *dimm, int number)
 	edac_dbg(4, "%s%i: %smapped as virtual row %d, chan %d\n",
 		 dimm->mci->csbased ? "rank" : "dimm",
 		 number, location, dimm->csrow, dimm->cschannel);
-	edac_dbg(4, "  dimm = %p\n", dimm);
+	edac_dbg(4, "  dimm = %pK\n", dimm);
 	edac_dbg(4, "  dimm->label = '%s'\n", dimm->label);
 	edac_dbg(4, "  dimm->nr_pages = 0x%x\n", dimm->nr_pages);
 	edac_dbg(4, "  dimm->grain = %d\n", dimm->grain);
@@ -100,30 +100,30 @@ static void edac_mc_dump_dimm(struct dimm_info *dimm, int number)
 static void edac_mc_dump_csrow(struct csrow_info *csrow)
 {
 	edac_dbg(4, "csrow->csrow_idx = %d\n", csrow->csrow_idx);
-	edac_dbg(4, "  csrow = %p\n", csrow);
+	edac_dbg(4, "  csrow = %pK\n", csrow);
 	edac_dbg(4, "  csrow->first_page = 0x%lx\n", csrow->first_page);
 	edac_dbg(4, "  csrow->last_page = 0x%lx\n", csrow->last_page);
 	edac_dbg(4, "  csrow->page_mask = 0x%lx\n", csrow->page_mask);
 	edac_dbg(4, "  csrow->nr_channels = %d\n", csrow->nr_channels);
-	edac_dbg(4, "  csrow->channels = %p\n", csrow->channels);
-	edac_dbg(4, "  csrow->mci = %p\n", csrow->mci);
+	edac_dbg(4, "  csrow->channels = %pK\n", csrow->channels);
+	edac_dbg(4, "  csrow->mci = %pK\n", csrow->mci);
 }
 
 static void edac_mc_dump_mci(struct mem_ctl_info *mci)
 {
-	edac_dbg(3, "\tmci = %p\n", mci);
+	edac_dbg(3, "\tmci = %pK\n", mci);
 	edac_dbg(3, "\tmci->mtype_cap = %lx\n", mci->mtype_cap);
 	edac_dbg(3, "\tmci->edac_ctl_cap = %lx\n", mci->edac_ctl_cap);
 	edac_dbg(3, "\tmci->edac_cap = %lx\n", mci->edac_cap);
-	edac_dbg(4, "\tmci->edac_check = %p\n", mci->edac_check);
-	edac_dbg(3, "\tmci->nr_csrows = %d, csrows = %p\n",
+	edac_dbg(4, "\tmci->edac_check = %pK\n", mci->edac_check);
+	edac_dbg(3, "\tmci->nr_csrows = %d, csrows = %pK\n",
 		 mci->nr_csrows, mci->csrows);
-	edac_dbg(3, "\tmci->nr_dimms = %d, dimms = %p\n",
+	edac_dbg(3, "\tmci->nr_dimms = %d, dimms = %pK\n",
 		 mci->tot_dimms, mci->dimms);
-	edac_dbg(3, "\tdev = %p\n", mci->pdev);
+	edac_dbg(3, "\tdev = %pK\n", mci->pdev);
 	edac_dbg(3, "\tmod_name:ctl_name = %s:%s\n",
 		 mci->mod_name, mci->ctl_name);
-	edac_dbg(3, "\tpvt_info = %p\n\n", mci->pvt_info);
+	edac_dbg(3, "\tpvt_info = %pK\n\n", mci->pvt_info);
 }
 
 #endif				/* CONFIG_EDAC_DEBUG */

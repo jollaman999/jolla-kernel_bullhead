@@ -283,7 +283,7 @@ int ecm_ipa_init(struct ecm_ipa_params *params)
 		goto fail_netdev_priv;
 	}
 	memset(ecm_ipa_ctx, 0, sizeof(*ecm_ipa_ctx));
-	ECM_IPA_DEBUG("ecm_ipa_ctx (private) = %p\n", ecm_ipa_ctx);
+	ECM_IPA_DEBUG("ecm_ipa_ctx (private) = %pK\n", ecm_ipa_ctx);
 
 	ecm_ipa_ctx->net = net;
 	ecm_ipa_ctx->tx_enable = true;
@@ -390,7 +390,7 @@ int ecm_ipa_connect(u32 usb_to_ipa_hdl, u32 ipa_to_usb_hdl, void *priv)
 
 	ECM_IPA_LOG_ENTRY();
 	NULL_CHECK(priv);
-	ECM_IPA_DEBUG("usb_to_ipa_hdl = %d, ipa_to_usb_hdl = %d, priv=0x%p\n",
+	ECM_IPA_DEBUG("usb_to_ipa_hdl = %d, ipa_to_usb_hdl = %d, priv=0x%pK\n",
 		      usb_to_ipa_hdl, ipa_to_usb_hdl, priv);
 
 	next_state = ecm_ipa_next_state(ecm_ipa_ctx->state, ECM_IPA_CONNECT);
@@ -748,7 +748,7 @@ int ecm_ipa_disconnect(void *priv)
 
 	ECM_IPA_LOG_ENTRY();
 	NULL_CHECK(ecm_ipa_ctx);
-	ECM_IPA_DEBUG("priv=0x%p\n", priv);
+	ECM_IPA_DEBUG("priv=0x%pK\n", priv);
 
 	next_state = ecm_ipa_next_state(ecm_ipa_ctx->state, ECM_IPA_DISCONNECT);
 	if (next_state == ECM_IPA_INVALID) {
@@ -823,7 +823,7 @@ void ecm_ipa_cleanup(void *priv)
 
 	ECM_IPA_LOG_ENTRY();
 
-	ECM_IPA_DEBUG("priv=0x%p\n", priv);
+	ECM_IPA_DEBUG("priv=0x%pK\n", priv);
 
 	if (!ecm_ipa_ctx) {
 		ECM_IPA_ERROR("ecm_ipa_ctx NULL pointer\n");

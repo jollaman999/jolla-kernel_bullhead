@@ -55,7 +55,7 @@ objio_free_deviceid_node(struct nfs4_deviceid_node *d)
 {
 	struct objio_dev_ent *de = container_of(d, struct objio_dev_ent, id_node);
 
-	dprintk("%s: free od=%p\n", __func__, de->od.od);
+	dprintk("%s: free od=%pK\n", __func__, de->od.od);
 	osduld_put_device(de->od.od);
 	kfree(de);
 }
@@ -84,11 +84,11 @@ _dev_list_add(const struct nfs_server *nfss,
 	struct objio_dev_ent *n;
 
 	if (!de) {
-		dprintk("%s: -ENOMEM od=%p\n", __func__, od);
+		dprintk("%s: -ENOMEM od=%pK\n", __func__, od);
 		return NULL;
 	}
 
-	dprintk("%s: Adding od=%p\n", __func__, od);
+	dprintk("%s: Adding od=%pK\n", __func__, od);
 	nfs4_init_deviceid_node(&de->id_node,
 				nfss->pnfs_curr_ld,
 				nfss->nfs_client,
@@ -98,7 +98,7 @@ _dev_list_add(const struct nfs_server *nfss,
 	d = nfs4_insert_deviceid_node(&de->id_node);
 	n = container_of(d, struct objio_dev_ent, id_node);
 	if (n != de) {
-		dprintk("%s: Race with other n->od=%p\n", __func__, n->od.od);
+		dprintk("%s: Race with other n->od=%pK\n", __func__, n->od.od);
 		objio_free_deviceid_node(&de->id_node);
 		de = n;
 	}

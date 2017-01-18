@@ -446,7 +446,7 @@ static int inline port_init(struct ioc3_port *port)
 		sbbr_l = &idd->vma->sbbr_l;
 		sbbr_h = &idd->vma->sbbr_h;
 		ring_pci_addr = (unsigned long __iomem)port->ip_dma_ringbuf;
-		DPRINT_CONFIG(("%s: ring_pci_addr 0x%p\n",
+		DPRINT_CONFIG(("%s: ring_pci_addr 0x%pK\n",
 			       __func__, (void *)ring_pci_addr));
 
 		writel((unsigned int)((uint64_t) ring_pci_addr >> 32), sbbr_h);
@@ -1026,7 +1026,7 @@ ioc3_change_speed(struct uart_port *the_port,
 	writel(port->ip_sscr, &port->ip_serial_regs->sscr);
 
 	/* Set the configuration and proper notification call */
-	DPRINT_CONFIG(("%s : port 0x%p line %d cflag 0%o "
+	DPRINT_CONFIG(("%s : port 0x%pK line %d cflag 0%o "
 		       "config_port(baud %d data %d stop %d penable %d "
 			" parity %d), notification 0x%x\n",
 		       __func__, (void *)port, the_port->line, cflag, baud,
@@ -1918,7 +1918,7 @@ static inline int ioc3_serial_core_attach( struct ioc3_submodule *is,
 	int ii, phys_port;
 	struct pci_dev *pdev = idd->pdev;
 
-	DPRINT_CONFIG(("%s: attach pdev 0x%p - card_ptr 0x%p\n",
+	DPRINT_CONFIG(("%s: attach pdev 0x%pK - card_ptr 0x%pK\n",
 		       __func__, pdev, (void *)card_ptr));
 
 	if (!card_ptr)
@@ -1932,7 +1932,7 @@ static inline int ioc3_serial_core_attach( struct ioc3_submodule *is,
 		port = card_ptr->ic_port[phys_port].icp_port;
 		port->ip_port = the_port;
 
-		DPRINT_CONFIG(("%s: attach the_port 0x%p / port 0x%p [%d/%d]\n",
+		DPRINT_CONFIG(("%s: attach the_port 0x%pK / port 0x%pK [%d/%d]\n",
 			__func__, (void *)the_port, (void *)port,
 				phys_port, ii));
 
@@ -2018,7 +2018,7 @@ ioc3uart_probe(struct ioc3_submodule *is, struct ioc3_driver_data *idd)
 	int phys_port;
 	int cnt;
 
-	DPRINT_CONFIG(("%s (0x%p, 0x%p)\n", __func__, is, idd));
+	DPRINT_CONFIG(("%s (0x%pK, 0x%pK)\n", __func__, is, idd));
 
 	card_ptr = kzalloc(sizeof(struct ioc3_card), GFP_KERNEL);
 	if (!card_ptr) {
@@ -2067,8 +2067,8 @@ ioc3uart_probe(struct ioc3_submodule *is, struct ioc3_driver_data *idd)
 			port->ip_serial_regs = &idd->vma->port_a;
 			port->ip_uart_regs = &idd->vma->sregs.uarta;
 
-			DPRINT_CONFIG(("%s : Port A ip_serial_regs 0x%p "
-				       "ip_uart_regs 0x%p\n",
+			DPRINT_CONFIG(("%s : Port A ip_serial_regs 0x%pK "
+				       "ip_uart_regs 0x%pK\n",
 				       __func__,
 				       (void *)port->ip_serial_regs,
 				       (void *)port->ip_uart_regs));
@@ -2081,9 +2081,9 @@ ioc3uart_probe(struct ioc3_submodule *is, struct ioc3_driver_data *idd)
 				  (TOTAL_RING_BUF_SIZE - 1)) == 0));
 			port->ip_inring = RING(port, RX_A);
 			port->ip_outring = RING(port, TX_A);
-			DPRINT_CONFIG(("%s : Port A ip_cpu_ringbuf 0x%p "
-				       "ip_dma_ringbuf 0x%p, ip_inring 0x%p "
-					"ip_outring 0x%p\n",
+			DPRINT_CONFIG(("%s : Port A ip_cpu_ringbuf 0x%pK "
+				       "ip_dma_ringbuf 0x%pK, ip_inring 0x%pK "
+					"ip_outring 0x%pK\n",
 				       __func__,
 				       (void *)port->ip_cpu_ringbuf,
 				       (void *)port->ip_dma_ringbuf,
@@ -2094,8 +2094,8 @@ ioc3uart_probe(struct ioc3_submodule *is, struct ioc3_driver_data *idd)
 			port->ip_serial_regs = &idd->vma->port_b;
 			port->ip_uart_regs = &idd->vma->sregs.uartb;
 
-			DPRINT_CONFIG(("%s : Port B ip_serial_regs 0x%p "
-				       "ip_uart_regs 0x%p\n",
+			DPRINT_CONFIG(("%s : Port B ip_serial_regs 0x%pK "
+				       "ip_uart_regs 0x%pK\n",
 				       __func__,
 				       (void *)port->ip_serial_regs,
 				       (void *)port->ip_uart_regs));
@@ -2107,9 +2107,9 @@ ioc3uart_probe(struct ioc3_submodule *is, struct ioc3_driver_data *idd)
 			    ports[phys_port - 1]->ip_cpu_ringbuf;
 			port->ip_inring = RING(port, RX_B);
 			port->ip_outring = RING(port, TX_B);
-			DPRINT_CONFIG(("%s : Port B ip_cpu_ringbuf 0x%p "
-				       "ip_dma_ringbuf 0x%p, ip_inring 0x%p "
-					"ip_outring 0x%p\n",
+			DPRINT_CONFIG(("%s : Port B ip_cpu_ringbuf 0x%pK "
+				       "ip_dma_ringbuf 0x%pK, ip_inring 0x%pK "
+					"ip_outring 0x%pK\n",
 				       __func__,
 				       (void *)port->ip_cpu_ringbuf,
 				       (void *)port->ip_dma_ringbuf,
@@ -2117,18 +2117,18 @@ ioc3uart_probe(struct ioc3_submodule *is, struct ioc3_driver_data *idd)
 				       (void *)port->ip_outring));
 		}
 
-		DPRINT_CONFIG(("%s : port %d [addr 0x%p] card_ptr 0x%p",
+		DPRINT_CONFIG(("%s : port %d [addr 0x%pK] card_ptr 0x%pK",
 			       __func__,
 			       phys_port, (void *)port, (void *)card_ptr));
-		DPRINT_CONFIG((" ip_serial_regs 0x%p ip_uart_regs 0x%p\n",
+		DPRINT_CONFIG((" ip_serial_regs 0x%pK ip_uart_regs 0x%pK\n",
 			       (void *)port->ip_serial_regs,
 			       (void *)port->ip_uart_regs));
 
 		/* Initialize the hardware for IOC3 */
 		port_init(port);
 
-		DPRINT_CONFIG(("%s: phys_port %d port 0x%p inring 0x%p "
-			       "outring 0x%p\n",
+		DPRINT_CONFIG(("%s: phys_port %d port 0x%pK inring 0x%pK "
+			       "outring 0x%pK\n",
 			       __func__,
 			       phys_port, (void *)port,
 			       (void *)port->ip_inring,

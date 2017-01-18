@@ -103,7 +103,7 @@ void die(const char *str, struct pt_regs *regs, long err,
 	print_modules();
 	show_regs(regs);
 
-	pr_err("Process: %s (pid: %d, stack limit = %p)\n", current->comm,
+	pr_err("Process: %s (pid: %d, stack limit = %pK)\n", current->comm,
 	       task_pid_nr(current), task_stack_page(current) + THREAD_SIZE);
 
 	bust_spinlocks(0);

@@ -444,7 +444,7 @@ static void instream_close(struct hpi_message *phm, struct hpi_response *phr,
 		instream_user_open[phm->adapter_index][phm->
 			obj_index].h_owner) {
 		/* HPI_DEBUG_LOG(INFO,"closing adapter %d "
-		   "instream %d owned by %p\n",
+		   "instream %d owned by %pK\n",
 		   phm->wAdapterIndex, phm->wObjIndex, hOwner); */
 		instream_user_open[phm->adapter_index][phm->
 			obj_index].h_owner = NULL;
@@ -468,7 +468,7 @@ static void instream_close(struct hpi_message *phm, struct hpi_response *phr,
 		}
 	} else {
 		HPI_DEBUG_LOG(WARNING,
-			"%p trying to close %d instream %d owned by %p\n",
+			"%pK trying to close %d instream %d owned by %pK\n",
 			h_owner, phm->adapter_index, phm->obj_index,
 			instream_user_open[phm->adapter_index][phm->
 				obj_index].h_owner);
@@ -542,7 +542,7 @@ static void outstream_close(struct hpi_message *phm, struct hpi_response *phr,
 		outstream_user_open[phm->adapter_index][phm->
 			obj_index].h_owner) {
 		/* HPI_DEBUG_LOG(INFO,"closing adapter %d "
-		   "outstream %d owned by %p\n",
+		   "outstream %d owned by %pK\n",
 		   phm->wAdapterIndex, phm->wObjIndex, hOwner); */
 		outstream_user_open[phm->adapter_index][phm->
 			obj_index].h_owner = NULL;
@@ -566,7 +566,7 @@ static void outstream_close(struct hpi_message *phm, struct hpi_response *phr,
 		}
 	} else {
 		HPI_DEBUG_LOG(WARNING,
-			"%p trying to close %d outstream %d owned by %p\n",
+			"%pK trying to close %d outstream %d owned by %pK\n",
 			h_owner, phm->adapter_index, phm->obj_index,
 			outstream_user_open[phm->adapter_index][phm->
 				obj_index].h_owner);

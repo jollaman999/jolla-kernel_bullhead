@@ -200,7 +200,7 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *queue)
 		chunk->end_of_packet = 1;
 	}
 
-	SCTP_DEBUG_PRINTK("+++sctp_inq_pop+++ chunk %p[%s],"
+	SCTP_DEBUG_PRINTK("+++sctp_inq_pop+++ chunk %pK[%s],"
 			  " length %d, skb->len %d\n",chunk,
 			  sctp_cname(SCTP_ST_CHUNK(chunk->chunk_hdr->type)),
 			  ntohs(chunk->chunk_hdr->length), chunk->skb->len);

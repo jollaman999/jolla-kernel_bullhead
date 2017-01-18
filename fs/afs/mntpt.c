@@ -106,7 +106,7 @@ static struct dentry *afs_mntpt_lookup(struct inode *dir,
 				       struct dentry *dentry,
 				       unsigned int flags)
 {
-	_enter("%p,%p{%p{%s},%s}",
+	_enter("%pK,%pK{%pK{%s},%s}",
 	       dir,
 	       dentry,
 	       dentry->d_parent,
@@ -122,7 +122,7 @@ static struct dentry *afs_mntpt_lookup(struct inode *dir,
  */
 static int afs_mntpt_open(struct inode *inode, struct file *file)
 {
-	_enter("%p,%p{%p{%s},%s}",
+	_enter("%pK,%pK{%pK{%s},%s}",
 	       inode, file,
 	       file->f_path.dentry->d_parent,
 	       file->f_path.dentry->d_parent ?
@@ -217,11 +217,11 @@ static struct vfsmount *afs_mntpt_do_automount(struct dentry *mntpt)
 	/* try and do the mount */
 	_debug("--- attempting mount %s -o %s ---", devname, options);
 	mnt = vfs_kern_mount(&afs_fs_type, 0, devname, options);
-	_debug("--- mount result %p ---", mnt);
+	_debug("--- mount result %pK ---", mnt);
 
 	free_page((unsigned long) devname);
 	free_page((unsigned long) options);
-	_leave(" = %p", mnt);
+	_leave(" = %pK", mnt);
 	return mnt;
 
 error:
@@ -252,7 +252,7 @@ struct vfsmount *afs_d_automount(struct path *path)
 	mnt_set_expiry(newmnt, &afs_vfsmounts);
 	queue_delayed_work(afs_wq, &afs_mntpt_expiry_timer,
 			   afs_mntpt_expiry_timeout * HZ);
-	_leave(" = %p", newmnt);
+	_leave(" = %pK", newmnt);
 	return newmnt;
 }
 

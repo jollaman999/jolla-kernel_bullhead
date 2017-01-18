@@ -460,12 +460,12 @@ static void i596_display_data(struct net_device *dev)
 	struct i596_rfd *rfd;
 	struct i596_rbd *rbd;
 
-	printk(KERN_ERR "lp and scp at %p, .sysbus = %08lx, .iscp = %p\n",
+	printk(KERN_ERR "lp and scp at %pK, .sysbus = %08lx, .iscp = %pK\n",
 	       &lp->scp, lp->scp.sysbus, lp->scp.iscp);
-	printk(KERN_ERR "iscp at %p, iscp.stat = %08lx, .scb = %p\n",
+	printk(KERN_ERR "iscp at %pK, iscp.stat = %08lx, .scb = %pK\n",
 	       &lp->iscp, lp->iscp.stat, lp->iscp.scb);
-	printk(KERN_ERR "scb at %p, scb.status = %04x, .command = %04x,"
-		" .cmd = %p, .rfd = %p\n",
+	printk(KERN_ERR "scb at %pK, scb.status = %04x, .command = %04x,"
+		" .cmd = %pK, .rfd = %pK\n",
 	       &lp->scb, lp->scb.status, lp->scb.command,
 		lp->scb.cmd, lp->scb.rfd);
 	printk(KERN_ERR "   errors: crc %lx, align %lx, resource %lx,"
@@ -474,23 +474,23 @@ static void i596_display_data(struct net_device *dev)
 		lp->scb.over_err, lp->scb.rcvdt_err, lp->scb.short_err);
 	cmd = lp->cmd_head;
 	while (cmd != I596_NULL) {
-		printk(KERN_ERR "cmd at %p, .status = %04x, .command = %04x, .b_next = %p\n",
+		printk(KERN_ERR "cmd at %pK, .status = %04x, .command = %04x, .b_next = %pK\n",
 		  cmd, cmd->status, cmd->command, cmd->b_next);
 		cmd = cmd->v_next;
 	}
 	rfd = lp->rfd_head;
-	printk(KERN_ERR "rfd_head = %p\n", rfd);
+	printk(KERN_ERR "rfd_head = %pK\n", rfd);
 	do {
-		printk(KERN_ERR "   %p .stat %04x, .cmd %04x, b_next %p, rbd %p,"
+		printk(KERN_ERR "   %pK .stat %04x, .cmd %04x, b_next %pK, rbd %pK,"
                         " count %04x\n",
 			rfd, rfd->stat, rfd->cmd, rfd->b_next, rfd->rbd,
 			rfd->count);
 		rfd = rfd->v_next;
 	} while (rfd != lp->rfd_head);
 	rbd = lp->rbd_head;
-	printk(KERN_ERR "rbd_head = %p\n", rbd);
+	printk(KERN_ERR "rbd_head = %pK\n", rbd);
 	do {
-		printk(KERN_ERR "   %p .count %04x, b_next %p, b_data %p, size %04x\n",
+		printk(KERN_ERR "   %pK .count %04x, b_next %pK, b_data %pK, size %04x\n",
 			rbd, rbd->count, rbd->b_next, rbd->b_data, rbd->size);
 		rbd = rbd->v_next;
 	} while (rbd != lp->rbd_head);
@@ -749,7 +749,7 @@ static inline int i596_rx(struct net_device *dev)
 	struct i596_rbd *rbd;
 	int frames = 0;
 
-	DEB(DEB_RXFRAME,printk(KERN_DEBUG "i596_rx(), rfd_head %p, rbd_head %p\n",
+	DEB(DEB_RXFRAME,printk(KERN_DEBUG "i596_rx(), rfd_head %pK, rbd_head %pK\n",
 			lp->rfd_head, lp->rbd_head));
 
 	rfd = lp->rfd_head;		/* Ref next frame to check */
@@ -764,7 +764,7 @@ static inline int i596_rx(struct net_device *dev)
 			/* XXX Now what? */
 			rbd = I596_NULL;
 		}
-		DEB(DEB_RXFRAME, printk(KERN_DEBUG "  rfd %p, rfd.rbd %p, rfd.stat %04x\n",
+		DEB(DEB_RXFRAME, printk(KERN_DEBUG "  rfd %pK, rfd.rbd %pK, rfd.stat %04x\n",
 			rfd, rfd->rbd, rfd->stat));
 
 		if (rbd != I596_NULL && ((rfd->stat) & STAT_OK)) {
@@ -1053,7 +1053,7 @@ static netdev_tx_t i596_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	struct i596_tbd *tbd;
 	short length = skb->len;
 
-	DEB(DEB_STARTTX,printk(KERN_DEBUG "%s: i596_start_xmit(%x,%p) called\n",
+	DEB(DEB_STARTTX,printk(KERN_DEBUG "%s: i596_start_xmit(%x,%pK) called\n",
 				dev->name, skb->len, skb->data));
 
 	if (skb->len < ETH_ZLEN) {
@@ -1105,7 +1105,7 @@ static netdev_tx_t i596_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 static void print_eth(unsigned char *add, char *str)
 {
-	printk(KERN_DEBUG "i596 0x%p, %pM --> %pM %02X%02X, %s\n",
+	printk(KERN_DEBUG "i596 0x%pK, %pM --> %pM %02X%02X, %s\n",
 	       add, add + 6, add, add[12], add[13], str);
 }
 

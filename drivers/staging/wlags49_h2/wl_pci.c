@@ -686,8 +686,8 @@ int wl_pci_dma_alloc( struct pci_dev *pdev, struct wl_private *lp )
 //     for( i = 0; i < NUM_TX_DESC; i++ ) {
 //         status = wl_pci_dma_alloc_tx_packet( pdev, lp, &lp->dma.tx_packet[i] );
 //         if( status == 0 ) {
-//             DBG_PRINT( "lp->dma.tx_packet[%d] :                 0x%p\n", i, lp->dma.tx_packet[i] );
-//             DBG_PRINT( "lp->dma.tx_packet[%d]->next_desc_addr : 0x%p\n", i, lp->dma.tx_packet[i]->next_desc_addr );
+//             DBG_PRINT( "lp->dma.tx_packet[%d] :                 0x%pK\n", i, lp->dma.tx_packet[i] );
+//             DBG_PRINT( "lp->dma.tx_packet[%d]->next_desc_addr : 0x%pK\n", i, lp->dma.tx_packet[i]->next_desc_addr );
 //             lp->dma.tx_rsc_ind++;
 //         } else {
 //             DBG_ERROR( DbgInfo, "Could not alloc DMA Tx Packet\n" );
@@ -696,15 +696,15 @@ int wl_pci_dma_alloc( struct pci_dev *pdev, struct wl_private *lp )
 //     }
 //     if( status == 0 ) {
 //         status = wl_pci_dma_alloc_desc( pdev, lp, &lp->dma.tx_reclaim_desc );
-//         DBG_PRINT( "lp->dma.tx_reclaim_desc: 0x%p\n", lp->dma.tx_reclaim_desc );
+//         DBG_PRINT( "lp->dma.tx_reclaim_desc: 0x%pK\n", lp->dma.tx_reclaim_desc );
 //     }
 //     /* Alloc for the Rx chain and its reclaim descriptor */
 //     if( status == 0 ) {
 //         for( i = 0; i < NUM_RX_DESC; i++ ) {
 //             status = wl_pci_dma_alloc_rx_packet( pdev, lp, &lp->dma.rx_packet[i] );
 //             if( status == 0 ) {
-//                 DBG_PRINT( "lp->dma.rx_packet[%d]                 : 0x%p\n", i, lp->dma.rx_packet[i] );
-//                 DBG_PRINT( "lp->dma.rx_packet[%d]->next_desc_addr : 0x%p\n", i, lp->dma.rx_packet[i]->next_desc_addr );
+//                 DBG_PRINT( "lp->dma.rx_packet[%d]                 : 0x%pK\n", i, lp->dma.rx_packet[i] );
+//                 DBG_PRINT( "lp->dma.rx_packet[%d]->next_desc_addr : 0x%pK\n", i, lp->dma.rx_packet[i]->next_desc_addr );
 //                 lp->dma.rx_rsc_ind++;
 //             } else {
 //                 DBG_ERROR( DbgInfo, "Could not alloc DMA Rx Packet\n" );
@@ -714,7 +714,7 @@ int wl_pci_dma_alloc( struct pci_dev *pdev, struct wl_private *lp )
 //     }
 //     if( status == 0 ) {
 //         status = wl_pci_dma_alloc_desc( pdev, lp, &lp->dma.rx_reclaim_desc );
-//         DBG_PRINT( "lp->dma.rx_reclaim_desc: 0x%p\n", lp->dma.rx_reclaim_desc );
+//         DBG_PRINT( "lp->dma.rx_reclaim_desc: 0x%pK\n", lp->dma.rx_reclaim_desc );
 //     }
 //     /* Store status, as host should not call HCF functions if this fails */
 //     lp->dma.status = status;  //;?all useages of dma.status have been commented out
@@ -1305,23 +1305,23 @@ void wl_pci_dma_hcf_supply( struct wl_private *lp )
     //{
         /* Hand over the Rx/Tx reclaim descriptors to the HCF */
         if( lp->dma.tx_reclaim_desc ) {
-            DBG_PRINT( "lp->dma.tx_reclaim_desc: 0x%p\n", lp->dma.tx_reclaim_desc );
+            DBG_PRINT( "lp->dma.tx_reclaim_desc: 0x%pK\n", lp->dma.tx_reclaim_desc );
             hcf_dma_tx_put( &lp->hcfCtx, lp->dma.tx_reclaim_desc, 0 );
             lp->dma.tx_reclaim_desc = NULL;
-            DBG_PRINT( "lp->dma.tx_reclaim_desc: 0x%p\n", lp->dma.tx_reclaim_desc );
+            DBG_PRINT( "lp->dma.tx_reclaim_desc: 0x%pK\n", lp->dma.tx_reclaim_desc );
         }
         if( lp->dma.rx_reclaim_desc ) {
-            DBG_PRINT( "lp->dma.rx_reclaim_desc: 0x%p\n", lp->dma.rx_reclaim_desc );
+            DBG_PRINT( "lp->dma.rx_reclaim_desc: 0x%pK\n", lp->dma.rx_reclaim_desc );
             hcf_dma_rx_put( &lp->hcfCtx, lp->dma.rx_reclaim_desc );
             lp->dma.rx_reclaim_desc = NULL;
-            DBG_PRINT( "lp->dma.rx_reclaim_desc: 0x%p\n", lp->dma.rx_reclaim_desc );
+            DBG_PRINT( "lp->dma.rx_reclaim_desc: 0x%pK\n", lp->dma.rx_reclaim_desc );
         }
         /* Hand over the Rx descriptor chain to the HCF */
         for( i = 0; i < NUM_RX_DESC; i++ ) {
-            DBG_PRINT( "lp->dma.rx_packet[%d]:    0x%p\n", i, lp->dma.rx_packet[i] );
+            DBG_PRINT( "lp->dma.rx_packet[%d]:    0x%pK\n", i, lp->dma.rx_packet[i] );
             hcf_dma_rx_put( &lp->hcfCtx, lp->dma.rx_packet[i] );
             lp->dma.rx_packet[i] = NULL;
-            DBG_PRINT( "lp->dma.rx_packet[%d]:    0x%p\n", i, lp->dma.rx_packet[i] );
+            DBG_PRINT( "lp->dma.rx_packet[%d]:    0x%pK\n", i, lp->dma.rx_packet[i] );
         }
     //}
 
@@ -1366,7 +1366,7 @@ void wl_pci_dma_hcf_reclaim( struct wl_private *lp )
 
     wl_pci_dma_hcf_reclaim_rx( lp );
     for( i = 0; i < NUM_RX_DESC; i++ ) {
-        DBG_PRINT( "rx_packet[%d] 0x%p\n", i, lp->dma.rx_packet[i] );
+        DBG_PRINT( "rx_packet[%d] 0x%pK\n", i, lp->dma.rx_packet[i] );
 //         if( lp->dma.rx_packet[i] == NULL ) {
 //             DBG_PRINT( "wl_pci_dma_hcf_reclaim: rx_packet[%d] NULL\n", i );
 //         }
@@ -1374,7 +1374,7 @@ void wl_pci_dma_hcf_reclaim( struct wl_private *lp )
 
     wl_pci_dma_hcf_reclaim_tx( lp );
     for( i = 0; i < NUM_TX_DESC; i++ ) {
-        DBG_PRINT( "tx_packet[%d] 0x%p\n", i, lp->dma.tx_packet[i] );
+        DBG_PRINT( "tx_packet[%d] 0x%pK\n", i, lp->dma.tx_packet[i] );
 //         if( lp->dma.tx_packet[i] == NULL ) {
 //             DBG_PRINT( "wl_pci_dma_hcf_reclaim: tx_packet[%d] NULL\n", i );
 //         }
@@ -1419,7 +1419,7 @@ void wl_pci_dma_hcf_reclaim_rx( struct wl_private *lp )
                 /* A reclaim descriptor is being given back by the HCF. Reclaim
                    descriptors have a NULL buf_addr */
                 lp->dma.rx_reclaim_desc = p;
-            	DBG_PRINT( "reclaim_descriptor: 0x%p\n", p );
+            	DBG_PRINT( "reclaim_descriptor: 0x%pK\n", p );
                 continue;
             }
             for( i = 0; i < NUM_RX_DESC; i++ ) {
@@ -1430,7 +1430,7 @@ void wl_pci_dma_hcf_reclaim_rx( struct wl_private *lp )
             /* An Rx buffer descriptor is being given back by the HCF */
             lp->dma.rx_packet[i] = p;
             lp->dma.rx_rsc_ind++;
-        	DBG_PRINT( "rx_packet[%d] 0x%p\n", i, lp->dma.rx_packet[i] );
+        	DBG_PRINT( "rx_packet[%d] 0x%pK\n", i, lp->dma.rx_packet[i] );
         }
     //}
     DBG_LEAVE( DbgInfo );
@@ -1551,7 +1551,7 @@ void wl_pci_dma_hcf_reclaim_tx( struct wl_private *lp )
                 /* A Reclaim descriptor is being given back by the HCF. Reclaim
                    descriptors have a NULL buf_addr */
                 lp->dma.tx_reclaim_desc = p;
-            	DBG_PRINT( "reclaim_descriptor: 0x%p\n", p );
+            	DBG_PRINT( "reclaim_descriptor: 0x%pK\n", p );
                 continue;
             }
             for( i = 0; i < NUM_TX_DESC; i++ ) {
@@ -1562,7 +1562,7 @@ void wl_pci_dma_hcf_reclaim_tx( struct wl_private *lp )
             /* An Rx buffer descriptor is being given back by the HCF */
             lp->dma.tx_packet[i] = p;
             lp->dma.tx_rsc_ind++;
-        	DBG_PRINT( "tx_packet[%d] 0x%p\n", i, lp->dma.tx_packet[i] );
+        	DBG_PRINT( "tx_packet[%d] 0x%pK\n", i, lp->dma.tx_packet[i] );
         }
     //}
 

@@ -254,7 +254,7 @@ sfax_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	struct channel_req	*rq;
 	int			err = 0;
 
-	pr_debug("%s: cmd:%x %p\n", sf->name, cmd, arg);
+	pr_debug("%s: cmd:%x %pK\n", sf->name, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
 		rq = arg;
@@ -268,7 +268,7 @@ sfax_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 			pr_info("%s: cannot get module\n", sf->name);
 		break;
 	case CLOSE_CHANNEL:
-		pr_debug("%s: dev(%d) close from %p\n", sf->name,
+		pr_debug("%s: dev(%d) close from %pK\n", sf->name,
 			 dch->dev.id, __builtin_return_address(0));
 		module_put(THIS_MODULE);
 		break;

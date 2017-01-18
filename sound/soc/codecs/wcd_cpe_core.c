@@ -2799,7 +2799,7 @@ static int wcd_cpe_buf_alloc(void *core_handle,
 				rc = -EINVAL;
 				goto fail;
 		}
-		pr_debug("%s: pcm_buf[%d].mem %p pcm_buf[%d].phys %pa\n",
+		pr_debug("%s: pcm_buf[%d].mem %pK pcm_buf[%d].phys %pa\n",
 			 __func__, count,
 			 (void *)pcm_buf[count].mem,
 			 count, &(pcm_buf[count].phys));

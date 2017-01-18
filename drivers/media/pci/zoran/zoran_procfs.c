@@ -157,7 +157,7 @@ static ssize_t zoran_write(struct file *file, const char __user *buffer,
 		return -EFAULT;
 	}
 	string[count] = 0;
-	dprintk(4, KERN_INFO "%s: write_proc: name=%s count=%zu zr=%p\n",
+	dprintk(4, KERN_INFO "%s: write_proc: name=%s count=%zu zr=%pK\n",
 		ZR_DEVNAME(zr), file->f_path.dentry->d_name.name, count, zr);
 	ldelim = " \t\n";
 	tdelim = "=";
@@ -200,7 +200,7 @@ zoran_proc_init (struct zoran *zr)
 	if (zr->zoran_proc != NULL) {
 		dprintk(2,
 			KERN_INFO
-			"%s: procfs entry /proc/%s allocated. data=%p\n",
+			"%s: procfs entry /proc/%s allocated. data=%pK\n",
 			ZR_DEVNAME(zr), name, zr);
 	} else {
 		dprintk(1, KERN_ERR "%s: Unable to initialise /proc/%s\n",

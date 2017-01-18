@@ -471,7 +471,7 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
 
 	xid = get_xid();
 
-	cifs_dbg(FYI, "parent inode = 0x%p name is: %s and dentry = 0x%p\n",
+	cifs_dbg(FYI, "parent inode = 0x%pK name is: %s and dentry = 0x%pK\n",
 		 inode, direntry->d_name.name, direntry);
 
 	tlink = cifs_sb_tlink(CIFS_SB(inode->i_sb));
@@ -540,7 +540,7 @@ int cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
 	__u32 oplock;
 	int created = FILE_CREATED;
 
-	cifs_dbg(FYI, "cifs_create parent inode = 0x%p name is: %s and dentry = 0x%p\n",
+	cifs_dbg(FYI, "cifs_create parent inode = 0x%pK name is: %s and dentry = 0x%pK\n",
 		 inode, direntry->d_name.name, direntry);
 
 	tlink = cifs_sb_tlink(CIFS_SB(inode->i_sb));
@@ -710,7 +710,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
 
 	xid = get_xid();
 
-	cifs_dbg(FYI, "parent inode = 0x%p name is: %s and dentry = 0x%p\n",
+	cifs_dbg(FYI, "parent inode = 0x%pK name is: %s and dentry = 0x%pK\n",
 		 parent_dir_inode, direntry->d_name.name, direntry);
 
 	/* check whether path exists */
@@ -741,7 +741,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
 	} else {
 		cifs_dbg(FYI, "NULL inode in lookup\n");
 	}
-	cifs_dbg(FYI, "Full path: %s inode = 0x%p\n",
+	cifs_dbg(FYI, "Full path: %s inode = 0x%pK\n",
 		 full_path, direntry->d_inode);
 
 	if (pTcon->unix_ext) {

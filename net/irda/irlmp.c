@@ -1361,7 +1361,7 @@ void irlmp_flow_indication(struct lap_cb *self, LOCAL_FLOW flow)
 		/* Uh-oh... Paranoia */
 		if(curr == NULL)
 			break;
-		IRDA_DEBUG(4, "%s() : curr is %p, next was %p and is now %p, still %d to go - queue len = %d\n", __func__, curr, next, self->flow_next, lsap_todo, IRLAP_GET_TX_QUEUE_LEN(self->irlap));
+		IRDA_DEBUG(4, "%s() : curr is %pK, next was %pK and is now %pK, still %d to go - queue len = %d\n", __func__, curr, next, self->flow_next, lsap_todo, IRLAP_GET_TX_QUEUE_LEN(self->irlap));
 
 		/* Inform lsap user that it can send one more packet. */
 		if (curr->notify.flow_indication != NULL)

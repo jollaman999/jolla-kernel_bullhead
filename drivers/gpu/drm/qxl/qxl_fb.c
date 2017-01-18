@@ -388,7 +388,7 @@ static int qxlfb_create(struct qxl_fbdev *qfbdev,
 	/* TODO: what's the usual response to memory allocation errors? */
 	BUG_ON(!shadow);
 	QXL_INFO(qdev,
-	"surface0 at gpu offset %lld, mmap_offset %lld (virt %p, shadow %p)\n",
+	"surface0 at gpu offset %lld, mmap_offset %lld (virt %pK, shadow %pK)\n",
 		 qxl_bo_gpu_offset(qbo),
 		 qxl_bo_mmap_offset(qbo),
 		 qbo->kptr,

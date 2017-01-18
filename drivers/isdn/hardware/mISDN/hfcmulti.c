@@ -934,7 +934,7 @@ hfcmulti_resync(struct hfc_multi *locked, struct hfc_multi *newmaster, int rm)
 	spin_lock(&plx_lock); /* must be locked inside other locks */
 
 	if (debug & DEBUG_HFCMULTI_PLXSD)
-		printk(KERN_DEBUG "%s: RESYNC(syncmaster=0x%p)\n",
+		printk(KERN_DEBUG "%s: RESYNC(syncmaster=0x%pK)\n",
 		       __func__, syncmaster);
 
 	/* select new master */
@@ -974,7 +974,7 @@ hfcmulti_resync(struct hfc_multi *locked, struct hfc_multi *newmaster, int rm)
 	if (newmaster) {
 		hc = newmaster;
 		if (debug & DEBUG_HFCMULTI_PLXSD)
-			printk(KERN_DEBUG "id=%d (0x%p) = syncronized with "
+			printk(KERN_DEBUG "id=%d (0x%pK) = syncronized with "
 			       "interface.\n", hc->id, hc);
 		/* Enable new sync master */
 		plx_acc_32 = hc->plx_membase + PLX_GPIOC;
@@ -993,7 +993,7 @@ hfcmulti_resync(struct hfc_multi *locked, struct hfc_multi *newmaster, int rm)
 			hc = pcmmaster;
 			if (debug & DEBUG_HFCMULTI_PLXSD)
 				printk(KERN_DEBUG
-				       "id=%d (0x%p) = PCM master syncronized "
+				       "id=%d (0x%pK) = PCM master syncronized "
 				       "with QUARTZ\n", hc->id, hc);
 			if (hc->ctype == HFC_TYPE_E1) {
 				/* Use the crystal clock for the PCM
@@ -3701,7 +3701,7 @@ hfcm_bctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 	u_long	flags;
 
 	if (bch->debug & DEBUG_HW)
-		printk(KERN_DEBUG "%s: cmd:%x %p\n",
+		printk(KERN_DEBUG "%s: cmd:%x %pK\n",
 		       __func__, cmd, arg);
 	switch (cmd) {
 	case CLOSE_CHANNEL:
@@ -4064,7 +4064,7 @@ open_dchannel(struct hfc_multi *hc, struct dchannel *dch,
 	u_long	flags;
 
 	if (debug & DEBUG_HW_OPEN)
-		printk(KERN_DEBUG "%s: dev(%d) open from %p\n", __func__,
+		printk(KERN_DEBUG "%s: dev(%d) open from %pK\n", __func__,
 		       dch->dev.id, __builtin_return_address(0));
 	if (rq->protocol == ISDN_P_NONE)
 		return -EINVAL;
@@ -4193,7 +4193,7 @@ hfcm_dctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 	u_long			flags;
 
 	if (dch->debug & DEBUG_HW)
-		printk(KERN_DEBUG "%s: cmd:%x %p\n",
+		printk(KERN_DEBUG "%s: cmd:%x %pK\n",
 		       __func__, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
@@ -4223,7 +4223,7 @@ hfcm_dctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 		break;
 	case CLOSE_CHANNEL:
 		if (debug & DEBUG_HW_OPEN)
-			printk(KERN_DEBUG "%s: dev(%d) close from %p\n",
+			printk(KERN_DEBUG "%s: dev(%d) close from %pK\n",
 			       __func__, dch->dev.id,
 			       __builtin_return_address(0));
 		module_put(THIS_MODULE);
@@ -4663,7 +4663,7 @@ release_card(struct hfc_multi *hc)
 	udelay(1000);
 	if (hc->irq) {
 		if (debug & DEBUG_HFCMULTI_INIT)
-			printk(KERN_DEBUG "%s: free irq %d (hc=%p)\n",
+			printk(KERN_DEBUG "%s: free irq %d (hc=%pK)\n",
 			    __func__, hc->irq, hc);
 		free_irq(hc->irq, hc);
 		hc->irq = 0;

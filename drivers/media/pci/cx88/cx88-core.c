@@ -552,7 +552,7 @@ void cx88_wakeup(struct cx88_core *core,
 		if ((s16) (count - buf->count) < 0)
 			break;
 		v4l2_get_timestamp(&buf->vb.ts);
-		dprintk(2,"[%p/%d] wakeup reg=%d buf=%d\n",buf,buf->vb.i,
+		dprintk(2,"[%pK/%d] wakeup reg=%d buf=%d\n",buf,buf->vb.i,
 			count, buf->count);
 		buf->vb.state = VIDEOBUF_DONE;
 		list_del(&buf->vb.queue);

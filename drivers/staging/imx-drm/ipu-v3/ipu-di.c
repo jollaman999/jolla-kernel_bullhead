@@ -763,7 +763,7 @@ int ipu_di_init(struct ipu_soc *ipu, struct device *dev, int id,
 		goto failed_clk_register;
 	}
 
-	dev_dbg(dev, "DI%d base: 0x%08lx remapped to %p\n",
+	dev_dbg(dev, "DI%d base: 0x%08lx remapped to %pK\n",
 			id, base, di->base);
 	di->inuse = false;
 	di->ipu = ipu;

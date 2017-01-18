@@ -273,7 +273,7 @@ static dma_addr_t iommu_alloc(struct device *dev, struct iommu_table *tbl,
 	entry = iommu_range_alloc(dev, tbl, npages);
 
 	if (unlikely(entry == DMA_ERROR_CODE)) {
-		pr_warn("failed to allocate %u pages in iommu %p\n",
+		pr_warn("failed to allocate %u pages in iommu %pK\n",
 			npages, tbl);
 		return DMA_ERROR_CODE;
 	}
@@ -592,9 +592,9 @@ begin:
 	/* 1. using the Page Migration Control reg set SoftStop */
 	target = calgary_reg(bbar, phb_offset(bus) | PHB_PAGE_MIG_CTRL);
 	val = be32_to_cpu(readl(target));
-	printk(KERN_DEBUG "1a. read 0x%x [LE] from %p\n", val, target);
+	printk(KERN_DEBUG "1a. read 0x%x [LE] from %pK\n", val, target);
 	val |= PMR_SOFTSTOP;
-	printk(KERN_DEBUG "1b. writing 0x%x [LE] to %p\n", val, target);
+	printk(KERN_DEBUG "1b. writing 0x%x [LE] to %pK\n", val, target);
 	writel(cpu_to_be32(val), target);
 
 	/* 2. poll split queues until all DMA activity is done */
@@ -610,7 +610,7 @@ begin:
 	/* 3. poll Page Migration DEBUG for SoftStopFault */
 	target = calgary_reg(bbar, phb_offset(bus) | PHB_PAGE_MIG_DEBUG);
 	val = be32_to_cpu(readl(target));
-	printk(KERN_DEBUG "3. read 0x%x [LE] from %p\n", val, target);
+	printk(KERN_DEBUG "3. read 0x%x [LE] from %pK\n", val, target);
 
 	/* 4. if SoftStopFault - goto (1) */
 	if (val & PMR_SOFTSTOPFAULT) {
@@ -624,12 +624,12 @@ begin:
 
 	/* 5. Slam into HardStop by reading PHB_PAGE_MIG_CTRL */
 	target = calgary_reg(bbar, phb_offset(bus) | PHB_PAGE_MIG_CTRL);
-	printk(KERN_DEBUG "5a. slamming into HardStop by reading %p\n", target);
+	printk(KERN_DEBUG "5a. slamming into HardStop by reading %pK\n", target);
 	val = be32_to_cpu(readl(target));
-	printk(KERN_DEBUG "5b. read 0x%x [LE] from %p\n", val, target);
+	printk(KERN_DEBUG "5b. read 0x%x [LE] from %pK\n", val, target);
 	target = calgary_reg(bbar, phb_offset(bus) | PHB_PAGE_MIG_DEBUG);
 	val = be32_to_cpu(readl(target));
-	printk(KERN_DEBUG "5c. read 0x%x [LE] from %p (debug)\n", val, target);
+	printk(KERN_DEBUG "5c. read 0x%x [LE] from %pK (debug)\n", val, target);
 
 	/* 6. invalidate TCE cache */
 	printk(KERN_DEBUG "6. invalidating TCE cache\n");
@@ -640,16 +640,16 @@ begin:
 	printk(KERN_DEBUG "7a. Re-reading PMCR\n");
 	target = calgary_reg(bbar, phb_offset(bus) | PHB_PAGE_MIG_CTRL);
 	val = be32_to_cpu(readl(target));
-	printk(KERN_DEBUG "7b. read 0x%x [LE] from %p\n", val, target);
+	printk(KERN_DEBUG "7b. read 0x%x [LE] from %pK\n", val, target);
 
 	/* 8. Remove HardStop */
 	printk(KERN_DEBUG "8a. removing HardStop from PMCR\n");
 	target = calgary_reg(bbar, phb_offset(bus) | PHB_PAGE_MIG_CTRL);
 	val = 0;
-	printk(KERN_DEBUG "8b. writing 0x%x [LE] to %p\n", val, target);
+	printk(KERN_DEBUG "8b. writing 0x%x [LE] to %pK\n", val, target);
 	writel(cpu_to_be32(val), target);
 	val = be32_to_cpu(readl(target));
-	printk(KERN_DEBUG "8c. read 0x%x [LE] from %p\n", val, target);
+	printk(KERN_DEBUG "8c. read 0x%x [LE] from %pK\n", val, target);
 }
 
 static void __init calgary_reserve_mem_region(struct pci_dev *dev, u64 start,
@@ -1064,7 +1064,7 @@ static int __init calgary_init_one(struct pci_dev *dev)
 
 	if (dev->bus->parent) {
 		if (dev->bus->parent->self)
-			printk(KERN_WARNING "Calgary: IEEEE, dev %p has "
+			printk(KERN_WARNING "Calgary: IEEEE, dev %pK has "
 			       "bus->parent->self!\n", dev);
 		dev->bus->parent->self = dev;
 	} else

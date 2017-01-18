@@ -94,7 +94,7 @@ struct ib_ah *ehca_create_ah(struct ib_pd *pd, struct ib_ah_attr *ah_attr)
 
 	av = kmem_cache_alloc(av_cache, GFP_KERNEL);
 	if (!av) {
-		ehca_err(pd->device, "Out of memory pd=%p ah_attr=%p",
+		ehca_err(pd->device, "Out of memory pd=%pK ah_attr=%pK",
 			 pd, ah_attr);
 		return ERR_PTR(-ENOMEM);
 	}
@@ -135,7 +135,7 @@ struct ib_ah *ehca_create_ah(struct ib_pd *pd, struct ib_ah_attr *ah_attr)
 			ret = -EINVAL;
 			ehca_err(pd->device, "Invalid port number "
 				 "ehca_query_port() returned %x "
-				 "pd=%p ah_attr=%p", rc, pd, ah_attr);
+				 "pd=%pK ah_attr=%pK", rc, pd, ah_attr);
 			goto create_ah_exit1;
 		}
 		memset(&gid, 0, sizeof(gid));
@@ -146,7 +146,7 @@ struct ib_ah *ehca_create_ah(struct ib_pd *pd, struct ib_ah_attr *ah_attr)
 			ret = -EINVAL;
 			ehca_err(pd->device, "Failed to retrieve sgid "
 				 "ehca_query_gid() returned %x "
-				 "pd=%p ah_attr=%p", rc, pd, ah_attr);
+				 "pd=%pK ah_attr=%pK", rc, pd, ah_attr);
 			goto create_ah_exit1;
 		}
 		memcpy(&av->av.grh.word_1, &gid, sizeof(gid));
@@ -198,7 +198,7 @@ int ehca_modify_ah(struct ib_ah *ah, struct ib_ah_attr *ah_attr)
 		if (rc) { /* invalid port number */
 			ehca_err(ah->device, "Invalid port number "
 				 "ehca_query_port() returned %x "
-				 "ah=%p ah_attr=%p port_num=%x",
+				 "ah=%pK ah_attr=%pK port_num=%x",
 				 rc, ah, ah_attr, ah_attr->port_num);
 			return -EINVAL;
 		}
@@ -209,7 +209,7 @@ int ehca_modify_ah(struct ib_ah *ah, struct ib_ah_attr *ah_attr)
 		if (rc) {
 			ehca_err(ah->device, "Failed to retrieve sgid "
 				 "ehca_query_gid() returned %x "
-				 "ah=%p ah_attr=%p port_num=%x "
+				 "ah=%pK ah_attr=%pK port_num=%x "
 				 "sgid_index=%x",
 				 rc, ah, ah_attr, ah_attr->port_num,
 				 ah_attr->grh.sgid_index);

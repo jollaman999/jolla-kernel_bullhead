@@ -23,17 +23,17 @@ static struct kprobe kp = {
 static int handler_pre(struct kprobe *p, struct pt_regs *regs)
 {
 #ifdef CONFIG_X86
-	printk(KERN_INFO "pre_handler: p->addr = 0x%p, ip = %lx,"
+	printk(KERN_INFO "pre_handler: p->addr = 0x%pK, ip = %lx,"
 			" flags = 0x%lx\n",
 		p->addr, regs->ip, regs->flags);
 #endif
 #ifdef CONFIG_PPC
-	printk(KERN_INFO "pre_handler: p->addr = 0x%p, nip = 0x%lx,"
+	printk(KERN_INFO "pre_handler: p->addr = 0x%pK, nip = 0x%lx,"
 			" msr = 0x%lx\n",
 		p->addr, regs->nip, regs->msr);
 #endif
 #ifdef CONFIG_MIPS
-	printk(KERN_INFO "pre_handler: p->addr = 0x%p, epc = 0x%lx,"
+	printk(KERN_INFO "pre_handler: p->addr = 0x%pK, epc = 0x%lx,"
 			" status = 0x%lx\n",
 		p->addr, regs->cp0_epc, regs->cp0_status);
 #endif
@@ -47,15 +47,15 @@ static void handler_post(struct kprobe *p, struct pt_regs *regs,
 				unsigned long flags)
 {
 #ifdef CONFIG_X86
-	printk(KERN_INFO "post_handler: p->addr = 0x%p, flags = 0x%lx\n",
+	printk(KERN_INFO "post_handler: p->addr = 0x%pK, flags = 0x%lx\n",
 		p->addr, regs->flags);
 #endif
 #ifdef CONFIG_PPC
-	printk(KERN_INFO "post_handler: p->addr = 0x%p, msr = 0x%lx\n",
+	printk(KERN_INFO "post_handler: p->addr = 0x%pK, msr = 0x%lx\n",
 		p->addr, regs->msr);
 #endif
 #ifdef CONFIG_MIPS
-	printk(KERN_INFO "post_handler: p->addr = 0x%p, status = 0x%lx\n",
+	printk(KERN_INFO "post_handler: p->addr = 0x%pK, status = 0x%lx\n",
 		p->addr, regs->cp0_status);
 #endif
 }
@@ -67,7 +67,7 @@ static void handler_post(struct kprobe *p, struct pt_regs *regs,
  */
 static int handler_fault(struct kprobe *p, struct pt_regs *regs, int trapnr)
 {
-	printk(KERN_INFO "fault_handler: p->addr = 0x%p, trap #%dn",
+	printk(KERN_INFO "fault_handler: p->addr = 0x%pK, trap #%dn",
 		p->addr, trapnr);
 	/* Return 0 because we don't handle the fault. */
 	return 0;
@@ -85,14 +85,14 @@ static int __init kprobe_init(void)
 		printk(KERN_INFO "register_kprobe failed, returned %d\n", ret);
 		return ret;
 	}
-	printk(KERN_INFO "Planted kprobe at %p\n", kp.addr);
+	printk(KERN_INFO "Planted kprobe at %pK\n", kp.addr);
 	return 0;
 }
 
 static void __exit kprobe_exit(void)
 {
 	unregister_kprobe(&kp);
-	printk(KERN_INFO "kprobe at %p unregistered\n", kp.addr);
+	printk(KERN_INFO "kprobe at %pK unregistered\n", kp.addr);
 }
 
 module_init(kprobe_init)

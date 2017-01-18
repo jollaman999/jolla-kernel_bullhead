@@ -630,7 +630,7 @@ int ufs_empty_dir(struct inode * inode)
 			if (de->d_reclen == 0) {
 				ufs_error(inode->i_sb, __func__,
 					"zero-length directory entry: "
-					"kaddr=%p, de=%p\n", kaddr, de);
+					"kaddr=%pK, de=%pK\n", kaddr, de);
 				goto not_empty;
 			}
 			if (de->d_ino) {

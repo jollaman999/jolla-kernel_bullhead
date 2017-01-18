@@ -185,7 +185,7 @@ static int apbps2_of_probe(struct platform_device *ofdev)
 	snprintf(priv->io->phys, sizeof(priv->io->phys),
 		 "apbps2_%d", apbps2_idx++);
 
-	dev_info(&ofdev->dev, "irq = %d, base = 0x%p\n", irq, priv->regs);
+	dev_info(&ofdev->dev, "irq = %d, base = 0x%pK\n", irq, priv->regs);
 
 	serio_register_port(priv->io);
 

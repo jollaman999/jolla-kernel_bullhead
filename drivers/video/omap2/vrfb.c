@@ -251,7 +251,7 @@ int omap_vrfb_map_angle(struct vrfb *vrfb, u16 height, u8 rot)
 		return -ENOMEM;
 	}
 
-	DBG("ioremapped vrfb area %d of size %lu into %p\n", rot, size,
+	DBG("ioremapped vrfb area %d of size %lu into %pK\n", rot, size,
 		vrfb->vaddr[rot]);
 
 	return 0;

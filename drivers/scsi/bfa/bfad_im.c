@@ -217,7 +217,7 @@ bfad_im_abort_handler(struct scsi_cmnd *cmnd)
 
 	bfa_trc(bfad, hal_io->iotag);
 	BFA_LOG(KERN_INFO, bfad, bfa_log_level,
-		"scsi%d: abort cmnd %p iotag %x\n",
+		"scsi%d: abort cmnd %pK iotag %x\n",
 		im_port->shost->host_no, cmnd, hal_io->iotag);
 	(void) bfa_ioim_abort(hal_io);
 	spin_unlock_irqrestore(&bfad->bfad_lock, flags);
@@ -234,7 +234,7 @@ bfad_im_abort_handler(struct scsi_cmnd *cmnd)
 	cmnd->scsi_done(cmnd);
 	bfa_trc(bfad, hal_io->iotag);
 	BFA_LOG(KERN_INFO, bfad, bfa_log_level,
-		"scsi%d: complete abort 0x%p iotag 0x%x\n",
+		"scsi%d: complete abort 0x%pK iotag 0x%x\n",
 		im_port->shost->host_no, cmnd, hal_io->iotag);
 	return SUCCESS;
 out:
@@ -1227,7 +1227,7 @@ bfad_im_queuecommand_lck(struct scsi_cmnd *cmnd, void (*done) (struct scsi_cmnd 
 	spin_lock_irqsave(&bfad->bfad_lock, flags);
 	if (!(bfad->bfad_flags & BFAD_HAL_START_DONE)) {
 		printk(KERN_WARNING
-			"bfad%d, queuecommand %p %x failed, BFA stopped\n",
+			"bfad%d, queuecommand %pK %x failed, BFA stopped\n",
 		       bfad->inst_no, cmnd, cmnd->cmnd[0]);
 		cmnd->result = ScsiResult(DID_NO_CONNECT, 0);
 		goto out_fail_cmd;

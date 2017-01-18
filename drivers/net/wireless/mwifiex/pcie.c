@@ -443,7 +443,7 @@ static int mwifiex_init_rxq_ring(struct mwifiex_adapter *adapter)
 		MWIFIEX_SKB_PACB(skb, &buf_pa);
 
 		dev_dbg(adapter->dev,
-			"info: RX ring: skb=%p len=%d data=%p buf_pa=%#x:%x\n",
+			"info: RX ring: skb=%pK len=%d data=%pK buf_pa=%#x:%x\n",
 			skb, skb->len, skb->data, (u32)buf_pa,
 			(u32)((u64)buf_pa >> 32));
 
@@ -500,7 +500,7 @@ static int mwifiex_pcie_init_evt_ring(struct mwifiex_adapter *adapter)
 		MWIFIEX_SKB_PACB(skb, &buf_pa);
 
 		dev_dbg(adapter->dev,
-			"info: EVT ring: skb=%p len=%d data=%p buf_pa=%#x:%x\n",
+			"info: EVT ring: skb=%pK len=%d data=%pK buf_pa=%#x:%x\n",
 			skb, skb->len, skb->data, (u32)buf_pa,
 			(u32)((u64)buf_pa >> 32));
 
@@ -657,7 +657,7 @@ static int mwifiex_pcie_create_txbd_ring(struct mwifiex_adapter *adapter)
 		return -ENOMEM;
 	}
 	dev_dbg(adapter->dev,
-		"info: txbd_ring - base: %p, pbase: %#x:%x, len: %x\n",
+		"info: txbd_ring - base: %pK, pbase: %#x:%x, len: %x\n",
 		card->txbd_ring_vbase, (unsigned int)card->txbd_ring_pbase,
 		(u32)((u64)card->txbd_ring_pbase >> 32), card->txbd_ring_size);
 
@@ -720,7 +720,7 @@ static int mwifiex_pcie_create_rxbd_ring(struct mwifiex_adapter *adapter)
 	}
 
 	dev_dbg(adapter->dev,
-		"info: rxbd_ring - base: %p, pbase: %#x:%x, len: %#x\n",
+		"info: rxbd_ring - base: %pK, pbase: %#x:%x, len: %#x\n",
 		card->rxbd_ring_vbase, (u32)card->rxbd_ring_pbase,
 		(u32)((u64)card->rxbd_ring_pbase >> 32),
 		card->rxbd_ring_size);
@@ -783,7 +783,7 @@ static int mwifiex_pcie_create_evtbd_ring(struct mwifiex_adapter *adapter)
 	}
 
 	dev_dbg(adapter->dev,
-		"info: CMDRSP/EVT bd_ring - base: %p pbase: %#x:%x len: %#x\n",
+		"info: CMDRSP/EVT bd_ring - base: %pK pbase: %#x:%x len: %#x\n",
 		card->evtbd_ring_vbase, (u32)card->evtbd_ring_pbase,
 		(u32)((u64)card->evtbd_ring_pbase >> 32),
 		card->evtbd_ring_size);
@@ -972,7 +972,7 @@ static int mwifiex_pcie_send_data_complete(struct mwifiex_adapter *adapter)
 		skb = card->tx_buf_list[wrdoneidx];
 		if (skb) {
 			dev_dbg(adapter->dev,
-				"SEND COMP: Detach skb %p at txbd_rdidx=%d\n",
+				"SEND COMP: Detach skb %pK at txbd_rdidx=%d\n",
 				skb, wrdoneidx);
 			MWIFIEX_SKB_PACB(skb, &buf_pa);
 			pci_unmap_single(card->dev, buf_pa, skb->len,
@@ -1045,7 +1045,7 @@ mwifiex_pcie_send_data(struct mwifiex_adapter *adapter, struct sk_buff *skb,
 	__le16 *tmp;
 
 	if (!(skb->data && skb->len)) {
-		dev_err(adapter->dev, "%s(): invalid parameter <%p, %#x>\n",
+		dev_err(adapter->dev, "%s(): invalid parameter <%pK, %#x>\n",
 			__func__, skb->data, skb->len);
 		return -1;
 	}
@@ -1233,7 +1233,7 @@ static int mwifiex_pcie_process_recv_data(struct mwifiex_adapter *adapter)
 		MWIFIEX_SKB_PACB(skb_tmp, &buf_pa);
 
 		dev_dbg(adapter->dev,
-			"RECV DATA: Attach new sk_buff %p at rxbd_rdidx=%d\n",
+			"RECV DATA: Attach new sk_buff %pK at rxbd_rdidx=%d\n",
 			skb_tmp, rd_index);
 		card->rx_buf_list[rd_index] = skb_tmp;
 
@@ -1298,7 +1298,7 @@ mwifiex_pcie_send_boot_cmd(struct mwifiex_adapter *adapter, struct sk_buff *skb)
 
 	if (!(skb->data && skb->len)) {
 		dev_err(adapter->dev,
-			"Invalid parameter in %s <%p. len %d>\n",
+			"Invalid parameter in %s <%pK. len %d>\n",
 			__func__, skb->data, skb->len);
 		return -1;
 	}
@@ -1387,7 +1387,7 @@ mwifiex_pcie_send_cmd(struct mwifiex_adapter *adapter, struct sk_buff *skb)
 	u8 *payload = (u8 *)skb->data;
 
 	if (!(skb->data && skb->len)) {
-		dev_err(adapter->dev, "Invalid parameter in %s <%p, %#x>\n",
+		dev_err(adapter->dev, "Invalid parameter in %s <%pK, %#x>\n",
 			__func__, skb->data, skb->len);
 		return -1;
 	}
@@ -1722,7 +1722,7 @@ static int mwifiex_pcie_event_complete(struct mwifiex_adapter *adapter,
 		skb = NULL;
 	} else {
 		dev_dbg(adapter->dev,
-			"info: ERROR: buf still valid at index %d, <%p, %p>\n",
+			"info: ERROR: buf still valid at index %d, <%pK, %pK>\n",
 			rdptr, card->evt_buf_list[rdptr], skb);
 	}
 
@@ -2024,7 +2024,7 @@ static irqreturn_t mwifiex_pcie_interrupt(int irq, void *context)
 
 	card = (struct pcie_service_card *) pci_get_drvdata(pdev);
 	if (!card || !card->adapter) {
-		pr_debug("info: %s: card=%p adapter=%p\n", __func__, card,
+		pr_debug("info: %s: card=%pK adapter=%pK\n", __func__, card,
 			 card ? card->adapter : NULL);
 		goto exit;
 	}
@@ -2218,7 +2218,7 @@ static int mwifiex_pcie_init(struct mwifiex_adapter *adapter)
 	}
 
 	dev_dbg(adapter->dev,
-		"PCI memory map Virt0: %p PCI memory map Virt2: %p\n",
+		"PCI memory map Virt0: %pK PCI memory map Virt2: %pK\n",
 		card->pci_mmap, card->pci_mmap1);
 
 	card->cmdrsp_buf = NULL;

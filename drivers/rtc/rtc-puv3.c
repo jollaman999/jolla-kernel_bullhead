@@ -242,7 +242,7 @@ static int puv3_rtc_probe(struct platform_device *pdev)
 	struct resource *res;
 	int ret;
 
-	pr_debug("%s: probe=%p\n", __func__, pdev);
+	pr_debug("%s: probe=%pK\n", __func__, pdev);
 
 	/* find the IRQs */
 	puv3_rtc_tickno = platform_get_irq(pdev, 1);

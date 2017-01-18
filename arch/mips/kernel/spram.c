@@ -183,11 +183,11 @@ static void probe_spram(char *type,
 
 			v = vp[0];
 			if (v != TDAT)
-				printk(KERN_ERR "vp=%p wrote=%08x got=%08x\n",
+				printk(KERN_ERR "vp=%pK wrote=%08x got=%08x\n",
 				       vp, TDAT, v);
 			v = vp[1];
 			if (v != ~TDAT)
-				printk(KERN_ERR "vp=%p wrote=%08x got=%08x\n",
+				printk(KERN_ERR "vp=%pK wrote=%08x got=%08x\n",
 				       vp+1, ~TDAT, v);
 		}
 

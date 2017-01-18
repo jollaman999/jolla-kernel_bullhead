@@ -567,7 +567,7 @@ int i915_suspend(struct drm_device *dev, pm_message_t state)
 	int error;
 
 	if (!dev || !dev->dev_private) {
-		DRM_ERROR("dev: %p\n", dev);
+		DRM_ERROR("dev: %pK\n", dev);
 		DRM_ERROR("DRM not initialized, aborting suspend.\n");
 		return -ENODEV;
 	}

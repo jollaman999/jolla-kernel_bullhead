@@ -123,7 +123,7 @@ acpi_ds_get_predicate_value(struct acpi_walk_state *walk_state,
 
 	if (!obj_desc) {
 		ACPI_ERROR((AE_INFO,
-			    "No predicate ObjDesc=%p State=%p",
+			    "No predicate ObjDesc=%pK State=%pK",
 			    obj_desc, walk_state));
 
 		return_ACPI_STATUS(AE_AML_NO_OPERAND);
@@ -140,7 +140,7 @@ acpi_ds_get_predicate_value(struct acpi_walk_state *walk_state,
 
 	if (local_obj_desc->common.type != ACPI_TYPE_INTEGER) {
 		ACPI_ERROR((AE_INFO,
-			    "Bad predicate (not an integer) ObjDesc=%p State=%p Type=0x%X",
+			    "Bad predicate (not an integer) ObjDesc=%pK State=%pK Type=0x%X",
 			    obj_desc, walk_state, obj_desc->common.type));
 
 		status = AE_AML_OPERAND_TYPE;
@@ -172,7 +172,7 @@ acpi_ds_get_predicate_value(struct acpi_walk_state *walk_state,
 
       cleanup:
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Completed a predicate eval=%X Op=%p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Completed a predicate eval=%X Op=%pK\n",
 			  walk_state->control_state->common.value,
 			  walk_state->op));
 
@@ -234,7 +234,7 @@ acpi_ds_exec_begin_op(struct acpi_walk_state *walk_state,
 
 		if (acpi_ns_opens_scope(walk_state->op_info->object_type)) {
 			ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-					  "(%s) Popping scope for Op %p\n",
+					  "(%s) Popping scope for Op %pK\n",
 					  acpi_ut_get_type_name(walk_state->
 								op_info->
 								object_type),
@@ -264,7 +264,7 @@ acpi_ds_exec_begin_op(struct acpi_walk_state *walk_state,
 	    (walk_state->control_state->common.state ==
 	     ACPI_CONTROL_CONDITIONAL_EXECUTING)) {
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "Exec predicate Op=%p State=%p\n", op,
+				  "Exec predicate Op=%pK State=%pK\n", op,
 				  walk_state));
 
 		walk_state->control_state->common.state =
@@ -499,7 +499,7 @@ acpi_status acpi_ds_exec_end_op(struct acpi_walk_state *walk_state)
 			     || (op->asl.parent->asl.aml_opcode ==
 				 AML_VAR_PACKAGE_OP))) {
 				ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-						  "Method Reference in a Package, Op=%p\n",
+						  "Method Reference in a Package, Op=%pK\n",
 						  op));
 
 				op->common.node =
@@ -511,7 +511,7 @@ acpi_status acpi_ds_exec_end_op(struct acpi_walk_state *walk_state)
 			}
 
 			ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-					  "Method invocation, Op=%p\n", op));
+					  "Method invocation, Op=%pK\n", op));
 
 			/*
 			 * (AML_METHODCALL) Op->Asl.Value.Arg->Asl.Node contains
@@ -562,7 +562,7 @@ acpi_status acpi_ds_exec_end_op(struct acpi_walk_state *walk_state)
 		case AML_TYPE_CREATE_FIELD:
 
 			ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-					  "Executing CreateField Buffer/Index Op=%p\n",
+					  "Executing CreateField Buffer/Index Op=%pK\n",
 					  op));
 
 			status = acpi_ds_load2_end_op(walk_state);
@@ -577,7 +577,7 @@ acpi_status acpi_ds_exec_end_op(struct acpi_walk_state *walk_state)
 		case AML_TYPE_CREATE_OBJECT:
 
 			ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-					  "Executing CreateObject (Buffer/Package) Op=%p\n",
+					  "Executing CreateObject (Buffer/Package) Op=%pK\n",
 					  op));
 
 			switch (op->common.parent->common.aml_opcode) {
@@ -643,7 +643,7 @@ acpi_status acpi_ds_exec_end_op(struct acpi_walk_state *walk_state)
 
 			if (op->common.aml_opcode == AML_REGION_OP) {
 				ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-						  "Executing OpRegion Address/Length Op=%p\n",
+						  "Executing OpRegion Address/Length Op=%pK\n",
 						  op));
 
 				status =
@@ -654,7 +654,7 @@ acpi_status acpi_ds_exec_end_op(struct acpi_walk_state *walk_state)
 				}
 			} else if (op->common.aml_opcode == AML_DATA_REGION_OP) {
 				ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-						  "Executing DataTableRegion Strings Op=%p\n",
+						  "Executing DataTableRegion Strings Op=%pK\n",
 						  op));
 
 				status =
@@ -665,7 +665,7 @@ acpi_status acpi_ds_exec_end_op(struct acpi_walk_state *walk_state)
 				}
 			} else if (op->common.aml_opcode == AML_BANK_FIELD_OP) {
 				ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-						  "Executing BankField Op=%p\n",
+						  "Executing BankField Op=%pK\n",
 						  op));
 
 				status =
@@ -680,20 +680,20 @@ acpi_status acpi_ds_exec_end_op(struct acpi_walk_state *walk_state)
 		case AML_TYPE_UNDEFINED:
 
 			ACPI_ERROR((AE_INFO,
-				    "Undefined opcode type Op=%p", op));
+				    "Undefined opcode type Op=%pK", op));
 			return_ACPI_STATUS(AE_NOT_IMPLEMENTED);
 
 		case AML_TYPE_BOGUS:
 
 			ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-					  "Internal opcode=%X type Op=%p\n",
+					  "Internal opcode=%X type Op=%pK\n",
 					  walk_state->opcode, op));
 			break;
 
 		default:
 
 			ACPI_ERROR((AE_INFO,
-				    "Unimplemented opcode, class=0x%X type=0x%X Opcode=0x%X Op=%p",
+				    "Unimplemented opcode, class=0x%X type=0x%X Opcode=0x%X Op=%pK",
 				    op_class, op_type, op->common.aml_opcode,
 				    op));
 

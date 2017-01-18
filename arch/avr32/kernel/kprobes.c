@@ -37,7 +37,7 @@ int __kprobes arch_prepare_kprobe(struct kprobe *p)
 	 * kernel address as well... */
 
 	if (!ret) {
-		pr_debug("copy kprobe at %p\n", p->addr);
+		pr_debug("copy kprobe at %pK\n", p->addr);
 		memcpy(p->ainsn.insn, p->addr, MAX_INSN_SIZE * sizeof(kprobe_opcode_t));
 		p->opcode = *p->addr;
 	}
@@ -47,7 +47,7 @@ int __kprobes arch_prepare_kprobe(struct kprobe *p)
 
 void __kprobes arch_arm_kprobe(struct kprobe *p)
 {
-	pr_debug("arming kprobe at %p\n", p->addr);
+	pr_debug("arming kprobe at %pK\n", p->addr);
 	ocd_enable(NULL);
 	*p->addr = BREAKPOINT_INSTRUCTION;
 	flush_icache_range((unsigned long)p->addr,
@@ -56,7 +56,7 @@ void __kprobes arch_arm_kprobe(struct kprobe *p)
 
 void __kprobes arch_disarm_kprobe(struct kprobe *p)
 {
-	pr_debug("disarming kprobe at %p\n", p->addr);
+	pr_debug("disarming kprobe at %pK\n", p->addr);
 	ocd_disable(NULL);
 	*p->addr = p->opcode;
 	flush_icache_range((unsigned long)p->addr,
@@ -67,7 +67,7 @@ static void __kprobes prepare_singlestep(struct kprobe *p, struct pt_regs *regs)
 {
 	unsigned long dc;
 
-	pr_debug("preparing to singlestep over %p (PC=%08lx)\n",
+	pr_debug("preparing to singlestep over %pK (PC=%08lx)\n",
 		 p->addr, regs->pc);
 
 	BUG_ON(!(sysreg_read(SR) & SYSREG_BIT(SR_D)));
@@ -113,7 +113,7 @@ static int __kprobes kprobe_handler(struct pt_regs *regs)
 	void *addr = (void *)regs->pc;
 	int ret = 0;
 
-	pr_debug("kprobe_handler: kprobe_running=%p\n",
+	pr_debug("kprobe_handler: kprobe_running=%pK\n",
 		 kprobe_running());
 
 	/*
@@ -166,7 +166,7 @@ static int __kprobes post_kprobe_handler(struct pt_regs *regs)
 {
 	struct kprobe *cur = kprobe_running();
 
-	pr_debug("post_kprobe_handler, cur=%p\n", cur);
+	pr_debug("post_kprobe_handler, cur=%pK\n", cur);
 
 	if (!cur)
 		return 0;
@@ -208,7 +208,7 @@ int __kprobes kprobe_exceptions_notify(struct notifier_block *self,
 	struct die_args *args = (struct die_args *)data;
 	int ret = NOTIFY_DONE;
 
-	pr_debug("kprobe_exceptions_notify: val=%lu, data=%p\n",
+	pr_debug("kprobe_exceptions_notify: val=%lu, data=%pK\n",
 		 val, data);
 
 	switch (val) {

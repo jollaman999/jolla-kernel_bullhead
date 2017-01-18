@@ -161,7 +161,7 @@ static void isci_port_bc_change_received(struct isci_host *ihost,
 					 struct isci_phy *iphy)
 {
 	dev_dbg(&ihost->pdev->dev,
-		"%s: isci_phy = %p, sas_phy = %p\n",
+		"%s: isci_phy = %pK, sas_phy = %pK\n",
 		__func__, iphy, &iphy->sas_phy);
 
 	ihost->sas_ha.notify_port_event(&iphy->sas_phy, PORTE_BROADCAST_RCVD);
@@ -177,7 +177,7 @@ static void isci_port_link_up(struct isci_host *isci_host,
 	unsigned long success = true;
 
 	dev_dbg(&isci_host->pdev->dev,
-		"%s: isci_port = %p\n",
+		"%s: isci_port = %pK\n",
 		__func__, iport);
 
 	spin_lock_irqsave(&iphy->sas_phy.frame_rcvd_lock, flags);
@@ -243,7 +243,7 @@ static void isci_port_link_down(struct isci_host *isci_host,
 	struct isci_remote_device *isci_device;
 
 	dev_dbg(&isci_host->pdev->dev,
-		"%s: isci_port = %p\n", __func__, isci_port);
+		"%s: isci_port = %pK\n", __func__, isci_port);
 
 	if (isci_port) {
 
@@ -259,7 +259,7 @@ static void isci_port_link_down(struct isci_host *isci_host,
 					    &isci_port->remote_dev_list,
 					    node) {
 				dev_dbg(&isci_host->pdev->dev,
-					"%s: isci_device = %p\n",
+					"%s: isci_device = %pK\n",
 					__func__, isci_device);
 				set_bit(IDEV_GONE, &isci_device->flags);
 			}
@@ -274,7 +274,7 @@ static void isci_port_link_down(struct isci_host *isci_host,
 					   PHYE_LOSS_OF_SIGNAL);
 
 	dev_dbg(&isci_host->pdev->dev,
-		"%s: isci_port = %p - Done\n", __func__, isci_port);
+		"%s: isci_port = %pK - Done\n", __func__, isci_port);
 }
 
 static bool is_port_ready_state(enum sci_port_states state)
@@ -318,7 +318,7 @@ static void isci_port_hard_reset_complete(struct isci_port *isci_port,
 	struct isci_host *ihost = isci_port->owning_controller;
 
 	dev_dbg(&ihost->pdev->dev,
-		"%s: isci_port = %p, completion_status=%x\n",
+		"%s: isci_port = %pK, completion_status=%x\n",
 		     __func__, isci_port, completion_status);
 
 	/* Save the status of the hard reset from the port. */
@@ -794,7 +794,7 @@ static void port_timeout(unsigned long data)
 		 * case stay in the stopped state.
 		 */
 		dev_err(sciport_to_dev(iport),
-			"%s: SCIC Port 0x%p failed to stop before tiemout.\n",
+			"%s: SCIC Port 0x%pK failed to stop before tiemout.\n",
 			__func__,
 			iport);
 	} else if (current_state == SCI_PORT_STOPPING) {
@@ -806,7 +806,7 @@ static void port_timeout(unsigned long data)
 		 * reporting a timeout this should not happen.
 		 */
 		dev_err(sciport_to_dev(iport),
-			"%s: SCIC Port 0x%p is processing a timeout operation "
+			"%s: SCIC Port 0x%pK is processing a timeout operation "
 			"in state %d.\n", __func__, iport, current_state);
 	}
 
@@ -1652,7 +1652,7 @@ int isci_port_perform_hard_reset(struct isci_host *ihost, struct isci_port *ipor
 	enum sci_status status;
 	int ret = TMF_RESP_FUNC_COMPLETE;
 
-	dev_dbg(&ihost->pdev->dev, "%s: iport = %p\n",
+	dev_dbg(&ihost->pdev->dev, "%s: iport = %pK\n",
 		__func__, iport);
 
 	spin_lock_irqsave(&ihost->scic_lock, flags);
@@ -1667,14 +1667,14 @@ int isci_port_perform_hard_reset(struct isci_host *ihost, struct isci_port *ipor
 		wait_port_reset(ihost, iport);
 
 		dev_dbg(&ihost->pdev->dev,
-			"%s: iport = %p; hard reset completion\n",
+			"%s: iport = %pK; hard reset completion\n",
 			__func__, iport);
 
 		if (iport->hard_reset_status != SCI_SUCCESS) {
 			ret = TMF_RESP_FUNC_FAILED;
 
 			dev_err(&ihost->pdev->dev,
-				"%s: iport = %p; hard reset failed (0x%x)\n",
+				"%s: iport = %pK; hard reset failed (0x%x)\n",
 				__func__, iport, iport->hard_reset_status);
 		}
 	} else {
@@ -1683,7 +1683,7 @@ int isci_port_perform_hard_reset(struct isci_host *ihost, struct isci_port *ipor
 		ret = TMF_RESP_FUNC_FAILED;
 
 		dev_err(&ihost->pdev->dev,
-			"%s: iport = %p; sci_port_hard_reset call"
+			"%s: iport = %pK; sci_port_hard_reset call"
 			" failed 0x%x\n",
 			__func__, iport, status);
 

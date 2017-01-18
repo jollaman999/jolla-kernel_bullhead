@@ -218,7 +218,7 @@ static int psc_dma_open(struct snd_pcm_substream *substream)
 	struct psc_dma_stream *s;
 	int rc;
 
-	dev_dbg(psc_dma->dev, "psc_dma_open(substream=%p)\n", substream);
+	dev_dbg(psc_dma->dev, "psc_dma_open(substream=%pK)\n", substream);
 
 	if (substream->pstr->stream == SNDRV_PCM_STREAM_CAPTURE)
 		s = &psc_dma->capture;
@@ -244,7 +244,7 @@ static int psc_dma_close(struct snd_pcm_substream *substream)
 	struct psc_dma *psc_dma = snd_soc_dai_get_drvdata(rtd->cpu_dai);
 	struct psc_dma_stream *s;
 
-	dev_dbg(psc_dma->dev, "psc_dma_close(substream=%p)\n", substream);
+	dev_dbg(psc_dma->dev, "psc_dma_close(substream=%pK)\n", substream);
 
 	if (substream->pstr->stream == SNDRV_PCM_STREAM_CAPTURE)
 		s = &psc_dma->capture;
@@ -309,7 +309,7 @@ static int psc_dma_new(struct snd_soc_pcm_runtime *rtd)
 	size_t size = psc_dma_hardware.buffer_bytes_max;
 	int rc = 0;
 
-	dev_dbg(rtd->platform->dev, "psc_dma_new(card=%p, dai=%p, pcm=%p)\n",
+	dev_dbg(rtd->platform->dev, "psc_dma_new(card=%pK, dai=%pK, pcm=%pK)\n",
 		card, dai, pcm);
 
 	if (!card->dev->dma_mask)
@@ -352,7 +352,7 @@ static void psc_dma_free(struct snd_pcm *pcm)
 	struct snd_pcm_substream *substream;
 	int stream;
 
-	dev_dbg(rtd->platform->dev, "psc_dma_free(pcm=%p)\n", pcm);
+	dev_dbg(rtd->platform->dev, "psc_dma_free(pcm=%pK)\n", pcm);
 
 	for (stream = 0; stream < 2; stream++) {
 		substream = pcm->streams[stream].substream;
