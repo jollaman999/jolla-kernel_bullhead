@@ -230,7 +230,7 @@ dasd_fba_erp_postaction(struct dasd_ccw_req * cqr)
 	if (cqr->function == dasd_default_erp_action)
 		return dasd_default_erp_postaction;
 
-	DBF_DEV_EVENT(DBF_WARNING, cqr->startdev, "unknown ERP action %p",
+	DBF_DEV_EVENT(DBF_WARNING, cqr->startdev, "unknown ERP action %pK",
 		    cqr->function);
 	return NULL;
 }
@@ -483,10 +483,10 @@ dasd_fba_dump_sense(struct dasd_device *device, struct dasd_ccw_req * req,
 		      " I/O status report for device %s:\n",
 		      dev_name(&device->cdev->dev));
 	len += sprintf(page + len, PRINTK_HEADER
-		       " in req: %p CS: 0x%02X DS: 0x%02X\n", req,
+		       " in req: %pK CS: 0x%02X DS: 0x%02X\n", req,
 		       irb->scsw.cmd.cstat, irb->scsw.cmd.dstat);
 	len += sprintf(page + len, PRINTK_HEADER
-		       " device %s: Failing CCW: %p\n",
+		       " device %s: Failing CCW: %pK\n",
 		       dev_name(&device->cdev->dev),
 		       (void *) (addr_t) irb->scsw.cmd.cpa);
 	if (irb->esw.esw0.erw.cons) {
@@ -512,10 +512,10 @@ dasd_fba_dump_sense(struct dasd_device *device, struct dasd_ccw_req * req,
 	act = req->cpaddr;
         for (last = act; last->flags & (CCW_FLAG_CC | CCW_FLAG_DC); last++);
 	end = min(act + 8, last);
-	len = sprintf(page, PRINTK_HEADER " Related CP in req: %p\n", req);
+	len = sprintf(page, PRINTK_HEADER " Related CP in req: %pK\n", req);
 	while (act <= end) {
 		len += sprintf(page + len, PRINTK_HEADER
-			       " CCW %p: %08X %08X DAT:",
+			       " CCW %pK: %08X %08X DAT:",
 			       act, ((int *) act)[0], ((int *) act)[1]);
 		for (count = 0; count < 32 && count < act->count;
 		     count += sizeof(int))
@@ -537,7 +537,7 @@ dasd_fba_dump_sense(struct dasd_device *device, struct dasd_ccw_req * req,
 	end = min((struct ccw1 *)(addr_t) irb->scsw.cmd.cpa + 2, last);
 	while (act <= end) {
 		len += sprintf(page + len, PRINTK_HEADER
-			       " CCW %p: %08X %08X DAT:",
+			       " CCW %pK: %08X %08X DAT:",
 			       act, ((int *) act)[0], ((int *) act)[1]);
 		for (count = 0; count < 32 && count < act->count;
 		     count += sizeof(int))
@@ -555,7 +555,7 @@ dasd_fba_dump_sense(struct dasd_device *device, struct dasd_ccw_req * req,
 	}
 	while (act <= last) {
 		len += sprintf(page + len, PRINTK_HEADER
-			       " CCW %p: %08X %08X DAT:",
+			       " CCW %pK: %08X %08X DAT:",
 			       act, ((int *) act)[0], ((int *) act)[1]);
 		for (count = 0; count < 32 && count < act->count;
 		     count += sizeof(int))

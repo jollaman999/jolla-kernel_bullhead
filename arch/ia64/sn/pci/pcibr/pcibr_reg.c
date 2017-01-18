@@ -37,7 +37,7 @@ void pcireg_control_bit_clr(struct pcibus_info *pcibus_info, u64 bits)
 			break;
 		default:
 			panic
-			    ("pcireg_control_bit_clr: unknown bridgetype bridge 0x%p",
+			    ("pcireg_control_bit_clr: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}
@@ -57,7 +57,7 @@ void pcireg_control_bit_set(struct pcibus_info *pcibus_info, u64 bits)
 			break;
 		default:
 			panic
-			    ("pcireg_control_bit_set: unknown bridgetype bridge 0x%p",
+			    ("pcireg_control_bit_set: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}
@@ -81,7 +81,7 @@ u64 pcireg_tflush_get(struct pcibus_info *pcibus_info)
 			break;
 		default:
 			panic
-			    ("pcireg_tflush_get: unknown bridgetype bridge 0x%p",
+			    ("pcireg_tflush_get: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}
@@ -111,7 +111,7 @@ u64 pcireg_intr_status_get(struct pcibus_info * pcibus_info)
 			break;
 		default:
 			panic
-			    ("pcireg_intr_status_get: unknown bridgetype bridge 0x%p",
+			    ("pcireg_intr_status_get: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}
@@ -135,7 +135,7 @@ void pcireg_intr_enable_bit_clr(struct pcibus_info *pcibus_info, u64 bits)
 			break;
 		default:
 			panic
-			    ("pcireg_intr_enable_bit_clr: unknown bridgetype bridge 0x%p",
+			    ("pcireg_intr_enable_bit_clr: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}
@@ -155,7 +155,7 @@ void pcireg_intr_enable_bit_set(struct pcibus_info *pcibus_info, u64 bits)
 			break;
 		default:
 			panic
-			    ("pcireg_intr_enable_bit_set: unknown bridgetype bridge 0x%p",
+			    ("pcireg_intr_enable_bit_set: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}
@@ -185,7 +185,7 @@ void pcireg_intr_addr_addr_set(struct pcibus_info *pcibus_info, int int_n,
 			break;
 		default:
 			panic
-			    ("pcireg_intr_addr_addr_get: unknown bridgetype bridge 0x%p",
+			    ("pcireg_intr_addr_addr_get: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}
@@ -208,7 +208,7 @@ void pcireg_force_intr_set(struct pcibus_info *pcibus_info, int int_n)
 			break;
 		default:
 			panic
-			    ("pcireg_force_intr_set: unknown bridgetype bridge 0x%p",
+			    ("pcireg_force_intr_set: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}
@@ -233,7 +233,7 @@ u64 pcireg_wrb_flush_get(struct pcibus_info *pcibus_info, int device)
 			    __sn_readq_relaxed(&ptr->pic.p_wr_req_buf[device]);
 			break;
 		default:
-		      panic("pcireg_wrb_flush_get: unknown bridgetype bridge 0x%p", ptr);
+		      panic("pcireg_wrb_flush_get: unknown bridgetype bridge 0x%pK", ptr);
 		}
 
 	}
@@ -256,7 +256,7 @@ void pcireg_int_ate_set(struct pcibus_info *pcibus_info, int ate_index,
 			break;
 		default:
 			panic
-			    ("pcireg_int_ate_set: unknown bridgetype bridge 0x%p",
+			    ("pcireg_int_ate_set: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}
@@ -277,7 +277,7 @@ u64 __iomem *pcireg_int_ate_addr(struct pcibus_info *pcibus_info, int ate_index)
 			break;
 		default:
 			panic
-			    ("pcireg_int_ate_addr: unknown bridgetype bridge 0x%p",
+			    ("pcireg_int_ate_addr: unknown bridgetype bridge 0x%pK",
 			     ptr);
 		}
 	}

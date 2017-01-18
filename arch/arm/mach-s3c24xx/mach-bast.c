@@ -279,7 +279,7 @@ static void bast_nand_select(struct s3c2410_nand_set *set, int slot)
 
 	slot = set->nr_map[slot] & 3;
 
-	pr_debug("bast_nand: selecting slot %d (set %p,%p)\n",
+	pr_debug("bast_nand: selecting slot %d (set %pK,%pK)\n",
 		 slot, set, set->nr_map);
 
 	tmp = __raw_readb(BAST_VA_CTRL2);

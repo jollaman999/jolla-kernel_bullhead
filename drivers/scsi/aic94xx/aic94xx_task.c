@@ -345,7 +345,7 @@ Again:
 	if (unlikely((task->task_state_flags & SAS_TASK_STATE_ABORTED))) {
 		struct completion *completion = ascb->completion;
 		spin_unlock_irqrestore(&task->task_state_lock, flags);
-		ASD_DPRINTK("task 0x%p done with opcode 0x%x resp 0x%x "
+		ASD_DPRINTK("task 0x%pK done with opcode 0x%x resp 0x%x "
 			    "stat 0x%x but aborted by upper layer!\n",
 			    task, opcode, ts->resp, ts->stat);
 		if (completion)

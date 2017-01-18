@@ -179,7 +179,7 @@ static struct sg_table *sgtable_alloc(const size_t bytes, u32 flags,
 		return ERR_PTR(err);
 	}
 
-	pr_debug("%s: sgt:%p(%d entries)\n", __func__, sgt, nr_entries);
+	pr_debug("%s: sgt:%pK(%d entries)\n", __func__, sgt, nr_entries);
 
 	return sgt;
 }
@@ -193,7 +193,7 @@ static void sgtable_free(struct sg_table *sgt)
 	sg_free_table(sgt);
 	kfree(sgt);
 
-	pr_debug("%s: sgt:%p\n", __func__, sgt);
+	pr_debug("%s: sgt:%pK\n", __func__, sgt);
 }
 
 /* map 'sglist' to a contiguous mpu virtual area and return 'va' */
@@ -602,7 +602,7 @@ static u32 map_iommu_region(struct iommu_domain *domain, struct omap_iommu *obj,
 
 	mutex_unlock(&obj->mmap_lock);
 
-	dev_dbg(obj->dev, "%s: da:%08x(%x) flags:%08x va:%p\n",
+	dev_dbg(obj->dev, "%s: da:%08x(%x) flags:%08x va:%pK\n",
 		__func__, new->da_start, bytes, new->flags, va);
 
 	return new->da_start;

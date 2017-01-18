@@ -887,7 +887,7 @@ static int __init hp_sdc_init(void)
 			"HP SDC NMI", &hp_sdc))
 		goto err2;
 
-	printk(KERN_INFO PREFIX "HP SDC at 0x%p, IRQ %d (NMI IRQ %d)\n",
+	printk(KERN_INFO PREFIX "HP SDC at 0x%pK, IRQ %d (NMI IRQ %d)\n",
 	       (void *)hp_sdc.base_io, hp_sdc.irq, hp_sdc.nmi);
 
 	hp_sdc_status_in8();
@@ -921,7 +921,7 @@ static int __init hp_sdc_init(void)
  err1:
 	release_region(hp_sdc.data_io, 2);
  err0:
-	printk(KERN_WARNING PREFIX ": %s SDC IO=0x%p IRQ=0x%x NMI=0x%x\n",
+	printk(KERN_WARNING PREFIX ": %s SDC IO=0x%pK IRQ=0x%x NMI=0x%x\n",
 		errstr, (void *)hp_sdc.base_io, hp_sdc.irq, hp_sdc.nmi);
 	hp_sdc.dev = NULL;
 

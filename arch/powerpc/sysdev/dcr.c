@@ -207,7 +207,7 @@ dcr_host_mmio_t dcr_map_mmio(struct device_node *dev,
 	ret.token = ioremap(addr, dcr_c * ret.stride);
 	if (ret.token == NULL)
 		return ret;
-	pr_debug("mapped at 0x%p -> base is 0x%p\n",
+	pr_debug("mapped at 0x%pK -> base is 0x%pK\n",
 		 ret.token, ret.token - dcr_n * ret.stride);
 	ret.token -= dcr_n * ret.stride;
 	return ret;

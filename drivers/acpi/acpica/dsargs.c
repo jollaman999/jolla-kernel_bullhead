@@ -289,7 +289,7 @@ acpi_status acpi_ds_get_buffer_arguments(union acpi_operand_object *obj_desc)
 	node = obj_desc->buffer.node;
 	if (!node) {
 		ACPI_ERROR((AE_INFO,
-			    "No pointer back to namespace node in buffer object %p",
+			    "No pointer back to namespace node in buffer object %pK",
 			    obj_desc));
 		return_ACPI_STATUS(AE_AML_INTERNAL);
 	}
@@ -333,7 +333,7 @@ acpi_status acpi_ds_get_package_arguments(union acpi_operand_object *obj_desc)
 	node = obj_desc->package.node;
 	if (!node) {
 		ACPI_ERROR((AE_INFO,
-			    "No pointer back to namespace node in package %p",
+			    "No pointer back to namespace node in package %pK",
 			    obj_desc));
 		return_ACPI_STATUS(AE_AML_INTERNAL);
 	}
@@ -385,7 +385,7 @@ acpi_status acpi_ds_get_region_arguments(union acpi_operand_object *obj_desc)
 	ACPI_DEBUG_EXEC(acpi_ut_display_init_pathname
 			(ACPI_TYPE_REGION, node, NULL));
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "[%4.4s] OpRegion Arg Init at AML %p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "[%4.4s] OpRegion Arg Init at AML %pK\n",
 			  acpi_ut_get_node_name(node),
 			  extra_desc->extra.aml_start));
 

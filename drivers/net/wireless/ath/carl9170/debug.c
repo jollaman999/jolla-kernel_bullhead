@@ -292,7 +292,7 @@ static void carl9170_debugfs_format_frame(struct ar9170 *ar,
 	struct carl9170_tx_info *arinfo = (void *) txinfo->rate_driver_data;
 	struct ieee80211_hdr *hdr = (void *) txc->frame_data;
 
-	ADD(buf, *off, bufsize, "%s %p, c:%2x, DA:%pM, sq:%4d, mc:%.4x, "
+	ADD(buf, *off, bufsize, "%s %pK, c:%2x, DA:%pM, sq:%4d, mc:%.4x, "
 	    "pc:%.8x, to:%d ms\n", prefix, skb, txc->s.cookie,
 	    ieee80211_get_DA(hdr), get_seq_h(hdr),
 	    le16_to_cpu(txc->f.mac_control), le32_to_cpu(txc->f.phy_control),

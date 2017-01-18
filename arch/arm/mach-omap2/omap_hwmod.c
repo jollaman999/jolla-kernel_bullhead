@@ -2436,7 +2436,7 @@ static void __init _init_mpu_rt_base(struct omap_hwmod *oh, void *data)
 		return;
 	}
 
-	pr_debug("omap_hwmod: %s: MPU register target at va %p\n",
+	pr_debug("omap_hwmod: %s: MPU register target at va %pK\n",
 		 oh->name, va_start);
 
 	oh->_mpu_rt_va = va_start;

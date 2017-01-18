@@ -132,10 +132,10 @@ void __init print_memmap(void)
 		"    kmap    : 0x%08lx - 0x%08lx   (%4ld MiB)\n"
 		"    vmalloc : 0x%08lx - 0x%08lx   (%4ld MiB)\n"
 		"    lowmem  : 0x%08lx - 0x%08lx   (%4ld MiB)\n"
-		"      .init : 0x%p" " - 0x%p" "   (%4d KiB)\n"
-		"      .text : 0x%p" " - 0x%p" "   (%4d KiB)\n"
-		"      .data : 0x%p" " - 0x%p" "   (%4d KiB)\n"
-		"      .bss  : 0x%p" " - 0x%p" "   (%4d KiB)\n",
+		"      .init : 0x%pK" " - 0x%pK" "   (%4d KiB)\n"
+		"      .text : 0x%pK" " - 0x%pK" "   (%4d KiB)\n"
+		"      .data : 0x%pK" " - 0x%pK" "   (%4d KiB)\n"
+		"      .bss  : 0x%pK" " - 0x%pK" "   (%4d KiB)\n",
 		MLK(VECTORS, VECTORS + 256),
 		MLM(KMAP_START, KMAP_END),
 		MLM(VMALLOC_START, VMALLOC_END),

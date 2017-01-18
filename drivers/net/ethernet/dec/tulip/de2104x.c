@@ -2073,7 +2073,7 @@ static int de_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto err_out_iomap;
 
 	/* print info about board and interface just registered */
-	netdev_info(dev, "%s at %p, %pM, IRQ %d\n",
+	netdev_info(dev, "%s at %pK, %pM, IRQ %d\n",
 		    de->de21040 ? "21040" : "21041",
 		    regs, dev->dev_addr, pdev->irq);
 

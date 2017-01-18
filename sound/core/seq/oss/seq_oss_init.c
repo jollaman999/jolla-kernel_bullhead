@@ -193,7 +193,7 @@ snd_seq_oss_open(struct file *file, int level)
 		snd_printk(KERN_ERR "can't malloc device info\n");
 		return -ENOMEM;
 	}
-	debug_printk(("oss_open: dp = %p\n", dp));
+	debug_printk(("oss_open: dp = %pK\n", dp));
 
 	dp->cseq = system_client;
 	dp->port = -1;

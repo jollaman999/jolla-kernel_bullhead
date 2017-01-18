@@ -47,7 +47,7 @@ static struct fsnotify_event *get_one_event(struct fsnotify_group *group,
 {
 	BUG_ON(!mutex_is_locked(&group->notification_mutex));
 
-	pr_debug("%s: group=%p count=%zd\n", __func__, group, count);
+	pr_debug("%s: group=%pK count=%zd\n", __func__, group, count);
 
 	if (fsnotify_notify_queue_is_empty(group))
 		return NULL;
@@ -67,7 +67,7 @@ static int create_fd(struct fsnotify_group *group,
 	int client_fd;
 	struct file *new_file;
 
-	pr_debug("%s: group=%p event=%p\n", __func__, group, event);
+	pr_debug("%s: group=%pK event=%pK\n", __func__, group, event);
 
 	client_fd = get_unused_fd_flags(group->fanotify_data.f_flags);
 	if (client_fd < 0)
@@ -115,7 +115,7 @@ static int fill_event_metadata(struct fsnotify_group *group,
 {
 	int ret = 0;
 
-	pr_debug("%s: group=%p metadata=%p event=%p\n", __func__,
+	pr_debug("%s: group=%pK metadata=%pK event=%pK\n", __func__,
 		 group, metadata, event);
 
 	*file = NULL;
@@ -153,7 +153,7 @@ static struct fanotify_response_event *dequeue_re(struct fsnotify_group *group,
 	}
 	mutex_unlock(&group->fanotify_data.access_mutex);
 
-	pr_debug("%s: found return_re=%p\n", __func__, return_re);
+	pr_debug("%s: found return_re=%pK\n", __func__, return_re);
 
 	return return_re;
 }
@@ -165,7 +165,7 @@ static int process_access_response(struct fsnotify_group *group,
 	__s32 fd = response_struct->fd;
 	__u32 response = response_struct->response;
 
-	pr_debug("%s: group=%p fd=%d response=%d\n", __func__, group,
+	pr_debug("%s: group=%pK fd=%d response=%d\n", __func__, group,
 		 fd, response);
 	/*
 	 * make sure the response is valid, if invalid we do nothing and either
@@ -245,7 +245,7 @@ static ssize_t copy_event_to_user(struct fsnotify_group *group,
 	struct file *f;
 	int fd, ret;
 
-	pr_debug("%s: group=%p event=%p\n", __func__, group, event);
+	pr_debug("%s: group=%pK event=%pK\n", __func__, group, event);
 
 	ret = fill_event_metadata(group, &fanotify_event_metadata, event, &f);
 	if (ret < 0)
@@ -307,7 +307,7 @@ static ssize_t fanotify_read(struct file *file, char __user *buf,
 	start = buf;
 	group = file->private_data;
 
-	pr_debug("%s: group=%p\n", __func__, group);
+	pr_debug("%s: group=%pK\n", __func__, group);
 
 	while (1) {
 		prepare_to_wait(&group->notification_waitq, &wait, TASK_INTERRUPTIBLE);
@@ -360,7 +360,7 @@ static ssize_t fanotify_write(struct file *file, const char __user *buf, size_t 
 	if (count > sizeof(response))
 		count = sizeof(response);
 
-	pr_debug("%s: group=%p count=%zu\n", __func__, group, count);
+	pr_debug("%s: group=%pK count=%zu\n", __func__, group, count);
 
 	if (copy_from_user(&response, buf, count))
 		return -EFAULT;
@@ -387,7 +387,7 @@ static int fanotify_release(struct inode *ignored, struct file *file)
 	atomic_inc(&group->fanotify_data.bypass_perm);
 
 	list_for_each_entry_safe(re, lre, &group->fanotify_data.access_list, list) {
-		pr_debug("%s: found group=%p re=%p event=%p\n", __func__, group,
+		pr_debug("%s: found group=%pK re=%pK event=%pK\n", __func__, group,
 			 re, re->event);
 
 		list_del_init(&re->list);
@@ -456,7 +456,7 @@ static int fanotify_find_path(int dfd, const char __user *filename,
 {
 	int ret;
 
-	pr_debug("%s: dfd=%d filename=%p flags=%x\n", __func__,
+	pr_debug("%s: dfd=%d filename=%pK flags=%x\n", __func__,
 		 dfd, filename, flags);
 
 	if (filename == NULL) {
@@ -633,7 +633,7 @@ static int fanotify_add_inode_mark(struct fsnotify_group *group,
 	__u32 added;
 	int ret = 0;
 
-	pr_debug("%s: group=%p inode=%p\n", __func__, group, inode);
+	pr_debug("%s: group=%pK inode=%pK\n", __func__, group, inode);
 
 	/*
 	 * If some other task has this inode open for write we should not add
@@ -768,7 +768,7 @@ SYSCALL_DEFINE5(fanotify_mark, int, fanotify_fd, unsigned int, flags,
 	struct path path;
 	int ret;
 
-	pr_debug("%s: fanotify_fd=%d flags=%x dfd=%d pathname=%p mask=%llx\n",
+	pr_debug("%s: fanotify_fd=%d flags=%x dfd=%d pathname=%pK mask=%llx\n",
 		 __func__, fanotify_fd, flags, dfd, pathname, mask);
 
 	/* we only use the lower 32 bits as of right now. */

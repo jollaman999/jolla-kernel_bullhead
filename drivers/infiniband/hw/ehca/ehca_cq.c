@@ -144,7 +144,7 @@ struct ib_cq *ehca_create_cq(struct ib_device *device, int cqe, int comp_vector,
 
 	my_cq = kmem_cache_zalloc(cq_cache, GFP_KERNEL);
 	if (!my_cq) {
-		ehca_err(device, "Out of memory for ehca_cq struct device=%p",
+		ehca_err(device, "Out of memory for ehca_cq struct device=%pK",
 			 device);
 		atomic_dec(&shca->num_cqs);
 		return ERR_PTR(-ENOMEM);
@@ -171,7 +171,7 @@ struct ib_cq *ehca_create_cq(struct ib_device *device, int cqe, int comp_vector,
 
 	if (my_cq->token < 0) {
 		cq = ERR_PTR(-ENOMEM);
-		ehca_err(device, "Can't allocate new idr entry. device=%p",
+		ehca_err(device, "Can't allocate new idr entry. device=%pK",
 			 device);
 		goto create_cq_exit1;
 	}
@@ -185,7 +185,7 @@ struct ib_cq *ehca_create_cq(struct ib_device *device, int cqe, int comp_vector,
 
 	if (h_ret != H_SUCCESS) {
 		ehca_err(device, "hipz_h_alloc_resource_cq() failed "
-			 "h_ret=%lli device=%p", h_ret, device);
+			 "h_ret=%lli device=%pK", h_ret, device);
 		cq = ERR_PTR(ehca2ib_return_code(h_ret));
 		goto create_cq_exit2;
 	}
@@ -193,7 +193,7 @@ struct ib_cq *ehca_create_cq(struct ib_device *device, int cqe, int comp_vector,
 	ipz_rc = ipz_queue_ctor(NULL, &my_cq->ipz_queue, param.act_pages,
 				EHCA_PAGESIZE, sizeof(struct ehca_cqe), 0, 0);
 	if (!ipz_rc) {
-		ehca_err(device, "ipz_queue_ctor() failed ipz_rc=%i device=%p",
+		ehca_err(device, "ipz_queue_ctor() failed ipz_rc=%i device=%pK",
 			 ipz_rc, device);
 		cq = ERR_PTR(-EINVAL);
 		goto create_cq_exit3;
@@ -203,7 +203,7 @@ struct ib_cq *ehca_create_cq(struct ib_device *device, int cqe, int comp_vector,
 		vpage = ipz_qpageit_get_inc(&my_cq->ipz_queue);
 		if (!vpage) {
 			ehca_err(device, "ipz_qpageit_get_inc() "
-				 "returns NULL device=%p", device);
+				 "returns NULL device=%pK", device);
 			cq = ERR_PTR(-EAGAIN);
 			goto create_cq_exit4;
 		}
@@ -221,7 +221,7 @@ struct ib_cq *ehca_create_cq(struct ib_device *device, int cqe, int comp_vector,
 
 		if (h_ret < H_SUCCESS) {
 			ehca_err(device, "hipz_h_register_rpage_cq() failed "
-				 "ehca_cq=%p cq_num=%x h_ret=%lli counter=%i "
+				 "ehca_cq=%pK cq_num=%x h_ret=%lli counter=%i "
 				 "act_pages=%i", my_cq, my_cq->cq_number,
 				 h_ret, counter, param.act_pages);
 			cq = ERR_PTR(-EINVAL);
@@ -232,7 +232,7 @@ struct ib_cq *ehca_create_cq(struct ib_device *device, int cqe, int comp_vector,
 			vpage = ipz_qpageit_get_inc(&my_cq->ipz_queue);
 			if ((h_ret != H_SUCCESS) || vpage) {
 				ehca_err(device, "Registration of pages not "
-					 "complete ehca_cq=%p cq_num=%x "
+					 "complete ehca_cq=%pK cq_num=%x "
 					 "h_ret=%lli", my_cq, my_cq->cq_number,
 					 h_ret);
 				cq = ERR_PTR(-EAGAIN);
@@ -241,7 +241,7 @@ struct ib_cq *ehca_create_cq(struct ib_device *device, int cqe, int comp_vector,
 		} else {
 			if (h_ret != H_PAGE_REGISTERED) {
 				ehca_err(device, "Registration of page failed "
-					 "ehca_cq=%p cq_num=%x h_ret=%lli "
+					 "ehca_cq=%pK cq_num=%x h_ret=%lli "
 					 "counter=%i act_pages=%i",
 					 my_cq, my_cq->cq_number,
 					 h_ret, counter, param.act_pages);
@@ -255,7 +255,7 @@ struct ib_cq *ehca_create_cq(struct ib_device *device, int cqe, int comp_vector,
 
 	gal = my_cq->galpas.kernel;
 	cqx_fec = hipz_galpa_load(gal, CQTEMM_OFFSET(cqx_fec));
-	ehca_dbg(device, "ehca_cq=%p cq_num=%x CQX_FEC=%llx",
+	ehca_dbg(device, "ehca_cq=%pK cq_num=%x CQX_FEC=%llx",
 		 my_cq, my_cq->cq_number, cqx_fec);
 
 	my_cq->ib_cq.cqe = my_cq->nr_of_entries =
@@ -296,7 +296,7 @@ create_cq_exit4:
 create_cq_exit3:
 	h_ret = hipz_h_destroy_cq(adapter_handle, my_cq, 1);
 	if (h_ret != H_SUCCESS)
-		ehca_err(device, "hipz_h_destroy_cq() failed ehca_cq=%p "
+		ehca_err(device, "hipz_h_destroy_cq() failed ehca_cq=%pK "
 			 "cq_num=%x h_ret=%lli", my_cq, my_cq->cq_number, h_ret);
 
 create_cq_exit2:
@@ -345,7 +345,7 @@ int ehca_destroy_cq(struct ib_cq *cq)
 	h_ret = hipz_h_destroy_cq(adapter_handle, my_cq, 0);
 	if (h_ret == H_R_STATE) {
 		/* cq in err: read err data and destroy it forcibly */
-		ehca_dbg(device, "ehca_cq=%p cq_num=%x resource=%llx in err "
+		ehca_dbg(device, "ehca_cq=%pK cq_num=%x resource=%llx in err "
 			 "state. Try to delete it forcibly.",
 			 my_cq, cq_num, my_cq->ipz_cq_handle.handle);
 		ehca_error_data(shca, my_cq, my_cq->ipz_cq_handle.handle);
@@ -356,7 +356,7 @@ int ehca_destroy_cq(struct ib_cq *cq)
 	}
 	if (h_ret != H_SUCCESS) {
 		ehca_err(device, "hipz_h_destroy_cq() failed h_ret=%lli "
-			 "ehca_cq=%p cq_num=%x", h_ret, my_cq, cq_num);
+			 "ehca_cq=%pK cq_num=%x", h_ret, my_cq, cq_num);
 		return ehca2ib_return_code(h_ret);
 	}
 	ipz_queue_dtor(NULL, &my_cq->ipz_queue);

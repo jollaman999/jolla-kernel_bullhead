@@ -585,7 +585,7 @@ static int dma_4u_map_sg(struct device *dev, struct scatterlist *sglist,
 		/* Handle failure */
 		if (unlikely(entry == DMA_ERROR_CODE)) {
 			if (printk_ratelimit())
-				printk(KERN_INFO "iommu_alloc failed, iommu %p paddr %lx"
+				printk(KERN_INFO "iommu_alloc failed, iommu %pK paddr %lx"
 				       " npages %lx\n", iommu, paddr, npages);
 			goto iommu_map_failed;
 		}

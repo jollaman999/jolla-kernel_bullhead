@@ -1066,14 +1066,14 @@ static inline void sk_refcnt_debug_inc(struct sock *sk)
 static inline void sk_refcnt_debug_dec(struct sock *sk)
 {
 	atomic_dec(&sk->sk_prot->socks);
-	printk(KERN_DEBUG "%s socket %p released, %d are still alive\n",
+	printk(KERN_DEBUG "%s socket %pK released, %d are still alive\n",
 	       sk->sk_prot->name, sk, atomic_read(&sk->sk_prot->socks));
 }
 
 static inline void sk_refcnt_debug_release(const struct sock *sk)
 {
 	if (atomic_read(&sk->sk_refcnt) != 1)
-		printk(KERN_DEBUG "Destruction of the %s socket %p delayed, refcnt=%d\n",
+		printk(KERN_DEBUG "Destruction of the %s socket %pK delayed, refcnt=%d\n",
 		       sk->sk_prot->name, sk, atomic_read(&sk->sk_refcnt));
 }
 #else /* SOCK_REFCNT_DEBUG */

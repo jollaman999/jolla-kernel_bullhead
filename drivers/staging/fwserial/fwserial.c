@@ -939,7 +939,7 @@ static void fwserial_destroy(struct kref *kref)
 	mutex_lock(&port_table_lock);
 	for (j = 0; j < num_ports; ++i, ++j) {
 		port_table_corrupt |= port_table[i] != ports[j];
-		WARN_ONCE(port_table_corrupt, "port_table[%d]: %p != ports[%d]: %p",
+		WARN_ONCE(port_table_corrupt, "port_table[%d]: %pK != ports[%d]: %pK",
 		     i, port_table[i], j, ports[j]);
 
 		port_table[i] = NULL;

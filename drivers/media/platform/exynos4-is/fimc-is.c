@@ -218,7 +218,7 @@ static int fimc_is_register_subdevs(struct fimc_is *is)
 				dev_warn(&is->pdev->dev, "DT parse error: %s\n",
 							 child->full_name);
 			}
-			pr_debug("%s(): registered subdev: %p\n",
+			pr_debug("%s(): registered subdev: %pK\n",
 				 __func__, sd->name);
 		}
 	}
@@ -252,7 +252,7 @@ static int fimc_is_load_setfile(struct fimc_is *is, char *file_name)
 	fimc_is_mem_barrier();
 	is->setfile.size = fw->size;
 
-	pr_debug("mem vaddr: %p, setfile buf: %p\n", is->memory.vaddr, buf);
+	pr_debug("mem vaddr: %pK, setfile buf: %pK\n", is->memory.vaddr, buf);
 
 	memcpy(is->fw.setfile_info,
 		fw->data + fw->size - FIMC_IS_SETFILE_INFO_LEN,

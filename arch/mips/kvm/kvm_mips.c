@@ -223,7 +223,7 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
 	unsigned long npages = 0;
 	int i, err = 0;
 
-	kvm_debug("%s: kvm: %p slot: %d, GPA: %llx, size: %llx, QVA: %llx\n",
+	kvm_debug("%s: kvm: %pK slot: %d, GPA: %llx, size: %llx, QVA: %llx\n",
 		  __func__, kvm, mem->slot, mem->guest_phys_addr,
 		  mem->memory_size, mem->userspace_addr);
 
@@ -244,7 +244,7 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
 			}
 
 			kvm_info
-			    ("Allocated space for Guest PMAP Table (%ld pages) @ %p\n",
+			    ("Allocated space for Guest PMAP Table (%ld pages) @ %pK\n",
 			     npages, kvm->arch.guest_pmap);
 
 			/* Now setup the page table */
@@ -290,7 +290,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id)
 	if (err)
 		goto out_free_cpu;
 
-	kvm_info("kvm @ %p: create cpu %d at %p\n", kvm, id, vcpu);
+	kvm_info("kvm @ %pK: create cpu %d at %pK\n", kvm, id, vcpu);
 
 	/* Allocate space for host mode exception handlers that handle
 	 * guest mode exits
@@ -310,7 +310,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id)
 		err = -ENOMEM;
 		goto out_uninit_cpu;
 	}
-	kvm_info("Allocated %d bytes for KVM Exception Handlers @ %p\n",
+	kvm_info("Allocated %d bytes for KVM Exception Handlers @ %pK\n",
 		 ALIGN(size, PAGE_SIZE), gebase);
 
 	/* Save new ebase */
@@ -328,7 +328,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id)
 
 	/* For vectored interrupts poke the exception code @ all offsets 0-7 */
 	for (i = 0; i < 8; i++) {
-		kvm_debug("L1 Vectored handler @ %p\n",
+		kvm_debug("L1 Vectored handler @ %pK\n",
 			  gebase + 0x200 + (i * VECTORSPACING));
 		memcpy(gebase + 0x200 + (i * VECTORSPACING), mips32_exception,
 		       mips32_exceptionEnd - mips32_exception);
@@ -336,7 +336,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id)
 
 	/* General handler, relocate to unmapped space for sanity's sake */
 	offset = 0x2000;
-	kvm_info("Installing KVM Exception handlers @ %p, %#x bytes\n",
+	kvm_info("Installing KVM Exception handlers @ %pK, %#x bytes\n",
 		 gebase + offset,
 		 mips32_GuestExceptionEnd - mips32_GuestException);
 
@@ -363,7 +363,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id)
 		goto out_free_gebase;
 	}
 
-	kvm_info("Allocated COMM page @ %p\n", vcpu->arch.kseg0_commpage);
+	kvm_info("Allocated COMM page @ %pK\n", vcpu->arch.kseg0_commpage);
 	kvm_mips_commpage_init(vcpu);
 
 	/* Init */
@@ -1060,7 +1060,7 @@ int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
 
 	local_irq_enable();
 
-	kvm_debug("kvm_mips_handle_exit: cause: %#x, PC: %p, kvm_run: %p, kvm_vcpu: %p\n",
+	kvm_debug("kvm_mips_handle_exit: cause: %#x, PC: %pK, kvm_run: %pK, kvm_vcpu: %pK\n",
 			cause, opc, run, vcpu);
 
 	/* Do a privilege check, if in UM most of these exit conditions end up
@@ -1077,7 +1077,7 @@ int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
 
 	switch (exccode) {
 	case T_INT:
-		kvm_debug("[%d]T_INT @ %p\n", vcpu->vcpu_id, opc);
+		kvm_debug("[%d]T_INT @ %pK\n", vcpu->vcpu_id, opc);
 
 		++vcpu->stat.int_exits;
 		trace_kvm_exit(vcpu, INT_EXITS);
@@ -1090,7 +1090,7 @@ int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
 		break;
 
 	case T_COP_UNUSABLE:
-		kvm_debug("T_COP_UNUSABLE: @ PC: %p\n", opc);
+		kvm_debug("T_COP_UNUSABLE: @ PC: %pK\n", opc);
 
 		++vcpu->stat.cop_unusable_exits;
 		trace_kvm_exit(vcpu, COP_UNUSABLE_EXITS);
@@ -1109,7 +1109,7 @@ int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
 
 	case T_TLB_ST_MISS:
 		kvm_debug
-		    ("TLB ST fault:  cause %#x, status %#lx, PC: %p, BadVaddr: %#lx\n",
+		    ("TLB ST fault:  cause %#x, status %#lx, PC: %pK, BadVaddr: %#lx\n",
 		     cause, kvm_read_c0_guest_status(vcpu->arch.cop0), opc,
 		     badvaddr);
 
@@ -1119,7 +1119,7 @@ int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
 		break;
 
 	case T_TLB_LD_MISS:
-		kvm_debug("TLB LD fault: cause %#x, PC: %p, BadVaddr: %#lx\n",
+		kvm_debug("TLB LD fault: cause %#x, PC: %pK, BadVaddr: %#lx\n",
 			  cause, opc, badvaddr);
 
 		++vcpu->stat.tlbmiss_ld_exits;
@@ -1159,7 +1159,7 @@ int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
 
 	default:
 		kvm_err
-		    ("Exception Code: %d, not yet handled, @ PC: %p, inst: 0x%08x  BadVaddr: %#lx Status: %#lx\n",
+		    ("Exception Code: %d, not yet handled, @ PC: %pK, inst: 0x%08x  BadVaddr: %#lx Status: %#lx\n",
 		     exccode, opc, kvm_get_inst(opc, vcpu), badvaddr,
 		     kvm_read_c0_guest_status(vcpu->arch.cop0));
 		kvm_arch_vcpu_dump_regs(vcpu);

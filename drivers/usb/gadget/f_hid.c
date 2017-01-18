@@ -75,7 +75,7 @@ static void hacky_device_list_add(struct f_hidg *hidg)
 			return;
 		}
 	}
-	pr_err("%s: too many devices, not adding device %p\n", __func__, hidg);
+	pr_err("%s: too many devices, not adding device %pK\n", __func__, hidg);
 }
 static void hacky_device_list_remove(struct f_hidg *hidg)
 {
@@ -86,7 +86,7 @@ static void hacky_device_list_remove(struct f_hidg *hidg)
 			return;
 		}
 	}
-	pr_err("%s: cannot find device %p\n", __func__, hidg);
+	pr_err("%s: cannot find device %pK\n", __func__, hidg);
 }
 static int hacky_device_list_check(struct f_hidg *hidg)
 {
@@ -216,7 +216,7 @@ static ssize_t f_hidg_read(struct file *file, char __user *buffer,
 		return -EFAULT;
 
 	if (hacky_device_list_check(hidg)) {
-		pr_err("%s: trying to read from device %p that was destroyed\n", __func__, hidg);
+		pr_err("%s: trying to read from device %pK that was destroyed\n", __func__, hidg);
 		return -EIO;
 	}
 
@@ -291,7 +291,7 @@ static ssize_t f_hidg_write(struct file *file, const char __user *buffer,
 		return -EFAULT;
 
 	if (hacky_device_list_check(hidg)) {
-		pr_err("%s: trying to write to device %p that was destroyed\n", __func__, hidg);
+		pr_err("%s: trying to write to device %pK that was destroyed\n", __func__, hidg);
 		return -EIO;
 	}
 
@@ -310,7 +310,7 @@ static ssize_t f_hidg_write(struct file *file, const char __user *buffer,
 			return -ERESTARTSYS;
 
 		if (hacky_device_list_check(hidg)) {
-			pr_err("%s: trying to write to device %p that was destroyed\n", __func__, hidg);
+			pr_err("%s: trying to write to device %pK that was destroyed\n", __func__, hidg);
 			return -EIO;
 		}
 
@@ -355,14 +355,14 @@ static unsigned int f_hidg_poll(struct file *file, poll_table *wait)
 	unsigned int	ret = 0;
 
 	if (hacky_device_list_check(hidg)) {
-		pr_err("%s: trying to poll device %p that was destroyed\n", __func__, hidg);
+		pr_err("%s: trying to poll device %pK that was destroyed\n", __func__, hidg);
 		return -EIO;
 	}
 
 	poll_wait(file, &hidg->read_queue, wait);
 
 	if (hacky_device_list_check(hidg)) {
-		pr_err("%s: trying to poll device %p that was destroyed\n", __func__, hidg);
+		pr_err("%s: trying to poll device %pK that was destroyed\n", __func__, hidg);
 		return -EIO;
 	}
 
@@ -645,7 +645,7 @@ static int hidg_bind(struct usb_configuration *c, struct usb_function *f)
 	int			status;
 	dev_t			dev;
 
-	pr_info("%s: creating device %p\n", __func__, hidg);
+	pr_info("%s: creating device %pK\n", __func__, hidg);
 
 	/* allocate instance-specific interface IDs, and patch descriptors */
 	status = usb_interface_id(c, f);
@@ -732,7 +732,7 @@ static void hidg_unbind(struct usb_configuration *c, struct usb_function *f)
 {
 	struct f_hidg *hidg = func_to_hidg(f);
 
-	pr_info("%s: destroying device %p\n", __func__, hidg);
+	pr_info("%s: destroying device %pK\n", __func__, hidg);
 	/* This does not cover all race conditions, only most common one */
 	mutex_lock(&hidg->lock);
 	hacky_device_list_remove(hidg);

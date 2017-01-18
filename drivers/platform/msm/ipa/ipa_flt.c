@@ -1164,7 +1164,7 @@ static int __ipa_add_global_flt_rule(enum ipa_ip_type ip,
 	struct ipa_flt_tbl *tbl;
 
 	if (rule == NULL || rule_hdl == NULL) {
-		IPAERR("bad parms rule=%p rule_hdl=%p\n", rule, rule_hdl);
+		IPAERR("bad parms rule=%pK rule_hdl=%pK\n", rule, rule_hdl);
 
 		return -EINVAL;
 	}
@@ -1183,7 +1183,7 @@ static int __ipa_add_ep_flt_rule(enum ipa_ip_type ip, enum ipa_client_type ep,
 	int ipa_ep_idx;
 
 	if (rule == NULL || rule_hdl == NULL || ep >= IPA_CLIENT_MAX) {
-		IPAERR("bad parms rule=%p rule_hdl=%p ep=%d\n", rule,
+		IPAERR("bad parms rule=%pK rule_hdl=%pK ep=%d\n", rule,
 				rule_hdl, ep);
 
 		return -EINVAL;

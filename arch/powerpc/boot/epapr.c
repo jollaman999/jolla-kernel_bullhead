@@ -37,7 +37,7 @@ static void platform_fixups(void)
 
 	if (ima_size < (unsigned long)_end)
 		printf("WARNING: Image loaded outside IMA!"
-		       " (_end=%p, ima_size=0x%lx)\n", _end, ima_size);
+		       " (_end=%pK, ima_size=0x%lx)\n", _end, ima_size);
 	if (ima_size < fdt_addr)
 		printf("WARNING: Device tree address is outside IMA!"
 		       "(fdt_addr=0x%lx, ima_size=0x%lx)\n", fdt_addr,

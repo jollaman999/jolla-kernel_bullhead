@@ -1357,11 +1357,11 @@ static int radeon_do_init_cp(struct drm_device *dev, drm_radeon_init_t *init,
 		dev->agp_buffer_map->handle =
 			(void *)(unsigned long)dev->agp_buffer_map->offset;
 
-		DRM_DEBUG("dev_priv->cp_ring->handle %p\n",
+		DRM_DEBUG("dev_priv->cp_ring->handle %pK\n",
 			  dev_priv->cp_ring->handle);
-		DRM_DEBUG("dev_priv->ring_rptr->handle %p\n",
+		DRM_DEBUG("dev_priv->ring_rptr->handle %pK\n",
 			  dev_priv->ring_rptr->handle);
-		DRM_DEBUG("dev->agp_buffer_map->handle %p\n",
+		DRM_DEBUG("dev->agp_buffer_map->handle %pK\n",
 			  dev->agp_buffer_map->handle);
 	}
 
@@ -1486,7 +1486,7 @@ static int radeon_do_init_cp(struct drm_device *dev, drm_radeon_init_t *init,
 			dev_priv->gart_info.gart_table_location =
 			    DRM_ATI_GART_FB;
 
-			DRM_DEBUG("Setting phys_pci_gart to %p %08lX\n",
+			DRM_DEBUG("Setting phys_pci_gart to %pK %08lX\n",
 				  dev_priv->gart_info.addr,
 				  dev_priv->pcigart_offset);
 		} else {

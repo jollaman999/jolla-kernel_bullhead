@@ -39,7 +39,7 @@ static struct fscache_object *cachefiles_alloc_object(
 
 	cache = container_of(_cache, struct cachefiles_cache, cache);
 
-	_enter("{%s},%p,", cache->cache.identifier, cookie);
+	_enter("{%s},%pK,", cache->cache.identifier, cookie);
 
 	lookup_data = kmalloc(sizeof(*lookup_data), cachefiles_gfp);
 	if (!lookup_data)
@@ -96,7 +96,7 @@ static struct fscache_object *cachefiles_alloc_object(
 	lookup_data->key = key;
 	object->lookup_data = lookup_data;
 
-	_leave(" = %p [%p]", &object->fscache, lookup_data);
+	_leave(" = %pK [%pK]", &object->fscache, lookup_data);
 	return &object->fscache;
 
 nomem_key:
@@ -166,7 +166,7 @@ static void cachefiles_lookup_complete(struct fscache_object *_object)
 
 	object = container_of(_object, struct cachefiles_object, fscache);
 
-	_enter("{OBJ%x,%p}", object->fscache.debug_id, object->lookup_data);
+	_enter("{OBJ%x,%pK}", object->fscache.debug_id, object->lookup_data);
 
 	if (object->lookup_data) {
 		kfree(object->lookup_data->key);
@@ -351,7 +351,7 @@ static void cachefiles_sync_cache(struct fscache_cache *_cache)
 	const struct cred *saved_cred;
 	int ret;
 
-	_enter("%p", _cache);
+	_enter("%pK", _cache);
 
 	cache = container_of(_cache, struct cachefiles_cache, cache);
 

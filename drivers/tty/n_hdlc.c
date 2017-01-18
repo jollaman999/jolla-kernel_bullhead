@@ -412,7 +412,7 @@ static void n_hdlc_send_frames(struct n_hdlc *n_hdlc, struct tty_struct *tty)
 		
 	while (tbuf) {
 		if (debuglevel >= DEBUG_LEVEL_INFO)	
-			printk("%s(%d)sending frame %p, count=%d\n",
+			printk("%s(%d)sending frame %pK, count=%d\n",
 				__FILE__,__LINE__,tbuf,tbuf->count);
 			
 		/* Send the next block of data to device */
@@ -431,7 +431,7 @@ static void n_hdlc_send_frames(struct n_hdlc *n_hdlc, struct tty_struct *tty)
 		
 		if (actual == tbuf->count) {
 			if (debuglevel >= DEBUG_LEVEL_INFO)	
-				printk("%s(%d)frame %p completed\n",
+				printk("%s(%d)frame %pK completed\n",
 					__FILE__,__LINE__,tbuf);
 					
 			/* free current transmit buffer */
@@ -447,7 +447,7 @@ static void n_hdlc_send_frames(struct n_hdlc *n_hdlc, struct tty_struct *tty)
 			tbuf = n_hdlc_buf_get(&n_hdlc->tx_buf_list);
 		} else {
 			if (debuglevel >= DEBUG_LEVEL_INFO)	
-				printk("%s(%d)frame %p pending\n",
+				printk("%s(%d)frame %pK pending\n",
 					__FILE__,__LINE__,tbuf);
 					
 			/* buffer not accepted by driver */
@@ -706,7 +706,7 @@ static ssize_t n_hdlc_tty_write(struct tty_struct *tty, struct file *file,
 		n_hdlc = tty2n_hdlc (tty);
 		if (!n_hdlc || n_hdlc->magic != HDLC_MAGIC || 
 		    tty != n_hdlc->tty) {
-			printk("n_hdlc_tty_write: %p invalid after wait!\n", n_hdlc);
+			printk("n_hdlc_tty_write: %pK invalid after wait!\n", n_hdlc);
 			error = -EIO;
 			break;
 		}

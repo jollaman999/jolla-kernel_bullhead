@@ -421,7 +421,7 @@ u64 hipz_h_query_hca(const struct ipz_adapter_handle adapter_handle,
 	u64 r_cb = __pa(query_hca_rblock);
 
 	if (r_cb & (EHCA_PAGESIZE-1)) {
-		ehca_gen_err("response_block=%p not page aligned",
+		ehca_gen_err("response_block=%pK not page aligned",
 			     query_hca_rblock);
 		return H_PARAMETER;
 	}
@@ -769,16 +769,16 @@ u64 hipz_h_register_rpage_mr(const struct ipz_adapter_handle adapter_handle,
 			int i;
 			kpage = __va(logical_address_of_page);
 			for (i = 0; i < count; i++)
-				ehca_gen_dbg("kpage[%d]=%p",
+				ehca_gen_dbg("kpage[%d]=%pK",
 					     i, (void *)kpage[i]);
 		} else
-			ehca_gen_dbg("kpage=%p",
+			ehca_gen_dbg("kpage=%pK",
 				     (void *)logical_address_of_page);
 	}
 
 	if ((count > 1) && (logical_address_of_page & (EHCA_PAGESIZE-1))) {
 		ehca_gen_err("logical_address_of_page not on a 4k boundary "
-			     "adapter_handle=%llx mr=%p mr_handle=%llx "
+			     "adapter_handle=%llx mr=%pK mr_handle=%llx "
 			     "pagesize=%x queue_type=%x "
 			     "logical_address_of_page=%llx count=%llx",
 			     adapter_handle.handle, mr,

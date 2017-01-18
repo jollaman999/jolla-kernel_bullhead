@@ -104,7 +104,7 @@ void oz_elt_info_free(struct oz_elt_buf *buf, struct oz_elt_info *ei)
 			buf->elt_pool = &ei->link;
 			ei->magic = OZ_ELT_INFO_MAGIC_FREE;
 		} else {
-			oz_trace("oz_elt_info_free: bad magic ei: %p"
+			oz_trace("oz_elt_info_free: bad magic ei: %pK"
 				" magic: 0x%x\n",
 				ei, ei->magic);
 		}

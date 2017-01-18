@@ -132,7 +132,7 @@ acpi_ex_get_object_reference(union acpi_operand_object *obj_desc,
 	*return_desc = reference_obj;
 
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-			  "Object %p Type [%s], returning Reference %p\n",
+			  "Object %pK Type [%s], returning Reference %pK\n",
 			  obj_desc, acpi_ut_get_object_type_name(obj_desc),
 			  *return_desc));
 

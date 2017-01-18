@@ -151,7 +151,7 @@ mptscsih_getFreeChainBuffer(MPT_ADAPTER *ioc, int *retIndex)
 		chain_idx = offset / ioc->req_sz;
 		rc = SUCCESS;
 		dsgprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		    "getFreeChainBuffer chainBuf=%p ChainBuffer=%p offset=%d chain_idx=%d\n",
+		    "getFreeChainBuffer chainBuf=%pK ChainBuffer=%pK offset=%d chain_idx=%d\n",
 		    ioc->name, chainBuf, ioc->ChainBuffer, offset, chain_idx));
 	} else {
 		rc = FAILED;
@@ -346,7 +346,7 @@ nextSGEset:
 		 */
 		if ((mptscsih_getFreeChainBuffer(ioc, &newIndex)) == FAILED) {
 			dfailprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-			    "getFreeChainBuffer FAILED SCSI cmd=%02x (%p)\n",
+			    "getFreeChainBuffer FAILED SCSI cmd=%02x (%pK)\n",
  			    ioc->name, pReq->CDB[0], SCpnt));
 			return FAILED;
 		}
@@ -367,7 +367,7 @@ nextSGEset:
 		 *   out the Address and Flags fields.
 		 */
 		chainSge = (char *) psge;
-		dsgprintk(ioc, printk(MYIOC_s_DEBUG_FMT "  Current buff @ %p (index 0x%x)",
+		dsgprintk(ioc, printk(MYIOC_s_DEBUG_FMT "  Current buff @ %pK (index 0x%x)",
 		    ioc->name, psge, req_idx));
 
 		/* Start the SGE for the next buffer
@@ -376,7 +376,7 @@ nextSGEset:
 		sgeOffset = 0;
 		sg_done = 0;
 
-		dsgprintk(ioc, printk(MYIOC_s_DEBUG_FMT "  Chain buff @ %p (index 0x%x)\n",
+		dsgprintk(ioc, printk(MYIOC_s_DEBUG_FMT "  Chain buff @ %pK (index 0x%x)\n",
 		    ioc->name, psge, chain_idx));
 
 		/* Start the SGE for the next buffer
@@ -646,11 +646,11 @@ mptscsih_io_done(MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf, MPT_FRAME_HDR *mr)
 
 	if((ioc->facts.MsgVersion >= MPI_VERSION_01_05) && pScsiReply){
 		dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-			"ScsiDone (mf=%p,mr=%p,sc=%p,idx=%d,task-tag=%d)\n",
+			"ScsiDone (mf=%pK,mr=%pK,sc=%pK,idx=%d,task-tag=%d)\n",
 			ioc->name, mf, mr, sc, req_idx, pScsiReply->TaskTag));
 	}else{
 		dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-			"ScsiDone (mf=%p,mr=%p,sc=%p,idx=%d)\n",
+			"ScsiDone (mf=%pK,mr=%pK,sc=%pK,idx=%d)\n",
 			ioc->name, mf, mr, sc, req_idx));
 	}
 
@@ -1052,7 +1052,7 @@ mptscsih_flush_running_cmds(MPT_SCSI_HOST *hd)
 		sc->result = DID_RESET << 16;
 		sc->host_scribble = NULL;
 		dtmprintk(ioc, sdev_printk(KERN_INFO, sc->device, MYIOC_s_FMT
-		    "completing cmds: fw_channel %d, fw_id %d, sc=%p, mf = %p, "
+		    "completing cmds: fw_channel %d, fw_id %d, sc=%pK, mf = %pK, "
 		    "idx=%x\n", ioc->name, channel, id, sc, mf, ii));
 		sc->scsi_done(sc);
 	}
@@ -1115,7 +1115,7 @@ mptscsih_search_running_cmds(MPT_SCSI_HOST *hd, VirtDevice *vdevice)
 			sc->result = DID_NO_CONNECT << 16;
 			dtmprintk(ioc, sdev_printk(KERN_INFO, sc->device,
 			   MYIOC_s_FMT "completing cmds: fw_channel %d, "
-			   "fw_id %d, sc=%p, mf = %p, idx=%x\n", ioc->name,
+			   "fw_id %d, sc=%pK, mf = %pK, idx=%x\n", ioc->name,
 			   vdevice->vtarget->channel, vdevice->vtarget->id,
 			   sc, mf, ii));
 			sc->scsi_done(sc);
@@ -1331,7 +1331,7 @@ mptscsih_qcmd(struct scsi_cmnd *SCpnt, void (*done)(struct scsi_cmnd *))
 	ioc = hd->ioc;
 	SCpnt->scsi_done = done;
 
-	dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT "qcmd: SCpnt=%p, done()=%p\n",
+	dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT "qcmd: SCpnt=%pK, done()=%pK\n",
 		ioc->name, SCpnt, done));
 
 	if (ioc->taskmgmt_quiesce_io)
@@ -1434,7 +1434,7 @@ mptscsih_qcmd(struct scsi_cmnd *SCpnt, void (*done)(struct scsi_cmnd *))
 	mptscsih_set_scsi_lookup(ioc, my_idx, SCpnt);
 
 	mpt_put_msg_frame(ioc->DoneCtx, ioc, mf);
-	dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Issued SCSI cmd (%p) mf=%p idx=%d\n",
+	dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Issued SCSI cmd (%pK) mf=%pK idx=%d\n",
 			ioc->name, SCpnt, mf, my_idx));
 	DBG_DUMP_REQUEST_FRAME(ioc, (u32 *)mf);
 	return 0;
@@ -1578,7 +1578,7 @@ mptscsih_IssueTaskMgmt(MPT_SCSI_HOST *hd, u8 type, u8 channel, u8 id, int lun,
 		mpt_clear_taskmgmt_in_progress_flag(ioc);
 		goto out;
 	}
-	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "TaskMgmt request (mf=%p)\n",
+	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "TaskMgmt request (mf=%pK)\n",
 			ioc->name, mf));
 
 	/* Format the Request
@@ -1618,7 +1618,7 @@ mptscsih_IssueTaskMgmt(MPT_SCSI_HOST *hd, u8 type, u8 channel, u8 id, int lun,
 			sizeof(SCSITaskMgmt_t), (u32*)pScsiTm, CAN_SLEEP);
 		if (retval) {
 			dfailprintk(ioc, printk(MYIOC_s_ERR_FMT
-				"TaskMgmt handshake FAILED!(mf=%p, rc=%d) \n",
+				"TaskMgmt handshake FAILED!(mf=%pK, rc=%d) \n",
 				ioc->name, mf, retval));
 			mpt_free_msg_frame(ioc, mf);
 			mpt_clear_taskmgmt_in_progress_flag(ioc);
@@ -1631,7 +1631,7 @@ mptscsih_IssueTaskMgmt(MPT_SCSI_HOST *hd, u8 type, u8 channel, u8 id, int lun,
 	if (!(ioc->taskmgmt_cmds.status & MPT_MGMT_STATUS_COMMAND_GOOD)) {
 		retval = FAILED;
 		dtmprintk(ioc, printk(MYIOC_s_ERR_FMT
-		    "TaskMgmt TIMED OUT!(mf=%p)\n", ioc->name, mf));
+		    "TaskMgmt TIMED OUT!(mf=%pK)\n", ioc->name, mf));
 		mpt_clear_taskmgmt_in_progress_flag(ioc);
 		if (ioc->taskmgmt_cmds.status & MPT_MGMT_STATUS_DID_IOCRESET)
 			goto out;
@@ -1705,19 +1705,19 @@ mptscsih_abort(struct scsi_cmnd * SCpnt)
 		SCpnt->result = DID_RESET << 16;
 		SCpnt->scsi_done(SCpnt);
 		printk(KERN_ERR MYNAM ": task abort: "
-		    "can't locate host! (sc=%p)\n", SCpnt);
+		    "can't locate host! (sc=%pK)\n", SCpnt);
 		return FAILED;
 	}
 
 	ioc = hd->ioc;
-	printk(MYIOC_s_INFO_FMT "attempting task abort! (sc=%p)\n",
+	printk(MYIOC_s_INFO_FMT "attempting task abort! (sc=%pK)\n",
 	       ioc->name, SCpnt);
 	scsi_print_command(SCpnt);
 
 	vdevice = SCpnt->device->hostdata;
 	if (!vdevice || !vdevice->vtarget) {
 		dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		    "task abort: device has been deleted (sc=%p)\n",
+		    "task abort: device has been deleted (sc=%pK)\n",
 		    ioc->name, SCpnt));
 		SCpnt->result = DID_NO_CONNECT << 16;
 		SCpnt->scsi_done(SCpnt);
@@ -1729,7 +1729,7 @@ mptscsih_abort(struct scsi_cmnd * SCpnt)
 	 */
 	if (vdevice->vtarget->tflags & MPT_TARGET_FLAGS_RAID_COMPONENT) {
 		dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		    "task abort: hidden raid component (sc=%p)\n",
+		    "task abort: hidden raid component (sc=%pK)\n",
 		    ioc->name, SCpnt));
 		SCpnt->result = DID_RESET << 16;
 		retval = FAILED;
@@ -1740,7 +1740,7 @@ mptscsih_abort(struct scsi_cmnd * SCpnt)
 	 */
 	if (vdevice->vtarget->raidVolume) {
 		dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		    "task abort: raid volume (sc=%p)\n",
+		    "task abort: raid volume (sc=%pK)\n",
 		    ioc->name, SCpnt));
 		SCpnt->result = DID_RESET << 16;
 		retval = FAILED;
@@ -1755,7 +1755,7 @@ mptscsih_abort(struct scsi_cmnd * SCpnt)
 		 */
 		SCpnt->result = DID_RESET << 16;
 		dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "task abort: "
-		   "Command not in the active list! (sc=%p)\n", ioc->name,
+		   "Command not in the active list! (sc=%pK)\n", ioc->name,
 		   SCpnt));
 		retval = SUCCESS;
 		goto out;
@@ -1784,18 +1784,18 @@ mptscsih_abort(struct scsi_cmnd * SCpnt)
 
 	if (SCPNT_TO_LOOKUP_IDX(ioc, SCpnt) == scpnt_idx) {
 		dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		    "task abort: command still in active list! (sc=%p)\n",
+		    "task abort: command still in active list! (sc=%pK)\n",
 		    ioc->name, SCpnt));
 		retval = FAILED;
 	} else {
 		dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		    "task abort: command cleared from active list! (sc=%p)\n",
+		    "task abort: command cleared from active list! (sc=%pK)\n",
 		    ioc->name, SCpnt));
 		retval = SUCCESS;
 	}
 
  out:
-	printk(MYIOC_s_INFO_FMT "task abort: %s (rv=%04x) (sc=%p)\n",
+	printk(MYIOC_s_INFO_FMT "task abort: %s (rv=%04x) (sc=%pK)\n",
 	    ioc->name, ((retval == SUCCESS) ? "SUCCESS" : "FAILED"), retval,
 	    SCpnt);
 
@@ -1823,12 +1823,12 @@ mptscsih_dev_reset(struct scsi_cmnd * SCpnt)
 	 */
 	if ((hd = shost_priv(SCpnt->device->host)) == NULL){
 		printk(KERN_ERR MYNAM ": target reset: "
-		   "Can't locate host! (sc=%p)\n", SCpnt);
+		   "Can't locate host! (sc=%pK)\n", SCpnt);
 		return FAILED;
 	}
 
 	ioc = hd->ioc;
-	printk(MYIOC_s_INFO_FMT "attempting target reset! (sc=%p)\n",
+	printk(MYIOC_s_INFO_FMT "attempting target reset! (sc=%pK)\n",
 	       ioc->name, SCpnt);
 	scsi_print_command(SCpnt);
 
@@ -1852,7 +1852,7 @@ mptscsih_dev_reset(struct scsi_cmnd * SCpnt)
 				mptscsih_get_tm_timeout(ioc));
 
  out:
-	printk (MYIOC_s_INFO_FMT "target reset: %s (sc=%p)\n",
+	printk (MYIOC_s_INFO_FMT "target reset: %s (sc=%pK)\n",
 	    ioc->name, ((retval == 0) ? "SUCCESS" : "FAILED" ), SCpnt);
 
 	if (retval == 0)
@@ -1883,12 +1883,12 @@ mptscsih_bus_reset(struct scsi_cmnd * SCpnt)
 	 */
 	if ((hd = shost_priv(SCpnt->device->host)) == NULL){
 		printk(KERN_ERR MYNAM ": bus reset: "
-		   "Can't locate host! (sc=%p)\n", SCpnt);
+		   "Can't locate host! (sc=%pK)\n", SCpnt);
 		return FAILED;
 	}
 
 	ioc = hd->ioc;
-	printk(MYIOC_s_INFO_FMT "attempting bus reset! (sc=%p)\n",
+	printk(MYIOC_s_INFO_FMT "attempting bus reset! (sc=%pK)\n",
 	       ioc->name, SCpnt);
 	scsi_print_command(SCpnt);
 
@@ -1903,7 +1903,7 @@ mptscsih_bus_reset(struct scsi_cmnd * SCpnt)
 					vdevice->vtarget->channel, 0, 0, 0,
 					mptscsih_get_tm_timeout(ioc));
 
-	printk(MYIOC_s_INFO_FMT "bus reset: %s (sc=%p)\n",
+	printk(MYIOC_s_INFO_FMT "bus reset: %s (sc=%pK)\n",
 	    ioc->name, ((retval == 0) ? "SUCCESS" : "FAILED" ), SCpnt);
 
 	if (retval == 0)
@@ -1932,7 +1932,7 @@ mptscsih_host_reset(struct scsi_cmnd *SCpnt)
 	/*  If we can't locate the host to reset, then we failed. */
 	if ((hd = shost_priv(SCpnt->device->host)) == NULL){
 		printk(KERN_ERR MYNAM ": host reset: "
-		    "Can't locate host! (sc=%p)\n", SCpnt);
+		    "Can't locate host! (sc=%pK)\n", SCpnt);
 		return FAILED;
 	}
 
@@ -1940,7 +1940,7 @@ mptscsih_host_reset(struct scsi_cmnd *SCpnt)
 	mptscsih_flush_running_cmds(hd);
 
 	ioc = hd->ioc;
-	printk(MYIOC_s_INFO_FMT "attempting host reset! (sc=%p)\n",
+	printk(MYIOC_s_INFO_FMT "attempting host reset! (sc=%pK)\n",
 	    ioc->name, SCpnt);
 
 	/*  If our attempts to reset the host failed, then return a failed
@@ -1952,7 +1952,7 @@ mptscsih_host_reset(struct scsi_cmnd *SCpnt)
 	else
 		status = SUCCESS;
 
-	printk(MYIOC_s_INFO_FMT "host reset: %s (sc=%p)\n",
+	printk(MYIOC_s_INFO_FMT "host reset: %s (sc=%pK)\n",
 	    ioc->name, ((retval == 0) ? "SUCCESS" : "FAILED" ), SCpnt);
 
 	return status;
@@ -2065,7 +2065,7 @@ mptscsih_taskmgmt_complete(MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf,
 	MPT_FRAME_HDR *mr)
 {
 	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		"TaskMgmt completed (mf=%p, mr=%p)\n", ioc->name, mf, mr));
+		"TaskMgmt completed (mf=%pK, mr=%pK)\n", ioc->name, mf, mr));
 
 	ioc->taskmgmt_cmds.status |= MPT_MGMT_STATUS_COMMAND_GOOD;
 
@@ -2382,7 +2382,7 @@ mptscsih_slave_configure(struct scsi_device *sdev)
 	vdevice = sdev->hostdata;
 
 	dsprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		"device @ %p, channel=%d, id=%d, lun=%d\n",
+		"device @ %pK, channel=%d, id=%d, lun=%d\n",
 		ioc->name, sdev, sdev->channel, sdev->id, sdev->lun));
 	if (ioc->bus_type == SPI)
 		dsprintk(ioc, printk(MYIOC_s_DEBUG_FMT

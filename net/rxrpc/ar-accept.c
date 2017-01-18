@@ -236,7 +236,7 @@ process_next_packet:
 		return;
 	}
 
-	_net("incoming call skb %p", skb);
+	_net("incoming call skb %pK", skb);
 
 	sp = rxrpc_skb(skb);
 
@@ -386,20 +386,20 @@ struct rxrpc_call *rxrpc_accept_call(struct rxrpc_sock *rx,
 	rxrpc_get_call(call);
 	write_unlock_bh(&call->state_lock);
 	write_unlock(&rx->call_lock);
-	_leave(" = %p{%d}", call, call->debug_id);
+	_leave(" = %pK{%d}", call, call->debug_id);
 	return call;
 
 	/* if the call is already dying or dead, then we leave the socket's ref
 	 * on it to be released by rxrpc_dead_call_expired() as induced by
 	 * rxrpc_release_call() */
 out_release:
-	_debug("release %p", call);
+	_debug("release %pK", call);
 	if (!test_bit(RXRPC_CALL_RELEASED, &call->flags) &&
 	    !test_and_set_bit(RXRPC_CALL_RELEASE, &call->events))
 		rxrpc_queue_call(call);
 out_discard:
 	write_unlock_bh(&call->state_lock);
-	_debug("discard %p", call);
+	_debug("discard %pK", call);
 out:
 	write_unlock(&rx->call_lock);
 	_leave(" = %d", ret);
@@ -456,13 +456,13 @@ int rxrpc_reject_call(struct rxrpc_sock *rx)
 	 * on it to be released by rxrpc_dead_call_expired() as induced by
 	 * rxrpc_release_call() */
 out_release:
-	_debug("release %p", call);
+	_debug("release %pK", call);
 	if (!test_bit(RXRPC_CALL_RELEASED, &call->flags) &&
 	    !test_and_set_bit(RXRPC_CALL_RELEASE, &call->events))
 		rxrpc_queue_call(call);
 out_discard:
 	write_unlock_bh(&call->state_lock);
-	_debug("discard %p", call);
+	_debug("discard %pK", call);
 out:
 	write_unlock(&rx->call_lock);
 	_leave(" = %d", ret);
@@ -484,7 +484,7 @@ struct rxrpc_call *rxrpc_kernel_accept_call(struct socket *sock,
 
 	_enter(",%lx", user_call_ID);
 	call = rxrpc_accept_call(rxrpc_sk(sock->sk), user_call_ID);
-	_leave(" = %p", call);
+	_leave(" = %pK", call);
 	return call;
 }
 

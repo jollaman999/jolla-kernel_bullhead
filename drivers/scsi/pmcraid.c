@@ -2141,7 +2141,7 @@ static void pmcraid_ioa_reset(struct pmcraid_cmd *cmd)
 		pinstance->reset_cmd = cmd;
 	}
 
-	pmcraid_info("reset_engine: state = %d, command = %p\n",
+	pmcraid_info("reset_engine: state = %d, command = %pK\n",
 		      pinstance->ioa_state, cmd);
 
 	switch (pinstance->ioa_state) {

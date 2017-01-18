@@ -1808,7 +1808,7 @@ int wl1271_acx_set_rx_filter(struct wl1271 *wl, u8 index, bool enable,
 	WARN_ON(index >= WL1271_MAX_RX_FILTERS);
 
 	wl1271_debug(DEBUG_ACX,
-		     "acx set rx filter idx: %d enable: %d filter: %p",
+		     "acx set rx filter idx: %d enable: %d filter: %pK",
 		     index, enable, filter);
 
 	if (enable) {

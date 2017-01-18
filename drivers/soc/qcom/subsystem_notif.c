@@ -197,7 +197,7 @@ static int subsys_notifier_test_call(struct notifier_block *this,
 	switch (code) {
 
 	default:
-		printk(KERN_WARNING "%s: Notification %s from subsystem %p\n",
+		printk(KERN_WARNING "%s: Notification %s from subsystem %pK\n",
 			__func__, notif_to_string(code), data);
 	break;
 
@@ -213,7 +213,7 @@ static struct notifier_block nb = {
 static void subsys_notif_reg_test_notifier(const char *subsys_name)
 {
 	void *handle = subsys_notif_register_notifier(subsys_name, &nb);
-	printk(KERN_WARNING "%s: Registered test notifier, handle=%p",
+	printk(KERN_WARNING "%s: Registered test notifier, handle=%pK",
 			__func__, handle);
 }
 #endif

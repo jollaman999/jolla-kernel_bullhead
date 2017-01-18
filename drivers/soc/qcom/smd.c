@@ -1882,7 +1882,7 @@ int smd_named_open_on_edge(const char *name, uint32_t edge,
 		return -EPROBE_DEFER;
 	}
 
-	SMD_DBG("smd_open('%s', %p, %p)\n", name, priv, notify);
+	SMD_DBG("smd_open('%s', %pK, %pK)\n", name, priv, notify);
 
 	ch = smd_get_channel(name, edge);
 	if (!ch) {
@@ -3189,7 +3189,7 @@ static __init int modem_restart_late_init(void)
 	for (i = 0; i < ARRAY_SIZE(restart_notifiers); i++) {
 		nb = &restart_notifiers[i];
 		handle = subsys_notif_register_notifier(nb->name, &nb->nb);
-		SMD_DBG("%s: registering notif for '%s', handle=%p\n",
+		SMD_DBG("%s: registering notif for '%s', handle=%pK\n",
 				__func__, nb->name, handle);
 	}
 

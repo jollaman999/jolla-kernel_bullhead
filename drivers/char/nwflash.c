@@ -126,7 +126,7 @@ static ssize_t flash_read(struct file *file, char __user *buf, size_t size,
 
 	if (flashdebug)
 		printk(KERN_DEBUG "flash_read: flash_read: offset=0x%llx, "
-		       "buffer=%p, count=0x%zx.\n", *ppos, buf, size);
+		       "buffer=%pK, count=0x%zx.\n", *ppos, buf, size);
 	/*
 	 * We now lock against reads and writes. --rmk
 	 */
@@ -149,7 +149,7 @@ static ssize_t flash_write(struct file *file, const char __user *buf,
 	int i, j;
 
 	if (flashdebug)
-		printk("flash_write: offset=0x%lX, buffer=0x%p, count=0x%X.\n",
+		printk("flash_write: offset=0x%lX, buffer=0x%pK, count=0x%X.\n",
 		       p, buf, count);
 
 	if (!gbWriteEnable)
@@ -216,7 +216,7 @@ static ssize_t flash_write(struct file *file, const char __user *buf,
 		}
 		if (flashdebug)
 			printk(KERN_DEBUG "flash_write: writing offset %lX, "
-			       "from buf %p, bytes left %X.\n", p, buf,
+			       "from buf %pK, bytes left %X.\n", p, buf,
 			       count - written);
 
 		/*
@@ -391,7 +391,7 @@ static int erase_block(int nBlock)
 	 * check if erase errors were reported
 	 */
 	if (c1 & 0x20) {
-		printk(KERN_ERR "flash_erase: err at %p\n", pWritePtr);
+		printk(KERN_ERR "flash_erase: err at %pK\n", pWritePtr);
 
 		/*
 		 * reset error
@@ -409,7 +409,7 @@ static int erase_block(int nBlock)
 
 	for (temp = 0; temp < 16 * 1024; temp++, pWritePtr += 4) {
 		if ((temp1 = *(volatile unsigned int *) pWritePtr) != 0xFFFFFFFF) {
-			printk(KERN_ERR "flash_erase: verify err at %p = %X\n",
+			printk(KERN_ERR "flash_erase: verify err at %pK = %X\n",
 			       pWritePtr, temp1);
 			return -1;
 		}

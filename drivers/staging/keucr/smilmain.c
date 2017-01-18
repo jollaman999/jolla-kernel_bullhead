@@ -103,7 +103,7 @@ int SM_FreeMem(void)
 	{
 		if (Log2Phy[i]!=NULL)
 		{
-			pr_info("Free Zone = %x, Addr = %p\n", i, Log2Phy[i]);
+			pr_info("Free Zone = %x, Addr = %pK\n", i, Log2Phy[i]);
 			kfree(Log2Phy[i]);
 			Log2Phy[i] = NULL;
 		}

@@ -68,7 +68,7 @@ int main(void)
 		exit(1);
 	}
 
-	printf("Returned address is %p\n", addr);
+	printf("Returned address is %pK\n", addr);
 	check_bytes(addr);
 	write_bytes(addr);
 	ret = read_bytes(addr);

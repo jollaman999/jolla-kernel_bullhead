@@ -264,10 +264,10 @@ static void dump_command_io(struct ngene *dev)
 	printk(KERN_ERR "ngene_to_host (%04x): %*ph\n", NGENE_TO_HOST, 8, buf);
 
 	b = dev->hosttongene;
-	printk(KERN_ERR "dev->hosttongene (%p): %*ph\n", b, 8, b);
+	printk(KERN_ERR "dev->hosttongene (%pK): %*ph\n", b, 8, b);
 
 	b = dev->ngenetohost;
-	printk(KERN_ERR "dev->ngenetohost (%p): %*ph\n", b, 8, b);
+	printk(KERN_ERR "dev->ngenetohost (%pK): %*ph\n", b, 8, b);
 }
 
 static int ngene_command_mutex(struct ngene *dev, struct ngene_command *com)

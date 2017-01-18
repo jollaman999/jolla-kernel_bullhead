@@ -220,16 +220,16 @@ restart:
 	while (n) {
 		rsv = rb_entry(n, struct ext3_reserve_window_node, rsv_node);
 		if (verbose)
-			printk("reservation window 0x%p "
+			printk("reservation window 0x%pK "
 			       "start:  %lu, end:  %lu\n",
 			       rsv, rsv->rsv_start, rsv->rsv_end);
 		if (rsv->rsv_start && rsv->rsv_start >= rsv->rsv_end) {
-			printk("Bad reservation %p (start >= end)\n",
+			printk("Bad reservation %pK (start >= end)\n",
 			       rsv);
 			bad = 1;
 		}
 		if (prev && prev->rsv_end >= rsv->rsv_start) {
-			printk("Bad reservation %p (prev->end >= start)\n",
+			printk("Bad reservation %pK (prev->end >= start)\n",
 			       rsv);
 			bad = 1;
 		}
@@ -1708,7 +1708,7 @@ allocated:
 	if (ret_block + num - 1 >= le32_to_cpu(es->s_blocks_count)) {
 		ext3_error(sb, "ext3_new_block",
 			    "block("E3FSBLK") >= blocks count(%d) - "
-			    "block_group = %d, es == %p ", ret_block,
+			    "block_group = %d, es == %pK ", ret_block,
 			le32_to_cpu(es->s_blocks_count), group_no, es);
 		goto out;
 	}

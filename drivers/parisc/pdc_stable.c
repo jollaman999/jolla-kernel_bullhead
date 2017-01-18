@@ -158,7 +158,7 @@ pdcspath_fetch(struct pdcspath_entry *entry)
 
 	devpath = &entry->devpath;
 	
-	DPRINTK("%s: fetch: 0x%p, 0x%p, addr: 0x%lx\n", __func__,
+	DPRINTK("%s: fetch: 0x%pK, 0x%pK, addr: 0x%lx\n", __func__,
 			entry, devpath, entry->addr);
 
 	/* addr, devpath and count must be word aligned */
@@ -172,7 +172,7 @@ pdcspath_fetch(struct pdcspath_entry *entry)
 
 	entry->ready = 1;
 	
-	DPRINTK("%s: device: 0x%p\n", __func__, entry->dev);
+	DPRINTK("%s: device: 0x%pK\n", __func__, entry->dev);
 	
 	return 0;
 }
@@ -208,7 +208,7 @@ pdcspath_store(struct pdcspath_entry *entry)
 	}
 	/* else, we expect the provided hwpath to be valid. */
 	
-	DPRINTK("%s: store: 0x%p, 0x%p, addr: 0x%lx\n", __func__,
+	DPRINTK("%s: store: 0x%pK, 0x%pK, addr: 0x%lx\n", __func__,
 			entry, devpath, entry->addr);
 
 	/* addr, devpath and count must be word aligned */
@@ -220,7 +220,7 @@ pdcspath_store(struct pdcspath_entry *entry)
 	/* kobject is already registered */
 	entry->ready = 2;
 	
-	DPRINTK("%s: device: 0x%p\n", __func__, entry->dev);
+	DPRINTK("%s: device: 0x%pK\n", __func__, entry->dev);
 }
 
 /**

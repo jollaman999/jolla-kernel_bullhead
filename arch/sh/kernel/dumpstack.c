@@ -46,7 +46,7 @@ void dump_mem(const char *str, unsigned long bottom, unsigned long top)
 
 void printk_address(unsigned long address, int reliable)
 {
-	printk(" [<%p>] %s%pS\n", (void *) address,
+	printk(" [<%pK>] %s%pS\n", (void *) address,
 			reliable ? "" : "? ", (void *) address);
 }
 

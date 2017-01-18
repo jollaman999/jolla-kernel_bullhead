@@ -1665,7 +1665,7 @@ he_service_rbrq(struct he_dev *he_dev, int group)
 	while (he_dev->rbrq_head != rbrq_tail) {
 		++updated;
 
-		HPRINTK("%p rbrq%d 0x%x len=%d cid=0x%x %s%s%s%s%s%s\n",
+		HPRINTK("%pK rbrq%d 0x%x len=%d cid=0x%x %s%s%s%s%s%s\n",
 			he_dev->rbrq_head, group,
 			RBRQ_ADDR(he_dev->rbrq_head),
 			RBRQ_BUFLEN(he_dev->rbrq_head),
@@ -2062,7 +2062,7 @@ __enqueue_tpd(struct he_dev *he_dev, struct he_tpd *tpd, unsigned cid)
 {
 	struct he_tpdrq *new_tail;
 
-	HPRINTK("tpdrq %p cid 0x%x -> tpdrq_tail %p\n",
+	HPRINTK("tpdrq %pK cid 0x%x -> tpdrq_tail %pK\n",
 					tpd, cid, he_dev->tpdrq_tail);
 
 	/* new_tail = he_dev->tpdrq_tail; */
@@ -2136,7 +2136,7 @@ he_open(struct atm_vcc *vcc)
 	if (vci == ATM_VCI_UNSPEC || vpi == ATM_VPI_UNSPEC)
 		return 0;
 
-	HPRINTK("open vcc %p %d.%d\n", vcc, vpi, vci);
+	HPRINTK("open vcc %pK %d.%d\n", vcc, vpi, vci);
 
 	set_bit(ATM_VF_ADDR, &vcc->flags);
 
@@ -2276,7 +2276,7 @@ he_open(struct atm_vcc *vcc)
 	if (vcc->qos.rxtp.traffic_class != ATM_NONE) {
 		unsigned aal;
 
-		HPRINTK("open rx cid 0x%x (rx_waitq %p)\n", cid,
+		HPRINTK("open rx cid 0x%x (rx_waitq %pK)\n", cid,
 		 				&HE_VCC(vcc)->rx_waitq);
 
 		switch (vcc->qos.aal) {
@@ -2347,7 +2347,7 @@ he_close(struct atm_vcc *vcc)
 #define MAX_RETRY 30
 	int retry = 0, sleep = 1, tx_inuse;
 
-	HPRINTK("close vcc %p %d.%d\n", vcc, vcc->vpi, vcc->vci);
+	HPRINTK("close vcc %pK %d.%d\n", vcc, vcc->vpi, vcc->vci);
 
 	clear_bit(ATM_VF_READY, &vcc->flags);
 	cid = he_mkcid(he_dev, vcc->vpi, vcc->vci);

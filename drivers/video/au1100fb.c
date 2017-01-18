@@ -106,7 +106,7 @@ static int au1100fb_fb_blank(int blank_mode, struct fb_info *fbi)
 {
 	struct au1100fb_device *fbdev = to_au1100fb_device(fbi);
 
-	print_dbg("fb_blank %d %p", blank_mode, fbi);
+	print_dbg("fb_blank %d %pK", blank_mode, fbi);
 
 	switch (blank_mode) {
 
@@ -297,7 +297,7 @@ int au1100fb_fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *fbi)
 
 	fbdev = to_au1100fb_device(fbi);
 
-	print_dbg("fb_pan_display %p %p", var, fbi);
+	print_dbg("fb_pan_display %pK %pK", var, fbi);
 
 	if (!var || !fbdev) {
 		return -EINVAL;
@@ -308,7 +308,7 @@ int au1100fb_fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *fbi)
 		return -EINVAL;
 	}
 
-	print_dbg("fb_pan_display 2 %p %p", var, fbi);
+	print_dbg("fb_pan_display 2 %pK %pK", var, fbi);
 	dy = var->yoffset - fbi->var.yoffset;
 	if (dy) {
 
@@ -328,7 +328,7 @@ int au1100fb_fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *fbi)
 			fbdev->regs->lcd_dmaaddr0 = LCD_DMA_SA_N(dmaaddr);
 	}
 	}
-	print_dbg("fb_pan_display 3 %p %p", var, fbi);
+	print_dbg("fb_pan_display 3 %pK %pK", var, fbi);
 
 	return 0;
 }
@@ -341,7 +341,7 @@ void au1100fb_fb_rotate(struct fb_info *fbi, int angle)
 {
 	struct au1100fb_device *fbdev = to_au1100fb_device(fbi);
 
-	print_dbg("fb_rotate %p %d", fbi, angle);
+	print_dbg("fb_rotate %pK %d", fbi, angle);
 
 	if (fbdev && (angle > 0) && !(angle % 90)) {
 
@@ -470,7 +470,7 @@ static int au1100fb_drv_probe(struct platform_device *dev)
 
 	fbdev->regs = (struct au1100fb_regs*)KSEG1ADDR(au1100fb_fix.mmio_start);
 
-	print_dbg("Register memory map at %p", fbdev->regs);
+	print_dbg("Register memory map at %pK", fbdev->regs);
 	print_dbg("phys=0x%08x, size=%d", fbdev->regs_phys, fbdev->regs_len);
 
 	/* Allocate the framebuffer to the maximum screen size * nbr of video buffers */
@@ -503,7 +503,7 @@ static int au1100fb_drv_probe(struct platform_device *dev)
 #endif
 	}
 
-	print_dbg("Framebuffer memory map at %p", fbdev->fb_mem);
+	print_dbg("Framebuffer memory map at %pK", fbdev->fb_mem);
 	print_dbg("phys=0x%08x, size=%dK", fbdev->fb_phys, fbdev->fb_len / 1024);
 
 	/* Setup LCD clock to AUX (48 MHz) */

@@ -342,7 +342,7 @@ static int snd_disconnect_release(struct inode *inode, struct file *file)
 		return df->disconnected_f_op->release(inode, file);
 	}
 
-	panic("%s(%p, %p) failed!", __func__, inode, file);
+	panic("%s(%pK, %pK) failed!", __func__, inode, file);
 }
 
 static unsigned int snd_disconnect_poll(struct file * file, poll_table * wait)
@@ -961,7 +961,7 @@ int snd_card_file_remove(struct snd_card *card, struct file *file)
 	}
 	spin_unlock(&card->files_lock);
 	if (!found) {
-		snd_printk(KERN_ERR "ALSA card file remove problem (%p)\n", file);
+		snd_printk(KERN_ERR "ALSA card file remove problem (%pK)\n", file);
 		return -ENOENT;
 	}
 	kfree(found);

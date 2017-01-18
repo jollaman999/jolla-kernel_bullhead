@@ -170,7 +170,7 @@ static int beiscsi_bindconn_cid(struct beiscsi_hba *phba,
 		return -EINVAL;
 	} else {
 		beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_CONFIG,
-			    "BS_%d : phba->conn_table[%d]=%p(beiscsi_conn)\n",
+			    "BS_%d : phba->conn_table[%d]=%pK(beiscsi_conn)\n",
 			    cri_index, beiscsi_conn);
 
 		phba->conn_table[cri_index] = beiscsi_conn;
@@ -208,7 +208,7 @@ int beiscsi_conn_bind(struct iscsi_cls_session *cls_session,
 
 	if (beiscsi_ep->phba != phba) {
 		beiscsi_log(phba, KERN_ERR, BEISCSI_LOG_CONFIG,
-			    "BS_%d : beiscsi_ep->hba=%p not equal to phba=%p\n",
+			    "BS_%d : beiscsi_ep->hba=%pK not equal to phba=%pK\n",
 			    beiscsi_ep->phba, phba);
 
 		return -EEXIST;
@@ -219,7 +219,7 @@ int beiscsi_conn_bind(struct iscsi_cls_session *cls_session,
 	beiscsi_ep->conn = beiscsi_conn;
 
 	beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_CONFIG,
-		    "BS_%d : beiscsi_conn=%p conn=%p ep_cid=%d\n",
+		    "BS_%d : beiscsi_conn=%pK conn=%pK ep_cid=%d\n",
 		    beiscsi_conn, conn, beiscsi_ep->ep_cid);
 
 	return beiscsi_bindconn_cid(phba, beiscsi_conn, beiscsi_ep->ep_cid);

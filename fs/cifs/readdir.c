@@ -361,17 +361,17 @@ static char *nxt_dir_entry(char *old_entry, char *end_of_smb, int level)
 				pfData->FileNameLength;
 	} else
 		new_entry = old_entry + le32_to_cpu(pDirInfo->NextEntryOffset);
-	cifs_dbg(FYI, "new entry %p old entry %p\n", new_entry, old_entry);
+	cifs_dbg(FYI, "new entry %pK old entry %pK\n", new_entry, old_entry);
 	/* validate that new_entry is not past end of SMB */
 	if (new_entry >= end_of_smb) {
-		cifs_dbg(VFS, "search entry %p began after end of SMB %p old entry %p\n",
+		cifs_dbg(VFS, "search entry %pK began after end of SMB %pK old entry %pK\n",
 			 new_entry, end_of_smb, old_entry);
 		return NULL;
 	} else if (((level == SMB_FIND_FILE_INFO_STANDARD) &&
 		    (new_entry + sizeof(FIND_FILE_STANDARD_INFO) > end_of_smb))
 		  || ((level != SMB_FIND_FILE_INFO_STANDARD) &&
 		   (new_entry + sizeof(FILE_DIRECTORY_INFO) > end_of_smb)))  {
-		cifs_dbg(VFS, "search entry %p extends after end of SMB %p\n",
+		cifs_dbg(VFS, "search entry %pK extends after end of SMB %pK\n",
 			 new_entry, end_of_smb);
 		return NULL;
 	} else
@@ -832,7 +832,7 @@ int cifs_readdir(struct file *file, void *direntry, filldir_t filldir)
 			cifs_dbg(FYI, "could not find entry\n");
 			goto rddir2_exit;
 		}
-		cifs_dbg(FYI, "loop through %d times filling dir for net buf %p\n",
+		cifs_dbg(FYI, "loop through %d times filling dir for net buf %pK\n",
 			 num_to_fill, cifsFile->srch_inf.ntwrk_buf_start);
 		max_len = tcon->ses->server->ops->calc_smb_size(
 				cifsFile->srch_inf.ntwrk_buf_start);

@@ -391,7 +391,7 @@ static int radeon_crtc_page_flip(struct drm_crtc *crtc,
 	spin_unlock_irqrestore(&dev->event_lock, flags);
 
 	/* pin the new buffer */
-	DRM_DEBUG_DRIVER("flip-ioctl() cur_fbo = %p, cur_bbo = %p\n",
+	DRM_DEBUG_DRIVER("flip-ioctl() cur_fbo = %pK, cur_bbo = %pK\n",
 			 work->old_rbo, rbo);
 
 	r = radeon_bo_reserve(rbo, false);

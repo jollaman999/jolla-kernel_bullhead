@@ -1554,7 +1554,7 @@ static void ad_agg_selection_logic(struct aggregator *agg)
 			 best->actor_oper_aggregator_key,
 			 best->partner_oper_aggregator_key,
 			 best->is_individual, best->is_active);
-		pr_debug("best ports %p slave %p %s\n",
+		pr_debug("best ports %pK slave %pK %s\n",
 			 best->lag_ports, best->slave,
 			 best->slave ? best->slave->dev->name : "NULL");
 

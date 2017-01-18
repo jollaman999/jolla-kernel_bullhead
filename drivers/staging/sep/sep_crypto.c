@@ -1441,7 +1441,7 @@ static void sep_crypto_block(void *data)
 	ta_ctx->are_we_done_yet = &are_we_done_yet;
 
 	pr_debug("sep_crypto_block\n");
-	pr_debug("tfm is %p sctx is %p ta_ctx is %p\n",
+	pr_debug("tfm is %pK sctx is %pK ta_ctx is %pK\n",
 		tfm, sctx, ta_ctx);
 	pr_debug("key_sent is %d\n", sctx->key_sent);
 
@@ -1518,7 +1518,7 @@ static void sep_crypto_block(void *data)
 	/* That's it; entire thing done, get out of queue */
 
 	pr_debug("crypto_block leaving\n");
-	pr_debug("tfm is %p sctx is %p ta_ctx is %p\n", tfm, sctx, ta_ctx);
+	pr_debug("tfm is %pK sctx is %pK ta_ctx is %pK\n", tfm, sctx, ta_ctx);
 }
 
 /**
@@ -1552,7 +1552,7 @@ static u32 crypto_post_op(struct sep_device *sep)
 	sctx = crypto_ablkcipher_ctx(tfm);
 
 	pr_debug("crypto_post op\n");
-	pr_debug("key_sent is %d tfm is %p sctx is %p ta_ctx is %p\n",
+	pr_debug("key_sent is %d tfm is %pK sctx is %pK ta_ctx is %pK\n",
 		sctx->key_sent, tfm, sctx, ta_ctx);
 
 	dev_dbg(&ta_ctx->sep_used->pdev->dev, "crypto post_op\n");
@@ -1700,7 +1700,7 @@ static u32 crypto_post_op(struct sep_device *sep)
 		sep_crypto_release(sctx, ta_ctx, 0);
 	}
 	pr_debug("crypto_post_op done\n");
-	pr_debug("key_sent is %d tfm is %p sctx is %p ta_ctx is %p\n",
+	pr_debug("key_sent is %d tfm is %pK sctx is %pK ta_ctx is %pK\n",
 		sctx->key_sent, tfm, sctx, ta_ctx);
 
 	return 0;
@@ -3293,7 +3293,7 @@ static int sep_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
 
 	pr_debug("sep aes setkey\n");
 
-	pr_debug("tfm is %p sctx is %p\n", tfm, sctx);
+	pr_debug("tfm is %pK sctx is %pK\n", tfm, sctx);
 	switch (keylen) {
 	case SEP_AES_KEY_128_SIZE:
 		sctx->aes_key_size = AES_128;
@@ -3410,7 +3410,7 @@ static int sep_aes_cbc_encrypt(struct ablkcipher_request *req)
 	/* Clear out task context */
 	memset(ta_ctx, 0, sizeof(struct this_task_ctx));
 
-	pr_debug("tfm is %p sctx is %p and ta_ctx is %p\n",
+	pr_debug("tfm is %pK sctx is %pK and ta_ctx is %pK\n",
 		crypto_ablkcipher_reqtfm(req), sctx, ta_ctx);
 
 	ta_ctx->sep_used = sep_dev;
@@ -3449,7 +3449,7 @@ static int sep_aes_cbc_decrypt(struct ablkcipher_request *req)
 
 	pr_debug("sep - doing aes cbc decrypt\n");
 
-	pr_debug("tfm is %p sctx is %p and ta_ctx is %p\n",
+	pr_debug("tfm is %pK sctx is %pK and ta_ctx is %pK\n",
 		crypto_ablkcipher_reqtfm(req), sctx, ta_ctx);
 
 	/* Clear out task context */

@@ -84,7 +84,7 @@ static void of_pci_parse_addrs(struct device_node *node, struct pci_dev *dev)
 	addrs = of_get_property(node, "assigned-addresses", &proplen);
 	if (!addrs)
 		return;
-	pr_debug("    parse addresses (%d bytes) @ %p\n", proplen, addrs);
+	pr_debug("    parse addresses (%d bytes) @ %pK\n", proplen, addrs);
 	for (; proplen >= 20; proplen -= 20, addrs += 5) {
 		flags = pci_parse_of_flags(addrs[0], 0);
 		if (!flags)

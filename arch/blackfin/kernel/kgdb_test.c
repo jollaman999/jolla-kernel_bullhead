@@ -27,10 +27,10 @@ void kgdb_l1_test(void) __attribute__((l1_text));
 
 void kgdb_l1_test(void)
 {
-	pr_alert("L1(before change) : data variable addr = 0x%p, data value is %d\n", &num1, num1);
-	pr_alert("L1 : code function addr = 0x%p\n", kgdb_l1_test);
+	pr_alert("L1(before change) : data variable addr = 0x%pK, data value is %d\n", &num1, num1);
+	pr_alert("L1 : code function addr = 0x%pK\n", kgdb_l1_test);
 	num1 = num1 + 10;
-	pr_alert("L1(after change) : data variable addr = 0x%p, data value is %d\n", &num1, num1);
+	pr_alert("L1(after change) : data variable addr = 0x%pK, data value is %d\n", &num1, num1);
 }
 #endif
 
@@ -41,10 +41,10 @@ void kgdb_l2_test(void) __attribute__((l2));
 
 void kgdb_l2_test(void)
 {
-	pr_alert("L2(before change) : data variable addr = 0x%p, data value is %d\n", &num2, num2);
-	pr_alert("L2 : code function addr = 0x%p\n", kgdb_l2_test);
+	pr_alert("L2(before change) : data variable addr = 0x%pK, data value is %d\n", &num2, num2);
+	pr_alert("L2 : code function addr = 0x%pK\n", kgdb_l2_test);
 	num2 = num2 + 20;
-	pr_alert("L2(after change) : data variable addr = 0x%p, data value is %d\n", &num2, num2);
+	pr_alert("L2(after change) : data variable addr = 0x%pK, data value is %d\n", &num2, num2);
 }
 
 #endif

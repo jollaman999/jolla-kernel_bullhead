@@ -1141,7 +1141,7 @@ F01_E */
 		skb_put(skb, len - 4);
 
 		skb_copy_to_linear_data(skb, self->rx_buff.data, len - 4);
-		IRDA_DEBUG(2, "%s(): len=%x.rx_buff=%p\n", __func__,
+		IRDA_DEBUG(2, "%s(): len=%x.rx_buff=%pK\n", __func__,
 			   len - 4, self->rx_buff.data);
 
 		// Move to next frame 

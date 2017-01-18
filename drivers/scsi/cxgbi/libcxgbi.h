@@ -312,7 +312,7 @@ static inline void cxgbi_sock_set_flag(struct cxgbi_sock *csk,
 {
 	__set_bit(flag, &csk->flags);
 	log_debug(1 << CXGBI_DBG_SOCK,
-		"csk 0x%p,%u,0x%lx, bit %d.\n",
+		"csk 0x%pK,%u,0x%lx, bit %d.\n",
 		csk, csk->state, csk->flags, flag);
 }
 
@@ -321,7 +321,7 @@ static inline void cxgbi_sock_clear_flag(struct cxgbi_sock *csk,
 {
 	__clear_bit(flag, &csk->flags);
 	log_debug(1 << CXGBI_DBG_SOCK,
-		"csk 0x%p,%u,0x%lx, bit %d.\n",
+		"csk 0x%pK,%u,0x%lx, bit %d.\n",
 		csk, csk->state, csk->flags, flag);
 }
 
@@ -336,7 +336,7 @@ static inline int cxgbi_sock_flag(struct cxgbi_sock *csk,
 static inline void cxgbi_sock_set_state(struct cxgbi_sock *csk, int state)
 {
 	log_debug(1 << CXGBI_DBG_SOCK,
-		"csk 0x%p,%u,0x%lx, state -> %u.\n",
+		"csk 0x%pK,%u,0x%lx, state -> %u.\n",
 		csk, csk->state, csk->flags, state);
 	csk->state = state;
 }
@@ -348,7 +348,7 @@ static inline void cxgbi_sock_free(struct kref *kref)
 						refcnt);
 	if (csk) {
 		log_debug(1 << CXGBI_DBG_SOCK,
-			"free csk 0x%p, state %u, flags 0x%lx\n",
+			"free csk 0x%pK, state %u, flags 0x%lx\n",
 			csk, csk->state, csk->flags);
 		kfree(csk);
 	}
@@ -357,7 +357,7 @@ static inline void cxgbi_sock_free(struct kref *kref)
 static inline void __cxgbi_sock_put(const char *fn, struct cxgbi_sock *csk)
 {
 	log_debug(1 << CXGBI_DBG_SOCK,
-		"%s, put csk 0x%p, ref %u-1.\n",
+		"%s, put csk 0x%pK, ref %u-1.\n",
 		fn, csk, atomic_read(&csk->refcnt.refcount));
 	kref_put(&csk->refcnt, cxgbi_sock_free);
 }
@@ -366,7 +366,7 @@ static inline void __cxgbi_sock_put(const char *fn, struct cxgbi_sock *csk)
 static inline void __cxgbi_sock_get(const char *fn, struct cxgbi_sock *csk)
 {
 	log_debug(1 << CXGBI_DBG_SOCK,
-		"%s, get csk 0x%p, ref %u+1.\n",
+		"%s, get csk 0x%pK, ref %u+1.\n",
 		fn, csk, atomic_read(&csk->refcnt.refcount));
 	kref_get(&csk->refcnt);
 }

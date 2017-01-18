@@ -77,7 +77,7 @@ static int sram_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, sram);
 
-	dev_dbg(&pdev->dev, "SRAM pool: %ld KiB @ 0x%p\n", size / 1024, virt_base);
+	dev_dbg(&pdev->dev, "SRAM pool: %ld KiB @ 0x%pK\n", size / 1024, virt_base);
 
 	return 0;
 }

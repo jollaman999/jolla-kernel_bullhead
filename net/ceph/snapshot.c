@@ -71,7 +71,7 @@ void ceph_put_snap_context(struct ceph_snap_context *sc)
 	if (!sc)
 		return;
 	if (atomic_dec_and_test(&sc->nref)) {
-		/*printk(" deleting snap_context %p\n", sc);*/
+		/*printk(" deleting snap_context %pK\n", sc);*/
 		kfree(sc);
 	}
 }

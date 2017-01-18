@@ -161,7 +161,7 @@ static struct posix_acl *nfs3_get_cached_acl(struct inode *inode, int type)
 		acl = posix_acl_dup(acl);
 out:
 	spin_unlock(&inode->i_lock);
-	dprintk("NFS: nfs3_get_cached_acl(%s/%ld, %d) = %p\n", inode->i_sb->s_id,
+	dprintk("NFS: nfs3_get_cached_acl(%s/%ld, %d) = %pK\n", inode->i_sb->s_id,
 		inode->i_ino, type, acl);
 	return acl;
 }
@@ -171,7 +171,7 @@ static void nfs3_cache_acls(struct inode *inode, struct posix_acl *acl,
 {
 	struct nfs_inode *nfsi = NFS_I(inode);
 
-	dprintk("nfs3_cache_acls(%s/%ld, %p, %p)\n", inode->i_sb->s_id,
+	dprintk("nfs3_cache_acls(%s/%ld, %pK, %pK)\n", inode->i_sb->s_id,
 		inode->i_ino, acl, dfacl);
 	spin_lock(&inode->i_lock);
 	__nfs3_forget_cached_acls(NFS_I(inode));

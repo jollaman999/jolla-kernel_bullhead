@@ -102,7 +102,7 @@ static int dbg_show_descriptors(struct seq_file *s, void *p)
 		burst = dbg_burst_from_dcmd(dcmd);
 		width = (1 << ((dcmd >> 14) & 0x3)) >> 1;
 
-		pos += seq_printf(s, "[%03d] Desc at %08lx(virt %p)\n",
+		pos += seq_printf(s, "[%03d] Desc at %08lx(virt %pK)\n",
 				  i, phys_desc, desc);
 		pos += seq_printf(s, "\tDDADR = %08x\n", desc->ddadr);
 		pos += seq_printf(s, "\tDSADR = %08x\n", desc->dsadr);

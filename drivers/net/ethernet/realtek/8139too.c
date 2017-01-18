@@ -1026,14 +1026,14 @@ static int rtl8139_init_one(struct pci_dev *pdev,
 	tp->mii.reg_num_mask = 0x1f;
 
 	/* dev is fully set up and ready to use now */
-	pr_debug("about to register device named %s (%p)...\n",
+	pr_debug("about to register device named %s (%pK)...\n",
 		 dev->name, dev);
 	i = register_netdev (dev);
 	if (i) goto err_out;
 
 	pci_set_drvdata (pdev, dev);
 
-	netdev_info(dev, "%s at 0x%p, %pM, IRQ %d\n",
+	netdev_info(dev, "%s at 0x%pK, %pM, IRQ %d\n",
 		    board_info[ent->driver_data].name,
 		    ioaddr, dev->dev_addr, pdev->irq);
 

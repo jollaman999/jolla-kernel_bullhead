@@ -154,7 +154,7 @@ smb2_dump_detail(void *buf)
 	cifs_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
 		 smb->Command, smb->Status, smb->Flags, smb->MessageId,
 		 smb->ProcessId);
-	cifs_dbg(VFS, "smb buf %p len %u\n", smb, smb2_calc_size(smb));
+	cifs_dbg(VFS, "smb buf %pK len %u\n", smb, smb2_calc_size(smb));
 #endif
 }
 

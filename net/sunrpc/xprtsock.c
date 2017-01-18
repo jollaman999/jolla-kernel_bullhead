@@ -846,7 +846,7 @@ static void xs_close(struct rpc_xprt *xprt)
 {
 	struct sock_xprt *transport = container_of(xprt, struct sock_xprt, xprt);
 
-	dprintk("RPC:       xs_close xprt %p\n", xprt);
+	dprintk("RPC:       xs_close xprt %pK\n", xprt);
 
 	xs_reset_transport(transport);
 	xprt->reestablish_timeout = 0;
@@ -884,7 +884,7 @@ static void xs_destroy(struct rpc_xprt *xprt)
 {
 	struct sock_xprt *transport = container_of(xprt, struct sock_xprt, xprt);
 
-	dprintk("RPC:       xs_destroy xprt %p\n", xprt);
+	dprintk("RPC:       xs_destroy xprt %pK\n", xprt);
 
 	cancel_delayed_work_sync(&transport->connect_worker);
 
@@ -1217,7 +1217,7 @@ static inline void xs_tcp_read_common(struct rpc_xprt *xprt,
 		transport->tcp_flags &= ~TCP_RCV_COPY_DATA;
 		dprintk("RPC:       XID %08x truncated request\n",
 				ntohl(transport->tcp_xid));
-		dprintk("RPC:       xprt = %p, tcp_copied = %lu, "
+		dprintk("RPC:       xprt = %pK, tcp_copied = %lu, "
 				"tcp_offset = %u, tcp_reclen = %u\n",
 				xprt, transport->tcp_copied,
 				transport->tcp_offset, transport->tcp_reclen);
@@ -1226,7 +1226,7 @@ static inline void xs_tcp_read_common(struct rpc_xprt *xprt,
 
 	dprintk("RPC:       XID %08x read %Zd bytes\n",
 			ntohl(transport->tcp_xid), r);
-	dprintk("RPC:       xprt = %p, tcp_copied = %lu, tcp_offset = %u, "
+	dprintk("RPC:       xprt = %pK, tcp_copied = %lu, tcp_offset = %u, "
 			"tcp_reclen = %u\n", xprt, transport->tcp_copied,
 			transport->tcp_offset, transport->tcp_reclen);
 
@@ -1503,7 +1503,7 @@ static void xs_tcp_state_change(struct sock *sk)
 	read_lock_bh(&sk->sk_callback_lock);
 	if (!(xprt = xprt_from_sock(sk)))
 		goto out;
-	dprintk("RPC:       xs_tcp_state_change client %p...\n", xprt);
+	dprintk("RPC:       xs_tcp_state_change client %pK...\n", xprt);
 	dprintk("RPC:       state %x conn %d dead %d zapped %d sk_shutdown %d\n",
 			sk->sk_state, xprt_connected(xprt),
 			sock_flag(sk, SOCK_DEAD),
@@ -1690,7 +1690,7 @@ static unsigned short xs_get_random_port(void)
  */
 static void xs_set_port(struct rpc_xprt *xprt, unsigned short port)
 {
-	dprintk("RPC:       setting port for xprt %p to %u\n", xprt, port);
+	dprintk("RPC:       setting port for xprt %pK to %u\n", xprt, port);
 
 	rpc_set_port(xs_addr(xprt), port);
 	xs_update_peer_port(xprt);
@@ -1910,22 +1910,22 @@ static int xs_local_setup_socket(struct sock_xprt *transport)
 	}
 	xs_reclassify_socketu(sock);
 
-	dprintk("RPC:       worker connecting xprt %p via AF_LOCAL to %s\n",
+	dprintk("RPC:       worker connecting xprt %pK via AF_LOCAL to %s\n",
 			xprt, xprt->address_strings[RPC_DISPLAY_ADDR]);
 
 	status = xs_local_finish_connecting(xprt, sock);
 	switch (status) {
 	case 0:
-		dprintk("RPC:       xprt %p connected to %s\n",
+		dprintk("RPC:       xprt %pK connected to %s\n",
 				xprt, xprt->address_strings[RPC_DISPLAY_ADDR]);
 		xprt_set_connected(xprt);
 		break;
 	case -ENOENT:
-		dprintk("RPC:       xprt %p: socket %s does not exist\n",
+		dprintk("RPC:       xprt %pK: socket %s does not exist\n",
 				xprt, xprt->address_strings[RPC_DISPLAY_ADDR]);
 		break;
 	case -ECONNREFUSED:
-		dprintk("RPC:       xprt %p: connection refused for %s\n",
+		dprintk("RPC:       xprt %pK: connection refused for %s\n",
 				xprt, xprt->address_strings[RPC_DISPLAY_ADDR]);
 		break;
 	default:
@@ -2050,7 +2050,7 @@ static void xs_udp_setup_socket(struct work_struct *work)
 	if (IS_ERR(sock))
 		goto out;
 
-	dprintk("RPC:       worker connecting xprt %p via %s to "
+	dprintk("RPC:       worker connecting xprt %pK via %s to "
 				"%s (port %s)\n", xprt,
 			xprt->address_strings[RPC_DISPLAY_PROTO],
 			xprt->address_strings[RPC_DISPLAY_ADDR],
@@ -2073,7 +2073,7 @@ static void xs_abort_connection(struct sock_xprt *transport)
 	int result;
 	struct sockaddr any;
 
-	dprintk("RPC:       disconnecting xprt %p to reuse port\n", transport);
+	dprintk("RPC:       disconnecting xprt %pK to reuse port\n", transport);
 
 	/*
 	 * Disconnect the transport socket by doing a connect operation
@@ -2205,14 +2205,14 @@ static void xs_tcp_setup_socket(struct work_struct *work)
 			goto out_eagain;
 	}
 
-	dprintk("RPC:       worker connecting xprt %p via %s to "
+	dprintk("RPC:       worker connecting xprt %pK via %s to "
 				"%s (port %s)\n", xprt,
 			xprt->address_strings[RPC_DISPLAY_PROTO],
 			xprt->address_strings[RPC_DISPLAY_ADDR],
 			xprt->address_strings[RPC_DISPLAY_PORT]);
 
 	status = xs_tcp_finish_connecting(xprt, sock);
-	dprintk("RPC:       %p connect status %d connected %d sock state %d\n",
+	dprintk("RPC:       %pK connect status %d connected %d sock state %d\n",
 			xprt, -status, xprt_connected(xprt),
 			sock->sk->sk_state);
 	switch (status) {
@@ -2268,7 +2268,7 @@ static void xs_connect(struct rpc_xprt *xprt, struct rpc_task *task)
 	struct sock_xprt *transport = container_of(xprt, struct sock_xprt, xprt);
 
 	if (transport->sock != NULL && !RPC_IS_SOFTCONN(task)) {
-		dprintk("RPC:       xs_connect delayed xprt %p for %lu "
+		dprintk("RPC:       xs_connect delayed xprt %pK for %lu "
 				"seconds\n",
 				xprt, xprt->reestablish_timeout / HZ);
 		queue_delayed_work(rpciod_workqueue,
@@ -2280,7 +2280,7 @@ static void xs_connect(struct rpc_xprt *xprt, struct rpc_task *task)
 		if (xprt->reestablish_timeout > XS_TCP_MAX_REEST_TO)
 			xprt->reestablish_timeout = XS_TCP_MAX_REEST_TO;
 	} else {
-		dprintk("RPC:       xs_connect scheduled xprt %p\n", xprt);
+		dprintk("RPC:       xs_connect scheduled xprt %pK\n", xprt);
 		queue_delayed_work(rpciod_workqueue,
 				   &transport->connect_worker, 0);
 	}

@@ -539,7 +539,7 @@ svc_destroy(struct svc_serv *serv)
 			return;
 		}
 	} else
-		printk("svc_destroy: no threads for serv=%p!\n", serv);
+		printk("svc_destroy: no threads for serv=%pK!\n", serv);
 
 	del_timer_sync(&serv->sv_temptimer);
 

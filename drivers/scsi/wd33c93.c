@@ -697,7 +697,7 @@ transfer_pio(const wd33c93_regs regs, uchar * buf, int cnt,
 	uchar asr;
 
 	DB(DB_TRANSFER,
-	   printk("(%p,%d,%s:", buf, cnt, data_in_dir ? "in" : "out"))
+	   printk("(%pK,%d,%s:", buf, cnt, data_in_dir ? "in" : "out"))
 
 	write_wd33c93(regs, WD_CONTROL, CTRL_IDI | CTRL_EDI | CTRL_POLLED);
 	write_wd33c93_count(regs, cnt);
@@ -839,14 +839,14 @@ wd33c93_intr(struct Scsi_Host *instance)
  */
 	    if (hostdata->dma == D_DMA_RUNNING) {
 		DB(DB_TRANSFER,
-		   printk("[%p/%d:", cmd->SCp.ptr, cmd->SCp.this_residual))
+		   printk("[%pK/%d:", cmd->SCp.ptr, cmd->SCp.this_residual))
 		    hostdata->dma_stop(cmd->device->host, cmd, 1);
 		hostdata->dma = D_DMA_OFF;
 		length = cmd->SCp.this_residual;
 		cmd->SCp.this_residual = read_wd33c93_count(regs);
 		cmd->SCp.ptr += (length - cmd->SCp.this_residual);
 		DB(DB_TRANSFER,
-		   printk("%p/%d]", cmd->SCp.ptr, cmd->SCp.this_residual))
+		   printk("%pK/%d]", cmd->SCp.ptr, cmd->SCp.this_residual))
 	}
 
 /* Respond to the specific WD3393 interrupt - there are quite a few! */

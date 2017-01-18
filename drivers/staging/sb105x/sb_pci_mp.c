@@ -1854,7 +1854,7 @@ static int mp_remove_one_port(struct uart_driver *drv, struct sb_uart_port *port
 	struct sb_uart_state *state = drv->state + port->line;
 
 	if (state->port != port)
-		printk(KERN_ALERT "Removing wrong port: %p != %p\n",
+		printk(KERN_ALERT "Removing wrong port: %pK != %pK\n",
 				state->port, port);
 
 	MP_MUTEX_LOCK(mp_mutex);
@@ -1880,7 +1880,7 @@ static void autoconfig(struct mp_port *mtpt, unsigned int probeflags)
 	if (!mtpt->port.iobase && !mtpt->port.mapbase && !mtpt->port.membase)
 		return;
 
-	DEBUG_AUTOCONF("ttyMP%d: autoconf (0x%04x, 0x%p): ",
+	DEBUG_AUTOCONF("ttyMP%d: autoconf (0x%04x, 0x%pK): ",
 			mtpt->port.line, mtpt->port.iobase, mtpt->port.membase);
 
 	spin_lock_irqsave(&mtpt->port.lock, flags);

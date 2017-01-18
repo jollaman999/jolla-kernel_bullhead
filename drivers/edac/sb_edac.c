@@ -477,7 +477,7 @@ static struct pci_dev *get_pdev_slot_func(u8 bus, unsigned slot,
 
 		if (PCI_SLOT(sbridge_dev->pdev[i]->devfn) == slot &&
 		    PCI_FUNC(sbridge_dev->pdev[i]->devfn) == func) {
-			edac_dbg(1, "Associated %02x.%02x.%d with %p\n",
+			edac_dbg(1, "Associated %02x.%02x.%d with %pK\n",
 				 bus, slot, func, sbridge_dev->pdev[i]);
 			return sbridge_dev->pdev[i];
 		}
@@ -1304,7 +1304,7 @@ static int mci_bind_devs(struct mem_ctl_info *mci,
 			goto error;
 		}
 
-		edac_dbg(0, "Associated PCI %02x.%02d.%d with dev = %p\n",
+		edac_dbg(0, "Associated PCI %02x.%02d.%d with dev = %pK\n",
 			 sbridge_dev->bus,
 			 PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn),
 			 pdev);
@@ -1600,7 +1600,7 @@ static void sbridge_unregister_mci(struct sbridge_dev *sbridge_dev)
 	struct sbridge_pvt *pvt;
 
 	if (unlikely(!mci || !mci->pvt_info)) {
-		edac_dbg(0, "MC: dev = %p\n", &sbridge_dev->pdev[0]->dev);
+		edac_dbg(0, "MC: dev = %pK\n", &sbridge_dev->pdev[0]->dev);
 
 		sbridge_printk(KERN_ERR, "Couldn't find mci handler\n");
 		return;
@@ -1608,7 +1608,7 @@ static void sbridge_unregister_mci(struct sbridge_dev *sbridge_dev)
 
 	pvt = mci->pvt_info;
 
-	edac_dbg(0, "MC: mci = %p, dev = %p\n",
+	edac_dbg(0, "MC: mci = %pK, dev = %pK\n",
 		 mci, &sbridge_dev->pdev[0]->dev);
 
 	/* Remove MC sysfs nodes */
@@ -1645,7 +1645,7 @@ static int sbridge_register_mci(struct sbridge_dev *sbridge_dev)
 	if (unlikely(!mci))
 		return -ENOMEM;
 
-	edac_dbg(0, "MC: mci = %p, dev = %p\n",
+	edac_dbg(0, "MC: mci = %pK, dev = %pK\n",
 		 mci, &sbridge_dev->pdev[0]->dev);
 
 	pvt = mci->pvt_info;

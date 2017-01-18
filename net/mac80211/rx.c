@@ -541,7 +541,7 @@ static void ieee80211_verify_alignment(struct ieee80211_rx_data *rx)
 {
 #ifdef CONFIG_MAC80211_VERBOSE_DEBUG
 	WARN_ONCE((unsigned long)rx->skb->data & 1,
-		  "unaligned packet at 0x%p\n", rx->skb->data);
+		  "unaligned packet at 0x%pK\n", rx->skb->data);
 #endif
 }
 

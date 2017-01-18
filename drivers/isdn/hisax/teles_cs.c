@@ -76,7 +76,7 @@ static void teles_detach(struct pcmcia_device *link)
 {
 	local_info_t *info = link->priv;
 
-	dev_dbg(&link->dev, "teles_detach(0x%p)\n", link);
+	dev_dbg(&link->dev, "teles_detach(0x%pK)\n", link);
 
 	info->busy = 1;
 	teles_cs_release(link);
@@ -113,7 +113,7 @@ static int teles_cs_config(struct pcmcia_device *link)
 	int i;
 	IsdnCard_t icard;
 
-	dev_dbg(&link->dev, "teles_config(0x%p)\n", link);
+	dev_dbg(&link->dev, "teles_config(0x%pK)\n", link);
 
 	i = pcmcia_loop_config(link, teles_cs_configcheck, NULL);
 	if (i != 0)
@@ -151,7 +151,7 @@ static void teles_cs_release(struct pcmcia_device *link)
 {
 	local_info_t *local = link->priv;
 
-	dev_dbg(&link->dev, "teles_cs_release(0x%p)\n", link);
+	dev_dbg(&link->dev, "teles_cs_release(0x%pK)\n", link);
 
 	if (local) {
 		if (local->cardnr >= 0) {

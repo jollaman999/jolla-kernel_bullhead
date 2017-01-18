@@ -57,7 +57,7 @@ objlayout_alloc_layout_hdr(struct inode *inode, gfp_t gfp_flags)
 		spin_lock_init(&objlay->lock);
 		INIT_LIST_HEAD(&objlay->err_list);
 	}
-	dprintk("%s: Return %p\n", __func__, objlay);
+	dprintk("%s: Return %pK\n", __func__, objlay);
 	return &objlay->pnfs_layout;
 }
 
@@ -69,7 +69,7 @@ objlayout_free_layout_hdr(struct pnfs_layout_hdr *lo)
 {
 	struct objlayout *objlay = OBJLAYOUT(lo);
 
-	dprintk("%s: objlay %p\n", __func__, objlay);
+	dprintk("%s: objlay %pK\n", __func__, objlay);
 
 	WARN_ON(!list_empty(&objlay->err_list));
 	kfree(objlay);
@@ -94,7 +94,7 @@ objlayout_alloc_lseg(struct pnfs_layout_hdr *pnfslay,
 	struct page *scratch;
 	struct pnfs_layout_segment *lseg;
 
-	dprintk("%s: Begin pnfslay %p\n", __func__, pnfslay);
+	dprintk("%s: Begin pnfslay %pK\n", __func__, pnfslay);
 
 	scratch = alloc_page(gfp_flags);
 	if (!scratch)
@@ -112,7 +112,7 @@ objlayout_alloc_lseg(struct pnfs_layout_hdr *pnfslay,
 
 	__free_page(scratch);
 
-	dprintk("%s: Return %p\n", __func__, lseg);
+	dprintk("%s: Return %pK\n", __func__, lseg);
 	return lseg;
 
 err:
@@ -128,7 +128,7 @@ err_nofree:
 void
 objlayout_free_lseg(struct pnfs_layout_segment *lseg)
 {
-	dprintk("%s: freeing layout segment %p\n", __func__, lseg);
+	dprintk("%s: freeing layout segment %pK\n", __func__, lseg);
 
 	if (unlikely(!lseg))
 		return;

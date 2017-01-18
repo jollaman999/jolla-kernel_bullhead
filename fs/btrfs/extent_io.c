@@ -60,7 +60,7 @@ void btrfs_leak_debug_check(void)
 	while (!list_empty(&states)) {
 		state = list_entry(states.next, struct extent_state, leak_list);
 		printk(KERN_ERR "btrfs state leak: start %llu end %llu "
-		       "state %lu in tree %p refs %d\n",
+		       "state %lu in tree %pK refs %d\n",
 		       (unsigned long long)state->start,
 		       (unsigned long long)state->end,
 		       state->state, state->tree, atomic_read(&state->refs));
@@ -2268,7 +2268,7 @@ static int bio_readpage_error(struct bio *failed_bio, struct page *page,
 		 * matter what the error is, it is very likely to persist.
 		 */
 		pr_debug("bio_readpage_error: cannot repair, num_copies == 1. "
-			 "state=%p, num_copies=%d, next_mirror %d, "
+			 "state=%pK, num_copies=%d, next_mirror %d, "
 			 "failed_mirror %d\n", state, num_copies,
 			 failrec->this_mirror, failed_mirror);
 		free_io_failure(inode, failrec, 0);
@@ -2321,7 +2321,7 @@ static int bio_readpage_error(struct bio *failed_bio, struct page *page,
 	}
 
 	if (!state || failrec->this_mirror > num_copies) {
-		pr_debug("bio_readpage_error: (fail) state=%p, num_copies=%d, "
+		pr_debug("bio_readpage_error: (fail) state=%pK, num_copies=%d, "
 			 "next_mirror %d, failed_mirror %d\n", state,
 			 num_copies, failrec->this_mirror, failed_mirror);
 		free_io_failure(inode, failrec, 0);

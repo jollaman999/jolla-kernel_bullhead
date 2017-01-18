@@ -131,7 +131,7 @@ void show_regs(struct pt_regs *regs)
 
 	show_regs_print_info(KERN_INFO);
 
-	pr_info(" pt_regs @ %p\n", regs);
+	pr_info(" pt_regs @ %pK\n", regs);
 	pr_info(" SaveMask = 0x%04hx\n", regs->ctx.SaveMask);
 	pr_info(" Flags = 0x%04hx (%c%c%c%c)\n", regs->ctx.Flags,
 		regs->ctx.Flags & FLAG_Z ? 'Z' : 'z',

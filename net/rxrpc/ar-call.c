@@ -135,7 +135,7 @@ static struct rxrpc_call *rxrpc_alloc_client_call(
 	call->lifetimer.expires = jiffies + rxrpc_call_max_lifetime * HZ;
 	add_timer(&call->lifetimer);
 
-	_leave(" = %p", call);
+	_leave(" = %pK", call);
 	return call;
 }
 
@@ -153,7 +153,7 @@ struct rxrpc_call *rxrpc_get_client_call(struct rxrpc_sock *rx,
 	struct rxrpc_call *call, *candidate;
 	struct rb_node *p, *parent, **pp;
 
-	_enter("%p,%d,%d,%lx,%d",
+	_enter("%pK,%d,%d,%lx,%d",
 	       rx, trans ? trans->debug_id : -1, bundle ? bundle->debug_id : -1,
 	       user_call_ID, create);
 
@@ -220,14 +220,14 @@ struct rxrpc_call *rxrpc_get_client_call(struct rxrpc_sock *rx,
 
 	_net("CALL new %d on CONN %d", call->debug_id, call->conn->debug_id);
 
-	_leave(" = %p [new]", call);
+	_leave(" = %pK [new]", call);
 	return call;
 
 	/* we found the call in the list immediately */
 found_extant_call:
 	rxrpc_get_call(call);
 	read_unlock(&rx->call_lock);
-	_leave(" = %p [extant %d]", call, atomic_read(&call->usage));
+	_leave(" = %pK [extant %d]", call, atomic_read(&call->usage));
 	return call;
 
 	/* we found the call on the second time through the list */
@@ -235,7 +235,7 @@ found_extant_second:
 	rxrpc_get_call(call);
 	write_unlock(&rx->call_lock);
 	rxrpc_put_call(candidate);
-	_leave(" = %p [second %d]", call, atomic_read(&call->usage));
+	_leave(" = %pK [second %d]", call, atomic_read(&call->usage));
 	return call;
 }
 
@@ -274,7 +274,7 @@ struct rxrpc_call *rxrpc_incoming_call(struct rxrpc_sock *rx,
 
 	/* set the channel for this call */
 	call = conn->channels[candidate->channel];
-	_debug("channel[%u] is %p", candidate->channel, call);
+	_debug("channel[%u] is %pK", candidate->channel, call);
 	if (call && call->call_id == hdr->callNumber) {
 		/* already set; must've been a duplicate packet */
 		_debug("extant call [%d]", call->state);
@@ -351,13 +351,13 @@ struct rxrpc_call *rxrpc_incoming_call(struct rxrpc_sock *rx,
 
 	call->lifetimer.expires = jiffies + rxrpc_call_max_lifetime * HZ;
 	add_timer(&call->lifetimer);
-	_leave(" = %p {%d} [new]", call, call->debug_id);
+	_leave(" = %pK {%d} [new]", call, call->debug_id);
 	return call;
 
 extant_call:
 	write_unlock_bh(&conn->lock);
 	kmem_cache_free(rxrpc_call_jar, candidate);
-	_leave(" = %p {%d} [extant]", call, call ? call->debug_id : -1);
+	_leave(" = %pK {%d} [extant]", call, call ? call->debug_id : -1);
 	return call;
 
 aborted_call:
@@ -383,7 +383,7 @@ struct rxrpc_call *rxrpc_find_server_call(struct rxrpc_sock *rx,
 	struct rxrpc_call *call;
 	struct rb_node *p;
 
-	_enter("%p,%lx", rx, user_call_ID);
+	_enter("%pK,%lx", rx, user_call_ID);
 
 	/* search the extant calls for one that matches the specified user
 	 * ID */
@@ -409,7 +409,7 @@ struct rxrpc_call *rxrpc_find_server_call(struct rxrpc_sock *rx,
 found_extant_call:
 	rxrpc_get_call(call);
 	read_unlock(&rx->call_lock);
-	_leave(" = %p [%d]", call, atomic_read(&call->usage));
+	_leave(" = %pK [%d]", call, atomic_read(&call->usage));
 	return call;
 }
 
@@ -434,11 +434,11 @@ void rxrpc_release_call(struct rxrpc_call *call)
 	/* dissociate from the socket
 	 * - the socket's ref on the call is passed to the death timer
 	 */
-	_debug("RELEASE CALL %p (%d CONN %p)", call, call->debug_id, conn);
+	_debug("RELEASE CALL %pK (%d CONN %pK)", call, call->debug_id, conn);
 
 	write_lock_bh(&rx->call_lock);
 	if (!list_empty(&call->accept_link)) {
-		_debug("unlinking once-pending call %p { e=%lx f=%lx }",
+		_debug("unlinking once-pending call %pK { e=%lx f=%lx }",
 		       call, call->events, call->flags);
 		ASSERT(!test_bit(RXRPC_CALL_HAS_USERID, &call->flags));
 		list_del_init(&call->accept_link);
@@ -566,7 +566,7 @@ static void rxrpc_mark_call_released(struct rxrpc_call *call)
 	if (call->state < RXRPC_CALL_DEAD) {
 		sched = false;
 		if (call->state < RXRPC_CALL_COMPLETE) {
-			_debug("abort call %p", call);
+			_debug("abort call %pK", call);
 			call->state = RXRPC_CALL_LOCALLY_ABORTED;
 			call->abort_code = RX_CALL_DEAD;
 			if (!test_and_set_bit(RXRPC_CALL_ABORT, &call->events))
@@ -588,7 +588,7 @@ void rxrpc_release_calls_on_socket(struct rxrpc_sock *rx)
 	struct rxrpc_call *call;
 	struct rb_node *p;
 
-	_enter("%p", rx);
+	_enter("%pK", rx);
 
 	read_lock_bh(&rx->call_lock);
 
@@ -618,7 +618,7 @@ void __rxrpc_put_call(struct rxrpc_call *call)
 {
 	ASSERT(call != NULL);
 
-	_enter("%p{u=%d}", call, atomic_read(&call->usage));
+	_enter("%pK{u=%d}", call, atomic_read(&call->usage));
 
 	ASSERTCMP(atomic_read(&call->usage), >, 0);
 
@@ -702,7 +702,7 @@ static void rxrpc_destroy_call(struct work_struct *work)
 	struct rxrpc_call *call =
 		container_of(work, struct rxrpc_call, destroyer);
 
-	_enter("%p{%d,%d,%p}",
+	_enter("%pK{%d,%d,%pK}",
 	       call, atomic_read(&call->usage), call->channel, call->conn);
 
 	ASSERTCMP(call->state, ==, RXRPC_CALL_DEAD);
@@ -728,7 +728,7 @@ void __exit rxrpc_destroy_all_calls(void)
 
 	while (!list_empty(&rxrpc_calls)) {
 		call = list_entry(rxrpc_calls.next, struct rxrpc_call, link);
-		_debug("Zapping call %p", call);
+		_debug("Zapping call %pK", call);
 
 		list_del_init(&call->link);
 
@@ -744,7 +744,7 @@ void __exit rxrpc_destroy_all_calls(void)
 				break;
 		default:
 			printk(KERN_ERR "RXRPC:"
-			       " Call %p still in use (%d,%d,%s,%lx,%lx)!\n",
+			       " Call %pK still in use (%d,%d,%s,%lx,%lx)!\n",
 			       call, atomic_read(&call->usage),
 			       atomic_read(&call->ackr_not_idle),
 			       rxrpc_call_states[call->state],

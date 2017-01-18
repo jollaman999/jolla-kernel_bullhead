@@ -1097,7 +1097,7 @@ static int ufx_ops_open(struct fb_info *info, int user)
 		fb_deferred_io_init(info);
 	}
 
-	pr_debug("open /dev/fb%d user=%d fb_info=%p count=%d",
+	pr_debug("open /dev/fb%d user=%d fb_info=%pK count=%d",
 		info->node, user, info, dev->fb_count);
 
 	return 0;
@@ -1116,7 +1116,7 @@ static void ufx_free(struct kref *kref)
 	if (dev->urbs.count > 0)
 		ufx_free_urb_list(dev);
 
-	pr_debug("freeing ufx_data %p", dev);
+	pr_debug("freeing ufx_data %pK", dev);
 
 	kfree(dev);
 }
@@ -1646,7 +1646,7 @@ static int ufx_usb_probe(struct usb_interface *interface,
 
 	dev_dbg(dev->gdev, "%s %s - serial #%s\n",
 		usbdev->manufacturer, usbdev->product, usbdev->serial);
-	dev_dbg(dev->gdev, "vid_%04x&pid_%04x&rev_%04x driver's ufx_data struct at %p\n",
+	dev_dbg(dev->gdev, "vid_%04x&pid_%04x&rev_%04x driver's ufx_data struct at %pK\n",
 		usbdev->descriptor.idVendor, usbdev->descriptor.idProduct,
 		usbdev->descriptor.bcdDevice, dev);
 	dev_dbg(dev->gdev, "console enable=%d\n", console);

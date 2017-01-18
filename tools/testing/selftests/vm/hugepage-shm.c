@@ -70,7 +70,7 @@ int main(void)
 		shmctl(shmid, IPC_RMID, NULL);
 		exit(2);
 	}
-	printf("shmaddr: %p\n", shmaddr);
+	printf("shmaddr: %pK\n", shmaddr);
 
 	dprintf("Starting the writes:\n");
 	for (i = 0; i < LENGTH; i++) {

@@ -599,7 +599,7 @@ static int request_bridge_resources(struct cfg_hostres *res)
 	/* First window is for DSP internal memory */
 	dev_dbg(bridge, "mem_base[0] 0x%x\n", host_res->mem_base[0]);
 	dev_dbg(bridge, "mem_base[3] 0x%x\n", host_res->mem_base[3]);
-	dev_dbg(bridge, "dmmu_base %p\n", host_res->dmmu_base);
+	dev_dbg(bridge, "dmmu_base %pK\n", host_res->dmmu_base);
 
 	/* for 24xx base port is not mapping the mamory for DSP
 	 * internal memory TODO Do a ioremap here */
@@ -666,7 +666,7 @@ int drv_request_bridge_res_dsp(void **phost_resources)
 			host_res->mem_base[3]);
 		dev_dbg(bridge, "mem_base[4] 0x%x\n",
 			host_res->mem_base[4]);
-		dev_dbg(bridge, "dmmu_base %p\n", host_res->dmmu_base);
+		dev_dbg(bridge, "dmmu_base %pK\n", host_res->dmmu_base);
 
 		shm_size = drv_datap->shm_size;
 		if (shm_size >= 0x10000) {

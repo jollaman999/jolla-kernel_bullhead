@@ -630,7 +630,7 @@ int nfs4_setup_sequence(const struct nfs_server *server,
 		goto out;
 	}
 
-	dprintk("--> %s clp %p session %p sr_slot %d\n",
+	dprintk("--> %s clp %pK session %pK sr_slot %d\n",
 		__func__, session->clp, session, res->sr_slot ?
 			res->sr_slot->slot_nr : -1);
 
@@ -651,7 +651,7 @@ static void nfs41_call_sync_prepare(struct rpc_task *task, void *calldata)
 	struct nfs41_call_sync_data *data = calldata;
 	struct nfs4_session *session = nfs4_get_session(data->seq_server);
 
-	dprintk("--> %s data->seq_server %p\n", __func__, data->seq_server);
+	dprintk("--> %s data->seq_server %pK\n", __func__, data->seq_server);
 
 	nfs41_setup_sequence(session, data->seq_args, data->seq_res, task);
 }
@@ -4085,7 +4085,7 @@ static ssize_t __nfs4_get_acl_uncached(struct inode *inode, void *buf, size_t bu
 	args.acl_len = npages * PAGE_SIZE;
 	args.acl_pgbase = 0;
 
-	dprintk("%s  buf %p buflen %zu npages %d args.acl_len %zu\n",
+	dprintk("%s  buf %pK buflen %zu npages %d args.acl_len %zu\n",
 		__func__, buf, buflen, npages, args.acl_len);
 	ret = nfs4_call_sync(NFS_SERVER(inode)->client, NFS_SERVER(inode),
 			     &msg, &args.seq_args, &res.seq_res, 0);
@@ -5924,7 +5924,7 @@ int nfs4_proc_create_session(struct nfs_client *clp, struct rpc_cred *cred)
 	unsigned *ptr;
 	struct nfs4_session *session = clp->cl_session;
 
-	dprintk("--> %s clp=%p session=%p\n", __func__, clp, session);
+	dprintk("--> %s clp=%pK session=%pK\n", __func__, clp, session);
 
 	status = _nfs4_proc_create_session(clp, cred);
 	if (status)
@@ -6024,7 +6024,7 @@ static void nfs41_sequence_call_done(struct rpc_task *task, void *data)
 			return;
 		}
 	}
-	dprintk("%s rpc_cred %p\n", __func__, task->tk_msg.rpc_cred);
+	dprintk("%s rpc_cred %pK\n", __func__, task->tk_msg.rpc_cred);
 out:
 	dprintk("<-- %s\n", __func__);
 }
@@ -6802,7 +6802,7 @@ static int _nfs41_test_stateid(struct nfs_server *server, nfs4_stateid *stateid)
 		.rpc_resp = &res,
 	};
 
-	dprintk("NFS call  test_stateid %p\n", stateid);
+	dprintk("NFS call  test_stateid %pK\n", stateid);
 	nfs41_init_sequence(&args.seq_args, &res.seq_res, 0);
 	nfs4_set_sequence_privileged(&args.seq_args);
 	status = nfs4_call_sync_sequence(server->client, server, &msg,
@@ -6892,7 +6892,7 @@ static struct rpc_task *_nfs41_free_stateid(struct nfs_server *server,
 	};
 	struct nfs_free_stateid_data *data;
 
-	dprintk("NFS call  free_stateid %p\n", stateid);
+	dprintk("NFS call  free_stateid %pK\n", stateid);
 	data = kmalloc(sizeof(*data), GFP_NOFS);
 	if (!data)
 		return ERR_PTR(-ENOMEM);

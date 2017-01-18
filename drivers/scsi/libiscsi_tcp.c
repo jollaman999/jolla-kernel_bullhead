@@ -911,7 +911,7 @@ int iscsi_tcp_recv_skb(struct iscsi_conn *conn, struct sk_buff *skb,
 		}
 		BUG_ON(segment->copied >= segment->size);
 
-		ISCSI_DBG_TCP(conn, "skb %p ptr=%p avail=%u\n", skb, ptr,
+		ISCSI_DBG_TCP(conn, "skb %pK ptr=%pK avail=%u\n", skb, ptr,
 			      avail);
 		rc = iscsi_tcp_segment_recv(tcp_conn, segment, ptr, avail);
 		BUG_ON(rc == 0);
@@ -994,7 +994,7 @@ static struct iscsi_r2t_info *iscsi_tcp_get_curr_r2t(struct iscsi_task *task)
 			/* Continue with this R2T? */
 			if (r2t->data_length <= r2t->sent) {
 				ISCSI_DBG_TCP(task->conn,
-					      "  done with r2t %p\n", r2t);
+					      "  done with r2t %pK\n", r2t);
 				kfifo_in(&tcp_task->r2tpool.queue,
 					    (void *)&tcp_task->r2t,
 					    sizeof(void *));
@@ -1060,7 +1060,7 @@ flush:
 		return rc;
 	iscsi_prep_data_out_pdu(task, r2t, (struct iscsi_data *) task->hdr);
 
-	ISCSI_DBG_TCP(conn, "sol dout %p [dsn %d itt 0x%x doff %d dlen %d]\n",
+	ISCSI_DBG_TCP(conn, "sol dout %pK [dsn %d itt 0x%x doff %d dlen %d]\n",
 		      r2t, r2t->datasn - 1, task->hdr->itt,
 		      r2t->data_offset + r2t->sent, r2t->data_count);
 

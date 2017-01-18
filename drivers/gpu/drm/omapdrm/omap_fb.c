@@ -104,7 +104,7 @@ static void omap_framebuffer_destroy(struct drm_framebuffer *fb)
 	struct omap_framebuffer *omap_fb = to_omap_framebuffer(fb);
 	int i, n = drm_format_num_planes(fb->pixel_format);
 
-	DBG("destroy: FB ID: %d (%p)", fb->base.id, fb);
+	DBG("destroy: FB ID: %d (%pK)", fb->base.id, fb);
 
 	drm_framebuffer_cleanup(fb);
 
@@ -331,7 +331,7 @@ void omap_framebuffer_flush(struct drm_framebuffer *fb,
 {
 	struct drm_connector *connector = NULL;
 
-	VERB("flush: %d,%d %dx%d, fb=%p", x, y, w, h, fb);
+	VERB("flush: %d,%d %dx%d, fb=%pK", x, y, w, h, fb);
 
 	while ((connector = omap_framebuffer_get_next_connector(fb, connector))) {
 		/* only consider connectors that are part of a chain */
@@ -398,7 +398,7 @@ struct drm_framebuffer *omap_framebuffer_init(struct drm_device *dev,
 	const struct format *format = NULL;
 	int ret, i, n = drm_format_num_planes(mode_cmd->pixel_format);
 
-	DBG("create framebuffer: dev=%p, mode_cmd=%p (%dx%d@%4.4s)",
+	DBG("create framebuffer: dev=%pK, mode_cmd=%pK (%dx%d@%4.4s)",
 			dev, mode_cmd, mode_cmd->width, mode_cmd->height,
 			(char *)&mode_cmd->pixel_format);
 
@@ -459,7 +459,7 @@ struct drm_framebuffer *omap_framebuffer_init(struct drm_device *dev,
 		goto fail;
 	}
 
-	DBG("create: FB ID: %d (%p)", fb->base.id, fb);
+	DBG("create: FB ID: %d (%pK)", fb->base.id, fb);
 
 	return fb;
 

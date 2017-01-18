@@ -409,7 +409,7 @@ csio_confirm_rnode(struct csio_lnode *ln, uint32_t rdev_flowid,
 	}
 
 found_rnode:
-	csio_ln_dbg(ln, "found rnode:%p ssni:x%x name(wwpn):%llx\n",
+	csio_ln_dbg(ln, "found rnode:%pK ssni:x%x name(wwpn):%llx\n",
 		rn, rdev_flowid, wwn_to_u64(rdevp->wwpn));
 
 	/* Update flowid */
@@ -425,7 +425,7 @@ alloc_rnode:
 	if (!rn)
 		return NULL;
 
-	csio_ln_dbg(ln, "alloc rnode:%p ssni:x%x name(wwpn):%llx\n",
+	csio_ln_dbg(ln, "alloc rnode:%pK ssni:x%x name(wwpn):%llx\n",
 		rn, rdev_flowid, wwn_to_u64(rdevp->wwpn));
 
 	/* update rdev entry */

@@ -292,7 +292,7 @@ static int s3c_cpufreq_target(struct cpufreq_policy *policy,
 
 	last_target = target_freq;
 
-	s3c_freq_dbg("%s: policy %p, target %u, relation %u\n",
+	s3c_freq_dbg("%s: policy %pK, target %u, relation %u\n",
 		     __func__, policy, target_freq, relation);
 
 	if (ftab) {
@@ -373,7 +373,7 @@ struct clk *s3c_cpufreq_clk_get(struct device *dev, const char *name)
 
 static int s3c_cpufreq_init(struct cpufreq_policy *policy)
 {
-	printk(KERN_INFO "%s: initialising policy %p\n", __func__, policy);
+	printk(KERN_INFO "%s: initialising policy %pK\n", __func__, policy);
 
 	if (policy->cpu != 0)
 		return -EINVAL;
@@ -441,7 +441,7 @@ static int s3c_cpufreq_resume(struct cpufreq_policy *policy)
 {
 	int ret;
 
-	s3c_freq_dbg("%s: resuming with policy %p\n", __func__, policy);
+	s3c_freq_dbg("%s: resuming with policy %pK\n", __func__, policy);
 
 	last_target = ~0;	/* invalidate last_target setting */
 

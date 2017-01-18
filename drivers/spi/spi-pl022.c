@@ -665,7 +665,7 @@ static void readwriter(struct pl022 *pl022)
 	 * FIFO status flag indicates.
 	 */
 	dev_dbg(&pl022->adev->dev,
-		"%s, rx: %p, rxend: %p, tx: %p, txend: %p\n",
+		"%s, rx: %pK, rxend: %pK, tx: %pK, txend: %pK\n",
 		__func__, pl022->rx, pl022->rx_end, pl022->tx, pl022->tx_end);
 
 	/* Read as much as you can */
@@ -873,7 +873,7 @@ static void setup_dma_scatter(struct pl022 *pl022,
 			bufp += mapbytes;
 			bytesleft -= mapbytes;
 			dev_dbg(&pl022->adev->dev,
-				"set RX/TX target page @ %p, %d bytes, %d left\n",
+				"set RX/TX target page @ %pK, %d bytes, %d left\n",
 				bufp, mapbytes, bytesleft);
 		}
 	} else {
@@ -2222,7 +2222,7 @@ static int pl022_probe(struct amba_device *adev, const struct amba_id *id)
 		status = -ENOMEM;
 		goto err_no_ioremap;
 	}
-	printk(KERN_INFO "pl022: mapped registers from 0x%08x to %p\n",
+	printk(KERN_INFO "pl022: mapped registers from 0x%08x to %pK\n",
 	       adev->res.start, pl022->virtbase);
 
 	pl022->clk = devm_clk_get(&adev->dev, NULL);

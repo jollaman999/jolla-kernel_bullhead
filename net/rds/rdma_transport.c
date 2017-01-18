@@ -73,7 +73,7 @@ int rds_rdma_cm_event_handler(struct rdma_cm_id *cm_id,
 	struct rds_transport *trans;
 	int ret = 0;
 
-	rdsdebug("conn %p id %p handling event %u (%s)\n", conn, cm_id,
+	rdsdebug("conn %pK id %pK handling event %u (%s)\n", conn, cm_id,
 		 event->event, rds_cm_event_str(event->event));
 
 	if (cm_id->device->node_type == RDMA_NODE_RNIC)
@@ -147,7 +147,7 @@ out:
 	if (conn)
 		mutex_unlock(&conn->c_cm_lock);
 
-	rdsdebug("id %p event %u (%s) handling ret %d\n", cm_id, event->event,
+	rdsdebug("id %pK event %u (%s) handling ret %d\n", cm_id, event->event,
 		 rds_cm_event_str(event->event), ret);
 
 	return ret;
@@ -190,7 +190,7 @@ static int rds_rdma_listen_init(void)
 		goto out;
 	}
 
-	rdsdebug("cm %p listening on port %u\n", cm_id, RDS_PORT);
+	rdsdebug("cm %pK listening on port %u\n", cm_id, RDS_PORT);
 
 	rds_rdma_listen_id = cm_id;
 	cm_id = NULL;
@@ -203,7 +203,7 @@ out:
 static void rds_rdma_listen_stop(void)
 {
 	if (rds_rdma_listen_id) {
-		rdsdebug("cm %p\n", rds_rdma_listen_id);
+		rdsdebug("cm %pK\n", rds_rdma_listen_id);
 		rdma_destroy_id(rds_rdma_listen_id);
 		rds_rdma_listen_id = NULL;
 	}

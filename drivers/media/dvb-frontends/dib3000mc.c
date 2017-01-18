@@ -159,7 +159,7 @@ static int dib3000mc_set_output_mode(struct dib3000mc_state *state, int mode)
 	u16 elecout = 1;
 	u16 smo_reg = dib3000mc_read_word(state, 206) & 0x0010; /* keep the pid_parse bit */
 
-	dprintk("-I-  Setting output mode for demod %p to %d\n",
+	dprintk("-I-  Setting output mode for demod %pK to %d\n",
 			&state->demod, mode);
 
 	switch (mode) {
@@ -194,7 +194,7 @@ static int dib3000mc_set_output_mode(struct dib3000mc_state *state, int mode)
 			elecout = 1;
 			break;
 		default:
-			dprintk("Unhandled output_mode passed to be set for demod %p\n",&state->demod);
+			dprintk("Unhandled output_mode passed to be set for demod %pK\n",&state->demod);
 			outmode = 0;
 			break;
 	}

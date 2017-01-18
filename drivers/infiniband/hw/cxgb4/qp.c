@@ -202,7 +202,7 @@ static int create_qp(struct c4iw_rdev *rdev, struct t4_wq *wq,
 		ret = -ENOMEM;
 		goto free_sq;
 	}
-	PDBG("%s sq base va 0x%p pa 0x%llx rq base va 0x%p pa 0x%llx\n",
+	PDBG("%s sq base va 0x%pK pa 0x%llx rq base va 0x%pK pa 0x%llx\n",
 		__func__, wq->sq.queue,
 		(unsigned long long)virt_to_phys(wq->sq.queue),
 		wq->rq.queue,
@@ -299,7 +299,7 @@ static int create_qp(struct c4iw_rdev *rdev, struct t4_wq *wq,
 	if (ret)
 		goto free_dma;
 
-	PDBG("%s sqid 0x%x rqid 0x%x kdb 0x%p squdb 0x%llx rqudb 0x%llx\n",
+	PDBG("%s sqid 0x%x rqid 0x%x kdb 0x%pK squdb 0x%llx rqudb 0x%llx\n",
 	     __func__, wq->sq.qid, wq->rq.qid, wq->db,
 	     (unsigned long long)wq->sq.udb, (unsigned long long)wq->rq.udb);
 
@@ -627,13 +627,13 @@ static int build_inv_stag(union t4_wr *wqe, struct ib_send_wr *wr,
 
 void c4iw_qp_add_ref(struct ib_qp *qp)
 {
-	PDBG("%s ib_qp %p\n", __func__, qp);
+	PDBG("%s ib_qp %pK\n", __func__, qp);
 	atomic_inc(&(to_c4iw_qp(qp)->refcnt));
 }
 
 void c4iw_qp_rem_ref(struct ib_qp *qp)
 {
-	PDBG("%s ib_qp %p\n", __func__, qp);
+	PDBG("%s ib_qp %pK\n", __func__, qp);
 	if (atomic_dec_and_test(&(to_c4iw_qp(qp)->refcnt)))
 		wake_up(&(to_c4iw_qp(qp)->wait));
 }
@@ -965,7 +965,7 @@ static void post_terminate(struct c4iw_qp *qhp, struct t4_cqe *err_cqe,
 	struct sk_buff *skb;
 	struct terminate_message *term;
 
-	PDBG("%s qhp %p qid 0x%x tid %u\n", __func__, qhp, qhp->wq.sq.qid,
+	PDBG("%s qhp %pK qid 0x%x tid %u\n", __func__, qhp, qhp->wq.sq.qid,
 	     qhp->ep->hwtid);
 
 	skb = alloc_skb(sizeof *wqe, gfp);
@@ -1001,7 +1001,7 @@ static void __flush_qp(struct c4iw_qp *qhp, struct c4iw_cq *rchp,
 	int flushed;
 	unsigned long flag;
 
-	PDBG("%s qhp %p rchp %p schp %p\n", __func__, qhp, rchp, schp);
+	PDBG("%s qhp %pK rchp %pK schp %pK\n", __func__, qhp, rchp, schp);
 
 	/* locking hierarchy: cq lock first, then qp lock. */
 	spin_lock_irqsave(&rchp->lock, flag);
@@ -1065,7 +1065,7 @@ static int rdma_fini(struct c4iw_dev *rhp, struct c4iw_qp *qhp,
 	int ret;
 	struct sk_buff *skb;
 
-	PDBG("%s qhp %p qid 0x%x tid %u\n", __func__, qhp, qhp->wq.sq.qid,
+	PDBG("%s qhp %pK qid 0x%x tid %u\n", __func__, qhp, qhp->wq.sq.qid,
 	     ep->hwtid);
 
 	skb = alloc_skb(sizeof *wqe, GFP_KERNEL);
@@ -1126,7 +1126,7 @@ static int rdma_init(struct c4iw_dev *rhp, struct c4iw_qp *qhp)
 	int ret;
 	struct sk_buff *skb;
 
-	PDBG("%s qhp %p qid 0x%x tid %u\n", __func__, qhp, qhp->wq.sq.qid,
+	PDBG("%s qhp %pK qid 0x%x tid %u\n", __func__, qhp, qhp->wq.sq.qid,
 	     qhp->ep->hwtid);
 
 	skb = alloc_skb(sizeof *wqe, GFP_KERNEL);
@@ -1233,7 +1233,7 @@ int c4iw_modify_qp(struct c4iw_dev *rhp, struct c4iw_qp *qhp,
 	int free = 0;
 	struct c4iw_ep *ep = NULL;
 
-	PDBG("%s qhp %p sqid 0x%x rqid 0x%x ep %p state %d -> %d\n", __func__,
+	PDBG("%s qhp %pK sqid 0x%x rqid 0x%x ep %pK state %d -> %d\n", __func__,
 	     qhp, qhp->wq.sq.qid, qhp->wq.rq.qid, qhp->ep, qhp->attr.state,
 	     (mask & C4IW_QP_ATTR_NEXT_STATE) ? attrs->next_state : -1);
 
@@ -1413,7 +1413,7 @@ int c4iw_modify_qp(struct c4iw_dev *rhp, struct c4iw_qp *qhp,
 	}
 	goto out;
 err:
-	PDBG("%s disassociating ep %p qpid 0x%x\n", __func__, qhp->ep,
+	PDBG("%s disassociating ep %pK qpid 0x%x\n", __func__, qhp->ep,
 	     qhp->wq.sq.qid);
 
 	/* disassociate the LLP connection */
@@ -1500,7 +1500,7 @@ int c4iw_destroy_qp(struct ib_qp *ib_qp)
 	destroy_qp(&rhp->rdev, &qhp->wq,
 		   ucontext ? &ucontext->uctx : &rhp->rdev.uctx);
 
-	PDBG("%s ib_qp %p qpid 0x%0x\n", __func__, ib_qp, qhp->wq.sq.qid);
+	PDBG("%s ib_qp %pK qpid 0x%0x\n", __func__, ib_qp, qhp->wq.sq.qid);
 	kfree(qhp);
 	return 0;
 }
@@ -1527,7 +1527,7 @@ struct ib_qp *c4iw_create_qp(struct ib_pd *pd, struct ib_qp_init_attr *attrs,
 	int ret;
 	struct c4iw_mm_entry *mm1, *mm2, *mm3, *mm4, *mm5 = NULL;
 
-	PDBG("%s ib_pd %p\n", __func__, pd);
+	PDBG("%s ib_pd %pK\n", __func__, pd);
 
 	if (attrs->qp_type != IB_QPT_RC)
 		return ERR_PTR(-EINVAL);
@@ -1696,7 +1696,7 @@ struct ib_qp *c4iw_create_qp(struct ib_pd *pd, struct ib_qp_init_attr *attrs,
 	}
 	qhp->ibqp.qp_num = qhp->wq.sq.qid;
 	init_timer(&(qhp->timer));
-	PDBG("%s qhp %p sq_num_entries %d, rq_num_entries %d qpid 0x%0x\n",
+	PDBG("%s qhp %pK sq_num_entries %d, rq_num_entries %d qpid 0x%0x\n",
 	     __func__, qhp, qhp->attr.sq_num_entries, qhp->attr.rq_num_entries,
 	     qhp->wq.sq.qid);
 	return &qhp->ibqp;
@@ -1728,7 +1728,7 @@ int c4iw_ib_modify_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
 	enum c4iw_qp_attr_mask mask = 0;
 	struct c4iw_qp_attributes attrs;
 
-	PDBG("%s ib_qp %p\n", __func__, ibqp);
+	PDBG("%s ib_qp %pK\n", __func__, ibqp);
 
 	/* iwarp does not support the RTR state */
 	if ((attr_mask & IB_QP_STATE) && (attr->qp_state == IB_QPS_RTR))
@@ -1770,7 +1770,7 @@ int c4iw_ib_modify_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
 
 struct ib_qp *c4iw_get_qp(struct ib_device *dev, int qpn)
 {
-	PDBG("%s ib_dev %p qpn 0x%x\n", __func__, dev, qpn);
+	PDBG("%s ib_dev %pK qpn 0x%x\n", __func__, dev, qpn);
 	return (struct ib_qp *)get_qhp(to_c4iw_dev(dev), qpn);
 }
 

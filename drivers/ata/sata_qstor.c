@@ -319,7 +319,7 @@ static inline void qs_packet_start(struct ata_queued_cmd *qc)
 	struct ata_port *ap = qc->ap;
 	u8 __iomem *chan = qs_mmio_base(ap->host) + (ap->port_no * 0x4000);
 
-	VPRINTK("ENTER, ap %p\n", ap);
+	VPRINTK("ENTER, ap %pK\n", ap);
 
 	writeb(QS_CTR0_CLER, chan + QS_CCT_CTR0);
 	wmb();                             /* flush PRDs and pkt to memory */

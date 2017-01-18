@@ -321,7 +321,7 @@ static int wfd_allocate_input_buffers(struct wfd_device *wfd_dev,
 			rc = -EINVAL;
 			goto alloc_fail;
 		}
-		WFD_MSG_DBG("NOTE: enc paddr = [%p->%p], kvaddr = %p\n",
+		WFD_MSG_DBG("NOTE: enc paddr = [%pK->%pK], kvaddr = %pK\n",
 				enc_mregion->paddr, (int8_t *)
 				enc_mregion->paddr + enc_mregion->size,
 				enc_mregion->kvaddr);
@@ -350,7 +350,7 @@ static int wfd_allocate_input_buffers(struct wfd_device *wfd_dev,
 
 		if (rc) {
 			WFD_MSG_ERR(
-				"Failed to map to mdp, rc = %d, paddr = 0x%p\n",
+				"Failed to map to mdp, rc = %d, paddr = 0x%pK\n",
 				rc, mdp_mregion->paddr);
 			mdp_mregion->kvaddr = NULL;
 			mdp_mregion->paddr = NULL;
@@ -371,7 +371,7 @@ static int wfd_allocate_input_buffers(struct wfd_device *wfd_dev,
 		mdp_buf.kvaddr = (u32) mdp_mregion->kvaddr;
 		mdp_buf.paddr = (u32) mdp_mregion->paddr;
 
-		WFD_MSG_DBG("NOTE: mdp paddr = [%p->%p], kvaddr = %p\n",
+		WFD_MSG_DBG("NOTE: mdp paddr = [%pK->%pK], kvaddr = %pK\n",
 				mdp_mregion->paddr, (void *)
 				((int)mdp_mregion->paddr + mdp_mregion->size),
 				mdp_mregion->kvaddr);

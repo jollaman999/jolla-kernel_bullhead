@@ -648,7 +648,7 @@ static void handle_rx(struct vhost_net *net)
 		if (unlikely(vhost_hlen) &&
 		    memcpy_toiovecend(nvq->hdr, (unsigned char *)&hdr, 0,
 				      vhost_hlen)) {
-			vq_err(vq, "Unable to write vnet_hdr at addr %p\n",
+			vq_err(vq, "Unable to write vnet_hdr at addr %pK\n",
 			       vq->iov->iov_base);
 			break;
 		}

@@ -412,7 +412,7 @@ static int notify_for_subsystem(struct subsys_info *ss_info)
 			ss_info_channel->cb_data->event != GLINK_CONNECTED ||
 				!ss_info_channel->link_up) {
 
-			GLINK_INFO("<SSR> %s: %s:%s %s[%d], %s[%p], %s[%d]\n",
+			GLINK_INFO("<SSR> %s: %s:%s %s[%d], %s[%pK], %s[%d]\n",
 				__func__, ss_leaf_entry->edge, "Not connected",
 				"resp. remaining",
 				atomic_read(&responses_remaining), "handle",

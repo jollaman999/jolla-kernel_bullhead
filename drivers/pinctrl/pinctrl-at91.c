@@ -1636,7 +1636,7 @@ static int at91_gpio_probe(struct platform_device *pdev)
 
 	at91_gpio_of_irq_setup(np, at91_chip);
 
-	dev_info(&pdev->dev, "at address %p\n", at91_chip->regbase);
+	dev_info(&pdev->dev, "at address %pK\n", at91_chip->regbase);
 
 	return 0;
 

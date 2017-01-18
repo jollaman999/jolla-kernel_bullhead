@@ -2256,7 +2256,7 @@ qla82xx_start_scsi(srb_t *sp)
 		if (qla2x00_marker(vha, req,
 			rsp, 0, 0, MK_SYNC_ALL) != QLA_SUCCESS) {
 			ql_log(ql_log_warn, vha, 0x300c,
-			    "qla2x00_marker failed for cmd=%p.\n", cmd);
+			    "qla2x00_marker failed for cmd=%pK.\n", cmd);
 			return QLA_FUNCTION_FAILED;
 		}
 		vha->marker_needed = 0;
@@ -2297,7 +2297,7 @@ qla82xx_start_scsi(srb_t *sp)
 		more_dsd_lists = qla24xx_calc_dsd_lists(tot_dsds);
 		if ((more_dsd_lists + ha->gbl_dsd_inuse) >= NUM_DSD_CHAIN) {
 			ql_dbg(ql_dbg_io, vha, 0x300d,
-			    "Num of DSD list %d is than %d for cmd=%p.\n",
+			    "Num of DSD list %d is than %d for cmd=%pK.\n",
 			    more_dsd_lists + ha->gbl_dsd_inuse, NUM_DSD_CHAIN,
 			    cmd);
 			goto queuing_error;
@@ -2313,7 +2313,7 @@ qla82xx_start_scsi(srb_t *sp)
 			if (!dsd_ptr) {
 				ql_log(ql_log_fatal, vha, 0x300e,
 				    "Failed to allocate memory for dsd_dma "
-				    "for cmd=%p.\n", cmd);
+				    "for cmd=%pK.\n", cmd);
 				goto queuing_error;
 			}
 
@@ -2323,7 +2323,7 @@ qla82xx_start_scsi(srb_t *sp)
 				kfree(dsd_ptr);
 				ql_log(ql_log_fatal, vha, 0x300f,
 				    "Failed to allocate memory for dsd_addr "
-				    "for cmd=%p.\n", cmd);
+				    "for cmd=%pK.\n", cmd);
 				goto queuing_error;
 			}
 			list_add_tail(&dsd_ptr->list, &ha->gbl_dsd_list);
@@ -2349,7 +2349,7 @@ sufficient_dsds:
 		    mempool_alloc(ha->ctx_mempool, GFP_ATOMIC);
 		if (!ctx) {
 			ql_log(ql_log_fatal, vha, 0x3010,
-			    "Failed to allocate ctx for cmd=%p.\n", cmd);
+			    "Failed to allocate ctx for cmd=%pK.\n", cmd);
 			goto queuing_error;
 		}
 
@@ -2358,7 +2358,7 @@ sufficient_dsds:
 			GFP_ATOMIC, &ctx->fcp_cmnd_dma);
 		if (!ctx->fcp_cmnd) {
 			ql_log(ql_log_fatal, vha, 0x3011,
-			    "Failed to allocate fcp_cmnd for cmd=%p.\n", cmd);
+			    "Failed to allocate fcp_cmnd for cmd=%pK.\n", cmd);
 			goto queuing_error;
 		}
 
@@ -2374,7 +2374,7 @@ sufficient_dsds:
 				 */
 				ql_log(ql_log_warn, vha, 0x3012,
 				    "scsi cmd len %d not multiple of 4 "
-				    "for cmd=%p.\n", cmd->cmd_len, cmd);
+				    "for cmd=%pK.\n", cmd->cmd_len, cmd);
 				goto queuing_error_fcp_cmnd;
 			}
 			ctx->fcp_cmnd_len = 12 + cmd->cmd_len + 4;

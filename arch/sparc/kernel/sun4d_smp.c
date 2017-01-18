@@ -136,7 +136,7 @@ int smp4d_boot_one_cpu(int i, struct task_struct *idle)
 	smp_penguin_ctable.reg_size = 0;
 
 	/* whirrr, whirrr, whirrrrrrrrr... */
-	printk(KERN_INFO "Starting CPU %d at %p\n", i, entry);
+	printk(KERN_INFO "Starting CPU %d at %pK\n", i, entry);
 	local_ops->cache_all();
 	prom_startcpu(cpu_node,
 		      &smp_penguin_ctable, 0, (char *)entry);

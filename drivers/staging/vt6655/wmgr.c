@@ -4114,7 +4114,7 @@ s_vMgrRxProbeResponse(
 	    (sFrame.pwCapInfo == 0) ||
 	    (sFrame.pSSID == 0) ||
 	    (sFrame.pSuppRates == 0)) {
-		DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "Probe resp:Fail addr:[%p] \n", pRxPacket->p80211Header);
+		DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "Probe resp:Fail addr:[%pK] \n", pRxPacket->p80211Header);
 		DBG_PORT80(0xCC);
 		return;
 	}

@@ -429,7 +429,7 @@ static void ath6kl_usb_post_recv_transfers(struct ath6kl_usb_pipe *recv_pipe,
 				  ath6kl_usb_recv_complete, urb_context);
 
 		ath6kl_dbg(ATH6KL_DBG_USB_BULK,
-			   "ath6kl usb: bulk recv submit:%d, 0x%X (ep:0x%2.2X), %d bytes buf:0x%p\n",
+			   "ath6kl usb: bulk recv submit:%d, 0x%X (ep:0x%2.2X), %d bytes buf:0x%pK\n",
 			   recv_pipe->logical_pipe_num,
 			   recv_pipe->usb_pipe_handle, recv_pipe->ep_address,
 			   buffer_length, urb_context->skb);
@@ -496,7 +496,7 @@ static void ath6kl_usb_recv_complete(struct urb *urb)
 	int status = 0;
 
 	ath6kl_dbg(ATH6KL_DBG_USB_BULK,
-		   "%s: recv pipe: %d, stat:%d, len:%d urb:0x%p\n", __func__,
+		   "%s: recv pipe: %d, stat:%d, len:%d urb:0x%pK\n", __func__,
 		   pipe->logical_pipe_num, urb->status, urb->actual_length,
 		   urb);
 
@@ -584,11 +584,11 @@ static void ath6kl_usb_io_comp_work(struct work_struct *work)
 	while ((skb = skb_dequeue(&pipe->io_comp_queue))) {
 		if (pipe->flags & ATH6KL_USB_PIPE_FLAG_TX) {
 			ath6kl_dbg(ATH6KL_DBG_USB_BULK,
-				   "ath6kl usb xmit callback buf:0x%p\n", skb);
+				   "ath6kl usb xmit callback buf:0x%pK\n", skb);
 			ath6kl_core_tx_complete(ar_usb->ar, skb);
 		} else {
 			ath6kl_dbg(ATH6KL_DBG_USB_BULK,
-				   "ath6kl usb recv callback buf:0x%p\n", skb);
+				   "ath6kl usb recv callback buf:0x%pK\n", skb);
 			ath6kl_core_rx_complete(ar_usb->ar, skb,
 						pipe->logical_pipe_num);
 		}
@@ -702,7 +702,7 @@ static int ath6kl_usb_send(struct ath6kl *ar, u8 PipeID,
 	u8 *data;
 	u32 len;
 
-	ath6kl_dbg(ATH6KL_DBG_USB_BULK, "+%s pipe : %d, buf:0x%p\n",
+	ath6kl_dbg(ATH6KL_DBG_USB_BULK, "+%s pipe : %d, buf:0x%pK\n",
 		   __func__, PipeID, skb);
 
 	urb_context = ath6kl_usb_alloc_urb_from_pipe(pipe);

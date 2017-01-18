@@ -301,7 +301,7 @@ static int ft1000_open (struct inode *inode, struct file *file)
 
 	info = file->private_data = netdev_priv(dev->net);
 
-    DEBUG("f_owner = %p number of application = %d\n", (&file->f_owner), dev->appcnt );
+    DEBUG("f_owner = %pK number of application = %d\n", (&file->f_owner), dev->appcnt );
 
     // Check if maximum number of application exceeded
     if (dev->appcnt > MAX_NUM_APP) {

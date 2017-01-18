@@ -1668,7 +1668,7 @@ struct cmd_ctrl_node *__lbs_cmd_async(struct lbs_private *priv,
 	wake_up(&priv->waitq);
 
  done:
-	lbs_deb_leave_args(LBS_DEB_HOST, "ret %p", cmdnode);
+	lbs_deb_leave_args(LBS_DEB_HOST, "ret %pK", cmdnode);
 	return cmdnode;
 }
 

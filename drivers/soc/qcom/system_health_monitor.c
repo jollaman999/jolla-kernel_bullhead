@@ -340,7 +340,7 @@ EXPORT_SYMBOL(kern_check_system_health);
  */
 static int shm_svc_connect_cb(struct qmi_handle *handle, void *conn_h)
 {
-	SHM_DEBUG("%s: conn_h %p\n", __func__, conn_h);
+	SHM_DEBUG("%s: conn_h %pK\n", __func__, conn_h);
 	return 0;
 }
 
@@ -359,7 +359,7 @@ static void shm_svc_disconnect_worker(struct work_struct *work)
 	mutex_lock(&hma_info_list_lock);
 	list_for_each_entry(tmp_hma_info, &hma_info_list, list) {
 		if (dwp->conn_h == tmp_hma_info->conn_h) {
-			SHM_INFO("%s: conn_h %p to HMA in %s exited\n",
+			SHM_INFO("%s: conn_h %pK to HMA in %s exited\n",
 				 __func__, dwp->conn_h,
 				 tmp_hma_info->subsys_name);
 			tmp_hma_info->conn_h = NULL;
@@ -467,7 +467,7 @@ static int handle_health_mon_reg_req(void *conn_h, void *req_h, void *buf)
 				 __func__, req->name, tmp_hma_info->timeout);
 			hma_info_found = true;
 		} else if (!strcmp(tmp_hma_info->subsys_name, req->name)) {
-			SHM_ERR("%s: Duplicate HMA from %s - cur %p, new %p\n",
+			SHM_ERR("%s: Duplicate HMA from %s - cur %pK, new %pK\n",
 				__func__, req->name, tmp_hma_info->conn_h,
 				conn_h);
 		}

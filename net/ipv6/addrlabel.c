@@ -255,7 +255,7 @@ static int __ip6addrlbl_add(struct ip6addrlbl_entry *newp, int replace)
 	struct ip6addrlbl_entry *last = NULL, *p = NULL;
 	int ret = 0;
 
-	ADDRLABEL(KERN_DEBUG "%s(newp=%p, replace=%d)\n", __func__, newp,
+	ADDRLABEL(KERN_DEBUG "%s(newp=%pK, replace=%d)\n", __func__, newp,
 		  replace);
 
 	hlist_for_each_entry_safe(p, n,	&ip6addrlbl_table.head, list) {

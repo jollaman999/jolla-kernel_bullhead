@@ -113,7 +113,7 @@ int lapb_decode(struct lapb_cb *lapb, struct sk_buff *skb,
 {
 	frame->type = LAPB_ILLEGAL;
 
-	lapb_dbg(2, "(%p) S%d RX %02X %02X %02X\n",
+	lapb_dbg(2, "(%pK) S%d RX %02X %02X %02X\n",
 		 lapb->dev, lapb->state,
 		 skb->data[0], skb->data[1], skb->data[2]);
 
@@ -284,7 +284,7 @@ void lapb_transmit_frmr(struct lapb_cb *lapb)
 		dptr++;
 		*dptr++ = lapb->frmr_type;
 
-		lapb_dbg(1, "(%p) S%d TX FRMR %02X %02X %02X %02X %02X\n",
+		lapb_dbg(1, "(%pK) S%d TX FRMR %02X %02X %02X %02X %02X\n",
 			 lapb->dev, lapb->state,
 			 skb->data[1], skb->data[2], skb->data[3],
 			 skb->data[4], skb->data[5]);
@@ -299,7 +299,7 @@ void lapb_transmit_frmr(struct lapb_cb *lapb)
 		dptr++;
 		*dptr++ = lapb->frmr_type;
 
-		lapb_dbg(1, "(%p) S%d TX FRMR %02X %02X %02X\n",
+		lapb_dbg(1, "(%pK) S%d TX FRMR %02X %02X %02X\n",
 			 lapb->dev, lapb->state, skb->data[1],
 			 skb->data[2], skb->data[3]);
 	}

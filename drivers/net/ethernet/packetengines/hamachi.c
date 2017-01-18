@@ -738,7 +738,7 @@ static int hamachi_init_one(struct pci_dev *pdev,
 		goto err_out_unmap_rx;
 	}
 
-	printk(KERN_INFO "%s: %s type %x at %p, %pM, IRQ %d.\n",
+	printk(KERN_INFO "%s: %s type %x at %pK, %pM, IRQ %d.\n",
 		   dev->name, chip_tbl[chip_id].name, readl(ioaddr + ChipRev),
 		   ioaddr, dev->dev_addr, irq);
 	i = readb(ioaddr + PCIClkMeas);
@@ -1057,12 +1057,12 @@ static void hamachi_tx_timeout(struct net_device *dev)
 		   " resetting...\n", dev->name, (int)readw(ioaddr + TxStatus));
 
 	{
-		printk(KERN_DEBUG "  Rx ring %p: ", hmp->rx_ring);
+		printk(KERN_DEBUG "  Rx ring %pK: ", hmp->rx_ring);
 		for (i = 0; i < RX_RING_SIZE; i++)
 			printk(KERN_CONT " %8.8x",
 			       le32_to_cpu(hmp->rx_ring[i].status_n_length));
 		printk(KERN_CONT "\n");
-		printk(KERN_DEBUG"  Tx ring %p: ", hmp->tx_ring);
+		printk(KERN_DEBUG"  Tx ring %pK: ", hmp->tx_ring);
 		for (i = 0; i < TX_RING_SIZE; i++)
 			printk(KERN_CONT " %4.4x",
 			       le32_to_cpu(hmp->tx_ring[i].status_n_length));
@@ -1433,7 +1433,7 @@ static int hamachi_rx(struct net_device *dev)
 			printk(KERN_WARNING "%s: Oversized Ethernet frame spanned "
 				   "multiple buffers, entry %#x length %d status %4.4x!\n",
 				   dev->name, hmp->cur_rx, data_size, desc_status);
-			printk(KERN_WARNING "%s: Oversized Ethernet frame %p vs %p.\n",
+			printk(KERN_WARNING "%s: Oversized Ethernet frame %pK vs %pK.\n",
 				   dev->name, desc, &hmp->rx_ring[hmp->cur_rx % RX_RING_SIZE]);
 			printk(KERN_WARNING "%s: Oversized Ethernet frame -- next status %x/%x last status %x.\n",
 				   dev->name,

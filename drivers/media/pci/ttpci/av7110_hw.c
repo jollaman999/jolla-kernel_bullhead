@@ -137,7 +137,7 @@ static int waitdebi(struct av7110 *av7110, int adr, int state)
 {
 	int k;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	for (k = 0; k < 100; k++) {
 		if (irdebi(av7110, DEBINOSWAP, adr, 0, 2) == state)
@@ -153,7 +153,7 @@ static int load_dram(struct av7110 *av7110, u32 *data, int len)
 	int blocks, rest;
 	u32 base, bootblock = AV7110_BOOT_BLOCK;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	blocks = len / AV7110_BOOT_MAX_SIZE;
 	rest = len % AV7110_BOOT_MAX_SIZE;
@@ -214,7 +214,7 @@ int av7110_bootarm(struct av7110 *av7110)
 	u32 ret;
 	int i;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	av7110->arm_ready = 0;
 
@@ -346,7 +346,7 @@ static int __av7110_send_fw_cmd(struct av7110 *av7110, u16* buf, int length)
 	u32 stat;
 	int err;
 
-//	dprintk(4, "%p\n", av7110);
+//	dprintk(4, "%pK\n", av7110);
 
 	if (!av7110->arm_ready) {
 		dprintk(1, "arm not ready.\n");
@@ -476,7 +476,7 @@ static int av7110_send_fw_cmd(struct av7110 *av7110, u16* buf, int length)
 {
 	int ret;
 
-//	dprintk(4, "%p\n", av7110);
+//	dprintk(4, "%pK\n", av7110);
 
 	if (!av7110->arm_ready) {
 		dprintk(1, "arm not ready.\n");
@@ -499,7 +499,7 @@ int av7110_fw_cmd(struct av7110 *av7110, int type, int com, int num, ...)
 	u16 buf[MAX_XFER_SIZE];
 	int i, ret;
 
-//	dprintk(4, "%p\n", av7110);
+//	dprintk(4, "%pK\n", av7110);
 
 	if (2 + num > sizeof(buf)) {
 		printk(KERN_WARNING
@@ -531,7 +531,7 @@ int av7110_send_ci_cmd(struct av7110 *av7110, u8 subcom, u8 *buf, u8 len)
 	u16 cmd[18] = { ((COMTYPE_COMMON_IF << 8) + subcom),
 		16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	for(i = 0; i < len && i < 32; i++)
 	{
@@ -558,7 +558,7 @@ int av7110_fw_request(struct av7110 *av7110, u16 *request_buf,
 	u32 stat;
 #endif
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (!av7110->arm_ready) {
 		dprintk(1, "arm not ready.\n");
@@ -645,7 +645,7 @@ int av7110_firmversion(struct av7110 *av7110)
 	u16 buf[20];
 	u16 tag = ((COMTYPE_REQUEST << 8) + ReqVersion);
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (av7110_fw_query(av7110, tag, buf, 16)) {
 		printk("dvb-ttpci: failed to boot firmware @ card %d\n",
@@ -681,7 +681,7 @@ int av7110_diseqc_send(struct av7110 *av7110, int len, u8 *msg, unsigned long bu
 	u16 buf[18] = { ((COMTYPE_AUDIODAC << 8) + SendDiSEqC),
 			16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (len > 10)
 		len = 10;
@@ -879,7 +879,7 @@ static inline int LoadBitmap(struct av7110 *av7110,
 	u8 c;
 	int ret;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	format = bpp2bit[av7110->osdbpp[av7110->osdwin]];
 
@@ -928,14 +928,14 @@ static inline int LoadBitmap(struct av7110 *av7110,
 
 static int BlitBitmap(struct av7110 *av7110, u16 x, u16 y)
 {
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	return av7110_fw_cmd(av7110, COMTYPE_OSD, BlitBmp, 4, av7110->osdwin, x, y, 0);
 }
 
 static inline int ReleaseBitmap(struct av7110 *av7110)
 {
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (av7110->bmp_state != BMP_LOADED && FW_VERSION(av7110->arm_app) < 0x261e)
 		return -1;

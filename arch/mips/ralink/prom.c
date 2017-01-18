@@ -36,7 +36,7 @@ static __init void prom_init_cmdline(int argc, char **argv)
 	argv = (char **) KSEG1ADDR(fw_arg1);
 
 	if (!argv) {
-		pr_debug("argv=%p is invalid, skipping\n",
+		pr_debug("argv=%pK is invalid, skipping\n",
 		       argv);
 		return;
 	}

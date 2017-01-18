@@ -547,7 +547,7 @@ int nfcc_wake(int level, struct file *filp)
 	unsigned char wake_status = WAKE_REG;
 	struct qca199x_dev *qca199x_dev = filp->private_data;
 
-	dev_dbg(&qca199x_dev->client->dev, "%s: info: %p\n",
+	dev_dbg(&qca199x_dev->client->dev, "%s: info: %pK\n",
 			__func__, qca199x_dev);
 
 	curr_addr = qca199x_dev->client->addr;
@@ -649,7 +649,7 @@ int nfc_ioctl_power_states(struct file *filp, unsigned int cmd,
 		r = qca199x_clock_select(qca199x_dev);
 		if (r < 0)
 			goto err_req;
-		dev_dbg(&qca199x_dev->client->dev, "gpio_set_value disable: %s: info: %p\n",
+		dev_dbg(&qca199x_dev->client->dev, "gpio_set_value disable: %s: info: %pK\n",
 			__func__, qca199x_dev);
 		gpio_set_value(qca199x_dev->dis_gpio, 0);
 		usleep_range(1000, 1100);
@@ -671,17 +671,17 @@ int nfc_ioctl_power_states(struct file *filp, unsigned int cmd,
 		 * construed as response to initial message
 		 */
 		qca199x_dev->sent_first_nci_write = false;
-		dev_dbg(&qca199x_dev->client->dev, "gpio_set_value enable: %s: info: %p\n",
+		dev_dbg(&qca199x_dev->client->dev, "gpio_set_value enable: %s: info: %pK\n",
 			__func__, qca199x_dev);
 		gpio_set_value(qca199x_dev->dis_gpio, 1);
 		/* NFCC needs at least 100 ms to power cycle*/
 		msleep(100);
 	} else if (arg == 2) {
 		mutex_lock(&qca199x_dev->read_mutex);
-		dev_dbg(&qca199x_dev->client->dev, "before nfcc_initialise: %s: info: %p\n",
+		dev_dbg(&qca199x_dev->client->dev, "before nfcc_initialise: %s: info: %pK\n",
 			__func__, qca199x_dev);
 		r = nfcc_initialise(qca199x_dev->client, 0xE, qca199x_dev);
-		dev_dbg(&qca199x_dev->client->dev, "after nfcc_initialise: %s: info: %p\n",
+		dev_dbg(&qca199x_dev->client->dev, "after nfcc_initialise: %s: info: %pK\n",
 			__func__, qca199x_dev);
 		/* Also reset first NCI write */
 		qca199x_dev->sent_first_nci_write = false;
@@ -696,7 +696,7 @@ int nfc_ioctl_power_states(struct file *filp, unsigned int cmd,
 	} else if (arg == 4) {
 		mutex_lock(&qca199x_dev->read_mutex);
 		r = nfcc_wake(NFCC_WAKE, filp);
-		dev_dbg(&qca199x_dev->client->dev, "nfcc wake: %s: info: %p\n",
+		dev_dbg(&qca199x_dev->client->dev, "nfcc wake: %s: info: %pK\n",
 			__func__, qca199x_dev);
 		mutex_unlock(&qca199x_dev->read_mutex);
 	} else if (arg == 5) {
@@ -1267,7 +1267,7 @@ static int nfcc_initialise(struct i2c_client *client, unsigned short curr_addr,
 			(rsp[1] == CORE_RESET_OID) &&
 			(rsp[2] == CORE_RST_NTF_LENGTH)) {
 			dev_dbg(&client->dev,
-				"NFC core reset recvd: %s: info: %p\n",
+				"NFC core reset recvd: %s: info: %pK\n",
 				__func__, client);
 			core_reset_completed = true;
 		} else {

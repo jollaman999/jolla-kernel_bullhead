@@ -718,7 +718,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs,
 
 #if 0
 #define r(t) ELF64_R_TYPE(rel[i].r_info)==t ? #t :
-		printk("Symbol %s loc %p val 0x%Lx addend 0x%Lx: %s\n",
+		printk("Symbol %s loc %pK val 0x%Lx addend 0x%Lx: %s\n",
 			strtab + sym->st_name,
 			loc, val, addend,
 			r(R_PARISC_LTOFF14R)
@@ -735,7 +735,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs,
 		case R_PARISC_LTOFF21L:
 			/* LT-relative; left 21 bits */
 			val = get_got(me, val, addend);
-			DEBUGP("LTOFF21L Symbol %s loc %p val %lx\n",
+			DEBUGP("LTOFF21L Symbol %s loc %pK val %lx\n",
 			       strtab + sym->st_name,
 			       loc, val);
 			val = lrsel(val, 0);
@@ -746,14 +746,14 @@ int apply_relocate_add(Elf_Shdr *sechdrs,
 			/* LT-relative; right 14 bits */
 			val = get_got(me, val, addend);
 			val = rrsel(val, 0);
-			DEBUGP("LTOFF14R Symbol %s loc %p val %lx\n",
+			DEBUGP("LTOFF14R Symbol %s loc %pK val %lx\n",
 			       strtab + sym->st_name,
 			       loc, val);
 			*loc = mask(*loc, 14) | reassemble_14(val);
 			break;
 		case R_PARISC_PCREL22F:
 			/* PC-relative; 22 bits */
-			DEBUGP("PCREL22F Symbol %s loc %p val %lx\n",
+			DEBUGP("PCREL22F Symbol %s loc %pK val %lx\n",
 			       strtab + sym->st_name,
 			       loc, val);
 			val += addend;
@@ -807,14 +807,14 @@ int apply_relocate_add(Elf_Shdr *sechdrs,
 			/* 64-bit function address */
 			if(in_local(me, (void *)(val + addend))) {
 				*loc64 = get_fdesc(me, val+addend);
-				DEBUGP("FDESC for %s at %p points to %lx\n",
+				DEBUGP("FDESC for %s at %pK points to %lx\n",
 				       strtab + sym->st_name, *loc64,
 				       ((Elf_Fdesc *)*loc64)->addr);
 			} else {
 				/* if the symbol is not local to this
 				 * module then val+addend is a pointer
 				 * to the function descriptor */
-				DEBUGP("Non local FPTR64 Symbol %s loc %p val %lx\n",
+				DEBUGP("Non local FPTR64 Symbol %s loc %pK val %lx\n",
 				       strtab + sym->st_name,
 				       loc, val);
 				*loc64 = val + addend;
@@ -845,7 +845,7 @@ register_unwind_table(struct module *me,
 	end = table + sechdrs[me->arch.unwind_section].sh_size;
 	gp = (Elf_Addr)me->module_core + me->arch.got_offset;
 
-	DEBUGP("register_unwind_table(), sect = %d at 0x%p - 0x%p (gp=0x%lx)\n",
+	DEBUGP("register_unwind_table(), sect = %d at 0x%pK - 0x%pK (gp=0x%lx)\n",
 	       me->arch.unwind_section, table, end, gp);
 	me->arch.unwind = unwind_table_add(me->name, 0, gp, table, end);
 }
@@ -871,7 +871,7 @@ int module_finalize(const Elf_Ehdr *hdr,
 	u32 *addr;
 
 	entry = (Elf_Fdesc *)me->init;
-	printk("FINALIZE, ->init FPTR is %p, GP %lx ADDR %lx\n", entry,
+	printk("FINALIZE, ->init FPTR is %pK, GP %lx ADDR %lx\n", entry,
 	       entry->gp, entry->addr);
 	addr = (u32 *)entry->addr;
 	printk("INSNS: %x %x %x %x\n",
@@ -899,7 +899,7 @@ int module_finalize(const Elf_Ehdr *hdr,
 		}
 	}
 
-	DEBUGP("module %s: strtab %p, symhdr %p\n",
+	DEBUGP("module %s: strtab %pK, symhdr %pK\n",
 	       me->name, strtab, symhdr);
 
 	if(me->arch.got_count > MAX_GOTS) {

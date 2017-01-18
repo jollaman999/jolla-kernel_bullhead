@@ -642,7 +642,7 @@ brcmf_cfg80211_change_iface(struct wiphy *wiphy, struct net_device *ndev,
 	s32 ap = 0;
 	s32 err = 0;
 
-	brcmf_dbg(TRACE, "Enter, ndev=%p, type=%d\n", ndev, type);
+	brcmf_dbg(TRACE, "Enter, ndev=%pK, type=%d\n", ndev, type);
 
 	switch (type) {
 	case NL80211_IFTYPE_MONITOR:
@@ -771,7 +771,7 @@ static void brcmf_escan_prep(struct brcmf_cfg80211_info *cfg,
 			ptr += sizeof(ssid_le);
 		}
 	} else {
-		brcmf_dbg(SCAN, "Broadcast scan %p\n", request->ssids);
+		brcmf_dbg(SCAN, "Broadcast scan %pK\n", request->ssids);
 		if ((request->ssids) && request->ssids->ssid_len) {
 			brcmf_dbg(SCAN, "SSID %s len=%d\n",
 				  params_le->ssid_le.SSID,
@@ -1618,7 +1618,7 @@ brcmf_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
 		chanspec = 0;
 	}
 
-	brcmf_dbg(INFO, "ie (%p), ie_len (%zd)\n", sme->ie, sme->ie_len);
+	brcmf_dbg(INFO, "ie (%pK), ie_len (%zd)\n", sme->ie, sme->ie_len);
 
 	err = brcmf_set_wpa_version(ndev, sme);
 	if (err) {
@@ -3160,7 +3160,7 @@ static int brcmf_cfg80211_testmode(struct wiphy *wiphy, void *data, int len)
 	struct sk_buff *reply;
 	int ret;
 
-	brcmf_dbg(TRACE, "cmd %x set %d buf %p len %d\n", dcmd->cmd, dcmd->set,
+	brcmf_dbg(TRACE, "cmd %x set %d buf %pK len %d\n", dcmd->cmd, dcmd->set,
 		  dcmd->buf, dcmd->len);
 
 	if (dcmd->set)

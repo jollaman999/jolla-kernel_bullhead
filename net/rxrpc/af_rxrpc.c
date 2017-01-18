@@ -62,7 +62,7 @@ static inline int rxrpc_writable(struct sock *sk)
  */
 static void rxrpc_write_space(struct sock *sk)
 {
-	_enter("%p", sk);
+	_enter("%pK", sk);
 	rcu_read_lock();
 	if (rxrpc_writable(sk)) {
 		struct socket_wq *wq = rcu_dereference(sk->sk_wq);
@@ -128,7 +128,7 @@ static int rxrpc_bind(struct socket *sock, struct sockaddr *saddr, int len)
 	__be16 service_id;
 	int ret;
 
-	_enter("%p,%p,%d", rx, saddr, len);
+	_enter("%pK,%pK,%d", rx, saddr, len);
 
 	ret = rxrpc_validate_address(rx, srx, len);
 	if (ret < 0)
@@ -191,7 +191,7 @@ static int rxrpc_listen(struct socket *sock, int backlog)
 	struct rxrpc_sock *rx = rxrpc_sk(sk);
 	int ret;
 
-	_enter("%p,%d", rx, backlog);
+	_enter("%pK,%d", rx, backlog);
 
 	lock_sock(&rx->sk);
 
@@ -230,7 +230,7 @@ static struct rxrpc_transport *rxrpc_name_to_transport(struct socket *sock,
 	struct rxrpc_sock *rx = rxrpc_sk(sock->sk);
 	struct rxrpc_peer *peer;
 
-	_enter("%p,%p,%d,%d", rx, addr, addr_len, flags);
+	_enter("%pK,%pK,%d,%d", rx, addr, addr_len, flags);
 
 	ASSERT(rx->local != NULL);
 	ASSERT(rx->sk.sk_state > RXRPC_UNCONNECTED);
@@ -248,7 +248,7 @@ static struct rxrpc_transport *rxrpc_name_to_transport(struct socket *sock,
 	/* find a transport */
 	trans = rxrpc_get_transport(rx->local, peer, gfp);
 	rxrpc_put_peer(peer);
-	_leave(" = %p", trans);
+	_leave(" = %pK", trans);
 	return trans;
 }
 
@@ -321,7 +321,7 @@ out:
 	rxrpc_put_transport(trans);
 out_notrans:
 	release_sock(&rx->sk);
-	_leave(" = %p", call);
+	_leave(" = %pK", call);
 	return call;
 }
 
@@ -380,7 +380,7 @@ static int rxrpc_connect(struct socket *sock, struct sockaddr *addr,
 	struct rxrpc_sock *rx = rxrpc_sk(sk);
 	int ret;
 
-	_enter("%p,%p,%d,%d", rx, addr, addr_len, flags);
+	_enter("%pK,%pK,%d,%d", rx, addr, addr_len, flags);
 
 	ret = rxrpc_validate_address(rx, srx, addr_len);
 	if (ret < 0) {
@@ -618,7 +618,7 @@ static int rxrpc_create(struct net *net, struct socket *sock, int protocol,
 	struct rxrpc_sock *rx;
 	struct sock *sk;
 
-	_enter("%p,%d", sock, protocol);
+	_enter("%pK,%d", sock, protocol);
 
 	if (!net_eq(net, &init_net))
 		return -EAFNOSUPPORT;
@@ -653,7 +653,7 @@ static int rxrpc_create(struct net *net, struct socket *sock, int protocol,
 	rwlock_init(&rx->call_lock);
 	memset(&rx->srx, 0, sizeof(rx->srx));
 
-	_leave(" = 0 [%p]", rx);
+	_leave(" = 0 [%pK]", rx);
 	return 0;
 }
 
@@ -662,7 +662,7 @@ static int rxrpc_create(struct net *net, struct socket *sock, int protocol,
  */
 static void rxrpc_sock_destructor(struct sock *sk)
 {
-	_enter("%p", sk);
+	_enter("%pK", sk);
 
 	rxrpc_purge_queue(&sk->sk_receive_queue);
 
@@ -671,7 +671,7 @@ static void rxrpc_sock_destructor(struct sock *sk)
 	WARN_ON(sk->sk_socket);
 
 	if (!sock_flag(sk, SOCK_DEAD)) {
-		WARN(1, "Attempt to release alive rxrpc socket: %p\n", sk);
+		WARN(1, "Attempt to release alive rxrpc socket: %pK\n", sk);
 		return;
 	}
 }
@@ -683,7 +683,7 @@ static int rxrpc_release_sock(struct sock *sk)
 {
 	struct rxrpc_sock *rx = rxrpc_sk(sk);
 
-	_enter("%p{%d,%d}", sk, sk->sk_state, atomic_read(&sk->sk_refcnt));
+	_enter("%pK{%d,%d}", sk, sk->sk_state, atomic_read(&sk->sk_refcnt));
 
 	/* declare the socket closed for business */
 	sock_orphan(sk);
@@ -741,7 +741,7 @@ static int rxrpc_release(struct socket *sock)
 {
 	struct sock *sk = sock->sk;
 
-	_enter("%p{%p}", sock, sk);
+	_enter("%pK{%pK}", sock, sk);
 
 	if (!sk)
 		return 0;

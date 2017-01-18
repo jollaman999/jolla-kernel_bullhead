@@ -336,7 +336,7 @@ static int eata_pio_queue_lck(struct scsi_cmnd *cmd,
 	cp->status = USED;	/* claim free slot */
 
 	DBG(DBG_QUEUE, scmd_printk(KERN_DEBUG, cmd,
-		"eata_pio_queue 0x%p, y %d\n", cmd, y));
+		"eata_pio_queue 0x%pK, y %d\n", cmd, y));
 
 	cmd->scsi_done = (void *) done;
 
@@ -380,7 +380,7 @@ static int eata_pio_queue_lck(struct scsi_cmnd *cmd,
 	if (eata_pio_send_command(base, EATA_CMD_PIO_SEND_CP)) {
 		cmd->result = DID_BUS_BUSY << 16;
 		scmd_printk(KERN_NOTICE, cmd,
-			"eata_pio_queue pid 0x%p, HBA busy, "
+			"eata_pio_queue pid 0x%pK, HBA busy, "
 			"returning DID_BUS_BUSY, done.\n", cmd);
 		done(cmd);
 		cp->status = FREE;
@@ -395,7 +395,7 @@ static int eata_pio_queue_lck(struct scsi_cmnd *cmd,
 		outw(0, base + HA_RDATA);
 
 	DBG(DBG_QUEUE, scmd_printk(KERN_DEBUG, cmd,
-		"Queued base %#.4lx cmd: 0x%p "
+		"Queued base %#.4lx cmd: 0x%pK "
 		"slot %d irq %d\n", sh->base, cmd, y, sh->irq));
 
 	return 0;
@@ -408,7 +408,7 @@ static int eata_pio_abort(struct scsi_cmnd *cmd)
 	unsigned int loop = 100;
 
 	DBG(DBG_ABNORM, scmd_printk(KERN_WARNING, cmd,
-		"eata_pio_abort called pid: 0x%p\n", cmd));
+		"eata_pio_abort called pid: 0x%pK\n", cmd));
 
 	while (inb(cmd->device->host->base + HA_RAUXSTAT) & HA_ABUSY)
 		if (--loop == 0) {

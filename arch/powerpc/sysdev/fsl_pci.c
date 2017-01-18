@@ -532,7 +532,7 @@ int __init fsl_add_bridge(struct platform_device *pdev, int is_primary)
 		(unsigned long long)rsrc.start, hose->first_busno,
 		hose->last_busno);
 
-	pr_debug(" ->Hose at 0x%p, cfg_addr=0x%p,cfg_data=0x%p\n",
+	pr_debug(" ->Hose at 0x%pK, cfg_addr=0x%pK,cfg_data=0x%pK\n",
 		hose, hose->cfg_addr, hose->cfg_data);
 
 	/* Interpret the "ranges" property */
@@ -817,7 +817,7 @@ int __init mpc83xx_add_bridge(struct device_node *dev)
 	       (unsigned long long)rsrc_reg.start, hose->first_busno,
 	       hose->last_busno);
 
-	pr_debug(" ->Hose at 0x%p, cfg_addr=0x%p,cfg_data=0x%p\n",
+	pr_debug(" ->Hose at 0x%pK, cfg_addr=0x%pK,cfg_data=0x%pK\n",
 	    hose, hose->cfg_addr, hose->cfg_data);
 
 	/* Interpret the "ranges" property */

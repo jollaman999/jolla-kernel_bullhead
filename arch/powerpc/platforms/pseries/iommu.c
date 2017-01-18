@@ -650,7 +650,7 @@ static void pci_dma_bus_setup_pSeriesLP(struct pci_bus *bus)
 
 	ppci = PCI_DN(pdn);
 
-	pr_debug("  parent is %s, iommu_table: 0x%p\n",
+	pr_debug("  parent is %s, iommu_table: 0x%pK\n",
 		 pdn->full_name, ppci->iommu_table);
 
 	if (!ppci->iommu_table) {
@@ -658,7 +658,7 @@ static void pci_dma_bus_setup_pSeriesLP(struct pci_bus *bus)
 				   ppci->phb->node);
 		iommu_table_setparms_lpar(ppci->phb, pdn, tbl, dma_window);
 		ppci->iommu_table = iommu_init_table(tbl, ppci->phb->node);
-		pr_debug("  created table: %p\n", ppci->iommu_table);
+		pr_debug("  created table: %pK\n", ppci->iommu_table);
 	}
 }
 
@@ -1184,9 +1184,9 @@ static void pci_dma_dev_setup_pSeriesLP(struct pci_dev *dev)
 				   pci->phb->node);
 		iommu_table_setparms_lpar(pci->phb, pdn, tbl, dma_window);
 		pci->iommu_table = iommu_init_table(tbl, pci->phb->node);
-		pr_debug("  created table: %p\n", pci->iommu_table);
+		pr_debug("  created table: %pK\n", pci->iommu_table);
 	} else {
-		pr_debug("  found DMA window, table: %p\n", pci->iommu_table);
+		pr_debug("  found DMA window, table: %pK\n", pci->iommu_table);
 	}
 
 	set_iommu_table_base(&dev->dev, pci->iommu_table);

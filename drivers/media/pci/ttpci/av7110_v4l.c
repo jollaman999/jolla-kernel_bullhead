@@ -139,7 +139,7 @@ static int ves1820_writereg(struct saa7146_dev *dev, u8 addr, u8 reg, u8 data)
 	u8 buf[] = { 0x00, reg, data };
 	struct i2c_msg msg = { .addr = addr, .flags = 0, .buf = buf, .len = 3 };
 
-	dprintk(4, "dev: %p\n", dev);
+	dprintk(4, "dev: %pK\n", dev);
 
 	if (1 != i2c_transfer(&av7110->i2c_adap, &msg, 1))
 		return -1;
@@ -151,7 +151,7 @@ static int tuner_write(struct saa7146_dev *dev, u8 addr, u8 data [4])
 	struct av7110 *av7110 = dev->ext_priv;
 	struct i2c_msg msg = { .addr = addr, .flags = 0, .buf = data, .len = 4 };
 
-	dprintk(4, "dev: %p\n", dev);
+	dprintk(4, "dev: %pK\n", dev);
 
 	if (1 != i2c_transfer(&av7110->i2c_adap, &msg, 1))
 		return -1;
@@ -235,7 +235,7 @@ static int av7110_dvb_c_switch(struct saa7146_fh *fh)
 	u16 adswitch;
 	int source, sync, err;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if ((vv->video_status & STATUS_OVERLAY) != 0) {
 		vv->ov_suspend = vv->video_fh;

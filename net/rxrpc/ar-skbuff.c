@@ -102,7 +102,7 @@ void rxrpc_packet_destructor(struct sk_buff *skb)
 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
 	struct rxrpc_call *call = sp->call;
 
-	_enter("%p{%p}", skb, call);
+	_enter("%pK{%pK}", skb, call);
 
 	if (call) {
 		/* send the final ACK on a client call */

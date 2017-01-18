@@ -1213,7 +1213,7 @@ void pcibios_allocate_bus_resources(struct pci_bus *bus)
 		}
 
 		pr_debug("PCI: %s (bus %d) bridge rsrc %d: %016llx-%016llx "
-			 "[0x%x], parent %p (%s)\n",
+			 "[0x%x], parent %pK (%s)\n",
 			 bus->self ? pci_name(bus->self) : "PHB",
 			 bus->number, i,
 			 (unsigned long long)res->start,
@@ -1266,7 +1266,7 @@ static inline void alloc_resource(struct pci_dev *dev, int idx)
 		printk(KERN_WARNING "PCI: Cannot allocate resource region %d"
 		       " of device %s, will remap\n", idx, pci_name(dev));
 		if (pr)
-			pr_debug("PCI:  parent is %p: %016llx-%016llx [%x]\n",
+			pr_debug("PCI:  parent is %pK: %016llx-%016llx [%x]\n",
 				 pr,
 				 (unsigned long long)pr->start,
 				 (unsigned long long)pr->end,

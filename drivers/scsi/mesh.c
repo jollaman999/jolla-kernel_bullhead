@@ -306,7 +306,7 @@ mesh_dump_regs(struct mesh_state *ms)
 	int t;
 	struct mesh_target *tp;
 
-	printk(KERN_DEBUG "mesh: state at %p, regs at %p, dma at %p\n",
+	printk(KERN_DEBUG "mesh: state at %pK, regs at %pK, dma at %pK\n",
 	       ms, mr, md);
 	printk(KERN_DEBUG "    ct=%4x seq=%2x bs=%4x fc=%2x "
 	       "exc=%2x err=%2x im=%2x int=%2x sp=%2x\n",
@@ -326,7 +326,7 @@ mesh_dump_regs(struct mesh_state *ms)
 		tp = &ms->tgts[t];
 		if (tp->current_req == NULL)
 			continue;
-		printk(KERN_DEBUG "    target %d: req=%p goes_out=%d saved_ptr=%d\n",
+		printk(KERN_DEBUG "    target %d: req=%pK goes_out=%d saved_ptr=%d\n",
 		       t, tp->current_req, tp->data_goes_out, tp->saved_ptr);
 	}
 }
@@ -414,10 +414,10 @@ static void mesh_start_cmd(struct mesh_state *ms, struct scsi_cmnd *cmd)
 #if 1
 	if (DEBUG_TARGET(cmd)) {
 		int i;
-		printk(KERN_DEBUG "mesh_start: %p tgt=%d cmd=", cmd, id);
+		printk(KERN_DEBUG "mesh_start: %pK tgt=%d cmd=", cmd, id);
 		for (i = 0; i < cmd->cmd_len; ++i)
 			printk(" %x", cmd->cmnd[i]);
-		printk(" use_sg=%d buffer=%p bufflen=%u\n",
+		printk(" use_sg=%d buffer=%pK bufflen=%u\n",
 		       scsi_sg_count(cmd), scsi_sglist(cmd), scsi_bufflen(cmd));
 	}
 #endif
@@ -559,7 +559,7 @@ static void mesh_start(struct mesh_state *ms)
 	struct scsi_cmnd *cmd, *prev, *next;
 
 	if (ms->phase != idle || ms->current_req != NULL) {
-		printk(KERN_ERR "inappropriate mesh_start (phase=%d, ms=%p)",
+		printk(KERN_ERR "inappropriate mesh_start (phase=%d, ms=%pK)",
 		       ms->phase, ms);
 		return;
 	}
@@ -951,7 +951,7 @@ static void reselected(struct mesh_state *ms)
 	out_8(&mr->sync_params, tp->sync_params);
 	if (ALLOW_DEBUG(t)) {
 		printk(KERN_DEBUG "mesh: reselected by target %d\n", t);
-		printk(KERN_DEBUG "mesh: saved_ptr=%x goes_out=%d cmd=%p\n",
+		printk(KERN_DEBUG "mesh: saved_ptr=%x goes_out=%d cmd=%pK\n",
 		       tp->saved_ptr, tp->data_goes_out, tp->current_req);
 	}
 	ms->current_req = tp->current_req;
@@ -1342,7 +1342,7 @@ static void halt_dma(struct mesh_state *ms)
 	ms->data_ptr -= nb;
 	dlog(ms, "data_ptr %x", ms->data_ptr);
 	if (ms->data_ptr < 0) {
-		printk(KERN_ERR "mesh: halt_dma: data_ptr=%d (nb=%d, ms=%p)\n",
+		printk(KERN_ERR "mesh: halt_dma: data_ptr=%d (nb=%d, ms=%pK)\n",
 		       ms->data_ptr, nb, ms);
 		ms->data_ptr = 0;
 #ifdef MESH_DBG
@@ -1687,7 +1687,7 @@ static int mesh_abort(struct scsi_cmnd *cmd)
 {
 	struct mesh_state *ms = (struct mesh_state *) cmd->device->host->hostdata;
 
-	printk(KERN_DEBUG "mesh_abort(%p)\n", cmd);
+	printk(KERN_DEBUG "mesh_abort(%pK)\n", cmd);
 	mesh_dump_regs(ms);
 	dumplog(ms, cmd->device->id);
 	dumpslog(ms);

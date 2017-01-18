@@ -1843,7 +1843,7 @@ static void cciss_softirq_done(struct request *rq)
 		++sg_index;
 	}
 
-	dev_dbg(&h->pdev->dev, "Done with %p\n", rq);
+	dev_dbg(&h->pdev->dev, "Done with %pK\n", rq);
 
 	/* set the residual count for pc requests */
 	if (rq->cmd_type == REQ_TYPE_BLOCK_PC)
@@ -3079,7 +3079,7 @@ static inline int evaluate_target_status(ctlr_info_t *h,
 
 	if (cmd->err_info->ScsiStatus != SAM_STAT_CHECK_CONDITION) {
 		if (cmd->rq->cmd_type != REQ_TYPE_BLOCK_PC)
-			dev_warn(&h->pdev->dev, "cmd %p "
+			dev_warn(&h->pdev->dev, "cmd %pK "
 			       "has SCSI Status 0x%x\n",
 			       cmd, cmd->err_info->ScsiStatus);
 		return error_value;
@@ -3100,7 +3100,7 @@ static inline int evaluate_target_status(ctlr_info_t *h,
 	/* Not SG_IO or similar? */
 	if (cmd->rq->cmd_type != REQ_TYPE_BLOCK_PC) {
 		if (error_value != 0)
-			dev_warn(&h->pdev->dev, "cmd %p has CHECK CONDITION"
+			dev_warn(&h->pdev->dev, "cmd %pK has CHECK CONDITION"
 			       " sense key = 0x%x\n", cmd, sense_key);
 		return error_value;
 	}
@@ -3141,7 +3141,7 @@ static inline void complete_command(ctlr_info_t *h, CommandList_struct *cmd,
 		break;
 	case CMD_DATA_UNDERRUN:
 		if (cmd->rq->cmd_type == REQ_TYPE_FS) {
-			dev_warn(&h->pdev->dev, "cmd %p has"
+			dev_warn(&h->pdev->dev, "cmd %pK has"
 			       " completed with data underrun "
 			       "reported\n", cmd);
 			cmd->rq->resid_len = cmd->err_info->ResidualCnt;
@@ -3149,12 +3149,12 @@ static inline void complete_command(ctlr_info_t *h, CommandList_struct *cmd,
 		break;
 	case CMD_DATA_OVERRUN:
 		if (cmd->rq->cmd_type == REQ_TYPE_FS)
-			dev_warn(&h->pdev->dev, "cciss: cmd %p has"
+			dev_warn(&h->pdev->dev, "cciss: cmd %pK has"
 			       " completed with data overrun "
 			       "reported\n", cmd);
 		break;
 	case CMD_INVALID:
-		dev_warn(&h->pdev->dev, "cciss: cmd %p is "
+		dev_warn(&h->pdev->dev, "cciss: cmd %pK is "
 		       "reported invalid\n", cmd);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,
 			cmd->err_info->CommandStatus, DRIVER_OK,
@@ -3162,7 +3162,7 @@ static inline void complete_command(ctlr_info_t *h, CommandList_struct *cmd,
 				DID_PASSTHROUGH : DID_ERROR);
 		break;
 	case CMD_PROTOCOL_ERR:
-		dev_warn(&h->pdev->dev, "cciss: cmd %p has "
+		dev_warn(&h->pdev->dev, "cciss: cmd %pK has "
 		       "protocol error\n", cmd);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,
 			cmd->err_info->CommandStatus, DRIVER_OK,
@@ -3170,7 +3170,7 @@ static inline void complete_command(ctlr_info_t *h, CommandList_struct *cmd,
 				DID_PASSTHROUGH : DID_ERROR);
 		break;
 	case CMD_HARDWARE_ERR:
-		dev_warn(&h->pdev->dev, "cciss: cmd %p had "
+		dev_warn(&h->pdev->dev, "cciss: cmd %pK had "
 		       " hardware error\n", cmd);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,
 			cmd->err_info->CommandStatus, DRIVER_OK,
@@ -3178,7 +3178,7 @@ static inline void complete_command(ctlr_info_t *h, CommandList_struct *cmd,
 				DID_PASSTHROUGH : DID_ERROR);
 		break;
 	case CMD_CONNECTION_LOST:
-		dev_warn(&h->pdev->dev, "cciss: cmd %p had "
+		dev_warn(&h->pdev->dev, "cciss: cmd %pK had "
 		       "connection lost\n", cmd);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,
 			cmd->err_info->CommandStatus, DRIVER_OK,
@@ -3186,7 +3186,7 @@ static inline void complete_command(ctlr_info_t *h, CommandList_struct *cmd,
 				DID_PASSTHROUGH : DID_ERROR);
 		break;
 	case CMD_ABORTED:
-		dev_warn(&h->pdev->dev, "cciss: cmd %p was "
+		dev_warn(&h->pdev->dev, "cciss: cmd %pK was "
 		       "aborted\n", cmd);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,
 			cmd->err_info->CommandStatus, DRIVER_OK,
@@ -3194,7 +3194,7 @@ static inline void complete_command(ctlr_info_t *h, CommandList_struct *cmd,
 				DID_PASSTHROUGH : DID_ABORT);
 		break;
 	case CMD_ABORT_FAILED:
-		dev_warn(&h->pdev->dev, "cciss: cmd %p reports "
+		dev_warn(&h->pdev->dev, "cciss: cmd %pK reports "
 		       "abort failed\n", cmd);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,
 			cmd->err_info->CommandStatus, DRIVER_OK,
@@ -3203,35 +3203,35 @@ static inline void complete_command(ctlr_info_t *h, CommandList_struct *cmd,
 		break;
 	case CMD_UNSOLICITED_ABORT:
 		dev_warn(&h->pdev->dev, "cciss%d: unsolicited "
-		       "abort %p\n", h->ctlr, cmd);
+		       "abort %pK\n", h->ctlr, cmd);
 		if (cmd->retry_count < MAX_CMD_RETRIES) {
 			retry_cmd = 1;
-			dev_warn(&h->pdev->dev, "retrying %p\n", cmd);
+			dev_warn(&h->pdev->dev, "retrying %pK\n", cmd);
 			cmd->retry_count++;
 		} else
 			dev_warn(&h->pdev->dev,
-				"%p retried too many times\n", cmd);
+				"%pK retried too many times\n", cmd);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,
 			cmd->err_info->CommandStatus, DRIVER_OK,
 			(cmd->rq->cmd_type == REQ_TYPE_BLOCK_PC) ?
 				DID_PASSTHROUGH : DID_ABORT);
 		break;
 	case CMD_TIMEOUT:
-		dev_warn(&h->pdev->dev, "cmd %p timedout\n", cmd);
+		dev_warn(&h->pdev->dev, "cmd %pK timedout\n", cmd);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,
 			cmd->err_info->CommandStatus, DRIVER_OK,
 			(cmd->rq->cmd_type == REQ_TYPE_BLOCK_PC) ?
 				DID_PASSTHROUGH : DID_ERROR);
 		break;
 	case CMD_UNABORTABLE:
-		dev_warn(&h->pdev->dev, "cmd %p unabortable\n", cmd);
+		dev_warn(&h->pdev->dev, "cmd %pK unabortable\n", cmd);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,
 			cmd->err_info->CommandStatus, DRIVER_OK,
 			cmd->rq->cmd_type == REQ_TYPE_BLOCK_PC ?
 				DID_PASSTHROUGH : DID_ERROR);
 		break;
 	default:
-		dev_warn(&h->pdev->dev, "cmd %p returned "
+		dev_warn(&h->pdev->dev, "cmd %pK returned "
 		       "unknown status %x\n", cmd,
 		       cmd->err_info->CommandStatus);
 		rq->errors = make_status_bytes(SAM_STAT_GOOD,

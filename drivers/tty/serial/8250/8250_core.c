@@ -1049,7 +1049,7 @@ static void autoconfig(struct uart_8250_port *up, unsigned int probeflags)
 	if (!port->iobase && !port->mapbase && !port->membase)
 		return;
 
-	DEBUG_AUTOCONF("ttyS%d: autoconf (0x%04lx, 0x%p): ",
+	DEBUG_AUTOCONF("ttyS%d: autoconf (0x%04lx, 0x%pK): ",
 		       serial_index(port), port->iobase, port->membase);
 
 	/*

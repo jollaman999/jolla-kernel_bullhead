@@ -318,7 +318,7 @@ static void free_ioctx(struct kioctx *ctx)
 
 	aio_free_ring(ctx);
 
-	pr_debug("freeing %p\n", ctx);
+	pr_debug("freeing %pK\n", ctx);
 
 	/*
 	 * Here the call_rcu() is between the wait_event() for reqs_active to
@@ -388,7 +388,7 @@ static struct kioctx *ioctx_alloc(unsigned nr_events)
 	hlist_add_head_rcu(&ctx->list, &mm->ioctx_list);
 	spin_unlock(&mm->ioctx_lock);
 
-	pr_debug("allocated ioctx %p[%ld]: mm=%p mask=0x%x\n",
+	pr_debug("allocated ioctx %pK[%ld]: mm=%pK mask=0x%x\n",
 		 ctx, ctx->user_id, mm, ctx->nr_events);
 	return ctx;
 
@@ -646,7 +646,7 @@ void aio_complete(struct kiocb *iocb, long res, long res2)
 	kunmap_atomic(ev_page);
 	flush_dcache_page(ctx->ring_pages[pos / AIO_EVENTS_PER_PAGE]);
 
-	pr_debug("%p[%u]: %p: %p %Lx %lx %lx\n",
+	pr_debug("%pK[%u]: %pK: %pK %Lx %lx %lx\n",
 		 ctx, tail, iocb, iocb->ki_obj.user, iocb->ki_user_data,
 		 res, res2);
 
@@ -664,7 +664,7 @@ void aio_complete(struct kiocb *iocb, long res, long res2)
 
 	spin_unlock_irqrestore(&ctx->completion_lock, flags);
 
-	pr_debug("added to ring %p at [%u]\n", iocb, tail);
+	pr_debug("added to ring %pK at [%u]\n", iocb, tail);
 
 	/*
 	 * Check if the user asked us to deliver the result through an

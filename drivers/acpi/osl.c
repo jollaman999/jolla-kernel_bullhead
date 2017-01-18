@@ -433,7 +433,7 @@ void __ref acpi_os_unmap_memory(void __iomem *virt, acpi_size size)
 	map = acpi_map_lookup_virt(virt, size);
 	if (!map) {
 		mutex_unlock(&acpi_ioremap_lock);
-		WARN(true, PREFIX "%s: bad address %p\n", __func__, virt);
+		WARN(true, PREFIX "%s: bad address %pK\n", __func__, virt);
 		return;
 	}
 	acpi_os_drop_map_ref(map);
@@ -1096,7 +1096,7 @@ static acpi_status __acpi_os_execute(acpi_execute_type type,
 	struct workqueue_struct *queue;
 	int ret;
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-			  "Scheduling function [%p(%p)] for deferred execution.\n",
+			  "Scheduling function [%pK(%pK)] for deferred execution.\n",
 			  function, context));
 
 	/*
@@ -1191,7 +1191,7 @@ acpi_os_create_semaphore(u32 max_units, u32 initial_units, acpi_handle * handle)
 
 	*handle = (acpi_handle *) sem;
 
-	ACPI_DEBUG_PRINT((ACPI_DB_MUTEX, "Creating semaphore[%p|%d].\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_MUTEX, "Creating semaphore[%pK|%d].\n",
 			  *handle, initial_units));
 
 	return AE_OK;
@@ -1211,7 +1211,7 @@ acpi_status acpi_os_delete_semaphore(acpi_handle handle)
 	if (!sem)
 		return AE_BAD_PARAMETER;
 
-	ACPI_DEBUG_PRINT((ACPI_DB_MUTEX, "Deleting semaphore[%p].\n", handle));
+	ACPI_DEBUG_PRINT((ACPI_DB_MUTEX, "Deleting semaphore[%pK].\n", handle));
 
 	BUG_ON(!list_empty(&sem->wait_list));
 	kfree(sem);
@@ -1236,7 +1236,7 @@ acpi_status acpi_os_wait_semaphore(acpi_handle handle, u32 units, u16 timeout)
 	if (units > 1)
 		return AE_SUPPORT;
 
-	ACPI_DEBUG_PRINT((ACPI_DB_MUTEX, "Waiting for semaphore[%p|%d|%d]\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_MUTEX, "Waiting for semaphore[%pK|%d|%d]\n",
 			  handle, units, timeout));
 
 	if (timeout == ACPI_WAIT_FOREVER)
@@ -1250,12 +1250,12 @@ acpi_status acpi_os_wait_semaphore(acpi_handle handle, u32 units, u16 timeout)
 
 	if (ACPI_FAILURE(status)) {
 		ACPI_DEBUG_PRINT((ACPI_DB_MUTEX,
-				  "Failed to acquire semaphore[%p|%d|%d], %s",
+				  "Failed to acquire semaphore[%pK|%d|%d], %s",
 				  handle, units, timeout,
 				  acpi_format_exception(status)));
 	} else {
 		ACPI_DEBUG_PRINT((ACPI_DB_MUTEX,
-				  "Acquired semaphore[%p|%d|%d]", handle,
+				  "Acquired semaphore[%pK|%d|%d]", handle,
 				  units, timeout));
 	}
 
@@ -1275,7 +1275,7 @@ acpi_status acpi_os_signal_semaphore(acpi_handle handle, u32 units)
 	if (units > 1)
 		return AE_SUPPORT;
 
-	ACPI_DEBUG_PRINT((ACPI_DB_MUTEX, "Signaling semaphore[%p|%d]\n", handle,
+	ACPI_DEBUG_PRINT((ACPI_DB_MUTEX, "Signaling semaphore[%pK|%d]\n", handle,
 			  units));
 
 	up(sem);

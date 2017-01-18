@@ -525,7 +525,7 @@ static void sctp_do_8_2_transport_strike(sctp_cmd_seq_t *commands,
 
 	if (transport->state != SCTP_INACTIVE &&
 	    (transport->error_count > transport->pathmaxrxt)) {
-		SCTP_DEBUG_PRINTK_IPADDR("transport_strike:association %p",
+		SCTP_DEBUG_PRINTK_IPADDR("transport_strike:association %pK",
 					 " transport IP: port:%d failed.\n",
 					 asoc,
 					 (&transport->ipaddr),
@@ -808,7 +808,7 @@ static void sctp_cmd_new_state(sctp_cmd_seq_t *cmds,
 
 	asoc->state = state;
 
-	SCTP_DEBUG_PRINTK("sctp_cmd_new_state: asoc %p[%s]\n",
+	SCTP_DEBUG_PRINTK("sctp_cmd_new_state: asoc %pK[%s]\n",
 			  asoc, sctp_state_tbl[state]);
 
 	if (sctp_style(sk, TCP)) {
@@ -1085,18 +1085,18 @@ static void sctp_cmd_send_asconf(struct sctp_association *asoc)
  */
 #define DEBUG_PRE \
 	SCTP_DEBUG_PRINTK("sctp_do_sm prefn: " \
-			  "ep %p, %s, %s, asoc %p[%s], %s\n", \
+			  "ep %pK, %s, %s, asoc %pK[%s], %s\n", \
 			  ep, sctp_evttype_tbl[event_type], \
 			  (*debug_fn)(subtype), asoc, \
 			  sctp_state_tbl[state], state_fn->name)
 
 #define DEBUG_POST \
 	SCTP_DEBUG_PRINTK("sctp_do_sm postfn: " \
-			  "asoc %p, status: %s\n", \
+			  "asoc %pK, status: %s\n", \
 			  asoc, sctp_status_tbl[status])
 
 #define DEBUG_POST_SFX \
-	SCTP_DEBUG_PRINTK("sctp_do_sm post sfx: error %d, asoc %p[%s]\n", \
+	SCTP_DEBUG_PRINTK("sctp_do_sm post sfx: error %d, asoc %pK[%s]\n", \
 			  error, asoc, \
 			  sctp_state_tbl[(asoc && sctp_id2assoc(ep->base.sk, \
 			  sctp_assoc2id(asoc)))?asoc->state:SCTP_STATE_CLOSED])
@@ -1426,7 +1426,7 @@ static int sctp_cmd_interpreter(sctp_event_t event_type,
 
 		case SCTP_CMD_CHUNK_ULP:
 			/* Send a chunk to the sockets layer.  */
-			SCTP_DEBUG_PRINTK("sm_sideff: %s %p, %s %p.\n",
+			SCTP_DEBUG_PRINTK("sm_sideff: %s %pK, %s %pK.\n",
 					  "chunk_up:", cmd->obj.chunk,
 					  "ulpq:", &asoc->ulpq);
 			sctp_ulpq_tail_data(&asoc->ulpq, cmd->obj.chunk,
@@ -1435,7 +1435,7 @@ static int sctp_cmd_interpreter(sctp_event_t event_type,
 
 		case SCTP_CMD_EVENT_ULP:
 			/* Send a notification to the sockets layer.  */
-			SCTP_DEBUG_PRINTK("sm_sideff: %s %p, %s %p.\n",
+			SCTP_DEBUG_PRINTK("sm_sideff: %s %pK, %s %pK.\n",
 					  "event_up:",cmd->obj.ulpevent,
 					  "ulpq:",&asoc->ulpq);
 			sctp_ulpq_tail_event(&asoc->ulpq, cmd->obj.ulpevent);

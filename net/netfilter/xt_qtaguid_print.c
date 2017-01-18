@@ -47,7 +47,7 @@ char *pp_tag_t(tag_t *tag)
 		res = kasprintf(GFP_ATOMIC, "tag_t@null{}");
 	else
 		res = kasprintf(GFP_ATOMIC,
-				"tag_t@%p{tag=0x%llx, uid=%u}",
+				"tag_t@%pK{tag=0x%llx, uid=%u}",
 				tag, *tag, get_uid_from_tag(*tag));
 	_bug_on_err_or_null(res);
 	return res;
@@ -61,7 +61,7 @@ char *pp_data_counters(struct data_counters *dc, bool showValues)
 		res = kasprintf(GFP_ATOMIC, "data_counters@null{}");
 	else if (showValues)
 		res = kasprintf(
-			GFP_ATOMIC, "data_counters@%p{"
+			GFP_ATOMIC, "data_counters@%pK{"
 			"set0{"
 			"rx{"
 			"tcp{b=%llu, p=%llu}, "
@@ -106,7 +106,7 @@ char *pp_data_counters(struct data_counters *dc, bool showValues)
 			dc->bpc[1][IFS_TX][IFS_PROTO_OTHER].bytes,
 			dc->bpc[1][IFS_TX][IFS_PROTO_OTHER].packets);
 	else
-		res = kasprintf(GFP_ATOMIC, "data_counters@%p{...}", dc);
+		res = kasprintf(GFP_ATOMIC, "data_counters@%pK{...}", dc);
 	_bug_on_err_or_null(res);
 	return res;
 }
@@ -123,7 +123,7 @@ char *pp_tag_node(struct tag_node *tn)
 	}
 	tag_str = pp_tag_t(&tn->tag);
 	res = kasprintf(GFP_ATOMIC,
-			"tag_node@%p{tag=%s}",
+			"tag_node@%pK{tag=%s}",
 			tn, tag_str);
 	_bug_on_err_or_null(res);
 	kfree(tag_str);
@@ -142,7 +142,7 @@ char *pp_tag_ref(struct tag_ref *tr)
 	}
 	tn_str = pp_tag_node(&tr->tn);
 	res = kasprintf(GFP_ATOMIC,
-			"tag_ref@%p{%s, num_sock_tags=%d}",
+			"tag_ref@%pK{%s, num_sock_tags=%d}",
 			tr, tn_str, tr->num_sock_tags);
 	_bug_on_err_or_null(res);
 	kfree(tn_str);
@@ -165,7 +165,7 @@ char *pp_tag_stat(struct tag_stat *ts)
 	counters_str = pp_data_counters(&ts->counters, true);
 	parent_counters_str = pp_data_counters(ts->parent_counters, false);
 	res = kasprintf(GFP_ATOMIC,
-			"tag_stat@%p{%s, counters=%s, parent_counters=%s}",
+			"tag_stat@%pK{%s, counters=%s, parent_counters=%s}",
 			ts, tn_str, counters_str, parent_counters_str);
 	_bug_on_err_or_null(res);
 	kfree(tn_str);
@@ -181,7 +181,7 @@ char *pp_iface_stat(struct iface_stat *is)
 		res = kasprintf(GFP_ATOMIC, "iface_stat@null{}");
 	} else {
 		struct data_counters *cnts = &is->totals_via_skb;
-		res = kasprintf(GFP_ATOMIC, "iface_stat@%p{"
+		res = kasprintf(GFP_ATOMIC, "iface_stat@%pK{"
 				"list=list_head{...}, "
 				"ifname=%s, "
 				"total_dev={rx={bytes=%llu, "
@@ -198,8 +198,8 @@ char *pp_iface_stat(struct iface_stat *is)
 				"tx={bytes=%llu, "
 				"packets=%llu}}, "
 				"active=%d, "
-				"net_dev=%p, "
-				"proc_ptr=%p, "
+				"net_dev=%pK, "
+				"proc_ptr=%pK, "
 				"tag_stat_tree=rb_root{...}}",
 				is,
 				is->ifname,
@@ -235,9 +235,9 @@ char *pp_sock_tag(struct sock_tag *st)
 		return res;
 	}
 	tag_str = pp_tag_t(&st->tag);
-	res = kasprintf(GFP_ATOMIC, "sock_tag@%p{"
+	res = kasprintf(GFP_ATOMIC, "sock_tag@%pK{"
 			"sock_node=rb_node{...}, "
-			"sk=%p socket=%p (f_count=%lu), list=list_head{...}, "
+			"sk=%pK socket=%pK (f_count=%lu), list=list_head{...}, "
 			"pid=%u, tag=%s}",
 			st, st->sk, st->socket, atomic_long_read(
 				&st->socket->file->f_count),
@@ -254,7 +254,7 @@ char *pp_uid_tag_data(struct uid_tag_data *utd)
 	if (!utd)
 		res = kasprintf(GFP_ATOMIC, "uid_tag_data@null{}");
 	else
-		res = kasprintf(GFP_ATOMIC, "uid_tag_data@%p{"
+		res = kasprintf(GFP_ATOMIC, "uid_tag_data@%pK{"
 				"uid=%u, num_active_acct_tags=%d, "
 				"num_pqd=%d, "
 				"tag_node_tree=rb_root{...}, "
@@ -276,7 +276,7 @@ char *pp_proc_qtu_data(struct proc_qtu_data *pqd)
 		return res;
 	}
 	parent_tag_data_str = pp_uid_tag_data(pqd->parent_tag_data);
-	res = kasprintf(GFP_ATOMIC, "proc_qtu_data@%p{"
+	res = kasprintf(GFP_ATOMIC, "proc_qtu_data@%pK{"
 			"node=rb_node{...}, pid=%u, "
 			"parent_tag_data=%s, "
 			"sock_tag_list=list_head{...}}",

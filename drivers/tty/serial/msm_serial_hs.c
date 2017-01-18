@@ -724,14 +724,14 @@ static int msm_hs_spsconnect_tx(struct msm_hs_port *msm_uport)
 	ret = sps_connect(sps_pipe_handle, sps_config);
 	if (ret) {
 		MSM_HS_ERR("msm_serial_hs: sps_connect() failed for tx!!\n"
-		"pipe_handle=0x%p ret=%d", sps_pipe_handle, ret);
+		"pipe_handle=0x%pK ret=%d", sps_pipe_handle, ret);
 		return ret;
 	}
 	/* Register callback event for EOT (End of transfer) event. */
 	ret = sps_register_event(sps_pipe_handle, sps_event);
 	if (ret) {
 		MSM_HS_ERR("msm_serial_hs: sps_connect() failed for tx!!\n"
-		"pipe_handle=0x%p ret=%d", sps_pipe_handle, ret);
+		"pipe_handle=0x%pK ret=%d", sps_pipe_handle, ret);
 		goto reg_event_err;
 	}
 
@@ -781,14 +781,14 @@ static int msm_hs_spsconnect_rx(struct uart_port *uport)
 	ret = sps_connect(sps_pipe_handle, sps_config);
 	if (ret) {
 		MSM_HS_ERR("msm_serial_hs: sps_connect() failed for rx!!\n"
-		"pipe_handle=0x%p ret=%d", sps_pipe_handle, ret);
+		"pipe_handle=0x%pK ret=%d", sps_pipe_handle, ret);
 		return ret;
 	}
 	/* Register callback event for DESC_DONE event. */
 	ret = sps_register_event(sps_pipe_handle, sps_event);
 	if (ret) {
 		MSM_HS_ERR("msm_serial_hs: sps_connect() failed for rx!!\n"
-		"pipe_handle=0x%p ret=%d", sps_pipe_handle, ret);
+		"pipe_handle=0x%pK ret=%d", sps_pipe_handle, ret);
 		goto reg_event_err;
 	}
 	spin_lock_irqsave(&uport->lock, flags);
@@ -1394,7 +1394,7 @@ static void msm_hs_post_rx_desc(struct msm_hs_port *msm_uport, int inx)
 	phys_addr_t rbuff_addr = rx->rbuffer + (UARTDM_RX_BUF_SIZE * inx);
 	u8 *virt_addr = rx->buffer + (UARTDM_RX_BUF_SIZE * inx);
 
-	MSM_HS_DBG("%s: %d:Queue desc %d, 0x%llx, base 0x%llx virtaddr %p",
+	MSM_HS_DBG("%s: %d:Queue desc %d, 0x%llx, base 0x%llx virtaddr %pK",
 		__func__, msm_uport->uport.line, inx,
 		(u64)rbuff_addr, (u64)rx->rbuffer, virt_addr);
 
@@ -2234,7 +2234,7 @@ void msm_hs_request_clock_on(struct uart_port *uport)
 
 	__pm_stay_awake(&msm_uport->ws);
 	if (msm_uport->pm_state != MSM_HS_PM_ACTIVE) {
-		MSM_HS_WARN("%s(): %p runtime PM callback not invoked",
+		MSM_HS_WARN("%s(): %pK runtime PM callback not invoked",
 			__func__, uport->dev);
 		msm_hs_pm_resume(uport->dev);
 	}
@@ -2416,7 +2416,7 @@ static void msm_hs_get_pinctrl_configs(struct uart_port *uport)
 			goto pinctrl_fail;
 		}
 
-		MSM_HS_DBG("%s(): Pinctrl state active %p\n", __func__,
+		MSM_HS_DBG("%s(): Pinctrl state active %pK\n", __func__,
 			set_state);
 		msm_uport->gpio_state_active = set_state;
 
@@ -2428,7 +2428,7 @@ static void msm_hs_get_pinctrl_configs(struct uart_port *uport)
 			goto pinctrl_fail;
 		}
 
-		MSM_HS_DBG("%s(): Pinctrl state sleep %p\n", __func__,
+		MSM_HS_DBG("%s(): Pinctrl state sleep %pK\n", __func__,
 			set_state);
 		msm_uport->gpio_state_suspend = set_state;
 		return;
@@ -2811,7 +2811,7 @@ static int msm_hs_sps_init_ep_conn(struct msm_hs_port *msm_uport,
 	/* Get default connection configuration for an endpoint */
 	rc = sps_get_config(sps_pipe_handle, sps_config);
 	if (rc) {
-		MSM_HS_ERR("%s(): failed! pipe_handle=0x%p rc=%d",
+		MSM_HS_ERR("%s(): failed! pipe_handle=0x%pK rc=%d",
 			__func__, sps_pipe_handle, rc);
 		goto get_config_err;
 	}
@@ -2861,7 +2861,7 @@ static int msm_hs_sps_init_ep_conn(struct msm_hs_port *msm_uport,
 
 	/* Now save the sps pipe handle */
 	ep->pipe_handle = sps_pipe_handle;
-	MSM_HS_DBG("msm_serial_hs: success !! %s: pipe_handle=0x%p\n"
+	MSM_HS_DBG("msm_serial_hs: success !! %s: pipe_handle=0x%pK\n"
 		"desc_fifo.phys_base=0x%pa\n",
 		is_producer ? "READ" : "WRITE",
 		sps_pipe_handle, &sps_config->desc.phys_base);
@@ -2907,7 +2907,7 @@ static int msm_hs_sps_init(struct msm_hs_port *msm_uport)
 
 		MSM_HS_DBG("msm_serial_hs: bam physical base=0x%pa\n",
 							&bam.phys_addr);
-		MSM_HS_DBG("msm_serial_hs: bam virtual base=0x%p\n",
+		MSM_HS_DBG("msm_serial_hs: bam virtual base=0x%pK\n",
 							bam.virt_addr);
 
 		/* Register UART Peripheral BAM device to SPS driver */

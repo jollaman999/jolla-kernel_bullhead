@@ -831,7 +831,7 @@ static irqreturn_t pdc20621_interrupt(int irq, void *dev_instance)
 		else
 			ap = host->ports[port_no];
 		tmp = mask & (1 << i);
-		VPRINTK("seq %u, port_no %u, ap %p, tmp %x\n", i, port_no, ap, tmp);
+		VPRINTK("seq %u, port_no %u, ap %pK, tmp %x\n", i, port_no, ap, tmp);
 		if (tmp && ap) {
 			struct ata_queued_cmd *qc;
 

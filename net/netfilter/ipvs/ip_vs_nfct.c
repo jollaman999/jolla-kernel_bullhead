@@ -118,7 +118,7 @@ ip_vs_update_conntrack(struct sk_buff *skb, struct ip_vs_conn *cp, int outin)
 		    new_tuple.dst.protonum != IPPROTO_ICMPV6)
 			new_tuple.dst.u.tcp.port = cp->vport;
 	}
-	IP_VS_DBG(7, "%s: Updating conntrack ct=%p, status=0x%lX, "
+	IP_VS_DBG(7, "%s: Updating conntrack ct=%pK, status=0x%lX, "
 		  "ctinfo=%d, old reply=" FMT_TUPLE
 		  ", new reply=" FMT_TUPLE ", cp=" FMT_CONN "\n",
 		  __func__, ct, ct->status, ctinfo,
@@ -163,14 +163,14 @@ static void ip_vs_nfct_expect_callback(struct nf_conn *ct,
 	if (cp) {
 		/* Change reply CLIENT->RS to CLIENT->VS */
 		new_reply = ct->tuplehash[IP_CT_DIR_REPLY].tuple;
-		IP_VS_DBG(7, "%s: ct=%p, status=0x%lX, tuples=" FMT_TUPLE ", "
+		IP_VS_DBG(7, "%s: ct=%pK, status=0x%lX, tuples=" FMT_TUPLE ", "
 			  FMT_TUPLE ", found inout cp=" FMT_CONN "\n",
 			  __func__, ct, ct->status,
 			  ARG_TUPLE(orig), ARG_TUPLE(&new_reply),
 			  ARG_CONN(cp));
 		new_reply.dst.u3 = cp->vaddr;
 		new_reply.dst.u.tcp.port = cp->vport;
-		IP_VS_DBG(7, "%s: ct=%p, new tuples=" FMT_TUPLE ", " FMT_TUPLE
+		IP_VS_DBG(7, "%s: ct=%pK, new tuples=" FMT_TUPLE ", " FMT_TUPLE
 			  ", inout cp=" FMT_CONN "\n",
 			  __func__, ct,
 			  ARG_TUPLE(orig), ARG_TUPLE(&new_reply),
@@ -183,14 +183,14 @@ static void ip_vs_nfct_expect_callback(struct nf_conn *ct,
 	if (cp) {
 		/* Change reply VS->CLIENT to RS->CLIENT */
 		new_reply = ct->tuplehash[IP_CT_DIR_REPLY].tuple;
-		IP_VS_DBG(7, "%s: ct=%p, status=0x%lX, tuples=" FMT_TUPLE ", "
+		IP_VS_DBG(7, "%s: ct=%pK, status=0x%lX, tuples=" FMT_TUPLE ", "
 			  FMT_TUPLE ", found outin cp=" FMT_CONN "\n",
 			  __func__, ct, ct->status,
 			  ARG_TUPLE(orig), ARG_TUPLE(&new_reply),
 			  ARG_CONN(cp));
 		new_reply.src.u3 = cp->daddr;
 		new_reply.src.u.tcp.port = cp->dport;
-		IP_VS_DBG(7, "%s: ct=%p, new tuples=" FMT_TUPLE ", "
+		IP_VS_DBG(7, "%s: ct=%pK, new tuples=" FMT_TUPLE ", "
 			  FMT_TUPLE ", outin cp=" FMT_CONN "\n",
 			  __func__, ct,
 			  ARG_TUPLE(orig), ARG_TUPLE(&new_reply),
@@ -198,7 +198,7 @@ static void ip_vs_nfct_expect_callback(struct nf_conn *ct,
 		goto alter;
 	}
 
-	IP_VS_DBG(7, "%s: ct=%p, status=0x%lX, tuple=" FMT_TUPLE
+	IP_VS_DBG(7, "%s: ct=%pK, status=0x%lX, tuple=" FMT_TUPLE
 		  " - unknown expect\n",
 		  __func__, ct, ct->status, ARG_TUPLE(orig));
 	return;
@@ -238,7 +238,7 @@ void ip_vs_nfct_expect_related(struct sk_buff *skb, struct nf_conn *ct,
 
 	exp->expectfn = ip_vs_nfct_expect_callback;
 
-	IP_VS_DBG(7, "%s: ct=%p, expect tuple=" FMT_TUPLE "\n",
+	IP_VS_DBG(7, "%s: ct=%pK, expect tuple=" FMT_TUPLE "\n",
 		__func__, ct, ARG_TUPLE(&exp->tuple));
 	nf_ct_expect_related(exp);
 	nf_ct_expect_put(exp);
@@ -275,13 +275,13 @@ void ip_vs_conn_drop_conntrack(struct ip_vs_conn *cp)
 		ct = nf_ct_tuplehash_to_ctrack(h);
 		/* Show what happens instead of calling nf_ct_kill() */
 		if (del_timer(&ct->timeout)) {
-			IP_VS_DBG(7, "%s: ct=%p, deleted conntrack timer for tuple="
+			IP_VS_DBG(7, "%s: ct=%pK, deleted conntrack timer for tuple="
 				FMT_TUPLE "\n",
 				__func__, ct, ARG_TUPLE(&tuple));
 			if (ct->timeout.function)
 				ct->timeout.function(ct->timeout.data);
 		} else {
-			IP_VS_DBG(7, "%s: ct=%p, no conntrack timer for tuple="
+			IP_VS_DBG(7, "%s: ct=%pK, no conntrack timer for tuple="
 				FMT_TUPLE "\n",
 				__func__, ct, ARG_TUPLE(&tuple));
 		}

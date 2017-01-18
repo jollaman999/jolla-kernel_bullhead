@@ -53,7 +53,7 @@ static int find_boot_record(struct INFTLrecord *inftl)
 	struct INFTLPartition *ip;
 	size_t retlen;
 
-	pr_debug("INFTL: find_boot_record(inftl=%p)\n", inftl);
+	pr_debug("INFTL: find_boot_record(inftl=%pK)\n", inftl);
 
         /*
 	 * Assume logical EraseSize == physical erasesize for starting the
@@ -378,7 +378,7 @@ int INFTL_formatblock(struct INFTLrecord *inftl, int block)
 	struct mtd_info *mtd = inftl->mbd.mtd;
 	int physblock;
 
-	pr_debug("INFTL: INFTL_formatblock(inftl=%p,block=%d)\n", inftl, block);
+	pr_debug("INFTL: INFTL_formatblock(inftl=%pK,block=%d)\n", inftl, block);
 
 	memset(instr, 0, sizeof(struct erase_info));
 
@@ -547,7 +547,7 @@ int INFTL_mount(struct INFTLrecord *s)
 	int i;
 	u8 *ANACtable, ANAC;
 
-	pr_debug("INFTL: INFTL_mount(inftl=%p)\n", s);
+	pr_debug("INFTL: INFTL_mount(inftl=%pK)\n", s);
 
 	/* Search for INFTL MediaHeader and Spare INFTL Media Header */
 	if (find_boot_record(s) < 0) {

@@ -354,7 +354,7 @@ static int finish_mem_reg(struct c4iw_mr *mhp, u32 stag)
 	mhp->attr.stag = stag;
 	mmid = stag >> 8;
 	mhp->ibmr.rkey = mhp->ibmr.lkey = stag;
-	PDBG("%s mmid 0x%x mhp %p\n", __func__, mmid, mhp);
+	PDBG("%s mmid 0x%x mhp %pK\n", __func__, mmid, mhp);
 	return insert_handle(mhp->rhp, &mhp->rhp->mmidr, mhp, mmid);
 }
 
@@ -500,7 +500,7 @@ int c4iw_reregister_phys_mem(struct ib_mr *mr, int mr_rereg_mask,
 	int npages;
 	int ret;
 
-	PDBG("%s ib_mr %p ib_pd %p\n", __func__, mr, pd);
+	PDBG("%s ib_mr %pK ib_pd %pK\n", __func__, mr, pd);
 
 	/* There can be no memory windows */
 	if (atomic_read(&mr->usecnt))
@@ -564,7 +564,7 @@ struct ib_mr *c4iw_register_phys_mem(struct ib_pd *pd,
 	struct c4iw_mr *mhp;
 	int ret;
 
-	PDBG("%s ib_pd %p\n", __func__, pd);
+	PDBG("%s ib_pd %pK\n", __func__, pd);
 	php = to_c4iw_pd(pd);
 	rhp = php->rhp;
 
@@ -637,7 +637,7 @@ struct ib_mr *c4iw_get_dma_mr(struct ib_pd *pd, int acc)
 	int ret;
 	u32 stag = T4_STAG_UNSET;
 
-	PDBG("%s ib_pd %p\n", __func__, pd);
+	PDBG("%s ib_pd %pK\n", __func__, pd);
 	php = to_c4iw_pd(pd);
 	rhp = php->rhp;
 
@@ -685,7 +685,7 @@ struct ib_mr *c4iw_reg_user_mr(struct ib_pd *pd, u64 start, u64 length,
 	struct c4iw_pd *php;
 	struct c4iw_mr *mhp;
 
-	PDBG("%s ib_pd %p\n", __func__, pd);
+	PDBG("%s ib_pd %pK\n", __func__, pd);
 
 	if (length == ~0ULL)
 		return ERR_PTR(-EINVAL);
@@ -810,7 +810,7 @@ struct ib_mw *c4iw_alloc_mw(struct ib_pd *pd, enum ib_mw_type type)
 		kfree(mhp);
 		return ERR_PTR(-ENOMEM);
 	}
-	PDBG("%s mmid 0x%x mhp %p stag 0x%x\n", __func__, mmid, mhp, stag);
+	PDBG("%s mmid 0x%x mhp %pK stag 0x%x\n", __func__, mmid, mhp, stag);
 	return &(mhp->ibmw);
 }
 
@@ -826,7 +826,7 @@ int c4iw_dealloc_mw(struct ib_mw *mw)
 	remove_handle(rhp, &rhp->mmidr, mmid);
 	deallocate_window(&rhp->rdev, mhp->attr.stag);
 	kfree(mhp);
-	PDBG("%s ib_mw %p mmid 0x%x ptr %p\n", __func__, mw, mmid, mhp);
+	PDBG("%s ib_mw %pK mmid 0x%x ptr %pK\n", __func__, mw, mmid, mhp);
 	return 0;
 }
 
@@ -867,7 +867,7 @@ struct ib_mr *c4iw_alloc_fast_reg_mr(struct ib_pd *pd, int pbl_depth)
 		goto err3;
 	}
 
-	PDBG("%s mmid 0x%x mhp %p stag 0x%x\n", __func__, mmid, mhp, stag);
+	PDBG("%s mmid 0x%x mhp %pK stag 0x%x\n", __func__, mmid, mhp, stag);
 	return &(mhp->ibmr);
 err3:
 	dereg_mem(&rhp->rdev, stag, mhp->attr.pbl_size,
@@ -924,7 +924,7 @@ int c4iw_dereg_mr(struct ib_mr *ib_mr)
 	struct c4iw_mr *mhp;
 	u32 mmid;
 
-	PDBG("%s ib_mr %p\n", __func__, ib_mr);
+	PDBG("%s ib_mr %pK\n", __func__, ib_mr);
 	/* There can be no memory windows */
 	if (atomic_read(&ib_mr->usecnt))
 		return -EINVAL;
@@ -942,7 +942,7 @@ int c4iw_dereg_mr(struct ib_mr *ib_mr)
 		kfree((void *) (unsigned long) mhp->kva);
 	if (mhp->umem)
 		ib_umem_release(mhp->umem);
-	PDBG("%s mmid 0x%x ptr %p\n", __func__, mmid, mhp);
+	PDBG("%s mmid 0x%x ptr %pK\n", __func__, mmid, mhp);
 	kfree(mhp);
 	return 0;
 }

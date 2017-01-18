@@ -376,7 +376,7 @@ static void hotplug_devices(struct work_struct *dummy)
 		}
 
 		/* new device */
-		printk(KERN_INFO "Adding new virtio device %p\n", d);
+		printk(KERN_INFO "Adding new virtio device %pK\n", d);
 		add_kvm_device(d, i);
 	}
 }

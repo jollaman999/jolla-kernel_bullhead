@@ -887,7 +887,7 @@ static int __init atmel_lcdfb_init_fbinfo(struct atmel_lcdfb_info *sinfo)
 	info->var.activate |= FB_ACTIVATE_FORCE | FB_ACTIVATE_NOW;
 
 	dev_info(info->device,
-	       "%luKiB frame buffer at %08lx (mapped at %p)\n",
+	       "%luKiB frame buffer at %08lx (mapped at %pK)\n",
 	       (unsigned long)info->fix.smem_len / 1024,
 	       (unsigned long)info->fix.smem_start,
 	       info->screen_base);
@@ -1100,7 +1100,7 @@ static int __init atmel_lcdfb_probe(struct platform_device *pdev)
 	if (sinfo->atmel_lcdfb_power_control)
 		sinfo->atmel_lcdfb_power_control(1);
 
-	dev_info(dev, "fb%d: Atmel LCDC at 0x%08lx (mapped at %p), irq %d\n",
+	dev_info(dev, "fb%d: Atmel LCDC at 0x%08lx (mapped at %pK), irq %d\n",
 		       info->node, info->fix.mmio_start, sinfo->mmio, sinfo->irq_base);
 
 	return 0;

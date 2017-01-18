@@ -85,7 +85,7 @@ void acpi_ds_clear_implicit_return(struct acpi_walk_state *walk_state)
 		 * bubbled up several levels.
 		 */
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-				  "Removing reference on stale implicit return obj %p\n",
+				  "Removing reference on stale implicit return obj %pK\n",
 				  walk_state->implicit_return_obj));
 
 		acpi_ut_remove_reference(walk_state->implicit_return_obj);
@@ -127,7 +127,7 @@ acpi_ds_do_implicit_return(union acpi_operand_object *return_desc,
 	}
 
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "Result %p will be implicitly returned; Prev=%p\n",
+			  "Result %pK will be implicitly returned; Prev=%pK\n",
 			  return_desc, walk_state->implicit_return_obj));
 
 	/*
@@ -218,7 +218,7 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 	parent_info =
 	    acpi_ps_get_opcode_info(op->common.parent->common.aml_opcode);
 	if (parent_info->class == AML_CLASS_UNKNOWN) {
-		ACPI_ERROR((AE_INFO, "Unknown parent opcode Op=%p", op));
+		ACPI_ERROR((AE_INFO, "Unknown parent opcode Op=%pK", op));
 		return_UINT8(FALSE);
 	}
 
@@ -302,7 +302,7 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 
       result_used:
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "Result of [%s] used by Parent [%s] Op=%p\n",
+			  "Result of [%s] used by Parent [%s] Op=%pK\n",
 			  acpi_ps_get_opcode_name(op->common.aml_opcode),
 			  acpi_ps_get_opcode_name(op->common.parent->common.
 						  aml_opcode), op));
@@ -311,7 +311,7 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 
       result_not_used:
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "Result of [%s] not used by Parent [%s] Op=%p\n",
+			  "Result of [%s] not used by Parent [%s] Op=%pK\n",
 			  acpi_ps_get_opcode_name(op->common.aml_opcode),
 			  acpi_ps_get_opcode_name(op->common.parent->common.
 						  aml_opcode), op));
@@ -477,7 +477,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 	if ((arg->common.aml_opcode == AML_INT_NAMEPATH_OP) &&
 	    (arg->common.value.string) &&
 	    !(arg->common.flags & ACPI_PARSEOP_IN_STACK)) {
-		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Getting a name: Arg=%p\n",
+		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Getting a name: Arg=%pK\n",
 				  arg));
 
 		/* Get the entire name string from the AML stream */
@@ -611,7 +611,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 			opcode = AML_ZERO_OP;	/* Has no arguments! */
 
 			ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-					  "Null namepath: Arg=%p\n", arg));
+					  "Null namepath: Arg=%pK\n", arg));
 		} else {
 			opcode = arg->common.aml_opcode;
 		}
@@ -747,7 +747,7 @@ acpi_ds_create_operands(struct acpi_walk_state *walk_state,
 		index--;
 
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-				  "Arg #%u (%p) done, Arg1=%p\n", index, arg,
+				  "Arg #%u (%pK) done, Arg1=%pK\n", index, arg,
 				  first_arg));
 	}
 

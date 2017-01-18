@@ -480,7 +480,7 @@ void __init native_pagetable_init(void)
 
 		/* should not be large page here */
 		if (pmd_large(*pmd)) {
-			pr_warn("try to clear pte for ram above max_low_pfn: pfn: %lx pmd: %p pmd phys: %lx, but pmd is big page and is not using pte !\n",
+			pr_warn("try to clear pte for ram above max_low_pfn: pfn: %lx pmd: %pK pmd phys: %lx, but pmd is big page and is not using pte !\n",
 				pfn, pmd, __pa(pmd));
 			BUG_ON(1);
 		}
@@ -489,7 +489,7 @@ void __init native_pagetable_init(void)
 		if (!pte_present(*pte))
 			break;
 
-		printk(KERN_DEBUG "clearing pte for ram above max_low_pfn: pfn: %lx pmd: %p pmd phys: %lx pte: %p pte phys: %lx\n",
+		printk(KERN_DEBUG "clearing pte for ram above max_low_pfn: pfn: %lx pmd: %pK pmd phys: %lx pte: %pK pte phys: %lx\n",
 				pfn, pmd, __pa(pmd), pte, __pa(pte));
 		pte_clear(NULL, va, pte);
 	}

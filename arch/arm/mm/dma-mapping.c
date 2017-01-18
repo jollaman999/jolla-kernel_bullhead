@@ -155,7 +155,7 @@ static void arm_dma_unremap(struct device *dev, void *remapped_addr,
 
 	area = find_vm_area(remapped_addr);
 	if (!area || (area->flags & flags) != flags) {
-		WARN(1, "trying to free invalid coherent area: %p\n",
+		WARN(1, "trying to free invalid coherent area: %pK\n",
 				remapped_addr);
 		return;
 	}
@@ -369,7 +369,7 @@ static void __dma_free_remap(void *cpu_addr, size_t size, bool no_warn)
 	unsigned int flags = VM_ARM_DMA_CONSISTENT | VM_USERMAP;
 	struct vm_struct *area = find_vm_area(cpu_addr);
 	if (!area || (area->flags & flags) != flags) {
-		WARN(!no_warn, "trying to free invalid coherent area: %p\n",
+		WARN(!no_warn, "trying to free invalid coherent area: %pK\n",
 				cpu_addr);
 		return;
 	}
@@ -633,7 +633,7 @@ static bool __in_atomic_pool(void *start, size_t size)
 	if (end <= pool_end)
 		return true;
 
-	WARN(1, "Wrong coherent size(%p-%p) from atomic pool(%p-%p)\n",
+	WARN(1, "Wrong coherent size(%pK-%pK) from atomic pool(%pK-%pK)\n",
 	     start, end - 1, pool_start, pool_end - 1);
 
 	return false;
@@ -1517,7 +1517,7 @@ void arm_iommu_free_attrs(struct device *dev, size_t size, void *cpu_addr,
 	size = PAGE_ALIGN(size);
 
 	if (!pages) {
-		WARN(1, "trying to free invalid coherent area: %p\n", cpu_addr);
+		WARN(1, "trying to free invalid coherent area: %pK\n", cpu_addr);
 		return;
 	}
 

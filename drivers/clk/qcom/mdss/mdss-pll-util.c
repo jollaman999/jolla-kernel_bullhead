@@ -359,7 +359,7 @@ static int mdss_pll_util_parse_dfps(struct platform_device *pdev,
 		goto parse_dfps_addr_err;
 	}
 
-	pr_debug("dfps=%p phys=%pa enabled=%d cnt=%d\n", pll_res->dfps,
+	pr_debug("dfps=%pK phys=%pa enabled=%d cnt=%d\n", pll_res->dfps,
 		&phys, pll_res->dfps->panel_dfps.enabled,
 		pll_res->dfps->panel_dfps.frame_rate_cnt);
 

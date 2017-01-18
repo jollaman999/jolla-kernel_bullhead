@@ -559,7 +559,7 @@ static int s3c24xx_spi_probe(struct platform_device *pdev)
 	hw->master->setup  = s3c24xx_spi_setup;
 	hw->master->cleanup = s3c24xx_spi_cleanup;
 
-	dev_dbg(hw->dev, "bitbang at %p\n", &hw->bitbang);
+	dev_dbg(hw->dev, "bitbang at %pK\n", &hw->bitbang);
 
 	/* find and map our resources */
 

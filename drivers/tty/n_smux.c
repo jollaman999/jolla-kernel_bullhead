@@ -530,7 +530,7 @@ static void smux_lch_purge(void)
 	/* Empty TX ready list */
 	spin_lock_irqsave(&smux.tx_lock_lha2, flags);
 	while (!list_empty(&smux.lch_tx_ready_list)) {
-		SMUX_DBG("smux: %s: emptying ready list %p\n",
+		SMUX_DBG("smux: %s: emptying ready list %pK\n",
 				__func__, smux.lch_tx_ready_list.next);
 		ch = list_first_entry(&smux.lch_tx_ready_list,
 						struct smux_lch_t,
@@ -547,7 +547,7 @@ static void smux_lch_purge(void)
 						struct smux_pkt_t,
 						list);
 		list_del(&pkt->list);
-		SMUX_DBG("smux: %s: emptying power queue pkt=%p\n",
+		SMUX_DBG("smux: %s: emptying power queue pkt=%pK\n",
 				__func__, pkt);
 		smux_free_pkt(pkt);
 	}
@@ -1163,7 +1163,7 @@ static void smux_tx_queue(struct smux_pkt_t *pkt_ptr, struct smux_lch_t *ch,
 {
 	unsigned long flags;
 
-	SMUX_DBG("smux: %s: queuing pkt %p\n", __func__, pkt_ptr);
+	SMUX_DBG("smux: %s: queuing pkt %pK\n", __func__, pkt_ptr);
 
 	spin_lock_irqsave(&ch->tx_lock_lhb2, flags);
 	list_add_tail(&pkt_ptr->list, &ch->tx_queue);
@@ -2397,7 +2397,7 @@ static void smux_uart_power_on_atomic(void)
 	struct uart_state *state;
 
 	if (!smux.tty || !smux.tty->driver_data) {
-		SMUX_ERR("%s: unable to find UART port for tty %p\n",
+		SMUX_ERR("%s: unable to find UART port for tty %pK\n",
 				__func__, smux.tty);
 		return;
 	}
@@ -2425,7 +2425,7 @@ static void smux_uart_power_off_atomic(void)
 	struct uart_state *state;
 
 	if (!smux.tty || !smux.tty->driver_data) {
-		SMUX_ERR("%s: unable to find UART port for tty %p\n",
+		SMUX_ERR("%s: unable to find UART port for tty %pK\n",
 				__func__, smux.tty);
 		mutex_unlock(&smux.mutex_lha0);
 		return;
@@ -2643,7 +2643,7 @@ static void smux_rx_worker(struct work_struct *work)
 	smux.rx_activity_flag = 1;
 	spin_unlock_irqrestore(&smux.rx_lock_lha1, flags);
 
-	SMUX_DBG("smux: %s: %p, len=%d, flag=%d\n", __func__, data, len, flag);
+	SMUX_DBG("smux: %s: %pK, len=%d, flag=%d\n", __func__, data, len, flag);
 	used = 0;
 	do {
 		if (smux.in_reset) {
@@ -2721,7 +2721,7 @@ static void smux_rx_retry_worker(struct work_struct *work)
 					rx_retry_list);
 	spin_unlock_irqrestore(&ch->state_lock_lhb1, flags);
 
-	SMUX_DBG("smux: %s: ch %d retrying rx pkt %p\n",
+	SMUX_DBG("smux: %s: ch %d retrying rx pkt %pK\n",
 			__func__, ch->lcid, retry);
 	metadata.read.pkt_priv = 0;
 	metadata.read.buffer = 0;
@@ -3650,7 +3650,7 @@ static void smux_pdev_release(struct device *dev)
 	struct platform_device *pdev;
 
 	pdev = container_of(dev, struct platform_device, dev);
-	SMUX_DBG("smux: %s: releasing pdev %p '%s'\n",
+	SMUX_DBG("smux: %s: releasing pdev %pK '%s'\n",
 			__func__, pdev, pdev->name);
 	memset(&pdev->dev, 0x0, sizeof(pdev->dev));
 }
@@ -3666,7 +3666,7 @@ static int smuxld_open(struct tty_struct *tty)
 
 	mutex_lock(&smux.mutex_lha0);
 	if (smux.ld_open_count) {
-		SMUX_ERR("%s: %p multiple instances not supported\n",
+		SMUX_ERR("%s: %pK multiple instances not supported\n",
 			__func__, tty);
 		mutex_unlock(&smux.mutex_lha0);
 		return -EEXIST;

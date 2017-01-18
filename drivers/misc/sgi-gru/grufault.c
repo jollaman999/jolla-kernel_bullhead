@@ -343,7 +343,7 @@ static void gru_preload_tlb(struct gru_state *gru,
 					  GRU_PAGESIZE(pageshift)))
 			return;
 		gru_dbg(grudev,
-			"%s: gid %d, gts 0x%p, tfh 0x%p, vaddr 0x%lx, asid 0x%x, rw %d, ps %d, gpa 0x%lx\n",
+			"%s: gid %d, gts 0x%pK, tfh 0x%pK, vaddr 0x%lx, asid 0x%x, rw %d, ps %d, gpa 0x%lx\n",
 			atomic ? "atomic" : "non-atomic", gru->gs_gid, gts, tfh,
 			vaddr, asid, write, pageshift, gpa);
 		vaddr -= PAGE_SIZE;
@@ -443,7 +443,7 @@ static int gru_try_dropin(struct gru_state *gru,
 	tfh_write_restart(tfh, gpa, GAA_RAM, vaddr, asid, write,
 			  GRU_PAGESIZE(pageshift));
 	gru_dbg(grudev,
-		"%s: gid %d, gts 0x%p, tfh 0x%p, vaddr 0x%lx, asid 0x%x, indexway 0x%x,"
+		"%s: gid %d, gts 0x%pK, tfh 0x%pK, vaddr 0x%lx, asid 0x%x, indexway 0x%x,"
 		" rw %d, ps %d, gpa 0x%lx\n",
 		atomic ? "atomic" : "non-atomic", gru->gs_gid, gts, tfh, vaddr, asid,
 		indexway, write, pageshift, gpa);
@@ -453,7 +453,7 @@ static int gru_try_dropin(struct gru_state *gru,
 failnoasid:
 	/* No asid (delayed unload). */
 	STAT(tlb_dropin_fail_no_asid);
-	gru_dbg(grudev, "FAILED no_asid tfh: 0x%p, vaddr 0x%lx\n", tfh, vaddr);
+	gru_dbg(grudev, "FAILED no_asid tfh: 0x%pK, vaddr 0x%lx\n", tfh, vaddr);
 	if (!cbk)
 		tfh_user_polling_mode(tfh);
 	else
@@ -466,7 +466,7 @@ failupm:
 	tfh_user_polling_mode(tfh);
 	gru_flush_cache_cbe(cbe);
 	STAT(tlb_dropin_fail_upm);
-	gru_dbg(grudev, "FAILED upm tfh: 0x%p, vaddr 0x%lx\n", tfh, vaddr);
+	gru_dbg(grudev, "FAILED upm tfh: 0x%pK, vaddr 0x%lx\n", tfh, vaddr);
 	return 1;
 
 failfmm:
@@ -474,7 +474,7 @@ failfmm:
 	gru_flush_cache(tfh);
 	gru_flush_cache_cbe(cbe);
 	STAT(tlb_dropin_fail_fmm);
-	gru_dbg(grudev, "FAILED fmm tfh: 0x%p, state %d\n", tfh, tfh->state);
+	gru_dbg(grudev, "FAILED fmm tfh: 0x%pK, state %d\n", tfh, tfh->state);
 	return 0;
 
 failnoexception:
@@ -484,7 +484,7 @@ failnoexception:
 	if (cbk)
 		gru_flush_cache(cbk);
 	STAT(tlb_dropin_fail_no_exception);
-	gru_dbg(grudev, "FAILED non-exception tfh: 0x%p, status %d, state %d\n",
+	gru_dbg(grudev, "FAILED non-exception tfh: 0x%pK, status %d, state %d\n",
 		tfh, tfh->status, tfh->state);
 	return 0;
 
@@ -495,7 +495,7 @@ failidle:
 	if (cbk)
 		gru_flush_cache(cbk);
 	STAT(tlb_dropin_fail_idle);
-	gru_dbg(grudev, "FAILED idle tfh: 0x%p, state %d\n", tfh, tfh->state);
+	gru_dbg(grudev, "FAILED idle tfh: 0x%pK, state %d\n", tfh, tfh->state);
 	return 0;
 
 failinval:
@@ -503,7 +503,7 @@ failinval:
 	tfh_exception(tfh);
 	gru_flush_cache_cbe(cbe);
 	STAT(tlb_dropin_fail_invalid);
-	gru_dbg(grudev, "FAILED inval tfh: 0x%p, vaddr 0x%lx\n", tfh, vaddr);
+	gru_dbg(grudev, "FAILED inval tfh: 0x%pK, vaddr 0x%lx\n", tfh, vaddr);
 	return -EFAULT;
 
 failactive:
@@ -514,7 +514,7 @@ failactive:
 		gru_flush_cache(tfh);
 	gru_flush_cache_cbe(cbe);
 	STAT(tlb_dropin_fail_range_active);
-	gru_dbg(grudev, "FAILED range active: tfh 0x%p, vaddr 0x%lx\n",
+	gru_dbg(grudev, "FAILED range active: tfh 0x%pK, vaddr 0x%lx\n",
 		tfh, vaddr);
 	return 1;
 }
@@ -660,7 +660,7 @@ int gru_handle_user_call_os(unsigned long cb)
 	gts = gru_find_lock_gts(cb);
 	if (!gts)
 		return -EINVAL;
-	gru_dbg(grudev, "address 0x%lx, gid %d, gts 0x%p\n", cb, gts->ts_gru ? gts->ts_gru->gs_gid : -1, gts);
+	gru_dbg(grudev, "address 0x%lx, gid %d, gts 0x%pK\n", cb, gts->ts_gru ? gts->ts_gru->gs_gid : -1, gts);
 
 	if (ucbnum >= gts->ts_cbr_au_count * GRU_CBR_AU_SIZE)
 		goto exit;
@@ -707,7 +707,7 @@ int gru_get_exception_detail(unsigned long arg)
 	if (!gts)
 		return -EINVAL;
 
-	gru_dbg(grudev, "address 0x%lx, gid %d, gts 0x%p\n", excdet.cb, gts->ts_gru ? gts->ts_gru->gs_gid : -1, gts);
+	gru_dbg(grudev, "address 0x%lx, gid %d, gts 0x%pK\n", excdet.cb, gts->ts_gru ? gts->ts_gru->gs_gid : -1, gts);
 	ucbnum = get_cb_number((void *)excdet.cb);
 	if (ucbnum >= gts->ts_cbr_au_count * GRU_CBR_AU_SIZE) {
 		ret = -EINVAL;

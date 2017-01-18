@@ -113,7 +113,7 @@ static void adb_iop_listen(struct iop_msg *msg)
 	req = current_req;
 
 #ifdef DEBUG_ADB_IOP
-	printk("adb_iop_listen %p: rcvd packet, %d bytes: %02X %02X", req,
+	printk("adb_iop_listen %pK: rcvd packet, %d bytes: %02X %02X", req,
 		(uint) amsg->count + 2, (uint) amsg->flags, (uint) amsg->cmd);
 	for (i = 0; i < amsg->count; i++)
 		printk(" %02X", (uint) amsg->data[i]);
@@ -174,7 +174,7 @@ static void adb_iop_start(void)
 	local_irq_save(flags);
 
 #ifdef DEBUG_ADB_IOP
-	printk("adb_iop_start %p: sending packet, %d bytes:", req, req->nbytes);
+	printk("adb_iop_start %pK: sending packet, %d bytes:", req, req->nbytes);
 	for (i = 0 ; i < req->nbytes ; i++)
 		printk(" %02X", (uint) req->data[i]);
 	printk("\n");

@@ -229,7 +229,7 @@ static __ref void *spp_getpage(void)
 			after_bootmem ? "after bootmem" : "");
 	}
 
-	pr_debug("spp_getpage %p\n", ptr);
+	pr_debug("spp_getpage %pK\n", ptr);
 
 	return ptr;
 }
@@ -240,7 +240,7 @@ static pud_t *fill_pud(pgd_t *pgd, unsigned long vaddr)
 		pud_t *pud = (pud_t *)spp_getpage();
 		pgd_populate(&init_mm, pgd, pud);
 		if (pud != pud_offset(pgd, 0))
-			printk(KERN_ERR "PAGETABLE BUG #00! %p <-> %p\n",
+			printk(KERN_ERR "PAGETABLE BUG #00! %pK <-> %pK\n",
 			       pud, pud_offset(pgd, 0));
 	}
 	return pud_offset(pgd, vaddr);
@@ -252,7 +252,7 @@ static pmd_t *fill_pmd(pud_t *pud, unsigned long vaddr)
 		pmd_t *pmd = (pmd_t *) spp_getpage();
 		pud_populate(&init_mm, pud, pmd);
 		if (pmd != pmd_offset(pud, 0))
-			printk(KERN_ERR "PAGETABLE BUG #01! %p <-> %p\n",
+			printk(KERN_ERR "PAGETABLE BUG #01! %pK <-> %pK\n",
 			       pmd, pmd_offset(pud, 0));
 	}
 	return pmd_offset(pud, vaddr);
@@ -432,7 +432,7 @@ phys_pte_init(pte_t *pte_page, unsigned long addr, unsigned long end,
 		}
 
 		if (0)
-			printk("   pte=%p addr=%lx pte=%016lx\n",
+			printk("   pte=%pK addr=%lx pte=%016lx\n",
 			       pte, addr, pfn_pte(addr >> PAGE_SHIFT, PAGE_KERNEL).pte);
 		pages++;
 		set_pte(pte, pfn_pte(addr >> PAGE_SHIFT, prot));
@@ -1326,7 +1326,7 @@ static int __meminit vmemmap_populate_hugepages(unsigned long start,
 				/* check to see if we have contiguous blocks */
 				if (p_end != p || node_start != node) {
 					if (p_start)
-						printk(KERN_DEBUG " [%lx-%lx] PMD -> [%p-%p] on node %d\n",
+						printk(KERN_DEBUG " [%lx-%lx] PMD -> [%pK-%pK] on node %d\n",
 						       addr_start, addr_end-1, p_start, p_end-1, node_start);
 					addr_start = addr;
 					node_start = node;
@@ -1424,7 +1424,7 @@ void register_page_bootmem_memmap(unsigned long section_nr,
 void __meminit vmemmap_populate_print_last(void)
 {
 	if (p_start) {
-		printk(KERN_DEBUG " [%lx-%lx] PMD -> [%p-%p] on node %d\n",
+		printk(KERN_DEBUG " [%lx-%lx] PMD -> [%pK-%pK] on node %d\n",
 			addr_start, addr_end-1, p_start, p_end-1, node_start);
 		p_start = NULL;
 		p_end = NULL;

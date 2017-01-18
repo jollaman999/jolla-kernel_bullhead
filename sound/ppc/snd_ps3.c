@@ -629,7 +629,7 @@ static int snd_ps3_pcm_prepare(struct snd_pcm_substream *substream)
 		card->dma_start_bus_addr[SND_PS3_CH_R] =
 			runtime->dma_addr + (runtime->dma_bytes / 2);
 
-		pr_debug("%s: vaddr=%p bus=%#llx\n", __func__,
+		pr_debug("%s: vaddr=%pK bus=%#llx\n", __func__,
 			 card->dma_start_vaddr[SND_PS3_CH_L],
 			 card->dma_start_bus_addr[SND_PS3_CH_L]);
 
@@ -1043,7 +1043,7 @@ static int snd_ps3_driver_probe(struct ps3_system_bus_device *dev)
 		ret = -ENOMEM;
 		goto clean_preallocate;
 	}
-	pr_debug("%s: null vaddr=%p dma=%#llx\n", __func__,
+	pr_debug("%s: null vaddr=%pK dma=%#llx\n", __func__,
 		 the_card.null_buffer_start_vaddr,
 		 the_card.null_buffer_start_dma_addr);
 	/* set default sample rate/word width */

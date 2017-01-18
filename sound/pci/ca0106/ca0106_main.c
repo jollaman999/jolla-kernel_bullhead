@@ -583,7 +583,7 @@ static int snd_ca0106_pcm_open_playback_channel(struct snd_pcm_substream *substr
 
 	channel->use = 1;
 	/*
-	printk(KERN_DEBUG "open:channel_id=%d, chip=%p, channel=%p\n",
+	printk(KERN_DEBUG "open:channel_id=%d, chip=%pK, channel=%pK\n",
 	       channel_id, chip, channel);
 	*/
         //channel->interrupt = snd_ca0106_pcm_channel_interrupt;
@@ -677,7 +677,7 @@ static int snd_ca0106_pcm_open_capture_channel(struct snd_pcm_substream *substre
 
 	channel->use = 1;
 	/*
-        printk(KERN_DEBUG "open:channel_id=%d, chip=%p, channel=%p\n",
+        printk(KERN_DEBUG "open:channel_id=%d, chip=%pK, channel=%pK\n",
 	       channel_id, chip, channel);
 	*/
         //channel->interrupt = snd_ca0106_pcm_channel_interrupt;
@@ -779,9 +779,9 @@ static int snd_ca0106_pcm_prepare_playback(struct snd_pcm_substream *substream)
 		   runtime->channels, runtime->buffer_size,
 		   runtime->period_size, runtime->periods,
 		   frames_to_bytes(runtime, 1));
-	snd_printk(KERN_DEBUG "dma_addr=%x, dma_area=%p, table_base=%p\n",
+	snd_printk(KERN_DEBUG "dma_addr=%x, dma_area=%pK, table_base=%pK\n",
 		   runtime->dma_addr, runtime->dma_area, table_base);
-	snd_printk(KERN_DEBUG "dma_addr=%x, dma_area=%p, dma_bytes(size)=%x\n",
+	snd_printk(KERN_DEBUG "dma_addr=%x, dma_area=%pK, dma_bytes(size)=%x\n",
 		   emu->buffer.addr, emu->buffer.area, emu->buffer.bytes);
 #endif /* debug */
 	/* Rate can be set per channel. */
@@ -884,9 +884,9 @@ static int snd_ca0106_pcm_prepare_capture(struct snd_pcm_substream *substream)
 		   runtime->channels, runtime->buffer_size,
 		   runtime->period_size, runtime->periods,
 		   frames_to_bytes(runtime, 1));
-        snd_printk(KERN_DEBUG "dma_addr=%x, dma_area=%p, table_base=%p\n",
+        snd_printk(KERN_DEBUG "dma_addr=%x, dma_area=%pK, table_base=%pK\n",
 		   runtime->dma_addr, runtime->dma_area, table_base);
-	snd_printk(KERN_DEBUG "dma_addr=%x, dma_area=%p, dma_bytes(size)=%x\n",
+	snd_printk(KERN_DEBUG "dma_addr=%x, dma_area=%pK, dma_bytes(size)=%x\n",
 		   emu->buffer.addr, emu->buffer.area, emu->buffer.bytes);
 #endif /* debug */
 	/* reg71 controls ADC rate. */
@@ -1299,7 +1299,7 @@ static irqreturn_t snd_ca0106_interrupt(int irq, void *dev_id)
 				//printk(KERN_INFO "interrupt [%d] used\n", i);
                         }
 		}
-	        //printk(KERN_INFO "channel=%p\n",pchannel);
+	        //printk(KERN_INFO "channel=%pK\n",pchannel);
 	        //printk(KERN_INFO "interrupt stat76[%d] = %08x, use=%d, channel=%d\n", i, stat76, pchannel->use, pchannel->number);
 		mask <<= 1;
 	}
@@ -1313,7 +1313,7 @@ static irqreturn_t snd_ca0106_interrupt(int irq, void *dev_id)
 				//printk(KERN_INFO "interrupt [%d] used\n", i);
                         }
 		}
-	        //printk(KERN_INFO "channel=%p\n",pchannel);
+	        //printk(KERN_INFO "channel=%pK\n",pchannel);
 	        //printk(KERN_INFO "interrupt stat76[%d] = %08x, use=%d, channel=%d\n", i, stat76, pchannel->use, pchannel->number);
 		mask <<= 1;
 	}

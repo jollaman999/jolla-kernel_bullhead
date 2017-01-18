@@ -149,7 +149,7 @@ struct inode *ialloc(struct inode *parent, umode_t mode)
 	jfs_inode->xtlid = 0;
 	jfs_set_inode_flags(inode);
 
-	jfs_info("ialloc returns inode = 0x%p\n", inode);
+	jfs_info("ialloc returns inode = 0x%pK\n", inode);
 
 	return inode;
 

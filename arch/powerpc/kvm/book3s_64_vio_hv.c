@@ -56,7 +56,7 @@ long kvmppc_h_put_tce(struct kvm_vcpu *vcpu, unsigned long liobn,
 			struct page *page;
 			u64 *tbl;
 
-			/* udbg_printf("H_PUT_TCE: liobn 0x%lx => stt=%p  window_size=0x%x\n", */
+			/* udbg_printf("H_PUT_TCE: liobn 0x%lx => stt=%pK  window_size=0x%x\n", */
 			/* 	    liobn, stt, stt->window_size); */
 			if (ioba >= stt->window_size)
 				return H_PARAMETER;
@@ -65,7 +65,7 @@ long kvmppc_h_put_tce(struct kvm_vcpu *vcpu, unsigned long liobn,
 			tbl = (u64 *)page_address(page);
 
 			/* FIXME: Need to validate the TCE itself */
-			/* udbg_printf("tce @ %p\n", &tbl[idx % TCES_PER_PAGE]); */
+			/* udbg_printf("tce @ %pK\n", &tbl[idx % TCES_PER_PAGE]); */
 			tbl[idx % TCES_PER_PAGE] = tce;
 			return H_SUCCESS;
 		}

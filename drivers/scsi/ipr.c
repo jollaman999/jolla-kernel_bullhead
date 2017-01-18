@@ -8821,7 +8821,7 @@ static int ipr_probe_ioa_part2(struct ipr_ioa_cfg *ioa_cfg)
 
 	ENTER;
 	spin_lock_irqsave(ioa_cfg->host->host_lock, host_lock_flags);
-	dev_dbg(&ioa_cfg->pdev->dev, "ioa_cfg adx: 0x%p\n", ioa_cfg);
+	dev_dbg(&ioa_cfg->pdev->dev, "ioa_cfg adx: 0x%pK\n", ioa_cfg);
 	if (ioa_cfg->needs_hard_reset) {
 		ioa_cfg->needs_hard_reset = 0;
 		ipr_initiate_ioa_reset(ioa_cfg, IPR_SHUTDOWN_NONE);

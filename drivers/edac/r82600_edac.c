@@ -294,7 +294,7 @@ static int r82600_probe1(struct pci_dev *pdev, int dev_idx)
 	if (mci == NULL)
 		return -ENOMEM;
 
-	edac_dbg(0, "mci = %p\n", mci);
+	edac_dbg(0, "mci = %pK\n", mci);
 	mci->pdev = &pdev->dev;
 	mci->mtype_cap = MEM_FLAG_RDDR | MEM_FLAG_DDR;
 	mci->edac_ctl_cap = EDAC_FLAG_NONE | EDAC_FLAG_EC | EDAC_FLAG_SECDED;
@@ -310,7 +310,7 @@ static int r82600_probe1(struct pci_dev *pdev, int dev_idx)
 
 	if (ecc_enabled(dramcr)) {
 		if (scrub_disabled)
-			edac_dbg(3, "mci = %p - Scrubbing disabled! EAP: %#0x\n",
+			edac_dbg(3, "mci = %pK - Scrubbing disabled! EAP: %#0x\n",
 				 mci, eapr);
 	} else
 		mci->edac_cap = EDAC_FLAG_NONE;

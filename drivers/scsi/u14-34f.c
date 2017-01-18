@@ -1255,7 +1255,7 @@ static int u14_34f_queuecommand_lck(struct scsi_cmnd *SCpnt, void (*done)(struct
    j = ((struct hostdata *) SCpnt->device->host->hostdata)->board_number;
 
    if (SCpnt->host_scribble)
-      panic("%s: qcomm, SCpnt %p already active.\n",
+      panic("%s: qcomm, SCpnt %pK already active.\n",
             BN(j), SCpnt);
 
    /* i is the mailbox number, look for the first free mailbox
@@ -1360,7 +1360,7 @@ static int u14_34f_eh_abort(struct scsi_cmnd *SCarg) {
       printk("%s: abort, mbox %d is in use.\n", BN(j), i);
 
       if (SCarg != HD(j)->cp[i].SCpnt)
-         panic("%s: abort, mbox %d, SCarg %p, cp SCpnt %p.\n",
+         panic("%s: abort, mbox %d, SCarg %pK, cp SCpnt %pK.\n",
                BN(j), i, SCarg, HD(j)->cp[i].SCpnt);
 
       if (inb(sh[j]->io_port + REG_SYS_INTR) & IRQ_ASSERTED)
@@ -1748,7 +1748,7 @@ static irqreturn_t ihdlr(unsigned int j)
       if (H2DEV(HD(j)->cp[i].cp_dma_addr) == ret) break;
 
    if (i >= sh[j]->can_queue)
-      panic("%s: ihdlr, invalid mscp bus address %p, cp0 %p.\n", BN(j),
+      panic("%s: ihdlr, invalid mscp bus address %pK, cp0 %pK.\n", BN(j),
             (void *)ret, (void *)H2DEV(HD(j)->cp[0].cp_dma_addr));
 
    cpp = &(HD(j)->cp[i]);
@@ -1785,7 +1785,7 @@ static irqreturn_t ihdlr(unsigned int j)
    if (SCpnt == NULL) panic("%s: ihdlr, mbox %d, SCpnt == NULL.\n", BN(j), i);
 
    if (SCpnt->host_scribble == NULL)
-      panic("%s: ihdlr, mbox %d, SCpnt %p garbled.\n", BN(j), i,
+      panic("%s: ihdlr, mbox %d, SCpnt %pK garbled.\n", BN(j), i,
             SCpnt);
 
    if (*(unsigned int *)SCpnt->host_scribble != i)

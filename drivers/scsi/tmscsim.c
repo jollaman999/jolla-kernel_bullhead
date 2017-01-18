@@ -382,7 +382,7 @@ static struct dc390_dcb __inline__ *dc390_findDCB ( struct dc390_acb* pACB, u8 i
 	if (pDCB == pACB->pLinkDCB)
 	     return NULL;
      }
-   DCBDEBUG1( printk (KERN_DEBUG "DCB %p (%02x,%02x) found.\n",	\
+   DCBDEBUG1( printk (KERN_DEBUG "DCB %pK (%02x,%02x) found.\n",	\
 		      pDCB, pDCB->TargetID, pDCB->TargetLUN));
    return pDCB;
 }
@@ -390,7 +390,7 @@ static struct dc390_dcb __inline__ *dc390_findDCB ( struct dc390_acb* pACB, u8 i
 /* Insert SRB oin top of free list */
 static __inline__ void dc390_Free_insert (struct dc390_acb* pACB, struct dc390_srb* pSRB)
 {
-    DEBUG0(printk ("DC390: Free SRB %p\n", pSRB));
+    DEBUG0(printk ("DC390: Free SRB %pK\n", pSRB));
     pSRB->pNextSRB = pACB->pFreeSRB;
     pACB->pFreeSRB = pSRB;
 }
@@ -398,7 +398,7 @@ static __inline__ void dc390_Free_insert (struct dc390_acb* pACB, struct dc390_s
 static __inline__ void dc390_Going_append (struct dc390_dcb* pDCB, struct dc390_srb* pSRB)
 {
     pDCB->GoingSRBCnt++;
-    DEBUG0(printk("DC390: Append SRB %p to Going\n", pSRB));
+    DEBUG0(printk("DC390: Append SRB %pK to Going\n", pSRB));
     /* Append to the list of Going commands */
     if( pDCB->pGoingSRB )
 	pDCB->pGoingLast->pNextSRB = pSRB;
@@ -412,7 +412,7 @@ static __inline__ void dc390_Going_append (struct dc390_dcb* pDCB, struct dc390_
 
 static __inline__ void dc390_Going_remove (struct dc390_dcb* pDCB, struct dc390_srb* pSRB)
 {
-	DEBUG0(printk("DC390: Remove SRB %p from Going\n", pSRB));
+	DEBUG0(printk("DC390: Remove SRB %pK from Going\n", pSRB));
    if (pSRB == pDCB->pGoingSRB)
 	pDCB->pGoingSRB = pSRB->pNextSRB;
    else
@@ -421,7 +421,7 @@ static __inline__ void dc390_Going_remove (struct dc390_dcb* pDCB, struct dc390_
 	while (psrb && psrb->pNextSRB != pSRB)
 	  psrb = psrb->pNextSRB;
 	if (!psrb) 
-	  { printk (KERN_ERR "DC390: Remove non-ex. SRB %p from Going!\n", pSRB); return; }
+	  { printk (KERN_ERR "DC390: Remove non-ex. SRB %pK from Going!\n", pSRB); return; }
 	psrb->pNextSRB = pSRB->pNextSRB;
 	if (pSRB == pDCB->pGoingLast)
 	  pDCB->pGoingLast = psrb;
@@ -453,7 +453,7 @@ static int dc390_pci_map (struct dc390_srb* pSRB)
 		/* TODO: error handling */
 		if (pSRB->SGcount != 1)
 			error = 1;
-		DEBUG1(printk("%s(): Mapped sense buffer %p at %x\n", __func__, pcmd->sense_buffer, cmdp->saved_dma_handle));
+		DEBUG1(printk("%s(): Mapped sense buffer %pK at %x\n", __func__, pcmd->sense_buffer, cmdp->saved_dma_handle));
 	/* Map SG list */
 	} else if (scsi_sg_count(pcmd)) {
 		int nseg;
@@ -466,7 +466,7 @@ static int dc390_pci_map (struct dc390_srb* pSRB)
 		/* TODO: error handling */
 		if (nseg < 0)
 			error = 1;
-		DEBUG1(printk("%s(): Mapped SG %p with %d (%d) elements\n",\
+		DEBUG1(printk("%s(): Mapped SG %pK with %d (%d) elements\n",\
 			      __func__, scsi_sglist(pcmd), nseg, scsi_sg_count(pcmd)));
 	/* Map single segment */
 	} else
@@ -487,7 +487,7 @@ static void dc390_pci_unmap (struct dc390_srb* pSRB)
 		DEBUG1(printk("%s(): Unmapped sense buffer at %x\n", __func__, cmdp->saved_dma_handle));
 	} else {
 		scsi_dma_unmap(pcmd);
-		DEBUG1(printk("%s(): Unmapped SG at %p with %d elements\n",
+		DEBUG1(printk("%s(): Unmapped SG at %pK with %d elements\n",
 			      __func__, scsi_sglist(pcmd), scsi_sg_count(pcmd)));
 	}
 }
@@ -565,12 +565,12 @@ dc390_StartSCSI( struct dc390_acb* pACB, struct dc390_dcb* pDCB, struct dc390_sr
 	pDCB->TagMask |= 1 << tag[1];
 	pSRB->TagNumber = tag[1];
 	DC390_write8(ScsiFifo, tag[1]);
-	DEBUG1(printk(KERN_INFO "DC390: Select w/DisCn for SRB %p, block tag %02x\n", pSRB, tag[1]));
+	DEBUG1(printk(KERN_INFO "DC390: Select w/DisCn for SRB %pK, block tag %02x\n", pSRB, tag[1]));
 	cmd = SEL_W_ATN3;
     } else {
 	/* No TagQ */
 //no_tag:
-	DEBUG1(printk(KERN_INFO "DC390: Select w%s/DisCn for SRB %p, No TagQ\n", disc_allowed ? "" : "o", pSRB));
+	DEBUG1(printk(KERN_INFO "DC390: Select w%s/DisCn for SRB %pK, No TagQ\n", disc_allowed ? "" : "o", pSRB));
     }
 
     pSRB->SRBState = SRB_START_;
@@ -1529,7 +1529,7 @@ dc390_Disconnect( struct dc390_acb* pACB )
     pDCB = pACB->pActiveDCB;
     if (!pDCB)
      {
-	DEBUG0(printk(KERN_ERR "ACB:%p->ActiveDCB:%p IOPort:%04x IRQ:%02x !\n",\
+	DEBUG0(printk(KERN_ERR "ACB:%pK->ActiveDCB:%pK IOPort:%04x IRQ:%02x !\n",\
 	       pACB, pDCB, pACB->IOPortBase, pACB->IRQLevel));
 	mdelay(400);
 	DC390_read8 (INT_Status);	/* Reset Pending INT */
@@ -1601,7 +1601,7 @@ dc390_Reselect( struct dc390_acb* pACB )
 	    dc390_Going_remove(pDCB, pSRB);
 	    dc390_Free_insert(pACB, pSRB);
 	    pcmd->scsi_done (pcmd);
-	    DEBUG0(printk(KERN_DEBUG"DC390: Return SRB %p to free\n", pSRB));
+	    DEBUG0(printk(KERN_DEBUG"DC390: Return SRB %pK to free\n", pSRB));
 	}
     }
     /* Get ID */
@@ -1657,7 +1657,7 @@ dc390_Reselect( struct dc390_acb* pACB )
 	}
     }
 
-    DEBUG1(printk (KERN_DEBUG "Resel SRB(%p): TagNum (%02x)\n", pSRB, pSRB->TagNumber));
+    DEBUG1(printk (KERN_DEBUG "Resel SRB(%pK): TagNum (%02x)\n", pSRB, pSRB->TagNumber));
     pSRB->ScsiPhase = SCSI_NOP0;
     DC390_write8 (Scsi_Dest_ID, pDCB->TargetID);
     DC390_write8 (Sync_Period, pDCB->SyncPeriod);
@@ -1705,7 +1705,7 @@ dc390_SRBdone( struct dc390_acb* pACB, struct dc390_dcb* pDCB, struct dc390_srb*
 
     status = pSRB->TargetStatus;
 
-    DEBUG0(printk (" SRBdone (%02x,%08x), SRB %p\n", status, pcmd->result, pSRB));
+    DEBUG0(printk (" SRBdone (%02x,%08x), SRB %pK\n", status, pcmd->result, pSRB));
     if(pSRB->SRBFlag & AUTO_REQSENSE)
     {	/* Last command was a Request Sense */
 	pSRB->SRBFlag &= ~AUTO_REQSENSE;

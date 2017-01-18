@@ -55,7 +55,7 @@ static void videobuf_vm_open(struct vm_area_struct *vma)
 {
 	struct videobuf_mapping *map = vma->vm_private_data;
 
-	dprintk(2, "vm_open %p [count=%u,vma=%08lx-%08lx]\n", map,
+	dprintk(2, "vm_open %pK [count=%u,vma=%08lx-%08lx]\n", map,
 		map->count, vma->vm_start, vma->vm_end);
 
 	map->count++;
@@ -67,14 +67,14 @@ static void videobuf_vm_close(struct vm_area_struct *vma)
 	struct videobuf_queue *q = map->q;
 	int i;
 
-	dprintk(2, "vm_close %p [count=%u,vma=%08lx-%08lx]\n", map,
+	dprintk(2, "vm_close %pK [count=%u,vma=%08lx-%08lx]\n", map,
 		map->count, vma->vm_start, vma->vm_end);
 
 	map->count--;
 	if (0 == map->count) {
 		struct videobuf_vmalloc_memory *mem;
 
-		dprintk(1, "munmap %p q=%p\n", map, q);
+		dprintk(1, "munmap %pK q=%pK\n", map, q);
 		videobuf_queue_lock(q);
 
 		/* We need first to cancel streams, before unmapping */
@@ -101,7 +101,7 @@ static void videobuf_vm_close(struct vm_area_struct *vma)
 				/* vfree is not atomic - can't be
 				   called with IRQ's disabled
 				 */
-				dprintk(1, "%s: buf[%d] freeing (%p)\n",
+				dprintk(1, "%s: buf[%d] freeing (%pK)\n",
 					__func__, i, mem->vaddr);
 
 				vfree(mem->vaddr);
@@ -147,7 +147,7 @@ static struct videobuf_buffer *__videobuf_alloc_vb(size_t size)
 	mem = vb->priv = ((char *)vb) + size;
 	mem->magic = MAGIC_VMAL_MEM;
 
-	dprintk(1, "%s: allocated at %p(%ld+%ld) & %p(%ld)\n",
+	dprintk(1, "%s: allocated at %pK(%ld+%ld) & %pK(%ld)\n",
 		__func__, vb, (long)sizeof(*vb), (long)size - sizeof(*vb),
 		mem, (long)sizeof(*mem));
 
@@ -194,7 +194,7 @@ static int __videobuf_iolock(struct videobuf_queue *q,
 			printk(KERN_ERR "vmalloc (%d pages) failed\n", pages);
 			return -ENOMEM;
 		}
-		dprintk(1, "vmalloc is at addr %p (%d pages)\n",
+		dprintk(1, "vmalloc is at addr %pK (%d pages)\n",
 			mem->vaddr, pages);
 
 #if 0
@@ -259,7 +259,7 @@ static int __videobuf_mmap_mapper(struct videobuf_queue *q,
 		printk(KERN_ERR "vmalloc (%d pages) failed\n", pages);
 		goto error;
 	}
-	dprintk(1, "vmalloc is at addr %p (%d pages)\n", mem->vaddr, pages);
+	dprintk(1, "vmalloc is at addr %pK (%d pages)\n", mem->vaddr, pages);
 
 	/* Try to remap memory */
 	retval = remap_vmalloc_range(vma, mem->vaddr, 0);
@@ -273,7 +273,7 @@ static int __videobuf_mmap_mapper(struct videobuf_queue *q,
 	vma->vm_flags       |= VM_DONTEXPAND | VM_DONTDUMP;
 	vma->vm_private_data = map;
 
-	dprintk(1, "mmap %p: q=%p %08lx-%08lx (%lx) pgoff %08lx buf %d\n",
+	dprintk(1, "mmap %pK: q=%pK %08lx-%08lx (%lx) pgoff %08lx buf %d\n",
 		map, q, vma->vm_start, vma->vm_end,
 		(long int)buf->bsize,
 		vma->vm_pgoff, buf->i);

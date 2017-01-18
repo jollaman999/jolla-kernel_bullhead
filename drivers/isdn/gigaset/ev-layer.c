@@ -1490,7 +1490,7 @@ static void process_event(struct cardstate *cs, struct event_t *ev)
 	} else {
 		at_state = ev->at_state;
 		if (at_state_invalid(cs, at_state)) {
-			gig_dbg(DEBUG_EVENT, "event for invalid at_state %p",
+			gig_dbg(DEBUG_EVENT, "event for invalid at_state %pK",
 				at_state);
 			return;
 		}

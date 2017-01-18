@@ -47,7 +47,7 @@ static int nfsd_acceptable(void *expv, struct dentry *dentry)
 		tdentry = parent;
 	}
 	if (tdentry != exp->ex_path.dentry)
-		dprintk("nfsd_acceptable failed at %p %s\n", tdentry, tdentry->d_name.name);
+		dprintk("nfsd_acceptable failed at %pK %s\n", tdentry, tdentry->d_name.name);
 	rv = (tdentry == exp->ex_path.dentry);
 	dput(tdentry);
 	return rv;

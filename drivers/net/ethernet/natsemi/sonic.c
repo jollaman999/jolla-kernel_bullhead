@@ -206,7 +206,7 @@ static int sonic_send_packet(struct sk_buff *skb, struct net_device *dev)
 	int entry = lp->next_tx;
 
 	if (sonic_debug > 2)
-		printk("sonic_send_packet: skb=%p, dev=%p\n", skb, dev);
+		printk("sonic_send_packet: skb=%pK, dev=%pK\n", skb, dev);
 
 	length = skb->len;
 	if (length < ETH_ZLEN) {

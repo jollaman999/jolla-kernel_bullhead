@@ -263,7 +263,7 @@ uf_alloc_netdevice(CsrSdioFunction *sdio_dev, int bus_id)
         free_netdev(priv->netdev[0]);
         return NULL;
     }
-    unifi_trace(priv, UDBG2, "Netdev %p client (id:%d s:0x%X) is registered\n",
+    unifi_trace(priv, UDBG2, "Netdev %pK client (id:%d s:0x%X) is registered\n",
             dev, priv->netdev_client->client_id, priv->netdev_client->sender_id);
 
     priv->sta_wmm_capabilities = 0;
@@ -368,7 +368,7 @@ uf_alloc_netdevice(CsrSdioFunction *sdio_dev, int bus_id)
         interfacePriv->netdev_callback_registered = TRUE;
     }
     else {
-        unifi_warning(priv, "Failed to register netdevice notifier : %d %p\n", rc, dev);
+        unifi_warning(priv, "Failed to register netdevice notifier : %d %pK\n", rc, dev);
     }
 #endif /* CSR_SUPPORT_WEXT */
 
@@ -546,7 +546,7 @@ uf_free_netdevice(unifi_priv_t *priv)
     for (i=CSR_WIFI_NUM_INTERFACES-1; i>=0; i--) {
         /*Free the netdev struct and priv, which are all one lump*/
         if (priv->netdev[i]) {
-            unifi_error(priv, "uf_free_netdevice: netdev %d %p\n", i, priv->netdev[i]);
+            unifi_error(priv, "uf_free_netdevice: netdev %d %pK\n", i, priv->netdev[i]);
             free_netdev(priv->netdev[i]);
         }
     }
@@ -2029,7 +2029,7 @@ uf_process_rx_pending_queue(unifi_priv_t *priv, int queue,
                 memcmp(rx_q_item->sa.a, source_address.a, ETH_ALEN)) {
 
             unifi_trace(priv, UDBG2,
-                        "uf_process_rx_pending_queue: Skipping sa=%02X%02X%02X%02X%02X%02X skb=%p, bulkdata=%p\n",
+                        "uf_process_rx_pending_queue: Skipping sa=%02X%02X%02X%02X%02X%02X skb=%pK, bulkdata=%pK\n",
                         rx_q_item->sa.a[0], rx_q_item->sa.a[1],
                         rx_q_item->sa.a[2], rx_q_item->sa.a[3],
                         rx_q_item->sa.a[4], rx_q_item->sa.a[5],
@@ -2041,7 +2041,7 @@ uf_process_rx_pending_queue(unifi_priv_t *priv, int queue,
 
 
         unifi_trace(priv, UDBG2,
-                    "uf_process_rx_pending_queue: Was Blocked skb=%p, bulkdata=%p\n",
+                    "uf_process_rx_pending_queue: Was Blocked skb=%pK, bulkdata=%pK\n",
                     rx_q_item->skb, &rx_q_item->bulkdata);
 
         if (indicate) {
@@ -2381,7 +2381,7 @@ unifi_rx(unifi_priv_t *priv, CSR_SIGNAL *signal, bulk_data_param_t *bulkdata)
         rx_q_item->signal = *signal;
         memcpy(rx_q_item->sa.a, sa, ETH_ALEN);
         memcpy(rx_q_item->da.a, da, ETH_ALEN);
-        unifi_trace(priv, UDBG2, "%s: Blocked skb=%p, bulkdata=%p\n",
+        unifi_trace(priv, UDBG2, "%s: Blocked skb=%pK, bulkdata=%pK\n",
                     __FUNCTION__, rx_q_item->skb, &rx_q_item->bulkdata);
 
         if (queue == UF_CONTROLLED_PORT_Q) {
@@ -2900,7 +2900,7 @@ uf_netdev_event(struct notifier_block *notif, unsigned long event, void* ptr) {
      * structure is not safe to use.
      */
     if (uf_find_netdev_priv(interfacePriv) == -1) {
-        unifi_trace(NULL, UDBG1, "uf_netdev_event: ignore e=%d, ptr=%p, priv=%p %s\n",
+        unifi_trace(NULL, UDBG1, "uf_netdev_event: ignore e=%d, ptr=%pK, priv=%pK %s\n",
                     event, ptr, interfacePriv, netdev->name);
         return 0;
     }
@@ -2908,7 +2908,7 @@ uf_netdev_event(struct notifier_block *notif, unsigned long event, void* ptr) {
     switch(event) {
     case NETDEV_CHANGE:
         priv = interfacePriv->privPtr;
-        unifi_trace(priv, UDBG1, "NETDEV_CHANGE: %p %s %s waiting for it\n",
+        unifi_trace(priv, UDBG1, "NETDEV_CHANGE: %pK %s %s waiting for it\n",
                     ptr,
                     netdev->name,
                     interfacePriv->wait_netdev_change ? "" : "not");

@@ -94,7 +94,7 @@ static int zt5550_hc_config(struct pci_dev *pdev)
 	}
 
 	hc_dev = pdev;
-	dbg("hc_dev = %p", hc_dev);
+	dbg("hc_dev = %pK", hc_dev);
 	dbg("pci resource start %llx", (unsigned long long)pci_resource_start(hc_dev, 1));
 	dbg("pci resource len %llx", (unsigned long long)pci_resource_len(hc_dev, 1));
 

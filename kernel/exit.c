@@ -1214,7 +1214,7 @@ static int *task_stopped_code(struct task_struct *p, bool ptrace)
  * @ptrace: is the wait for ptrace
  * @p: task to wait for
  *
- * Handle sys_wait4() work for %p in state %TASK_STOPPED or %TASK_TRACED.
+ * Handle sys_wait4() work for %pK in state %TASK_STOPPED or %TASK_TRACED.
  *
  * CONTEXT:
  * read_lock(&tasklist_lock), which is released if return value is

@@ -333,7 +333,7 @@ __jffs2_dbg_acct_paranoia_check_nolock(struct jffs2_sb_info *c,
 			my_dirty_size += totlen;
 
 		if ((!ref_next(ref2)) != (ref2 == jeb->last_node)) {
-			JFFS2_ERROR("node_ref for node at %#08x (mem %p) has next at %#08x (mem %p), last_node is at %#08x (mem %p).\n",
+			JFFS2_ERROR("node_ref for node at %#08x (mem %pK) has next at %#08x (mem %pK), last_node is at %#08x (mem %pK).\n",
 				    ref_offset(ref2), ref2, ref_offset(ref_next(ref2)), ref_next(ref2),
 				    ref_offset(jeb->last_node), jeb->last_node);
 			goto error;
@@ -709,12 +709,12 @@ __jffs2_dbg_dump_fragtree_nolock(struct jffs2_inode_info *f)
 	printk(JFFS2_DBG_MSG_PREFIX " dump fragtree of ino #%u\n", f->inocache->ino);
 	while(this) {
 		if (this->node)
-			printk(JFFS2_DBG "frag %#04x-%#04x: %#08x(%d) on flash (*%p), left (%p), right (%p), parent (%p)\n",
+			printk(JFFS2_DBG "frag %#04x-%#04x: %#08x(%d) on flash (*%pK), left (%pK), right (%pK), parent (%pK)\n",
 				this->ofs, this->ofs+this->size, ref_offset(this->node->raw),
 				ref_flags(this->node->raw), this, frag_left(this), frag_right(this),
 				frag_parent(this));
 		else
-			printk(JFFS2_DBG "frag %#04x-%#04x: hole (*%p). left (%p), right (%p), parent (%p)\n",
+			printk(JFFS2_DBG "frag %#04x-%#04x: hole (*%pK). left (%pK), right (%pK), parent (%pK)\n",
 				this->ofs, this->ofs+this->size, this, frag_left(this),
 				frag_right(this), frag_parent(this));
 		if (this->ofs != lastofs)

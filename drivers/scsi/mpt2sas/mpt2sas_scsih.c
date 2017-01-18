@@ -2584,13 +2584,13 @@ _scsih_abort(struct scsi_cmnd *scmd)
 	int r;
 
 	sdev_printk(KERN_INFO, scmd->device, "attempting task abort! "
-	    "scmd(%p)\n", scmd);
+	    "scmd(%pK)\n", scmd);
 	_scsih_tm_display_info(ioc, scmd);
 
 	sas_device_priv_data = scmd->device->hostdata;
 	if (!sas_device_priv_data || !sas_device_priv_data->sas_target) {
 		sdev_printk(KERN_INFO, scmd->device, "device been deleted! "
-		    "scmd(%p)\n", scmd);
+		    "scmd(%pK)\n", scmd);
 		scmd->result = DID_NO_CONNECT << 16;
 		scmd->scsi_done(scmd);
 		r = SUCCESS;
@@ -2623,7 +2623,7 @@ _scsih_abort(struct scsi_cmnd *scmd)
 	    scmd->serial_number, TM_MUTEX_ON);
 
  out:
-	sdev_printk(KERN_INFO, scmd->device, "task abort: %s scmd(%p)\n",
+	sdev_printk(KERN_INFO, scmd->device, "task abort: %s scmd(%pK)\n",
 	    ((r == SUCCESS) ? "SUCCESS" : "FAILED"), scmd);
 	return r;
 }
@@ -2647,13 +2647,13 @@ _scsih_dev_reset(struct scsi_cmnd *scmd)
 	struct scsi_target *starget = scmd->device->sdev_target;
 
 	starget_printk(KERN_INFO, starget, "attempting device reset! "
-	    "scmd(%p)\n", scmd);
+	    "scmd(%pK)\n", scmd);
 	_scsih_tm_display_info(ioc, scmd);
 
 	sas_device_priv_data = scmd->device->hostdata;
 	if (!sas_device_priv_data || !sas_device_priv_data->sas_target) {
 		starget_printk(KERN_INFO, starget, "device been deleted! "
-		    "scmd(%p)\n", scmd);
+		    "scmd(%pK)\n", scmd);
 		scmd->result = DID_NO_CONNECT << 16;
 		scmd->scsi_done(scmd);
 		r = SUCCESS;
@@ -2685,7 +2685,7 @@ _scsih_dev_reset(struct scsi_cmnd *scmd)
 	    TM_MUTEX_ON);
 
  out:
-	sdev_printk(KERN_INFO, scmd->device, "device reset: %s scmd(%p)\n",
+	sdev_printk(KERN_INFO, scmd->device, "device reset: %s scmd(%pK)\n",
 	    ((r == SUCCESS) ? "SUCCESS" : "FAILED"), scmd);
 	return r;
 }
@@ -2708,13 +2708,13 @@ _scsih_target_reset(struct scsi_cmnd *scmd)
 	struct scsi_target *starget = scmd->device->sdev_target;
 
 	starget_printk(KERN_INFO, starget, "attempting target reset! "
-	    "scmd(%p)\n", scmd);
+	    "scmd(%pK)\n", scmd);
 	_scsih_tm_display_info(ioc, scmd);
 
 	sas_device_priv_data = scmd->device->hostdata;
 	if (!sas_device_priv_data || !sas_device_priv_data->sas_target) {
 		starget_printk(KERN_INFO, starget, "target been deleted! "
-		    "scmd(%p)\n", scmd);
+		    "scmd(%pK)\n", scmd);
 		scmd->result = DID_NO_CONNECT << 16;
 		scmd->scsi_done(scmd);
 		r = SUCCESS;
@@ -2745,7 +2745,7 @@ _scsih_target_reset(struct scsi_cmnd *scmd)
 	    30, 0, TM_MUTEX_ON);
 
  out:
-	starget_printk(KERN_INFO, starget, "target reset: %s scmd(%p)\n",
+	starget_printk(KERN_INFO, starget, "target reset: %s scmd(%pK)\n",
 	    ((r == SUCCESS) ? "SUCCESS" : "FAILED"), scmd);
 	return r;
 }
@@ -2762,14 +2762,14 @@ _scsih_host_reset(struct scsi_cmnd *scmd)
 	struct MPT2SAS_ADAPTER *ioc = shost_priv(scmd->device->host);
 	int r, retval;
 
-	printk(MPT2SAS_INFO_FMT "attempting host reset! scmd(%p)\n",
+	printk(MPT2SAS_INFO_FMT "attempting host reset! scmd(%pK)\n",
 	    ioc->name, scmd);
 	scsi_print_command(scmd);
 
 	retval = mpt2sas_base_hard_reset_handler(ioc, CAN_SLEEP,
 	    FORCE_BIG_HAMMER);
 	r = (retval < 0) ? FAILED : SUCCESS;
-	printk(MPT2SAS_INFO_FMT "host reset: %s scmd(%p)\n",
+	printk(MPT2SAS_INFO_FMT "host reset: %s scmd(%pK)\n",
 	    ioc->name, ((r == SUCCESS) ? "SUCCESS" : "FAILED"), scmd);
 
 	return r;
@@ -5869,7 +5869,7 @@ broadcast_aen_retry:
 		if (r == FAILED) {
 			sdev_printk(KERN_WARNING, sdev,
 			    "mpt2sas_scsih_issue_tm: FAILED when sending "
-			    "QUERY_TASK: scmd(%p)\n", scmd);
+			    "QUERY_TASK: scmd(%pK)\n", scmd);
 			spin_lock_irqsave(&ioc->scsi_lookup_lock, flags);
 			goto broadcast_aen_retry;
 		}
@@ -5877,7 +5877,7 @@ broadcast_aen_retry:
 		    & MPI2_IOCSTATUS_MASK;
 		if (ioc_status != MPI2_IOCSTATUS_SUCCESS) {
 			sdev_printk(KERN_WARNING, sdev, "query task: FAILED "
-			    "with IOCSTATUS(0x%04x), scmd(%p)\n", ioc_status,
+			    "with IOCSTATUS(0x%04x), scmd(%pK)\n", ioc_status,
 			    scmd);
 			spin_lock_irqsave(&ioc->scsi_lookup_lock, flags);
 			goto broadcast_aen_retry;
@@ -5910,14 +5910,14 @@ broadcast_aen_retry:
 		if (r == FAILED) {
 			sdev_printk(KERN_WARNING, sdev,
 			    "mpt2sas_scsih_issue_tm: ABORT_TASK: FAILED : "
-			    "scmd(%p)\n", scmd);
+			    "scmd(%pK)\n", scmd);
 			goto tm_retry;
 		}
 
 		if (task_abort_retries > 1)
 			sdev_printk(KERN_WARNING, sdev,
 			    "mpt2sas_scsih_issue_tm: ABORT_TASK: RETRIES (%d):"
-			    " scmd(%p)\n",
+			    " scmd(%pK)\n",
 			    task_abort_retries - 1, scmd);
 
 		termination_count += le32_to_cpu(mpi_reply->TerminationCount);
@@ -8168,7 +8168,7 @@ _scsih_suspend(struct pci_dev *pdev, pm_message_t state)
 	mpt2sas_base_stop_watchdog(ioc);
 	scsi_block_requests(shost);
 	device_state = pci_choose_state(pdev, state);
-	printk(MPT2SAS_INFO_FMT "pdev=0x%p, slot=%s, entering "
+	printk(MPT2SAS_INFO_FMT "pdev=0x%pK, slot=%s, entering "
 	    "operating state [D%d]\n", ioc->name, pdev,
 	    pci_name(pdev), device_state);
 
@@ -8192,7 +8192,7 @@ _scsih_resume(struct pci_dev *pdev)
 	pci_power_t device_state = pdev->current_state;
 	int r;
 
-	printk(MPT2SAS_INFO_FMT "pdev=0x%p, slot=%s, previous "
+	printk(MPT2SAS_INFO_FMT "pdev=0x%pK, slot=%s, previous "
 	    "operating state [D%d]\n", ioc->name, pdev,
 	    pci_name(pdev), device_state);
 

@@ -111,7 +111,7 @@ static int siena_probe_port(struct efx_nic *efx)
 	if (rc)
 		return rc;
 	netif_dbg(efx, probe, efx->net_dev,
-		  "stats buffer at %llx (virt %p phys %llx)\n",
+		  "stats buffer at %llx (virt %pK phys %llx)\n",
 		  (u64)efx->stats_buffer.dma_addr,
 		  efx->stats_buffer.addr,
 		  (u64)virt_to_phys(efx->stats_buffer.addr));
@@ -342,7 +342,7 @@ static int siena_probe_nic(struct efx_nic *efx)
 	BUG_ON(efx->irq_status.dma_addr & 0x0f);
 
 	netif_dbg(efx, probe, efx->net_dev,
-		  "INT_KER at %llx (virt %p phys %llx)\n",
+		  "INT_KER at %llx (virt %pK phys %llx)\n",
 		  (unsigned long long)efx->irq_status.dma_addr,
 		  efx->irq_status.addr,
 		  (unsigned long long)virt_to_phys(efx->irq_status.addr));

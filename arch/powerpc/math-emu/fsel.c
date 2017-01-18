@@ -13,7 +13,7 @@ fsel(u32 *frD, void *frA, u32 *frB, u32 *frC)
 	FP_DECL_EX;
 
 #ifdef DEBUG
-	printk("%s: %p %p %p %p\n", __func__, frD, frA, frB, frC);
+	printk("%s: %pK %pK %pK %pK\n", __func__, frD, frA, frB, frC);
 #endif
 
 	FP_UNPACK_DP(A, frA);

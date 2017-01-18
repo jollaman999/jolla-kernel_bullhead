@@ -91,7 +91,7 @@ bte_result_t bte_copy(u64 src, u64 dest, u64 len, u64 mode, void *notification)
 	int bte_if_index, nasid_index;
 	int bte_first, btes_per_node = BTES_PER_NODE;
 
-	BTE_PRINTK(("bte_copy(0x%lx, 0x%lx, 0x%lx, 0x%lx, 0x%p)\n",
+	BTE_PRINTK(("bte_copy(0x%lx, 0x%lx, 0x%lx, 0x%lx, 0x%pK)\n",
 		    src, dest, len, mode, notification));
 
 	if (len == 0) {

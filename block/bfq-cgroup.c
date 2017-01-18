@@ -344,7 +344,7 @@ static struct bfq_group *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
 		if (entity->sched_data != &bfqg->sched_data) {
 			bic_set_bfqq(bic, NULL, 0);
 			bfq_log_bfqq(bfqd, async_bfqq,
-				     "bic_change_group: %p %d",
+				     "bic_change_group: %pK %d",
 				     async_bfqq, atomic_read(&async_bfqq->ref));
 			bfq_put_queue(async_bfqq);
 		}
@@ -589,7 +589,7 @@ static void bfq_disconnect_groups(struct bfq_data *bfqd)
 		 */
 		rcu_assign_pointer(bfqg->bfqd, NULL);
 
-		bfq_log(bfqd, "disconnect_groups: put async for group %p",
+		bfq_log(bfqd, "disconnect_groups: put async for group %pK",
 			bfqg);
 		bfq_put_async_queues(bfqd, bfqg);
 	}

@@ -703,10 +703,10 @@ static void vivi_thread_tick(struct vivi_dev *dev)
 
 	/* Fill buffer */
 	vivi_fillbuff(dev, buf);
-	dprintk(dev, 1, "filled buffer %p\n", buf);
+	dprintk(dev, 1, "filled buffer %pK\n", buf);
 
 	vb2_buffer_done(&buf->vb, VB2_BUF_STATE_DONE);
-	dprintk(dev, 2, "[%p/%d] done\n", buf, buf->vb.v4l2_buf.index);
+	dprintk(dev, 2, "[%pK/%d] done\n", buf, buf->vb.v4l2_buf.index);
 }
 
 #define frames_to_ms(dev, frames)				\
@@ -804,7 +804,7 @@ static void vivi_stop_generating(struct vivi_dev *dev)
 		buf = list_entry(dma_q->active.next, struct vivi_buffer, list);
 		list_del(&buf->list);
 		vb2_buffer_done(&buf->vb, VB2_BUF_STATE_ERROR);
-		dprintk(dev, 2, "[%p/%d] done\n", buf, buf->vb.v4l2_buf.index);
+		dprintk(dev, 2, "[%pK/%d] done\n", buf, buf->vb.v4l2_buf.index);
 	}
 }
 /* ------------------------------------------------------------------

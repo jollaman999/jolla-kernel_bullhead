@@ -2254,7 +2254,7 @@ static struct ippp_ccp_reset *isdn_ppp_ccp_reset_alloc(struct ippp_struct *is)
 		       " structure - no mem\n");
 		return NULL;
 	}
-	printk(KERN_DEBUG "ippp_ccp: allocated reset data structure %p\n", r);
+	printk(KERN_DEBUG "ippp_ccp: allocated reset data structure %pK\n", r);
 	is->reset = r;
 	return r;
 }
@@ -2264,7 +2264,7 @@ static void isdn_ppp_ccp_reset_free(struct ippp_struct *is)
 {
 	unsigned int id;
 
-	printk(KERN_DEBUG "ippp_ccp: freeing reset data structure %p\n",
+	printk(KERN_DEBUG "ippp_ccp: freeing reset data structure %pK\n",
 	       is->reset);
 	for (id = 0; id < 256; id++) {
 		if (is->reset->rs[id]) {

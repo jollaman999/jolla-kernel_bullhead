@@ -437,7 +437,7 @@ static void _ipw_write_indirect(struct ipw_priv *priv, u32 addr, u8 * data,
 /* 32-bit indirect write (above 4K) */
 static void _ipw_write_reg32(struct ipw_priv *priv, u32 reg, u32 value)
 {
-	IPW_DEBUG_IO(" %p : reg = 0x%8X : value = 0x%8X\n", priv, reg, value);
+	IPW_DEBUG_IO(" %pK : reg = 0x%8X : value = 0x%8X\n", priv, reg, value);
 	_ipw_write32(priv, IPW_INDIRECT_ADDR, reg);
 	_ipw_write32(priv, IPW_INDIRECT_DATA, value);
 }
@@ -479,7 +479,7 @@ static u32 _ipw_read_reg32(struct ipw_priv *priv, u32 reg)
 {
 	u32 value;
 
-	IPW_DEBUG_IO("%p : reg = 0x%08x\n", priv, reg);
+	IPW_DEBUG_IO("%pK : reg = 0x%08x\n", priv, reg);
 
 	_ipw_write32(priv, IPW_INDIRECT_ADDR, reg);
 	value = _ipw_read32(priv, IPW_INDIRECT_DATA);
@@ -496,7 +496,7 @@ static void _ipw_read_indirect(struct ipw_priv *priv, u32 addr, u8 * buf,
 	u32 dif_len = addr - aligned_addr;
 	u32 i;
 
-	IPW_DEBUG_IO("addr = %i, buf = %p, num = %i\n", addr, buf, num);
+	IPW_DEBUG_IO("addr = %i, buf = %pK, num = %i\n", addr, buf, num);
 
 	if (num <= 0) {
 		return;
@@ -533,7 +533,7 @@ static void _ipw_write_indirect(struct ipw_priv *priv, u32 addr, u8 * buf,
 	u32 dif_len = addr - aligned_addr;
 	u32 i;
 
-	IPW_DEBUG_IO("addr = %i, buf = %p, num = %i\n", addr, buf, num);
+	IPW_DEBUG_IO("addr = %i, buf = %pK, num = %i\n", addr, buf, num);
 
 	if (num <= 0) {
 		return;
@@ -11784,7 +11784,7 @@ static int ipw_pci_probe(struct pci_dev *pdev,
 
 	priv->hw_base = base;
 	IPW_DEBUG_INFO("pci_resource_len = 0x%08x\n", length);
-	IPW_DEBUG_INFO("pci_resource_base = %p\n", base);
+	IPW_DEBUG_INFO("pci_resource_base = %pK\n", base);
 
 	err = ipw_setup_deferred_work(priv);
 	if (err) {

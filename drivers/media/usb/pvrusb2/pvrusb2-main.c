@@ -80,7 +80,7 @@ static int pvr_probe(struct usb_interface *intf,
 		return -ENOMEM;
 	}
 
-	pvr2_trace(PVR2_TRACE_INIT,"pvr_probe(pvr=%p)",pvr);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr_probe(pvr=%pK)",pvr);
 
 	usb_set_intfdata(intf, pvr);
 
@@ -95,12 +95,12 @@ static void pvr_disconnect(struct usb_interface *intf)
 {
 	struct pvr2_context *pvr = usb_get_intfdata(intf);
 
-	pvr2_trace(PVR2_TRACE_INIT,"pvr_disconnect(pvr=%p) BEGIN",pvr);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr_disconnect(pvr=%pK) BEGIN",pvr);
 
 	usb_set_intfdata (intf, NULL);
 	pvr2_context_disconnect(pvr);
 
-	pvr2_trace(PVR2_TRACE_INIT,"pvr_disconnect(pvr=%p) DONE",pvr);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr_disconnect(pvr=%pK) DONE",pvr);
 
 }
 

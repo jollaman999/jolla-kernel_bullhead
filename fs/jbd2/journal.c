@@ -1217,7 +1217,7 @@ journal_t * jbd2_journal_init_inode (struct inode *inode)
 	p = journal->j_devname + strlen(journal->j_devname);
 	sprintf(p, "-%lu", journal->j_inode->i_ino);
 	jbd_debug(1,
-		  "journal %p: inode %s/%ld, size %Ld, bits %d, blksize %ld\n",
+		  "journal %pK: inode %s/%ld, size %Ld, bits %d, blksize %ld\n",
 		  journal, inode->i_sb->s_id, inode->i_ino,
 		  (long long) inode->i_size,
 		  inode->i_sb->s_blocksize_bits, inode->i_sb->s_blocksize);

@@ -142,12 +142,12 @@ static inline void free_continguous_pages(void *addr, unsigned int order)
 	int i;
 	struct page *page = virt_to_page(addr);
 	for (i = 0; i < (1<<order); i++) {
-		MCDRV_DBG_VERBOSE(mcd, "free page at 0x%p", page);
+		MCDRV_DBG_VERBOSE(mcd, "free page at 0x%pK", page);
 		clear_bit(PG_reserved, &page->flags);
 		page++;
 	}
 
-	MCDRV_DBG_VERBOSE(mcd, "freeing addr:%p, order:%x", addr, order);
+	MCDRV_DBG_VERBOSE(mcd, "freeing addr:%pK, order:%x", addr, order);
 	free_pages((unsigned long)addr, order);
 }
 
@@ -161,7 +161,7 @@ static int free_buffer(struct mc_buffer *buffer)
 		return -EINVAL;
 
 	MCDRV_DBG_VERBOSE(mcd,
-			  "handle=%u phys_addr=0x%llx, virt_addr=0x%p len=%u",
+			  "handle=%u phys_addr=0x%llx, virt_addr=0x%pK len=%u",
 		  buffer->handle, (u64)buffer->phys,
 		  buffer->addr, buffer->len);
 
@@ -462,7 +462,7 @@ int mc_get_buffer(struct mc_instance *instance,
 	list_add(&cbuffer->list, &ctx.cont_bufs);
 
 	MCDRV_DBG_VERBOSE(mcd,
-			  "allocd phys=0x%llx-0x%llx, size=%ld kvirt=0x%p h=%d",
+			  "allocd phys=0x%llx-0x%llx, size=%ld kvirt=0x%pK h=%d",
 			  (u64)phys,
 			  (u64)(phys+allocated_size),
 			  allocated_size, addr, cbuffer->handle);
@@ -551,7 +551,7 @@ int mc_register_wsm_mmu(struct mc_instance *instance,
 		return -EINVAL;
 	}
 
-	MCDRV_DBG_VERBOSE(mcd, "buffer: %p, len=%08x", buffer, len);
+	MCDRV_DBG_VERBOSE(mcd, "buffer: %pK, len=%08x", buffer, len);
 
 	if (!mc_find_cont_wsm_addr(instance, buffer, &kbuff, len))
 		table = mc_alloc_mmu_table(instance, NULL, kbuff, len);
@@ -680,7 +680,7 @@ static int mc_fd_mmap(struct file *file, struct vm_area_struct *vmarea)
 	struct mc_buffer *buffer = 0;
 	int ret = 0;
 
-	MCDRV_DBG_VERBOSE(mcd, "start=0x%p, size=%ld, offset=%ld, mci=0x%llX",
+	MCDRV_DBG_VERBOSE(mcd, "start=0x%pK, size=%ld, offset=%ld, mci=0x%llX",
 			  (void *)vmarea->vm_start, len, vmarea->vm_pgoff,
 			  (u64)ctx.mci_base.phys);
 

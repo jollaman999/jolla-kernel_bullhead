@@ -1110,7 +1110,7 @@ mpc52xx_console_get_options(struct uart_port *port,
 	struct mpc52xx_psc __iomem *psc = PSC(port);
 	unsigned char mr1;
 
-	pr_debug("mpc52xx_console_get_options(port=%p)\n", port);
+	pr_debug("mpc52xx_console_get_options(port=%pK)\n", port);
 
 	/* Read the mode registers */
 	out_8(&psc->command, MPC52xx_PSC_SEL_MODE_REG_1);
@@ -1189,7 +1189,7 @@ mpc52xx_console_setup(struct console *co, char *options)
 	int parity = 'n';
 	int flow = 'n';
 
-	pr_debug("mpc52xx_console_setup co=%p, co->index=%i, options=%s\n",
+	pr_debug("mpc52xx_console_setup co=%pK, co->index=%i, options=%s\n",
 		 co, co->index, options);
 
 	if ((co->index < 0) || (co->index >= MPC52xx_PSC_MAXNUM)) {
@@ -1230,7 +1230,7 @@ mpc52xx_console_setup(struct console *co, char *options)
 	if (port->membase == NULL)
 		return -EINVAL;
 
-	pr_debug("mpc52xx-psc uart at %p, mapped to %p, irq=%x, freq=%i\n",
+	pr_debug("mpc52xx-psc uart at %pK, mapped to %pK, irq=%x, freq=%i\n",
 		 (void *)port->mapbase, port->membase,
 		 port->irq, port->uartclk);
 
@@ -1364,7 +1364,7 @@ static int mpc52xx_uart_of_probe(struct platform_device *op)
 		return -EINVAL;
 	}
 
-	dev_dbg(&op->dev, "mpc52xx-psc uart at %p, irq=%x, freq=%i\n",
+	dev_dbg(&op->dev, "mpc52xx-psc uart at %pK, irq=%x, freq=%i\n",
 		(void *)port->mapbase, port->irq, port->uartclk);
 
 	/* Add the port to the uart sub-system */

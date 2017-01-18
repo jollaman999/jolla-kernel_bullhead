@@ -168,9 +168,9 @@ static int send_to_group(struct inode *to_tell,
 			vfsmount_test_mask &= ~inode_mark->ignored_mask;
 	}
 
-	pr_debug("%s: group=%p to_tell=%p mask=%x inode_mark=%p"
-		 " inode_test_mask=%x vfsmount_mark=%p vfsmount_test_mask=%x"
-		 " data=%p data_is=%d cookie=%d event=%p\n",
+	pr_debug("%s: group=%pK to_tell=%pK mask=%x inode_mark=%pK"
+		 " inode_test_mask=%x vfsmount_mark=%pK vfsmount_test_mask=%x"
+		 " data=%pK data_is=%d cookie=%d event=%pK\n",
 		 __func__, group, to_tell, mask, inode_mark,
 		 inode_test_mask, vfsmount_mark, vfsmount_test_mask, data,
 		 data_is, cookie, *event);

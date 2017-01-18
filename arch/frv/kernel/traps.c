@@ -472,7 +472,7 @@ void show_stack(struct task_struct *task, unsigned long *sp)
 
 void show_trace_task(struct task_struct *tsk)
 {
-	printk("CONTEXT: stack=0x%lx frame=0x%p LR=0x%lx RET=0x%lx\n",
+	printk("CONTEXT: stack=0x%lx frame=0x%pK LR=0x%lx RET=0x%lx\n",
 	       tsk->thread.sp, tsk->thread.frame, tsk->thread.lr, tsk->thread.sched_lr);
 }
 
@@ -545,7 +545,7 @@ static void show_backtrace_regs(struct pt_regs *frame)
 	int loop;
 
 	/* print the registers for this frame */
-	printk("<-- %s Frame: @%p -->\n",
+	printk("<-- %s Frame: @%pK -->\n",
 	       frame->psr & PSR_S ? "Kernel Mode" : "User Mode",
 	       frame);
 
@@ -609,7 +609,7 @@ void show_backtrace(struct pt_regs *frame, unsigned long sp)
 
 		tos = frame->sp;
 		if (((unsigned long) frame) + sizeof(*frame) != tos) {
-			printk("-- TOS %08lx does not follow frame %p --\n",
+			printk("-- TOS %08lx does not follow frame %pK --\n",
 			       tos, frame);
 			break;
 		}

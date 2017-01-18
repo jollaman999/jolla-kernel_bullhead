@@ -62,7 +62,7 @@ videobuf_vm_open(struct vm_area_struct *vma)
 {
 	struct videobuf_mapping *map = vma->vm_private_data;
 
-	D("vm_open %p [count=%u,vma=%08lx-%08lx]\n",
+	D("vm_open %pK [count=%u,vma=%08lx-%08lx]\n",
 		map, map->count, vma->vm_start, vma->vm_end);
 
 	map->count++;
@@ -74,14 +74,14 @@ static void videobuf_vm_close(struct vm_area_struct *vma)
 	struct videobuf_queue *q = map->q;
 	int i, rc;
 
-	D("vm_close %p [count=%u,vma=%08lx-%08lx]\n",
+	D("vm_close %pK [count=%u,vma=%08lx-%08lx]\n",
 		map, map->count, vma->vm_start, vma->vm_end);
 
 	map->count--;
 	if (0 == map->count) {
 		struct videobuf_contig_pmem *mem;
 
-		D("munmap %p q=%p\n", map, q);
+		D("munmap %pK q=%pK\n", map, q);
 		mutex_lock(&q->vb_lock);
 
 		/* We need first to cancel streams, before unmapping */
@@ -258,7 +258,7 @@ static int __videobuf_mmap_mapper(struct videobuf_queue *q,
 	vma->vm_flags       |= VM_DONTEXPAND;
 	vma->vm_private_data = map;
 
-	D("mmap %p: q=%p %08lx-%08lx (%lx) pgoff %08lx buf %d\n",
+	D("mmap %pK: q=%pK %08lx-%08lx (%lx) pgoff %08lx buf %d\n",
 		map, q, vma->vm_start, vma->vm_end,
 		(long int)buf->bsize,
 		vma->vm_pgoff, buf->i);

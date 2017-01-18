@@ -284,7 +284,7 @@ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node)
 
 		vmemmap_list_populate(__pa(p), start, node);
 
-		pr_debug("      * %016lx..%016lx allocated at %p\n",
+		pr_debug("      * %016lx..%016lx allocated at %pK\n",
 			 start, start + page_size, p);
 
 		vmemmap_create_mapping(start, page_size, __pa(p));

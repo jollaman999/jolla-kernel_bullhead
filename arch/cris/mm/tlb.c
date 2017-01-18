@@ -37,7 +37,7 @@ alloc_context(struct mm_struct *mm)
 {
 	struct mm_struct *old_mm;
 
-	D(printk("tlb: alloc context %d (%p)\n", map_replace_ptr, mm));
+	D(printk("tlb: alloc context %d (%pK)\n", map_replace_ptr, mm));
 
 	/* did we replace an mm ? */
 
@@ -86,7 +86,7 @@ void
 destroy_context(struct mm_struct *mm)
 {
 	if(mm->context.page_id != NO_CONTEXT) {
-		D(printk("destroy_context %d (%p)\n", mm->context.page_id, mm));
+		D(printk("destroy_context %d (%pK)\n", mm->context.page_id, mm));
 		flush_tlb_mm(mm);  /* TODO this might be redundant ? */
 		page_id_map[mm->context.page_id] = NULL;
 	}

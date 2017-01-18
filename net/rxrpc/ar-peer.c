@@ -96,7 +96,7 @@ static struct rxrpc_peer *rxrpc_alloc_peer(struct sockaddr_rxrpc *srx,
 		peer->maxdata = peer->mtu - peer->hdrsize;
 	}
 
-	_leave(" = %p", peer);
+	_leave(" = %pK", peer);
 	return peer;
 }
 
@@ -172,7 +172,7 @@ success:
 	     &peer->srx.transport.sin.sin_addr,
 	     ntohs(peer->srx.transport.sin.sin_port));
 
-	_leave(" = %p {u=%d}", peer, usage);
+	_leave(" = %pK {u=%d}", peer, usage);
 	return peer;
 
 	/* we found the peer in the list immediately */
@@ -225,7 +225,7 @@ found_UDP_peer:
 	_net("Rx UDP DGRAM from peer %d", peer->debug_id);
 	atomic_inc(&peer->usage);
 	read_unlock_bh(&rxrpc_peer_lock);
-	_leave(" = %p", peer);
+	_leave(" = %pK", peer);
 	return peer;
 
 new_UDP_peer:
@@ -240,7 +240,7 @@ new_UDP_peer:
  */
 void rxrpc_put_peer(struct rxrpc_peer *peer)
 {
-	_enter("%p{u=%d}", peer, atomic_read(&peer->usage));
+	_enter("%pK{u=%d}", peer, atomic_read(&peer->usage));
 
 	ASSERTCMP(atomic_read(&peer->usage), >, 0);
 
@@ -261,7 +261,7 @@ static void rxrpc_destroy_peer(struct work_struct *work)
 	struct rxrpc_peer *peer =
 		container_of(work, struct rxrpc_peer, destroyer);
 
-	_enter("%p{%d}", peer, atomic_read(&peer->usage));
+	_enter("%pK{%d}", peer, atomic_read(&peer->usage));
 
 	write_lock_bh(&rxrpc_peer_lock);
 	list_del(&peer->link);

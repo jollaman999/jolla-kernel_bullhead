@@ -215,7 +215,7 @@ static void smp_callin(void)
 	 */
 	calibrate_delay();
 	cpu_data(cpuid).loops_per_jiffy = loops_per_jiffy;
-	pr_debug("Stack at about %p\n", &cpuid);
+	pr_debug("Stack at about %pK\n", &cpuid);
 
 	/*
 	 * This must be done before setting cpu_online_mask

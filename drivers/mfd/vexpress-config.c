@@ -167,7 +167,7 @@ struct vexpress_config_trans {
 static void vexpress_config_dump_trans(const char *what,
 		struct vexpress_config_trans *trans)
 {
-	pr_debug("%s %s trans %p func 0x%p offset %d data 0x%x status %d\n",
+	pr_debug("%s %s trans %pK func 0x%pK offset %d data 0x%x status %d\n",
 			what, trans->write ? "write" : "read", trans,
 			trans->func->func, trans->offset,
 			trans->data ? *trans->data : 0, trans->status);

@@ -1714,7 +1714,7 @@ static int mpeg_release(struct file *file)
 	struct cx231xx_fh  *fh  = file->private_data;
 	struct cx231xx *dev = fh->dev;
 
-	dprintk(3, "mpeg_release()! dev=0x%p\n", dev);
+	dprintk(3, "mpeg_release()! dev=0x%pK\n", dev);
 
 	mutex_lock(&dev->lock);
 

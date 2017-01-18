@@ -36,7 +36,7 @@ static unsigned int alloc_null_binding(struct nf_conn *ct, unsigned int hooknum)
 	struct nf_nat_range range;
 
 	range.flags = 0;
-	pr_debug("Allocating NULL binding for %p (%pI4)\n", ct,
+	pr_debug("Allocating NULL binding for %pK (%pI4)\n", ct,
 		 HOOK2MANIP(hooknum) == NF_NAT_MANIP_SRC ?
 		 &ct->tuplehash[IP_CT_DIR_REPLY].tuple.dst.u3.ip :
 		 &ct->tuplehash[IP_CT_DIR_REPLY].tuple.src.u3.ip);
@@ -125,7 +125,7 @@ nf_nat_ipv4_fn(unsigned int hooknum,
 			if (ret != NF_ACCEPT)
 				return ret;
 		} else {
-			pr_debug("Already setup manip %s for ct %p\n",
+			pr_debug("Already setup manip %s for ct %pK\n",
 				 maniptype == NF_NAT_MANIP_SRC ? "SRC" : "DST",
 				 ct);
 			if (nf_nat_oif_changed(hooknum, ctinfo, nat, out))

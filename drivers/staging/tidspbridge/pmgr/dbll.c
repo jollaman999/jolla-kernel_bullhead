@@ -285,7 +285,7 @@ bool dbll_get_addr(struct dbll_library_obj *zl_lib, char *name,
 		status = true;
 	}
 
-	dev_dbg(bridge, "%s: lib: %p name: %s paddr: %p, status 0x%x\n",
+	dev_dbg(bridge, "%s: lib: %pK name: %s paddr: %pK, status 0x%x\n",
 		__func__, zl_lib, name, sym_val, status);
 	return status;
 }
@@ -378,7 +378,7 @@ int dbll_get_sect(struct dbll_library_obj *lib, char *name, u32 *paddr,
 		opened_doff = false;
 	}
 
-	dev_dbg(bridge, "%s: lib: %p name: %s paddr: %p psize: %p, "
+	dev_dbg(bridge, "%s: lib: %pK name: %s paddr: %pK psize: %pK, "
 		"status 0x%x\n", __func__, lib, name, paddr, psize, status);
 
 	return status;
@@ -504,7 +504,7 @@ int dbll_load(struct dbll_library_obj *lib, dbll_flags flags,
 	if (opened_doff)
 		dof_close(zl_lib);
 
-	dev_dbg(bridge, "%s: lib: %p flags: 0x%x entry: %p, status 0x%x\n",
+	dev_dbg(bridge, "%s: lib: %pK flags: 0x%x entry: %pK, status 0x%x\n",
 		__func__, lib, flags, entry, status);
 
 	return status;
@@ -638,7 +638,7 @@ func_cont:
 
 	}
 
-	dev_dbg(bridge, "%s: target: %p file: %s lib_obj: %p, status 0x%x\n",
+	dev_dbg(bridge, "%s: target: %pK file: %s lib_obj: %pK, status 0x%x\n",
 		__func__, target, file, lib_obj, status);
 
 	return status;
@@ -705,7 +705,7 @@ func_cont:
 		opened_doff = false;
 	}
 
-	dev_dbg(bridge, "%s: lib: %p name: %s buf: %p size: 0x%x, "
+	dev_dbg(bridge, "%s: lib: %pK name: %s buf: %pK size: 0x%x, "
 		"status 0x%x\n", __func__, lib, name, buf, size, status);
 	return status;
 }
@@ -718,7 +718,7 @@ void dbll_unload(struct dbll_library_obj *lib, struct dbll_attrs *attrs)
 	struct dbll_library_obj *zl_lib = (struct dbll_library_obj *)lib;
 	s32 err = 0;
 
-	dev_dbg(bridge, "%s: lib: %p\n", __func__, lib);
+	dev_dbg(bridge, "%s: lib: %pK\n", __func__, lib);
 	zl_lib->load_ref--;
 	/* Unload only if reference count is 0 */
 	if (zl_lib->load_ref != 0)

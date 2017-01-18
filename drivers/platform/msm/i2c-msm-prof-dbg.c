@@ -535,7 +535,7 @@ void i2c_msm_prof_dump_pip_dscn(struct i2c_msm_ctrl *ctrl,
 			(struct i2c_msm_dma_chan *) ((ulong) event->data0);
 	int ret = event->data1;
 	dev_info(ctrl->dev,
-		"%3zu.%03zums PIP_DCNCT sps_disconnect(hndl:0x%p %s):%d\n",
+		"%3zu.%03zums PIP_DCNCT sps_disconnect(hndl:0x%pK %s):%d\n",
 		msec, usec, chan->dma_chan, chan->name, ret);
 }
 
@@ -546,7 +546,7 @@ void i2c_msm_prof_dump_pip_cnct(struct i2c_msm_ctrl *ctrl,
 			(struct i2c_msm_dma_chan *) ((ulong) event->data0);
 	int ret = event->data1;
 	dev_info(ctrl->dev,
-		"%3zu.%03zums PIP_CNCT sps_connect(hndl:0x%p %s):%d\n",
+		"%3zu.%03zums PIP_CNCT sps_connect(hndl:0x%pK %s):%d\n",
 		msec, usec, chan->dma_chan, chan->name, ret);
 }
 

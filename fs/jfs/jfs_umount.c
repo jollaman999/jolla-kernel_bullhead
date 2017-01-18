@@ -57,7 +57,7 @@ int jfs_umount(struct super_block *sb)
 	struct jfs_log *log;
 	int rc = 0;
 
-	jfs_info("UnMount JFS: sb:0x%p", sb);
+	jfs_info("UnMount JFS: sb:0x%pK", sb);
 
 	/*
 	 *	update superblock and close log

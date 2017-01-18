@@ -785,7 +785,7 @@ static void netlink_sock_destruct(struct sock *sk)
 #endif /* CONFIG_NETLINK_MMAP */
 
 	if (!sock_flag(sk, SOCK_DEAD)) {
-		printk(KERN_ERR "Freeing alive netlink socket %p\n", sk);
+		printk(KERN_ERR "Freeing alive netlink socket %pK\n", sk);
 		return;
 	}
 

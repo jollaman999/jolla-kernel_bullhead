@@ -783,8 +783,8 @@ static int receive_from_sock(struct connection *con)
 					  con->cb.base, con->cb.len,
 					  PAGE_CACHE_SIZE);
 	if (ret == -EBADMSG) {
-		log_print("lowcomms: addr=%p, base=%u, len=%u, "
-			  "iov_len=%u, iov_base[0]=%p, read=%d",
+		log_print("lowcomms: addr=%pK, base=%u, len=%u, "
+			  "iov_len=%u, iov_base[0]=%pK, read=%d",
 			  page_address(con->rx_page), con->cb.base, con->cb.len,
 			  len, iov[0].iov_base, r);
 	}

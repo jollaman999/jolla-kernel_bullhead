@@ -430,7 +430,7 @@ static void __init ttc_timer_init(struct device_node *timer)
 	ttc_setup_clocksource(clk, timer_baseaddr);
 	ttc_setup_clockevent(clk, timer_baseaddr + 4, irq);
 
-	pr_info("%s #0 at %p, irq=%d\n", timer->name, timer_baseaddr, irq);
+	pr_info("%s #0 at %pK, irq=%d\n", timer->name, timer_baseaddr, irq);
 }
 
 CLOCKSOURCE_OF_DECLARE(ttc, "cdns,ttc", ttc_timer_init);

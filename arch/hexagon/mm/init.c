@@ -243,13 +243,13 @@ void __init setup_arch_memory(void)
 				| __HVM_PDE_S_4MB);
 	}
 
-	printk(KERN_INFO "clearing segtable from %p to %p\n", segtable,
+	printk(KERN_INFO "clearing segtable from %pK to %pK\n", segtable,
 		segtable_end);
 	while (segtable < (segtable_end-8))
 		*(segtable++) = __HVM_PDE_S_INVALID;
 	/* stop the pointer at the device I/O 4MB page  */
 
-	printk(KERN_INFO "segtable = %p (should be equal to _K_io_map)\n",
+	printk(KERN_INFO "segtable = %pK (should be equal to _K_io_map)\n",
 		segtable);
 
 #if 0

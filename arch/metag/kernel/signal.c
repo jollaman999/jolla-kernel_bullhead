@@ -197,7 +197,7 @@ static int setup_rt_frame(int sig, struct k_sigaction *ka, siginfo_t *info,
 	regs->REG_ARG3 = (unsigned long) &frame->uc;
 	regs->REG_PC = (unsigned long) ka->sa.sa_handler;
 
-	pr_debug("SIG deliver (%s:%d): sp=%p pc=%08x pr=%08x\n",
+	pr_debug("SIG deliver (%s:%d): sp=%pK pc=%08x pr=%08x\n",
 		 current->comm, current->pid, frame, regs->REG_PC,
 		 regs->REG_RTP);
 

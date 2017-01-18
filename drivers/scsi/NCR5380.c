@@ -97,8 +97,8 @@
 #endif
 
 #if (NDEBUG & NDEBUG_LISTS)
-#define LIST(x,y) {printk("LINE:%d   Adding %p to %p\n", __LINE__, (void*)(x), (void*)(y)); if ((x)==(y)) udelay(5); }
-#define REMOVE(w,x,y,z) {printk("LINE:%d   Removing: %p->%p  %p->%p \n", __LINE__, (void*)(w), (void*)(x), (void*)(y), (void*)(z)); if ((x)==(y)) udelay(5); }
+#define LIST(x,y) {printk("LINE:%d   Adding %pK to %pK\n", __LINE__, (void*)(x), (void*)(y)); if ((x)==(y)) udelay(5); }
+#define REMOVE(w,x,y,z) {printk("LINE:%d   Removing: %pK->%pK  %pK->%pK \n", __LINE__, (void*)(w), (void*)(x), (void*)(y), (void*)(z)); if ((x)==(y)) udelay(5); }
 #else
 #define LIST(x,y)
 #define REMOVE(w,x,y,z)
@@ -1048,7 +1048,7 @@ static void NCR5380_main(struct work_struct *work)
 			for (tmp = (Scsi_Cmnd *) hostdata->issue_queue, prev = NULL; tmp; prev = tmp, tmp = (Scsi_Cmnd *) tmp->host_scribble) 
 			{
 				if (prev != tmp)
-					dprintk(NDEBUG_LISTS, ("MAIN tmp=%p   target=%d   busy=%d lun=%d\n", tmp, tmp->target, hostdata->busy[tmp->target], tmp->lun));
+					dprintk(NDEBUG_LISTS, ("MAIN tmp=%pK   target=%d   busy=%d lun=%d\n", tmp, tmp->target, hostdata->busy[tmp->target], tmp->lun));
 				/*  When we find one, remove it from the issue queue. */
 				if (!(hostdata->busy[tmp->device->id] & (1 << tmp->device->lun))) {
 					if (prev) {

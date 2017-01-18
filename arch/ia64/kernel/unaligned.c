@@ -353,14 +353,14 @@ set_rse_reg (struct pt_regs *regs, unsigned long r1, unsigned long val, int nat)
 	bsp     = ia64_rse_skip_regs(ubs_end, -sof);
 	addr    = ia64_rse_skip_regs(bsp, ridx);
 
-	DPRINT("ubs_end=%p bsp=%p addr=%p\n", (void *) ubs_end, (void *) bsp, (void *) addr);
+	DPRINT("ubs_end=%pK bsp=%pK addr=%pK\n", (void *) ubs_end, (void *) bsp, (void *) addr);
 
 	ia64_poke(current, sw, (unsigned long) ubs_end, (unsigned long) addr, val);
 
 	rnat_addr = ia64_rse_rnat_addr(addr);
 
 	ia64_peek(current, sw, (unsigned long) ubs_end, (unsigned long) rnat_addr, &rnats);
-	DPRINT("rnat @%p = 0x%lx nat=%d old nat=%ld\n",
+	DPRINT("rnat @%pK = 0x%lx nat=%d old nat=%ld\n",
 	       (void *) rnat_addr, rnats, nat, (rnats >> ia64_rse_slot_num(addr)) & 1);
 
 	nat_mask = 1UL << ia64_rse_slot_num(addr);
@@ -370,7 +370,7 @@ set_rse_reg (struct pt_regs *regs, unsigned long r1, unsigned long val, int nat)
 		rnats &= ~nat_mask;
 	ia64_poke(current, sw, (unsigned long) ubs_end, (unsigned long) rnat_addr, rnats);
 
-	DPRINT("rnat changed to @%p = 0x%lx\n", (void *) rnat_addr, rnats);
+	DPRINT("rnat changed to @%pK = 0x%lx\n", (void *) rnat_addr, rnats);
 }
 
 
@@ -424,7 +424,7 @@ get_rse_reg (struct pt_regs *regs, unsigned long r1, unsigned long *val, int *na
 	bsp     = ia64_rse_skip_regs(ubs_end, -sof);
 	addr    = ia64_rse_skip_regs(bsp, ridx);
 
-	DPRINT("ubs_end=%p bsp=%p addr=%p\n", (void *) ubs_end, (void *) bsp, (void *) addr);
+	DPRINT("ubs_end=%pK bsp=%pK addr=%pK\n", (void *) ubs_end, (void *) bsp, (void *) addr);
 
 	ia64_peek(current, sw, (unsigned long) ubs_end, (unsigned long) addr, val);
 
@@ -432,7 +432,7 @@ get_rse_reg (struct pt_regs *regs, unsigned long r1, unsigned long *val, int *na
 		rnat_addr = ia64_rse_rnat_addr(addr);
 		nat_mask = 1UL << ia64_rse_slot_num(addr);
 
-		DPRINT("rnat @%p = 0x%lx\n", (void *) rnat_addr, rnats);
+		DPRINT("rnat @%pK = 0x%lx\n", (void *) rnat_addr, rnats);
 
 		ia64_peek(current, sw, (unsigned long) ubs_end, (unsigned long) rnat_addr, &rnats);
 		*nat = (rnats & nat_mask) != 0;
@@ -493,13 +493,13 @@ setreg (unsigned long regnum, unsigned long val, int nat, struct pt_regs *regs)
 	 * UNAT bit_pos = GR[r3]{8:3} form EAS-2.4
 	 */
 	bitmask   = 1UL << (addr >> 3 & 0x3f);
-	DPRINT("*0x%lx=0x%lx NaT=%d prev_unat @%p=%lx\n", addr, val, nat, (void *) unat, *unat);
+	DPRINT("*0x%lx=0x%lx NaT=%d prev_unat @%pK=%lx\n", addr, val, nat, (void *) unat, *unat);
 	if (nat) {
 		*unat |= bitmask;
 	} else {
 		*unat &= ~bitmask;
 	}
-	DPRINT("*0x%lx=0x%lx NaT=%d new unat: %p=%lx\n", addr, val, nat, (void *) unat,*unat);
+	DPRINT("*0x%lx=0x%lx NaT=%d new unat: %pK=%lx\n", addr, val, nat, (void *) unat,*unat);
 }
 
 /*

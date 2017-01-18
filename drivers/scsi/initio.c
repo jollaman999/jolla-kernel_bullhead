@@ -691,7 +691,7 @@ static struct scsi_ctrl_blk *initio_alloc_scb(struct initio_host *host)
 	spin_lock_irqsave(&host->avail_lock, flags);
 	if ((scb = host->first_avail) != NULL) {
 #if DEBUG_QUEUE
-		printk("find scb at %p\n", scb);
+		printk("find scb at %pK\n", scb);
 #endif
 		if ((host->first_avail = scb->next) == NULL)
 			host->last_avail = NULL;
@@ -715,7 +715,7 @@ static void initio_release_scb(struct initio_host * host, struct scsi_ctrl_blk *
 	unsigned long flags;
 
 #if DEBUG_QUEUE
-	printk("Release SCB %p; ", cmnd);
+	printk("Release SCB %pK; ", cmnd);
 #endif
 	spin_lock_irqsave(&(host->avail_lock), flags);
 	cmnd->srb = NULL;
@@ -736,7 +736,7 @@ static void initio_append_pend_scb(struct initio_host * host, struct scsi_ctrl_b
 {
 
 #if DEBUG_QUEUE
-	printk("Append pend SCB %p; ", scbp);
+	printk("Append pend SCB %pK; ", scbp);
 #endif
 	scbp->status = SCB_PEND;
 	scbp->next = NULL;
@@ -754,7 +754,7 @@ static void initio_push_pend_scb(struct initio_host * host, struct scsi_ctrl_blk
 {
 
 #if DEBUG_QUEUE
-	printk("Push pend SCB %p; ", scbp);
+	printk("Push pend SCB %pK; ", scbp);
 #endif
 	scbp->status = SCB_PEND;
 	if ((scbp->next = host->first_pending) != NULL) {
@@ -797,7 +797,7 @@ static void initio_unlink_pend_scb(struct initio_host * host, struct scsi_ctrl_b
 	struct scsi_ctrl_blk *tmp, *prev;
 
 #if DEBUG_QUEUE
-	printk("unlink pend SCB %p; ", scb);
+	printk("unlink pend SCB %pK; ", scb);
 #endif
 
 	prev = tmp = host->first_pending;
@@ -823,7 +823,7 @@ static void initio_append_busy_scb(struct initio_host * host, struct scsi_ctrl_b
 {
 
 #if DEBUG_QUEUE
-	printk("append busy SCB %p; ", scbp);
+	printk("append busy SCB %pK; ", scbp);
 #endif
 	if (scbp->tagmsg)
 		host->act_tags[scbp->target]++;
@@ -856,7 +856,7 @@ static struct scsi_ctrl_blk *initio_pop_busy_scb(struct initio_host * host)
 			host->targets[tmp->target].flags &= ~TCF_BUSY;
 	}
 #if DEBUG_QUEUE
-	printk("Pop busy SCB %p; ", tmp);
+	printk("Pop busy SCB %pK; ", tmp);
 #endif
 	return tmp;
 }
@@ -867,7 +867,7 @@ static void initio_unlink_busy_scb(struct initio_host * host, struct scsi_ctrl_b
 	struct scsi_ctrl_blk *tmp, *prev;
 
 #if DEBUG_QUEUE
-	printk("unlink busy SCB %p; ", scb);
+	printk("unlink busy SCB %pK; ", scb);
 #endif
 
 	prev = tmp = host->first_busy;
@@ -910,7 +910,7 @@ struct scsi_ctrl_blk *initio_find_busy_scb(struct initio_host * host, u16 tarlun
 		tmp = tmp->next;
 	}
 #if DEBUG_QUEUE
-	printk("find busy SCB %p; ", tmp);
+	printk("find busy SCB %pK; ", tmp);
 #endif
 	return tmp;
 }
@@ -918,7 +918,7 @@ struct scsi_ctrl_blk *initio_find_busy_scb(struct initio_host * host, u16 tarlun
 static void initio_append_done_scb(struct initio_host * host, struct scsi_ctrl_blk * scbp)
 {
 #if DEBUG_QUEUE
-	printk("append done SCB %p; ", scbp);
+	printk("append done SCB %pK; ", scbp);
 #endif
 
 	scbp->status = SCB_DONE;
@@ -942,7 +942,7 @@ struct scsi_ctrl_blk *initio_find_done_scb(struct initio_host * host)
 		tmp->next = NULL;
 	}
 #if DEBUG_QUEUE
-	printk("find done SCB %p; ",tmp);
+	printk("find done SCB %pK; ",tmp);
 #endif
 	return tmp;
 }

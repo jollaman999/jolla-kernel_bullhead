@@ -659,7 +659,7 @@ alloc_scq(struct idt77252_dev *card, int class)
 	skb_queue_head_init(&scq->transmit);
 	skb_queue_head_init(&scq->pending);
 
-	TXPRINTK("idt77252: SCQ: base 0x%p, next 0x%p, last 0x%p, paddr %08llx\n",
+	TXPRINTK("idt77252: SCQ: base 0x%pK, next 0x%pK, last 0x%pK, paddr %08llx\n",
 		 scq->base, scq->next, scq->last, (unsigned long long)scq->paddr);
 
 	return scq;
@@ -708,7 +708,7 @@ push_on_scq(struct idt77252_dev *card, struct vc_map *vc, struct sk_buff *skb)
 	struct scqe *tbd;
 	int entries;
 
-	TXPRINTK("%s: SCQ: next 0x%p\n", card->name, scq->next);
+	TXPRINTK("%s: SCQ: next 0x%pK\n", card->name, scq->next);
 
 	atomic_inc(&scq->used);
 	entries = atomic_read(&scq->used);
@@ -768,7 +768,7 @@ push_on_scq(struct idt77252_dev *card, struct vc_map *vc, struct sk_buff *skb)
 
 	TXPRINTK("%d entries in SCQ used (push).\n", atomic_read(&scq->used));
 
-	XPRINTK("%s: SCQ (after push %2d) head = 0x%x, next = 0x%p.\n",
+	XPRINTK("%s: SCQ (after push %2d) head = 0x%x, next = 0x%pK.\n",
 		card->name, atomic_read(&scq->used),
 		read_sram(card, scq->scd + 1), scq->next);
 
@@ -795,12 +795,12 @@ drain_scq(struct idt77252_dev *card, struct vc_map *vc)
 	struct sk_buff *skb;
 	struct atm_vcc *vcc;
 
-	TXPRINTK("%s: SCQ (before drain %2d) next = 0x%p.\n",
+	TXPRINTK("%s: SCQ (before drain %2d) next = 0x%pK.\n",
 		 card->name, atomic_read(&scq->used), scq->next);
 
 	skb = skb_dequeue(&scq->transmit);
 	if (skb) {
-		TXPRINTK("%s: freeing skb at %p.\n", card->name, skb);
+		TXPRINTK("%s: freeing skb at %pK.\n", card->name, skb);
 
 		pci_unmap_single(card->pcidev, IDT77252_PRV_PADDR(skb),
 				 skb->len, PCI_DMA_TODEVICE);
@@ -1040,7 +1040,7 @@ dequeue_rx(struct idt77252_dev *card, struct rsq_entry *rsqe)
 	vpi = (header >> 16) & 0x00ff;
 	vci = (header >>  0) & 0xffff;
 
-	RXPRINTK("%s: SDU for %d.%d received in buffer 0x%p (data 0x%p).\n",
+	RXPRINTK("%s: SDU for %d.%d received in buffer 0x%pK (data 0x%pK).\n",
 		 card->name, vpi, vci, skb, skb->data);
 
 	if ((vpi >= (1 << card->vpibits)) || (vci != (vci & card->vcimask))) {
@@ -1418,7 +1418,7 @@ idt77252_tx(struct idt77252_dev *card)
 	else
 		tsqe = card->tsq.next + 1;
 
-	TXPRINTK("idt77252_tx: tsq  %p: base %p, next %p, last %p\n", tsqe,
+	TXPRINTK("idt77252_tx: tsq  %pK: base %pK, next %pK, last %pK\n", tsqe,
 		 card->tsq.base, card->tsq.next, card->tsq.last);
 	TXPRINTK("idt77252_tx: tsqb %08x, tsqt %08x, tsqh %08x, \n",
 		 readl(SAR_REG_TSQB),
@@ -1431,7 +1431,7 @@ idt77252_tx(struct idt77252_dev *card)
 		return;
 
 	do {
-		TXPRINTK("tsqe: 0x%p [0x%08x 0x%08x]\n", tsqe,
+		TXPRINTK("tsqe: 0x%pK [0x%08x 0x%08x]\n", tsqe,
 			 le32_to_cpu(tsqe->word_1),
 			 le32_to_cpu(tsqe->word_2));
 
@@ -1516,7 +1516,7 @@ idt77252_tx(struct idt77252_dev *card)
 		else
 			tsqe = card->tsq.next + 1;
 
-		TXPRINTK("tsqe: %p: base %p, next %p, last %p\n", tsqe,
+		TXPRINTK("tsqe: %pK: base %pK, next %pK, last %pK\n", tsqe,
 			 card->tsq.base, card->tsq.next, card->tsq.last);
 
 		stat = le32_to_cpu(tsqe->word_2);
@@ -1526,7 +1526,7 @@ idt77252_tx(struct idt77252_dev *card)
 	writel((unsigned long)card->tsq.next - (unsigned long)card->tsq.base,
 	       SAR_REG_TSQH);
 
-	XPRINTK("idt77252_tx-after writel%d: TSQ head = 0x%x, tail = 0x%x, next = 0x%p.\n",
+	XPRINTK("idt77252_tx-after writel%d: TSQ head = 0x%x, tail = 0x%x, next = 0x%pK.\n",
 		card->index, readl(SAR_REG_TSQH),
 		readl(SAR_REG_TSQT), card->tsq.next);
 }
@@ -3409,7 +3409,7 @@ static int init_card(struct atm_dev *dev)
 	}
 	memset(card->raw_cell_hnd, 0, 2 * sizeof(u32));
 	writel(card->raw_cell_paddr, SAR_REG_RAWHND);
-	IPRINTK("%s: raw cell handle is at 0x%p.\n", card->name,
+	IPRINTK("%s: raw cell handle is at 0x%pK.\n", card->name,
 		card->raw_cell_hnd);
 
 	size = sizeof(struct vc_map *) * card->tct_size;
@@ -3748,7 +3748,7 @@ static int __init idt77252_init(void)
 {
 	struct sk_buff *skb;
 
-	printk("%s: at %p\n", __func__, idt77252_init);
+	printk("%s: at %pK\n", __func__, idt77252_init);
 
 	if (sizeof(skb->cb) < sizeof(struct atm_skb_data) +
 			      sizeof(struct idt77252_skb_prv)) {

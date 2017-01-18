@@ -49,7 +49,7 @@ struct ceph_monmap *ceph_monmap_decode(void *p, void *end)
 	ceph_decode_32_safe(&p, end, len, bad);
 	ceph_decode_need(&p, end, len, bad);
 
-	dout("monmap_decode %p %p len %d\n", p, end, (int)(end-p));
+	dout("monmap_decode %pK %pK len %d\n", p, end, (int)(end-p));
 
 	ceph_decode_16_safe(&p, end, version, bad);
 
@@ -464,7 +464,7 @@ static struct ceph_msg *get_generic_reply(struct ceph_connection *con,
 		*skip = 1;
 		m = NULL;
 	} else {
-		dout("get_generic_reply %lld got %p\n", tid, req->reply);
+		dout("get_generic_reply %lld got %pK\n", tid, req->reply);
 		*skip = 0;
 		m = ceph_msg_get(req->reply);
 		/*
@@ -515,7 +515,7 @@ static void handle_statfs_reply(struct ceph_mon_client *monc,
 
 	if (msg->front.iov_len != sizeof(*reply))
 		goto bad;
-	dout("handle_statfs_reply %p tid %llu\n", msg, tid);
+	dout("handle_statfs_reply %pK tid %llu\n", msg, tid);
 
 	mutex_lock(&monc->mutex);
 	req = __lookup_generic_req(monc, tid);
@@ -607,7 +607,7 @@ static void handle_poolop_reply(struct ceph_mon_client *monc,
 
 	if (msg->front.iov_len < sizeof(*reply))
 		goto bad;
-	dout("handle_poolop_reply %p tid %llu\n", msg, tid);
+	dout("handle_poolop_reply %pK tid %llu\n", msg, tid);
 
 	mutex_lock(&monc->mutex);
 	req = __lookup_generic_req(monc, tid);

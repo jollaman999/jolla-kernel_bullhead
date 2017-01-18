@@ -521,7 +521,7 @@ static int ext4_d_revalidate(struct dentry *dentry, unsigned int flags)
 
 		if (IS_ERR(cp))
 			cp = (char *) "???";
-		pr_err("revalidate: %s %p %d %d %d\n", cp, dentry->d_fsdata,
+		pr_err("revalidate: %s %pK %d %d %d\n", cp, dentry->d_fsdata,
 		       cached_with_key, d_is_negative(dentry),
 		       dir_has_key);
 #endif

@@ -347,7 +347,7 @@ static int udl_fb_open(struct fb_info *info, int user)
 		fb_deferred_io_init(info);
 	}
 
-	pr_notice("open /dev/fb%d user=%d fb_info=%p count=%d\n",
+	pr_notice("open /dev/fb%d user=%d fb_info=%pK count=%d\n",
 		  info->node, user, info, ufbdev->fb_count);
 
 	return 0;
@@ -546,7 +546,7 @@ static int udlfb_create(struct drm_fb_helper *helper,
 	}
 
 
-	DRM_DEBUG_KMS("allocated %dx%d vmal %p\n",
+	DRM_DEBUG_KMS("allocated %dx%d vmal %pK\n",
 		      fb->width, fb->height,
 		      ufbdev->ufb.obj->vmapping);
 

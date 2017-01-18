@@ -123,7 +123,7 @@ static int xencomm_create(void *buffer, unsigned long bytes,
 	struct xencomm_desc *desc;
 	int rc;
 
-	pr_debug("%s: %p[%ld]\n", __func__, buffer, bytes);
+	pr_debug("%s: %pK[%ld]\n", __func__, buffer, bytes);
 
 	if (bytes == 0) {
 		/* don't create a descriptor; Xen recognizes NULL. */

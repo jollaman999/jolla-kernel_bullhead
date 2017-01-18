@@ -1773,7 +1773,7 @@ static int ipa_wwan_probe(struct platform_device *pdev)
 	ipa_netdevs[0] = dev;
 	wwan_ptr = netdev_priv(dev);
 	memset(wwan_ptr, 0, sizeof(*wwan_ptr));
-	IPAWANDBG("wwan_ptr (private) = %p", wwan_ptr);
+	IPAWANDBG("wwan_ptr (private) = %pK", wwan_ptr);
 	wwan_ptr->net = dev;
 	wwan_ptr->outstanding_high = DEFAULT_OUTSTANDING_HIGH;
 	wwan_ptr->outstanding_low = DEFAULT_OUTSTANDING_LOW;

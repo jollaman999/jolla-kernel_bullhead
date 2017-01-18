@@ -205,7 +205,7 @@ static int nfs4_realloc_slot_table(struct nfs4_slot_table *tbl,
 	nfs4_reset_slot_table(tbl, max_reqs - 1, ivalue);
 	spin_unlock(&tbl->slot_tbl_lock);
 
-	dprintk("%s: tbl=%p slots=%p max_slots=%d\n", __func__,
+	dprintk("%s: tbl=%pK slots=%pK max_slots=%d\n", __func__,
 		tbl, tbl->slots, tbl->max_slots);
 out:
 	dprintk("<-- %s: return %d\n", __func__, ret);
@@ -449,7 +449,7 @@ void nfs4_destroy_session(struct nfs4_session *session)
 	rcu_read_lock();
 	xprt = rcu_dereference(session->clp->cl_rpcclient->cl_xprt);
 	rcu_read_unlock();
-	dprintk("%s Destroy backchannel for xprt %p\n",
+	dprintk("%s Destroy backchannel for xprt %pK\n",
 		__func__, xprt);
 	xprt_destroy_backchannel(xprt, NFS41_BC_MIN_CALLBACKS);
 	nfs4_destroy_slot_tables(session);

@@ -288,14 +288,14 @@ static void pvscsi_kick_io(const struct pvscsi_adapter *adapter,
 
 static void ll_adapter_reset(const struct pvscsi_adapter *adapter)
 {
-	dev_dbg(pvscsi_dev(adapter), "Adapter Reset on %p\n", adapter);
+	dev_dbg(pvscsi_dev(adapter), "Adapter Reset on %pK\n", adapter);
 
 	pvscsi_write_cmd_desc(adapter, PVSCSI_CMD_ADAPTER_RESET, NULL, 0);
 }
 
 static void ll_bus_reset(const struct pvscsi_adapter *adapter)
 {
-	dev_dbg(pvscsi_dev(adapter), "Resetting bus on %p\n", adapter);
+	dev_dbg(pvscsi_dev(adapter), "Resetting bus on %pK\n", adapter);
 
 	pvscsi_write_cmd_desc(adapter, PVSCSI_CMD_RESET_BUS, NULL, 0);
 }
@@ -572,7 +572,7 @@ static void pvscsi_complete_request(struct pvscsi_adapter *adapter,
 	}
 
 	dev_dbg(&cmd->device->sdev_gendev,
-		"cmd=%p %x ctx=%p result=0x%x status=0x%x,%x\n",
+		"cmd=%pK %x ctx=%pK result=0x%x status=0x%x,%x\n",
 		cmd, cmd->cmnd[0], ctx, cmd->result, btstat, sdstat);
 
 	cmd->scsi_done(cmd);
@@ -710,7 +710,7 @@ static int pvscsi_queue_lck(struct scsi_cmnd *cmd, void (*done)(struct scsi_cmnd
 	cmd->scsi_done = done;
 
 	dev_dbg(&cmd->device->sdev_gendev,
-		"queued cmd %p, ctx %p, op=%x\n", cmd, ctx, cmd->cmnd[0]);
+		"queued cmd %pK, ctx %pK, op=%x\n", cmd, ctx, cmd->cmnd[0]);
 
 	spin_unlock_irqrestore(&adapter->hw_lock, flags);
 
@@ -727,7 +727,7 @@ static int pvscsi_abort(struct scsi_cmnd *cmd)
 	struct pvscsi_ctx *ctx;
 	unsigned long flags;
 
-	scmd_printk(KERN_DEBUG, cmd, "task abort on host %u, %p\n",
+	scmd_printk(KERN_DEBUG, cmd, "task abort on host %u, %pK\n",
 		    adapter->host->host_no, cmd);
 
 	spin_lock_irqsave(&adapter->hw_lock, flags);
@@ -744,7 +744,7 @@ static int pvscsi_abort(struct scsi_cmnd *cmd)
 	 */
 	ctx = pvscsi_find_context(adapter, cmd);
 	if (!ctx) {
-		scmd_printk(KERN_DEBUG, cmd, "Failed to abort cmd %p\n", cmd);
+		scmd_printk(KERN_DEBUG, cmd, "Failed to abort cmd %pK\n", cmd);
 		goto out;
 	}
 
@@ -772,7 +772,7 @@ static void pvscsi_reset_all(struct pvscsi_adapter *adapter)
 		struct scsi_cmnd *cmd = ctx->cmd;
 		if (cmd) {
 			scmd_printk(KERN_ERR, cmd,
-				    "Forced reset on cmd %p\n", cmd);
+				    "Forced reset on cmd %pK\n", cmd);
 			pvscsi_unmap_buffers(adapter, ctx);
 			pvscsi_release_context(adapter, ctx);
 			cmd->result = (DID_RESET << 16);

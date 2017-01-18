@@ -666,7 +666,7 @@ err_init_adapter:
 	priv = NULL;
 
 done:
-	lbtf_deb_leave_args(LBTF_DEB_MAIN, "priv %p", priv);
+	lbtf_deb_leave_args(LBTF_DEB_MAIN, "priv %pK", priv);
 	return priv;
 }
 EXPORT_SYMBOL_GPL(lbtf_add_card);

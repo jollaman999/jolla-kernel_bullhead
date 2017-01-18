@@ -991,7 +991,7 @@ int ipa_mhi_init(struct ipa_mhi_init_params *params)
 	IPA_MHI_DBG("mmio_addr = 0x%x\n", params->mmio_addr);
 	IPA_MHI_DBG("first_ch_idx = 0x%x\n", params->first_ch_idx);
 	IPA_MHI_DBG("first_er_idx = 0x%x\n", params->first_er_idx);
-	IPA_MHI_DBG("notify = %pF priv = %p\n", params->notify, params->priv);
+	IPA_MHI_DBG("notify = %pF priv = %pK\n", params->notify, params->priv);
 
 	/* Initialize context */
 	ipa_mhi_ctx = kzalloc(sizeof(*ipa_mhi_ctx), GFP_KERNEL);

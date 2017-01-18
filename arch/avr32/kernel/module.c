@@ -255,7 +255,7 @@ int apply_relocate_add(Elf32_Shdr *sechdrs, const char *strtab,
 			 * value of PC.  Just subtract the value of
 			 * GOT, and we're done.
 			 */
-			pr_debug("GOTPC: PC=0x%x, got_offset=0x%lx, core=0x%p\n",
+			pr_debug("GOTPC: PC=0x%x, got_offset=0x%lx, core=0x%pK\n",
 				 relocation, module->arch.got_offset,
 				 module->module_core);
 			relocation -= ((unsigned long)module->module_core

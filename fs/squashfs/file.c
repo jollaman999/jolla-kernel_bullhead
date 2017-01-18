@@ -137,7 +137,7 @@ static struct meta_index *empty_meta_index(struct inode *inode, int offset,
 		goto failed;
 	}
 
-	TRACE("empty_meta_index: returned meta entry %d, %p\n",
+	TRACE("empty_meta_index: returned meta entry %d, %pK\n",
 			msblk->next_meta_index,
 			&msblk->meta_index[msblk->next_meta_index]);
 

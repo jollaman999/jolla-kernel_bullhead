@@ -844,7 +844,7 @@ ecryptfs_write_tag_70_packet(char *dest, size_t *remaining_bytes,
 	if (rc < 0) {
 		printk(KERN_ERR "%s: Error setting key for crypto context; "
 		       "rc = [%d]. s->auth_tok->token.password.session_key_"
-		       "encryption_key = [0x%p]; mount_crypt_stat->"
+		       "encryption_key = [0x%pK]; mount_crypt_stat->"
 		       "global_default_fn_cipher_key_bytes = [%zd]\n", __func__,
 		       rc,
 		       s->auth_tok->token.password.session_key_encryption_key,
@@ -1052,7 +1052,7 @@ ecryptfs_parse_tag_70_packet(char **filename, size_t *filename_size,
 	if (rc < 0) {
 		printk(KERN_ERR "%s: Error setting key for crypto context; "
 		       "rc = [%d]. s->auth_tok->token.password.session_key_"
-		       "encryption_key = [0x%p]; mount_crypt_stat->"
+		       "encryption_key = [0x%pK]; mount_crypt_stat->"
 		       "global_default_fn_cipher_key_bytes = [%zd]\n", __func__,
 		       rc,
 		       s->auth_tok->token.password.session_key_encryption_key,

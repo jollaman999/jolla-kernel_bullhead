@@ -412,7 +412,7 @@ static void brcmf_usb_tx_complete(struct urb *urb)
 	struct brcmf_usbreq *req = (struct brcmf_usbreq *)urb->context;
 	struct brcmf_usbdev_info *devinfo = req->devinfo;
 
-	brcmf_dbg(USB, "Enter, urb->status=%d, skb=%p\n", urb->status,
+	brcmf_dbg(USB, "Enter, urb->status=%d, skb=%pK\n", urb->status,
 		  req->skb);
 	brcmf_usb_del_fromq(devinfo, req);
 
@@ -569,7 +569,7 @@ static int brcmf_usb_tx(struct device *dev, struct sk_buff *skb)
 	struct brcmf_usbreq  *req;
 	int ret;
 
-	brcmf_dbg(USB, "Enter, skb=%p\n", skb);
+	brcmf_dbg(USB, "Enter, skb=%pK\n", skb);
 	if (devinfo->bus_pub.state != BRCMFMAC_USB_STATE_UP) {
 		ret = -EIO;
 		goto fail;
@@ -844,7 +844,7 @@ brcmf_usb_dl_writeimage(struct brcmf_usbdev_info *devinfo, u8 *fw, int fwlen)
 	u32 rdlstate, rdlbytes;
 	int err = 0;
 
-	brcmf_dbg(USB, "Enter, fw %p, len %d\n", fw, fwlen);
+	brcmf_dbg(USB, "Enter, fw %pK, len %d\n", fw, fwlen);
 
 	bulkchunk = kmalloc(RDL_CHUNK, GFP_ATOMIC);
 	if (bulkchunk == NULL) {
@@ -1027,7 +1027,7 @@ brcmf_usb_fw_download(struct brcmf_usbdev_info *devinfo)
 
 static void brcmf_usb_detach(struct brcmf_usbdev_info *devinfo)
 {
-	brcmf_dbg(USB, "Enter, devinfo %p\n", devinfo);
+	brcmf_dbg(USB, "Enter, devinfo %pK\n", devinfo);
 
 	/* free the URBS */
 	brcmf_usb_free_q(&devinfo->rx_freeq, false);
@@ -1277,7 +1277,7 @@ brcmf_usb_disconnect_cb(struct brcmf_usbdev_info *devinfo)
 {
 	if (!devinfo)
 		return;
-	brcmf_dbg(USB, "Enter, bus_pub %p\n", devinfo);
+	brcmf_dbg(USB, "Enter, bus_pub %pK\n", devinfo);
 
 	brcmf_detach(devinfo->dev);
 	kfree(devinfo->bus_pub.bus);

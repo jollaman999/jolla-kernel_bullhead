@@ -269,7 +269,7 @@ static void *___m_alloc(m_pool_s *mp, int size)
 		}
 	}
 #ifdef DEBUG
-	printk("___m_alloc(%d) = %p\n", size, (void *) a);
+	printk("___m_alloc(%d) = %pK\n", size, (void *) a);
 #endif
 	return (void *) a;
 }
@@ -283,7 +283,7 @@ static void ___m_free(m_pool_s *mp, void *ptr, int size)
 	m_link_s *h = mp->h;
 
 #ifdef DEBUG
-	printk("___m_free(%p, %d)\n", ptr, size);
+	printk("___m_free(%pK, %d)\n", ptr, size);
 #endif
 
 	if (size > (PAGE_SIZE << MEMO_PAGE_ORDER))
@@ -329,7 +329,7 @@ static void *__m_calloc2(m_pool_s *mp, int size, char *name, int uflags)
 	p = ___m_alloc(mp, size);
 
 	if (DEBUG_FLAGS & DEBUG_ALLOC)
-		printk ("new %-10s[%4d] @%p.\n", name, size, p);
+		printk ("new %-10s[%4d] @%pK.\n", name, size, p);
 
 	if (p)
 		memset(p, 0, size);
@@ -344,7 +344,7 @@ static void *__m_calloc2(m_pool_s *mp, int size, char *name, int uflags)
 static void __m_free(m_pool_s *mp, void *ptr, int size, char *name)
 {
 	if (DEBUG_FLAGS & DEBUG_ALLOC)
-		printk ("freeing %-10s[%4d] @%p.\n", name, size, ptr);
+		printk ("freeing %-10s[%4d] @%pK.\n", name, size, ptr);
 
 	___m_free(mp, ptr, size);
 
@@ -3550,7 +3550,7 @@ ncr_script_copy_and_bind (struct ncb *np, ncrcmd *src, ncrcmd *dst, int len)
 		}
 
 		if (DEBUG_FLAGS & DEBUG_SCRIPT)
-			printk (KERN_DEBUG "%p:  <%x>\n",
+			printk (KERN_DEBUG "%pK:  <%x>\n",
 				(src-1), (unsigned)opcode);
 
 		/*
@@ -4674,7 +4674,7 @@ static int ncr_abort_command (struct ncb *np, struct scsi_cmnd *cmd)
 	switch(cp->host_status) {
 	case HS_BUSY:
 	case HS_NEGOTIATE:
-		printk ("%s: abort ccb=%p (cancel)\n", ncr_name (np), cp);
+		printk ("%s: abort ccb=%pK (cancel)\n", ncr_name (np), cp);
 			cp->start.schedule.l_paddr =
 				cpu_to_scr(NCB_SCRIPTH_PHYS (np, cancel));
 		retv = SCSI_ABORT_PENDING;
@@ -5016,7 +5016,7 @@ void ncr_complete (struct ncb *np, struct ccb *cp)
 		/*
 		**  Other protocol messes
 		*/
-		PRINT_ADDR(cmd, "COMMAND FAILED (%x %x) @%p.\n",
+		PRINT_ADDR(cmd, "COMMAND FAILED (%x %x) @%pK.\n",
 			cp->host_status, cp->scsi_status, cp);
 
 		cmd->result = ScsiResult(DID_ERROR, cp->scsi_status);
@@ -6357,7 +6357,7 @@ static void ncr_int_ma (struct ncb *np)
 	*/
 
 	if (DEBUG_FLAGS & DEBUG_PHASE) {
-		printk ("\nCP=%p CP2=%p DSP=%x NXT=%x VDSP=%p CMD=%x ",
+		printk ("\nCP=%pK CP2=%pK DSP=%x NXT=%x VDSP=%pK CMD=%x ",
 			cp, np->header.cp,
 			(unsigned)dsp,
 			(unsigned)nxtdsp, vdsp, cmd);
@@ -6392,7 +6392,7 @@ static void ncr_int_ma (struct ncb *np)
 	}
 
 	if (DEBUG_FLAGS & DEBUG_PHASE) {
-		printk ("OCMD=%x\nTBLP=%p OLEN=%x OADR=%x\n",
+		printk ("OCMD=%x\nTBLP=%pK OLEN=%x OADR=%x\n",
 			(unsigned) (scr_to_cpu(vdsp[0]) >> 24),
 			tblp,
 			(unsigned) olen,
@@ -7174,7 +7174,7 @@ static struct ccb *ncr_get_ccb(struct ncb *np, struct scsi_cmnd *cmd)
 			cp = list_entry(qp, struct ccb, link_ccbq);
 			if (cp->magic) {
 				PRINT_ADDR(cmd, "ccb free list corrupted "
-						"(@%p)\n", cp);
+						"(@%pK)\n", cp);
 				cp = NULL;
 			} else {
 				list_add_tail(qp, &lp->wait_ccbq);
@@ -7236,7 +7236,7 @@ static struct ccb *ncr_get_ccb(struct ncb *np, struct scsi_cmnd *cmd)
 	cp->lun    = ln;
 
 	if (DEBUG_FLAGS & DEBUG_TAGS) {
-		PRINT_ADDR(cmd, "ccb @%p using tag %d.\n", cp, tag);
+		PRINT_ADDR(cmd, "ccb @%pK using tag %d.\n", cp, tag);
 	}
 
 	return cp;
@@ -7257,7 +7257,7 @@ static void ncr_free_ccb (struct ncb *np, struct ccb *cp)
 	struct lcb *lp = tp->lp[cp->lun];
 
 	if (DEBUG_FLAGS & DEBUG_TAGS) {
-		PRINT_ADDR(cp->cmd, "ccb @%p freeing tag %d.\n", cp, cp->tag);
+		PRINT_ADDR(cp->cmd, "ccb @%pK freeing tag %d.\n", cp, cp->tag);
 	}
 
 	/*

@@ -183,7 +183,7 @@ void __iounmap(const volatile void __iomem *addr)
 
 	p = remove_vm_area((void *) (PAGE_MASK & (unsigned long __force) addr));
 	if (!p)
-		printk(KERN_ERR "iounmap: bad address %p\n", addr);
+		printk(KERN_ERR "iounmap: bad address %pK\n", addr);
 
 	kfree(p);
 }

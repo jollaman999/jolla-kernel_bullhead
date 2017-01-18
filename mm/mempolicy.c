@@ -668,7 +668,7 @@ static int vma_replace_policy(struct vm_area_struct *vma,
 	struct mempolicy *old;
 	struct mempolicy *new;
 
-	pr_debug("vma %lx-%lx/%lx vm_ops %p vm_file %p set_policy %p\n",
+	pr_debug("vma %lx-%lx/%lx vm_ops %pK vm_file %pK set_policy %pK\n",
 		 vma->vm_start, vma->vm_end, vma->vm_pgoff,
 		 vma->vm_ops, vma->vm_file,
 		 vma->vm_ops ? vma->vm_ops->set_policy : NULL);

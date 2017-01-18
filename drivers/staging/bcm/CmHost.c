@@ -860,9 +860,9 @@ static VOID DumpCmControlPacket(PVOID pvBuffer)
 
 	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "u8MBSService: 0x%X", pstAddIndication->sfAuthorizedSet.u8MBSService);
 	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "u8QosParamSet: 0x%X", pstAddIndication->sfAuthorizedSet.u8QosParamSet);
-	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "u8TrafficPriority: 0x%X, %p",
+	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "u8TrafficPriority: 0x%X, %pK",
 			pstAddIndication->sfAuthorizedSet.u8TrafficPriority, &pstAddIndication->sfAuthorizedSet.u8TrafficPriority);
-	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "u32MaxSustainedTrafficRate: 0x%X 0x%p",
+	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "u32MaxSustainedTrafficRate: 0x%X 0x%pK",
 			pstAddIndication->sfAuthorizedSet.u32MaxSustainedTrafficRate,
 			&pstAddIndication->sfAuthorizedSet.u32MaxSustainedTrafficRate);
 	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "u32MaxTrafficBurst: 0x%X", pstAddIndication->sfAuthorizedSet.u32MaxTrafficBurst);
@@ -918,7 +918,7 @@ static VOID DumpCmControlPacket(PVOID pvBuffer)
 		struct bcm_convergence_types *psfCSType = NULL;
 		psfCSType =  &pstAddIndication->sfAuthorizedSet.cConvergenceSLTypes[nIndex];
 
-		BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "psfCSType = %p", psfCSType);
+		BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "psfCSType = %pK", psfCSType);
 		BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "CCPacketClassificationRuleSI====>");
 		BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, DUMP_CONTROL, DBG_LVL_ALL, "u8ClassifierRulePriority: 0x%X ",
 				psfCSType->cCPacketClassificationRule.u8ClassifierRulePriority);
@@ -1477,9 +1477,9 @@ static inline struct bcm_add_indication_alt
 	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "AddIndication-u8TID : 0x%X", ntohs(pstAddIndication->u16TID));
 	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "AddIndication-u8CID : 0x%X", ntohs(pstAddIndication->u16CID));
 	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "AddIndication-u16VCID : 0x%X", ntohs(pstAddIndication->u16VCID));
-	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "AddIndication-autorized set loc : %p", pstAddIndication->psfAuthorizedSet);
-	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "AddIndication-admitted set loc : %p", pstAddIndication->psfAdmittedSet);
-	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "AddIndication-Active set loc : %p", pstAddIndication->psfActiveSet);
+	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "AddIndication-autorized set loc : %pK", pstAddIndication->psfAuthorizedSet);
+	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "AddIndication-admitted set loc : %pK", pstAddIndication->psfAdmittedSet);
+	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "AddIndication-Active set loc : %pK", pstAddIndication->psfActiveSet);
 
 	pstAddIndicationDest->u8Type = pstAddIndication->u8Type;
 	pstAddIndicationDest->u8Direction = pstAddIndication->eConnectionDir;
@@ -1514,7 +1514,7 @@ static inline struct bcm_add_indication_alt
 
 	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "Dumping the whole raw packet");
 	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "============================================================");
-	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, " pstAddIndicationDest->sfActiveSet size  %zx %p", sizeof(*pstAddIndicationDest), pstAddIndicationDest);
+	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, " pstAddIndicationDest->sfActiveSet size  %zx %pK", sizeof(*pstAddIndicationDest), pstAddIndicationDest);
 	/* BCM_DEBUG_PRINT_BUFFER(Adapter,DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, (unsigned char *)pstAddIndicationDest, sizeof(*pstAddIndicationDest)); */
 	BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, CONN_MSG, DBG_LVL_ALL, "============================================================");
 	return pstAddIndicationDest;

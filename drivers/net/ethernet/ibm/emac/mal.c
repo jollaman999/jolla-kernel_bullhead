@@ -176,7 +176,7 @@ void mal_poll_add(struct mal_instance *mal, struct mal_commac *commac)
 
 	spin_lock_irqsave(&mal->lock, flags);
 
-	MAL_DBG(mal, "poll_add(%p)" NL, commac);
+	MAL_DBG(mal, "poll_add(%pK)" NL, commac);
 
 	/* starts disabled */
 	set_bit(MAL_COMMAC_POLL_DISABLED, &commac->flags);
@@ -192,7 +192,7 @@ void mal_poll_del(struct mal_instance *mal, struct mal_commac *commac)
 
 	spin_lock_irqsave(&mal->lock, flags);
 
-	MAL_DBG(mal, "poll_del(%p)" NL, commac);
+	MAL_DBG(mal, "poll_del(%pK)" NL, commac);
 
 	list_del(&commac->poll_list);
 

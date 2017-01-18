@@ -516,7 +516,7 @@ static void pata_macio_qc_prep(struct ata_queued_cmd *qc)
 	struct dbdma_cmd *table;
 	unsigned int si, pi;
 
-	dev_dbgdma(priv->dev, "%s: qc %p flags %lx, write %d dev %d\n",
+	dev_dbgdma(priv->dev, "%s: qc %pK flags %lx, write %d dev %d\n",
 		   __func__, qc, qc->flags, write, qc->dev->devno);
 
 	if (!(qc->flags & ATA_QCFLAG_DMAMAP))
@@ -592,7 +592,7 @@ static void pata_macio_bmdma_setup(struct ata_queued_cmd *qc)
 	struct dbdma_regs __iomem *dma_regs = ap->ioaddr.bmdma_addr;
 	int dev = qc->dev->devno;
 
-	dev_dbgdma(priv->dev, "%s: qc %p\n", __func__, qc);
+	dev_dbgdma(priv->dev, "%s: qc %pK\n", __func__, qc);
 
 	/* Make sure DMA commands updates are visible */
 	writel(priv->dma_table_dma, &dma_regs->cmdptr);
@@ -620,7 +620,7 @@ static void pata_macio_bmdma_start(struct ata_queued_cmd *qc)
 	struct pata_macio_priv *priv = ap->private_data;
 	struct dbdma_regs __iomem *dma_regs = ap->ioaddr.bmdma_addr;
 
-	dev_dbgdma(priv->dev, "%s: qc %p\n", __func__, qc);
+	dev_dbgdma(priv->dev, "%s: qc %pK\n", __func__, qc);
 
 	writel((RUN << 16) | RUN, &dma_regs->control);
 	/* Make sure it gets to the controller right now */
@@ -634,7 +634,7 @@ static void pata_macio_bmdma_stop(struct ata_queued_cmd *qc)
 	struct dbdma_regs __iomem *dma_regs = ap->ioaddr.bmdma_addr;
 	unsigned int timeout = 1000000;
 
-	dev_dbgdma(priv->dev, "%s: qc %p\n", __func__, qc);
+	dev_dbgdma(priv->dev, "%s: qc %pK\n", __func__, qc);
 
 	/* Stop the DMA engine and wait for it to full halt */
 	writel (((RUN|WAKE|DEAD) << 16), &dma_regs->control);

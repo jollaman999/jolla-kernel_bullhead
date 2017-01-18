@@ -1332,13 +1332,13 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 #endif
 	}
 
-	pr_debug("PP_addr at %p[%x]: 0x%x\n",
+	pr_debug("PP_addr at %pK[%x]: 0x%x\n",
 		 ioaddr, ADD_PORT, ioread16(ioaddr + ADD_PORT));
 	iowrite16(PP_ChipID, ioaddr + ADD_PORT);
 
 	tmp = ioread16(ioaddr + DATA_PORT);
 	if (tmp != CHIP_EISA_ID_SIG) {
-		pr_debug("%s: incorrect signature at %p[%x]: 0x%x!="
+		pr_debug("%s: incorrect signature at %pK[%x]: 0x%x!="
 			 CHIP_EISA_ID_SIG_STR "\n",
 			 dev->name, ioaddr, DATA_PORT, tmp);
 		retval = -ENODEV;
@@ -1364,7 +1364,7 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 
 	pr_info_once("%s\n", version);
 
-	pr_info("%s: cs89%c0%s rev %c found at %p ",
+	pr_info("%s: cs89%c0%s rev %c found at %pK ",
 		dev->name,
 		lp->chip_type == CS8900  ? '0' : '2',
 		lp->chip_type == CS8920M ? "M" : "",

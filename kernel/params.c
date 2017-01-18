@@ -106,7 +106,7 @@ static int parse_one(char *param,
 			if (!val && params[i].ops->set != param_set_bool
 			    && params[i].ops->set != param_set_bint)
 				return -EINVAL;
-			pr_debug("handling %s with %p\n", param,
+			pr_debug("handling %s with %pK\n", param,
 				params[i].ops->set);
 			mutex_lock(&param_lock);
 			err = params[i].ops->set(val, &params[i]);

@@ -43,7 +43,7 @@ static void rds_tcp_inc_purge(struct rds_incoming *inc)
 {
 	struct rds_tcp_incoming *tinc;
 	tinc = container_of(inc, struct rds_tcp_incoming, ti_inc);
-	rdsdebug("purging tinc %p inc %p\n", tinc, inc);
+	rdsdebug("purging tinc %pK inc %pK\n", tinc, inc);
 	skb_queue_purge(&tinc->ti_skb_list);
 }
 
@@ -52,7 +52,7 @@ void rds_tcp_inc_free(struct rds_incoming *inc)
 	struct rds_tcp_incoming *tinc;
 	tinc = container_of(inc, struct rds_tcp_incoming, ti_inc);
 	rds_tcp_inc_purge(inc);
-	rdsdebug("freeing tinc %p inc %p\n", tinc, inc);
+	rdsdebug("freeing tinc %pK inc %pK\n", tinc, inc);
 	kmem_cache_free(rds_tcp_incoming_slab, tinc);
 }
 
@@ -86,8 +86,8 @@ int rds_tcp_inc_copy_to_user(struct rds_incoming *inc, struct iovec *first_iov,
 			to_copy = min(tmp.iov_len, size);
 			to_copy = min(to_copy, skb->len - skb_off);
 
-			rdsdebug("ret %d size %zu skb %p skb_off %lu "
-				 "skblen %d iov_base %p iov_len %zu cpy %lu\n",
+			rdsdebug("ret %d size %zu skb %pK skb_off %lu "
+				 "skblen %d iov_base %pK iov_len %zu cpy %lu\n",
 				 ret, size, skb, skb_off, skb->len,
 				 tmp.iov_base, tmp.iov_len, to_copy);
 
@@ -181,7 +181,7 @@ static int rds_tcp_data_recv(read_descriptor_t *desc, struct sk_buff *skb,
 	struct sk_buff *clone;
 	size_t left = len, to_copy;
 
-	rdsdebug("tcp data tc %p skb %p offset %u len %zu\n", tc, skb, offset,
+	rdsdebug("tcp data tc %pK skb %pK offset %u len %zu\n", tc, skb, offset,
 		 len);
 
 	/*
@@ -197,7 +197,7 @@ static int rds_tcp_data_recv(read_descriptor_t *desc, struct sk_buff *skb,
 				goto out;
 			}
 			tc->t_tinc = tinc;
-			rdsdebug("alloced tinc %p\n", tinc);
+			rdsdebug("alloced tinc %pK\n", tinc);
 			rds_inc_init(&tinc->ti_inc, conn, conn->c_faddr);
 			/*
 			 * XXX * we might be able to use the __ variants when
@@ -208,7 +208,7 @@ static int rds_tcp_data_recv(read_descriptor_t *desc, struct sk_buff *skb,
 
 		if (left && tc->t_tinc_hdr_rem) {
 			to_copy = min(tc->t_tinc_hdr_rem, left);
-			rdsdebug("copying %zu header from skb %p\n", to_copy,
+			rdsdebug("copying %zu header from skb %pK\n", to_copy,
 				 skb);
 			skb_copy_bits(skb, offset,
 				      (char *)&tinc->ti_inc.i_hdr +
@@ -245,8 +245,8 @@ static int rds_tcp_data_recv(read_descriptor_t *desc, struct sk_buff *skb,
 			}
 			skb_queue_tail(&tinc->ti_skb_list, clone);
 
-			rdsdebug("skb %p data %p len %d off %u to_copy %zu -> "
-				 "clone %p data %p len %d\n",
+			rdsdebug("skb %pK data %pK len %d off %u to_copy %zu -> "
+				 "clone %pK data %pK len %d\n",
 				 skb, skb->data, skb->len, offset, to_copy,
 				 clone, clone->data, clone->len);
 
@@ -293,7 +293,7 @@ static int rds_tcp_read_sock(struct rds_connection *conn, gfp_t gfp)
 	desc.count = 1; /* give more than one skb per call */
 
 	tcp_read_sock(sock->sk, &desc, rds_tcp_data_recv);
-	rdsdebug("tcp_read_sock for tc %p gfp 0x%x returned %d\n", tc, gfp,
+	rdsdebug("tcp_read_sock for tc %pK gfp 0x%x returned %d\n", tc, gfp,
 		 desc.error);
 
 	return desc.error;
@@ -312,7 +312,7 @@ int rds_tcp_recv(struct rds_connection *conn)
 	struct socket *sock = tc->t_sock;
 	int ret = 0;
 
-	rdsdebug("recv worker conn %p tc %p sock %p\n", conn, tc, sock);
+	rdsdebug("recv worker conn %pK tc %pK sock %pK\n", conn, tc, sock);
 
 	lock_sock(sock->sk);
 	ret = rds_tcp_read_sock(conn, GFP_KERNEL);
@@ -327,7 +327,7 @@ void rds_tcp_data_ready(struct sock *sk, int bytes)
 	struct rds_connection *conn;
 	struct rds_tcp_connection *tc;
 
-	rdsdebug("data ready sk %p bytes %d\n", sk, bytes);
+	rdsdebug("data ready sk %pK bytes %d\n", sk, bytes);
 
 	read_lock(&sk->sk_callback_lock);
 	conn = sk->sk_user_data;

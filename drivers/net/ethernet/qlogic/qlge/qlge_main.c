@@ -3011,7 +3011,7 @@ static void ql_tx_ring_clean(struct ql_adapter *qdev)
 			tx_ring_desc = &tx_ring->q[i];
 			if (tx_ring_desc && tx_ring_desc->skb) {
 				netif_err(qdev, ifdown, qdev->ndev,
-					  "Freeing lost SKB %p, from queue %d, index %d.\n",
+					  "Freeing lost SKB %pK, from queue %d, index %d.\n",
 					  tx_ring_desc->skb, j,
 					  tx_ring_desc->index);
 				ql_unmap_send(qdev, tx_ring_desc,
@@ -3532,7 +3532,7 @@ static int ql_request_irq(struct ql_adapter *qdev)
 				     "%s: context->name = %s.\n", __func__,
 				     intr_context->name);
 			netif_printk(qdev, ifup, KERN_DEBUG, qdev->ndev,
-				     "%s: dev_id = 0x%p.\n", __func__,
+				     "%s: dev_id = 0x%pK.\n", __func__,
 				     &qdev->rx_ring[0]);
 			status =
 			    request_irq(pdev->irq, qlge_isr,

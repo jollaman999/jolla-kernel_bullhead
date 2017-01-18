@@ -1452,7 +1452,7 @@ static int __init edma_probe(struct platform_device *pdev)
 
 		edma_cc[j]->default_queue = info[j]->default_queue;
 
-		dev_dbg(&pdev->dev, "DMA REG BASE ADDR=%p\n",
+		dev_dbg(&pdev->dev, "DMA REG BASE ADDR=%pK\n",
 			edmacc_regs_base[j]);
 
 		for (i = 0; i < edma_cc[j]->num_slots; i++)

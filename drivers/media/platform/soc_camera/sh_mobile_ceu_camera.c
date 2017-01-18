@@ -366,7 +366,7 @@ static int sh_mobile_ceu_videobuf_prepare(struct vb2_buffer *vb)
 	struct sh_mobile_ceu_buffer *buf = to_ceu_vb(vb);
 
 	/* Added list head initialization on alloc */
-	WARN(!list_empty(&buf->queue), "Buffer %p on queue!\n", vb);
+	WARN(!list_empty(&buf->queue), "Buffer %pK on queue!\n", vb);
 
 	return 0;
 }
@@ -389,7 +389,7 @@ static void sh_mobile_ceu_videobuf_queue(struct vb2_buffer *vb)
 
 	vb2_set_plane_payload(vb, 0, size);
 
-	dev_dbg(icd->parent, "%s (vb=0x%p) 0x%p %lu\n", __func__,
+	dev_dbg(icd->parent, "%s (vb=0x%pK) 0x%pK %lu\n", __func__,
 		vb, vb2_plane_vaddr(vb, 0), vb2_get_plane_payload(vb, 0));
 
 #ifdef DEBUG

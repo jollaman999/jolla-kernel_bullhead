@@ -291,7 +291,7 @@ static int ieee80211_ccmp_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	}
 	keyidx >>= 6;
 	if (key->key_idx != keyidx) {
-		pr_debug("RX tkey->key_idx=%d frame keyidx=%d priv=%p\n",
+		pr_debug("RX tkey->key_idx=%d frame keyidx=%d priv=%pK\n",
 			 key->key_idx, keyidx, priv);
 		return -6;
 	}

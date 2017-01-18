@@ -1632,7 +1632,7 @@ err_out:
 	spin_unlock_irqrestore(&dev->lock, flags);
 err_out_exit:
 	if (err) {
-		printk("%s: iv: %p [%d], key: %p [%d], mode: %u, op: %u, "
+		printk("%s: iv: %pK [%d], key: %pK [%d], mode: %u, op: %u, "
 				"type: %u, err: %d.\n",
 			dev->name, rctx->iv, rctx->ivsize,
 			ctx->key, ctx->keysize,
@@ -1781,8 +1781,8 @@ static void hifn_process_ready(struct ablkcipher_request *req, int error)
 			t = &rctx->walk.cache[idx];
 			dst = &req->dst[idx];
 
-			dprintk("\n%s: sg_page(t): %p, t->length: %u, "
-				"sg_page(dst): %p, dst->length: %u, "
+			dprintk("\n%s: sg_page(t): %pK, t->length: %u, "
+				"sg_page(dst): %pK, dst->length: %u, "
 				"nbytes: %u.\n",
 				__func__, sg_page(t), t->length,
 				sg_page(dst), dst->length, nbytes);
@@ -1931,7 +1931,7 @@ static void hifn_work(struct work_struct *work)
 
 			printk("%s: res: ", __func__);
 			for (i=0; i<HIFN_D_RES_RSIZE; ++i) {
-				printk("%x.%p ", dma->resr[i].l, dev->sa[i]);
+				printk("%x.%pK ", dma->resr[i].l, dev->sa[i]);
 				if (dev->sa[i]) {
 					hifn_process_ready(dev->sa[i], -ENODEV);
 					hifn_complete_sa(dev, i);

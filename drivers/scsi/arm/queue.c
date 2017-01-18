@@ -90,7 +90,7 @@ int queue_initialise (Queue_t *queue)
 void queue_free (Queue_t *queue)
 {
 	if (!list_empty(&queue->head))
-		printk(KERN_WARNING "freeing non-empty queue %p\n", queue);
+		printk(KERN_WARNING "freeing non-empty queue %pK\n", queue);
 	kfree(queue->alloc);
 }
      

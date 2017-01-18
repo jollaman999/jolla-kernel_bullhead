@@ -137,7 +137,7 @@ static ssize_t ps3flash_read(char __user *userbuf, void *kernelbuf,
 	const void *src;
 
 	dev_dbg(&dev->sbd.core,
-		"%s:%u: Reading %zu bytes at position %lld to U0x%p/K0x%p\n",
+		"%s:%u: Reading %zu bytes at position %lld to U0x%pK/K0x%pK\n",
 		__func__, __LINE__, count, *pos, userbuf, kernelbuf);
 
 	size = dev->regions[dev->region_idx].size*dev->blk_size;
@@ -166,7 +166,7 @@ static ssize_t ps3flash_read(char __user *userbuf, void *kernelbuf,
 			goto fail;
 
 		dev_dbg(&dev->sbd.core,
-			"%s:%u: copy %lu bytes from 0x%p to U0x%p/K0x%p\n",
+			"%s:%u: copy %lu bytes from 0x%pK to U0x%pK/K0x%pK\n",
 			__func__, __LINE__, n, src, userbuf, kernelbuf);
 		if (userbuf) {
 			if (copy_to_user(userbuf, src, n)) {
@@ -206,7 +206,7 @@ static ssize_t ps3flash_write(const char __user *userbuf,
 	void *dst;
 
 	dev_dbg(&dev->sbd.core,
-		"%s:%u: Writing %zu bytes at position %lld from U0x%p/K0x%p\n",
+		"%s:%u: Writing %zu bytes at position %lld from U0x%pK/K0x%pK\n",
 		__func__, __LINE__, count, *pos, userbuf, kernelbuf);
 
 	size = dev->regions[dev->region_idx].size*dev->blk_size;
@@ -238,7 +238,7 @@ static ssize_t ps3flash_write(const char __user *userbuf,
 			goto fail;
 
 		dev_dbg(&dev->sbd.core,
-			"%s:%u: copy %lu bytes from U0x%p/K0x%p to 0x%p\n",
+			"%s:%u: copy %lu bytes from U0x%pK/K0x%pK to 0x%pK\n",
 			__func__, __LINE__, n, userbuf, kernelbuf, dst);
 		if (userbuf) {
 			if (copy_from_user(dst, userbuf, n)) {

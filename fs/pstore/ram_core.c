@@ -206,11 +206,11 @@ static void persistent_ram_ecc_old(struct persistent_ram_zone *prz)
 			size = buffer->data + prz->buffer_size - block;
 		numerr = persistent_ram_decode_rs8(prz, block, size, par);
 		if (numerr > 0) {
-			pr_devel("persistent_ram: error in block %p, %d\n",
+			pr_devel("persistent_ram: error in block %pK, %d\n",
 			       block, numerr);
 			prz->corrected_bytes += numerr;
 		} else if (numerr < 0) {
-			pr_devel("persistent_ram: uncorrectable error in block %p\n",
+			pr_devel("persistent_ram: uncorrectable error in block %pK\n",
 				block);
 			prz->bad_blocks++;
 		}

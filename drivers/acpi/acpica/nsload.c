@@ -180,7 +180,7 @@ acpi_status acpi_ns_load_namespace(void)
 	(void)acpi_ns_load_table_by_type(ACPI_TABLE_ID_PSDT);
 
 	ACPI_DEBUG_PRINT_RAW((ACPI_DB_INIT,
-			      "ACPI Namespace successfully loaded at root %p\n",
+			      "ACPI Namespace successfully loaded at root %pK\n",
 			      acpi_gbl_root_node));
 
 	return_ACPI_STATUS(status);

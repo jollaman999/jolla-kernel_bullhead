@@ -66,7 +66,7 @@ DECLARE_EVENT_CLASS(mhi_tre_template,
 		__entry->dir = dir;
 	),
 
-	TP_printk("CHAN: %d TRE: 0x%p BUF: 0x%llx LEN: 0x%x DIR:%s",
+	TP_printk("CHAN: %d TRE: 0x%pK BUF: 0x%llx LEN: 0x%x DIR:%s",
 		__entry->chan, __entry->tre_addr,
 		__entry->buf_ptr, __entry->buf_len,
 		__entry->dir ? "IN" : "OUT")
@@ -99,7 +99,7 @@ DECLARE_EVENT_CLASS(mhi_ev_template,
 		__entry->chan = MHI_EV_READ_CHID(EV_CHID, ev);
 	),
 
-	TP_printk("CHAN: %d EVENT 0x%p TRE_p: 0x%llx LEN: 0x%x",
+	TP_printk("CHAN: %d EVENT 0x%pK TRE_p: 0x%llx LEN: 0x%x",
 		__entry->chan, __entry->ev_addr,
 		__entry->tre_addr, __entry->tre_len)
 )

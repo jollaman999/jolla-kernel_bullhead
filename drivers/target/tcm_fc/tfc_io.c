@@ -179,7 +179,7 @@ int ft_queue_data_in(struct se_cmd *se_cmd)
 		error = lport->tt.seq_send(lport, seq, fp);
 		if (error) {
 			/* XXX For now, initiator will retry */
-			pr_err_ratelimited("%s: Failed to send frame %p, "
+			pr_err_ratelimited("%s: Failed to send frame %pK, "
 						"xid <0x%x>, remaining %zu, "
 						"lso_max <0x%x>\n",
 						__func__, fp, ep->xid,
@@ -235,7 +235,7 @@ void ft_recv_write_data(struct ft_cmd *cmd, struct fc_frame *fp)
 		 */
 		buf = fc_frame_payload_get(fp, 1);
 		if (buf)
-			pr_err("%s: xid 0x%x, f_ctl 0x%x, cmd->sg %p, "
+			pr_err("%s: xid 0x%x, f_ctl 0x%x, cmd->sg %pK, "
 				"cmd->sg_cnt 0x%x. DDP was setup"
 				" hence not expected to receive frame with "
 				"payload, Frame will be dropped if"

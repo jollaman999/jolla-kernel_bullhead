@@ -197,7 +197,7 @@ static struct firmware_buf *__allocate_fw_buf(const char *fw_name,
 	buf->fwc = fwc;
 	init_completion(&buf->completion);
 
-	pr_debug("%s: fw-%s buf=%p\n", __func__, fw_name, buf);
+	pr_debug("%s: fw-%s buf=%pK\n", __func__, fw_name, buf);
 
 	return buf;
 }
@@ -254,7 +254,7 @@ static void __fw_free_buf(struct kref *ref)
 	struct firmware_buf *buf = to_fwbuf(ref);
 	struct firmware_cache *fwc = buf->fwc;
 
-	pr_debug("%s: fw-%s buf=%p data=%p size=%u\n",
+	pr_debug("%s: fw-%s buf=%pK data=%pK size=%u\n",
 		 __func__, buf->fw_id, buf, buf->data,
 		 (unsigned int)buf->size);
 
@@ -410,7 +410,7 @@ static void fw_set_page_data(struct firmware_buf *buf, struct firmware *fw)
 	fw->size = buf->size;
 	fw->data = buf->data;
 
-	pr_debug("%s: fw-%s buf=%p data=%p size=%u\n",
+	pr_debug("%s: fw-%s buf=%pK data=%pK size=%u\n",
 		 __func__, buf->fw_id, buf, buf->data,
 		 (unsigned int)buf->size);
 }
@@ -421,7 +421,7 @@ static void fw_name_devm_release(struct device *dev, void *res)
 	struct fw_name_devm *fwn = res;
 
 	if (fwn->magic == (unsigned long)&fw_cache)
-		pr_debug("%s: fw_name-%s devm-%p released\n",
+		pr_debug("%s: fw_name-%s devm-%pK released\n",
 				__func__, fwn->name, res);
 }
 

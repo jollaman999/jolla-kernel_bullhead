@@ -1891,8 +1891,8 @@ static int fixup_owner(u32 __user *uaddr, struct futex_q *q, int locked)
 	 * the owner of the rt_mutex.
 	 */
 	if (rt_mutex_owner(&q->pi_state->pi_mutex) == current)
-		printk(KERN_ERR "fixup_owner: ret = %d pi-mutex: %p "
-				"pi-state %p\n", ret,
+		printk(KERN_ERR "fixup_owner: ret = %d pi-mutex: %pK "
+				"pi-state %pK\n", ret,
 				q->pi_state->pi_mutex.owner,
 				q->pi_state->owner);
 

@@ -928,7 +928,7 @@ static int deinterlace_open(struct file *file)
 
 	ctx->colorspace = V4L2_COLORSPACE_REC709;
 
-	dprintk(pcdev, "Created instance %p, m2m_ctx: %p\n", ctx, ctx->m2m_ctx);
+	dprintk(pcdev, "Created instance %pK, m2m_ctx: %pK\n", ctx, ctx->m2m_ctx);
 
 	return 0;
 }
@@ -938,7 +938,7 @@ static int deinterlace_release(struct file *file)
 	struct deinterlace_dev *pcdev = video_drvdata(file);
 	struct deinterlace_ctx *ctx = file->private_data;
 
-	dprintk(pcdev, "Releasing instance %p\n", ctx);
+	dprintk(pcdev, "Releasing instance %pK\n", ctx);
 
 	v4l2_m2m_ctx_release(ctx->m2m_ctx);
 	kfree(ctx->xt);

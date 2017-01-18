@@ -321,7 +321,7 @@
         - Changed conversion of pointers to unsigned longs instead of integers.
         - Changed type of I/O port variables from uint32_t to unsigned long.
         - Modified OFFSET macro to work with 64-bit as well as 32-bit.
-        - Changed sprintf and printk format specifiers for pointers to %p.
+        - Changed sprintf and printk format specifiers for pointers to %pK.
         - Changed some int to long type casts where needed in sprintf & printk.
         - Added l modifiers to sprintf and printk format specifiers for longs.
         - Removed unused local variables.
@@ -879,8 +879,8 @@ qla1280_error_action(struct scsi_cmnd *cmd, enum action action)
 		RD_REG_WORD(&ha->iobase->ictrl), jiffies);
 
 	if (qla1280_verbose)
-		printk(KERN_INFO "scsi(%li): Resetting Cmnd=0x%p, "
-		       "Handle=0x%p, action=0x%x\n",
+		printk(KERN_INFO "scsi(%li): Resetting Cmnd=0x%pK, "
+		       "Handle=0x%pK, action=0x%x\n",
 		       ha->host_no, cmd, CMD_HANDLE(cmd), action);
 
 	/*
@@ -1603,7 +1603,7 @@ qla1280_chip_diag(struct scsi_qla_host *ha)
 	int status = 0;
 	int cnt;
 	uint16_t data;
-	dprintk(3, "qla1280_chip_diag: testing device at 0x%p \n", &reg->id_l);
+	dprintk(3, "qla1280_chip_diag: testing device at 0x%pK \n", &reg->id_l);
 
 	dprintk(1, "scsi(%ld): Verifying chip\n", ha->host_no);
 
@@ -1787,7 +1787,7 @@ qla1280_load_firmware_dma(struct scsi_qla_host *ha)
 		if (cnt > risc_code_size)
 			cnt = risc_code_size;
 
-		dprintk(2, "qla1280_setup_chip:  loading risc @ =(0x%p),"
+		dprintk(2, "qla1280_setup_chip:  loading risc @ =(0x%pK),"
 			"%d,%d(0x%x)\n",
 			fw_data, cnt, num, risc_address);
 		for(i = 0; i < cnt; i++)
@@ -1800,7 +1800,7 @@ qla1280_load_firmware_dma(struct scsi_qla_host *ha)
 		mb[2] = (ha->request_dma >> 16) & 0xffff;
 		mb[7] = pci_dma_hi32(ha->request_dma) & 0xffff;
 		mb[6] = pci_dma_hi32(ha->request_dma) >> 16;
-		dprintk(2, "%s: op=%d  0x%p = 0x%4x,0x%4x,0x%4x,0x%4x\n",
+		dprintk(2, "%s: op=%d  0x%pK = 0x%4x,0x%4x,0x%4x,0x%4x\n",
 				__func__, mb[0],
 				(void *)(long)ha->request_dma,
 				mb[6], mb[7], mb[2], mb[3]);
@@ -2857,7 +2857,7 @@ qla1280_64bit_start_scsi(struct scsi_qla_host *ha, struct srb * sp)
 	ha->req_q_cnt -= req_cnt;
 	CMD_HANDLE(sp->cmd) = (unsigned char *)(unsigned long)(cnt + 1);
 
-	dprintk(2, "start: cmd=%p sp=%p CDB=%xm, handle %lx\n", cmd, sp,
+	dprintk(2, "start: cmd=%pK sp=%pK CDB=%xm, handle %lx\n", cmd, sp,
 		cmd->cmnd[0], (long)CMD_HANDLE(sp->cmd));
 	dprintk(2, "             bus %i, target %i, lun %i\n",
 		SCSI_BUS_32(cmd), SCSI_TCN_32(cmd), SCSI_LUN_32(cmd));
@@ -3073,7 +3073,7 @@ qla1280_32bit_start_scsi(struct scsi_qla_host *ha, struct srb * sp)
 
 	ENTER("qla1280_32bit_start_scsi");
 
-	dprintk(1, "32bit_start: cmd=%p sp=%p CDB=%x\n", cmd, sp,
+	dprintk(1, "32bit_start: cmd=%pK sp=%pK CDB=%x\n", cmd, sp,
 		cmd->cmnd[0]);
 
 	/* Calculate number of entries and segments required. */
@@ -3089,7 +3089,7 @@ qla1280_32bit_start_scsi(struct scsi_qla_host *ha, struct srb * sp)
 			if ((seg_cnt - 4) % 7)
 				req_cnt++;
 		}
-		dprintk(3, "S/G Transfer cmd=%p seg_cnt=0x%x, req_cnt=%x\n",
+		dprintk(3, "S/G Transfer cmd=%pK seg_cnt=0x%x, req_cnt=%x\n",
 			cmd, seg_cnt, req_cnt);
 	} else if (seg_cnt < 0) {
 		status = 1;
@@ -3609,7 +3609,7 @@ qla1280_isr(struct scsi_qla_host *ha, struct list_head *done_q)
 		}
 
 		if (pkt->entry_type == STATUS_TYPE || pkt->entry_status) {
-			dprintk(2, "status: Cmd %p, handle %i\n",
+			dprintk(2, "status: Cmd %pK, handle %i\n",
 				ha->outstanding_cmds[pkt->handle]->cmd,
 				pkt->handle);
 			if (pkt->entry_type == STATUS_TYPE)
@@ -4046,7 +4046,7 @@ __qla1280_print_scsi_cmd(struct scsi_cmnd *cmd)
 	ha = (struct scsi_qla_host *)host->hostdata;
 
 	sp = (struct srb *)CMD_SP(cmd);
-	printk("SCSI Command @= 0x%p, Handle=0x%p\n", cmd, CMD_HANDLE(cmd));
+	printk("SCSI Command @= 0x%pK, Handle=0x%pK\n", cmd, CMD_HANDLE(cmd));
 	printk("  chan=%d, target = 0x%02x, lun = 0x%02x, cmd_len = 0x%02x\n",
 	       SCSI_BUS_32(cmd), SCSI_TCN_32(cmd), SCSI_LUN_32(cmd),
 	       CMD_CDBLEN(cmd));
@@ -4055,7 +4055,7 @@ __qla1280_print_scsi_cmd(struct scsi_cmnd *cmd)
 		printk("0x%02x ", cmd->cmnd[i]);
 	}
 	printk("  seg_cnt =%d\n", scsi_sg_count(cmd));
-	printk("  request buffer=0x%p, request buffer len=0x%x\n",
+	printk("  request buffer=0x%pK, request buffer len=0x%x\n",
 	       scsi_sglist(cmd), scsi_bufflen(cmd));
 	/* if (cmd->use_sg)
 	   {
@@ -4065,7 +4065,7 @@ __qla1280_print_scsi_cmd(struct scsi_cmnd *cmd)
 	   } */
 	printk("  tag=%d, transfersize=0x%x \n",
 	       cmd->tag, cmd->transfersize);
-	printk("  SP=0x%p\n", CMD_SP(cmd));
+	printk("  SP=0x%pK\n", CMD_SP(cmd));
 	printk(" underflow size = 0x%x, direction=0x%x\n",
 	       cmd->underflow, cmd->sc_data_direction);
 }

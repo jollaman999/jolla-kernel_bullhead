@@ -66,11 +66,11 @@ int ehca_create_eq(struct ehca_shca *shca,
 	eq->is_initialized = 0;
 
 	if (type != EHCA_EQ && type != EHCA_NEQ) {
-		ehca_err(ib_dev, "Invalid EQ type %x. eq=%p", type, eq);
+		ehca_err(ib_dev, "Invalid EQ type %x. eq=%pK", type, eq);
 		return -EINVAL;
 	}
 	if (!length) {
-		ehca_err(ib_dev, "EQ length must not be zero. eq=%p", eq);
+		ehca_err(ib_dev, "EQ length must not be zero. eq=%pK", eq);
 		return -EINVAL;
 	}
 
@@ -83,14 +83,14 @@ int ehca_create_eq(struct ehca_shca *shca,
 					 &nr_pages, &eq->ist);
 
 	if (h_ret != H_SUCCESS) {
-		ehca_err(ib_dev, "Can't allocate EQ/NEQ. eq=%p", eq);
+		ehca_err(ib_dev, "Can't allocate EQ/NEQ. eq=%pK", eq);
 		return -EINVAL;
 	}
 
 	ret = ipz_queue_ctor(NULL, &eq->ipz_queue, nr_pages,
 			     EHCA_PAGESIZE, sizeof(struct ehca_eqe), 0, 0);
 	if (!ret) {
-		ehca_err(ib_dev, "Can't allocate EQ pages eq=%p", eq);
+		ehca_err(ib_dev, "Can't allocate EQ pages eq=%pK", eq);
 		goto create_eq_exit1;
 	}
 

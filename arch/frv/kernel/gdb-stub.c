@@ -1183,7 +1183,7 @@ static void __maybe_unused gdbstub_show_regs(void)
 
 	gdbstub_printk("\n");
 
-	gdbstub_printk("Frame: @%p [%s]\n",
+	gdbstub_printk("Frame: @%pK [%s]\n",
 		       __debug_frame,
 		       __debug_frame->psr & PSR_S ? "kernel" : "user");
 
@@ -1411,7 +1411,7 @@ void gdbstub(int sigval)
 	save_user_regs(&__debug_frame0->uc);
 
 #if 0
-	gdbstub_printk("--> gdbstub() %08x %p %08x %08x\n",
+	gdbstub_printk("--> gdbstub() %08x %pK %08x %08x\n",
 		       __debug_frame->pc,
 		       __debug_frame,
 		       __debug_regs->brr,

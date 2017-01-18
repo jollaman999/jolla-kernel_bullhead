@@ -209,7 +209,7 @@ retry:
 			err = srp_cmd_queue(shost, cmd, iue,
 					    (unsigned long)rport, 0);
 			if (err) {
-				eprintk("cannot queue cmd %p %d\n", cmd, err);
+				eprintk("cannot queue cmd %pK %d\n", cmd, err);
 				srp_iu_put(iue);
 			}
 			goto retry;
@@ -270,7 +270,7 @@ static int ibmvstgt_rdma(struct scsi_cmnd *sc, struct scatterlist *sg, int nsg,
 				token = sg_dma_address(sg + sidx);
 
 				if (sidx > nsg) {
-					eprintk("out of sg %p %d %d\n",
+					eprintk("out of sg %pK %d %d\n",
 						iue, sidx, nsg);
 					return -EIO;
 				}
@@ -290,7 +290,7 @@ static int ibmvstgt_cmd_done(struct scsi_cmnd *sc,
 	struct srp_target *target = iue->target;
 	int err = 0;
 
-	dprintk("%p %p %x %u\n", iue, target, vio_iu(iue)->srp.cmd.cdb[0],
+	dprintk("%pK %pK %x %u\n", iue, target, vio_iu(iue)->srp.cmd.cdb[0],
 		scsi_sg_count(sc));
 
 	if (scsi_sg_count(sc))
@@ -301,7 +301,7 @@ static int ibmvstgt_cmd_done(struct scsi_cmnd *sc,
 	spin_unlock_irqrestore(&target->lock, flags);
 
 	if (err|| sc->result != SAM_STAT_GOOD) {
-		eprintk("operation failed %p %d %x\n",
+		eprintk("operation failed %pK %d %x\n",
 			iue, sc->result, vio_iu(iue)->srp.cmd.cdb[0]);
 		send_rsp(iue, sc, HARDWARE_ERROR, 0x00);
 	} else
@@ -325,7 +325,7 @@ int send_adapter_info(struct iu_entry *iue,
 	info = dma_alloc_coherent(target->dev, sizeof(*info), &data_token,
 				  GFP_KERNEL);
 	if (!info) {
-		eprintk("bad dma_alloc_coherent %p\n", target);
+		eprintk("bad dma_alloc_coherent %pK\n", target);
 		return 1;
 	}
 
@@ -407,7 +407,7 @@ static int process_tsk_mgmt(struct iu_entry *iue)
 	union viosrp_iu *iu = vio_iu(iue);
 	int fn;
 
-	dprintk("%p %u\n", iue, iu->srp.tsk_mgmt.tsk_mgmt_func);
+	dprintk("%pK %u\n", iue, iu->srp.tsk_mgmt.tsk_mgmt_func);
 
 	switch (iu->srp.tsk_mgmt.tsk_mgmt_func) {
 	case SRP_TSK_ABORT_TASK:
@@ -517,7 +517,7 @@ static void process_iu(struct viosrp_crq *crq, struct srp_target *target)
 
 	iue = srp_iu_get(target);
 	if (!iue) {
-		eprintk("Error getting IU from pool, %p\n", target);
+		eprintk("Error getting IU from pool, %pK\n", target);
 		return;
 	}
 
@@ -527,7 +527,7 @@ static void process_iu(struct viosrp_crq *crq, struct srp_target *target)
 			  iue->remote_token, vport->liobn, iue->sbuf->dma);
 
 	if (err != H_SUCCESS) {
-		eprintk("%ld transferring data error %p\n", err, iue);
+		eprintk("%ld transferring data error %pK\n", err, iue);
 		goto out;
 	}
 
@@ -729,7 +729,7 @@ static int ibmvstgt_eh_abort_handler(struct scsi_cmnd *sc)
 	struct iu_entry *iue = (struct iu_entry *) sc->SCp.ptr;
 	struct srp_target *target = iue->target;
 
-	dprintk("%p %p %x\n", iue, target, vio_iu(iue)->srp.cmd.cdb[0]);
+	dprintk("%pK %pK %x\n", iue, target, vio_iu(iue)->srp.cmd.cdb[0]);
 
 	spin_lock_irqsave(&target->lock, flags);
 	list_del(&iue->ilist);
@@ -747,7 +747,7 @@ static int ibmvstgt_tsk_mgmt_response(struct Scsi_Host *shost,
 	union viosrp_iu *iu = vio_iu(iue);
 	unsigned char status, asc;
 
-	eprintk("%p %d\n", iue, result);
+	eprintk("%pK %d\n", iue, result);
 	status = NO_SENSE;
 	asc = 0;
 
@@ -774,7 +774,7 @@ static int ibmvstgt_it_nexus_response(struct Scsi_Host *shost, u64 itn_id,
 	struct vio_port *vport = target_to_port(target);
 
 	if (result) {
-		eprintk("%p %d\n", shost, result);
+		eprintk("%pK %d\n", shost, result);
 		srp_rport_del(vport->rport);
 		vport->rport = NULL;
 	}

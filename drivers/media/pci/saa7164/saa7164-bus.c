@@ -59,11 +59,11 @@ void saa7164_bus_dump(struct saa7164_dev *dev)
 
 	dprintk(DBGLVL_BUS, "Dumping the bus structure:\n");
 	dprintk(DBGLVL_BUS, " .type             = %d\n", b->Type);
-	dprintk(DBGLVL_BUS, " .dev->bmmio       = 0x%p\n", dev->bmmio);
+	dprintk(DBGLVL_BUS, " .dev->bmmio       = 0x%pK\n", dev->bmmio);
 	dprintk(DBGLVL_BUS, " .m_wMaxReqSize    = 0x%x\n", b->m_wMaxReqSize);
-	dprintk(DBGLVL_BUS, " .m_pdwSetRing     = 0x%p\n", b->m_pdwSetRing);
+	dprintk(DBGLVL_BUS, " .m_pdwSetRing     = 0x%pK\n", b->m_pdwSetRing);
 	dprintk(DBGLVL_BUS, " .m_dwSizeSetRing  = 0x%x\n", b->m_dwSizeSetRing);
-	dprintk(DBGLVL_BUS, " .m_pdwGetRing     = 0x%p\n", b->m_pdwGetRing);
+	dprintk(DBGLVL_BUS, " .m_pdwGetRing     = 0x%pK\n", b->m_pdwGetRing);
 	dprintk(DBGLVL_BUS, " .m_dwSizeGetRing  = 0x%x\n", b->m_dwSizeGetRing);
 
 	dprintk(DBGLVL_BUS, " .m_dwSetReadPos   = 0x%x (0x%08x)\n",

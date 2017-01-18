@@ -464,7 +464,7 @@ void __init of_irq_init(const struct of_device_id *matches)
 				continue;
 			}
 
-			pr_debug("of_irq_init: init %s @ %p, parent %p\n",
+			pr_debug("of_irq_init: init %s @ %pK, parent %pK\n",
 				 match->compatible,
 				 desc->dev, desc->interrupt_parent);
 			irq_init_cb = (of_irq_init_cb_t)match->data;

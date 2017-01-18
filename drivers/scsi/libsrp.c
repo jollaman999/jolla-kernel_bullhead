@@ -198,13 +198,13 @@ static int srp_direct_data(struct scsi_cmnd *sc, struct srp_direct_buf *md,
 		iue = (struct iu_entry *) sc->SCp.ptr;
 		sg = scsi_sglist(sc);
 
-		dprintk("%p %u %u %d\n", iue, scsi_bufflen(sc),
+		dprintk("%pK %u %u %d\n", iue, scsi_bufflen(sc),
 			md->len, scsi_sg_count(sc));
 
 		nsg = dma_map_sg(iue->target->dev, sg, scsi_sg_count(sc),
 				 DMA_BIDIRECTIONAL);
 		if (!nsg) {
-			printk("fail to map %p %d\n", iue, scsi_sg_count(sc));
+			printk("fail to map %pK %d\n", iue, scsi_sg_count(sc));
 			return 0;
 		}
 		len = min(scsi_bufflen(sc), md->len);
@@ -235,7 +235,7 @@ static int srp_indirect_data(struct scsi_cmnd *sc, struct srp_cmd *cmd,
 		iue = (struct iu_entry *) sc->SCp.ptr;
 		sg = scsi_sglist(sc);
 
-		dprintk("%p %u %u %d %d\n",
+		dprintk("%pK %u %u %d %d\n",
 			iue, scsi_bufflen(sc), id->len,
 			cmd->data_in_desc_cnt, cmd->data_out_desc_cnt);
 	}
@@ -275,7 +275,7 @@ rdma:
 		nsg = dma_map_sg(iue->target->dev, sg, scsi_sg_count(sc),
 				 DMA_BIDIRECTIONAL);
 		if (!nsg) {
-			eprintk("fail to map %p %d\n", iue, scsi_sg_count(sc));
+			eprintk("fail to map %pK %d\n", iue, scsi_sg_count(sc));
 			err = -EIO;
 			goto free_mem;
 		}
@@ -421,7 +421,7 @@ int srp_cmd_queue(struct Scsi_Host *shost, struct srp_cmd *cmd, void *info,
 	dir = srp_cmd_direction(cmd);
 	len = vscsis_data_length(cmd, dir);
 
-	dprintk("%p %x %lx %d %d %d %llx\n", info, cmd->cdb[0],
+	dprintk("%pK %x %lx %d %d %d %llx\n", info, cmd->cdb[0],
 		cmd->lun, dir, len, tag, (unsigned long long) cmd->tag);
 
 	sc = scsi_host_get_command(shost, dir, GFP_KERNEL);

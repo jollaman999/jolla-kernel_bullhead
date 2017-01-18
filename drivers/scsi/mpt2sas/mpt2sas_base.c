@@ -540,7 +540,7 @@ _base_sas_ioc_info(struct MPT2SAS_ADAPTER *ioc, MPI2DefaultReply_t *mpi_reply,
 		break;
 	}
 
-	printk(MPT2SAS_WARN_FMT "ioc_status: %s(0x%04x), request(0x%p),"
+	printk(MPT2SAS_WARN_FMT "ioc_status: %s(0x%04x), request(0x%pK),"
 	    " (%s)\n", ioc->name, desc, ioc_status, request_hdr, func_str);
 
 	_debug_dump_mf(request_hdr, frame_sz/4);
@@ -1548,7 +1548,7 @@ mpt2sas_base_map_resources(struct MPT2SAS_ADAPTER *ioc)
 		    reply_q->name,  ((ioc->msix_enable) ? "PCI-MSI-X enabled" :
 		    "IO-APIC enabled"), reply_q->vector);
 
-	printk(MPT2SAS_INFO_FMT "iomem(0x%016llx), mapped(0x%p), size(%d)\n",
+	printk(MPT2SAS_INFO_FMT "iomem(0x%016llx), mapped(0x%pK), size(%d)\n",
 	    ioc->name, (unsigned long long)chip_phys, ioc->chip, memap_sz);
 	printk(MPT2SAS_INFO_FMT "ioport(0x%016llx), size(%d)\n",
 	    ioc->name, (unsigned long long)pio_chip, pio_sz);
@@ -2344,7 +2344,7 @@ _base_release_memory_pools(struct MPT2SAS_ADAPTER *ioc)
 	if (ioc->request) {
 		pci_free_consistent(ioc->pdev, ioc->request_dma_sz,
 		    ioc->request,  ioc->request_dma);
-		dexitprintk(ioc, printk(MPT2SAS_INFO_FMT "request_pool(0x%p)"
+		dexitprintk(ioc, printk(MPT2SAS_INFO_FMT "request_pool(0x%pK)"
 		    ": free\n", ioc->name, ioc->request));
 		ioc->request = NULL;
 	}
@@ -2353,7 +2353,7 @@ _base_release_memory_pools(struct MPT2SAS_ADAPTER *ioc)
 		pci_pool_free(ioc->sense_dma_pool, ioc->sense, ioc->sense_dma);
 		if (ioc->sense_dma_pool)
 			pci_pool_destroy(ioc->sense_dma_pool);
-		dexitprintk(ioc, printk(MPT2SAS_INFO_FMT "sense_pool(0x%p)"
+		dexitprintk(ioc, printk(MPT2SAS_INFO_FMT "sense_pool(0x%pK)"
 		    ": free\n", ioc->name, ioc->sense));
 		ioc->sense = NULL;
 	}
@@ -2362,7 +2362,7 @@ _base_release_memory_pools(struct MPT2SAS_ADAPTER *ioc)
 		pci_pool_free(ioc->reply_dma_pool, ioc->reply, ioc->reply_dma);
 		if (ioc->reply_dma_pool)
 			pci_pool_destroy(ioc->reply_dma_pool);
-		dexitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply_pool(0x%p)"
+		dexitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply_pool(0x%pK)"
 		     ": free\n", ioc->name, ioc->reply));
 		ioc->reply = NULL;
 	}
@@ -2373,7 +2373,7 @@ _base_release_memory_pools(struct MPT2SAS_ADAPTER *ioc)
 		if (ioc->reply_free_dma_pool)
 			pci_pool_destroy(ioc->reply_free_dma_pool);
 		dexitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply_free_pool"
-		    "(0x%p): free\n", ioc->name, ioc->reply_free));
+		    "(0x%pK): free\n", ioc->name, ioc->reply_free));
 		ioc->reply_free = NULL;
 	}
 
@@ -2383,14 +2383,14 @@ _base_release_memory_pools(struct MPT2SAS_ADAPTER *ioc)
 		if (ioc->reply_post_free_dma_pool)
 			pci_pool_destroy(ioc->reply_post_free_dma_pool);
 		dexitprintk(ioc, printk(MPT2SAS_INFO_FMT
-		    "reply_post_free_pool(0x%p): free\n", ioc->name,
+		    "reply_post_free_pool(0x%pK): free\n", ioc->name,
 		    ioc->reply_post_free));
 		ioc->reply_post_free = NULL;
 	}
 
 	if (ioc->config_page) {
 		dexitprintk(ioc, printk(MPT2SAS_INFO_FMT
-		    "config_page(0x%p): free\n", ioc->name,
+		    "config_page(0x%pK): free\n", ioc->name,
 		    ioc->config_page));
 		pci_free_consistent(ioc->pdev, ioc->config_page_sz,
 		    ioc->config_page, ioc->config_page_dma);
@@ -2582,7 +2582,7 @@ _base_allocate_memory_pools(struct MPT2SAS_ADAPTER *ioc,  int sleep_flag)
 	    ioc->request_sz);
 
 
-	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "request pool(0x%p): "
+	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "request pool(0x%pK): "
 	    "depth(%d), frame_size(%d), pool_size(%d kB)\n", ioc->name,
 	    ioc->request, ioc->hba_queue_depth, ioc->request_sz,
 	    (ioc->hba_queue_depth * ioc->request_sz)/1024));
@@ -2600,7 +2600,7 @@ _base_allocate_memory_pools(struct MPT2SAS_ADAPTER *ioc,  int sleep_flag)
 		goto out;
 	}
 
-	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "scsiio(0x%p): "
+	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "scsiio(0x%pK): "
 	    "depth(%d)\n", ioc->name, ioc->request,
 	    ioc->scsiio_depth));
 
@@ -2647,7 +2647,7 @@ chain_done:
 		goto out;
 	}
 	ioc->hi_priority_smid = ioc->scsiio_depth + 1;
-	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "hi_priority(0x%p): "
+	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "hi_priority(0x%pK): "
 	    "depth(%d), start smid(%d)\n", ioc->name, ioc->hi_priority,
 	    ioc->hi_priority_depth, ioc->hi_priority_smid));
 
@@ -2660,7 +2660,7 @@ chain_done:
 		goto out;
 	}
 	ioc->internal_smid = ioc->hi_priority_smid + ioc->hi_priority_depth;
-	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "internal(0x%p): "
+	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "internal(0x%pK): "
 	    "depth(%d), start smid(%d)\n", ioc->name, ioc->internal,
 	     ioc->internal_depth, ioc->internal_smid));
 
@@ -2681,7 +2681,7 @@ chain_done:
 		goto out;
 	}
 	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT
-	    "sense pool(0x%p): depth(%d), element_size(%d), pool_size"
+	    "sense pool(0x%pK): depth(%d), element_size(%d), pool_size"
 	    "(%d kB)\n", ioc->name, ioc->sense, ioc->scsiio_depth,
 	    SCSI_SENSE_BUFFERSIZE, sz/1024));
 	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "sense_dma(0x%llx)\n",
@@ -2706,7 +2706,7 @@ chain_done:
 	}
 	ioc->reply_dma_min_address = (u32)(ioc->reply_dma);
 	ioc->reply_dma_max_address = (u32)(ioc->reply_dma) + sz;
-	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply pool(0x%p): depth"
+	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply pool(0x%pK): depth"
 	    "(%d), frame_size(%d), pool_size(%d kB)\n", ioc->name, ioc->reply,
 	    ioc->reply_free_queue_depth, ioc->reply_sz, sz/1024));
 	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply_dma(0x%llx)\n",
@@ -2730,7 +2730,7 @@ chain_done:
 		goto out;
 	}
 	memset(ioc->reply_free, 0, sz);
-	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply_free pool(0x%p): "
+	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply_free pool(0x%pK): "
 	    "depth(%d), element_size(%d), pool_size(%d kB)\n", ioc->name,
 	    ioc->reply_free, ioc->reply_free_queue_depth, 4, sz/1024));
 	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply_free_dma"
@@ -2760,7 +2760,7 @@ chain_done:
 	}
 	memset(ioc->reply_post_free, 0, sz);
 	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply post free pool"
-	    "(0x%p): depth(%d), element_size(%d), pool_size(%d kB)\n",
+	    "(0x%pK): depth(%d), element_size(%d), pool_size(%d kB)\n",
 	    ioc->name, ioc->reply_post_free, ioc->reply_post_queue_depth, 8,
 	    sz/1024));
 	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "reply_post_free_dma = "
@@ -2776,7 +2776,7 @@ chain_done:
 		    "failed\n", ioc->name);
 		goto out;
 	}
-	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "config page(0x%p): size"
+	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "config page(0x%pK): size"
 	    "(%d)\n", ioc->name, ioc->config_page, ioc->config_page_sz));
 	dinitprintk(ioc, printk(MPT2SAS_INFO_FMT "config_page_dma"
 	    "(0x%llx)\n", ioc->name, (unsigned long long)ioc->config_page_dma));

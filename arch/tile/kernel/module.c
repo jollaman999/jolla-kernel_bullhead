@@ -211,7 +211,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs,
 			value = (long) value >> 3;     /* count by instrs */
 			if (!validate_jumpoff(value)) {
 				pr_warning("module %s: Out of range jump to"
-					   " %#llx at %#llx (%p)\n", me->name,
+					   " %#llx at %#llx (%pK)\n", me->name,
 					   sym->st_value + rel[i].r_addend,
 					   rel[i].r_offset, location);
 				return -ENOEXEC;

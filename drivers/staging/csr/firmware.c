@@ -104,7 +104,7 @@ unifi_fw_read_stop(void *ospriv, void *dlpriv)
 
     if (dl_struct != NULL) {
         if (dl_struct->dl_data != NULL) {
-            unifi_trace(priv, UDBG2, "Release f/w buffer %p, %d bytes\n",
+            unifi_trace(priv, UDBG2, "Release f/w buffer %pK, %d bytes\n",
                         dl_struct->dl_data, dl_struct->dl_len);
         }
         uf_release_firmware(priv, dl_struct);

@@ -197,7 +197,7 @@ static int hw_device_init(struct ci13xxx *ci, void __iomem *base)
 	if (ci->hw_ep_max > ENDPT_MAX)
 		return -ENODEV;
 
-	dev_dbg(ci->dev, "ChipIdea HDRC found, lpm: %d; cap: %p op: %p\n",
+	dev_dbg(ci->dev, "ChipIdea HDRC found, lpm: %d; cap: %pK op: %pK\n",
 		ci->hw_bank.lpm, ci->hw_bank.cap, ci->hw_bank.op);
 
 	/* setup lock mode ? */

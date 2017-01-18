@@ -470,7 +470,7 @@ static void bf5xx_nand_dma_rw(struct mtd_info *mtd,
 	struct nand_chip *chip = mtd->priv;
 	unsigned short val;
 
-	dev_dbg(info->device, " mtd->%p, buf->%p, is_read %d\n",
+	dev_dbg(info->device, " mtd->%pK, buf->%pK, is_read %d\n",
 			mtd, buf, is_read);
 
 	/*
@@ -535,7 +535,7 @@ static void bf5xx_nand_dma_read_buf(struct mtd_info *mtd,
 	struct bf5xx_nand_info *info = mtd_to_nand_info(mtd);
 	struct nand_chip *chip = mtd->priv;
 
-	dev_dbg(info->device, "mtd->%p, buf->%p, int %d\n", mtd, buf, len);
+	dev_dbg(info->device, "mtd->%pK, buf->%pK, int %d\n", mtd, buf, len);
 
 	if (len == chip->ecc.size)
 		bf5xx_nand_dma_rw(mtd, buf, 1);
@@ -549,7 +549,7 @@ static void bf5xx_nand_dma_write_buf(struct mtd_info *mtd,
 	struct bf5xx_nand_info *info = mtd_to_nand_info(mtd);
 	struct nand_chip *chip = mtd->priv;
 
-	dev_dbg(info->device, "mtd->%p, buf->%p, len %d\n", mtd, buf, len);
+	dev_dbg(info->device, "mtd->%pK, buf->%pK, len %d\n", mtd, buf, len);
 
 	if (len == chip->ecc.size)
 		bf5xx_nand_dma_rw(mtd, (uint8_t *)buf, 0);
@@ -733,7 +733,7 @@ static int bf5xx_nand_probe(struct platform_device *pdev)
 	struct mtd_info *mtd = NULL;
 	int err = 0;
 
-	dev_dbg(&pdev->dev, "(%p)\n", pdev);
+	dev_dbg(&pdev->dev, "(%pK)\n", pdev);
 
 	if (!plat) {
 		dev_err(&pdev->dev, "no platform specific information\n");

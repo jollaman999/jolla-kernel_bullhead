@@ -588,7 +588,7 @@ static int pcan_add_channels(struct pcan_pccard *card)
 		ccr &= ~PCC_CCR_LED_OFF_CHAN(i);
 
 		dev_info(&pdev->dev,
-			"%s on channel %d at 0x%p irq %d\n",
+			"%s on channel %d at 0x%pK irq %d\n",
 			netdev->name, i, priv->reg_base, pdev->irq);
 	}
 

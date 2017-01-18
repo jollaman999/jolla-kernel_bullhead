@@ -85,7 +85,7 @@ struct parport_gsc_private {
 static inline void parport_gsc_write_data(struct parport *p, unsigned char d)
 {
 #ifdef DEBUG_PARPORT
-	printk (KERN_DEBUG "parport_gsc_write_data(%p,0x%02x)\n", p, d);
+	printk (KERN_DEBUG "parport_gsc_write_data(%pK,0x%02x)\n", p, d);
 #endif
 	parport_writeb(d, DATA(p));
 }
@@ -94,7 +94,7 @@ static inline unsigned char parport_gsc_read_data(struct parport *p)
 {
 	unsigned char val = parport_readb (DATA (p));
 #ifdef DEBUG_PARPORT
-	printk (KERN_DEBUG "parport_gsc_read_data(%p) = 0x%02x\n",
+	printk (KERN_DEBUG "parport_gsc_read_data(%pK) = 0x%02x\n",
 		p, val);
 #endif
 	return val;

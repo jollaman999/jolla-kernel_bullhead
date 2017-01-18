@@ -1094,7 +1094,7 @@ static bool s_bHandleRxEncryption(
 				else if (pDevice->pMgmt->byCSSPK == KEY_CTL_CCMP)
 					byDecMode = KEY_CTL_CCMP;
 			}
-			DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "unicast pkt: %d, %p\n", byDecMode, pKey);
+			DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "unicast pkt: %d, %pK\n", byDecMode, pKey);
 		} else {
 			// use group key
 			KeybGetKey(&(pDevice->sKey), pDevice->abyBSSID, byKeyIdx, &pKey);
@@ -1102,7 +1102,7 @@ static bool s_bHandleRxEncryption(
 				byDecMode = KEY_CTL_TKIP;
 			else if (pDevice->pMgmt->byCSSGK == KEY_CTL_CCMP)
 				byDecMode = KEY_CTL_CCMP;
-			DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "group pkt: %d, %d, %p\n", byKeyIdx, byDecMode, pKey);
+			DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "group pkt: %d, %d, %pK\n", byKeyIdx, byDecMode, pKey);
 		}
 	}
 	// our WEP only support Default Key

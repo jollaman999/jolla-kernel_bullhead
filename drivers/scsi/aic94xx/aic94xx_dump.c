@@ -930,7 +930,7 @@ void asd_dump_frame_rcvd(struct asd_phy *phy,
 
 static void asd_dump_scb(struct asd_ascb *ascb, int ind)
 {
-	asd_printk("scb%d: vaddr: 0x%p, dma_handle: 0x%llx, next: 0x%llx, "
+	asd_printk("scb%d: vaddr: 0x%pK, dma_handle: 0x%llx, next: 0x%llx, "
 		   "index:%d, opcode:0x%02x\n",
 		   ind, ascb->dma_scb.vaddr,
 		   (unsigned long long)ascb->dma_scb.dma_handle,

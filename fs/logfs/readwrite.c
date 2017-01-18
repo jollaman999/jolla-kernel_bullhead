@@ -291,7 +291,7 @@ static void logfs_lock_write_page(struct page *page)
 	while (unlikely(!trylock_page(page))) {
 		if (loop++ > 0x1000) {
 			/* Has been observed once so far... */
-			printk(KERN_ERR "stack at %p\n", &loop);
+			printk(KERN_ERR "stack at %pK\n", &loop);
 			BUG();
 		}
 		if (PagePreLocked(page)) {

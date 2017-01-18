@@ -796,7 +796,7 @@ register_lock_class(struct lockdep_map *lock, unsigned int subclass, int force)
 		graph_unlock();
 		raw_local_irq_restore(flags);
 
-		printk("\nnew class %p: %s", class->key, class->name);
+		printk("\nnew class %pK: %s", class->key, class->name);
 		if (class->name_version > 1)
 			printk("#%d", class->name_version);
 		printk("\n");
@@ -2024,14 +2024,14 @@ cache_hit:
 			debug_atomic_inc(chain_lookup_hits);
 			if (very_verbose(class))
 				printk("\nhash chain already cached, key: "
-					"%016Lx tail class: [%p] %s\n",
+					"%016Lx tail class: [%pK] %s\n",
 					(unsigned long long)chain_key,
 					class->key, class->name);
 			return 0;
 		}
 	}
 	if (very_verbose(class))
-		printk("\nnew hash chain, key: %016Lx tail class: [%p] %s\n",
+		printk("\nnew hash chain, key: %016Lx tail class: [%pK] %s\n",
 			(unsigned long long)chain_key, class->key, class->name);
 	/*
 	 * Allocate a new chain entry from the static array, and add
@@ -2980,7 +2980,7 @@ void lockdep_init_map(struct lockdep_map *lock, const char *name,
 	 * Sanity check, the lock-class key must be persistent:
 	 */
 	if (!static_obj(key)) {
-		printk("BUG: key %p not in .data!\n", key);
+		printk("BUG: key %pK not in .data!\n", key);
 		/*
 		 * What it says above ^^^^^, I suggest you read it.
 		 */
@@ -3082,7 +3082,7 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
 	}
 	atomic_inc((atomic_t *)&class->ops);
 	if (very_verbose(class)) {
-		printk("\nacquire class [%p] %s", class->key, class->name);
+		printk("\nacquire class [%pK] %s", class->key, class->name);
 		if (class->name_version > 1)
 			printk("#%d", class->name_version);
 		printk("\n");
@@ -4044,7 +4044,7 @@ print_freed_lock_bug(struct task_struct *curr, const void *mem_from,
 	printk("[ BUG: held lock freed! ]\n");
 	print_kernel_ident();
 	printk("-------------------------\n");
-	printk("%s/%d is freeing memory %p-%p, with a lock still held there!\n",
+	printk("%s/%d is freeing memory %pK-%pK, with a lock still held there!\n",
 		curr->comm, task_pid_nr(curr), mem_from, mem_to-1);
 	print_lock(hlock);
 	lockdep_print_held_locks(curr);

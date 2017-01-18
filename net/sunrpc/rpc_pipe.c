@@ -1124,7 +1124,7 @@ rpc_fill_super(struct super_block *sb, void *data, int silent)
 		return -ENOMEM;
 	if (rpc_populate(root, files, RPCAUTH_lockd, RPCAUTH_RootEOF, NULL))
 		return -ENOMEM;
-	dprintk("RPC:       sending pipefs MOUNT notification for net %p%s\n",
+	dprintk("RPC:       sending pipefs MOUNT notification for net %pK%s\n",
 		net, NET_NAME(net));
 	sn->pipefs_sb = sb;
 	err = blocking_notifier_call_chain(&rpc_pipefs_notifier_list,
@@ -1163,7 +1163,7 @@ static void rpc_kill_sb(struct super_block *sb)
 	}
 	sn->pipefs_sb = NULL;
 	mutex_unlock(&sn->pipefs_sb_lock);
-	dprintk("RPC:       sending pipefs UMOUNT notification for net %p%s\n",
+	dprintk("RPC:       sending pipefs UMOUNT notification for net %pK%s\n",
 		net, NET_NAME(net));
 	blocking_notifier_call_chain(&rpc_pipefs_notifier_list,
 					   RPC_PIPEFS_UMOUNT,

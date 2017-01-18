@@ -93,7 +93,7 @@ static void store_io_and_region_in_bio(struct bio *bio, struct io *io,
 				       unsigned region)
 {
 	if (unlikely(!IS_ALIGNED((unsigned long)io, DM_IO_MAX_REGIONS))) {
-		DMCRIT("Unaligned struct io pointer %p", io);
+		DMCRIT("Unaligned struct io pointer %pK", io);
 		BUG();
 	}
 

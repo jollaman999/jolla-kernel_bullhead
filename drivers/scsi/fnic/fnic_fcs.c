@@ -695,7 +695,7 @@ void fnic_set_port_id(struct fc_lport *lport, u32 port_id, struct fc_frame *fp)
 	u8 *mac;
 	int ret;
 
-	FNIC_FCS_DBG(KERN_DEBUG, lport->host, "set port_id %x fp %p\n",
+	FNIC_FCS_DBG(KERN_DEBUG, lport->host, "set port_id %x fp %pK\n",
 		     port_id, fp);
 
 	/*

@@ -1145,7 +1145,7 @@ void cris_io_interface_delete_watcher(void (*notify)(const unsigned int gpio_in_
 		kfree(w);
 		return;
 	}
-	printk(KERN_WARNING "cris_io_interface_delete_watcher: Deleting unknown watcher 0x%p\n", notify);
+	printk(KERN_WARNING "cris_io_interface_delete_watcher: Deleting unknown watcher 0x%pK\n", notify);
 }
 
 

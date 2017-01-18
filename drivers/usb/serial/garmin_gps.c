@@ -415,7 +415,7 @@ static int gsp_rec_packet(struct garmin_data *garmin_data_p, int count)
 
 	/* sanity check, remove after test ... */
 	if ((__u8 *)&(usbdata[3]) != recpkt) {
-		dev_dbg(dev, "%s - ptr mismatch %p - %p\n", __func__,
+		dev_dbg(dev, "%s - ptr mismatch %pK - %pK\n", __func__,
 			&(usbdata[4]), recpkt);
 		return -EINVPKT;
 	}

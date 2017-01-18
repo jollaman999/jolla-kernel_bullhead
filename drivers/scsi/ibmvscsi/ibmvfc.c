@@ -1389,7 +1389,7 @@ static int ibmvfc_map_sg_data(struct scsi_cmnd *scmd,
 static void ibmvfc_timeout(struct ibmvfc_event *evt)
 {
 	struct ibmvfc_host *vhost = evt->vhost;
-	dev_err(vhost->dev, "Command timed out (%p). Resetting connection\n", evt);
+	dev_err(vhost->dev, "Command timed out (%pK). Resetting connection\n", evt);
 	ibmvfc_reset_host(vhost);
 }
 

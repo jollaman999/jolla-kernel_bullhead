@@ -1293,7 +1293,7 @@ static int i5400_probe1(struct pci_dev *pdev, int dev_idx)
 	if (mci == NULL)
 		return -ENOMEM;
 
-	edac_dbg(0, "MC: mci = %p\n", mci);
+	edac_dbg(0, "MC: mci = %pK\n", mci);
 
 	mci->pdev = &pdev->dev;	/* record ptr  to the generic device */
 

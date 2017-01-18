@@ -276,7 +276,7 @@ int FsTruncateFile(struct inode *inode, u64 old_size, u64 new_size)
 	/* acquire the lock for file system critical section */
 	sm_P(&p_fs->v_sem);
 
-	DPRINTK("FsTruncateFile entered (inode %p size %llu)\n", inode, new_size);
+	DPRINTK("FsTruncateFile entered (inode %pK size %llu)\n", inode, new_size);
 
 	err = ffsTruncateFile(inode, old_size, new_size);
 
@@ -378,7 +378,7 @@ int FsWriteStat(struct inode *inode, DIR_ENTRY_T *info)
 	/* acquire the lock for file system critical section */
 	sm_P(&p_fs->v_sem);
 
-	DPRINTK("FsWriteStat entered (inode %p info %p\n", inode, info);
+	DPRINTK("FsWriteStat entered (inode %pK info %pK\n", inode, info);
 
 	err = ffsSetStat(inode, info);
 

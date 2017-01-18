@@ -83,7 +83,7 @@ static void btrfs_kobject_uevent(struct block_device *bdev,
 
 	ret = kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, action);
 	if (ret)
-		pr_warn("Sending event '%d' to kobject: '%s' (%p): failed\n",
+		pr_warn("Sending event '%d' to kobject: '%s' (%pK): failed\n",
 			action,
 			kobject_name(&disk_to_dev(bdev->bd_disk)->kobj),
 			&disk_to_dev(bdev->bd_disk)->kobj);

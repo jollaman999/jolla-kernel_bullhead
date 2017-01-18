@@ -87,7 +87,7 @@ static int ptrace_read_user(struct task_struct *tsk, unsigned long offset,
 	if (offset < sizeof(struct pt_regs))
 		value = regs[offset / sizeof(regs[0])];
 
-	pr_debug("ptrace_read_user(%s[%u], %#lx, %p) -> %#lx\n",
+	pr_debug("ptrace_read_user(%s[%u], %#lx, %pK) -> %#lx\n",
 		 tsk->comm, tsk->pid, offset, data, value);
 
 	return put_user(value, data);

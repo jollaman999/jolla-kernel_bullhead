@@ -804,7 +804,7 @@ static ssize_t mhi_uci_client_read(struct file *file, char __user *buf,
 	}
 	/* We finished with this buffer, map it back */
 	if (*bytes_pending == 0) {
-		uci_log(UCI_DBG_VERBOSE, "Pkt loc %p ,chan %d\n",
+		uci_log(UCI_DBG_VERBOSE, "Pkt loc %pK ,chan %d\n",
 					uci_handle->pkt_loc, chan);
 		memset(uci_handle->pkt_loc, 0, buf_size);
 		phy_buf = dma_map_single(NULL, uci_handle->pkt_loc,

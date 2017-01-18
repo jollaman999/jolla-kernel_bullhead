@@ -523,7 +523,7 @@ void txEnd(tid_t tid)
 	 * routine.
 	 */
 	if (tblk->flag & tblkGC_LAZY) {
-		jfs_info("txEnd called w/lazy tid: %d, tblk = 0x%p", tid, tblk);
+		jfs_info("txEnd called w/lazy tid: %d, tblk = 0x%pK", tid, tblk);
 		TXN_UNLOCK();
 
 		spin_lock_irq(&log->gclock);	// LOGGC_LOCK
@@ -532,7 +532,7 @@ void txEnd(tid_t tid)
 		return;
 	}
 
-	jfs_info("txEnd: tid: %d, tblk = 0x%p", tid, tblk);
+	jfs_info("txEnd: tid: %d, tblk = 0x%pK", tid, tblk);
 
 	assert(tblk->next == 0);
 
@@ -618,7 +618,7 @@ struct tlock *txLock(tid_t tid, struct inode *ip, struct metapage * mp,
 	if (lid == 0)
 		goto allocateLock;
 
-	jfs_info("txLock: tid:%d ip:0x%p mp:0x%p lid:%d", tid, ip, mp, lid);
+	jfs_info("txLock: tid:%d ip:0x%pK mp:0x%pK lid:%d", tid, ip, mp, lid);
 
 	/* is page locked by the requester transaction ? */
 	tlck = lid_to_tlock(lid);
@@ -710,7 +710,7 @@ struct tlock *txLock(tid_t tid, struct inode *ip, struct metapage * mp,
 		/* mark the page dirty and nohomeok */
 		metapage_nohomeok(mp);
 
-		jfs_info("locking mp = 0x%p, nohomeok = %d tid = %d tlck = 0x%p",
+		jfs_info("locking mp = 0x%pK, nohomeok = %d tid = %d tlck = 0x%pK",
 			 mp, mp->nohomeok, tid, tlck);
 
 		/* if anonymous transaction, and buffer is on the group
@@ -812,7 +812,7 @@ struct tlock *txLock(tid_t tid, struct inode *ip, struct metapage * mp,
 		break;
 
 	default:
-		jfs_err("UFO tlock:0x%p", tlck);
+		jfs_err("UFO tlock:0x%pK", tlck);
 	}
 
 	/*
@@ -916,7 +916,7 @@ static void txUnlock(struct tblock * tblk)
 	int difft, diffp;
 	unsigned long flags;
 
-	jfs_info("txUnlock: tblk = 0x%p", tblk);
+	jfs_info("txUnlock: tblk = 0x%pK", tblk);
 	log = JFS_SBI(tblk->sb)->log;
 
 	/*
@@ -926,7 +926,7 @@ static void txUnlock(struct tblock * tblk)
 		tlck = lid_to_tlock(lid);
 		next = tlck->next;
 
-		jfs_info("unlocking lid = %d, tlck = 0x%p", lid, tlck);
+		jfs_info("unlocking lid = %d, tlck = 0x%pK", lid, tlck);
 
 		/* unbind page from tlock */
 		if ((mp = tlck->mp) != NULL &&
@@ -1424,7 +1424,7 @@ static int txLog(struct jfs_log * log, struct tblock * tblk, struct commit * cd)
 			break;
 
 		default:
-			jfs_err("UFO tlock:0x%p", tlck);
+			jfs_err("UFO tlock:0x%pK", tlck);
 		}
 	}
 
@@ -1506,7 +1506,7 @@ static int diLog(struct jfs_log * log, struct tblock * tblk, struct lrd * lrd,
 		/* mark page as homeward bound */
 		tlck->flag |= tlckWRITEPAGE;
 	} else
-		jfs_err("diLog: UFO type tlck:0x%p", tlck);
+		jfs_err("diLog: UFO type tlck:0x%pK", tlck);
 #ifdef  _JFS_WIP
 	/*
 	 *	alloc/free external EA extent
@@ -1799,7 +1799,7 @@ static void xtLog(struct jfs_log * log, struct tblock * tblk, struct lrd * lrd,
 			xadlock->xdlist = &p->xad[lwm];
 			tblk->xflag &= ~COMMIT_LAZY;
 		}
-		jfs_info("xtLog: alloc ip:0x%p mp:0x%p tlck:0x%p lwm:%d "
+		jfs_info("xtLog: alloc ip:0x%pK mp:0x%pK tlck:0x%pK lwm:%d "
 			 "count:%d", tlck->ip, mp, tlck, lwm, xadlock->count);
 
 		maplock->index = 1;
@@ -1902,7 +1902,7 @@ static void xtLog(struct jfs_log * log, struct tblock * tblk, struct lrd * lrd,
 			xadlock->xdlist = &p->xad[XTENTRYSTART];
 			tblk->xflag &= ~COMMIT_LAZY;
 		}
-		jfs_info("xtLog: free ip:0x%p mp:0x%p count:%d lwm:2",
+		jfs_info("xtLog: free ip:0x%pK mp:0x%pK count:%d lwm:2",
 			 tlck->ip, mp, xadlock->count);
 
 		maplock->index = 1;
@@ -2026,7 +2026,7 @@ static void xtLog(struct jfs_log * log, struct tblock * tblk, struct lrd * lrd,
 			xadlock->count = next - lwm;
 			xadlock->xdlist = &p->xad[lwm];
 
-			jfs_info("xtLog: alloc ip:0x%p mp:0x%p count:%d "
+			jfs_info("xtLog: alloc ip:0x%pK mp:0x%pK count:%d "
 				 "lwm:%d next:%d",
 				 tlck->ip, mp, xadlock->count, lwm, next);
 			maplock->index++;
@@ -2048,7 +2048,7 @@ static void xtLog(struct jfs_log * log, struct tblock * tblk, struct lrd * lrd,
 			pxdlock->count = 1;
 			pxdlock->pxd = pxd;
 
-			jfs_info("xtLog: truncate ip:0x%p mp:0x%p count:%d "
+			jfs_info("xtLog: truncate ip:0x%pK mp:0x%pK count:%d "
 				 "hwm:%d", ip, mp, pxdlock->count, hwm);
 			maplock->index++;
 			xadlock++;
@@ -2067,7 +2067,7 @@ static void xtLog(struct jfs_log * log, struct tblock * tblk, struct lrd * lrd,
 			xadlock->count = hwm - next + 1;
 			xadlock->xdlist = &p->xad[next];
 
-			jfs_info("xtLog: free ip:0x%p mp:0x%p count:%d "
+			jfs_info("xtLog: free ip:0x%pK mp:0x%pK count:%d "
 				 "next:%d hwm:%d",
 				 tlck->ip, mp, xadlock->count, next, hwm);
 			maplock->index++;
@@ -2508,7 +2508,7 @@ void txFreeMap(struct inode *ip,
 	pxd_t *pxd;
 	int n;
 
-	jfs_info("txFreeMap: tblk:0x%p maplock:0x%p maptype:0x%x",
+	jfs_info("txFreeMap: tblk:0x%pK maplock:0x%pK maptype:0x%x",
 		 tblk, maplock, maptype);
 
 	/*
@@ -2705,11 +2705,11 @@ static void txLazyCommit(struct tblock * tblk)
 	       ((tblk->flag & tblkGC_UNLOCKED) == 0)) {
 		/* We must have gotten ahead of the user thread
 		 */
-		jfs_info("jfs_lazycommit: tblk 0x%p not unlocked", tblk);
+		jfs_info("jfs_lazycommit: tblk 0x%pK not unlocked", tblk);
 		yield();
 	}
 
-	jfs_info("txLazyCommit: processing tblk 0x%p", tblk);
+	jfs_info("txLazyCommit: processing tblk 0x%pK", tblk);
 
 	txUpdateMap(tblk);
 
@@ -2735,7 +2735,7 @@ static void txLazyCommit(struct tblock * tblk)
 	} else
 		spin_unlock_irq(&log->gclock);	// LOGGC_UNLOCK
 
-	jfs_info("txLazyCommit: done: tblk = 0x%p", tblk);
+	jfs_info("txLazyCommit: done: tblk = 0x%pK", tblk);
 }
 
 /*

@@ -179,7 +179,7 @@ int ps3stor_setup(struct ps3_storage_device *dev, irq_handler_t handler)
 			__ffs((unsigned long)dev->bounce_buf));
 	if (alignment < 12) {
 		dev_err(&dev->sbd.core,
-			"%s:%u: bounce buffer not aligned (%lx at 0x%p)\n",
+			"%s:%u: bounce buffer not aligned (%lx at 0x%pK)\n",
 			__func__, __LINE__, dev->bounce_size, dev->bounce_buf);
 		error = -EINVAL;
 		goto fail_free_irq;

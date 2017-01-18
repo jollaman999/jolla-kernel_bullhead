@@ -2415,7 +2415,7 @@ static int  device_xmit(struct sk_buff *skb, struct net_device *dev) {
 	}
 
 	MACvTransmitAC0(pDevice->PortOffset);
-//    DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "acdma0:pDevice->apCurrTD= %p\n", pHeadTD);
+//    DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "acdma0:pDevice->apCurrTD= %pK\n", pHeadTD);
 
 	dev->trans_start = jiffies;
 

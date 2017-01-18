@@ -71,7 +71,7 @@ static void report_instruction_timeout(void *h)
 	else if (TYPE_IS(TFH, goff))
 		id = "TFH";
 
-	panic(KERN_ALERT "GRU %p (%s) is malfunctioning\n", h, id);
+	panic(KERN_ALERT "GRU %pK (%s) is malfunctioning\n", h, id);
 }
 
 static int wait_instruction_complete(void *h, enum mcs_op opc)

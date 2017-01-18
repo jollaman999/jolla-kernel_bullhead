@@ -2018,7 +2018,7 @@ static int mpq_dmx_init_out_pipe(struct mpq_demux *mpq_demux,
 		goto unmap_mem;
 	}
 	MPQ_DVB_DBG_PRINT(
-		"%s: tspp2_pipe_open(): handle=0x%x, iova=0x%0x, mem=%p\n",
+		"%s: tspp2_pipe_open(): handle=0x%x, iova=0x%0x, mem=%pK\n",
 		__func__, pipe_info->handle, pipe_info->buffer.iova,
 		pipe_info->buffer.mem);
 
@@ -7009,7 +7009,7 @@ static int mpq_dmx_tspp2_pipes_print(struct seq_file *s, void *p)
 				pipe_info->hw_missed_notif);
 			seq_printf(s, "handler count  : %d\n",
 				pipe_info->handler_count);
-			seq_printf(s, "buffer address : 0x%p(0x%p)\n",
+			seq_printf(s, "buffer address : 0x%pK(0x%pK)\n",
 				pipe_info->buffer.mem,
 				(void *)pipe_info->buffer.iova);
 			seq_printf(s, "buffer size    : %d\n",

@@ -245,7 +245,7 @@ CsrResult unifi_coredump_capture(card_t *card, struct unifi_coredump_req *req)
         }
 
         unifi_trace(card->ospriv, UDBG3,
-                    "Coredump (%p), SeqNo=%d, cur_read=%p, next_write=%p\n",
+                    "Coredump (%pK), SeqNo=%d, cur_read=%pK, next_write=%pK\n",
                     req,
                     card->dump_cur_read->count,
                     card->dump_cur_read, card->dump_next_write);
@@ -389,7 +389,7 @@ CsrResult unifi_coredump_get_value(card_t *card, struct unifi_coredump_req *req)
                 /* Walk the list for the index'th entry, but
                  * stop when about to wrap. */
                 unifi_trace(card->ospriv, UDBG6,
-                            "%d: %d, @%p, p=%p, n=%p, cr=%p, h=%p\n",
+                            "%d: %d, @%pK, p=%pK, n=%pK, cr=%pK, h=%pK\n",
                             i, find_dump->count, find_dump, find_dump->prev,
                             find_dump->next, card->dump_cur_read, card->dump_buf);
                 if (find_dump->prev == card->dump_cur_read)

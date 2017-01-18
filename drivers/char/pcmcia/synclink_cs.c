@@ -579,7 +579,7 @@ static int mgslpc_config(struct pcmcia_device *link)
 	int ret;
 
 	if (debug_level >= DEBUG_LEVEL_INFO)
-		printk("mgslpc_config(0x%p)\n", link);
+		printk("mgslpc_config(0x%pK)\n", link);
 
 	link->config_flags |= CONF_ENABLE_IRQ | CONF_AUTO_SET_IO;
 
@@ -615,7 +615,7 @@ static void mgslpc_release(u_long arg)
 	struct pcmcia_device *link = (struct pcmcia_device *)arg;
 
 	if (debug_level >= DEBUG_LEVEL_INFO)
-		printk("mgslpc_release(0x%p)\n", link);
+		printk("mgslpc_release(0x%pK)\n", link);
 
 	pcmcia_disable_device(link);
 }
@@ -623,7 +623,7 @@ static void mgslpc_release(u_long arg)
 static void mgslpc_detach(struct pcmcia_device *link)
 {
 	if (debug_level >= DEBUG_LEVEL_INFO)
-		printk("mgslpc_detach(0x%p)\n", link);
+		printk("mgslpc_detach(0x%pK)\n", link);
 
 	((MGSLPC_INFO *)link->priv)->stop = 1;
 	mgslpc_release((u_long)link);

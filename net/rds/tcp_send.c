@@ -97,7 +97,7 @@ int rds_tcp_xmit(struct rds_connection *conn, struct rds_message *rm,
 		set_bit(RDS_MSG_HAS_ACK_SEQ, &rm->m_flags);
 		tc->t_last_expected_una = rm->m_ack_seq + 1;
 
-		rdsdebug("rm %p tcp nxt %u ack_seq %llu\n",
+		rdsdebug("rm %pK tcp nxt %u ack_seq %llu\n",
 			 rm, rds_tcp_snd_nxt(tc),
 			 (unsigned long long)rm->m_ack_seq);
 	}
@@ -122,7 +122,7 @@ int rds_tcp_xmit(struct rds_connection *conn, struct rds_message *rm,
 						rm->data.op_sg[sg].offset + off,
 						rm->data.op_sg[sg].length - off,
 						MSG_DONTWAIT|MSG_NOSIGNAL);
-		rdsdebug("tcp sendpage %p:%u:%u ret %d\n", (void *)sg_page(&rm->data.op_sg[sg]),
+		rdsdebug("tcp sendpage %pK:%u:%u ret %d\n", (void *)sg_page(&rm->data.op_sg[sg]),
 			 rm->data.op_sg[sg].offset + off, rm->data.op_sg[sg].length - off,
 			 ret);
 		if (ret <= 0)
@@ -182,7 +182,7 @@ void rds_tcp_write_space(struct sock *sk)
 	}
 
 	tc = conn->c_transport_data;
-	rdsdebug("write_space for tc %p\n", tc);
+	rdsdebug("write_space for tc %pK\n", tc);
 	write_space = tc->t_orig_write_space;
 	rds_tcp_stats_inc(s_tcp_write_space_calls);
 

@@ -60,11 +60,11 @@ static int dtc_bus_reset(Scsi_Cmnd *);
 
 #define dbNCR5380_read(reg)                                              \
     (rval=readb(DTC_address(reg)), \
-     (((unsigned char) printk("DTC : read register %d at addr %p is: %02x\n"\
+     (((unsigned char) printk("DTC : read register %d at addr %pK is: %02x\n"\
     , (reg), DTC_address(reg), rval)), rval ) )
 
 #define dbNCR5380_write(reg, value) do {                                  \
-    printk("DTC : write %02x to register %d at address %p\n",         \
+    printk("DTC : write %02x to register %d at address %pK\n",         \
             (value), (reg), DTC_address(reg));     \
     writeb(value, DTC_address(reg));} while(0)
 
@@ -75,11 +75,11 @@ static int dtc_bus_reset(Scsi_Cmnd *);
 #else
 #define NCR5380_read(reg) (readb(DTC_address(reg)))
 #define xNCR5380_read(reg)						\
-    (((unsigned char) printk("DTC : read register %d at address %p\n"\
+    (((unsigned char) printk("DTC : read register %d at address %pK\n"\
     , (reg), DTC_address(reg))), readb(DTC_address(reg)))
 
 #define NCR5380_write(reg, value) do {					\
-    printk("DTC : write %02x to register %d at address %p\n", 	\
+    printk("DTC : write %02x to register %d at address %pK\n", 	\
 	    (value), (reg), DTC_address(reg));	\
     writeb(value, DTC_address(reg));} while(0)
 #endif

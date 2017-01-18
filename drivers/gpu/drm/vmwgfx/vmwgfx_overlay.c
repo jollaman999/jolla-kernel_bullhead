@@ -308,7 +308,7 @@ static int vmw_overlay_update_stream(struct vmw_private *dev_priv,
 	if (!buf)
 		return -EINVAL;
 
-	DRM_DEBUG("   %s: old %p, new %p, %spaused\n", __func__,
+	DRM_DEBUG("   %s: old %pK, new %pK, %spaused\n", __func__,
 		  stream->buf, buf, stream->paused ? "" : "not ");
 
 	if (stream->buf != buf) {

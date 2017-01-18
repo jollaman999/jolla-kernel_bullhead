@@ -409,7 +409,7 @@ void __dev_remove_pack(struct packet_type *pt)
 		}
 	}
 
-	pr_warn("dev_remove_pack: %p not found\n", pt);
+	pr_warn("dev_remove_pack: %pK not found\n", pt);
 out:
 	spin_unlock(&ptype_lock);
 }
@@ -485,7 +485,7 @@ void __dev_remove_offload(struct packet_offload *po)
 		}
 	}
 
-	pr_warn("dev_remove_offload: %p not found\n", po);
+	pr_warn("dev_remove_offload: %pK not found\n", po);
 out:
 	spin_unlock(&offload_lock);
 }
@@ -4934,7 +4934,7 @@ static void rollback_registered_many(struct list_head *head)
 		 * devices and proceed with the remaining.
 		 */
 		if (dev->reg_state == NETREG_UNINITIALIZED) {
-			pr_debug("unregister_netdevice: device %s/%p never was registered\n",
+			pr_debug("unregister_netdevice: device %s/%pK never was registered\n",
 				 dev->name, dev);
 
 			WARN_ON(1);

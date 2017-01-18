@@ -428,7 +428,7 @@ int agp_bind_memory(struct agp_memory *curr, off_t pg_start)
 		return -EINVAL;
 
 	if (curr->is_bound) {
-		printk(KERN_INFO PFX "memory %p is already bound!\n", curr);
+		printk(KERN_INFO PFX "memory %pK is already bound!\n", curr);
 		return -EINVAL;
 	}
 	if (!curr->is_flushed) {
@@ -468,7 +468,7 @@ int agp_unbind_memory(struct agp_memory *curr)
 		return -EINVAL;
 
 	if (!curr->is_bound) {
-		printk(KERN_INFO PFX "memory %p was not bound!\n", curr);
+		printk(KERN_INFO PFX "memory %pK was not bound!\n", curr);
 		return -EINVAL;
 	}
 

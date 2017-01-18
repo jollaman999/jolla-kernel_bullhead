@@ -1173,18 +1173,18 @@ static inline void vcc_tx_add_aal5_descriptor(struct lanai_vcc *lvcc,
 {
 	int pos;
 	APRINTK((((unsigned long) lvcc->tx.buf.ptr) & 15) == 0,
-	    "vcc_tx_add_aal5_descriptor: bad ptr=%p\n", lvcc->tx.buf.ptr);
+	    "vcc_tx_add_aal5_descriptor: bad ptr=%pK\n", lvcc->tx.buf.ptr);
 	lvcc->tx.buf.ptr += 4;	/* Hope the values REALLY don't matter */
 	pos = ((unsigned char *) lvcc->tx.buf.ptr) -
 	    (unsigned char *) lvcc->tx.buf.start;
 	APRINTK((pos & ~0x0001FFF0) == 0,
 	    "vcc_tx_add_aal5_descriptor: bad pos (%d) before, vci=%d, "
-	    "start,ptr,end=%p,%p,%p\n", pos, lvcc->vci,
+	    "start,ptr,end=%pK,%pK,%pK\n", pos, lvcc->vci,
 	    lvcc->tx.buf.start, lvcc->tx.buf.ptr, lvcc->tx.buf.end);
 	pos = (pos + len) & (lanai_buf_size(&lvcc->tx.buf) - 1);
 	APRINTK((pos & ~0x0001FFF0) == 0,
 	    "vcc_tx_add_aal5_descriptor: bad pos (%d) after, vci=%d, "
-	    "start,ptr,end=%p,%p,%p\n", pos, lvcc->vci,
+	    "start,ptr,end=%pK,%pK,%pK\n", pos, lvcc->vci,
 	    lvcc->tx.buf.start, lvcc->tx.buf.ptr, lvcc->tx.buf.end);
 	lvcc->tx.buf.ptr[-1] =
 	    cpu_to_le32(DESCRIPTOR_MAGIC | DESCRIPTOR_AAL5 |
@@ -1199,7 +1199,7 @@ static inline void vcc_tx_add_aal5_trailer(struct lanai_vcc *lvcc,
 	int len, int cpi, int uu)
 {
 	APRINTK((((unsigned long) lvcc->tx.buf.ptr) & 15) == 8,
-	    "vcc_tx_add_aal5_trailer: bad ptr=%p\n", lvcc->tx.buf.ptr);
+	    "vcc_tx_add_aal5_trailer: bad ptr=%pK\n", lvcc->tx.buf.ptr);
 	lvcc->tx.buf.ptr += 2;
 	lvcc->tx.buf.ptr[-2] = cpu_to_be32((uu << 24) | (cpi << 16) | len);
 	if (lvcc->tx.buf.ptr >= lvcc->tx.buf.end)
@@ -1248,7 +1248,7 @@ static inline void lanai_endtx(struct lanai_dev *lanai,
 	int i, ptr = ((unsigned char *) lvcc->tx.buf.ptr) -
 	    (unsigned char *) lvcc->tx.buf.start;
 	APRINTK((ptr & ~0x0001FFF0) == 0,
-	    "lanai_endtx: bad ptr (%d), vci=%d, start,ptr,end=%p,%p,%p\n",
+	    "lanai_endtx: bad ptr (%d), vci=%d, start,ptr,end=%pK,%pK,%pK\n",
 	    ptr, lvcc->vci, lvcc->tx.buf.start, lvcc->tx.buf.ptr,
 	    lvcc->tx.buf.end);
 

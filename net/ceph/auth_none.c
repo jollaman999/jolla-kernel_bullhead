@@ -121,7 +121,7 @@ int ceph_auth_none_init(struct ceph_auth_client *ac)
 {
 	struct ceph_auth_none_info *xi;
 
-	dout("ceph_auth_none_init %p\n", ac);
+	dout("ceph_auth_none_init %pK\n", ac);
 	xi = kzalloc(sizeof(*xi), GFP_NOFS);
 	if (!xi)
 		return -ENOMEM;

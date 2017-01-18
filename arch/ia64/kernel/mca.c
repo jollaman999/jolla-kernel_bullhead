@@ -1627,7 +1627,7 @@ default_monarch_init_process(struct notifier_block *self, unsigned long val, voi
 			if (g->pid)
 				printk(" %d", g->pid);
 			else
-				printk(" %d (cpu %d task 0x%p)", g->pid, task_cpu(g), g);
+				printk(" %d (cpu %d task 0x%pK)", g->pid, task_cpu(g), g);
 		}
 	}
 	printk("\n\n");
