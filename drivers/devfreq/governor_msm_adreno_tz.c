@@ -26,6 +26,8 @@
 
 #ifdef CONFIG_ADRENO_IDLER
 #include <linux/fb.h>
+
+extern bool adreno_idler_active;
 #endif
 
 static DEFINE_SPINLOCK(tz_lock);
@@ -316,18 +318,20 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 	*freq = stats.current_frequency;
 
 #ifdef CONFIG_ADRENO_IDLER
-	/*
-	 * Force to use & record as min freq when system has
-	 * entered pm-suspend or screen-off state.
-	 */
-	if (suspended || mdss_is_off) {
-		*freq = devfreq->profile->freq_table[devfreq->profile->max_state - 1];
-		return 0;
-	}
+	if (adreno_idler_active) {
+		/*
+		 * Force to use & record as min freq when system has
+		 * entered pm-suspend or screen-off state.
+		 */
+		if (suspended || mdss_is_off) {
+			*freq = devfreq->profile->freq_table[devfreq->profile->max_state - 1];
+			return 0;
+		}
 
-	if (adreno_idler(stats, devfreq, freq)) {
-		/* adreno_idler has asked to bail out now */
-		return 0;
+		if (adreno_idler(stats, devfreq, freq)) {
+			/* adreno_idler has asked to bail out now */
+			return 0;
+		}
 	}
 #endif
 
