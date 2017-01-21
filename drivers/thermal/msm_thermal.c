@@ -5175,6 +5175,7 @@ static int probe_vdd_rstr(struct device_node *node,
 
 	key = "qcom,disable-vdd-rstr";
 	if (of_property_read_bool(node, key)) {
+		pr_info("vdd restriction is disabled\n");
 		vdd_rstr_probed = true;
 		vdd_rstr_enabled = false;
 		rails_cnt = 0;
