@@ -231,7 +231,7 @@ static void bnx2fc_scsi_done(struct bnx2fc_cmd *io_req, int err_code)
 	}
 	sc_cmd->result = err_code << 16;
 
-	BNX2FC_IO_DBG(io_req, "sc=%p, result=0x%x, retries=%d, allowed=%d\n",
+	BNX2FC_IO_DBG(io_req, "sc=%pK, result=0x%x, retries=%d, allowed=%d\n",
 		sc_cmd, host_byte(sc_cmd->result), sc_cmd->retries,
 		sc_cmd->allowed);
 	scsi_set_resid(sc_cmd, scsi_bufflen(sc_cmd));

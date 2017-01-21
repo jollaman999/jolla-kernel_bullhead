@@ -155,7 +155,7 @@ static u8 i2c_ctrl_read (struct controller *ctlr_ptr, void __iomem *WPGBbar, u8 
 	unsigned long ultemp;
 	unsigned long data;	// actual data HILO format
 
-	debug_polling ("%s - Entry WPGBbar[%p] index[%x] \n", __func__, WPGBbar, index);
+	debug_polling ("%s - Entry WPGBbar[%pK] index[%x] \n", __func__, WPGBbar, index);
 
 	//--------------------------------------------------------------------
 	// READ - step 1
@@ -263,7 +263,7 @@ static u8 i2c_ctrl_write (struct controller *ctlr_ptr, void __iomem *WPGBbar, u8
 	unsigned long data;	// actual data HILO format
 	int i;
 
-	debug_polling ("%s - Entry WPGBbar[%p] index[%x] cmd[%x]\n", __func__, WPGBbar, index, cmd);
+	debug_polling ("%s - Entry WPGBbar[%pK] index[%x] cmd[%x]\n", __func__, WPGBbar, index, cmd);
 
 	rc = 0;
 	//--------------------------------------------------------------------
@@ -542,7 +542,7 @@ int ibmphp_hpc_readslot (struct slot * pslot, u8 cmd, u8 * pstatus)
 	int rc = 0;
 	int busindex;
 
-	debug_polling ("%s - Entry pslot[%p] cmd[%x] pstatus[%p]\n", __func__, pslot, cmd, pstatus);
+	debug_polling ("%s - Entry pslot[%pK] cmd[%x] pstatus[%pK]\n", __func__, pslot, cmd, pstatus);
 
 	if ((pslot == NULL)
 	    || ((pstatus == NULL) && (cmd != READ_ALLSTAT) && (cmd != READ_BUSSTATUS))) {
@@ -682,7 +682,7 @@ int ibmphp_hpc_writeslot (struct slot * pslot, u8 cmd)
 	int rc = 0;
 	int timeout;
 
-	debug_polling ("%s - Entry pslot[%p] cmd[%x]\n", __func__, pslot, cmd);
+	debug_polling ("%s - Entry pslot[%pK] cmd[%x]\n", __func__, pslot, cmd);
 	if (pslot == NULL) {
 		rc = -EINVAL;
 		err ("%s - Error Exit rc[%d]\n", __func__, rc);
@@ -936,7 +936,7 @@ static int process_changeinstatus (struct slot *pslot, struct slot *poldslot)
 	u8 disable = 0;
 	u8 update = 0;
 
-	debug ("process_changeinstatus - Entry pslot[%p], poldslot[%p]\n", pslot, poldslot);
+	debug ("process_changeinstatus - Entry pslot[%pK], poldslot[%pK]\n", pslot, poldslot);
 
 	// bit 0 - HPC_SLOT_POWER
 	if ((pslot->status & 0x01) != (poldslot->status & 0x01))

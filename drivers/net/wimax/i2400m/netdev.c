@@ -104,7 +104,7 @@ int i2400m_open(struct net_device *net_dev)
 	struct i2400m *i2400m = net_dev_to_i2400m(net_dev);
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(net_dev %p [i2400m %p])\n", net_dev, i2400m);
+	d_fnstart(3, dev, "(net_dev %pK [i2400m %pK])\n", net_dev, i2400m);
 	/* Make sure we wait until init is complete... */
 	mutex_lock(&i2400m->init_mutex);
 	if (i2400m->updown)
@@ -112,7 +112,7 @@ int i2400m_open(struct net_device *net_dev)
 	else
 		result = -EBUSY;
 	mutex_unlock(&i2400m->init_mutex);
-	d_fnend(3, dev, "(net_dev %p [i2400m %p]) = %d\n",
+	d_fnend(3, dev, "(net_dev %pK [i2400m %pK]) = %d\n",
 		net_dev, i2400m, result);
 	return result;
 }
@@ -124,9 +124,9 @@ int i2400m_stop(struct net_device *net_dev)
 	struct i2400m *i2400m = net_dev_to_i2400m(net_dev);
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(net_dev %p [i2400m %p])\n", net_dev, i2400m);
+	d_fnstart(3, dev, "(net_dev %pK [i2400m %pK])\n", net_dev, i2400m);
 	i2400m_net_wake_stop(i2400m);
-	d_fnend(3, dev, "(net_dev %p [i2400m %p]) = 0\n", net_dev, i2400m);
+	d_fnend(3, dev, "(net_dev %pK [i2400m %pK]) = 0\n", net_dev, i2400m);
 	return 0;
 }
 
@@ -164,7 +164,7 @@ void i2400m_wake_tx_work(struct work_struct *ws)
 	i2400m->wake_tx_skb = NULL;
 	spin_unlock_irqrestore(&i2400m->tx_lock, flags);
 
-	d_fnstart(3, dev, "(ws %p i2400m %p skb %p)\n", ws, i2400m, skb);
+	d_fnstart(3, dev, "(ws %pK i2400m %pK skb %pK)\n", ws, i2400m, skb);
 	result = -EINVAL;
 	if (skb == NULL) {
 		dev_err(dev, "WAKE&TX: skb disappeared!\n");
@@ -203,7 +203,7 @@ out_kfree:
 	kfree_skb(skb);	/* refcount transferred by _hard_start_xmit() */
 out_put:
 	i2400m_put(i2400m);
-	d_fnend(3, dev, "(ws %p i2400m %p skb %p) = void [%d]\n",
+	d_fnend(3, dev, "(ws %pK i2400m %pK skb %pK) = void [%d]\n",
 		ws, i2400m, skb, result);
 }
 
@@ -239,7 +239,7 @@ void i2400m_net_wake_stop(struct i2400m *i2400m)
 	struct sk_buff *wake_tx_skb;
 	unsigned long flags;
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	/*
 	 * See i2400m_hard_start_xmit(), references are taken there and
 	 * here we release them if the packet was still pending.
@@ -256,7 +256,7 @@ void i2400m_net_wake_stop(struct i2400m *i2400m)
 		kfree_skb(wake_tx_skb);
 	}
 
-	d_fnend(3, dev, "(i2400m %p) = void\n", i2400m);
+	d_fnend(3, dev, "(i2400m %pK) = void\n", i2400m);
 }
 
 
@@ -279,10 +279,10 @@ int i2400m_net_wake_tx(struct i2400m *i2400m, struct net_device *net_dev,
 	struct device *dev = i2400m_dev(i2400m);
 	unsigned long flags;
 
-	d_fnstart(3, dev, "(skb %p net_dev %p)\n", skb, net_dev);
+	d_fnstart(3, dev, "(skb %pK net_dev %pK)\n", skb, net_dev);
 	if (net_ratelimit()) {
 		d_printf(3, dev, "WAKE&NETTX: "
-			 "skb %p sending %d bytes to radio\n",
+			 "skb %pK sending %d bytes to radio\n",
 			 skb, skb->len);
 		d_dump(4, dev, skb->data, skb->len);
 	}
@@ -307,11 +307,11 @@ int i2400m_net_wake_tx(struct i2400m *i2400m, struct net_device *net_dev,
 		 * for that. */
 		if (net_ratelimit())
 			d_printf(1, dev, "NETTX: device exiting idle, "
-				 "dropping skb %p, queue running %d\n",
+				 "dropping skb %pK, queue running %d\n",
 				 skb, netif_queue_stopped(net_dev));
 		result = -EBUSY;
 	}
-	d_fnend(3, dev, "(skb %p net_dev %p) = %d\n", skb, net_dev, result);
+	d_fnend(3, dev, "(skb %pK net_dev %pK) = %d\n", skb, net_dev, result);
 	return result;
 }
 
@@ -331,16 +331,16 @@ int i2400m_net_tx(struct i2400m *i2400m, struct net_device *net_dev,
 	int result;
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(i2400m %p net_dev %p skb %p)\n",
+	d_fnstart(3, dev, "(i2400m %pK net_dev %pK skb %pK)\n",
 		  i2400m, net_dev, skb);
 	/* FIXME: check eth hdr, only IPv4 is routed by the device as of now */
 	net_dev->trans_start = jiffies;
 	i2400m_tx_prep_header(skb);
-	d_printf(3, dev, "NETTX: skb %p sending %d bytes to radio\n",
+	d_printf(3, dev, "NETTX: skb %pK sending %d bytes to radio\n",
 		 skb, skb->len);
 	d_dump(4, dev, skb->data, skb->len);
 	result = i2400m_tx(i2400m, skb->data, skb->len, I2400M_PT_DATA);
-	d_fnend(3, dev, "(i2400m %p net_dev %p skb %p) = %d\n",
+	d_fnend(3, dev, "(i2400m %pK net_dev %pK skb %pK) = %d\n",
 		i2400m, net_dev, skb, result);
 	return result;
 }
@@ -372,7 +372,7 @@ netdev_tx_t i2400m_hard_start_xmit(struct sk_buff *skb,
 	struct device *dev = i2400m_dev(i2400m);
 	int result = -1;
 
-	d_fnstart(3, dev, "(skb %p net_dev %p)\n", skb, net_dev);
+	d_fnstart(3, dev, "(skb %pK net_dev %pK)\n", skb, net_dev);
 
 	if (skb_header_cloned(skb) && 
 	    pskb_expand_head(skb, 0, 0, GFP_ATOMIC))
@@ -390,7 +390,7 @@ drop:
 		net_dev->stats.tx_bytes += skb->len;
 	}
 	dev_kfree_skb(skb);
-	d_fnend(3, dev, "(skb %p net_dev %p) = %d\n", skb, net_dev, result);
+	d_fnend(3, dev, "(skb %pK net_dev %pK) = %d\n", skb, net_dev, result);
 	return NETDEV_TX_OK;
 }
 
@@ -492,11 +492,11 @@ void i2400m_net_rx(struct i2400m *i2400m, struct sk_buff *skb_rx,
 	struct device *dev = i2400m_dev(i2400m);
 	struct sk_buff *skb;
 
-	d_fnstart(2, dev, "(i2400m %p buf %p buf_len %d)\n",
+	d_fnstart(2, dev, "(i2400m %pK buf %pK buf_len %d)\n",
 		  i2400m, buf, buf_len);
 	if (i) {
 		skb = skb_get(skb_rx);
-		d_printf(2, dev, "RX: reusing first payload skb %p\n", skb);
+		d_printf(2, dev, "RX: reusing first payload skb %pK\n", skb);
 		skb_pull(skb, buf - (void *) skb->data);
 		skb_trim(skb, (void *) skb_end_pointer(skb) - buf);
 	} else {
@@ -523,7 +523,7 @@ void i2400m_net_rx(struct i2400m *i2400m, struct sk_buff *skb_rx,
 	d_dump(4, dev, buf, buf_len);
 	netif_rx_ni(skb);	/* see notes in function header */
 error_skb_realloc:
-	d_fnend(2, dev, "(i2400m %p buf %p buf_len %d) = void\n",
+	d_fnend(2, dev, "(i2400m %pK buf %pK buf_len %d) = void\n",
 		i2400m, buf, buf_len);
 }
 
@@ -557,7 +557,7 @@ void i2400m_net_erx(struct i2400m *i2400m, struct sk_buff *skb,
 	struct device *dev = i2400m_dev(i2400m);
 	int protocol;
 
-	d_fnstart(2, dev, "(i2400m %p skb %p [%u] cs %d)\n",
+	d_fnstart(2, dev, "(i2400m %pK skb %pK [%u] cs %d)\n",
 		  i2400m, skb, skb->len, cs);
 	switch(cs) {
 	case I2400M_CS_IPV4_0:
@@ -582,7 +582,7 @@ void i2400m_net_erx(struct i2400m *i2400m, struct sk_buff *skb,
 	d_dump(4, dev, skb->data, skb->len);
 	netif_rx_ni(skb);	/* see notes in function header */
 error:
-	d_fnend(2, dev, "(i2400m %p skb %p [%u] cs %d) = void\n",
+	d_fnend(2, dev, "(i2400m %pK skb %pK [%u] cs %d) = void\n",
 		i2400m, skb, skb->len, cs);
 }
 
@@ -619,7 +619,7 @@ static const struct ethtool_ops i2400m_ethtool_ops = {
  */
 void i2400m_netdev_setup(struct net_device *net_dev)
 {
-	d_fnstart(3, NULL, "(net_dev %p)\n", net_dev);
+	d_fnstart(3, NULL, "(net_dev %pK)\n", net_dev);
 	ether_setup(net_dev);
 	net_dev->mtu = I2400M_MAX_MTU;
 	net_dev->tx_queue_len = I2400M_TX_QLEN;
@@ -633,7 +633,7 @@ void i2400m_netdev_setup(struct net_device *net_dev)
 	net_dev->watchdog_timeo = I2400M_TX_TIMEOUT;
 	net_dev->netdev_ops = &i2400m_netdev_ops;
 	net_dev->ethtool_ops = &i2400m_ethtool_ops;
-	d_fnend(3, NULL, "(net_dev %p) = void\n", net_dev);
+	d_fnend(3, NULL, "(net_dev %pK) = void\n", net_dev);
 }
 EXPORT_SYMBOL_GPL(i2400m_netdev_setup);
 

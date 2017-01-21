@@ -75,7 +75,7 @@ ol_tx_desc_alloc(struct ol_txrx_pdev_t *pdev, struct ol_txrx_vdev_t *vdev)
 #endif
            ) {
             TXRX_PRINT(TXRX_PRINT_LEVEL_ERR,
-                       "%s Potential tx_desc corruption pkt_type:0x%x pdev:0x%p",
+                       "%s Potential tx_desc corruption pkt_type:0x%x pdev:0x%pK",
                          __func__, tx_desc->pkt_type, pdev);
 #ifdef QCA_COMPUTE_TX_DELAY
             TXRX_PRINT(TXRX_PRINT_LEVEL_ERR, "%s Timestamp:0x%x\n",
@@ -86,7 +86,7 @@ ol_tx_desc_alloc(struct ol_txrx_pdev_t *pdev, struct ol_txrx_vdev_t *vdev)
         if ((u_int32_t *) tx_desc->htt_tx_desc < g_dbg_htt_desc_start_addr ||
             (u_int32_t *) tx_desc->htt_tx_desc > g_dbg_htt_desc_end_addr) {
             TXRX_PRINT(TXRX_PRINT_LEVEL_ERR,
-                       "%s Potential htt_desc curruption:0x%p pdev:0x%p\n",
+                       "%s Potential htt_desc curruption:0x%pK pdev:0x%pK\n",
                        __func__, tx_desc->htt_tx_desc, pdev);
             adf_os_assert(0);
         }

@@ -341,7 +341,7 @@ static void xiic_process(struct xiic_i2c *i2c)
 	pend = isr & ier;
 
 	dev_dbg(i2c->adap.dev.parent, "%s entry, IER: 0x%x, ISR: 0x%x, "
-		"pend: 0x%x, SR: 0x%x, msg: %p, nmsgs: %d\n",
+		"pend: 0x%x, SR: 0x%x, msg: %pK, nmsgs: %d\n",
 		__func__, ier, isr, pend, xiic_getreg8(i2c, XIIC_SR_REG_OFFSET),
 		i2c->tx_msg, i2c->nmsgs);
 
@@ -542,7 +542,7 @@ static void xiic_start_send(struct xiic_i2c *i2c)
 
 	xiic_irq_clr(i2c, XIIC_INTR_TX_ERROR_MASK);
 
-	dev_dbg(i2c->adap.dev.parent, "%s entry, msg: %p, len: %d, "
+	dev_dbg(i2c->adap.dev.parent, "%s entry, msg: %pK, len: %d, "
 		"ISR: 0x%x, CR: 0x%x\n",
 		__func__, msg, msg->len, xiic_getreg32(i2c, XIIC_IISR_OFFSET),
 		xiic_getreg8(i2c, XIIC_CR_REG_OFFSET));
@@ -587,7 +587,7 @@ static void __xiic_start_xfer(struct xiic_i2c *i2c)
 {
 	int first = 1;
 	int fifo_space = xiic_tx_fifo_space(i2c);
-	dev_dbg(i2c->adap.dev.parent, "%s entry, msg: %p, fifos space: %d\n",
+	dev_dbg(i2c->adap.dev.parent, "%s entry, msg: %pK, fifos space: %d\n",
 		__func__, i2c->tx_msg, fifo_space);
 
 	if (!i2c->tx_msg)

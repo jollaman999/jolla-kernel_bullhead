@@ -94,7 +94,7 @@ void limFTCleanupPreAuthInfo(tpAniSirGlobal pMac, tpPESession psessionEntry)
                &sessionId);
 
 #if defined WLAN_FEATURE_VOWIFI_11R_DEBUG
-      PELOG1(limLog( pMac, LOG1, FL("Freeing pFTPreAuthReq= %p"),
+      PELOG1(limLog( pMac, LOG1, FL("Freeing pFTPreAuthReq= %pK"),
              psessionEntry->ftPEContext.pFTPreAuthReq);)
 #endif
       if (psessionEntry->ftPEContext.pFTPreAuthReq->pbssDescription) {
@@ -165,7 +165,7 @@ void limFTCleanup(tpAniSirGlobal pMac, tpPESession psessionEntry)
 
    if (NULL != psessionEntry->ftPEContext.pFTPreAuthReq) {
 #if defined WLAN_FEATURE_VOWIFI_11R_DEBUG
-      PELOG1(limLog( pMac, LOG1, FL("Freeing pFTPreAuthReq= %p"),
+      PELOG1(limLog( pMac, LOG1, FL("Freeing pFTPreAuthReq= %pK"),
              psessionEntry->ftPEContext.pFTPreAuthReq);)
 #endif
       if (NULL != psessionEntry->ftPEContext.pFTPreAuthReq->pbssDescription) {
@@ -312,13 +312,13 @@ int limProcessFTPreAuthReq(tpAniSirGlobal pMac, tpSirMsgQ pMsg)
         psessionEntry->ftPEContext.pFTPreAuthReq->preAuthchannelNum) {
        /* Need to suspend link only if the channels are different */
        PELOG2(limLog(pMac, LOG2, FL("Performing pre-auth on different"
-               " channel (session %p)"), psessionEntry);)
+               " channel (session %pK)"), psessionEntry);)
        limSuspendLink(pMac, eSIR_CHECK_ROAMING_SCAN,
                       limFTPreAuthSuspendLinkHandler,
                       (tANI_U32 *)psessionEntry);
     } else {
        PELOG2(limLog(pMac, LOG2, FL("Performing pre-auth on same"
-                " channel (session %p)"), psessionEntry);)
+                " channel (session %pK)"), psessionEntry);)
         /* We are in the same channel. Perform pre-auth */
        limPerformFTPreAuth(pMac, eHAL_STATUS_SUCCESS, NULL, psessionEntry);
     }
@@ -368,7 +368,7 @@ void limPerformFTPreAuth(tpAniSirGlobal pMac, eHalStatus status,
 
 #if defined WLAN_FEATURE_VOWIFI_11R_DEBUG
     PELOG2(limLog(pMac,LOG2,"Entered wait auth2 state for FT"
-           " (old session %p)", psessionEntry);)
+           " (old session %pK)", psessionEntry);)
 #endif
 
     if (psessionEntry->is11Rconnection) {
@@ -1114,7 +1114,7 @@ void limPostFTPreAuthRsp(tpAniSirGlobal pMac, tSirRetStatus status,
    vos_mem_zero( pFTPreAuthRsp, rspLen);
 
 #if defined WLAN_FEATURE_VOWIFI_11R_DEBUG
-   PELOGE(limLog( pMac, LOG1, FL("Auth Rsp = %p"), pFTPreAuthRsp);)
+   PELOGE(limLog( pMac, LOG1, FL("Auth Rsp = %pK"), pFTPreAuthRsp);)
 #endif
 
    if (psessionEntry) {
@@ -1255,7 +1255,7 @@ void limHandleFTPreAuthRsp(tpAniSirGlobal pMac, tSirRetStatus status,
             sizeof(psessionEntry->htConfig));
       pftSessionEntry->limSmeState = eLIM_SME_WT_REASSOC_STATE;
 
-      PELOGE(limLog(pMac, LOG1, "%s:created session (%p) with id = %d",
+      PELOGE(limLog(pMac, LOG1, "%s:created session (%pK) with id = %d",
                __func__, pftSessionEntry, pftSessionEntry->peSessionId);)
 
       /* Update the ReAssoc BSSID of the current session */
@@ -1528,7 +1528,7 @@ void limProcessFTPreauthRspTimeout(tpAniSirGlobal pMac)
    if (eANI_BOOLEAN_TRUE ==
          psessionEntry->ftPEContext.pFTPreAuthReq->bPreAuthRspProcessed) {
       limLog(pMac,LOGE,FL("Auth rsp already posted to SME"
-               " (session %p)"), psessionEntry);
+               " (session %pK)"), psessionEntry);
       return;
    }
    else {
@@ -1540,7 +1540,7 @@ void limProcessFTPreauthRspTimeout(tpAniSirGlobal pMac)
        * limProcessAuthFrameNoSession.
        */
       limLog(pMac,LOG1,FL("Auth rsp not yet posted to SME"
-               " (session %p)"), psessionEntry);
+               " (session %pK)"), psessionEntry);
       psessionEntry->ftPEContext.pFTPreAuthReq->bPreAuthRspProcessed =
          eANI_BOOLEAN_TRUE;
    }

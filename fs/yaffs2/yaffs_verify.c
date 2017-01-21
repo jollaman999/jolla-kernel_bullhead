@@ -174,7 +174,7 @@ void yaffs_verify_oh(struct yaffs_obj *obj, struct yaffs_obj_hdr *oh,
 
 	if (!(tags && obj && oh)) {
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Verifying object header tags %p obj %p oh %p",
+			"Verifying object header tags %pK obj %pK oh %pK",
 			tags, obj, oh);
 		return;
 	}
@@ -364,7 +364,7 @@ void yaffs_verify_obj(struct yaffs_obj *obj)
 	/* Verify it has a parent */
 	if (obj && !obj->fake && (!obj->parent || obj->parent->my_dev != dev)) {
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Obj %d has parent pointer %p which does not look like an object",
+			"Obj %d has parent pointer %pK which does not look like an object",
 			obj->obj_id, obj->parent);
 	}
 
@@ -496,7 +496,7 @@ void yaffs_verify_dir(struct yaffs_obj *directory)
 			list_obj = list_entry(lh, struct yaffs_obj, siblings);
 			if (list_obj->parent != directory) {
 				yaffs_trace(YAFFS_TRACE_ALWAYS,
-					"Object in directory list has wrong parent %p",
+					"Object in directory list has wrong parent %pK",
 					list_obj->parent);
 				YBUG();
 			}

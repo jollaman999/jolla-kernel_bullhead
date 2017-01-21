@@ -80,7 +80,7 @@ int spu_alloc_lscsa(struct spu_state *csa)
 
 	csa->use_big_pages = 1;
 
-	pr_debug("spu_alloc_lscsa(csa=0x%p), trying to allocate 64K pages\n",
+	pr_debug("spu_alloc_lscsa(csa=0x%pK), trying to allocate 64K pages\n",
 		 csa);
 
 	/* First try to allocate our 64K pages. We need 5 of them

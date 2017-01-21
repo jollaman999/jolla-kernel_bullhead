@@ -2550,7 +2550,7 @@ static int cnss_probe(struct platform_device *pdev)
 		}
 	}
 
-	pr_debug("%s: ramdump addr: %p, phys: %pa\n", __func__,
+	pr_debug("%s: ramdump addr: %pK, phys: %pa\n", __func__,
 			penv->ramdump_addr, &penv->ramdump_phys);
 
 	if (penv->ramdump_size == 0) {

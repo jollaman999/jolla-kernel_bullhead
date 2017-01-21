@@ -91,7 +91,7 @@ static void msm_iommu_meta_add(struct msm_iommu_meta *meta)
 		} else if (meta->table > entry->table) {
 			p = &(*p)->rb_right;
 		} else {
-			pr_err("%s: dma_buf %p already exists\n", __func__,
+			pr_err("%s: dma_buf %pK already exists\n", __func__,
 				entry->dbuf);
 			BUG();
 		}
@@ -142,7 +142,7 @@ static void msm_iommu_add(struct msm_iommu_meta *meta,
 		} else if (iommu->key > entry->key) {
 			p = &(*p)->rb_right;
 		} else {
-			pr_err("%s: dma_buf %p already has mapping for domain %d and partition %d\n",
+			pr_err("%s: dma_buf %pK already has mapping for domain %d and partition %d\n",
 				__func__,
 				meta->dbuf,
 				iommu_map_domain(iommu),
@@ -228,7 +228,7 @@ static int msm_iommu_map_iommu(struct msm_iommu_meta *meta,
 			      table->sgl,
 			      size, prot);
 	if (ret) {
-		pr_err("%s: could not map %lx in domain %p\n",
+		pr_err("%s: could not map %lx in domain %pK\n",
 			__func__, data->iova_addr, domain);
 		goto out1;
 	}
@@ -462,13 +462,13 @@ static int __msm_map_iommu_common(
 		}
 	} else {
 		if (iommu_map->flags != iommu_flags) {
-			pr_err("%s: dma_buf %p is already mapped with iommu flags %lx, trying to map with flags %lx\n",
+			pr_err("%s: dma_buf %pK is already mapped with iommu flags %lx, trying to map with flags %lx\n",
 				__func__, dma_buf,
 				iommu_map->flags, iommu_flags);
 			ret = -EINVAL;
 			goto out_unlock;
 		} else if (iommu_map->mapped_size != iova_length) {
-			pr_err("%s: dma_buf %p is already mapped with length %x, trying to map with length %lx\n",
+			pr_err("%s: dma_buf %pK is already mapped with length %x, trying to map with length %lx\n",
 				__func__, dma_buf, iommu_map->mapped_size,
 				iova_length);
 			ret = -EINVAL;
@@ -583,7 +583,7 @@ static void __msm_unmap_iommu_common(struct sg_table *table, int domain_num,
 	mutex_lock(&msm_iommu_map_mutex);
 	meta = msm_iommu_meta_lookup(table);
 	if (!meta) {
-		WARN(1, "%s: (%d,%d) was never mapped for %p\n", __func__,
+		WARN(1, "%s: (%d,%d) was never mapped for %pK\n", __func__,
 				domain_num, partition_num, table);
 		mutex_unlock(&msm_iommu_map_mutex);
 		goto out;
@@ -595,7 +595,7 @@ static void __msm_unmap_iommu_common(struct sg_table *table, int domain_num,
 	iommu_map = msm_iommu_lookup(meta, domain_num, partition_num);
 
 	if (!iommu_map) {
-		WARN(1, "%s: (%d,%d) was never mapped for %p\n", __func__,
+		WARN(1, "%s: (%d,%d) was never mapped for %pK\n", __func__,
 				domain_num, partition_num, table);
 		mutex_unlock(&meta->lock);
 		goto out;

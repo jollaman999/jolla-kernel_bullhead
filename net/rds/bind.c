@@ -101,7 +101,7 @@ struct rds_sock *rds_find_bound(__be32 addr, __be16 port)
 	else
 		rs = NULL;
 
-	rdsdebug("returning rs %p for %pI4:%u\n", rs, &addr,
+	rdsdebug("returning rs %pK for %pI4:%u\n", rs, &addr,
 		ntohs(port));
 	return rs;
 }
@@ -129,7 +129,7 @@ static int rds_add_bound(struct rds_sock *rs, __be32 addr, __be16 *port)
 		if (!rds_bind_lookup(addr, cpu_to_be16(rover), rs)) {
 			*port = rs->rs_bound_port;
 			ret = 0;
-			rdsdebug("rs %p binding to %pI4:%d\n",
+			rdsdebug("rs %pK binding to %pI4:%d\n",
 			  rs, &addr, (int)ntohs(*port));
 			break;
 		}
@@ -147,7 +147,7 @@ void rds_remove_bound(struct rds_sock *rs)
 	spin_lock_irqsave(&rds_bind_lock, flags);
 
 	if (rs->rs_bound_addr) {
-		rdsdebug("rs %p unbinding from %pI4:%d\n",
+		rdsdebug("rs %pK unbinding from %pI4:%d\n",
 		  rs, &rs->rs_bound_addr,
 		  ntohs(rs->rs_bound_port));
 

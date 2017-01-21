@@ -243,7 +243,7 @@ int lmLog(struct jfs_log * log, struct tblock * tblk, struct lrd * lrd,
 	struct metapage *mp = NULL;
 	unsigned long flags;
 
-	jfs_info("lmLog: log:0x%p tblk:0x%p, lrd:0x%p tlck:0x%p",
+	jfs_info("lmLog: log:0x%pK tblk:0x%pK, lrd:0x%pK tlck:0x%pK",
 		 log, tblk, lrd, tlck);
 
 	LOG_LOCK(log);
@@ -410,7 +410,7 @@ lmWriteRecord(struct jfs_log * log, struct tblock * tblk, struct lrd * lrd,
 	}
 #endif				/* _JFS_WIP */
 	else {
-		jfs_err("lmWriteRecord: UFO tlck:0x%p", tlck);
+		jfs_err("lmWriteRecord: UFO tlck:0x%pK", tlck);
 		return 0;	/* Probably should trap */
 	}
 	l2linesize = linelock->l2linesize;
@@ -538,7 +538,7 @@ lmWriteRecord(struct jfs_log * log, struct tblock * tblk, struct lrd * lrd,
 			LOGGC_UNLOCK(log);
 		}
 
-		jfs_info("lmWriteRecord: lrd:0x%04x bp:0x%p pn:%d eor:0x%x",
+		jfs_info("lmWriteRecord: lrd:0x%04x bp:0x%pK pn:%d eor:0x%x",
 			le16_to_cpu(lrd->type), log->bp, log->page, dstoffset);
 
 		/* page not full ? */
@@ -690,7 +690,7 @@ int lmGroupCommit(struct jfs_log * log, struct tblock * tblk)
 		LOGGC_UNLOCK(log);
 		return rc;
 	}
-	jfs_info("lmGroup Commit: tblk = 0x%p, gcrtc = %d", tblk, log->gcrtc);
+	jfs_info("lmGroup Commit: tblk = 0x%pK, gcrtc = %d", tblk, log->gcrtc);
 
 	if (tblk->xflag & COMMIT_LAZY)
 		tblk->flag |= tblkGC_LAZY;
@@ -856,7 +856,7 @@ static void lmPostGC(struct lbuf * bp)
 			log->flush_tblk = NULL;
 		}
 
-		jfs_info("lmPostGC: tblk = 0x%p, flag = 0x%x", tblk,
+		jfs_info("lmPostGC: tblk = 0x%pK, flag = 0x%x", tblk,
 			 tblk->flag);
 
 		if (!(tblk->xflag & COMMIT_FORCE))
@@ -1269,7 +1269,7 @@ int lmLogInit(struct jfs_log * log)
 	struct logpage *lp;
 	int lsn = 0;
 
-	jfs_info("lmLogInit: log:0x%p", log);
+	jfs_info("lmLogInit: log:0x%pK", log);
 
 	/* initialize the group commit serialization lock */
 	LOGGC_LOCK_INIT(log);
@@ -1333,7 +1333,7 @@ int lmLogInit(struct jfs_log * log)
 				rc = -EINVAL;
 				goto errout20;
 			}
-			jfs_info("lmLogInit: inline log:0x%p base:0x%Lx "
+			jfs_info("lmLogInit: inline log:0x%pK base:0x%Lx "
 				 "size:0x%x", log,
 				 (unsigned long long) log->base, log->size);
 		} else {
@@ -1343,7 +1343,7 @@ int lmLogInit(struct jfs_log * log)
 			}
 			log->size = le32_to_cpu(logsuper->size);
 			log->l2bsize = le32_to_cpu(logsuper->l2bsize);
-			jfs_info("lmLogInit: external log:0x%p base:0x%Lx "
+			jfs_info("lmLogInit: external log:0x%pK base:0x%Lx "
 				 "size:0x%x", log,
 				 (unsigned long long) log->base, log->size);
 		}
@@ -1462,7 +1462,7 @@ int lmLogClose(struct super_block *sb)
 	struct block_device *bdev;
 	int rc = 0;
 
-	jfs_info("lmLogClose: log:0x%p", log);
+	jfs_info("lmLogClose: log:0x%pK", log);
 
 	mutex_lock(&jfs_log_mutex);
 	LOG_LOCK(log);
@@ -1538,7 +1538,7 @@ void jfs_flush_journal(struct jfs_log *log, int wait)
 	if (!log)
 		return;
 
-	jfs_info("jfs_flush_journal: log:0x%p wait=%d", log, wait);
+	jfs_info("jfs_flush_journal: log:0x%pK wait=%d", log, wait);
 
 	LOGGC_LOCK(log);
 
@@ -1662,7 +1662,7 @@ int lmLogShutdown(struct jfs_log * log)
 	struct lbuf *bp;
 	struct logpage *lp;
 
-	jfs_info("lmLogShutdown: log:0x%p", log);
+	jfs_info("lmLogShutdown: log:0x%pK", log);
 
 	jfs_flush_journal(log, 2);
 
@@ -1812,7 +1812,7 @@ static int lbmLogInit(struct jfs_log * log)
 	int i;
 	struct lbuf *lbuf;
 
-	jfs_info("lbmLogInit: log:0x%p", log);
+	jfs_info("lbmLogInit: log:0x%pK", log);
 
 	/* initialize current buffer cursor */
 	log->bp = NULL;
@@ -1880,7 +1880,7 @@ static void lbmLogShutdown(struct jfs_log * log)
 {
 	struct lbuf *lbuf;
 
-	jfs_info("lbmLogShutdown: log:0x%p", log);
+	jfs_info("lbmLogShutdown: log:0x%pK", log);
 
 	lbuf = log->lbuf_free;
 	while (lbuf) {
@@ -1992,7 +1992,7 @@ static int lbmRead(struct jfs_log * log, int pn, struct lbuf ** bpp)
 	 * allocate a log buffer
 	 */
 	*bpp = bp = lbmAllocate(log, pn);
-	jfs_info("lbmRead: bp:0x%p pn:0x%x", bp, pn);
+	jfs_info("lbmRead: bp:0x%pK pn:0x%x", bp, pn);
 
 	bp->l_flag |= lbmREAD;
 
@@ -2044,7 +2044,7 @@ static void lbmWrite(struct jfs_log * log, struct lbuf * bp, int flag,
 	struct lbuf *tail;
 	unsigned long flags;
 
-	jfs_info("lbmWrite: bp:0x%p flag:0x%x pn:0x%x", bp, flag, bp->l_pn);
+	jfs_info("lbmWrite: bp:0x%pK flag:0x%x pn:0x%x", bp, flag, bp->l_pn);
 
 	/* map the logical block address to physical block address */
 	bp->l_blkno =
@@ -2108,7 +2108,7 @@ static void lbmWrite(struct jfs_log * log, struct lbuf * bp, int flag,
  */
 static void lbmDirectWrite(struct jfs_log * log, struct lbuf * bp, int flag)
 {
-	jfs_info("lbmDirectWrite: bp:0x%p flag:0x%x pn:0x%x",
+	jfs_info("lbmDirectWrite: bp:0x%pK flag:0x%x pn:0x%x",
 		 bp, flag, bp->l_pn);
 
 	/*
@@ -2175,7 +2175,7 @@ static int lbmIOWait(struct lbuf * bp, int flag)
 	unsigned long flags;
 	int rc = 0;
 
-	jfs_info("lbmIOWait1: bp:0x%p flag:0x%x:0x%x", bp, bp->l_flag, flag);
+	jfs_info("lbmIOWait1: bp:0x%pK flag:0x%x:0x%x", bp, bp->l_flag, flag);
 
 	LCACHE_LOCK(flags);		/* disable+lock */
 
@@ -2188,7 +2188,7 @@ static int lbmIOWait(struct lbuf * bp, int flag)
 
 	LCACHE_UNLOCK(flags);	/* unlock+enable */
 
-	jfs_info("lbmIOWait2: bp:0x%p flag:0x%x:0x%x", bp, bp->l_flag, flag);
+	jfs_info("lbmIOWait2: bp:0x%pK flag:0x%x:0x%x", bp, bp->l_flag, flag);
 	return rc;
 }
 
@@ -2207,7 +2207,7 @@ static void lbmIODone(struct bio *bio, int error)
 	/*
 	 * get back jfs buffer bound to the i/o buffer
 	 */
-	jfs_info("lbmIODone: bp:0x%p flag:0x%x", bp, bp->l_flag);
+	jfs_info("lbmIODone: bp:0x%pK flag:0x%x", bp, bp->l_flag);
 
 	LCACHE_LOCK(flags);		/* disable+lock */
 

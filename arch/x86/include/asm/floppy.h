@@ -207,7 +207,7 @@ static int hard_dma_setup(char *addr, unsigned long size, int mode, int io)
 {
 #ifdef FLOPPY_SANITY_CHECK
 	if (CROSS_64KB(addr, size)) {
-		printk("DMA crossing 64-K boundary %p-%p\n", addr, addr+size);
+		printk("DMA crossing 64-K boundary %pK-%pK\n", addr, addr+size);
 		return -1;
 	}
 #endif

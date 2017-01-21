@@ -240,7 +240,7 @@ EXPORT_SYMBOL_GPL(cpufreq_generic_attr);
 void cpufreq_frequency_table_get_attr(struct cpufreq_frequency_table *table,
 				      unsigned int cpu)
 {
-	pr_debug("setting show_table for cpu %u to %p\n", cpu, table);
+	pr_debug("setting show_table for cpu %u to %pK\n", cpu, table);
 	per_cpu(cpufreq_show_table, cpu) = table;
 }
 EXPORT_SYMBOL_GPL(cpufreq_frequency_table_get_attr);

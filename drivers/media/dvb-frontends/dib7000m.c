@@ -154,7 +154,7 @@ static int dib7000m_set_output_mode(struct dib7000m_state *state, int mode)
 	fifo_threshold = 1792;
 	smo_mode = (dib7000m_read_word(state, 294 + state->reg_offs) & 0x0010) | (1 << 1);
 
-	dprintk( "setting output mode for demod %p to %d", &state->demod, mode);
+	dprintk( "setting output mode for demod %pK to %d", &state->demod, mode);
 
 	switch (mode) {
 		case OUTMODE_MPEG2_PAR_GATED_CLK:   // STBs with parallel gated clock
@@ -181,7 +181,7 @@ static int dib7000m_set_output_mode(struct dib7000m_state *state, int mode)
 			outreg = 0;
 			break;
 		default:
-			dprintk( "Unhandled output_mode passed to be set for demod %p",&state->demod);
+			dprintk( "Unhandled output_mode passed to be set for demod %pK",&state->demod);
 			break;
 	}
 
@@ -804,7 +804,7 @@ static int dib7000m_agc_startup(struct dvb_frontend *demod)
 
 			dib7000m_restart_agc(state);
 
-			dprintk( "SPLIT %p: %hd", demod, agc_split);
+			dprintk( "SPLIT %pK: %hd", demod, agc_split);
 
 			(*agc_state)++;
 			ret = 5;

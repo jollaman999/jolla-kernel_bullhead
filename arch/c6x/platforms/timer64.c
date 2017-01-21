@@ -205,7 +205,7 @@ void __init timer64_init(void)
 		pr_debug("%s: Cannot map timer registers.\n", np->full_name);
 		goto out;
 	}
-	pr_debug("%s: Timer registers=%p.\n", np->full_name, timer);
+	pr_debug("%s: Timer registers=%pK.\n", np->full_name, timer);
 
 	cd->irq	= irq_of_parse_and_map(np, 0);
 	if (cd->irq == NO_IRQ) {

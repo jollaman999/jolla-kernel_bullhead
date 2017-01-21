@@ -6369,7 +6369,7 @@ limProcessModifyAddIEs(tpAniSirGlobal pMac, tANI_U32 *pMsg)
         }
         else
         {
-            limLog(pMac, LOGE, FL("Invalid request pIEBuffer %p ieBufferlength"
+            limLog(pMac, LOGE, FL("Invalid request pIEBuffer %pK ieBufferlength"
                             " %d ieIDLen %d ieID %d. update Type %d"),
                             pModifyAddIEs->modifyIE.pIEBuffer,
                             pModifyAddIEs->modifyIE.ieBufferlength,

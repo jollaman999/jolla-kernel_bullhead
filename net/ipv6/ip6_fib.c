@@ -1222,24 +1222,24 @@ static struct fib6_node *fib6_repair_tree(struct net *net,
 			if (!child) {
 				if (w->root == fn) {
 					w->root = w->node = NULL;
-					RT6_TRACE("W %p adjusted by delroot 1\n", w);
+					RT6_TRACE("W %pK adjusted by delroot 1\n", w);
 				} else if (w->node == fn) {
-					RT6_TRACE("W %p adjusted by delnode 1, s=%d/%d\n", w, w->state, nstate);
+					RT6_TRACE("W %pK adjusted by delnode 1, s=%d/%d\n", w, w->state, nstate);
 					w->node = pn;
 					w->state = nstate;
 				}
 			} else {
 				if (w->root == fn) {
 					w->root = child;
-					RT6_TRACE("W %p adjusted by delroot 2\n", w);
+					RT6_TRACE("W %pK adjusted by delroot 2\n", w);
 				}
 				if (w->node == fn) {
 					w->node = child;
 					if (children&2) {
-						RT6_TRACE("W %p adjusted by delnode 2, s=%d\n", w, w->state);
+						RT6_TRACE("W %pK adjusted by delnode 2, s=%d\n", w, w->state);
 						w->state = w->state>=FWS_R ? FWS_U : FWS_INIT;
 					} else {
-						RT6_TRACE("W %p adjusted by delnode 2, s=%d\n", w, w->state);
+						RT6_TRACE("W %pK adjusted by delnode 2, s=%d\n", w, w->state);
 						w->state = w->state>=FWS_C ? FWS_U : FWS_INIT;
 					}
 				}
@@ -1291,7 +1291,7 @@ static void fib6_del_route(struct fib6_node *fn, struct rt6_info **rtp,
 	read_lock(&fib6_walker_lock);
 	FOR_WALKERS(w) {
 		if (w->state == FWS_C && w->leaf == rt) {
-			RT6_TRACE("walker %p adjusted by delroute\n", w);
+			RT6_TRACE("walker %pK adjusted by delroute\n", w);
 			w->leaf = rt->dst.rt6_next;
 			if (!w->leaf)
 				w->state = FWS_U;
@@ -1495,7 +1495,7 @@ static int fib6_clean_node(struct fib6_walker_t *w)
 			res = fib6_del(rt, &info);
 			if (res) {
 #if RT6_DEBUG >= 2
-				pr_debug("%s: del failed: rt=%p@%p err=%d\n",
+				pr_debug("%s: del failed: rt=%pK@%pK err=%d\n",
 					 __func__, rt, rt->rt6i_node, res);
 #endif
 				continue;
@@ -1579,7 +1579,7 @@ void fib6_clean_all(struct net *net, int (*func)(struct rt6_info *, void *arg),
 static int fib6_prune_clone(struct rt6_info *rt, void *arg)
 {
 	if (rt->rt6i_flags & RTF_CACHE) {
-		RT6_TRACE("pruning clone %p\n", rt);
+		RT6_TRACE("pruning clone %pK\n", rt);
 		return -1;
 	}
 
@@ -1616,14 +1616,14 @@ static int fib6_age(struct rt6_info *rt, void *arg)
 
 	if (rt->rt6i_flags & RTF_EXPIRES && rt->dst.expires) {
 		if (time_after(now, rt->dst.expires)) {
-			RT6_TRACE("expiring %p\n", rt);
+			RT6_TRACE("expiring %pK\n", rt);
 			return -1;
 		}
 		gc_args.more++;
 	} else if (rt->rt6i_flags & RTF_CACHE) {
 		if (atomic_read(&rt->dst.__refcnt) == 0 &&
 		    time_after_eq(now, rt->dst.lastuse + gc_args.timeout)) {
-			RT6_TRACE("aging clone %p\n", rt);
+			RT6_TRACE("aging clone %pK\n", rt);
 			return -1;
 		} else if (rt->rt6i_flags & RTF_GATEWAY) {
 			struct neighbour *neigh;
@@ -1635,7 +1635,7 @@ static int fib6_age(struct rt6_info *rt, void *arg)
 				neigh_release(neigh);
 			}
 			if (!(neigh_flags & NTF_ROUTER)) {
-				RT6_TRACE("purging route %p via non-router but gateway\n",
+				RT6_TRACE("purging route %pK via non-router but gateway\n",
 					  rt);
 				return -1;
 			}

@@ -941,7 +941,7 @@ static void __init *careful_zallocation(int nid, unsigned long size,
 		ret = __alloc_bootmem_node(NODE_DATA(new_nid),
 				size, align, 0);
 
-		dbg("alloc_bootmem %p %lx\n", ret, size);
+		dbg("alloc_bootmem %pK %lx\n", ret, size);
 	}
 
 	memset(ret, 0, size);
@@ -1053,7 +1053,7 @@ void __init do_init_bootmem(void)
 					SMP_CACHE_BYTES, end_pfn);
 
   		dbg("node %d\n", nid);
-		dbg("NODE_DATA() = %p\n", NODE_DATA(nid));
+		dbg("NODE_DATA() = %pK\n", NODE_DATA(nid));
 
 		NODE_DATA(nid)->bdata = &bootmem_node_data[nid];
 		NODE_DATA(nid)->node_start_pfn = start_pfn;
@@ -1070,7 +1070,7 @@ void __init do_init_bootmem(void)
 					bootmap_pages << PAGE_SHIFT,
 					PAGE_SIZE, end_pfn);
 
-		dbg("bootmap_vaddr = %p\n", bootmem_vaddr);
+		dbg("bootmap_vaddr = %pK\n", bootmem_vaddr);
 
 		init_bootmem_node(NODE_DATA(nid),
 				  __pa(bootmem_vaddr) >> PAGE_SHIFT,

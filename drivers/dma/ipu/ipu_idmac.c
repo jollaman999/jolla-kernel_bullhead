@@ -791,7 +791,7 @@ static int ipu_submit_buffer(struct idmac_channel *ichan,
 	ipu_update_channel_buffer(ichan, buf_idx, sg_dma_address(sg));
 
 	ipu_select_buffer(chan_id, buf_idx);
-	dev_dbg(dev, "Updated sg %p on channel 0x%x buffer %d\n",
+	dev_dbg(dev, "Updated sg %pK on channel 0x%x buffer %d\n",
 		sg, chan_id, buf_idx);
 
 	return 0;
@@ -833,7 +833,7 @@ static dma_cookie_t idmac_tx_submit(struct dma_async_tx_descriptor *tx)
 	/* Sanity check */
 	if (!list_empty(&desc->list)) {
 		/* The descriptor doesn't belong to client */
-		dev_err(dev, "Descriptor %p not prepared!\n", tx);
+		dev_err(dev, "Descriptor %pK not prepared!\n", tx);
 		return -EBUSY;
 	}
 
@@ -864,7 +864,7 @@ static dma_cookie_t idmac_tx_submit(struct dma_async_tx_descriptor *tx)
 			goto out;
 	}
 
-	dev_dbg(dev, "Submitting sg %p\n", &desc->sg[0]);
+	dev_dbg(dev, "Submitting sg %pK\n", &desc->sg[0]);
 
 	cookie = dma_cookie_assign(tx);
 
@@ -1238,7 +1238,7 @@ static irqreturn_t idmac_interrupt(int irq, void *dev_id)
 	/* Find the descriptor of sgnext */
 	sgnew = idmac_sg_next(ichan, &descnew, *sg);
 	if (sgnext != sgnew)
-		dev_err(dev, "Submitted buffer %p, next buffer %p\n", sgnext, sgnew);
+		dev_err(dev, "Submitted buffer %pK, next buffer %pK\n", sgnext, sgnew);
 
 	/*
 	 * if sgnext == NULL sg must be the last element in a scatterlist and

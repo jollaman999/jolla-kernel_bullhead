@@ -211,7 +211,7 @@ static const struct v4l2_subdev_internal_ops msm_tof_internal_ops = {
 static long msm_tof_subdev_ioctl(struct v4l2_subdev *sd,
 			unsigned int cmd, void *arg)
 {
-	vl6180_dbgmsg("Subdev_ioctl not handled cmd: %u arg: %p\n",cmd,arg);
+	vl6180_dbgmsg("Subdev_ioctl not handled cmd: %u arg: %pK\n",cmd,arg);
 	return 0;
 }
 

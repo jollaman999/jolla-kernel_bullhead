@@ -58,7 +58,7 @@ irnet_post_event(irnet_socket *	ap,
 {
   int			index;		/* In the log */
 
-  DENTER(CTRL_TRACE, "(ap=0x%p, event=%d, daddr=%08x, name=``%s'')\n",
+  DENTER(CTRL_TRACE, "(ap=0x%pK, event=%d, daddr=%08x, name=``%s'')\n",
 	 ap, event, daddr, name);
 
   /* Protect this section via spinlock.
@@ -125,7 +125,7 @@ irnet_open_tsap(irnet_socket *	self)
 {
   notify_t	notify;		/* Callback structure */
 
-  DENTER(IRDA_SR_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SR_TRACE, "(self=0x%pK)\n", self);
 
   DABORT(self->tsap != NULL, -EBUSY, IRDA_SR_ERROR, "Already busy !\n");
 
@@ -150,7 +150,7 @@ irnet_open_tsap(irnet_socket *	self)
   /* Remember which TSAP selector we actually got */
   self->stsap_sel = self->tsap->stsap_sel;
 
-  DEXIT(IRDA_SR_TRACE, " - tsap=0x%p, sel=0x%X\n",
+  DEXIT(IRDA_SR_TRACE, " - tsap=0x%pK, sel=0x%X\n",
 	self->tsap, self->stsap_sel);
   return 0;
 }
@@ -176,7 +176,7 @@ irnet_ias_to_tsap(irnet_socket *	self,
 {
   __u8	dtsap_sel = 0;		/* TSAP we are looking for */
 
-  DENTER(IRDA_SR_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SR_TRACE, "(self=0x%pK)\n", self);
 
   /* By default, no error */
   self->errno = 0;
@@ -256,7 +256,7 @@ irnet_ias_to_tsap(irnet_socket *	self,
 static inline int
 irnet_find_lsap_sel(irnet_socket *	self)
 {
-  DENTER(IRDA_SR_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SR_TRACE, "(self=0x%pK)\n", self);
 
   /* This should not happen */
   DABORT(self->iriap, -EBUSY, IRDA_SR_ERROR, "busy with a previous query.\n");
@@ -293,7 +293,7 @@ irnet_connect_tsap(irnet_socket *	self)
 {
   int		err;
 
-  DENTER(IRDA_SR_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SR_TRACE, "(self=0x%pK)\n", self);
 
   /* Open a local TSAP (an IrTTP instance) */
   err = irnet_open_tsap(self);
@@ -396,7 +396,7 @@ irnet_discover_daddr_and_lsap_sel(irnet_socket *	self)
 {
   int	ret;
 
-  DENTER(IRDA_SR_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SR_TRACE, "(self=0x%pK)\n", self);
 
   /* Ask lmp for the current discovery log */
   self->discoveries = irlmp_get_discoveries(&self->disco_number, self->mask,
@@ -409,7 +409,7 @@ irnet_discover_daddr_and_lsap_sel(irnet_socket *	self)
       clear_bit(0, &self->ttp_connect);
       DRETURN(-ENETUNREACH, IRDA_SR_INFO, "No Cachelog...\n");
     }
-  DEBUG(IRDA_SR_INFO, "Got the log (0x%p), size is %d\n",
+  DEBUG(IRDA_SR_INFO, "Got the log (0x%pK), size is %d\n",
 	self->discoveries, self->disco_number);
 
   /* Start with the first discovery */
@@ -454,7 +454,7 @@ irnet_dname_to_daddr(irnet_socket *	self)
   int	number;			/* Number of nodes in the log */
   int	i;
 
-  DENTER(IRDA_SR_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SR_TRACE, "(self=0x%pK)\n", self);
 
   /* Ask lmp for the current discovery log */
   discoveries = irlmp_get_discoveries(&number, 0xffff,
@@ -502,7 +502,7 @@ irnet_dname_to_daddr(irnet_socket *	self)
 int
 irda_irnet_create(irnet_socket *	self)
 {
-  DENTER(IRDA_SOCK_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SOCK_TRACE, "(self=0x%pK)\n", self);
 
   self->magic = IRNET_MAGIC;	/* Paranoia */
 
@@ -548,7 +548,7 @@ irda_irnet_connect(irnet_socket *	self)
 {
   int		err;
 
-  DENTER(IRDA_SOCK_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SOCK_TRACE, "(self=0x%pK)\n", self);
 
   /* Check if we are already trying to connect.
    * Because irda_irnet_connect() can be called directly by pppd plus
@@ -615,7 +615,7 @@ irda_irnet_connect(irnet_socket *	self)
 void
 irda_irnet_destroy(irnet_socket *	self)
 {
-  DENTER(IRDA_SOCK_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SOCK_TRACE, "(self=0x%pK)\n", self);
   if(self == NULL)
     return;
 
@@ -705,7 +705,7 @@ irnet_daddr_to_dname(irnet_socket *	self)
   int	number;			/* Number of nodes in the log */
   int	i;
 
-  DENTER(IRDA_SERV_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SERV_TRACE, "(self=0x%pK)\n", self);
 
   /* Ask lmp for the current discovery log */
   discoveries = irlmp_get_discoveries(&number, 0xffff,
@@ -751,7 +751,7 @@ irnet_find_socket(irnet_socket *	self)
   irnet_socket *	new = (irnet_socket *) NULL;
   int			err;
 
-  DENTER(IRDA_SERV_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SERV_TRACE, "(self=0x%pK)\n", self);
 
   /* Get the addresses of the requester */
   self->daddr = irttp_get_daddr(self->tsap);
@@ -770,7 +770,7 @@ irnet_find_socket(irnet_socket *	self)
       new = (irnet_socket *) hashbin_find(irnet_server.list,
 					  0, self->rname);
       if(new)
-	DEBUG(IRDA_SERV_INFO, "Socket 0x%p matches rname ``%s''.\n",
+	DEBUG(IRDA_SERV_INFO, "Socket 0x%pK matches rname ``%s''.\n",
 	      new, new->rname);
     }
 
@@ -787,7 +787,7 @@ irnet_find_socket(irnet_socket *	self)
 	  if((new->rdaddr == self->daddr) || (new->daddr == self->daddr))
 	    {
 	      /* Yes !!! Get it.. */
-	      DEBUG(IRDA_SERV_INFO, "Socket 0x%p matches daddr %#08x.\n",
+	      DEBUG(IRDA_SERV_INFO, "Socket 0x%pK matches daddr %#08x.\n",
 		    new, self->daddr);
 	      break;
 	    }
@@ -806,7 +806,7 @@ irnet_find_socket(irnet_socket *	self)
 	     (new->rname[0] == '\0') && (new->ppp_open))
 	    {
 	      /* Yes !!! Get it.. */
-	      DEBUG(IRDA_SERV_INFO, "Socket 0x%p is free.\n",
+	      DEBUG(IRDA_SERV_INFO, "Socket 0x%pK is free.\n",
 		    new);
 	      break;
 	    }
@@ -817,7 +817,7 @@ irnet_find_socket(irnet_socket *	self)
   /* Spin lock end */
   spin_unlock_bh(&irnet_server.spinlock);
 
-  DEXIT(IRDA_SERV_TRACE, " - new = 0x%p\n", new);
+  DEXIT(IRDA_SERV_TRACE, " - new = 0x%pK\n", new);
   return new;
 }
 
@@ -835,7 +835,7 @@ irnet_connect_socket(irnet_socket *	server,
 		     __u32		max_sdu_size,
 		     __u8		max_header_size)
 {
-  DENTER(IRDA_SERV_TRACE, "(server=0x%p, new=0x%p)\n",
+  DENTER(IRDA_SERV_TRACE, "(server=0x%pK, new=0x%pK)\n",
 	 server, new);
 
   /* Now attach up the new socket */
@@ -907,7 +907,7 @@ static inline void
 irnet_disconnect_server(irnet_socket *	self,
 			struct sk_buff *skb)
 {
-  DENTER(IRDA_SERV_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_SERV_TRACE, "(self=0x%pK)\n", self);
 
   /* Put the received packet in the black hole */
   kfree_skb(skb);
@@ -981,7 +981,7 @@ irnet_setup_server(void)
 		      (void *) &irnet_server.s);
 #endif
 
-  DEXIT(IRDA_SERV_TRACE, " - self=0x%p\n", &irnet_server.s);
+  DEXIT(IRDA_SERV_TRACE, " - self=0x%pK\n", &irnet_server.s);
   return 0;
 }
 
@@ -1037,7 +1037,7 @@ irnet_data_indication(void *	instance,
   unsigned char *	p;
   int			code = 0;
 
-  DENTER(IRDA_TCB_TRACE, "(self/ap=0x%p, skb=0x%p)\n",
+  DENTER(IRDA_TCB_TRACE, "(self/ap=0x%pK, skb=0x%pK)\n",
 	 ap, skb);
   DASSERT(skb != NULL, 0, IRDA_CB_ERROR, "skb is NULL !!!\n");
 
@@ -1108,7 +1108,7 @@ irnet_disconnect_indication(void *	instance,
   int			test_open;
   int			test_connect;
 
-  DENTER(IRDA_TCB_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_TCB_TRACE, "(self=0x%pK)\n", self);
   DASSERT(self != NULL, , IRDA_CB_ERROR, "Self is NULL !!!\n");
 
   /* Don't care about it, but let's not leak it */
@@ -1191,7 +1191,7 @@ irnet_connect_confirm(void *	instance,
 {
   irnet_socket *	self = (irnet_socket *) instance;
 
-  DENTER(IRDA_TCB_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_TCB_TRACE, "(self=0x%pK)\n", self);
 
   /* Check if socket is closing down (via irda_irnet_destroy()) */
   if(! test_bit(0, &self->ttp_connect))
@@ -1257,7 +1257,7 @@ irnet_flow_indication(void *	instance,
   irnet_socket *	self = (irnet_socket *) instance;
   LOCAL_FLOW		oldflow = self->tx_flow;
 
-  DENTER(IRDA_TCB_TRACE, "(self=0x%p, flow=%d)\n", self, flow);
+  DENTER(IRDA_TCB_TRACE, "(self=0x%pK, flow=%d)\n", self, flow);
 
   /* Update our state */
   self->tx_flow = flow;
@@ -1298,7 +1298,7 @@ irnet_status_indication(void *	instance,
 {
   irnet_socket *	self = (irnet_socket *) instance;
 
-  DENTER(IRDA_TCB_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_TCB_TRACE, "(self=0x%pK)\n", self);
   DASSERT(self != NULL, , IRDA_CB_ERROR, "Self is NULL !!!\n");
 
   /* We can only get this event if we are connected */
@@ -1340,9 +1340,9 @@ irnet_connect_indication(void *		instance,
   irnet_socket *	server = &irnet_server.s;
   irnet_socket *	new = (irnet_socket *) NULL;
 
-  DENTER(IRDA_TCB_TRACE, "(server=0x%p)\n", server);
+  DENTER(IRDA_TCB_TRACE, "(server=0x%pK)\n", server);
   DASSERT(instance == &irnet_server, , IRDA_CB_ERROR,
-	  "Invalid instance (0x%p) !!!\n", instance);
+	  "Invalid instance (0x%pK) !!!\n", instance);
   DASSERT(sap == irnet_server.s.tsap, , IRDA_CB_ERROR, "Invalid sap !!!\n");
 
   /* Try to find the most appropriate IrNET socket */
@@ -1486,7 +1486,7 @@ irnet_getvalue_confirm(int	result,
 {
   irnet_socket *	self = (irnet_socket *) priv;
 
-  DENTER(IRDA_OCB_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_OCB_TRACE, "(self=0x%pK)\n", self);
   DASSERT(self != NULL, , IRDA_OCB_ERROR, "Self is NULL !!!\n");
 
   /* Check if already connected (via irnet_connect_socket())
@@ -1550,7 +1550,7 @@ irnet_discovervalue_confirm(int		result,
   irnet_socket *	self = (irnet_socket *) priv;
   __u8			dtsap_sel;		/* TSAP we are looking for */
 
-  DENTER(IRDA_OCB_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_OCB_TRACE, "(self=0x%pK)\n", self);
   DASSERT(self != NULL, , IRDA_OCB_ERROR, "Self is NULL !!!\n");
 
   /* Check if already connected (via irnet_connect_socket())
@@ -1603,7 +1603,7 @@ irnet_discovervalue_confirm(int		result,
   self->iriap = NULL;
 
   /* No more items : remove the log and signal termination */
-  DEBUG(IRDA_OCB_INFO, "Cleaning up log (0x%p)\n",
+  DEBUG(IRDA_OCB_INFO, "Cleaning up log (0x%pK)\n",
 	self->discoveries);
   if(self->discoveries != NULL)
     {
@@ -1663,9 +1663,9 @@ irnet_discovery_indication(discinfo_t *		discovery,
 {
   irnet_socket *	self = &irnet_server.s;
 
-  DENTER(IRDA_OCB_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_OCB_TRACE, "(self=0x%pK)\n", self);
   DASSERT(priv == &irnet_server, , IRDA_OCB_ERROR,
-	  "Invalid instance (0x%p) !!!\n", priv);
+	  "Invalid instance (0x%pK) !!!\n", priv);
 
   DEBUG(IRDA_OCB_INFO, "Discovered new IrNET/IrLAN node %s...\n",
 	discovery->info);
@@ -1694,9 +1694,9 @@ irnet_expiry_indication(discinfo_t *	expiry,
 {
   irnet_socket *	self = &irnet_server.s;
 
-  DENTER(IRDA_OCB_TRACE, "(self=0x%p)\n", self);
+  DENTER(IRDA_OCB_TRACE, "(self=0x%pK)\n", self);
   DASSERT(priv == &irnet_server, , IRDA_OCB_ERROR,
-	  "Invalid instance (0x%p) !!!\n", priv);
+	  "Invalid instance (0x%pK) !!!\n", priv);
 
   DEBUG(IRDA_OCB_INFO, "IrNET/IrLAN node %s expired...\n",
 	expiry->info);

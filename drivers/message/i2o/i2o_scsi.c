@@ -360,7 +360,7 @@ static int i2o_scsi_reply(struct i2o_controller *c, u32 m,
 	 */
 	error = le32_to_cpu(msg->body[0]);
 
-	osm_debug("Completed %0x%p\n", cmd);
+	osm_debug("Completed %0x%pK\n", cmd);
 
 	cmd->result = error & 0xff;
 	/*
@@ -677,7 +677,7 @@ static int i2o_scsi_queuecommand_lck(struct scsi_cmnd *SCpnt,
 	/* Queue the message */
 	i2o_msg_post(c, msg);
 
-	osm_debug("Issued %0x%p\n", SCpnt);
+	osm_debug("Issued %0x%pK\n", SCpnt);
 
 	return 0;
 

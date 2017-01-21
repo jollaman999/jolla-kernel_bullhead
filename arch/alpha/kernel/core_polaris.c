@@ -73,7 +73,7 @@ mk_conf_addr(struct pci_bus *pbus, unsigned int device_fn, int where,
 		    POLARIS_DENSE_CONFIG_BASE;
 
         DBG_CFG(("mk_conf_addr(bus=%d ,device_fn=0x%x, where=0x%x,"
-                 " returning address 0x%p\n"
+                 " returning address 0x%pK\n"
                  bus, device_fn, where, *pci_addr));
 
 	return 0;

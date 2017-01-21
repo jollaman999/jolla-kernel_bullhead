@@ -554,7 +554,7 @@ static int metapage_releasepage(struct page *page, gfp_t gfp_mask)
 		if (!mp)
 			continue;
 
-		jfs_info("metapage_releasepage: mp = 0x%p", mp);
+		jfs_info("metapage_releasepage: mp = 0x%pK", mp);
 		if (mp->count || mp->nohomeok ||
 		    test_bit(META_dirty, &mp->flag)) {
 			jfs_info("count = %ld, nohomeok = %d", mp->count,
@@ -684,12 +684,12 @@ struct metapage *__get_metapage(struct inode *inode, unsigned long lblock,
 	}
 
 	if (new) {
-		jfs_info("zeroing mp = 0x%p", mp);
+		jfs_info("zeroing mp = 0x%pK", mp);
 		memset(mp->data, 0, PSIZE);
 	}
 
 	unlock_page(page);
-	jfs_info("__get_metapage: returning = 0x%p data = 0x%p", mp, mp->data);
+	jfs_info("__get_metapage: returning = 0x%pK data = 0x%pK", mp, mp->data);
 	return mp;
 
 unlock:
@@ -699,7 +699,7 @@ unlock:
 
 void grab_metapage(struct metapage * mp)
 {
-	jfs_info("grab_metapage: mp = 0x%p", mp);
+	jfs_info("grab_metapage: mp = 0x%pK", mp);
 	page_cache_get(mp->page);
 	lock_page(mp->page);
 	mp->count++;
@@ -710,7 +710,7 @@ void grab_metapage(struct metapage * mp)
 void force_metapage(struct metapage *mp)
 {
 	struct page *page = mp->page;
-	jfs_info("force_metapage: mp = 0x%p", mp);
+	jfs_info("force_metapage: mp = 0x%pK", mp);
 	set_bit(META_forcewrite, &mp->flag);
 	clear_bit(META_sync, &mp->flag);
 	page_cache_get(page);
@@ -743,7 +743,7 @@ void put_metapage(struct metapage *mp)
 void release_metapage(struct metapage * mp)
 {
 	struct page *page = mp->page;
-	jfs_info("release_metapage: mp = 0x%p, flag = 0x%lx", mp, mp->flag);
+	jfs_info("release_metapage: mp = 0x%pK, flag = 0x%lx", mp, mp->flag);
 
 	BUG_ON(!page);
 

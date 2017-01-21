@@ -250,7 +250,7 @@ static int packetize_data(const u8 *data, size_t length)
 		if ((rc = create_packet(temp, packet_length)))
 			return rc;
 
-		pr_debug("%p:%td\n", temp, (end - temp));
+		pr_debug("%pK:%td\n", temp, (end - temp));
 		temp += packet_length;
 	}
 
@@ -511,7 +511,7 @@ static ssize_t read_rbu_mono_data(char *buffer, loff_t pos, size_t count)
 	/* check to see if we have something to return */
 	if ((rbu_data.image_update_buffer == NULL) ||
 		(rbu_data.bios_image_size == 0)) {
-		pr_debug("read_rbu_data_mono: image_update_buffer %p ,"
+		pr_debug("read_rbu_data_mono: image_update_buffer %pK ,"
 			"bios_image_size %lu\n",
 			rbu_data.image_update_buffer,
 			rbu_data.bios_image_size);

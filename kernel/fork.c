@@ -586,7 +586,7 @@ static void check_mm(struct mm_struct *mm)
 
 		if (unlikely(x))
 			printk(KERN_ALERT "BUG: Bad rss-counter state "
-					  "mm:%p idx:%d val:%ld\n", mm, i, x);
+					  "mm:%pK idx:%d val:%ld\n", mm, i, x);
 	}
 
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE

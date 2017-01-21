@@ -140,7 +140,7 @@ static void DoSendCompletion(HTC_ENDPOINT       *pEndpoint,
             /* using legacy EpTxComplete */
             do {
                 pPacket = HTC_PACKET_DEQUEUE(pQueueToIndicate);
-                AR_DEBUG_PRINTF(ATH_DEBUG_SEND, (" HTC calling ep %d send complete callback on packet %p \n", \
+                AR_DEBUG_PRINTF(ATH_DEBUG_SEND, (" HTC calling ep %d send complete callback on packet %pK \n", \
                         pEndpoint->Id, pPacket));
                 pEndpoint->EpCallBacks.EpTxComplete(pEndpoint->EpCallBacks.pContext, pPacket);
             } while (!HTC_QUEUE_EMPTY(pQueueToIndicate));
@@ -422,7 +422,7 @@ static A_STATUS HTCIssuePackets(HTC_TARGET       *target,
     u_int16_t           payloadLen;
     HTC_FRAME_HDR       *pHtcHdr;
 
-    AR_DEBUG_PRINTF(ATH_DEBUG_SEND, ("+HTCIssuePackets: Queue: %p, Pkts %d \n",
+    AR_DEBUG_PRINTF(ATH_DEBUG_SEND, ("+HTCIssuePackets: Queue: %pK, Pkts %d \n",
                     pPktQueue, HTC_PACKET_QUEUE_DEPTH(pPktQueue)));
     while (TRUE) {
 #if defined(HIF_USB) || defined(HIF_SDIO)
@@ -538,7 +538,7 @@ static A_STATUS HTCIssuePackets(HTC_TARGET       *target,
 #endif
         while (!HTC_QUEUE_EMPTY(pPktQueue)) {
             if (status != A_NO_RESOURCE) {
-                AR_DEBUG_PRINTF(ATH_DEBUG_ERR, ("HTCIssuePackets, failed pkt:0x%p status:%d \n",pPacket,status));
+                AR_DEBUG_PRINTF(ATH_DEBUG_ERR, ("HTCIssuePackets, failed pkt:0x%pK status:%d \n",pPacket,status));
             }
             pPacket = HTC_PACKET_DEQUEUE(pPktQueue);
 	    if (pPacket) {
@@ -651,7 +651,7 @@ void GetHTCSendPacketsCreditBased(HTC_TARGET        *target,
             break;
         }
 
-        AR_DEBUG_PRINTF(ATH_DEBUG_SEND,(" Got head packet:%p , Queue Depth: %d\n",
+        AR_DEBUG_PRINTF(ATH_DEBUG_SEND,(" Got head packet:%pK , Queue Depth: %d\n",
                 pPacket, HTC_PACKET_QUEUE_DEPTH(pTxQueue)));
 
         transferLength = pPacket->ActualLength + HTC_HDR_LENGTH;
@@ -781,7 +781,7 @@ void GetHTCSendPackets(HTC_TARGET        *target,
                hif_pm_runtime_put(target->hif_dev);
             break;
         }
-        AR_DEBUG_PRINTF(ATH_DEBUG_SEND,(" Got packet:%p , New Queue Depth: %d\n",
+        AR_DEBUG_PRINTF(ATH_DEBUG_SEND,(" Got packet:%pK , New Queue Depth: %d\n",
                 pPacket, HTC_PACKET_QUEUE_DEPTH(pTxQueue)));
         /* For non-credit path the sequence number is already embedded
          * in the constructed HTC header
@@ -828,7 +828,7 @@ static HTC_SEND_QUEUE_RESULT HTCTrySend(HTC_TARGET       *target,
     int                   overflow;
     HTC_SEND_QUEUE_RESULT result = HTC_SEND_QUEUE_OK;
 
-    AR_DEBUG_PRINTF(ATH_DEBUG_SEND,("+HTCTrySend (Queue:%p Depth:%d)\n",
+    AR_DEBUG_PRINTF(ATH_DEBUG_SEND,("+HTCTrySend (Queue:%pK Depth:%d)\n",
             pCallersSendQueue,
             (pCallersSendQueue == NULL) ? 0 : HTC_PACKET_QUEUE_DEPTH(pCallersSendQueue)));
 
@@ -889,7 +889,7 @@ static HTC_SEND_QUEUE_RESULT HTCTrySend(HTC_TARGET       *target,
                 /* walk through the caller's queue and indicate each one to the send full handler */
             ITERATE_OVER_LIST_ALLOW_REMOVE(&pCallersSendQueue->QueueHead, pPacket, HTC_PACKET, ListLink) {
 
-                AR_DEBUG_PRINTF(ATH_DEBUG_SEND, (" Indicating overflowed TX packet: %p \n",
+                AR_DEBUG_PRINTF(ATH_DEBUG_SEND, (" Indicating overflowed TX packet: %pK \n",
                                 pPacket));
                 /*
                  * Remove headroom reserved for HTC_FRAME_HDR before giving
@@ -1107,7 +1107,7 @@ A_STATUS HTCSendPktsMultiple(HTC_HANDLE HTCHandle, HTC_PACKET_QUEUE *pPktQueue)
     adf_nbuf_t      netbuf;
     HTC_FRAME_HDR       *pHtcHdr;
 
-    AR_DEBUG_PRINTF(ATH_DEBUG_SEND, ("+HTCSendPktsMultiple: Queue: %p, Pkts %d \n",
+    AR_DEBUG_PRINTF(ATH_DEBUG_SEND, ("+HTCSendPktsMultiple: Queue: %pK, Pkts %d \n",
                     pPktQueue, HTC_PACKET_QUEUE_DEPTH(pPktQueue)));
 
         /* get packet at head to figure out which endpoint these packets will go into */
@@ -1209,7 +1209,7 @@ A_STATUS    HTCSendPkt(HTC_HANDLE HTCHandle, HTC_PACKET *pPacket)
     }
     a_mem_trace(GET_HTC_PACKET_NET_BUF_CONTEXT(pPacket));
     AR_DEBUG_PRINTF(ATH_DEBUG_SEND,
-                    ("+-HTCSendPkt: Enter endPointId: %d, buffer: %p, length: %d \n",
+                    ("+-HTCSendPkt: Enter endPointId: %d, buffer: %pK, length: %d \n",
                     pPacket->Endpoint, pPacket->pBuffer, pPacket->ActualLength));
     INIT_HTC_PACKET_QUEUE_AND_ADD(&queue,pPacket);
     return HTCSendPktsMultiple(HTCHandle, &queue);

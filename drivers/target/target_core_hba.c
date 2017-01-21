@@ -56,7 +56,7 @@ int transport_subsystem_register(struct se_subsystem_api *sub_api)
 	mutex_lock(&subsystem_mutex);
 	list_for_each_entry(s, &subsystem_list, sub_api_list) {
 		if (!strcmp(s->name, sub_api->name)) {
-			pr_err("%p is already registered with"
+			pr_err("%pK is already registered with"
 				" duplicate name %s, unable to process"
 				" request\n", s, s->name);
 			mutex_unlock(&subsystem_mutex);
@@ -67,7 +67,7 @@ int transport_subsystem_register(struct se_subsystem_api *sub_api)
 	mutex_unlock(&subsystem_mutex);
 
 	pr_debug("TCM: Registered subsystem plugin: %s struct module:"
-			" %p\n", sub_api->name, sub_api->owner);
+			" %pK\n", sub_api->name, sub_api->owner);
 	return 0;
 }
 EXPORT_SYMBOL(transport_subsystem_register);

@@ -799,7 +799,7 @@ ath5k_desc_alloc(struct ath5k_hw *ah)
 	}
 	ds = ah->desc;
 	da = ah->desc_daddr;
-	ATH5K_DBG(ah, ATH5K_DEBUG_ANY, "DMA map: %p (%zu) -> %llx\n",
+	ATH5K_DBG(ah, ATH5K_DEBUG_ANY, "DMA map: %pK (%zu) -> %llx\n",
 		ds, ah->desc_len, (unsigned long long)ah->desc_daddr);
 
 	bf = kcalloc(1 + ATH_TXBUF + ATH_RXBUF + ATH_BCBUF,
@@ -1720,7 +1720,7 @@ ath5k_beacon_setup(struct ath5k_hw *ah, struct ath5k_buf *bf)
 
 	bf->skbaddr = dma_map_single(ah->dev, skb->data, skb->len,
 			DMA_TO_DEVICE);
-	ATH5K_DBG(ah, ATH5K_DEBUG_BEACON, "skb %p [data %p len %u] "
+	ATH5K_DBG(ah, ATH5K_DEBUG_BEACON, "skb %pK [data %pK len %u] "
 			"skbaddr %llx\n", skb, skb->data, skb->len,
 			(unsigned long long)bf->skbaddr);
 
@@ -1873,7 +1873,7 @@ ath5k_beacon_send(struct ath5k_hw *ah)
 		int slot = ((tsftu % ah->bintval) * ATH_BCBUF) / ah->bintval;
 		vif = ah->bslot[(slot + 1) % ATH_BCBUF];
 		ATH5K_DBG(ah, ATH5K_DEBUG_BEACON,
-			"tsf %llx tsftu %x intval %u slot %u vif %p\n",
+			"tsf %llx tsftu %x intval %u slot %u vif %pK\n",
 			(unsigned long long)tsf, tsftu, ah->bintval, slot, vif);
 	} else /* only one interface */
 		vif = ah->bslot[0];
@@ -1904,7 +1904,7 @@ ath5k_beacon_send(struct ath5k_hw *ah)
 
 	if (unlikely(bf->skb == NULL || ah->opmode == NL80211_IFTYPE_STATION ||
 		     ah->opmode == NL80211_IFTYPE_MONITOR)) {
-		ATH5K_WARN(ah, "bf=%p bf_skb=%p\n", bf, bf->skb);
+		ATH5K_WARN(ah, "bf=%pK bf_skb=%pK\n", bf, bf->skb);
 		return;
 	}
 
@@ -1912,7 +1912,7 @@ ath5k_beacon_send(struct ath5k_hw *ah)
 
 	ath5k_hw_set_txdp(ah, ah->bhalq, bf->daddr);
 	ath5k_hw_start_tx_dma(ah, ah->bhalq);
-	ATH5K_DBG(ah, ATH5K_DEBUG_BEACON, "TXDP[%u] = %llx (%p)\n",
+	ATH5K_DBG(ah, ATH5K_DEBUG_BEACON, "TXDP[%u] = %llx (%pK)\n",
 		ah->bhalq, (unsigned long long)bf->daddr, bf->desc);
 
 	skb = ieee80211_get_buffered_bc(ah->hw, vif);

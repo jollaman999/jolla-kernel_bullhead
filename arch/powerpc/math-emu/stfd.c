@@ -7,7 +7,7 @@ stfd(void *frS, void *ea)
 {
 #if 0
 #ifdef DEBUG
-	printk("%s: S %p, ea %p: ", __func__, frS, ea);
+	printk("%s: S %pK, ea %pK: ", __func__, frS, ea);
 	dump_double(frS);
 	printk("\n");
 #endif

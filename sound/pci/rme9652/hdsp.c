@@ -3410,7 +3410,7 @@ snd_hdsp_proc_read(struct snd_info_entry *entry, struct snd_info_buffer *buffer)
 
 	snd_iprintf(buffer, "%s (Card #%d)\n", hdsp->card_name,
 		    hdsp->card->number + 1);
-	snd_iprintf(buffer, "Buffers: capture %p playback %p\n",
+	snd_iprintf(buffer, "Buffers: capture %pK playback %pK\n",
 		    hdsp->capture_buffer, hdsp->playback_buffer);
 	snd_iprintf(buffer, "IRQ: %d Registers bus: 0x%lx VM: 0x%lx\n",
 		    hdsp->irq, hdsp->port, (unsigned long)hdsp->iobase);

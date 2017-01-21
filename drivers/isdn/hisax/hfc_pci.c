@@ -72,7 +72,7 @@ static const PCI_ENTRY id_list[] =
 static void
 release_io_hfcpci(struct IsdnCardState *cs)
 {
-	printk(KERN_INFO "HiSax: release hfcpci at %p\n",
+	printk(KERN_INFO "HiSax: release hfcpci at %pK\n",
 	       cs->hw.hfcpci.pci_io);
 	cs->hw.hfcpci.int_m2 = 0;					/* interrupt output off ! */
 	Write_hfc(cs, HFCPCI_INT_M2, cs->hw.hfcpci.int_m2);
@@ -1723,7 +1723,7 @@ setup_hfcpci(struct IsdnCard *card)
 	pci_write_config_dword(cs->hw.hfcpci.dev, 0x80, (u32)cs->hw.hfcpci.dma);
 	cs->hw.hfcpci.pci_io = ioremap((ulong) cs->hw.hfcpci.pci_io, 256);
 	printk(KERN_INFO
-	       "HFC-PCI: defined at mem %p fifo %p(%lx) IRQ %d HZ %d\n",
+	       "HFC-PCI: defined at mem %pK fifo %pK(%lx) IRQ %d HZ %d\n",
 	       cs->hw.hfcpci.pci_io,
 	       cs->hw.hfcpci.fifos,
 	       (u_long)cs->hw.hfcpci.dma,

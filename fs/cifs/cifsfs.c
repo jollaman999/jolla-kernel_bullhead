@@ -690,7 +690,7 @@ cifs_do_mount(struct file_system_type *fs_type,
 	if (IS_ERR(root))
 		goto out_super;
 
-	cifs_dbg(FYI, "dentry root is: %p\n", root);
+	cifs_dbg(FYI, "dentry root is: %pK\n", root);
 	goto out;
 
 out_super:
@@ -722,7 +722,7 @@ static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 
 	rc = filemap_fdatawrite(inode->i_mapping);
 	if (rc)
-		cifs_dbg(FYI, "cifs_file_aio_write: %d rc on %p inode\n",
+		cifs_dbg(FYI, "cifs_file_aio_write: %d rc on %pK inode\n",
 			 rc, inode);
 
 	return written;

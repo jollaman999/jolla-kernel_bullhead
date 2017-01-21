@@ -1648,14 +1648,14 @@ retry_rcvqfill:
 			if (paddrl == 0) {
 				dev_err(dev, "%s: LOW 32bits PHYSICAL ADDRESS == 0\n",
 					__func__);
-				dev_err(dev, "skb[%p] PROBLEM\n", skb);
-				dev_err(dev, "         skbdata[%p]\n", skb->data);
+				dev_err(dev, "skb[%pK] PROBLEM\n", skb);
+				dev_err(dev, "         skbdata[%pK]\n", skb->data);
 				dev_err(dev, "         skblen[%x]\n", skb->len);
-				dev_err(dev, "         paddr[%p]\n", paddr);
+				dev_err(dev, "         paddr[%pK]\n", paddr);
 				dev_err(dev, "         paddrl[%x]\n", paddrl);
 				dev_err(dev, "         paddrh[%x]\n", paddrh);
-				dev_err(dev, "         rcvq->head[%p]\n", rcvq->head);
-				dev_err(dev, "         rcvq->tail[%p]\n", rcvq->tail);
+				dev_err(dev, "         rcvq->head[%pK]\n", rcvq->head);
+				dev_err(dev, "         rcvq->tail[%pK]\n", rcvq->tail);
 				dev_err(dev, "         rcvq->count[%x]\n", rcvq->count);
 				dev_err(dev, "SKIP THIS SKB!!!!!!!!\n");
 				goto retry_rcvqfill;
@@ -1664,14 +1664,14 @@ retry_rcvqfill:
 			if (paddrl == 0) {
 				dev_err(dev, "%s: LOW 32bits PHYSICAL ADDRESS == 0\n",
 					__func__);
-				dev_err(dev, "skb[%p] PROBLEM\n", skb);
-				dev_err(dev, "         skbdata[%p]\n", skb->data);
+				dev_err(dev, "skb[%pK] PROBLEM\n", skb);
+				dev_err(dev, "         skbdata[%pK]\n", skb->data);
 				dev_err(dev, "         skblen[%x]\n", skb->len);
-				dev_err(dev, "         paddr[%p]\n", paddr);
+				dev_err(dev, "         paddr[%pK]\n", paddr);
 				dev_err(dev, "         paddrl[%x]\n", paddrl);
 				dev_err(dev, "         paddrh[%x]\n", paddrh);
-				dev_err(dev, "         rcvq->head[%p]\n", rcvq->head);
-				dev_err(dev, "         rcvq->tail[%p]\n", rcvq->tail);
+				dev_err(dev, "         rcvq->head[%pK]\n", rcvq->head);
+				dev_err(dev, "         rcvq->tail[%pK]\n", rcvq->tail);
 				dev_err(dev, "         rcvq->count[%x]\n", rcvq->count);
 				dev_err(dev, "GIVE TO CARD ANYWAY\n");
 			}
@@ -1761,7 +1761,7 @@ static struct sk_buff *slic_rcvqueue_getnext(struct adapter *adapter)
 		}
 	} else {
 		dev_err(&adapter->netdev->dev,
-			"RcvQ Empty!! rcvq[%p] count[%x]\n", rcvq, rcvq->count);
+			"RcvQ Empty!! rcvq[%pK] count[%x]\n", rcvq, rcvq->count);
 		skb = NULL;
 	}
 	while (rcvq->count < SLIC_RCVQ_FILLTHRESH) {
@@ -1796,14 +1796,14 @@ static u32 slic_rcvqueue_reinsert(struct adapter *adapter, struct sk_buff *skb)
 		dev = &adapter->netdev->dev;
 		dev_err(dev, "%s: LOW 32bits PHYSICAL ADDRESS == 0\n",
 			__func__);
-		dev_err(dev, "skb[%p] PROBLEM\n", skb);
-		dev_err(dev, "         skbdata[%p]\n", skb->data);
+		dev_err(dev, "skb[%pK] PROBLEM\n", skb);
+		dev_err(dev, "         skbdata[%pK]\n", skb->data);
 		dev_err(dev, "         skblen[%x]\n", skb->len);
-		dev_err(dev, "         paddr[%p]\n", paddr);
+		dev_err(dev, "         paddr[%pK]\n", paddr);
 		dev_err(dev, "         paddrl[%x]\n", paddrl);
 		dev_err(dev, "         paddrh[%x]\n", paddrh);
-		dev_err(dev, "         rcvq->head[%p]\n", rcvq->head);
-		dev_err(dev, "         rcvq->tail[%p]\n", rcvq->tail);
+		dev_err(dev, "         rcvq->head[%pK]\n", rcvq->head);
+		dev_err(dev, "         rcvq->tail[%pK]\n", rcvq->tail);
 		dev_err(dev, "         rcvq->count[%x]\n", rcvq->count);
 	}
 	if (paddrh == 0) {
@@ -2425,7 +2425,7 @@ static void slic_xmit_fail(struct adapter *adapter,
 		switch (status) {
 		case XMIT_FAIL_LINK_STATE:
 			dev_err(&adapter->netdev->dev,
-				"reject xmit skb[%p: %x] linkstate[%s] "
+				"reject xmit skb[%pK: %x] linkstate[%s] "
 				"adapter[%s:%d] card[%s:%d]\n",
 				skb, skb->pkt_type,
 				SLIC_LINKSTATE(adapter->linkstate),
@@ -2436,12 +2436,12 @@ static void slic_xmit_fail(struct adapter *adapter,
 			break;
 		case XMIT_FAIL_ZERO_LENGTH:
 			dev_err(&adapter->netdev->dev,
-				"xmit_start skb->len == 0 skb[%p] type[%x]\n",
+				"xmit_start skb->len == 0 skb[%pK] type[%x]\n",
 				skb, skb->pkt_type);
 			break;
 		case XMIT_FAIL_HOSTCMD_FAIL:
 			dev_err(&adapter->netdev->dev,
-				"xmit_start skb[%p] type[%x] No host commands "
+				"xmit_start skb[%pK] type[%x] No host commands "
 				"available\n", skb, skb->pkt_type);
 			break;
 		}

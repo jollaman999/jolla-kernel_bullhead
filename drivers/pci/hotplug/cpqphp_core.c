@@ -120,7 +120,7 @@ static void __iomem * detect_SMBIOS_pointer(void __iomem *begin, void __iomem *e
 	if (!status)
 		fp = NULL;
 
-	dbg("Discovered SMBIOS Entry point at %p\n", fp);
+	dbg("Discovered SMBIOS Entry point at %pK\n", fp);
 
 	return fp;
 }
@@ -339,7 +339,7 @@ get_slot_mapping(struct pci_bus *bus, u8 bus_num, u8 dev_num, u8 *slot)
 
 	u8 tbus, tdevice, tslot, bridgeSlot;
 
-	dbg("%s: %p, %d, %d, %p\n", __func__, bus, bus_num, dev_num, slot);
+	dbg("%s: %pK, %d, %d, %pK\n", __func__, bus, bus_num, dev_num, slot);
 
 	bridgeSlot = 0xFF;
 
@@ -493,7 +493,7 @@ static int process_SI(struct hotplug_slot *hotplug_slot)
 	slot_func->device = device;
 	slot_func->function = function;
 	slot_func->configured = 0;
-	dbg("board_added(%p, %p)\n", slot_func, ctrl);
+	dbg("board_added(%pK, %pK)\n", slot_func, ctrl);
 	return cpqhp_process_SI(ctrl, slot_func);
 }
 
@@ -521,7 +521,7 @@ static int process_SS(struct hotplug_slot *hotplug_slot)
 	if (!slot_func)
 		return -ENODEV;
 
-	dbg("In %s, slot_func = %p, ctrl = %p\n", __func__, slot_func, ctrl);
+	dbg("In %s, slot_func = %pK, ctrl = %pK\n", __func__, slot_func, ctrl);
 	return cpqhp_process_SS(ctrl, slot_func);
 }
 
@@ -1102,7 +1102,7 @@ static int cpqhpc_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto err_free_bus;
 	}
 
-	dbg("pdev = %p\n", pdev);
+	dbg("pdev = %pK\n", pdev);
 	dbg("pci resource start %llx\n", (unsigned long long)pci_resource_start(pdev, 0));
 	dbg("pci resource len %llx\n", (unsigned long long)pci_resource_len(pdev, 0));
 

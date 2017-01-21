@@ -1532,7 +1532,7 @@ setup_tx_desc_die:
 	if (!e1000_check_64k_bound(adapter, txdr->desc, txdr->size)) {
 		void *olddesc = txdr->desc;
 		dma_addr_t olddma = txdr->dma;
-		e_err(tx_err, "txdr align check failed: %u bytes at %p\n",
+		e_err(tx_err, "txdr align check failed: %u bytes at %pK\n",
 		      txdr->size, txdr->desc);
 		/* Try again, without freeing the previous */
 		txdr->desc = dma_alloc_coherent(&pdev->dev, txdr->size,
@@ -1724,7 +1724,7 @@ setup_rx_desc_die:
 	if (!e1000_check_64k_bound(adapter, rxdr->desc, rxdr->size)) {
 		void *olddesc = rxdr->desc;
 		dma_addr_t olddma = rxdr->dma;
-		e_err(rx_err, "rxdr align check failed: %u bytes at %p\n",
+		e_err(rx_err, "rxdr align check failed: %u bytes at %pK\n",
 		      rxdr->size, rxdr->desc);
 		/* Try again, without freeing the previous */
 		rxdr->desc = dma_alloc_coherent(&pdev->dev, rxdr->size,
@@ -3417,7 +3417,7 @@ static void e1000_dump(struct e1000_adapter *adapter)
 		else
 			type = "";
 
-		pr_info("T%c[0x%03X]    %016llX %016llX %016llX %04X  %3X %016llX %p %s\n",
+		pr_info("T%c[0x%03X]    %016llX %016llX %016llX %04X  %3X %016llX %pK %s\n",
 			((le64_to_cpu(u->b) & (1<<20)) ? 'd' : 'c'), i,
 			le64_to_cpu(u->a), le64_to_cpu(u->b),
 			(u64)buffer_info->dma, buffer_info->length,
@@ -3457,7 +3457,7 @@ rx_ring_summary:
 		else
 			type = "";
 
-		pr_info("R[0x%03X]     %016llX %016llX %016llX %p %s\n",
+		pr_info("R[0x%03X]     %016llX %016llX %016llX %pK %s\n",
 			i, le64_to_cpu(u->a), le64_to_cpu(u->b),
 			(u64)buffer_info->dma, buffer_info->skb, type);
 	} /* for */
@@ -4497,7 +4497,7 @@ static void e1000_alloc_rx_buffers(struct e1000_adapter *adapter,
 		if (!e1000_check_64k_bound(adapter, skb->data, bufsz)) {
 			struct sk_buff *oldskb = skb;
 			e_err(rx_err, "skb align check failed: %u bytes at "
-			      "%p\n", bufsz, skb->data);
+			      "%pK\n", bufsz, skb->data);
 			/* Try again, without freeing the previous */
 			skb = netdev_alloc_skb_ip_align(netdev, bufsz);
 			/* Failed allocation, critical failure */
@@ -4542,7 +4542,7 @@ map_skb:
 					(void *)(unsigned long)buffer_info->dma,
 					adapter->rx_buffer_len)) {
 			e_err(rx_err, "dma align check failed: %u bytes at "
-			      "%p\n", adapter->rx_buffer_len,
+			      "%pK\n", adapter->rx_buffer_len,
 			      (void *)(unsigned long)buffer_info->dma);
 			dev_kfree_skb(skb);
 			buffer_info->skb = NULL;

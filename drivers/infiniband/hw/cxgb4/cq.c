@@ -149,7 +149,7 @@ static int create_cq(struct c4iw_rdev *rdev, struct t4_cq *cq,
 	ret = c4iw_ofld_send(rdev, skb);
 	if (ret)
 		goto err4;
-	PDBG("%s wait_event wr_wait %p\n", __func__, &wr_wait);
+	PDBG("%s wait_event wr_wait %pK\n", __func__, &wr_wait);
 	ret = c4iw_wait_for_reply(rdev, &wr_wait, 0, 0, __func__);
 	if (ret)
 		goto err4;
@@ -178,7 +178,7 @@ static void insert_recv_cqe(struct t4_wq *wq, struct t4_cq *cq)
 {
 	struct t4_cqe cqe;
 
-	PDBG("%s wq %p cq %p sw_cidx %u sw_pidx %u\n", __func__,
+	PDBG("%s wq %pK cq %pK sw_cidx %u sw_pidx %u\n", __func__,
 	     wq, cq, cq->sw_cidx, cq->sw_pidx);
 	memset(&cqe, 0, sizeof(cqe));
 	cqe.header = cpu_to_be32(V_CQE_STATUS(T4_ERR_SWFLUSH) |
@@ -197,7 +197,7 @@ int c4iw_flush_rq(struct t4_wq *wq, struct t4_cq *cq, int count)
 	int in_use = wq->rq.in_use - count;
 
 	BUG_ON(in_use < 0);
-	PDBG("%s wq %p cq %p rq.in_use %u skip count %u\n", __func__,
+	PDBG("%s wq %pK cq %pK rq.in_use %u skip count %u\n", __func__,
 	     wq, cq, wq->rq.in_use, count);
 	while (in_use--) {
 		insert_recv_cqe(wq, cq);
@@ -211,7 +211,7 @@ static void insert_sq_cqe(struct t4_wq *wq, struct t4_cq *cq,
 {
 	struct t4_cqe cqe;
 
-	PDBG("%s wq %p cq %p sw_cidx %u sw_pidx %u\n", __func__,
+	PDBG("%s wq %pK cq %pK sw_cidx %u sw_pidx %u\n", __func__,
 	     wq, cq, cq->sw_cidx, cq->sw_pidx);
 	memset(&cqe, 0, sizeof(cqe));
 	cqe.header = cpu_to_be32(V_CQE_STATUS(T4_ERR_SWFLUSH) |
@@ -251,7 +251,7 @@ void c4iw_flush_hw_cq(struct t4_cq *cq)
 	struct t4_cqe *cqe = NULL, *swcqe;
 	int ret;
 
-	PDBG("%s cq %p cqid 0x%x\n", __func__, cq, cq->cqid);
+	PDBG("%s cq %pK cqid 0x%x\n", __func__, cq, cq->cqid);
 	ret = t4_next_hw_cqe(cq, &cqe);
 	while (!ret) {
 		PDBG("%s flushing hwcq cidx 0x%x swcq pidx 0x%x\n",
@@ -297,7 +297,7 @@ void c4iw_count_scqes(struct t4_cq *cq, struct t4_wq *wq, int *count)
 		if (++ptr == cq->size)
 			ptr = 0;
 	}
-	PDBG("%s cq %p count %d\n", __func__, cq, *count);
+	PDBG("%s cq %pK count %d\n", __func__, cq, *count);
 }
 
 void c4iw_count_rcqes(struct t4_cq *cq, struct t4_wq *wq, int *count)
@@ -316,7 +316,7 @@ void c4iw_count_rcqes(struct t4_cq *cq, struct t4_wq *wq, int *count)
 		if (++ptr == cq->size)
 			ptr = 0;
 	}
-	PDBG("%s cq %p count %d\n", __func__, cq, *count);
+	PDBG("%s cq %pK count %d\n", __func__, cq, *count);
 }
 
 static void flush_completed_wrs(struct t4_wq *wq, struct t4_cq *cq)
@@ -542,11 +542,11 @@ flush_wq:
 
 skip_cqe:
 	if (SW_CQE(hw_cqe)) {
-		PDBG("%s cq %p cqid 0x%x skip sw cqe cidx %u\n",
+		PDBG("%s cq %pK cqid 0x%x skip sw cqe cidx %u\n",
 		     __func__, cq, cq->cqid, cq->sw_cidx);
 		t4_swcq_consume(cq);
 	} else {
-		PDBG("%s cq %p cqid 0x%x skip hw cqe cidx %u\n",
+		PDBG("%s cq %pK cqid 0x%x skip hw cqe cidx %u\n",
 		     __func__, cq, cq->cqid, cq->cidx);
 		t4_hwcq_consume(cq);
 	}
@@ -732,7 +732,7 @@ int c4iw_destroy_cq(struct ib_cq *ib_cq)
 	struct c4iw_cq *chp;
 	struct c4iw_ucontext *ucontext;
 
-	PDBG("%s ib_cq %p\n", __func__, ib_cq);
+	PDBG("%s ib_cq %pK\n", __func__, ib_cq);
 	chp = to_c4iw_cq(ib_cq);
 
 	remove_handle(chp->rhp, &chp->rhp->cqidr, chp->cq.cqid);
@@ -759,7 +759,7 @@ struct ib_cq *c4iw_create_cq(struct ib_device *ibdev, int entries,
 	size_t memsize, hwentries;
 	struct c4iw_mm_entry *mm, *mm2;
 
-	PDBG("%s ib_dev %p entries %d\n", __func__, ibdev, entries);
+	PDBG("%s ib_dev %pK entries %d\n", __func__, ibdev, entries);
 
 	rhp = to_c4iw_dev(ibdev);
 
@@ -857,7 +857,7 @@ struct ib_cq *c4iw_create_cq(struct ib_device *ibdev, int entries,
 		mm2->len = PAGE_SIZE;
 		insert_mmap(ucontext, mm2);
 	}
-	PDBG("%s cqid 0x%0x chp %p size %u memsize %zu, dma_addr 0x%0llx\n",
+	PDBG("%s cqid 0x%0x chp %pK size %u memsize %zu, dma_addr 0x%0llx\n",
 	     __func__, chp->cq.cqid, chp, chp->cq.size,
 	     chp->cq.memsize,
 	     (unsigned long long) chp->cq.dma_addr);

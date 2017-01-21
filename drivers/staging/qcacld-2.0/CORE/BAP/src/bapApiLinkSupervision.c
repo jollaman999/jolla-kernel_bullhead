@@ -518,7 +518,7 @@ static VOS_STATUS WLANBAP_TxLinkSupervisionCB
         }
     }
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO,
-               "%s:Returned Vos Packet:%p\n", __func__, pPacket );
+               "%s:Returned Vos Packet:%pK\n", __func__, pPacket );
 
     vos_pkt_return_packet( pPacket );
 

@@ -1120,7 +1120,7 @@ static int activate_dtv_t_c_path(enum demod_wrapper_pdm_num pdm)
 	/* adc mux */
 	if (device->path_control[DEMOD_WRAPPER_EXT_ATV])
 		adc_reg_val = 0x00000021;
-	dev_info(device->dev, "First write from %p\n", base + ADC_MUX_SEL);
+	dev_info(device->dev, "First write from %pK\n", base + ADC_MUX_SEL);
 	writel_relaxed(adc_reg_val, base + ADC_MUX_SEL);
 	dev_info(device->dev, "After first write\n");
 

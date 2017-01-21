@@ -331,7 +331,7 @@ static int ulite_request_port(struct uart_port *port)
 {
 	int ret;
 
-	pr_debug("ulite console: port=%p; port->mapbase=%llx\n",
+	pr_debug("ulite console: port=%pK; port->mapbase=%llx\n",
 		 port, (unsigned long long) port->mapbase);
 
 	if (!request_mem_region(port->mapbase, ULITE_REGION, "uartlite")) {

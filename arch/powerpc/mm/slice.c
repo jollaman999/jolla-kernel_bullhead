@@ -199,7 +199,7 @@ static void slice_convert(struct mm_struct *mm, struct slice_mask mask, int psiz
 	u64 lpsizes;
 	unsigned long i, flags;
 
-	slice_dbg("slice_convert(mm=%p, psize=%d)\n", mm, psize);
+	slice_dbg("slice_convert(mm=%pK, psize=%d)\n", mm, psize);
 	slice_print_mask(" mask", mask);
 
 	/* We need to use a spinlock here to protect against
@@ -397,7 +397,7 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 	/* Sanity checks */
 	BUG_ON(mm->task_size == 0);
 
-	slice_dbg("slice_get_unmapped_area(mm=%p, psize=%d...\n", mm, psize);
+	slice_dbg("slice_get_unmapped_area(mm=%pK, psize=%d...\n", mm, psize);
 	slice_dbg(" addr=%lx, len=%lx, flags=%lx, topdown=%d\n",
 		  addr, len, flags, topdown);
 
@@ -604,7 +604,7 @@ void slice_set_user_psize(struct mm_struct *mm, unsigned int psize)
 	unsigned int old_psize;
 	int i;
 
-	slice_dbg("slice_set_user_psize(mm=%p, psize=%d)\n", mm, psize);
+	slice_dbg("slice_set_user_psize(mm=%pK, psize=%d)\n", mm, psize);
 
 	spin_lock_irqsave(&slice_convert_lock, flags);
 
@@ -721,7 +721,7 @@ int is_hugepage_only_range(struct mm_struct *mm, unsigned long addr,
 #endif
 
 #if 0 /* too verbose */
-	slice_dbg("is_hugepage_only_range(mm=%p, addr=%lx, len=%lx)\n",
+	slice_dbg("is_hugepage_only_range(mm=%pK, addr=%lx, len=%lx)\n",
 		 mm, addr, len);
 	slice_print_mask(" mask", mask);
 	slice_print_mask(" available", available);

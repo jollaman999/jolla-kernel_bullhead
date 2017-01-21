@@ -750,7 +750,7 @@ ext4_ext_binsearch_idx(struct inode *inode,
 			r = m - 1;
 		else
 			l = m + 1;
-		ext_debug("%p(%u):%p(%u):%p(%u) ", l, le32_to_cpu(l->ei_block),
+		ext_debug("%pK(%u):%pK(%u):%pK(%u) ", l, le32_to_cpu(l->ei_block),
 				m, le32_to_cpu(m->ei_block),
 				r, le32_to_cpu(r->ei_block));
 	}
@@ -768,8 +768,8 @@ ext4_ext_binsearch_idx(struct inode *inode,
 		for (k = 0; k < le16_to_cpu(eh->eh_entries); k++, ix++) {
 		  if (k != 0 &&
 		      le32_to_cpu(ix->ei_block) <= le32_to_cpu(ix[-1].ei_block)) {
-				printk(KERN_DEBUG "k=%d, ix=0x%p, "
-				       "first=0x%p\n", k,
+				printk(KERN_DEBUG "k=%d, ix=0x%pK, "
+				       "first=0x%pK\n", k,
 				       ix, EXT_FIRST_INDEX(eh));
 				printk(KERN_DEBUG "%u <= %u\n",
 				       le32_to_cpu(ix->ei_block),
@@ -818,7 +818,7 @@ ext4_ext_binsearch(struct inode *inode,
 			r = m - 1;
 		else
 			l = m + 1;
-		ext_debug("%p(%u):%p(%u):%p(%u) ", l, le32_to_cpu(l->ee_block),
+		ext_debug("%pK(%u):%pK(%u):%pK(%u) ", l, le32_to_cpu(l->ee_block),
 				m, le32_to_cpu(m->ee_block),
 				r, le32_to_cpu(r->ee_block));
 	}
@@ -992,7 +992,7 @@ static int ext4_ext_insert_index(handle_t *handle, struct inode *inode,
 	BUG_ON(len < 0);
 	if (len > 0) {
 		ext_debug("insert new index %d: "
-				"move %d indices from 0x%p to 0x%p\n",
+				"move %d indices from 0x%pK to 0x%pK\n",
 				logical, len, ix, ix + 1);
 		memmove(ix + 1, ix, len * sizeof(struct ext4_extent_idx));
 	}
@@ -1203,7 +1203,7 @@ static int ext4_ext_split(handle_t *handle, struct inode *inode,
 		}
 		/* start copy indexes */
 		m = EXT_MAX_INDEX(path[i].p_hdr) - path[i].p_idx++;
-		ext_debug("cur 0x%p, last 0x%p\n", path[i].p_idx,
+		ext_debug("cur 0x%pK, last 0x%pK\n", path[i].p_idx,
 				EXT_MAX_INDEX(path[i].p_hdr));
 		ext4_ext_show_move(inode, path, newblock, i);
 		if (m) {
@@ -1676,7 +1676,7 @@ static int ext4_ext_correct_indexes(handle_t *handle, struct inode *inode,
 
 	if (unlikely(ex == NULL || eh == NULL)) {
 		EXT4_ERROR_INODE(inode,
-				 "ex %p == NULL or eh %p == NULL", ex, eh);
+				 "ex %pK == NULL or eh %pK == NULL", ex, eh);
 		return -EIO;
 	}
 
@@ -2098,7 +2098,7 @@ has_space:
 			   > le32_to_cpu(nearex->ee_block)) {
 			/* Insert after */
 			ext_debug("insert %u:%llu:[%d]%d before: "
-					"nearest %p\n",
+					"nearest %pK\n",
 					le32_to_cpu(newext->ee_block),
 					ext4_ext_pblock(newext),
 					ext4_ext_is_unwritten(newext),
@@ -2109,7 +2109,7 @@ has_space:
 			/* Insert before */
 			BUG_ON(newext->ee_block == nearex->ee_block);
 			ext_debug("insert %u:%llu:[%d]%d after: "
-					"nearest %p\n",
+					"nearest %pK\n",
 					le32_to_cpu(newext->ee_block),
 					ext4_ext_pblock(newext),
 					ext4_ext_is_unwritten(newext),
@@ -2119,7 +2119,7 @@ has_space:
 		len = EXT_LAST_EXTENT(eh) - nearex + 1;
 		if (len > 0) {
 			ext_debug("insert %u:%llu:[%d]%d: "
-					"move %d extents from 0x%p to 0x%p\n",
+					"move %d extents from 0x%pK to 0x%pK\n",
 					le32_to_cpu(newext->ee_block),
 					ext4_ext_pblock(newext),
 					ext4_ext_is_unwritten(newext),
@@ -2947,7 +2947,7 @@ again:
 			/* this level hasn't been touched yet */
 			path[i].p_idx = EXT_LAST_INDEX(path[i].p_hdr);
 			path[i].p_block = le16_to_cpu(path[i].p_hdr->eh_entries)+1;
-			ext_debug("init index ptr: hdr 0x%p, num %d\n",
+			ext_debug("init index ptr: hdr 0x%pK, num %d\n",
 				  path[i].p_hdr,
 				  le16_to_cpu(path[i].p_hdr->eh_entries));
 		} else {
@@ -2955,7 +2955,7 @@ again:
 			path[i].p_idx--;
 		}
 
-		ext_debug("level %d - index, first 0x%p, cur 0x%p\n",
+		ext_debug("level %d - index, first 0x%pK, cur 0x%pK\n",
 				i, EXT_FIRST_INDEX(path[i].p_hdr),
 				path[i].p_idx);
 		if (ext4_ext_more_to_rm(path + i)) {

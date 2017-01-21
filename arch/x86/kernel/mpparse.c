@@ -583,7 +583,7 @@ static int __init smp_scan_config(unsigned long base, unsigned long length)
 #endif
 			mpf_found = mpf;
 
-			printk(KERN_INFO "found SMP MP-table at [mem %#010llx-%#010llx] mapped at [%p]\n",
+			printk(KERN_INFO "found SMP MP-table at [mem %#010llx-%#010llx] mapped at [%pK]\n",
 			       (unsigned long long) virt_to_phys(mpf),
 			       (unsigned long long) virt_to_phys(mpf) +
 			       sizeof(*mpf) - 1, mpf);

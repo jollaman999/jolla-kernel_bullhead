@@ -21,7 +21,7 @@ DECLARE_EVENT_CLASS(workqueue_work,
 		__entry->work		= work;
 	),
 
-	TP_printk("work struct %p", __entry->work)
+	TP_printk("work struct %pK", __entry->work)
 );
 
 /**
@@ -57,7 +57,7 @@ TRACE_EVENT(workqueue_queue_work,
 		__entry->cpu		= pwq->pool->cpu;
 	),
 
-	TP_printk("work struct=%p function=%pf workqueue=%p req_cpu=%u cpu=%u",
+	TP_printk("work struct=%pK function=%pf workqueue=%pK req_cpu=%u cpu=%u",
 		  __entry->work, __entry->function, __entry->workqueue,
 		  __entry->req_cpu, __entry->cpu)
 );
@@ -99,7 +99,7 @@ TRACE_EVENT(workqueue_execute_start,
 		__entry->function	= work->func;
 	),
 
-	TP_printk("work struct %p: function %pf", __entry->work, __entry->function)
+	TP_printk("work struct %pK: function %pf", __entry->work, __entry->function)
 );
 
 /**

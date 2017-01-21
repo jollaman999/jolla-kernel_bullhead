@@ -93,7 +93,7 @@ int i2400mu_tx(struct i2400mu *i2400mu, struct i2400m_msg_hdr *tx_msg,
 	int usb_pipe, sent_size, do_autopm;
 	struct usb_endpoint_descriptor *epd;
 
-	d_fnstart(4, dev, "(i2400mu %p)\n", i2400mu);
+	d_fnstart(4, dev, "(i2400mu %pK)\n", i2400mu);
 	do_autopm = atomic_read(&i2400mu->do_autopm);
 	result = do_autopm ?
 		usb_autopm_get_interface(i2400mu->usb_iface) : 0;
@@ -160,7 +160,7 @@ retry:
 	}
 	if (do_autopm)
 		usb_autopm_put_interface(i2400mu->usb_iface);
-	d_fnend(4, dev, "(i2400mu %p) = result\n", i2400mu);
+	d_fnend(4, dev, "(i2400mu %pK) = result\n", i2400mu);
 	return result;
 }
 
@@ -184,7 +184,7 @@ int i2400mu_txd(void *_i2400mu)
 	size_t tx_msg_size;
 	unsigned long flags;
 
-	d_fnstart(4, dev, "(i2400mu %p)\n", i2400mu);
+	d_fnstart(4, dev, "(i2400mu %pK)\n", i2400mu);
 
 	spin_lock_irqsave(&i2400m->tx_lock, flags);
 	BUG_ON(i2400mu->tx_kthread != NULL);
@@ -213,7 +213,7 @@ int i2400mu_txd(void *_i2400mu)
 	i2400mu->tx_kthread = NULL;
 	spin_unlock_irqrestore(&i2400m->tx_lock, flags);
 
-	d_fnend(4, dev, "(i2400mu %p)\n", i2400mu);
+	d_fnend(4, dev, "(i2400mu %pK)\n", i2400mu);
 	return 0;
 }
 
@@ -231,9 +231,9 @@ void i2400mu_bus_tx_kick(struct i2400m *i2400m)
 	struct i2400mu *i2400mu = container_of(i2400m, struct i2400mu, i2400m);
 	struct device *dev = &i2400mu->usb_iface->dev;
 
-	d_fnstart(3, dev, "(i2400m %p) = void\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK) = void\n", i2400m);
 	wake_up_all(&i2400mu->tx_wq);
-	d_fnend(3, dev, "(i2400m %p) = void\n", i2400m);
+	d_fnend(3, dev, "(i2400m %pK) = void\n", i2400m);
 }
 
 

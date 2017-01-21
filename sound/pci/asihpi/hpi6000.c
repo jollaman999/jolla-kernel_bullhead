@@ -482,7 +482,7 @@ static short create_adapter_obj(struct hpi_adapter_obj *pao,
 	/* BAR1 - 32K = HPI registers on DSP */
 	phw->dw2040_HPICSR = pao->pci.ap_mem_base[0];
 	phw->dw2040_HPIDSP = pao->pci.ap_mem_base[1];
-	HPI_DEBUG_LOG(VERBOSE, "csr %p, dsp %p\n", phw->dw2040_HPICSR,
+	HPI_DEBUG_LOG(VERBOSE, "csr %pK, dsp %pK\n", phw->dw2040_HPICSR,
 		phw->dw2040_HPIDSP);
 
 	/* set addresses for the possible DSP HPI interfaces */
@@ -501,7 +501,7 @@ static short create_adapter_obj(struct hpi_adapter_obj *pao,
 			phw->dw2040_HPIDSP + (DATA_AUTOINC +
 			DSP_SPACING * dsp_index);
 
-		HPI_DEBUG_LOG(VERBOSE, "ctl %p, adr %p, dat %p, dat++ %p\n",
+		HPI_DEBUG_LOG(VERBOSE, "ctl %pK, adr %pK, dat %pK, dat++ %pK\n",
 			phw->ado[dsp_index].prHPI_control,
 			phw->ado[dsp_index].prHPI_address,
 			phw->ado[dsp_index].prHPI_data,

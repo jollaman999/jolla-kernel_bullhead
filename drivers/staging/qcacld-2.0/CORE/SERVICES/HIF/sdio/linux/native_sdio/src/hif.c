@@ -500,7 +500,7 @@ HIFReadWrite(HIF_DEVICE *device,
     AR_DEBUG_ASSERT(device != NULL);
     AR_DEBUG_ASSERT(device->func != NULL);
     AR_DEBUG_PRINTF(ATH_DEBUG_TRACE,
-        ("AR6000: device 0x%p addr 0x%X buffer 0x%p len %d req 0x%X context 0x%p",
+        ("AR6000: device 0x%pK addr 0x%X buffer 0x%pK len %d req 0x%X context 0x%pK",
         device, address, buffer, length, request, context));
 
     /*sdio r/w action is not needed when suspend with cut power,so just return*/
@@ -1069,7 +1069,7 @@ HIFShutDownDevice(HIF_DEVICE *device)
         for (i=0; i<MAX_HIF_DEVICES; ++i) {
             if (hif_devices[i] && hif_devices[i]->func == NULL) {
                 AR_DEBUG_PRINTF(ATH_DEBUG_TRACE,
-                                ("AR6000: Remove pending hif_device %p\n", hif_devices[i]));
+                                ("AR6000: Remove pending hif_device %pK\n", hif_devices[i]));
                 delHifDevice(hif_devices[i]);
                 hif_devices[i] = NULL;
             }
@@ -1176,7 +1176,7 @@ static int hifDeviceInserted(struct sdio_func *func, const struct sdio_device_id
         }
         if (i==MAX_HIF_DEVICES) {
             AR_DEBUG_PRINTF(ATH_DEBUG_ERROR,
-                ("AR6000: hifDeviceInserted, No more hif_devices[] slot for %p", device));
+                ("AR6000: hifDeviceInserted, No more hif_devices[] slot for %pK", device));
         }
 
         device->id = id;
@@ -1547,7 +1547,7 @@ BUS_REQUEST *hifAllocateBusRequest(HIF_DEVICE *device)
     }
     /* Release lock */
     spin_unlock_irqrestore(&device->lock, flag);
-    AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: hifAllocateBusRequest: 0x%p\n", busrequest));
+    AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: hifAllocateBusRequest: 0x%pK\n", busrequest));
     return busrequest;
 }
 
@@ -1557,7 +1557,7 @@ hifFreeBusRequest(HIF_DEVICE *device, BUS_REQUEST *busrequest)
     unsigned long flag;
 
     AR_DEBUG_ASSERT(busrequest != NULL);
-    //AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: hifFreeBusRequest: 0x%p\n", busrequest));
+    //AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: hifFreeBusRequest: 0x%pK\n", busrequest));
     /* Acquire lock */
     spin_lock_irqsave(&device->lock, flag);
 
@@ -1627,7 +1627,7 @@ static A_STATUS hifEnableFunc(HIF_DEVICE *device, struct sdio_func *func)
     int (*taskFunc)(void *) = NULL;
     int ret = A_OK;
 
-    ENTER("sdio_func 0x%p", func);
+    ENTER("sdio_func 0x%pK", func);
 
     AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: +hifEnableFunc\n"));
     device = getHifDevice(func);
@@ -2148,7 +2148,7 @@ static void
 delHifDevice(HIF_DEVICE * device)
 {
     AR_DEBUG_ASSERT(device!= NULL);
-    AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: delHifDevice; 0x%p\n", device));
+    AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: delHifDevice; 0x%pK\n", device));
     if (device->dma_buffer != NULL) {
         A_FREE(device->dma_buffer);
     }

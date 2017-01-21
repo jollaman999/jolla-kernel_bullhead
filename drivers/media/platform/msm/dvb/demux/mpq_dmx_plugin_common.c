@@ -944,7 +944,7 @@ static int mpq_map_buffer_to_kernel(
 		}
 		ion_handle_get_size(client, ion_handle, &tmp);
 		MPQ_DVB_DBG_PRINT(
-			"%s: mapped to address 0x%p, size=%lu\n",
+			"%s: mapped to address 0x%pK, size=%lu\n",
 			__func__, *kernel_mem, tmp);
 	}
 
@@ -1208,7 +1208,7 @@ static int mpq_dmx_init_external_buffers(
 		feed_data->buffer_desc.desc[i].write_ptr = 0;
 
 		MPQ_DVB_DBG_PRINT(
-			"%s: Buffer #%d: base=0x%p, handle=%d, size=%d\n",
+			"%s: Buffer #%d: base=0x%pK, handle=%d, size=%d\n",
 			__func__, i ,
 			feed_data->buffer_desc.desc[i].base,
 			feed_data->buffer_desc.desc[i].handle,
@@ -2645,7 +2645,7 @@ static int mpq_dmx_process_video_packet_framing(
 				DMX_IDX_VC1_SEQ_HEADER)) {
 
 				MPQ_DVB_DBG_PRINT(
-					"%s: Found Sequence Pattern, buf %p, i = %d, offset = %d, type = %lld\n",
+					"%s: Found Sequence Pattern, buf %pK, i = %d, offset = %d, type = %lld\n",
 					__func__, buf, i,
 					framing_res.info[i].offset,
 					framing_res.info[i].type);
@@ -3763,7 +3763,7 @@ static int mpq_sdmx_filter_setup(struct mpq_demux *mpq_demux,
 		}
 
 		MPQ_DVB_DBG_PRINT(
-			"%s: feed=0x%p, filter pid=%d, handle=%d, data buffer(s)=%d, size=%d\n",
+			"%s: feed=0x%pK, filter pid=%d, handle=%d, data buffer(s)=%d, size=%d\n",
 			__func__, feed, dvbdmx_feed->pid,
 			feed->sdmx_filter_handle,
 			data_buf_num, data_buff_desc[0].length);

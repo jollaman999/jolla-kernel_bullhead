@@ -217,7 +217,7 @@ void mv_u3d_done(struct mv_u3d_ep *ep, struct mv_u3d_req *req, int status)
 	usb_gadget_unmap_request(&u3d->gadget, &req->req, mv_u3d_ep_dir(ep));
 
 	if (status && (status != -ESHUTDOWN)) {
-		dev_dbg(u3d->dev, "complete %s req %p stat %d len %u/%u",
+		dev_dbg(u3d->dev, "complete %s req %pK stat %d len %u/%u",
 			ep->ep.name, &req->req, status,
 			req->req.actual, req->req.length);
 	}
@@ -811,15 +811,15 @@ mv_u3d_ep_queue(struct usb_ep *_ep, struct usb_request *_req, gfp_t gfp_flags)
 		return 0;
 	}
 
-	dev_dbg(u3d->dev, "%s: %s, req: 0x%p\n",
+	dev_dbg(u3d->dev, "%s: %s, req: 0x%pK\n",
 			__func__, _ep->name, req);
 
 	/* catch various bogus parameters */
 	if (!req->req.complete || !req->req.buf
 			|| !list_empty(&req->queue)) {
 		dev_err(u3d->dev,
-			"%s, bad params, _req: 0x%p,"
-			"req->req.complete: 0x%p, req->req.buf: 0x%p,"
+			"%s, bad params, _req: 0x%pK,"
+			"req->req.complete: 0x%pK, req->req.buf: 0x%pK,"
 			"list_empty: 0x%x\n",
 			__func__, _req,
 			req->req.complete, req->req.buf,

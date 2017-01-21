@@ -108,7 +108,7 @@ dmadbg_showchan(const char *fname, int line, struct s3c2410_dma_chan *chan)
 
 	dmadbg_capture(chan, &state);
 
-	printk(KERN_DEBUG "dma%d: %s:%d: ls=%d, cur=%p, %p %p\n",
+	printk(KERN_DEBUG "dma%d: %s:%d: ls=%d, cur=%pK, %pK %pK\n",
 	       chan->number, fname, line, chan->load_state,
 	       chan->curr, chan->next, chan->end);
 
@@ -211,7 +211,7 @@ s3c2410_dma_loadbuffer(struct s3c2410_dma_chan *chan,
 		return -EINVAL;
 	}
 
-	pr_debug("s3c2410_chan_loadbuffer: loading buff %p (0x%08lx,0x%06x)\n",
+	pr_debug("s3c2410_chan_loadbuffer: loading buff %pK (0x%08lx,0x%06x)\n",
 		 buf, (unsigned long)buf->data, buf->size);
 
 	/* check the state of the channel before we do anything */
@@ -229,7 +229,7 @@ s3c2410_dma_loadbuffer(struct s3c2410_dma_chan *chan,
 	 * and load another transfer after this one has finished...
 	 */
 	if (chan->load_state == S3C2410_DMALOAD_NONE) {
-		pr_debug("load_state is none, checking for noreload (next=%p)\n",
+		pr_debug("load_state is none, checking for noreload (next=%pK)\n",
 			 buf->next);
 		reload = (buf->next == NULL) ? S3C2410_DCON_NORELOAD : 0;
 	} else {
@@ -238,7 +238,7 @@ s3c2410_dma_loadbuffer(struct s3c2410_dma_chan *chan,
 	}
 
 	if ((buf->data & 0xf0000000) != 0x30000000) {
-		dmawarn("dmaload: buffer is %p\n", (void *)buf->data);
+		dmawarn("dmaload: buffer is %pK\n", (void *)buf->data);
 	}
 
 	writel(buf->data, chan->addr_reg);
@@ -293,7 +293,7 @@ s3c2410_dma_buffdone(struct s3c2410_dma_chan *chan, struct s3c2410_dma_buf *buf,
 		     enum s3c2410_dma_buffresult result)
 {
 #if 0
-	pr_debug("callback_fn=%p, buf=%p, id=%p, size=%d, result=%d\n",
+	pr_debug("callback_fn=%pK, buf=%pK, id=%pK, size=%d, result=%d\n",
 		 chan->callback_fn, buf, buf->id, buf->size, result);
 #endif
 
@@ -439,7 +439,7 @@ int s3c2410_dma_enqueue(enum dma_ch channel, void *id,
 	if (chan == NULL)
 		return -EINVAL;
 
-	pr_debug("%s: id=%p, data=%08x, size=%d\n",
+	pr_debug("%s: id=%pK, data=%08x, size=%d\n",
 		 __func__, id, (unsigned int)data, size);
 
 	buf = kmem_cache_alloc(dma_kmem, GFP_ATOMIC);
@@ -449,7 +449,7 @@ int s3c2410_dma_enqueue(enum dma_ch channel, void *id,
 		return -ENOMEM;
 	}
 
-	//pr_debug("%s: new buffer %p\n", __func__, buf);
+	//pr_debug("%s: new buffer %pK\n", __func__, buf);
 	//dbg_showchan(chan);
 
 	buf->next  = NULL;
@@ -462,18 +462,18 @@ int s3c2410_dma_enqueue(enum dma_ch channel, void *id,
 
 	if (chan->curr == NULL) {
 		/* we've got nothing loaded... */
-		pr_debug("%s: buffer %p queued onto empty channel\n",
+		pr_debug("%s: buffer %pK queued onto empty channel\n",
 			 __func__, buf);
 
 		chan->curr = buf;
 		chan->end  = buf;
 		chan->next = NULL;
 	} else {
-		pr_debug("dma%d: %s: buffer %p queued onto non-empty channel\n",
+		pr_debug("dma%d: %s: buffer %pK queued onto non-empty channel\n",
 			 chan->number, __func__, buf);
 
 		if (chan->end == NULL) {
-			pr_debug("dma%d: %s: %p not empty, and chan->end==NULL?\n",
+			pr_debug("dma%d: %s: %pK not empty, and chan->end==NULL?\n",
 				 chan->number, __func__, chan);
 		} else {
 			chan->end->next = buf;
@@ -524,7 +524,7 @@ s3c2410_dma_freebuf(struct s3c2410_dma_buf *buf)
 	if (magicok) {
 		kmem_cache_free(dma_kmem, buf);
 	} else {
-		printk("s3c2410_dma_freebuf: buff %p with bad magic\n", buf);
+		printk("s3c2410_dma_freebuf: buff %pK with bad magic\n", buf);
 	}
 }
 
@@ -635,7 +635,7 @@ s3c2410_dma_irq(int irq, void *devpw)
 		buf->next  = NULL;
 
 		if (buf->magic != BUF_MAGIC) {
-			printk(KERN_ERR "dma%d: %s: buf %p incorrect magic\n",
+			printk(KERN_ERR "dma%d: %s: buf %pK incorrect magic\n",
 			       chan->number, __func__, buf);
 			return IRQ_HANDLED;
 		}
@@ -719,7 +719,7 @@ int s3c2410_dma_request(enum dma_ch channel,
 	unsigned long flags;
 	int err;
 
-	pr_debug("dma%d: s3c2410_request_dma: client=%s, dev=%p\n",
+	pr_debug("dma%d: s3c2410_request_dma: client=%s, dev=%pK\n",
 		 channel, client->name, dev);
 
 	local_irq_save(flags);
@@ -764,7 +764,7 @@ int s3c2410_dma_request(enum dma_ch channel,
 
 	/* need to setup */
 
-	pr_debug("%s: channel initialised, %p\n", __func__, chan);
+	pr_debug("%s: channel initialised, %pK\n", __func__, chan);
 
 	return chan->number | DMACH_LOW_LEVEL;
 }
@@ -793,14 +793,14 @@ int s3c2410_dma_free(enum dma_ch channel, struct s3c2410_dma_client *client)
 	local_irq_save(flags);
 
 	if (chan->client != client) {
-		printk(KERN_WARNING "dma%d: possible free from different client (channel %p, passed %p)\n",
+		printk(KERN_WARNING "dma%d: possible free from different client (channel %pK, passed %pK)\n",
 		       channel, chan->client, client);
 	}
 
 	/* sort out stopping and freeing the channel */
 
 	if (chan->state != S3C2410_DMA_IDLE) {
-		pr_debug("%s: need to stop dma channel %p\n",
+		pr_debug("%s: need to stop dma channel %pK\n",
 		       __func__, chan);
 
 		/* possibly flush the channel */
@@ -885,7 +885,7 @@ static int s3c2410_dma_flush(struct s3c2410_dma_chan *chan)
 	struct s3c2410_dma_buf *buf, *next;
 	unsigned long flags;
 
-	pr_debug("%s: chan %p (%d)\n", __func__, chan, chan->number);
+	pr_debug("%s: chan %pK (%d)\n", __func__, chan, chan->number);
 
 	dbg_showchan(chan);
 
@@ -906,7 +906,7 @@ static int s3c2410_dma_flush(struct s3c2410_dma_chan *chan)
 		for ( ; buf != NULL; buf = next) {
 			next = buf->next;
 
-			pr_debug("%s: free buffer %p, next %p\n",
+			pr_debug("%s: free buffer %pK, next %pK\n",
 			       __func__, buf, buf->next);
 
 			s3c2410_dma_buffdone(chan, buf, S3C2410_RES_ABORT);
@@ -1326,7 +1326,7 @@ int __init s3c24xx_dma_init(unsigned int channels, unsigned int irq,
 
 		cp->load_timeout = 1<<18;
 
-		printk("DMA channel %d at %p, irq %d\n",
+		printk("DMA channel %d at %pK, irq %d\n",
 		       cp->number, cp->regs, cp->irq);
 	}
 

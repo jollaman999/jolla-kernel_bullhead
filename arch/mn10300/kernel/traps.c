@@ -316,7 +316,7 @@ void show_registers_only(struct pt_regs *regs)
 	       regs->lar, regs->lir, regs->mdr, regs->sp);
 	printk(KERN_EMERG "cvf: %08lx   crl: %08lx  crh: %08lx  drq: %08lx\n",
 	       regs->mcvf, regs->mcrl, regs->mcrh, regs->mdrq);
-	printk(KERN_EMERG "threadinfo=%p task=%p)\n",
+	printk(KERN_EMERG "threadinfo=%pK task=%pK)\n",
 	       current_thread_info(), current);
 
 	if ((unsigned long) current >= PAGE_OFFSET &&

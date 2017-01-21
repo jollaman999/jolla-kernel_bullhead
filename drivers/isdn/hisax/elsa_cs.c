@@ -94,7 +94,7 @@ static void elsa_cs_detach(struct pcmcia_device *link)
 {
 	local_info_t *info = link->priv;
 
-	dev_dbg(&link->dev, "elsa_cs_detach(0x%p)\n", link);
+	dev_dbg(&link->dev, "elsa_cs_detach(0x%pK)\n", link);
 
 	info->busy = 1;
 	elsa_cs_release(link);
@@ -131,7 +131,7 @@ static int elsa_cs_config(struct pcmcia_device *link)
 	int i;
 	IsdnCard_t icard;
 
-	dev_dbg(&link->dev, "elsa_config(0x%p)\n", link);
+	dev_dbg(&link->dev, "elsa_config(0x%pK)\n", link);
 
 	link->config_flags |= CONF_ENABLE_IRQ | CONF_AUTO_SET_IO;
 
@@ -169,7 +169,7 @@ static void elsa_cs_release(struct pcmcia_device *link)
 {
 	local_info_t *local = link->priv;
 
-	dev_dbg(&link->dev, "elsa_cs_release(0x%p)\n", link);
+	dev_dbg(&link->dev, "elsa_cs_release(0x%pK)\n", link);
 
 	if (local) {
 		if (local->cardnr >= 0) {

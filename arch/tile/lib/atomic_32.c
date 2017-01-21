@@ -203,7 +203,7 @@ EXPORT_SYMBOL(_atomic64_cmpxchg);
 struct __get_user __atomic_bad_address(int __user *addr)
 {
 	if (unlikely(!access_ok(VERIFY_WRITE, addr, sizeof(int))))
-		panic("Bad address used for kernel atomic op: %p\n", addr);
+		panic("Bad address used for kernel atomic op: %pK\n", addr);
 	return (struct __get_user) { .err = -EFAULT };
 }
 

@@ -174,7 +174,7 @@ static void fas216_dumpstate(FAS216_Info *info)
 
 static void print_SCp(struct scsi_pointer *SCp, const char *prefix, const char *suffix)
 {
-	printk("%sptr %p this_residual 0x%x buffer %p buffers_residual 0x%x%s",
+	printk("%sptr %pK this_residual 0x%x buffer %pK buffers_residual 0x%x%s",
 		prefix, SCp->ptr, SCp->this_residual, SCp->buffer,
 		SCp->buffers_residual, suffix);
 }
@@ -189,14 +189,14 @@ static void fas216_dumpinfo(FAS216_Info *info)
 		return;
 
 	printk("FAS216_Info=\n");
-	printk("  { magic_start=%lX host=%p SCpnt=%p origSCpnt=%p\n",
+	printk("  { magic_start=%lX host=%pK SCpnt=%pK origSCpnt=%pK\n",
 		info->magic_start, info->host, info->SCpnt,
 		info->origSCpnt);
 	printk("    scsi={ io_shift=%X irq=%X cfg={ %X %X %X %X }\n",
 		info->scsi.io_shift, info->scsi.irq,
 		info->scsi.cfg[0], info->scsi.cfg[1], info->scsi.cfg[2],
 		info->scsi.cfg[3]);
-	printk("           type=%p phase=%X\n",
+	printk("           type=%pK phase=%X\n",
 		info->scsi.type, info->scsi.phase);
 	print_SCp(&info->scsi.SCp, "           SCp={ ", " }\n");
 	printk("      msgs async_stp=%X disconnectable=%d aborting=%d }\n",
@@ -217,7 +217,7 @@ static void fas216_dumpinfo(FAS216_Info *info)
 			info->device[i].disconnect_ok, info->device[i].stp,
 			info->device[i].sof, info->device[i].sync_state);
 	}
-	printk("    dma={ transfer_type=%X setup=%p pseudo=%p stop=%p }\n",
+	printk("    dma={ transfer_type=%X setup=%pK pseudo=%pK stop=%pK }\n",
 		info->dma.transfer_type, info->dma.setup,
 		info->dma.pseudo, info->dma.stop);
 	printk("    internal_done=%X magic_end=%lX }\n",
@@ -395,7 +395,7 @@ static void print_debug_list(void)
 	i = cmd_ptr;
 	printk(KERN_ERR "FAS216 commands: ");
 	do {
-		printk("%02x:%p ", cmd_list[i].command, cmd_list[i].from);
+		printk("%02x:%pK ", cmd_list[i].command, cmd_list[i].from);
 		i = (i + 1) & 7;
 	} while (i != cmd_ptr);
 	printk("\n");
@@ -751,7 +751,7 @@ static void fas216_transfer(FAS216_Info *info)
 	fasdmatype_t dmatype;
 
 	fas216_log(info, LOG_BUFFER,
-		   "starttransfer: buffer %p length 0x%06x reqlen 0x%06x",
+		   "starttransfer: buffer %pK length 0x%06x reqlen 0x%06x",
 		   info->scsi.SCp.ptr, info->scsi.SCp.this_residual,
 		   info->scsi.SCp.phase);
 
@@ -1010,7 +1010,7 @@ fas216_reselected_intr(FAS216_Info *info)
 		 */
 		info->scsi.SCp = info->SCpnt->SCp;
 
-		fas216_log(info, LOG_CONNECT, "data pointers: [%p, %X]",
+		fas216_log(info, LOG_CONNECT, "data pointers: [%pK, %X]",
 			info->scsi.SCp.ptr, info->scsi.SCp.this_residual);
 		info->scsi.phase = PHASE_MSGIN;
 	} else {
@@ -1078,7 +1078,7 @@ static void fas216_parse_message(FAS216_Info *info, unsigned char *message, int 
 		info->SCpnt->SCp = info->scsi.SCp;
 		info->SCpnt->SCp.sent_command = 0;
 		fas216_log(info, LOG_CONNECT | LOG_MESSAGES | LOG_BUFFER,
-			"save data pointers: [%p, %X]",
+			"save data pointers: [%pK, %X]",
 			info->scsi.SCp.ptr, info->scsi.SCp.this_residual);
 		break;
 
@@ -1091,7 +1091,7 @@ static void fas216_parse_message(FAS216_Info *info, unsigned char *message, int 
 		 */
 		info->scsi.SCp = info->SCpnt->SCp;
 		fas216_log(info, LOG_CONNECT | LOG_MESSAGES | LOG_BUFFER,
-			"restore data pointers: [%p, 0x%x]",
+			"restore data pointers: [%pK, 0x%x]",
 			info->scsi.SCp.ptr, info->scsi.SCp.this_residual);
 		break;
 
@@ -1966,7 +1966,7 @@ static void fas216_kick(FAS216_Info *info)
 		break;
 	}
 
-	fas216_log(info, LOG_CONNECT, "select: data pointers [%p, %X]",
+	fas216_log(info, LOG_CONNECT, "select: data pointers [%pK, %X]",
 		info->scsi.SCp.ptr, info->scsi.SCp.this_residual);
 
 	/*
@@ -2079,7 +2079,7 @@ fas216_std_done(FAS216_Info *info, struct scsi_cmnd *SCpnt, unsigned int result)
 
 		default:
 			printk(KERN_ERR "scsi%d.%c: incomplete data transfer "
-				"detected: res=%08X ptr=%p len=%X CDB: ",
+				"detected: res=%08X ptr=%pK len=%X CDB: ",
 				info->host->host_no, '0' + SCpnt->device->id,
 				SCpnt->result, info->scsi.SCp.ptr,
 				info->scsi.SCp.this_residual);
@@ -2158,7 +2158,7 @@ static void fas216_done(FAS216_Info *info, unsigned int result)
 	 */
 	if (info->scsi.SCp.ptr && info->scsi.SCp.this_residual == 0) {
 		printk("scsi%d.%c: zero bytes left to transfer, but "
-		       "buffer pointer still valid: ptr=%p len=%08x CDB: ",
+		       "buffer pointer still valid: ptr=%pK len=%08x CDB: ",
 		       info->host->host_no, '0' + SCpnt->device->id,
 		       info->scsi.SCp.ptr, info->scsi.SCp.this_residual);
 		info->scsi.SCp.ptr = NULL;
@@ -2207,7 +2207,7 @@ static int fas216_queue_command_lck(struct scsi_cmnd *SCpnt,
 	fas216_checkmagic(info);
 
 	fas216_log_command(info, LOG_CONNECT, SCpnt,
-			   "received command (%p)", SCpnt);
+			   "received command (%pK)", SCpnt);
 
 	SCpnt->scsi_done = done;
 	SCpnt->host_scribble = (void *)fas216_std_done;
@@ -2430,7 +2430,7 @@ int fas216_eh_abort(struct scsi_cmnd *SCpnt)
 	print_debug_list();
 	fas216_dumpstate(info);
 
-	printk(KERN_WARNING "scsi%d: abort %p ", info->host->host_no, SCpnt);
+	printk(KERN_WARNING "scsi%d: abort %pK ", info->host->host_no, SCpnt);
 
 	switch (fas216_find_command(info, SCpnt)) {
 	/*
@@ -2963,7 +2963,7 @@ void fas216_print_host(FAS216_Info *info, struct seq_file *m)
 	seq_printf(m,
 			"\n"
 			"Chip    : %s\n"
-			" Address: 0x%p\n"
+			" Address: 0x%pK\n"
 			" IRQ    : %d\n"
 			" DMA    : %d\n",
 			info->scsi.type, info->scsi.io_base,

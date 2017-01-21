@@ -255,8 +255,8 @@ acpi_ev_install_handler(acpi_handle obj_handle,
 			if (next_handler_obj->address_space.space_id ==
 			    handler_obj->address_space.space_id) {
 				ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
-						  "Found handler for region [%s] in device %p(%p) "
-						  "handler %p\n",
+						  "Found handler for region [%s] in device %pK(%pK) "
+						  "handler %pK\n",
 						  acpi_ut_get_region_name
 						  (handler_obj->address_space.
 						   space_id), obj_desc,
@@ -435,7 +435,7 @@ acpi_ev_install_space_handler(struct acpi_namespace_node * node,
 		}
 	} else {
 		ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
-				  "Creating object on Device %p while installing handler\n",
+				  "Creating object on Device %pK while installing handler\n",
 				  node));
 
 		/* obj_desc does not exist, create one */
@@ -470,7 +470,7 @@ acpi_ev_install_space_handler(struct acpi_namespace_node * node,
 	}
 
 	ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
-			  "Installing address handler for region %s(%X) on Device %4.4s %p(%p)\n",
+			  "Installing address handler for region %s(%X) on Device %4.4s %pK(%pK)\n",
 			  acpi_ut_get_region_name(space_id), space_id,
 			  acpi_ut_get_node_name(node), node, obj_desc));
 

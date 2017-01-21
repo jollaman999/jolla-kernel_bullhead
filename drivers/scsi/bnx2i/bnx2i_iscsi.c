@@ -1434,7 +1434,7 @@ static int bnx2i_conn_bind(struct iscsi_cls_session *cls_session,
 		/* Error - TCP connection does not belong to this device
 		 */
 		iscsi_conn_printk(KERN_ALERT, cls_conn->dd_data,
-				  "conn bind, ep=0x%p (%s) does not",
+				  "conn bind, ep=0x%pK (%s) does not",
 				  bnx2i_ep, bnx2i_ep->hba->netdev->name);
 		iscsi_conn_printk(KERN_ALERT, cls_conn->dd_data,
 				  "belong to hba (%s)\n",

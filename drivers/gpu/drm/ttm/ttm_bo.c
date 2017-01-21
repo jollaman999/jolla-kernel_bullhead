@@ -86,7 +86,7 @@ static void ttm_bo_mem_space_debug(struct ttm_buffer_object *bo,
 {
 	int i, ret, mem_type;
 
-	pr_err("No space for %p (%lu pages, %luK, %luM)\n",
+	pr_err("No space for %pK (%lu pages, %luK, %luM)\n",
 	       bo, bo->mem.num_pages, bo->mem.size >> 10,
 	       bo->mem.size >> 20);
 	for (i = 0; i < placement->num_placement; i++) {
@@ -849,7 +849,7 @@ static int ttm_bo_evict(struct ttm_buffer_object *bo, bool interruptible,
 				no_wait_gpu);
 	if (ret) {
 		if (ret != -ERESTARTSYS) {
-			pr_err("Failed to find memory space for buffer 0x%p eviction\n",
+			pr_err("Failed to find memory space for buffer 0x%pK eviction\n",
 			       bo);
 			ttm_bo_mem_space_debug(bo, &placement);
 		}

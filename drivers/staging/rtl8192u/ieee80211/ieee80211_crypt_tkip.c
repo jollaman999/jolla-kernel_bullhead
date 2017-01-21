@@ -415,7 +415,7 @@ static int ieee80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	keyidx >>= 6;
 	if (tkey->key_idx != keyidx) {
 		printk(KERN_DEBUG "TKIP: RX tkey->key_idx=%d frame "
-		       "keyidx=%d priv=%p\n", tkey->key_idx, keyidx, priv);
+		       "keyidx=%d priv=%pK\n", tkey->key_idx, keyidx, priv);
 		return -6;
 	}
 	if (!tkey->key_set) {

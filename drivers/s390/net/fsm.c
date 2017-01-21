@@ -132,7 +132,7 @@ static void
 fsm_expire_timer(fsm_timer *this)
 {
 #if FSM_TIMER_DEBUG
-	printk(KERN_DEBUG "fsm(%s): Timer %p expired\n",
+	printk(KERN_DEBUG "fsm(%s): Timer %pK expired\n",
 	       this->fi->name, this);
 #endif
 	fsm_event(this->fi, this->expire_event, this->event_arg);
@@ -145,7 +145,7 @@ fsm_settimer(fsm_instance *fi, fsm_timer *this)
 	this->tl.function = (void *)fsm_expire_timer;
 	this->tl.data = (long)this;
 #if FSM_TIMER_DEBUG
-	printk(KERN_DEBUG "fsm(%s): Create timer %p\n", fi->name,
+	printk(KERN_DEBUG "fsm(%s): Create timer %pK\n", fi->name,
 	       this);
 #endif
 	init_timer(&this->tl);
@@ -155,7 +155,7 @@ void
 fsm_deltimer(fsm_timer *this)
 {
 #if FSM_TIMER_DEBUG
-	printk(KERN_DEBUG "fsm(%s): Delete timer %p\n", this->fi->name,
+	printk(KERN_DEBUG "fsm(%s): Delete timer %pK\n", this->fi->name,
 		this);
 #endif
 	del_timer(&this->tl);
@@ -166,7 +166,7 @@ fsm_addtimer(fsm_timer *this, int millisec, int event, void *arg)
 {
 
 #if FSM_TIMER_DEBUG
-	printk(KERN_DEBUG "fsm(%s): Add timer %p %dms\n",
+	printk(KERN_DEBUG "fsm(%s): Add timer %pK %dms\n",
 	       this->fi->name, this, millisec);
 #endif
 
@@ -186,7 +186,7 @@ fsm_modtimer(fsm_timer *this, int millisec, int event, void *arg)
 {
 
 #if FSM_TIMER_DEBUG
-	printk(KERN_DEBUG "fsm(%s): Restart timer %p %dms\n",
+	printk(KERN_DEBUG "fsm(%s): Restart timer %pK %dms\n",
 		this->fi->name, this, millisec);
 #endif
 

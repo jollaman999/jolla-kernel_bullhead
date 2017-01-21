@@ -95,7 +95,7 @@ acpi_ds_result_pop(union acpi_operand_object **object,
 	/* Empty result stack */
 
 	if (!state) {
-		ACPI_ERROR((AE_INFO, "Result stack is empty! State=%p",
+		ACPI_ERROR((AE_INFO, "Result stack is empty! State=%pK",
 			    walk_state));
 		return (AE_AML_NO_RETURN_VALUE);
 	}
@@ -108,7 +108,7 @@ acpi_ds_result_pop(union acpi_operand_object **object,
 	*object = state->results.obj_desc[index];
 	if (!*object) {
 		ACPI_ERROR((AE_INFO,
-			    "No result objects on result stack, State=%p",
+			    "No result objects on result stack, State=%pK",
 			    walk_state));
 		return (AE_AML_NO_RETURN_VALUE);
 	}
@@ -122,7 +122,7 @@ acpi_ds_result_pop(union acpi_operand_object **object,
 	}
 
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-			  "Obj=%p [%s] Index=%X State=%p Num=%X\n", *object,
+			  "Obj=%pK [%s] Index=%X State=%pK Num=%X\n", *object,
 			  acpi_ut_get_object_type_name(*object),
 			  index, walk_state, walk_state->result_count));
 
@@ -180,7 +180,7 @@ acpi_ds_result_push(union acpi_operand_object * object,
 
 	if (!object) {
 		ACPI_ERROR((AE_INFO,
-			    "Null Object! Obj=%p State=%p Num=%u",
+			    "Null Object! Obj=%pK State=%pK Num=%u",
 			    object, walk_state, walk_state->result_count));
 		return (AE_BAD_PARAMETER);
 	}
@@ -191,7 +191,7 @@ acpi_ds_result_push(union acpi_operand_object * object,
 	state->results.obj_desc[index] = object;
 	walk_state->result_count++;
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Obj=%p [%s] State=%p Num=%X Cur=%X\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Obj=%pK [%s] State=%pK Num=%X Cur=%X\n",
 			  object,
 			  acpi_ut_get_object_type_name((union
 							acpi_operand_object *)
@@ -224,7 +224,7 @@ static acpi_status acpi_ds_result_stack_push(struct acpi_walk_state *walk_state)
 
 	if (((u32) walk_state->result_size + ACPI_RESULTS_FRAME_OBJ_NUM) >
 	    ACPI_RESULTS_OBJ_NUM_MAX) {
-		ACPI_ERROR((AE_INFO, "Result stack overflow: State=%p Num=%u",
+		ACPI_ERROR((AE_INFO, "Result stack overflow: State=%pK Num=%u",
 			    walk_state, walk_state->result_size));
 		return (AE_STACK_OVERFLOW);
 	}
@@ -241,7 +241,7 @@ static acpi_status acpi_ds_result_stack_push(struct acpi_walk_state *walk_state)
 
 	walk_state->result_size += ACPI_RESULTS_FRAME_OBJ_NUM;
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Results=%p State=%p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Results=%pK State=%pK\n",
 			  state, walk_state));
 
 	return (AE_OK);
@@ -269,7 +269,7 @@ static acpi_status acpi_ds_result_stack_pop(struct acpi_walk_state *walk_state)
 
 	if (walk_state->results == NULL) {
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "Result stack underflow - State=%p\n",
+				  "Result stack underflow - State=%pK\n",
 				  walk_state));
 		return (AE_AML_NO_OPERAND);
 	}
@@ -287,7 +287,7 @@ static acpi_status acpi_ds_result_stack_pop(struct acpi_walk_state *walk_state)
 	walk_state->result_size -= ACPI_RESULTS_FRAME_OBJ_NUM;
 
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-			  "Result=%p RemainingResults=%X State=%p\n",
+			  "Result=%pK RemainingResults=%X State=%pK\n",
 			  state, walk_state->result_count, walk_state));
 
 	return (AE_OK);
@@ -315,7 +315,7 @@ acpi_ds_obj_stack_push(void *object, struct acpi_walk_state * walk_state)
 
 	if (walk_state->num_operands >= ACPI_OBJ_NUM_OPERANDS) {
 		ACPI_ERROR((AE_INFO,
-			    "Object stack overflow! Obj=%p State=%p #Ops=%u",
+			    "Object stack overflow! Obj=%pK State=%pK #Ops=%u",
 			    object, walk_state, walk_state->num_operands));
 		return (AE_STACK_OVERFLOW);
 	}
@@ -329,7 +329,7 @@ acpi_ds_obj_stack_push(void *object, struct acpi_walk_state * walk_state)
 
 	walk_state->operand_index++;
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Obj=%p [%s] State=%p #Ops=%X\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Obj=%pK [%s] State=%pK #Ops=%X\n",
 			  object,
 			  acpi_ut_get_object_type_name((union
 							acpi_operand_object *)
@@ -366,7 +366,7 @@ acpi_ds_obj_stack_pop(u32 pop_count, struct acpi_walk_state * walk_state)
 
 		if (walk_state->num_operands == 0) {
 			ACPI_ERROR((AE_INFO,
-				    "Object stack underflow! Count=%X State=%p #Ops=%u",
+				    "Object stack underflow! Count=%X State=%pK #Ops=%u",
 				    pop_count, walk_state,
 				    walk_state->num_operands));
 			return (AE_STACK_UNDERFLOW);
@@ -378,7 +378,7 @@ acpi_ds_obj_stack_pop(u32 pop_count, struct acpi_walk_state * walk_state)
 		walk_state->operands[walk_state->num_operands] = NULL;
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Count=%X State=%p #Ops=%u\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Count=%X State=%pK #Ops=%u\n",
 			  pop_count, walk_state, walk_state->num_operands));
 
 	return (AE_OK);
@@ -426,7 +426,7 @@ acpi_ds_obj_stack_pop_and_delete(u32 pop_count,
 		}
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Count=%X State=%p #Ops=%X\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Count=%X State=%pK #Ops=%X\n",
 			  pop_count, walk_state, walk_state->num_operands));
 }
 
@@ -452,7 +452,7 @@ struct acpi_walk_state *acpi_ds_get_current_walk_state(struct acpi_thread_state
 		return (NULL);
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "Current WalkState %p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "Current WalkState %pK\n",
 			  thread->walk_state_list));
 
 	return (thread->walk_state_list);
@@ -712,7 +712,7 @@ void acpi_ds_delete_walk_state(struct acpi_walk_state *walk_state)
 	}
 
 	if (walk_state->descriptor_type != ACPI_DESC_TYPE_WALK) {
-		ACPI_ERROR((AE_INFO, "%p is not a valid walk state",
+		ACPI_ERROR((AE_INFO, "%pK is not a valid walk state",
 			    walk_state));
 		return_VOID;
 	}
@@ -720,7 +720,7 @@ void acpi_ds_delete_walk_state(struct acpi_walk_state *walk_state)
 	/* There should not be any open scopes */
 
 	if (walk_state->parser_state.scope) {
-		ACPI_ERROR((AE_INFO, "%p walk still has a scope list",
+		ACPI_ERROR((AE_INFO, "%pK walk still has a scope list",
 			    walk_state));
 		acpi_ps_cleanup_scope(&walk_state->parser_state);
 	}

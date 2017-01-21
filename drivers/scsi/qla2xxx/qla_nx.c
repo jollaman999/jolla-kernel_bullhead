@@ -1693,12 +1693,12 @@ qla82xx_iospace_config(struct qla_hw_data *ha)
 	ha->max_req_queues = ha->max_rsp_queues = 1;
 	ha->msix_count = ha->max_rsp_queues + 1;
 	ql_dbg_pci(ql_dbg_multiq, ha->pdev, 0xc006,
-	    "nx_pci_base=%p iobase=%p "
+	    "nx_pci_base=%pK iobase=%pK "
 	    "max_req_queues=%d msix_count=%d.\n",
 	    (void *)ha->nx_pcibase, ha->iobase,
 	    ha->max_req_queues, ha->msix_count);
 	ql_dbg_pci(ql_dbg_init, ha->pdev, 0x0010,
-	    "nx_pci_base=%p iobase=%p "
+	    "nx_pci_base=%pK iobase=%pK "
 	    "max_req_queues=%d msix_count=%d.\n",
 	    (void *)ha->nx_pcibase, ha->iobase,
 	    ha->max_req_queues, ha->msix_count);
@@ -4115,7 +4115,7 @@ qla82xx_md_collect(scsi_qla_host_t *vha)
 
 	if (ha->fw_dumped) {
 		ql_log(ql_log_warn, vha, 0xb037,
-		    "Firmware has been previously dumped (%p) "
+		    "Firmware has been previously dumped (%pK) "
 		    "-- ignoring request.\n", ha->fw_dump);
 		goto md_failed;
 	}
@@ -4204,7 +4204,7 @@ qla82xx_md_collect(scsi_qla_host_t *vha)
 		}
 
 		ql_dbg(ql_dbg_p3p, vha, 0xb040,
-		    "[%s]: data ptr[%d]: %p, entry_hdr: %p\n"
+		    "[%s]: data ptr[%d]: %pK, entry_hdr: %pK\n"
 		    "entry_type: 0x%x, captrue_mask: 0x%x\n",
 		    __func__, i, data_ptr, entry_hdr,
 		    entry_hdr->entry_type,
@@ -4280,7 +4280,7 @@ qla82xx_md_collect(scsi_qla_host_t *vha)
 		}
 
 		ql_dbg(ql_dbg_p3p, vha, 0xb042,
-		    "[%s]: data ptr[%d]: %p\n", __func__, i, data_ptr);
+		    "[%s]: data ptr[%d]: %pK\n", __func__, i, data_ptr);
 
 		data_collected = (uint8_t *)data_ptr -
 		    (uint8_t *)ha->md_dump;
@@ -4298,7 +4298,7 @@ skip_nxt_entry:
 	}
 
 	ql_log(ql_log_info, vha, 0xb044,
-	    "Firmware dump saved to temp buffer (%ld/%p %ld/%p).\n",
+	    "Firmware dump saved to temp buffer (%ld/%pK %ld/%pK).\n",
 	    vha->host_no, ha->md_tmplt_hdr, vha->host_no, ha->md_dump);
 	ha->fw_dumped = 1;
 	qla2x00_post_uevent_work(vha, QLA_UEVENT_CODE_FW_DUMP);
@@ -4352,7 +4352,7 @@ qla82xx_md_free(scsi_qla_host_t *vha)
 	/* Release the template header allocated */
 	if (ha->md_tmplt_hdr) {
 		ql_log(ql_log_info, vha, 0xb048,
-		    "Free MiniDump template: %p, size (%d KB)\n",
+		    "Free MiniDump template: %pK, size (%d KB)\n",
 		    ha->md_tmplt_hdr, ha->md_template_size / 1024);
 		dma_free_coherent(&ha->pdev->dev, ha->md_template_size,
 		    ha->md_tmplt_hdr, ha->md_tmplt_hdr_dma);
@@ -4362,7 +4362,7 @@ qla82xx_md_free(scsi_qla_host_t *vha)
 	/* Release the template data buffer allocated */
 	if (ha->md_dump) {
 		ql_log(ql_log_info, vha, 0xb049,
-		    "Free MiniDump memory: %p, size (%d KB)\n",
+		    "Free MiniDump memory: %pK, size (%d KB)\n",
 		    ha->md_dump, ha->md_dump_size / 1024);
 		vfree(ha->md_dump);
 		ha->md_dump_size = 0;
@@ -4397,7 +4397,7 @@ qla82xx_md_prep(scsi_qla_host_t *vha)
 				    ha->md_dump_size / 1024);
 			else {
 				ql_log(ql_log_info, vha, 0xb04d,
-				    "Free MiniDump template: %p, size: (%d KB)\n",
+				    "Free MiniDump template: %pK, size: (%d KB)\n",
 				    ha->md_tmplt_hdr,
 				    ha->md_template_size / 1024);
 				dma_free_coherent(&ha->pdev->dev,

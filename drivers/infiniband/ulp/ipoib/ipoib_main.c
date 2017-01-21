@@ -466,7 +466,7 @@ static void path_rec_completion(int status,
 		old_ah   = path->ah;
 		path->ah = ah;
 
-		ipoib_dbg(priv, "created address handle %p for LID 0x%04x, SL %d\n",
+		ipoib_dbg(priv, "created address handle %pK for LID 0x%04x, SL %d\n",
 			  ah, be16_to_cpu(pathrec->dlid), pathrec->sl);
 
 		while ((skb = __skb_dequeue(&path->queue)))

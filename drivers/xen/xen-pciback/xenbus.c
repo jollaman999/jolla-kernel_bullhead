@@ -38,7 +38,7 @@ static struct xen_pcibk_device *alloc_pdev(struct xenbus_device *xdev)
 	pdev = kzalloc(sizeof(struct xen_pcibk_device), GFP_KERNEL);
 	if (pdev == NULL)
 		goto out;
-	dev_dbg(&xdev->dev, "allocated pdev @ 0x%p\n", pdev);
+	dev_dbg(&xdev->dev, "allocated pdev @ 0x%pK\n", pdev);
 
 	pdev->xdev = xdev;
 	dev_set_drvdata(&xdev->dev, pdev);

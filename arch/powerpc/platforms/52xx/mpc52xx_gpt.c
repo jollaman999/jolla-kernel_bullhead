@@ -209,7 +209,7 @@ static int mpc52xx_gpt_irq_map(struct irq_domain *h, unsigned int virq,
 {
 	struct mpc52xx_gpt_priv *gpt = h->host_data;
 
-	dev_dbg(gpt->dev, "%s: h=%p, virq=%i\n", __func__, h, virq);
+	dev_dbg(gpt->dev, "%s: h=%pK, virq=%i\n", __func__, h, virq);
 	irq_set_chip_data(virq, gpt);
 	irq_set_chip_and_handler(virq, &mpc52xx_gpt_irq_chip, handle_edge_irq);
 

@@ -355,7 +355,7 @@ int __kprobes __copy_instruction(u8 *dest, u8 *src)
 		newdisp = (u8 *) src + (s64) insn.displacement.value - (u8 *) dest;
 		if ((s64) (s32) newdisp != newdisp) {
 			pr_err("Kprobes error: new displacement does not fit into s32 (%llx)\n", newdisp);
-			pr_err("\tSrc: %p, Dest: %p, old disp: %x\n", src, dest, insn.displacement.value);
+			pr_err("\tSrc: %pK, Dest: %pK, old disp: %x\n", src, dest, insn.displacement.value);
 			return 0;
 		}
 		disp = (u8 *) dest + insn_offset_displacement(&insn);
@@ -541,7 +541,7 @@ reenter_kprobe(struct kprobe *p, struct pt_regs *regs, struct kprobe_ctlblk *kcb
 		 * Raise a BUG or we'll continue in an endless reentering loop
 		 * and eventually a stack overflow.
 		 */
-		printk(KERN_WARNING "Unrecoverable kprobe detected at %p.\n",
+		printk(KERN_WARNING "Unrecoverable kprobe detected at %pK.\n",
 		       p->addr);
 		dump_kprobe(p);
 		BUG();
@@ -1070,9 +1070,9 @@ int __kprobes longjmp_break_handler(struct kprobe *p, struct pt_regs *regs)
 		if (stack_addr(regs) != saved_sp) {
 			struct pt_regs *saved_regs = &kcb->jprobe_saved_regs;
 			printk(KERN_ERR
-			       "current sp %p does not match saved sp %p\n",
+			       "current sp %pK does not match saved sp %pK\n",
 			       stack_addr(regs), saved_sp);
-			printk(KERN_ERR "Saved registers for jprobe %p\n", jp);
+			printk(KERN_ERR "Saved registers for jprobe %pK\n", jp);
 			show_regs(saved_regs);
 			printk(KERN_ERR "Current registers\n");
 			show_regs(regs);

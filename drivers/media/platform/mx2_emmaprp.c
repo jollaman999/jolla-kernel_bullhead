@@ -819,7 +819,7 @@ static int emmaprp_open(struct file *file)
 	ctx->q_data[V4L2_M2M_DST].fmt = &formats[0];
 	mutex_unlock(&pcdev->dev_mutex);
 
-	dprintk(pcdev, "Created instance %p, m2m_ctx: %p\n", ctx, ctx->m2m_ctx);
+	dprintk(pcdev, "Created instance %pK, m2m_ctx: %pK\n", ctx, ctx->m2m_ctx);
 
 	return 0;
 }
@@ -829,7 +829,7 @@ static int emmaprp_release(struct file *file)
 	struct emmaprp_dev *pcdev = video_drvdata(file);
 	struct emmaprp_ctx *ctx = file->private_data;
 
-	dprintk(pcdev, "Releasing instance %p\n", ctx);
+	dprintk(pcdev, "Releasing instance %pK\n", ctx);
 
 	mutex_lock(&pcdev->dev_mutex);
 	clk_disable_unprepare(pcdev->clk_emma_ahb);

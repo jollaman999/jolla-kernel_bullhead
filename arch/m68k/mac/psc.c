@@ -93,7 +93,7 @@ void __init psc_init(void)
 	psc = (void *) PSC_BASE;
 	psc_present = 1;
 
-	printk("PSC detected at %p\n", psc);
+	printk("PSC detected at %pK\n", psc);
 
 	psc_dma_die_die_die();
 

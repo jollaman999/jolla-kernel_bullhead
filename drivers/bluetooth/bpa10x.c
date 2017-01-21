@@ -68,7 +68,7 @@ static int bpa10x_recv(struct hci_dev *hdev, int queue, void *buf, int count)
 {
 	struct bpa10x_data *data = hci_get_drvdata(hdev);
 
-	BT_DBG("%s queue %d buffer %p count %d", hdev->name,
+	BT_DBG("%s queue %d buffer %pK count %d", hdev->name,
 							queue, buf, count);
 
 	if (queue < 0 || queue > 1)
@@ -169,7 +169,7 @@ static void bpa10x_tx_complete(struct urb *urb)
 	struct sk_buff *skb = urb->context;
 	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
 
-	BT_DBG("%s urb %p status %d count %d", hdev->name,
+	BT_DBG("%s urb %pK status %d count %d", hdev->name,
 					urb, urb->status, urb->actual_length);
 
 	if (!test_bit(HCI_RUNNING, &hdev->flags))
@@ -192,7 +192,7 @@ static void bpa10x_rx_complete(struct urb *urb)
 	struct bpa10x_data *data = hci_get_drvdata(hdev);
 	int err;
 
-	BT_DBG("%s urb %p status %d count %d", hdev->name,
+	BT_DBG("%s urb %pK status %d count %d", hdev->name,
 					urb, urb->status, urb->actual_length);
 
 	if (!test_bit(HCI_RUNNING, &hdev->flags))
@@ -211,7 +211,7 @@ static void bpa10x_rx_complete(struct urb *urb)
 
 	err = usb_submit_urb(urb, GFP_ATOMIC);
 	if (err < 0) {
-		BT_ERR("%s urb %p failed to resubmit (%d)",
+		BT_ERR("%s urb %pK failed to resubmit (%d)",
 						hdev->name, urb, -err);
 		usb_unanchor_urb(urb);
 	}
@@ -248,7 +248,7 @@ static inline int bpa10x_submit_intr_urb(struct hci_dev *hdev)
 
 	err = usb_submit_urb(urb, GFP_KERNEL);
 	if (err < 0) {
-		BT_ERR("%s urb %p submission failed (%d)",
+		BT_ERR("%s urb %pK submission failed (%d)",
 						hdev->name, urb, -err);
 		usb_unanchor_urb(urb);
 	}
@@ -289,7 +289,7 @@ static inline int bpa10x_submit_bulk_urb(struct hci_dev *hdev)
 
 	err = usb_submit_urb(urb, GFP_KERNEL);
 	if (err < 0) {
-		BT_ERR("%s urb %p submission failed (%d)",
+		BT_ERR("%s urb %pK submission failed (%d)",
 						hdev->name, urb, -err);
 		usb_unanchor_urb(urb);
 	}
@@ -422,7 +422,7 @@ static int bpa10x_send_frame(struct sk_buff *skb)
 
 	err = usb_submit_urb(urb, GFP_ATOMIC);
 	if (err < 0) {
-		BT_ERR("%s urb %p submission failed", hdev->name, urb);
+		BT_ERR("%s urb %pK submission failed", hdev->name, urb);
 		kfree(urb->setup_packet);
 		usb_unanchor_urb(urb);
 	}
@@ -438,7 +438,7 @@ static int bpa10x_probe(struct usb_interface *intf, const struct usb_device_id *
 	struct hci_dev *hdev;
 	int err;
 
-	BT_DBG("intf %p id %p", intf, id);
+	BT_DBG("intf %pK id %pK", intf, id);
 
 	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
 		return -ENODEV;
@@ -485,7 +485,7 @@ static void bpa10x_disconnect(struct usb_interface *intf)
 {
 	struct bpa10x_data *data = usb_get_intfdata(intf);
 
-	BT_DBG("intf %p", intf);
+	BT_DBG("intf %pK", intf);
 
 	if (!data)
 		return;

@@ -380,7 +380,7 @@ void qxl_io_create_primary(struct qxl_device *qdev, unsigned width,
 {
 	struct qxl_surface_create *create;
 
-	QXL_INFO(qdev, "%s: qdev %p, ram_header %p\n", __func__, qdev,
+	QXL_INFO(qdev, "%s: qdev %pK, ram_header %pK\n", __func__, qdev,
 		 qdev->ram_header);
 	create = &qdev->ram_header->create_surface;
 	create->format = bo->surf.format;
@@ -389,7 +389,7 @@ void qxl_io_create_primary(struct qxl_device *qdev, unsigned width,
 	create->stride = bo->surf.stride;
 	create->mem = qxl_bo_physical_address(qdev, bo, offset);
 
-	QXL_INFO(qdev, "%s: mem = %llx, from %p\n", __func__, create->mem,
+	QXL_INFO(qdev, "%s: mem = %llx, from %pK\n", __func__, create->mem,
 		 bo->kptr);
 
 	create->flags = QXL_SURF_FLAG_KEEP_DATA;

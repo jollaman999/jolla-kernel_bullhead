@@ -122,7 +122,7 @@ static struct at_desc *atc_desc_get(struct at_dma_chan *atchan)
 			break;
 		}
 		dev_dbg(chan2dev(&atchan->chan_common),
-				"desc %p not ACKed\n", desc);
+				"desc %pK not ACKed\n", desc);
 	}
 	spin_unlock_irqrestore(&atchan->lock, flags);
 	dev_vdbg(chan2dev(&atchan->chan_common),
@@ -158,11 +158,11 @@ static void atc_desc_put(struct at_dma_chan *atchan, struct at_desc *desc)
 		spin_lock_irqsave(&atchan->lock, flags);
 		list_for_each_entry(child, &desc->tx_list, desc_node)
 			dev_vdbg(chan2dev(&atchan->chan_common),
-					"moving child desc %p to freelist\n",
+					"moving child desc %pK to freelist\n",
 					child);
 		list_splice_init(&desc->tx_list, &atchan->free_list);
 		dev_vdbg(chan2dev(&atchan->chan_common),
-			 "moving desc %p to freelist\n", desc);
+			 "moving desc %pK to freelist\n", desc);
 		list_add(&desc->desc_node, &atchan->free_list);
 		spin_unlock_irqrestore(&atchan->lock, flags);
 	}
@@ -1177,7 +1177,7 @@ static void atc_free_chan_resources(struct dma_chan *chan)
 	BUG_ON(atc_chan_is_enabled(atchan));
 
 	list_for_each_entry_safe(desc, _desc, &atchan->free_list, desc_node) {
-		dev_vdbg(chan2dev(chan), "  freeing descriptor %p\n", desc);
+		dev_vdbg(chan2dev(chan), "  freeing descriptor %pK\n", desc);
 		list_del(&desc->desc_node);
 		/* free link descriptor */
 		dma_pool_free(atdma->dma_desc_pool, desc, desc->txd.phys);

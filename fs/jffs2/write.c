@@ -213,7 +213,7 @@ struct jffs2_full_dirent *jffs2_write_dirent(struct jffs2_sb_info *c, struct jff
 	int retried = 0;
 	int ret;
 
-	jffs2_dbg(1, "%s(ino #%u, name at *0x%p \"%s\"->ino #%u, name_crc 0x%08x)\n",
+	jffs2_dbg(1, "%s(ino #%u, name at *0x%pK \"%s\"->ino #%u, name_crc 0x%08x)\n",
 		  __func__,
 		  je32_to_cpu(rd->pino), name, name, je32_to_cpu(rd->ino),
 		  je32_to_cpu(rd->name_crc));
@@ -227,7 +227,7 @@ struct jffs2_full_dirent *jffs2_write_dirent(struct jffs2_sb_info *c, struct jff
 		/* This should never happen, but seems to have done on at least one
 		   occasion: https://dev.laptop.org/ticket/4184 */
 		pr_crit("Error in jffs2_write_dirent() -- name contains zero bytes!\n");
-		pr_crit("Directory inode #%u, name at *0x%p \"%s\"->ino #%u, name_crc 0x%08x\n",
+		pr_crit("Directory inode #%u, name at *0x%pK \"%s\"->ino #%u, name_crc 0x%08x\n",
 			je32_to_cpu(rd->pino), name, name, je32_to_cpu(rd->ino),
 			je32_to_cpu(rd->name_crc));
 		WARN_ON(1);

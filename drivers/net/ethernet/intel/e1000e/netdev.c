@@ -294,7 +294,7 @@ static void e1000e_dump(struct e1000_adapter *adapter)
 			next_desc = " NTC";
 		else
 			next_desc = "";
-		pr_info("T%c[0x%03X]    %016llX %016llX %016llX %04X  %3X %016llX %p%s\n",
+		pr_info("T%c[0x%03X]    %016llX %016llX %016llX %04X  %3X %016llX %pK%s\n",
 			(!(le64_to_cpu(u0->b) & (1 << 29)) ? 'l' :
 			 ((le64_to_cpu(u0->b) & (1 << 20)) ? 'd' : 'c')),
 			i,
@@ -369,7 +369,7 @@ rx_ring_summary:
 
 			if (staterr & E1000_RXD_STAT_DD) {
 				/* Descriptor Done */
-				pr_info("%s[0x%03X]     %016llX %016llX %016llX %016llX ---------------- %p%s\n",
+				pr_info("%s[0x%03X]     %016llX %016llX %016llX %016llX ---------------- %pK%s\n",
 					"RWB", i,
 					(unsigned long long)le64_to_cpu(u1->a),
 					(unsigned long long)le64_to_cpu(u1->b),
@@ -377,7 +377,7 @@ rx_ring_summary:
 					(unsigned long long)le64_to_cpu(u1->d),
 					buffer_info->skb, next_desc);
 			} else {
-				pr_info("%s[0x%03X]     %016llX %016llX %016llX %016llX %016llX %p%s\n",
+				pr_info("%s[0x%03X]     %016llX %016llX %016llX %016llX %016llX %pK%s\n",
 					"R  ", i,
 					(unsigned long long)le64_to_cpu(u1->a),
 					(unsigned long long)le64_to_cpu(u1->b),
@@ -435,13 +435,13 @@ rx_ring_summary:
 
 			if (staterr & E1000_RXD_STAT_DD) {
 				/* Descriptor Done */
-				pr_info("%s[0x%03X]     %016llX %016llX ---------------- %p%s\n",
+				pr_info("%s[0x%03X]     %016llX %016llX ---------------- %pK%s\n",
 					"RWB", i,
 					(unsigned long long)le64_to_cpu(u1->a),
 					(unsigned long long)le64_to_cpu(u1->b),
 					buffer_info->skb, next_desc);
 			} else {
-				pr_info("%s[0x%03X]     %016llX %016llX %016llX %p%s\n",
+				pr_info("%s[0x%03X]     %016llX %016llX %016llX %pK%s\n",
 					"R  ", i,
 					(unsigned long long)le64_to_cpu(u1->a),
 					(unsigned long long)le64_to_cpu(u1->b),

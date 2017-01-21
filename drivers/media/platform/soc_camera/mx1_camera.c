@@ -147,7 +147,7 @@ static void free_buffer(struct videobuf_queue *vq, struct mx1_buffer *buf)
 
 	BUG_ON(in_interrupt());
 
-	dev_dbg(icd->parent, "%s (vb=0x%p) 0x%08lx %d\n", __func__,
+	dev_dbg(icd->parent, "%s (vb=0x%pK) 0x%08lx %d\n", __func__,
 		vb, vb->baddr, vb->bsize);
 
 	/*
@@ -167,7 +167,7 @@ static int mx1_videobuf_prepare(struct videobuf_queue *vq,
 	struct mx1_buffer *buf = container_of(vb, struct mx1_buffer, vb);
 	int ret;
 
-	dev_dbg(icd->parent, "%s (vb=0x%p) 0x%08lx %d\n", __func__,
+	dev_dbg(icd->parent, "%s (vb=0x%pK) 0x%08lx %d\n", __func__,
 		vb, vb->baddr, vb->bsize);
 
 	/* Added list head initialization on alloc */
@@ -248,7 +248,7 @@ static void mx1_videobuf_queue(struct videobuf_queue *vq,
 	struct mx1_camera_dev *pcdev = ici->priv;
 	struct mx1_buffer *buf = container_of(vb, struct mx1_buffer, vb);
 
-	dev_dbg(icd->parent, "%s (vb=0x%p) 0x%08lx %d\n", __func__,
+	dev_dbg(icd->parent, "%s (vb=0x%pK) 0x%08lx %d\n", __func__,
 		vb, vb->baddr, vb->bsize);
 
 	list_add_tail(&vb->queue, &pcdev->capture);
@@ -277,7 +277,7 @@ static void mx1_videobuf_release(struct videobuf_queue *vq,
 	struct soc_camera_device *icd = vq->priv_data;
 	struct device *dev = icd->parent;
 
-	dev_dbg(dev, "%s (vb=0x%p) 0x%08lx %d\n", __func__,
+	dev_dbg(dev, "%s (vb=0x%pK) 0x%08lx %d\n", __func__,
 		vb, vb->baddr, vb->bsize);
 
 	switch (vb->state) {
@@ -348,7 +348,7 @@ static void mx1_camera_dma_irq(int channel, void *data)
 	vb = &pcdev->active->vb;
 	buf = container_of(vb, struct mx1_buffer, vb);
 	WARN_ON(buf->inwork || list_empty(&vb->queue));
-	dev_dbg(dev, "%s (vb=0x%p) 0x%08lx %d\n", __func__,
+	dev_dbg(dev, "%s (vb=0x%pK) 0x%08lx %d\n", __func__,
 		vb, vb->baddr, vb->bsize);
 
 	mx1_camera_wakeup(pcdev, vb, buf);

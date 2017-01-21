@@ -271,18 +271,18 @@ static int ida_proc_show(struct seq_file *m, void *v)
 	seq_puts(m, "\nCurrent Queues:\n");
 
 	c = h->reqQ;
-	seq_printf(m, "reqQ = %p", c);
+	seq_printf(m, "reqQ = %pK", c);
 	if (c) c=c->next;
 	while(c && c != h->reqQ) {
-		seq_printf(m, "->%p", c);
+		seq_printf(m, "->%pK", c);
 		c=c->next;
 	}
 
 	c = h->cmpQ;
-	seq_printf(m, "\ncmpQ = %p", c);
+	seq_printf(m, "\ncmpQ = %pK", c);
 	if (c) c=c->next;
 	while(c && c != h->cmpQ) {
-		seq_printf(m, "->%p", c);
+		seq_printf(m, "->%pK", c);
 		c=c->next;
 	}
 
@@ -1031,7 +1031,7 @@ static inline void complete_command(cmdlist_t *cmd, int timeout)
                 pci_unmap_page(hba[cmd->ctlr]->pci_dev, cmd->req.sg[i].addr,
 				cmd->req.sg[i].size, ddir);
 
-	DBGPX(printk("Done with %p\n", rq););
+	DBGPX(printk("Done with %pK\n", rq););
 	__blk_end_request_all(rq, error);
 }
 

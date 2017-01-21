@@ -928,7 +928,7 @@ tc35815_init_queues(struct net_device *dev)
 				return -ENOMEM;
 			}
 		}
-		printk(KERN_DEBUG "%s: FD buf %p DataBuf",
+		printk(KERN_DEBUG "%s: FD buf %pK DataBuf",
 		       dev->name, lp->fd_buf);
 		printk("\n");
 	} else {
@@ -993,7 +993,7 @@ tc35815_init_queues(struct net_device *dev)
 				    RX_BUF_SIZE);
 	}
 
-	printk(KERN_DEBUG "%s: TxFD %p RxFD %p FrFD %p\n",
+	printk(KERN_DEBUG "%s: TxFD %pK RxFD %pK FrFD %pK\n",
 	       dev->name, lp->tfd_base, lp->rfd_base, lp->fbl_ptr);
 	return 0;
 }
@@ -1081,7 +1081,7 @@ tc35815_free_queues(struct net_device *dev)
 static void
 dump_txfd(struct TxFD *fd)
 {
-	printk("TxFD(%p): %08x %08x %08x %08x\n", fd,
+	printk("TxFD(%pK): %08x %08x %08x %08x\n", fd,
 	       le32_to_cpu(fd->fd.FDNext),
 	       le32_to_cpu(fd->fd.FDSystem),
 	       le32_to_cpu(fd->fd.FDStat),
@@ -1099,7 +1099,7 @@ dump_rxfd(struct RxFD *fd)
 	int i, bd_count = (le32_to_cpu(fd->fd.FDCtl) & FD_BDCnt_MASK) >> FD_BDCnt_SHIFT;
 	if (bd_count > 8)
 		bd_count = 8;
-	printk("RxFD(%p): %08x %08x %08x %08x\n", fd,
+	printk("RxFD(%pK): %08x %08x %08x %08x\n", fd,
 	       le32_to_cpu(fd->fd.FDNext),
 	       le32_to_cpu(fd->fd.FDSystem),
 	       le32_to_cpu(fd->fd.FDStat),
@@ -1120,7 +1120,7 @@ static void
 dump_frfd(struct FrFD *fd)
 {
 	int i;
-	printk("FrFD(%p): %08x %08x %08x %08x\n", fd,
+	printk("FrFD(%pK): %08x %08x %08x %08x\n", fd,
 	       le32_to_cpu(fd->fd.FDNext),
 	       le32_to_cpu(fd->fd.FDSystem),
 	       le32_to_cpu(fd->fd.FDStat),
@@ -1139,11 +1139,11 @@ panic_queues(struct net_device *dev)
 	struct tc35815_local *lp = netdev_priv(dev);
 	int i;
 
-	printk("TxFD base %p, start %u, end %u\n",
+	printk("TxFD base %pK, start %u, end %u\n",
 	       lp->tfd_base, lp->tfd_start, lp->tfd_end);
-	printk("RxFD base %p limit %p cur %p\n",
+	printk("RxFD base %pK limit %pK cur %pK\n",
 	       lp->rfd_base, lp->rfd_limit, lp->rfd_cur);
-	printk("FrFD %p\n", lp->fbl_ptr);
+	printk("FrFD %pK\n", lp->fbl_ptr);
 	for (i = 0; i < TX_FD_NUM; i++)
 		dump_txfd(&lp->tfd_base[i]);
 	for (i = 0; i < RX_FD_NUM; i++) {
@@ -1157,7 +1157,7 @@ panic_queues(struct net_device *dev)
 
 static void print_eth(const u8 *add)
 {
-	printk(KERN_DEBUG "print_eth(%p)\n", add);
+	printk(KERN_DEBUG "print_eth(%pK)\n", add);
 	printk(KERN_DEBUG " %pM => %pM : %02x%02x\n",
 		add + 6, add, add[12], add[13]);
 }
@@ -1637,7 +1637,7 @@ tc35815_rx(struct net_device *dev, int limit)
 			lp->rfd_cur = lp->rfd_base;
 #ifdef DEBUG
 		if (lp->rfd_cur != next_rfd)
-			printk("rfd_cur = %p, next_rfd %p\n",
+			printk("rfd_cur = %pK, next_rfd %pK\n",
 			       lp->rfd_cur, next_rfd);
 #endif
 	}

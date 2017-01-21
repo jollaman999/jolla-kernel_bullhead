@@ -60,7 +60,7 @@ struct agp_memory *agp_find_mem_by_key(int key)
 		curr = curr->next;
 	}
 
-	DBG("key=%d -> mem=%p", key, curr);
+	DBG("key=%d -> mem=%pK", key, curr);
 	return curr;
 }
 
@@ -71,7 +71,7 @@ static void agp_remove_from_pool(struct agp_memory *temp)
 
 	/* Check to see if this is even in the memory pool */
 
-	DBG("mem=%p", temp);
+	DBG("mem=%pK", temp);
 	if (agp_find_mem_by_key(temp->key) != NULL) {
 		next = temp->next;
 		prev = temp->prev;
@@ -125,14 +125,14 @@ agp_segment_priv *agp_find_seg_in_client(const struct agp_client *client,
 
 static void agp_remove_seg_from_client(struct agp_client *client)
 {
-	DBG("client=%p", client);
+	DBG("client=%pK", client);
 
 	if (client->segments != NULL) {
 		if (*(client->segments) != NULL) {
-			DBG("Freeing %p from client %p", *(client->segments), client);
+			DBG("Freeing %pK from client %pK", *(client->segments), client);
 			kfree(*(client->segments));
 		}
-		DBG("Freeing %p from client %p", client->segments, client);
+		DBG("Freeing %pK from client %pK", client->segments, client);
 		kfree(client->segments);
 		client->segments = NULL;
 	}
@@ -148,7 +148,7 @@ static void agp_add_seg_to_client(struct agp_client *client,
 	if (prev_seg != NULL)
 		agp_remove_seg_from_client(client);
 
-	DBG("Adding seg %p (%d segments) to client %p", seg, num_segments, client);
+	DBG("Adding seg %pK (%d segments) to client %pK", seg, num_segments, client);
 	client->num_segments = num_segments;
 	client->segments = seg;
 }
@@ -598,7 +598,7 @@ static int agp_mmap(struct file *file, struct vm_area_struct *vma)
 		if (!agp_find_seg_in_client(client, offset, size, vma->vm_page_prot))
 			goto out_inval;
 
-		DBG("client vm_ops=%p", kerninfo.vm_ops);
+		DBG("client vm_ops=%pK", kerninfo.vm_ops);
 		if (kerninfo.vm_ops) {
 			vma->vm_ops = kerninfo.vm_ops;
 		} else if (io_remap_pfn_range(vma, vma->vm_start,
@@ -614,7 +614,7 @@ static int agp_mmap(struct file *file, struct vm_area_struct *vma)
 		if (size != current_size)
 			goto out_inval;
 
-		DBG("controller vm_ops=%p", kerninfo.vm_ops);
+		DBG("controller vm_ops=%pK", kerninfo.vm_ops);
 		if (kerninfo.vm_ops) {
 			vma->vm_ops = kerninfo.vm_ops;
 		} else if (io_remap_pfn_range(vma, vma->vm_start,
@@ -645,7 +645,7 @@ static int agp_release(struct inode *inode, struct file *file)
 
 	mutex_lock(&(agp_fe.agp_mutex));
 
-	DBG("priv=%p", priv);
+	DBG("priv=%pK", priv);
 
 	if (test_bit(AGP_FF_IS_CONTROLLER, &priv->access_flags)) {
 		struct agp_controller *controller;
@@ -702,7 +702,7 @@ static int agp_open(struct inode *inode, struct file *file)
 	}
 	file->private_data = (void *) priv;
 	agp_insert_file_private(priv);
-	DBG("private=%p, client=%p", priv, client);
+	DBG("private=%pK, client=%pK", priv, client);
 
 	mutex_unlock(&(agp_fe.agp_mutex));
 
@@ -963,7 +963,7 @@ static long agp_ioctl(struct file *file,
 	struct agp_file_private *curr_priv = file->private_data;
 	int ret_val = -ENOTTY;
 
-	DBG("priv=%p, cmd=%x", curr_priv, cmd);
+	DBG("priv=%pK, cmd=%x", curr_priv, cmd);
 	mutex_lock(&(agp_fe.agp_mutex));
 
 	if ((agp_fe.current_controller == NULL) &&

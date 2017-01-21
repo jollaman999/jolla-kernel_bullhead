@@ -142,7 +142,7 @@ static int nes_inetaddr_event(struct notifier_block *notifier,
 	nes_debug(NES_DBG_NETDEV, "nes_inetaddr_event: ip address %pI4, netmask %pI4.\n",
 		  &ifa->ifa_address, &ifa->ifa_mask);
 	list_for_each_entry(nesdev, &nes_dev_list, list) {
-		nes_debug(NES_DBG_NETDEV, "Nesdev list entry = 0x%p. (%s)\n",
+		nes_debug(NES_DBG_NETDEV, "Nesdev list entry = 0x%pK. (%s)\n",
 				nesdev, nesdev->netdev[0]->name);
 		netdev = nesdev->netdev[0];
 		nesvnic = netdev_priv(netdev);
@@ -221,7 +221,7 @@ static int nes_net_event(struct notifier_block *notifier,
 	switch (event) {
 		case NETEVENT_NEIGH_UPDATE:
 			list_for_each_entry(nesdev, &nes_dev_list, list) {
-				/* nes_debug(NES_DBG_NETDEV, "Nesdev list entry = 0x%p.\n", nesdev); */
+				/* nes_debug(NES_DBG_NETDEV, "Nesdev list entry = 0x%pK.\n", nesdev); */
 				netdev = nesdev->netdev[0];
 				nesvnic = netdev_priv(netdev);
 				if (netdev == neigh->dev) {
@@ -522,7 +522,7 @@ static int nes_probe(struct pci_dev *pcidev, const struct pci_device_id *ent)
 		goto bail2;
 	}
 
-	nes_debug(NES_DBG_INIT, "Allocated nes device at %p\n", nesdev);
+	nes_debug(NES_DBG_INIT, "Allocated nes device at %pK\n", nesdev);
 	nesdev->pcidev = pcidev;
 	pci_set_drvdata(pcidev, nesdev);
 

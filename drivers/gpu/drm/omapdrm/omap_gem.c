@@ -386,7 +386,7 @@ static int fault_1d(struct drm_gem_object *obj,
 		pfn = (omap_obj->paddr >> PAGE_SHIFT) + pgoff;
 	}
 
-	VERB("Inserting %p pfn %lx, pa %lx", vmf->virtual_address,
+	VERB("Inserting %pK pfn %lx, pa %lx", vmf->virtual_address,
 			pfn, pfn << PAGE_SHIFT);
 
 	return vm_insert_mixed(vma, (unsigned long)vmf->virtual_address, pfn);
@@ -478,7 +478,7 @@ static int fault_2d(struct drm_gem_object *obj,
 
 	pfn = entry->paddr >> PAGE_SHIFT;
 
-	VERB("Inserting %p pfn %lx, pa %lx", vmf->virtual_address,
+	VERB("Inserting %pK pfn %lx, pa %lx", vmf->virtual_address,
 			pfn, pfn << PAGE_SHIFT);
 
 	for (i = n; i > 0; i--) {
@@ -1004,7 +1004,7 @@ void omap_gem_describe(struct drm_gem_object *obj, struct seq_file *m)
 	if (obj->map_list.map)
 		off = (uint64_t)obj->map_list.hash.key;
 
-	seq_printf(m, "%08x: %2d (%2d) %08llx %pad (%2d) %p %4d",
+	seq_printf(m, "%08x: %2d (%2d) %08llx %pad (%2d) %pK %4d",
 			omap_obj->flags, obj->name, obj->refcount.refcount.counter,
 			off, &omap_obj->paddr, omap_obj->paddr_cnt,
 			omap_obj->vaddr, omap_obj->roll);
@@ -1088,7 +1088,7 @@ static void sync_op_update(void)
 	list_for_each_entry_safe(waiter, n, &waiters, list) {
 		if (!is_waiting(waiter)) {
 			list_del(&waiter->list);
-			SYNC("notify: %p", waiter);
+			SYNC("notify: %pK", waiter);
 			waiter->notify(waiter->arg);
 			kfree(waiter);
 		}
@@ -1185,14 +1185,14 @@ int omap_gem_op_sync(struct drm_gem_object *obj, enum omap_gem_op op)
 
 		spin_lock(&sync_lock);
 		if (is_waiting(waiter)) {
-			SYNC("waited: %p", waiter);
+			SYNC("waited: %pK", waiter);
 			list_add_tail(&waiter->list, &waiters);
 			spin_unlock(&sync_lock);
 			ret = wait_event_interruptible(sync_event,
 					(waiter_task == NULL));
 			spin_lock(&sync_lock);
 			if (waiter_task) {
-				SYNC("interrupted: %p", waiter);
+				SYNC("interrupted: %pK", waiter);
 				/* we were interrupted */
 				list_del(&waiter->list);
 				waiter_task = NULL;
@@ -1238,7 +1238,7 @@ int omap_gem_op_async(struct drm_gem_object *obj, enum omap_gem_op op,
 
 		spin_lock(&sync_lock);
 		if (is_waiting(waiter)) {
-			SYNC("waited: %p", waiter);
+			SYNC("waited: %pK", waiter);
 			list_add_tail(&waiter->list, &waiters);
 			spin_unlock(&sync_lock);
 			return 0;

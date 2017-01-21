@@ -101,7 +101,7 @@ static void dwc2_driver_remove(struct pci_dev *dev)
 {
 	struct dwc2_hsotg *hsotg = pci_get_drvdata(dev);
 
-	dev_dbg(&dev->dev, "%s(%p)\n", __func__, dev);
+	dev_dbg(&dev->dev, "%s(%pK)\n", __func__, dev);
 
 	dwc2_hcd_remove(hsotg);
 	pci_disable_device(dev);
@@ -125,7 +125,7 @@ static int dwc2_driver_probe(struct pci_dev *dev,
 	struct dwc2_hsotg *hsotg;
 	int retval;
 
-	dev_dbg(&dev->dev, "%s(%p)\n", __func__, dev);
+	dev_dbg(&dev->dev, "%s(%pK)\n", __func__, dev);
 
 	hsotg = devm_kzalloc(&dev->dev, sizeof(*hsotg), GFP_KERNEL);
 	if (!hsotg)
@@ -138,7 +138,7 @@ static int dwc2_driver_probe(struct pci_dev *dev,
 	if (!hsotg->regs)
 		return -ENOMEM;
 
-	dev_dbg(&dev->dev, "mapped PA %08lx to VA %p\n",
+	dev_dbg(&dev->dev, "mapped PA %08lx to VA %pK\n",
 		(unsigned long)pci_resource_start(dev, 0), hsotg->regs);
 
 	if (pci_enable_device(dev) < 0)
@@ -153,7 +153,7 @@ static int dwc2_driver_probe(struct pci_dev *dev,
 	}
 
 	pci_set_drvdata(dev, hsotg);
-	dev_dbg(&dev->dev, "hsotg=%p\n", hsotg);
+	dev_dbg(&dev->dev, "hsotg=%pK\n", hsotg);
 
 	return retval;
 }

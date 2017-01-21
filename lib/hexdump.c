@@ -215,7 +215,7 @@ void print_hex_dump(const char *level, const char *prefix_str, int prefix_type,
 
 		switch (prefix_type) {
 		case DUMP_PREFIX_ADDRESS:
-			printk("%s%s%p: %s\n",
+			printk("%s%s%pK: %s\n",
 			       level, prefix_str, ptr + i, linebuf);
 			break;
 		case DUMP_PREFIX_OFFSET:

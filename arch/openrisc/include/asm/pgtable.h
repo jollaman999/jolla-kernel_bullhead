@@ -407,10 +407,10 @@ static inline void pmd_set(pmd_t *pmdp, pte_t *ptep)
 #define pfn_pte(pfn, prot)  __pte((((pfn) << PAGE_SHIFT)) | pgprot_val(prot))
 
 #define pte_ERROR(e) \
-	printk(KERN_ERR "%s:%d: bad pte %p(%08lx).\n", \
+	printk(KERN_ERR "%s:%d: bad pte %pK(%08lx).\n", \
 	       __FILE__, __LINE__, &(e), pte_val(e))
 #define pgd_ERROR(e) \
-	printk(KERN_ERR "%s:%d: bad pgd %p(%08lx).\n", \
+	printk(KERN_ERR "%s:%d: bad pgd %pK(%08lx).\n", \
 	       __FILE__, __LINE__, &(e), pgd_val(e))
 
 extern pgd_t swapper_pg_dir[PTRS_PER_PGD]; /* defined in head.S */

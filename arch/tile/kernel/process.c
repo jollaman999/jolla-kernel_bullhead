@@ -229,7 +229,7 @@ struct task_struct *validate_current(void)
 	if (unlikely((unsigned long)tsk < PAGE_OFFSET ||
 		     (high_memory && (void *)tsk > high_memory) ||
 		     ((unsigned long)tsk & (__alignof__(*tsk) - 1)) != 0)) {
-		pr_err("Corrupt 'current' %p (sp %#lx)\n", tsk, stack_pointer);
+		pr_err("Corrupt 'current' %pK (sp %#lx)\n", tsk, stack_pointer);
 		tsk = &corrupt;
 	}
 	return tsk;

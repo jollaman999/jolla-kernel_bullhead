@@ -461,7 +461,7 @@ static struct tnode *tnode_new(t_key key, int pos, int bits)
 		tn->empty_children = 1<<bits;
 	}
 
-	pr_debug("AT %p s=%zu %zu\n", tn, sizeof(struct tnode),
+	pr_debug("AT %pK s=%zu %zu\n", tn, sizeof(struct tnode),
 		 sizeof(struct rt_trie_node *) << bits);
 	return tn;
 }
@@ -532,7 +532,7 @@ static struct rt_trie_node *resize(struct trie *t, struct tnode *tn)
 	if (!tn)
 		return NULL;
 
-	pr_debug("In tnode_resize %p inflate_threshold=%d threshold=%d\n",
+	pr_debug("In tnode_resize %pK inflate_threshold=%d threshold=%d\n",
 		 tn, inflate_threshold, halve_threshold);
 
 	/* No children */
@@ -1155,7 +1155,7 @@ static struct list_head *fib_insert_node(struct trie *t, u32 key, int plen)
 	}
 
 	if (tp && tp->pos + tp->bits > 32)
-		pr_warn("fib_trie tp=%p pos=%d, bits=%d, key=%0x plen=%d\n",
+		pr_warn("fib_trie tp=%pK pos=%d, bits=%d, key=%0x plen=%d\n",
 			tp, tp->pos, tp->bits, key, plen);
 
 	/* Rebalance the trie */
@@ -1602,7 +1602,7 @@ static void trie_leaf_remove(struct trie *t, struct leaf *l)
 {
 	struct tnode *tp = node_parent((struct rt_trie_node *) l);
 
-	pr_debug("entering trie_leaf_remove(%p)\n", l);
+	pr_debug("entering trie_leaf_remove(%pK)\n", l);
 
 	if (tp) {
 		t_key cindex = tkey_extract_bits(l->key, tp->pos, tp->bits);
@@ -1654,7 +1654,7 @@ int fib_table_delete(struct fib_table *tb, struct fib_config *cfg)
 	if (!fa)
 		return -ESRCH;
 
-	pr_debug("Deleting %08x/%d tos=%d t=%p\n", key, plen, tos, t);
+	pr_debug("Deleting %08x/%d tos=%d t=%pK\n", key, plen, tos, t);
 
 	fa_to_delete = NULL;
 	fa = list_entry(fa->fa_list.prev, struct fib_alias, fa_list);
@@ -2004,7 +2004,7 @@ static struct rt_trie_node *fib_trie_get_next(struct fib_trie_iter *iter)
 	if (!tn)
 		return NULL;
 
-	pr_debug("get_next iter={node=%p index=%d depth=%d}\n",
+	pr_debug("get_next iter={node=%pK index=%d depth=%d}\n",
 		 iter->tnode, iter->index, iter->depth);
 rescan:
 	while (cindex < (1<<tn->bits)) {

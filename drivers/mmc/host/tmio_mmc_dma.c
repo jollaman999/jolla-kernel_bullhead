@@ -98,7 +98,7 @@ static void tmio_mmc_start_dma_rx(struct tmio_mmc_host *host)
 			ret = cookie;
 		}
 	}
-	dev_dbg(&host->pdev->dev, "%s(): mapped %d -> %d, cookie %d, rq %p\n",
+	dev_dbg(&host->pdev->dev, "%s(): mapped %d -> %d, cookie %d, rq %pK\n",
 		__func__, host->sg_len, ret, cookie, host->mrq);
 
 pio:
@@ -119,7 +119,7 @@ pio:
 			 "DMA failed: %d, falling back to PIO\n", ret);
 	}
 
-	dev_dbg(&host->pdev->dev, "%s(): desc %p, cookie %d, sg[%d]\n", __func__,
+	dev_dbg(&host->pdev->dev, "%s(): desc %pK, cookie %d, sg[%d]\n", __func__,
 		desc, cookie, host->sg_len);
 }
 
@@ -179,7 +179,7 @@ static void tmio_mmc_start_dma_tx(struct tmio_mmc_host *host)
 			ret = cookie;
 		}
 	}
-	dev_dbg(&host->pdev->dev, "%s(): mapped %d -> %d, cookie %d, rq %p\n",
+	dev_dbg(&host->pdev->dev, "%s(): mapped %d -> %d, cookie %d, rq %pK\n",
 		__func__, host->sg_len, ret, cookie, host->mrq);
 
 pio:
@@ -200,7 +200,7 @@ pio:
 			 "DMA failed: %d, falling back to PIO\n", ret);
 	}
 
-	dev_dbg(&host->pdev->dev, "%s(): desc %p, cookie %d\n", __func__,
+	dev_dbg(&host->pdev->dev, "%s(): desc %pK, cookie %d\n", __func__,
 		desc, cookie);
 }
 
@@ -264,7 +264,7 @@ out:
 /* It might be necessary to make filter MFD specific */
 static bool tmio_mmc_filter(struct dma_chan *chan, void *arg)
 {
-	dev_dbg(chan->device->dev, "%s: slave data %p\n", __func__, arg);
+	dev_dbg(chan->device->dev, "%s: slave data %pK\n", __func__, arg);
 	chan->private = arg;
 	return true;
 }
@@ -283,7 +283,7 @@ void tmio_mmc_request_dma(struct tmio_mmc_host *host, struct tmio_mmc_data *pdat
 
 		host->chan_tx = dma_request_channel(mask, tmio_mmc_filter,
 						    pdata->dma->chan_priv_tx);
-		dev_dbg(&host->pdev->dev, "%s: TX: got channel %p\n", __func__,
+		dev_dbg(&host->pdev->dev, "%s: TX: got channel %pK\n", __func__,
 			host->chan_tx);
 
 		if (!host->chan_tx)
@@ -291,7 +291,7 @@ void tmio_mmc_request_dma(struct tmio_mmc_host *host, struct tmio_mmc_data *pdat
 
 		host->chan_rx = dma_request_channel(mask, tmio_mmc_filter,
 						    pdata->dma->chan_priv_rx);
-		dev_dbg(&host->pdev->dev, "%s: RX: got channel %p\n", __func__,
+		dev_dbg(&host->pdev->dev, "%s: RX: got channel %pK\n", __func__,
 			host->chan_rx);
 
 		if (!host->chan_rx)

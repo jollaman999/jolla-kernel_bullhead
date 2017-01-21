@@ -365,7 +365,7 @@ static int wl1271_prepare_tx_frame(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 	}
 
 	if (hlid == WL12XX_INVALID_LINK_ID) {
-		wl1271_error("invalid hlid. dropping skb 0x%p", skb);
+		wl1271_error("invalid hlid. dropping skb 0x%pK", skb);
 		return -EINVAL;
 	}
 
@@ -946,7 +946,7 @@ static void wl1271_tx_complete_packet(struct wl1271 *wl,
 		skb_pull(skb, WL1271_EXTRA_SPACE_TKIP);
 	}
 
-	wl1271_debug(DEBUG_TX, "tx status id %u skb 0x%p failures %u rate 0x%x"
+	wl1271_debug(DEBUG_TX, "tx status id %u skb 0x%pK failures %u rate 0x%x"
 		     " status 0x%x",
 		     result->id, skb, result->ack_failures,
 		     result->rate_class_index, result->status);
@@ -1016,7 +1016,7 @@ void wl1271_tx_reset_link_queues(struct wl1271 *wl, u8 hlid)
 	for (i = 0; i < NUM_TX_QUEUES; i++) {
 		total[i] = 0;
 		while ((skb = skb_dequeue(&lnk->tx_queue[i]))) {
-			wl1271_debug(DEBUG_TX, "link freeing skb 0x%p", skb);
+			wl1271_debug(DEBUG_TX, "link freeing skb 0x%pK", skb);
 
 			if (!wl12xx_is_dummy_packet(wl, skb)) {
 				info = IEEE80211_SKB_CB(skb);
@@ -1090,7 +1090,7 @@ void wl12xx_tx_reset(struct wl1271 *wl)
 
 		skb = wl->tx_frames[i];
 		wl1271_free_tx_id(wl, i);
-		wl1271_debug(DEBUG_TX, "freeing skb 0x%p", skb);
+		wl1271_debug(DEBUG_TX, "freeing skb 0x%pK", skb);
 
 		if (!wl12xx_is_dummy_packet(wl, skb)) {
 			/*

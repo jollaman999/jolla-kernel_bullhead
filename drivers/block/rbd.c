@@ -441,7 +441,7 @@ void rbd_warn(struct rbd_device *rbd_dev, const char *fmt, ...)
 		printk(KERN_WARNING "%s: id %s: %pV\n",
 			RBD_DRV_NAME, rbd_dev->spec->image_id, &vaf);
 	else	/* punt */
-		printk(KERN_WARNING "%s: rbd_dev %p: %pV\n",
+		printk(KERN_WARNING "%s: rbd_dev %pK: %pV\n",
 			RBD_DRV_NAME, rbd_dev, &vaf);
 	va_end(args);
 }
@@ -554,7 +554,7 @@ static struct rbd_client *rbd_client_create(struct ceph_options *ceph_opts)
 	spin_unlock(&rbd_client_list_lock);
 
 	mutex_unlock(&ctl_mutex);
-	dout("%s: rbdc %p\n", __func__, rbdc);
+	dout("%s: rbdc %pK\n", __func__, rbdc);
 
 	return rbdc;
 
@@ -703,7 +703,7 @@ static void rbd_client_release(struct kref *kref)
 {
 	struct rbd_client *rbdc = container_of(kref, struct rbd_client, kref);
 
-	dout("%s: rbdc %p\n", __func__, rbdc);
+	dout("%s: rbdc %pK\n", __func__, rbdc);
 	spin_lock(&rbd_client_list_lock);
 	list_del(&rbdc->node);
 	spin_unlock(&rbd_client_list_lock);
@@ -1328,7 +1328,7 @@ static void obj_request_img_data_set(struct rbd_obj_request *obj_request)
 		struct rbd_device *rbd_dev;
 
 		rbd_dev = obj_request->img_request->rbd_dev;
-		rbd_warn(rbd_dev, "obj_request %p already marked img_data\n",
+		rbd_warn(rbd_dev, "obj_request %pK already marked img_data\n",
 			obj_request);
 	}
 }
@@ -1346,7 +1346,7 @@ static void obj_request_done_set(struct rbd_obj_request *obj_request)
 
 		if (obj_request_img_data_test(obj_request))
 			rbd_dev = obj_request->img_request->rbd_dev;
-		rbd_warn(rbd_dev, "obj_request %p already marked done\n",
+		rbd_warn(rbd_dev, "obj_request %pK already marked done\n",
 			obj_request);
 	}
 }
@@ -1398,7 +1398,7 @@ static bool obj_request_overlaps_parent(struct rbd_obj_request *obj_request)
 
 static void rbd_obj_request_get(struct rbd_obj_request *obj_request)
 {
-	dout("%s: obj %p (was %d)\n", __func__, obj_request,
+	dout("%s: obj %pK (was %d)\n", __func__, obj_request,
 		atomic_read(&obj_request->kref.refcount));
 	kref_get(&obj_request->kref);
 }
@@ -1407,14 +1407,14 @@ static void rbd_obj_request_destroy(struct kref *kref);
 static void rbd_obj_request_put(struct rbd_obj_request *obj_request)
 {
 	rbd_assert(obj_request != NULL);
-	dout("%s: obj %p (was %d)\n", __func__, obj_request,
+	dout("%s: obj %pK (was %d)\n", __func__, obj_request,
 		atomic_read(&obj_request->kref.refcount));
 	kref_put(&obj_request->kref, rbd_obj_request_destroy);
 }
 
 static void rbd_img_request_get(struct rbd_img_request *img_request)
 {
-	dout("%s: img %p (was %d)\n", __func__, img_request,
+	dout("%s: img %pK (was %d)\n", __func__, img_request,
 	     atomic_read(&img_request->kref.refcount));
 	kref_get(&img_request->kref);
 }
@@ -1425,7 +1425,7 @@ static void rbd_img_request_destroy(struct kref *kref);
 static void rbd_img_request_put(struct rbd_img_request *img_request)
 {
 	rbd_assert(img_request != NULL);
-	dout("%s: img %p (was %d)\n", __func__, img_request,
+	dout("%s: img %pK (was %d)\n", __func__, img_request,
 		atomic_read(&img_request->kref.refcount));
 	if (img_request_child_test(img_request))
 		kref_put(&img_request->kref, rbd_parent_request_destroy);
@@ -1446,7 +1446,7 @@ static inline void rbd_img_obj_request_add(struct rbd_img_request *img_request,
 	rbd_assert(obj_request->which != BAD_WHICH);
 	img_request->obj_request_count++;
 	list_add_tail(&obj_request->links, &img_request->obj_requests);
-	dout("%s: img %p obj %p w=%u\n", __func__, img_request, obj_request,
+	dout("%s: img %pK obj %pK w=%u\n", __func__, img_request, obj_request,
 		obj_request->which);
 }
 
@@ -1455,7 +1455,7 @@ static inline void rbd_img_obj_request_del(struct rbd_img_request *img_request,
 {
 	rbd_assert(obj_request->which != BAD_WHICH);
 
-	dout("%s: img %p obj %p w=%u\n", __func__, img_request, obj_request,
+	dout("%s: img %pK obj %pK w=%u\n", __func__, img_request, obj_request,
 		obj_request->which);
 	list_del(&obj_request->links);
 	rbd_assert(img_request->obj_request_count > 0);
@@ -1484,7 +1484,7 @@ static bool obj_request_type_valid(enum obj_request_type type)
 static int rbd_obj_request_submit(struct ceph_osd_client *osdc,
 				struct rbd_obj_request *obj_request)
 {
-	dout("%s: osdc %p obj %p\n", __func__, osdc, obj_request);
+	dout("%s: osdc %pK obj %pK\n", __func__, osdc, obj_request);
 
 	return ceph_osdc_start_request(osdc, obj_request->osd_req, false);
 }
@@ -1492,7 +1492,7 @@ static int rbd_obj_request_submit(struct ceph_osd_client *osdc,
 static void rbd_img_request_complete(struct rbd_img_request *img_request)
 {
 
-	dout("%s: img %p\n", __func__, img_request);
+	dout("%s: img %pK\n", __func__, img_request);
 
 	/*
 	 * If no error occurred, compute the aggregate transfer
@@ -1519,7 +1519,7 @@ static void rbd_img_request_complete(struct rbd_img_request *img_request)
 
 static int rbd_obj_request_wait(struct rbd_obj_request *obj_request)
 {
-	dout("%s: obj %p\n", __func__, obj_request);
+	dout("%s: obj %pK\n", __func__, obj_request);
 
 	return wait_for_completion_interruptible(&obj_request->completion);
 }
@@ -1583,7 +1583,7 @@ rbd_img_obj_request_read_callback(struct rbd_obj_request *obj_request)
 	u64 xferred = obj_request->xferred;
 	u64 length = obj_request->length;
 
-	dout("%s: obj %p img %p result %d %llu/%llu\n", __func__,
+	dout("%s: obj %pK img %pK result %d %llu/%llu\n", __func__,
 		obj_request, obj_request->img_request, obj_request->result,
 		xferred, length);
 	/*
@@ -1613,7 +1613,7 @@ rbd_img_obj_request_read_callback(struct rbd_obj_request *obj_request)
 
 static void rbd_obj_request_complete(struct rbd_obj_request *obj_request)
 {
-	dout("%s: obj %p cb %p\n", __func__, obj_request,
+	dout("%s: obj %pK cb %pK\n", __func__, obj_request,
 		obj_request->callback);
 	if (obj_request->callback)
 		obj_request->callback(obj_request);
@@ -1623,7 +1623,7 @@ static void rbd_obj_request_complete(struct rbd_obj_request *obj_request)
 
 static void rbd_osd_trivial_callback(struct rbd_obj_request *obj_request)
 {
-	dout("%s: obj %p\n", __func__, obj_request);
+	dout("%s: obj %pK\n", __func__, obj_request);
 	obj_request_done_set(obj_request);
 }
 
@@ -1639,7 +1639,7 @@ static void rbd_osd_read_callback(struct rbd_obj_request *obj_request)
 		rbd_dev = img_request->rbd_dev;
 	}
 
-	dout("%s: obj %p img %p result %d %llu/%llu\n", __func__,
+	dout("%s: obj %pK img %pK result %d %llu/%llu\n", __func__,
 		obj_request, img_request, obj_request->result,
 		obj_request->xferred, obj_request->length);
 	if (layered && obj_request->result == -ENOENT &&
@@ -1653,7 +1653,7 @@ static void rbd_osd_read_callback(struct rbd_obj_request *obj_request)
 
 static void rbd_osd_write_callback(struct rbd_obj_request *obj_request)
 {
-	dout("%s: obj %p result %d %llu\n", __func__, obj_request,
+	dout("%s: obj %pK result %d %llu\n", __func__, obj_request,
 		obj_request->result, obj_request->length);
 	/*
 	 * There is no such thing as a successful short write.  Set
@@ -1669,13 +1669,13 @@ static void rbd_osd_write_callback(struct rbd_obj_request *obj_request)
  */
 static void rbd_osd_stat_callback(struct rbd_obj_request *obj_request)
 {
-	dout("%s: obj %p\n", __func__, obj_request);
+	dout("%s: obj %pK\n", __func__, obj_request);
 	obj_request_done_set(obj_request);
 }
 
 static void rbd_osd_call_callback(struct rbd_obj_request *obj_request)
 {
-	dout("%s: obj %p\n", __func__, obj_request);
+	dout("%s: obj %pK\n", __func__, obj_request);
 
 	if (obj_request_img_data_test(obj_request))
 		rbd_osd_copyup_callback(obj_request);
@@ -1689,7 +1689,7 @@ static void rbd_osd_req_callback(struct ceph_osd_request *osd_req,
 	struct rbd_obj_request *obj_request = osd_req->r_priv;
 	u16 opcode;
 
-	dout("%s: osd_req %p msg %p\n", __func__, osd_req, msg);
+	dout("%s: osd_req %pK msg %pK\n", __func__, osd_req, msg);
 	rbd_assert(osd_req == obj_request->osd_req);
 	if (obj_request_img_data_test(obj_request)) {
 		rbd_assert(obj_request->img_request);
@@ -1886,7 +1886,7 @@ static struct rbd_obj_request *rbd_obj_request_create(const char *object_name,
 	init_completion(&obj_request->completion);
 	kref_init(&obj_request->kref);
 
-	dout("%s: \"%s\" %llu/%llu %d -> obj %p\n", __func__, object_name,
+	dout("%s: \"%s\" %llu/%llu %d -> obj %pK\n", __func__, object_name,
 		offset, length, (int)type, obj_request);
 
 	return obj_request;
@@ -1898,7 +1898,7 @@ static void rbd_obj_request_destroy(struct kref *kref)
 
 	obj_request = container_of(kref, struct rbd_obj_request, kref);
 
-	dout("%s: obj %p\n", __func__, obj_request);
+	dout("%s: obj %pK\n", __func__, obj_request);
 
 	rbd_assert(obj_request->img_request == NULL);
 	rbd_assert(obj_request->which == BAD_WHICH);
@@ -2037,7 +2037,7 @@ static struct rbd_img_request *rbd_img_request_create(
 	INIT_LIST_HEAD(&img_request->obj_requests);
 	kref_init(&img_request->kref);
 
-	dout("%s: rbd_dev %p %s %llu/%llu -> img %p\n", __func__, rbd_dev,
+	dout("%s: rbd_dev %pK %s %llu/%llu -> img %pK\n", __func__, rbd_dev,
 		write_request ? "write" : "read", offset, length,
 		img_request);
 
@@ -2052,7 +2052,7 @@ static void rbd_img_request_destroy(struct kref *kref)
 
 	img_request = container_of(kref, struct rbd_img_request, kref);
 
-	dout("%s: img %p\n", __func__, img_request);
+	dout("%s: img %pK\n", __func__, img_request);
 
 	for_each_obj_request_safe(img_request, obj_request, next_obj_request)
 		rbd_img_obj_request_del(img_request, obj_request);
@@ -2164,7 +2164,7 @@ static void rbd_img_obj_callback(struct rbd_obj_request *obj_request)
 	rbd_assert(obj_request_img_data_test(obj_request));
 	img_request = obj_request->img_request;
 
-	dout("%s: img %p obj %p\n", __func__, img_request, obj_request);
+	dout("%s: img %pK obj %pK\n", __func__, img_request, obj_request);
 	rbd_assert(img_request != NULL);
 	rbd_assert(img_request->obj_request_count > 0);
 	rbd_assert(which != BAD_WHICH);
@@ -2217,7 +2217,7 @@ static int rbd_img_request_fill(struct rbd_img_request *img_request,
 	u64 resid;
 	u16 opcode;
 
-	dout("%s: img %p type %d data_desc %p\n", __func__, img_request,
+	dout("%s: img %pK type %d data_desc %pK\n", __func__, img_request,
 		(int)type, data_desc);
 
 	opcode = write_request ? CEPH_OSD_OP_WRITE : CEPH_OSD_OP_READ;
@@ -2327,7 +2327,7 @@ rbd_osd_copyup_callback(struct rbd_obj_request *obj_request)
 	struct page **pages;
 	u32 page_count;
 
-	dout("%s: obj %p\n", __func__, obj_request);
+	dout("%s: obj %pK\n", __func__, obj_request);
 
 	rbd_assert(obj_request->type == OBJ_REQUEST_BIO);
 	rbd_assert(obj_request_img_data_test(obj_request));
@@ -2580,7 +2580,7 @@ static void rbd_img_obj_exists_callback(struct rbd_obj_request *obj_request)
 	result = obj_request->result;
 	obj_request->result = 0;
 
-	dout("%s: obj %p for obj %p result %d %llu/%llu\n", __func__,
+	dout("%s: obj %pK for obj %pK result %d %llu/%llu\n", __func__,
 		obj_request, orig_request, result,
 		obj_request->xferred, obj_request->length);
 	rbd_obj_request_put(obj_request);
@@ -2740,7 +2740,7 @@ static int rbd_img_request_submit(struct rbd_img_request *img_request)
 	struct rbd_obj_request *obj_request;
 	struct rbd_obj_request *next_obj_request;
 
-	dout("%s: img %p\n", __func__, img_request);
+	dout("%s: img %pK\n", __func__, img_request);
 	for_each_obj_request_safe(img_request, obj_request, next_obj_request) {
 		int ret;
 
@@ -4404,7 +4404,7 @@ static void rbd_dev_id_get(struct rbd_device *rbd_dev)
 	spin_lock(&rbd_dev_list_lock);
 	list_add_tail(&rbd_dev->node, &rbd_dev_list);
 	spin_unlock(&rbd_dev_list_lock);
-	dout("rbd_dev %p given dev id %llu\n", rbd_dev,
+	dout("rbd_dev %pK given dev id %llu\n", rbd_dev,
 		(unsigned long long) rbd_dev->dev_id);
 }
 
@@ -4420,7 +4420,7 @@ static void rbd_dev_id_put(struct rbd_device *rbd_dev)
 
 	rbd_assert(rbd_id > 0);
 
-	dout("rbd_dev %p released dev id %llu\n", rbd_dev,
+	dout("rbd_dev %pK released dev id %llu\n", rbd_dev,
 		(unsigned long long) rbd_dev->dev_id);
 	spin_lock(&rbd_dev_list_lock);
 	list_del_init(&rbd_dev->node);

@@ -141,7 +141,7 @@ static int balance_leaf_when_delete(struct tree_balance *tb, int flag)
 		}
 
 		RFALSE(!item_pos && !tb->CFL[0],
-		       "PAP-12020: tb->CFL[0]==%p, tb->L[0]==%p", tb->CFL[0],
+		       "PAP-12020: tb->CFL[0]==%pK, tb->L[0]==%pK", tb->CFL[0],
 		       tb->L[0]);
 
 		break;
@@ -156,7 +156,7 @@ static int balance_leaf_when_delete(struct tree_balance *tb, int flag)
 						     -tb->insert_size[0]);
 
 				RFALSE(!item_pos && !pos_in_item && !tb->CFL[0],
-				       "PAP-12030: can not change delimiting key. CFL[0]=%p",
+				       "PAP-12030: can not change delimiting key. CFL[0]=%pK",
 				       tb->CFL[0]);
 
 				if (!item_pos && !pos_in_item && tb->CFL[0]) {
@@ -1738,7 +1738,7 @@ void replace_key(struct tree_balance *tb, struct buffer_head *dest, int n_dest,
 {
 
 	RFALSE(dest == NULL || src == NULL,
-	       "vs-12305: source or destination buffer is 0 (src=%p, dest=%p)",
+	       "vs-12305: source or destination buffer is 0 (src=%pK, dest=%pK)",
 	       src, dest);
 	RFALSE(!B_IS_KEYS_LEVEL(dest),
 	       "vs-12310: invalid level (%z) for destination buffer. dest must be leaf",
@@ -1765,7 +1765,7 @@ int get_left_neighbor_position(struct tree_balance *tb, int h)
 	int Sh_position = PATH_H_POSITION(tb->tb_path, h + 1);
 
 	RFALSE(PATH_H_PPARENT(tb->tb_path, h) == NULL || tb->FL[h] == NULL,
-	       "vs-12325: FL[%d](%p) or F[%d](%p) does not exist",
+	       "vs-12325: FL[%d](%pK) or F[%d](%pK) does not exist",
 	       h, tb->FL[h], h, PATH_H_PPARENT(tb->tb_path, h));
 
 	if (Sh_position == 0)
@@ -1779,7 +1779,7 @@ int get_right_neighbor_position(struct tree_balance *tb, int h)
 	int Sh_position = PATH_H_POSITION(tb->tb_path, h + 1);
 
 	RFALSE(PATH_H_PPARENT(tb->tb_path, h) == NULL || tb->FR[h] == NULL,
-	       "vs-12330: F[%d](%p) or FR[%d](%p) does not exist",
+	       "vs-12330: F[%d](%pK) or FR[%d](%pK) does not exist",
 	       h, PATH_H_PPARENT(tb->tb_path, h), h, tb->FR[h]);
 
 	if (Sh_position == B_NR_ITEMS(PATH_H_PPARENT(tb->tb_path, h)))

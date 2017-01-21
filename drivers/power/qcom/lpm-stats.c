@@ -642,7 +642,7 @@ struct lpm_stats *lpm_stats_config_level(const char *name,
 	struct lpm_stats *stats = NULL;
 
 	if (!levels || num_levels <= 0 || IS_ERR(parent)) {
-		pr_err("%s: Invalid input\n\t\tlevels = %p\n\t\t"
+		pr_err("%s: Invalid input\n\t\tlevels = %pK\n\t\t"
 			"num_levels = %d\n\t\tparent = %ld\n",
 			__func__, levels, num_levels, PTR_ERR(parent));
 		return ERR_PTR(-EINVAL);

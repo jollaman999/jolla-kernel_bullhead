@@ -157,7 +157,7 @@ struct sk_buff *wimax_msg_alloc(struct wimax_dev *wimax_dev,
 	}
 	result = nla_put(skb, WIMAX_GNL_MSG_DATA, size, msg);
 	if (result < 0) {
-		dev_err(dev, "no memory to add payload (msg %p size %zu) in "
+		dev_err(dev, "no memory to add payload (msg %pK size %zu) in "
 			"attribute: %d\n", msg, size, result);
 		goto error_nla_put;
 	}
@@ -352,7 +352,7 @@ int wimax_gnl_doit_msg_from_user(struct sk_buff *skb, struct genl_info *info)
 	size_t msg_len;
 
 	might_sleep();
-	d_fnstart(3, NULL, "(skb %p info %p)\n", skb, info);
+	d_fnstart(3, NULL, "(skb %pK info %pK)\n", skb, info);
 	result = -ENODEV;
 	if (info->attrs[WIMAX_GNL_MSG_IFIDX] == NULL) {
 		printk(KERN_ERR "WIMAX_GNL_MSG_FROM_USER: can't find IFIDX "
@@ -414,7 +414,7 @@ error_alloc:
 error_no_data:
 	dev_put(wimax_dev->net_dev);
 error_no_wimax_dev:
-	d_fnend(3, NULL, "(skb %p info %p) = %d\n", skb, info, result);
+	d_fnend(3, NULL, "(skb %pK info %pK) = %d\n", skb, info, result);
 	return result;
 }
 

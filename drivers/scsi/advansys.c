@@ -2510,7 +2510,7 @@ static void asc_prt_scsi_host(struct Scsi_Host *s)
 {
 	struct asc_board *boardp = shost_priv(s);
 
-	printk("Scsi_Host at addr 0x%p, device %s\n", s, dev_name(boardp->dev));
+	printk("Scsi_Host at addr 0x%pK, device %s\n", s, dev_name(boardp->dev));
 	printk(" host_busy %u, host_no %d, last_reset %d,\n",
 	       s->host_busy, s->host_no, (unsigned)s->last_reset);
 
@@ -2753,7 +2753,7 @@ static u32 advansys_ptr_to_srb(struct asc_dvc_var *asc_dvc, void *ptr)
 		return BAD_SRB;
 	asc_dvc->ptr_map = new_ptr;
  out:
-	ASC_DBG(3, "Putting ptr %p into array offset %d\n", ptr, i);
+	ASC_DBG(3, "Putting ptr %pK into array offset %d\n", ptr, i);
 	asc_dvc->ptr_map[i] = ptr;
 	return i + 1;
 }
@@ -2770,7 +2770,7 @@ static void * advansys_srb_to_ptr(struct asc_dvc_var *asc_dvc, u32 srb)
 	}
 	ptr = asc_dvc->ptr_map[srb];
 	asc_dvc->ptr_map[srb] = NULL;
-	ASC_DBG(3, "Returning ptr %p from array offset %d\n", ptr, srb);
+	ASC_DBG(3, "Returning ptr %pK from array offset %d\n", ptr, srb);
 	return ptr;
 }
 
@@ -6184,7 +6184,7 @@ static void adv_isr_callback(ADV_DVC_VAR *adv_dvc_varp, ADV_SCSI_REQ_Q *scsiqp)
 	 * determined.
 	 */
 	scp = reqp->cmndp;
-	ASC_DBG(1, "scp 0x%p\n", scp);
+	ASC_DBG(1, "scp 0x%pK\n", scp);
 	if (scp == NULL) {
 		ASC_PRINT
 		    ("adv_isr_callback: scp is NULL; adv_req_t dropped.\n");
@@ -6194,7 +6194,7 @@ static void adv_isr_callback(ADV_DVC_VAR *adv_dvc_varp, ADV_SCSI_REQ_Q *scsiqp)
 
 	shost = scp->device->host;
 	ASC_STATS(shost, callback);
-	ASC_DBG(1, "shost 0x%p\n", shost);
+	ASC_DBG(1, "shost 0x%pK\n", shost);
 
 	boardp = shost_priv(shost);
 	BUG_ON(adv_dvc_varp != &boardp->dvc_var.adv_dvc_var);
@@ -7115,7 +7115,7 @@ static void asc_isr_callback(ASC_DVC_VAR *asc_dvc_varp, ASC_QDONE_INFO *qdonep)
 	struct scsi_cmnd *scp;
 	struct Scsi_Host *shost;
 
-	ASC_DBG(1, "asc_dvc_varp 0x%p, qdonep 0x%p\n", asc_dvc_varp, qdonep);
+	ASC_DBG(1, "asc_dvc_varp 0x%pK, qdonep 0x%pK\n", asc_dvc_varp, qdonep);
 	ASC_DBG_PRT_ASC_QDONE_INFO(2, qdonep);
 
 	scp = advansys_srb_to_ptr(asc_dvc_varp, qdonep->d2.srb_ptr);
@@ -7126,7 +7126,7 @@ static void asc_isr_callback(ASC_DVC_VAR *asc_dvc_varp, ASC_QDONE_INFO *qdonep)
 
 	shost = scp->device->host;
 	ASC_STATS(shost, callback);
-	ASC_DBG(1, "shost 0x%p\n", shost);
+	ASC_DBG(1, "shost 0x%pK\n", shost);
 
 	boardp = shost_priv(shost);
 	BUG_ON(asc_dvc_varp != &boardp->dvc_var.asc_dvc_var);
@@ -7485,7 +7485,7 @@ static int advansys_reset(struct scsi_cmnd *scp)
 	int status;
 	int ret = SUCCESS;
 
-	ASC_DBG(1, "0x%p\n", scp);
+	ASC_DBG(1, "0x%pK\n", scp);
 
 	ASC_STATS(shost, reset);
 
@@ -7603,7 +7603,7 @@ static irqreturn_t advansys_interrupt(int irq, void *dev_id)
 	struct asc_board *boardp = shost_priv(shost);
 	irqreturn_t result = IRQ_NONE;
 
-	ASC_DBG(2, "boardp 0x%p\n", boardp);
+	ASC_DBG(2, "boardp 0x%pK\n", boardp);
 	spin_lock(shost->host_lock);
 	if (ASC_NARROW_BOARD(boardp)) {
 		if (AscIsIntPending(shost->io_port)) {
@@ -8924,7 +8924,7 @@ static int asc_execute_scsi_cmnd(struct scsi_cmnd *scp)
 	int ret, err_code;
 	struct asc_board *boardp = shost_priv(scp->device->host);
 
-	ASC_DBG(1, "scp 0x%p\n", scp);
+	ASC_DBG(1, "scp 0x%pK\n", scp);
 
 	if (ASC_NARROW_BOARD(boardp)) {
 		ASC_DVC_VAR *asc_dvc = &boardp->dvc_var.asc_dvc_var;
@@ -11289,7 +11289,7 @@ static int advansys_wide_init_chip(struct Scsi_Host *shost)
 	 * is about 4 KB, so allocate all at once.
 	 */
 	adv_dvc->carrier_buf = kmalloc(ADV_CARRIER_BUFSIZE, GFP_KERNEL);
-	ASC_DBG(1, "carrier_buf 0x%p\n", adv_dvc->carrier_buf);
+	ASC_DBG(1, "carrier_buf 0x%pK\n", adv_dvc->carrier_buf);
 
 	if (!adv_dvc->carrier_buf)
 		goto kmalloc_failed;
@@ -11302,7 +11302,7 @@ static int advansys_wide_init_chip(struct Scsi_Host *shost)
 	for (req_cnt = adv_dvc->max_host_qng; req_cnt > 0; req_cnt--) {
 		reqp = kmalloc(sizeof(adv_req_t) * req_cnt, GFP_KERNEL);
 
-		ASC_DBG(1, "reqp 0x%p, req_cnt %d, bytes %lu\n", reqp, req_cnt,
+		ASC_DBG(1, "reqp 0x%pK, req_cnt %d, bytes %lu\n", reqp, req_cnt,
 			 (ulong)sizeof(adv_req_t) * req_cnt);
 
 		if (reqp)
@@ -11432,7 +11432,7 @@ static int advansys_board_found(struct Scsi_Host *shost, unsigned int iop,
 			goto err_shost;
 		}
 		adv_dvc_varp->iop_base = (AdvPortAddr)boardp->ioremap_addr;
-		ASC_DBG(1, "iop_base: 0x%p\n", adv_dvc_varp->iop_base);
+		ASC_DBG(1, "iop_base: 0x%pK\n", adv_dvc_varp->iop_base);
 
 		/*
 		 * Even though it isn't used to access wide boards, other
@@ -11791,7 +11791,7 @@ static int advansys_board_found(struct Scsi_Host *shost, unsigned int iop,
 #endif /* CONFIG_ISA */
 
 	/* Register IRQ Number. */
-	ASC_DBG(2, "request_irq(%d, %p)\n", boardp->irq, shost);
+	ASC_DBG(2, "request_irq(%d, %pK)\n", boardp->irq, shost);
 
 	ret = request_irq(boardp->irq, advansys_interrupt, share_irq,
 			  DRV_NAME, shost);

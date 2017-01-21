@@ -581,7 +581,7 @@ static int32_t msm_actuator_move_focus(
 	if ((a_ctrl->region_size <= 0) ||
 		(a_ctrl->region_size > MAX_ACTUATOR_REGION) ||
 		(!move_params->ringing_params)) {
-		pr_err("Invalid-region size = %d, ringing_params = %p\n",
+		pr_err("Invalid-region size = %d, ringing_params = %pK\n",
 		a_ctrl->region_size, move_params->ringing_params);
 		return -EFAULT;
 	}
@@ -701,7 +701,7 @@ static int32_t msm_actuator_bivcm_move_focus(
 	if ((a_ctrl->region_size <= 0) ||
 		(a_ctrl->region_size > MAX_ACTUATOR_REGION) ||
 		(!move_params->ringing_params)) {
-		pr_err("Invalid-region size = %d, ringing_params = %p\n",
+		pr_err("Invalid-region size = %d, ringing_params = %pK\n",
 		a_ctrl->region_size, move_params->ringing_params);
 		return -EFAULT;
 	}

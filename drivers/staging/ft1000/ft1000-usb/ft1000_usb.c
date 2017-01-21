@@ -160,7 +160,7 @@ static int ft1000_probe(struct usb_interface *interface,
 
 	pft1000info = netdev_priv(ft1000dev->net);
 
-	DEBUG("In probe: pft1000info=%p\n", pft1000info);
+	DEBUG("In probe: pft1000info=%pK\n", pft1000info);
 	ret = dsp_reload(ft1000dev);
 	if (ret) {
 		pr_err("Problem with DSP image loading\n");
@@ -221,7 +221,7 @@ static void ft1000_disconnect(struct usb_interface *interface)
 	DEBUG("ft1000_disconnect is called\n");
 
 	pft1000info = (struct ft1000_info *) usb_get_intfdata(interface);
-	DEBUG("In disconnect pft1000info=%p\n", pft1000info);
+	DEBUG("In disconnect pft1000info=%pK\n", pft1000info);
 
 	if (pft1000info) {
 		ft1000dev = pft1000info->priv;

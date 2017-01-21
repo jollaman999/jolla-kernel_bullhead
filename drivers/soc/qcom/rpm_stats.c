@@ -325,7 +325,7 @@ static int msm_rpmheap_file_show(struct seq_file *m, void *v)
 
 	reg_base = ioremap_nocache(pdata->heap_phys_addrbase, SZ_4);
 	if (!reg_base) {
-		pr_err("%s: ERROR could not ioremap start=%p\n",
+		pr_err("%s: ERROR could not ioremap start=%pK\n",
 			__func__, &pdata->heap_phys_addrbase);
 		return -EBUSY;
 	}

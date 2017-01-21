@@ -320,7 +320,7 @@ static int __init vesafb_probe(struct platform_device *dev)
 		pmi_base  = (unsigned short*)phys_to_virt(((unsigned long)screen_info.vesapm_seg << 4) + screen_info.vesapm_off);
 		pmi_start = (void*)((char*)pmi_base + pmi_base[1]);
 		pmi_pal   = (void*)((char*)pmi_base + pmi_base[2]);
-		printk(KERN_INFO "vesafb: pmi: set display start = %p, set palette = %p\n",pmi_start,pmi_pal);
+		printk(KERN_INFO "vesafb: pmi: set display start = %pK, set palette = %pK\n",pmi_start,pmi_pal);
 		if (pmi_base[3]) {
 			printk(KERN_INFO "vesafb: pmi: ports = ");
 				for (i = pmi_base[3]/2; pmi_base[i] != 0xffff; i++)
@@ -461,7 +461,7 @@ static int __init vesafb_probe(struct platform_device *dev)
 		goto err;
 	}
 
-	printk(KERN_INFO "vesafb: framebuffer at 0x%lx, mapped to 0x%p, "
+	printk(KERN_INFO "vesafb: framebuffer at 0x%lx, mapped to 0x%pK, "
 	       "using %dk, total %dk\n",
 	       vesafb_fix.smem_start, info->screen_base,
 	       size_remap/1024, size_total/1024);

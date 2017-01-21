@@ -189,7 +189,7 @@ static int fast_reg_xdr(struct svcxprt_rdma *xprt,
 	return 0;
 
  fatal_err:
-	printk("svcrdma: Error fast registering memory for xprt %p\n", xprt);
+	printk("svcrdma: Error fast registering memory for xprt %pK\n", xprt);
 	vec->frmr = NULL;
 	svc_rdma_put_frmr(xprt, frmr);
 	return -EIO;
@@ -301,7 +301,7 @@ static int send_write(struct svcxprt_rdma *xprt, struct svc_rqst *rqstp,
 
 	BUG_ON(vec->count > RPCSVC_MAXPAGES);
 	dprintk("svcrdma: RDMA_WRITE rmr=%x, to=%llx, xdr_off=%d, "
-		"write_len=%d, vec->sge=%p, vec->count=%lu\n",
+		"write_len=%d, vec->sge=%pK, vec->count=%lu\n",
 		rmr, (unsigned long long)to, xdr_off,
 		write_len, vec->sge, vec->count);
 
@@ -556,7 +556,7 @@ static int send_reply(struct svcxprt_rdma *rdma,
 	if (ret) {
 		printk(KERN_INFO
 		       "svcrdma: could not post a receive buffer, err=%d."
-		       "Closing transport %p.\n", ret, rdma);
+		       "Closing transport %pK.\n", ret, rdma);
 		set_bit(XPT_CLOSE, &rdma->sc_xprt.xpt_flags);
 		svc_rdma_put_frmr(rdma, vec->frmr);
 		svc_rdma_put_context(ctxt, 0);
@@ -687,7 +687,7 @@ int svc_rdma_sendto(struct svc_rqst *rqstp)
 	struct svc_rdma_op_ctxt *ctxt;
 	struct svc_rdma_req_map *vec;
 
-	dprintk("svcrdma: sending response for rqstp=%p\n", rqstp);
+	dprintk("svcrdma: sending response for rqstp=%pK\n", rqstp);
 
 	/* Get the RDMA request header. */
 	rdma_argp = xdr_start(&rqstp->rq_arg);

@@ -105,7 +105,7 @@ int i2400mu_bus_dev_start(struct i2400m *i2400m)
 	struct i2400mu *i2400mu = container_of(i2400m, struct i2400mu, i2400m);
 	struct device *dev = &i2400mu->usb_iface->dev;
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	result = i2400mu_tx_setup(i2400mu);
 	if (result < 0)
 		goto error_usb_tx_setup;
@@ -115,7 +115,7 @@ int i2400mu_bus_dev_start(struct i2400m *i2400m)
 	result = i2400mu_notification_setup(i2400mu);
 	if (result < 0)
 		goto error_notif_setup;
-	d_fnend(3, dev, "(i2400m %p) = %d\n", i2400m, result);
+	d_fnend(3, dev, "(i2400m %pK) = %d\n", i2400m, result);
 	return result;
 
 error_notif_setup:
@@ -123,7 +123,7 @@ error_notif_setup:
 error_usb_rx_setup:
 	i2400mu_tx_release(i2400mu);
 error_usb_tx_setup:
-	d_fnend(3, dev, "(i2400m %p) = void\n", i2400m);
+	d_fnend(3, dev, "(i2400m %pK) = void\n", i2400m);
 	return result;
 }
 
@@ -134,11 +134,11 @@ void i2400mu_bus_dev_stop(struct i2400m *i2400m)
 	struct i2400mu *i2400mu = container_of(i2400m, struct i2400mu, i2400m);
 	struct device *dev = &i2400mu->usb_iface->dev;
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	i2400mu_notification_release(i2400mu);
 	i2400mu_rx_release(i2400mu);
 	i2400mu_tx_release(i2400mu);
-	d_fnend(3, dev, "(i2400m %p) = void\n", i2400m);
+	d_fnend(3, dev, "(i2400m %pK) = void\n", i2400m);
 }
 
 
@@ -291,7 +291,7 @@ int i2400mu_bus_reset(struct i2400m *i2400m, enum i2400m_reset_type rt)
 		cpu_to_le32(I2400M_COLD_RESET_BARKER),
 	};
 
-	d_fnstart(3, dev, "(i2400m %p rt %u)\n", i2400m, rt);
+	d_fnstart(3, dev, "(i2400m %pK rt %u)\n", i2400m, rt);
 	if (rt == I2400M_RT_WARM)
 		result = __i2400mu_send_barker(
 			i2400mu, i2400m_WARM_BOOT_BARKER,
@@ -335,7 +335,7 @@ int i2400mu_bus_reset(struct i2400m *i2400m, enum i2400m_reset_type rt)
 		usb_queue_reset_device(i2400mu->usb_iface);
 		result = -ENODEV;
 	}
-	d_fnend(3, dev, "(i2400m %p rt %u) = %d\n", i2400m, rt, result);
+	d_fnend(3, dev, "(i2400m %pK rt %u) = %d\n", i2400m, rt, result);
 	return result;
 }
 
@@ -578,14 +578,14 @@ void i2400mu_disconnect(struct usb_interface *iface)
 	struct net_device *net_dev = i2400m->wimax_dev.net_dev;
 	struct device *dev = &iface->dev;
 
-	d_fnstart(3, dev, "(iface %p i2400m %p)\n", iface, i2400m);
+	d_fnstart(3, dev, "(iface %pK i2400m %pK)\n", iface, i2400m);
 
 	debugfs_remove_recursive(i2400mu->debugfs_dentry);
 	i2400m_release(i2400m);
 	usb_set_intfdata(iface, NULL);
 	usb_put_dev(i2400mu->usb_dev);
 	free_netdev(net_dev);
-	d_fnend(3, dev, "(iface %p i2400m %p) = void\n", iface, i2400m);
+	d_fnend(3, dev, "(iface %pK i2400m %pK) = void\n", iface, i2400m);
 }
 
 
@@ -641,7 +641,7 @@ int i2400mu_suspend(struct usb_interface *iface, pm_message_t pm_msg)
 		is_autosuspend = 1;
 #endif
 
-	d_fnstart(3, dev, "(iface %p pm_msg %u)\n", iface, pm_msg.event);
+	d_fnstart(3, dev, "(iface %pK pm_msg %u)\n", iface, pm_msg.event);
 	rmb();		/* see i2400m->updown's documentation  */
 	if (i2400m->updown == 0)
 		goto no_firmware;
@@ -681,7 +681,7 @@ int i2400mu_suspend(struct usb_interface *iface, pm_message_t pm_msg)
 error_enter_powersave:
 error_not_now:
 no_firmware:
-	d_fnend(3, dev, "(iface %p pm_msg %u) = %d\n",
+	d_fnend(3, dev, "(iface %pK pm_msg %u) = %d\n",
 		iface, pm_msg.event, result);
 	return result;
 }
@@ -695,7 +695,7 @@ int i2400mu_resume(struct usb_interface *iface)
 	struct i2400mu *i2400mu = usb_get_intfdata(iface);
 	struct i2400m *i2400m = &i2400mu->i2400m;
 
-	d_fnstart(3, dev, "(iface %p)\n", iface);
+	d_fnstart(3, dev, "(iface %pK)\n", iface);
 	rmb();		/* see i2400m->updown's documentation  */
 	if (i2400m->updown == 0) {
 		d_printf(1, dev, "fw was down, no resume needed\n");
@@ -707,7 +707,7 @@ int i2400mu_resume(struct usb_interface *iface)
 	 * come back; otherwise, we'd use something like a get-state
 	 * command... */
 out:
-	d_fnend(3, dev, "(iface %p) = %d\n", iface, ret);
+	d_fnend(3, dev, "(iface %pK) = %d\n", iface, ret);
 	return ret;
 }
 
@@ -720,9 +720,9 @@ int i2400mu_reset_resume(struct usb_interface *iface)
 	struct i2400mu *i2400mu = usb_get_intfdata(iface);
 	struct i2400m *i2400m = &i2400mu->i2400m;
 
-	d_fnstart(3, dev, "(iface %p)\n", iface);
+	d_fnstart(3, dev, "(iface %pK)\n", iface);
 	result = i2400m_dev_reset_handle(i2400m, "device reset on resume");
-	d_fnend(3, dev, "(iface %p) = %d\n", iface, result);
+	d_fnend(3, dev, "(iface %pK) = %d\n", iface, result);
 	return result < 0 ? result : 0;
 }
 

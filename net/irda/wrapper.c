@@ -249,7 +249,7 @@ async_bump(struct net_device *dev,
 		/* And hook the new skb to the rx_buff */
 		rx_buff->skb = newskb;
 		rx_buff->head = newskb->data;	/* NOT newskb->head */
-		//printk(KERN_DEBUG "ZeroCopy : len = %d, dataskb = %p, newskb = %p\n", rx_buff->len, dataskb, newskb);
+		//printk(KERN_DEBUG "ZeroCopy : len = %d, dataskb = %pK, newskb = %pK\n", rx_buff->len, dataskb, newskb);
 	}
 
 	/* Set proper length on skb (without CRC) */

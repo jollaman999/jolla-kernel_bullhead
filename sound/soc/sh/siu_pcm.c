@@ -352,7 +352,7 @@ static int siu_pcm_open(struct snd_pcm_substream *ss)
 	dma_cap_zero(mask);
 	dma_cap_set(DMA_SLAVE, mask);
 
-	dev_dbg(dev, "%s, port=%d@%p\n", __func__, port, port_info);
+	dev_dbg(dev, "%s, port=%d@%pK\n", __func__, port, port_info);
 
 	if (ss->stream == SNDRV_PCM_STREAM_PLAYBACK) {
 		siu_stream = &port_info->playback;
@@ -453,7 +453,7 @@ static int siu_pcm_trigger(struct snd_pcm_substream *ss, int cmd)
 	struct siu_port *port_info = siu_port_info(ss);
 	int ret;
 
-	dev_dbg(dev, "%s: port=%d@%p, cmd=%d\n", __func__,
+	dev_dbg(dev, "%s: port=%d@%pK, cmd=%d\n", __func__,
 		info->port_id, port_info, cmd);
 
 	switch (cmd) {

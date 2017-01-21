@@ -123,7 +123,7 @@ static int usb_allocate_stream_buffers(struct usb_data_stream *stream, int num, 
 			usb_free_stream_buffers(stream);
 			return -ENOMEM;
 		}
-		deb_mem("buffer %d: %p (dma: %Lu)\n",
+		deb_mem("buffer %d: %pK (dma: %Lu)\n",
 			stream->buf_num,
 stream->buf_list[stream->buf_num], (long long)stream->dma_addr[stream->buf_num]);
 		memset(stream->buf_list[stream->buf_num],0,size);

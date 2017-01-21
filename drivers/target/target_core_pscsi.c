@@ -358,7 +358,7 @@ static struct se_device *pscsi_alloc_device(struct se_hba *hba,
 		return NULL;
 	}
 
-	pr_debug("PSCSI: Allocated pdv: %p for %s\n", pdv, name);
+	pr_debug("PSCSI: Allocated pdv: %pK for %s\n", pdv, name);
 	return &pdv->dev;
 }
 
@@ -883,7 +883,7 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
 		off = sg->offset;
 		len = sg->length;
 
-		pr_debug("PSCSI: i: %d page: %p len: %d off: %d\n", i,
+		pr_debug("PSCSI: i: %d page: %pK len: %d off: %d\n", i,
 			page, len, off);
 
 		/*
@@ -910,7 +910,7 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
 				if (rw)
 					bio->bi_rw |= REQ_WRITE;
 
-				pr_debug("PSCSI: Allocated bio: %p,"
+				pr_debug("PSCSI: Allocated bio: %pK,"
 					" dir: %s nr_vecs: %d\n", bio,
 					(rw) ? "rw" : "r", nr_vecs);
 				/*
@@ -926,7 +926,7 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
 			}
 
 			pr_debug("PSCSI: Calling bio_add_pc_page() i: %d"
-				" bio: %p page: %p len: %d off: %d\n", i, bio,
+				" bio: %pK page: %pK len: %d off: %d\n", i, bio,
 				page, len, off);
 
 			rc = bio_add_pc_page(pdv->pdv_sd->request_queue,
@@ -939,7 +939,7 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
 
 			if (bio->bi_vcnt > nr_vecs) {
 				pr_debug("PSCSI: Reached bio->bi_vcnt max:"
-					" %d i: %d bio: %p, allocating another"
+					" %d i: %d bio: %pK, allocating another"
 					" bio\n", bio->bi_vcnt, i, bio);
 				/*
 				 * Clear the pointer so that another bio will
@@ -1139,7 +1139,7 @@ static void pscsi_req_done(struct request *req, int uptodate)
 
 	cmd->scsi_status = status_byte(pt->pscsi_result) << 1;
 	if (cmd->scsi_status) {
-		pr_debug("PSCSI Status Byte exception at cmd: %p CDB:"
+		pr_debug("PSCSI Status Byte exception at cmd: %pK CDB:"
 			" 0x%02x Result: 0x%08x\n", cmd, pt->pscsi_cdb[0],
 			pt->pscsi_result);
 	}
@@ -1149,7 +1149,7 @@ static void pscsi_req_done(struct request *req, int uptodate)
 		target_complete_cmd(cmd, cmd->scsi_status);
 		break;
 	default:
-		pr_debug("PSCSI Host Byte exception at cmd: %p CDB:"
+		pr_debug("PSCSI Host Byte exception at cmd: %pK CDB:"
 			" 0x%02x Result: 0x%08x\n", cmd, pt->pscsi_cdb[0],
 			pt->pscsi_result);
 		target_complete_cmd(cmd, SAM_STAT_CHECK_CONDITION);

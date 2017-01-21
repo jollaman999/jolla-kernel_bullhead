@@ -316,7 +316,7 @@ int mgag200_bo_reserve(struct mgag200_bo *bo, bool no_wait)
 	ret = ttm_bo_reserve(&bo->bo, true, no_wait, false, 0);
 	if (ret) {
 		if (ret != -ERESTARTSYS && ret != -EBUSY)
-			DRM_ERROR("reserve failed %p %d\n", bo, ret);
+			DRM_ERROR("reserve failed %pK %d\n", bo, ret);
 		return ret;
 	}
 	return 0;
@@ -397,7 +397,7 @@ int mgag200_bo_unpin(struct mgag200_bo *bo)
 {
 	int i, ret;
 	if (!bo->pin_count) {
-		DRM_ERROR("unpin bad %p\n", bo);
+		DRM_ERROR("unpin bad %pK\n", bo);
 		return 0;
 	}
 	bo->pin_count--;
@@ -417,7 +417,7 @@ int mgag200_bo_push_sysram(struct mgag200_bo *bo)
 {
 	int i, ret;
 	if (!bo->pin_count) {
-		DRM_ERROR("unpin bad %p\n", bo);
+		DRM_ERROR("unpin bad %pK\n", bo);
 		return 0;
 	}
 	bo->pin_count--;

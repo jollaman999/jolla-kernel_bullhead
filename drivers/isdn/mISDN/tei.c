@@ -1272,7 +1272,7 @@ mgr_ctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 
 	mgr = container_of(ch, struct manager, ch);
 	if (*debug & DEBUG_L2_CTRL)
-		printk(KERN_DEBUG "%s(%x, %p)\n", __func__, cmd, arg);
+		printk(KERN_DEBUG "%s(%x, %pK)\n", __func__, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
 		ret = create_teimgr(mgr, arg);

@@ -175,7 +175,7 @@ no_context:
 	/* Things are looking very, very bad now */
 	bust_spinlocks(1);
 	printk(KERN_EMERG "Unable to handle kernel paging request at "
-		"virtual address 0x%08lx, regs %p\n", address, regs);
+		"virtual address 0x%08lx, regs %pK\n", address, regs);
 	die("Bad Kernel VA", regs, SIGKILL);
 }
 

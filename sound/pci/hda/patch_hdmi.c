@@ -328,7 +328,7 @@ static int hinfo_to_pin_index(struct hdmi_spec *spec,
 		if (get_pcm_rec(spec, pin_idx)->stream == hinfo)
 			return pin_idx;
 
-	snd_printk(KERN_WARNING "HDMI: hinfo %p not registered\n", hinfo);
+	snd_printk(KERN_WARNING "HDMI: hinfo %pK not registered\n", hinfo);
 	return -EINVAL;
 }
 

@@ -205,7 +205,7 @@ static pvc_device* add_pvc(struct net_device *dev, u16 dlci)
 
 	pvc = kzalloc(sizeof(pvc_device), GFP_ATOMIC);
 #ifdef DEBUG_PVC
-	printk(KERN_DEBUG "add_pvc: allocated pvc %p, frad %p\n", pvc, dev);
+	printk(KERN_DEBUG "add_pvc: allocated pvc %pK, frad %pK\n", pvc, dev);
 #endif
 	if (!pvc)
 		return NULL;
@@ -252,7 +252,7 @@ static inline void delete_unused_pvcs(hdlc_device *hdlc)
 		if (!pvc_is_used(*pvc_p)) {
 			pvc_device *pvc = *pvc_p;
 #ifdef DEBUG_PVC
-			printk(KERN_DEBUG "freeing unused pvc: %p\n", pvc);
+			printk(KERN_DEBUG "freeing unused pvc: %pK\n", pvc);
 #endif
 			*pvc_p = pvc->next;
 			kfree(pvc);

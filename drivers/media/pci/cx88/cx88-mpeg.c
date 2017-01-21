@@ -226,7 +226,7 @@ static int cx8802_restart_queue(struct cx8802_dev    *dev,
 				buf->vb.state = VIDEOBUF_ACTIVE;
 				buf->count    = q->count++;
 				mod_timer(&q->timeout, jiffies+BUFFER_TIMEOUT);
-				dprintk(1,"[%p/%d] restart_queue - first active\n",
+				dprintk(1,"[%pK/%d] restart_queue - first active\n",
 					buf,buf->vb.i);
 
 			} else if (prev->vb.width  == buf->vb.width  &&
@@ -236,7 +236,7 @@ static int cx8802_restart_queue(struct cx8802_dev    *dev,
 				buf->vb.state = VIDEOBUF_ACTIVE;
 				buf->count    = q->count++;
 				prev->risc.jmp[1] = cpu_to_le32(buf->risc.dma);
-				dprintk(1,"[%p/%d] restart_queue - move to active\n",
+				dprintk(1,"[%pK/%d] restart_queue - move to active\n",
 					buf,buf->vb.i);
 			} else {
 				return 0;
@@ -247,7 +247,7 @@ static int cx8802_restart_queue(struct cx8802_dev    *dev,
 	}
 
 	buf = list_entry(q->active.next, struct cx88_buffer, vb.queue);
-	dprintk(2,"restart_queue [%p/%d]: restart dma\n",
+	dprintk(2,"restart_queue [%pK/%d]: restart dma\n",
 		buf, buf->vb.i);
 	cx8802_start_dma(dev, q, buf);
 	list_for_each_entry(buf, &q->active, vb.queue)
@@ -265,7 +265,7 @@ int cx8802_buf_prepare(struct videobuf_queue *q, struct cx8802_dev *dev,
 	struct videobuf_dmabuf *dma=videobuf_to_dma(&buf->vb);
 	int rc;
 
-	dprintk(1, "%s: %p\n", __func__, buf);
+	dprintk(1, "%s: %pK\n", __func__, buf);
 	if (0 != buf->vb.baddr  &&  buf->vb.bsize < size)
 		return -EINVAL;
 
@@ -306,7 +306,7 @@ void cx8802_buf_queue(struct cx8802_dev *dev, struct cx88_buffer *buf)
 		buf->vb.state = VIDEOBUF_ACTIVE;
 		buf->count    = cx88q->count++;
 		mod_timer(&cx88q->timeout, jiffies+BUFFER_TIMEOUT);
-		dprintk(1,"[%p/%d] %s - first active\n",
+		dprintk(1,"[%pK/%d] %s - first active\n",
 			buf, buf->vb.i, __func__);
 
 	} else {
@@ -316,7 +316,7 @@ void cx8802_buf_queue(struct cx8802_dev *dev, struct cx88_buffer *buf)
 		buf->vb.state = VIDEOBUF_ACTIVE;
 		buf->count    = cx88q->count++;
 		prev->risc.jmp[1] = cpu_to_le32(buf->risc.dma);
-		dprintk( 1, "[%p/%d] %s - append to active\n",
+		dprintk( 1, "[%pK/%d] %s - append to active\n",
 			buf, buf->vb.i, __func__);
 	}
 }
@@ -335,7 +335,7 @@ static void do_cancel_buffers(struct cx8802_dev *dev, const char *reason, int re
 		list_del(&buf->vb.queue);
 		buf->vb.state = VIDEOBUF_ERROR;
 		wake_up(&buf->vb.done);
-		dprintk(1,"[%p/%d] %s - dma=0x%08lx\n",
+		dprintk(1,"[%pK/%d] %s - dma=0x%08lx\n",
 			buf, buf->vb.i, reason, (unsigned long)buf->risc.dma);
 	}
 	if (restart)

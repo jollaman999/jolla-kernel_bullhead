@@ -299,7 +299,7 @@ struct acpi_table_header *acpi_tb_table_override(struct acpi_table_header
 		new_table = acpi_os_map_memory(new_address, new_table_length);
 		if (!new_table) {
 			ACPI_EXCEPTION((AE_INFO, AE_NO_MEMORY,
-					"%4.4s %p Attempted physical table override failed",
+					"%4.4s %pK Attempted physical table override failed",
 					table_header->signature,
 					ACPI_PHYSADDR_TO_PTR(table_desc->address)));
 			return (NULL);
@@ -315,7 +315,7 @@ struct acpi_table_header *acpi_tb_table_override(struct acpi_table_header
       finish_override:
 
 	ACPI_INFO((AE_INFO,
-		   "%4.4s %p %s table override, new table: %p",
+		   "%4.4s %pK %s table override, new table: %pK",
 		   table_header->signature,
 		   ACPI_PHYSADDR_TO_PTR(table_desc->address),
 		   override_type, new_table));

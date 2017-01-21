@@ -548,12 +548,12 @@ void cifs_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock)
 	if (oplock == OPLOCK_EXCLUSIVE) {
 		cinode->clientCanCacheAll = true;
 		cinode->clientCanCacheRead = true;
-		cifs_dbg(FYI, "Exclusive Oplock granted on inode %p\n",
+		cifs_dbg(FYI, "Exclusive Oplock granted on inode %pK\n",
 			 &cinode->vfs_inode);
 	} else if (oplock == OPLOCK_READ) {
 		cinode->clientCanCacheAll = false;
 		cinode->clientCanCacheRead = true;
-		cifs_dbg(FYI, "Level II Oplock granted on inode %p\n",
+		cifs_dbg(FYI, "Level II Oplock granted on inode %pK\n",
 			 &cinode->vfs_inode);
 	} else {
 		cinode->clientCanCacheAll = false;

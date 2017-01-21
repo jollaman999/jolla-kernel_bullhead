@@ -425,11 +425,11 @@ static void c2_rx_error(struct c2_port *c2_port, struct c2_element *elem)
 	if (rxp_hdr->status != RXP_HRXD_OK ||
 	    rxp_hdr->len > (rx_desc->len - sizeof(*rxp_hdr))) {
 		pr_debug("BAD RXP_HRXD\n");
-		pr_debug("  rx_desc : %p\n", rx_desc);
+		pr_debug("  rx_desc : %pK\n", rx_desc);
 		pr_debug("    index : %Zu\n",
 			elem - c2_port->rx_ring.start);
 		pr_debug("    len   : %u\n", rx_desc->len);
-		pr_debug("  rxp_hdr : %p [PA %p]\n", rxp_hdr,
+		pr_debug("  rxp_hdr : %pK [PA %pK]\n", rxp_hdr,
 			(void *) __pa((unsigned long) rxp_hdr));
 		pr_debug("    flags : 0x%x\n", rxp_hdr->flags);
 		pr_debug("    status: 0x%x\n", rxp_hdr->status);

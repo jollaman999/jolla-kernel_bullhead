@@ -167,7 +167,7 @@ void __init fpga_irq_init(void __iomem *base, const char *name, int irq_start,
 			f->used_irqs++;
 		}
 
-	pr_info("FPGA IRQ chip %d \"%s\" @ %p, %u irqs\n",
+	pr_info("FPGA IRQ chip %d \"%s\" @ %pK, %u irqs\n",
 		fpga_irq_id, name, base, f->used_irqs);
 
 	fpga_irq_id++;

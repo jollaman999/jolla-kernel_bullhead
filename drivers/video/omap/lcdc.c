@@ -728,7 +728,7 @@ static int setup_fbmem(struct omapfb_mem_desc *req_md)
 	if ((r = mmap_kern()) < 0)
 		return r;
 
-	dev_dbg(lcdc.fbdev->dev, "vram at %08x size %08lx mapped to 0x%p\n",
+	dev_dbg(lcdc.fbdev->dev, "vram at %08x size %08lx mapped to 0x%pK\n",
 		 lcdc.vram_phys, lcdc.vram_size, lcdc.vram_virt);
 
 	return 0;

@@ -1429,7 +1429,7 @@ static int nmk_gpio_probe(struct platform_device *dev)
 
 	nmk_gpio_init_irq(nmk_chip);
 
-	dev_info(&dev->dev, "at address %p\n", nmk_chip->addr);
+	dev_info(&dev->dev, "at address %pK\n", nmk_chip->addr);
 
 	return 0;
 }

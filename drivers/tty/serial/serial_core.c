@@ -2658,7 +2658,7 @@ int uart_remove_one_port(struct uart_driver *drv, struct uart_port *uport)
 	BUG_ON(in_interrupt());
 
 	if (state->uart_port != uport)
-		printk(KERN_ALERT "Removing wrong port: %p != %p\n",
+		printk(KERN_ALERT "Removing wrong port: %pK != %pK\n",
 			state->uart_port, uport);
 
 	mutex_lock(&port_mutex);

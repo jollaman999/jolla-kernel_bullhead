@@ -140,7 +140,7 @@ void irq_ctx_init(int cpu)
 
 	softirq_ctx[cpu] = irqctx;
 
-	printk("CPU %u irqstacks, hard=%p soft=%p\n",
+	printk("CPU %u irqstacks, hard=%pK soft=%pK\n",
 		cpu, hardirq_ctx[cpu], softirq_ctx[cpu]);
 }
 

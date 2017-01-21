@@ -453,7 +453,7 @@ enum sci_status sci_remote_node_context_event_handler(struct sci_remote_node_con
 				/* We really dont care if the hardware is going to suspend
 				 * the device since it's being invalidated anyway */
 				dev_warn(scirdev_to_dev(rnc_to_dev(sci_rnc)),
-					"%s: SCIC Remote Node Context 0x%p was "
+					"%s: SCIC Remote Node Context 0x%pK was "
 					"suspeneded by hardware while being "
 					"invalidated.\n", __func__, sci_rnc);
 				break;
@@ -472,7 +472,7 @@ enum sci_status sci_remote_node_context_event_handler(struct sci_remote_node_con
 				/* We really dont care if the hardware is going to suspend
 				 * the device since it's being resumed anyway */
 				dev_warn(scirdev_to_dev(rnc_to_dev(sci_rnc)),
-					"%s: SCIC Remote Node Context 0x%p was "
+					"%s: SCIC Remote Node Context 0x%pK was "
 					"suspeneded by hardware while being resumed.\n",
 					__func__, sci_rnc);
 				break;
@@ -594,7 +594,7 @@ enum sci_status sci_remote_node_context_suspend(
 	case SCI_RNC_INVALIDATING:
 		if (sci_rnc->destination_state == RNC_DEST_FINAL) {
 			dev_warn(scirdev_to_dev(idev),
-				 "%s: already destroying %p\n",
+				 "%s: already destroying %pK\n",
 				 __func__, sci_rnc);
 			return SCI_FAILURE_INVALID_STATE;
 		}
@@ -665,7 +665,7 @@ enum sci_status sci_remote_node_context_resume(struct sci_remote_node_context *s
 
 	state = sci_rnc->sm.current_state_id;
 	dev_dbg(scirdev_to_dev(idev),
-		"%s: state %s, cb_fn = %p, cb_p = %p; dest_state = %d; "
+		"%s: state %s, cb_fn = %pK, cb_p = %pK; dest_state = %d; "
 			"dev resume path %s\n",
 		__func__, rnc_state_name(state), cb_fn, cb_p,
 		sci_rnc->destination_state,

@@ -882,7 +882,7 @@ WLANSAP_RoamCallback
                       sapContext->sapsMachine = eSAP_DISCONNECTED;
 
                       VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_MED,
-                      "sapdfs: from state %s => %s with ignore cac FALSE on sapctx[%p]",
+                      "sapdfs: from state %s => %s with ignore cac FALSE on sapctx[%pK]",
                       "eSAP_DISCONNECTING", "DISCONNECTED", sapContext);
 
                       /* DFS Channel */
@@ -894,7 +894,7 @@ WLANSAP_RoamCallback
                    else
                    {
                       VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_MED,
-                      "sapdfs: from state %s => %s with ignore cac TRUE on sapctx[%p]",
+                      "sapdfs: from state %s => %s with ignore cac TRUE on sapctx[%pK]",
                       "eSAP_DISCONNECTING", "eSAP_STARTING", sapContext);
 
                       /* Start beaconing on the new channel */
@@ -910,7 +910,7 @@ WLANSAP_RoamCallback
                else
                {
                   VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_MED,
-                  "sapdfs: from state %s => %s on sapctx[%p]",
+                  "sapdfs: from state %s => %s on sapctx[%pK]",
                   "eSAP_DISCONNECTING", "eSAP_STARTING", sapContext);
 
                   /* non-DFS channel */

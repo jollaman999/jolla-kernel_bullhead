@@ -683,7 +683,7 @@ static long venc_set_input_buffer(struct v4l2_subdev *sd, void *arg)
 		.length = inst->num_input_planes,
 	};
 
-	WFD_MSG_DBG("Prepare %p with index, %d",
+	WFD_MSG_DBG("Prepare %pK with index, %d",
 		(void *)buf.m.planes[0].m.userptr, buf.index);
 	rc = msm_vidc_prepare_buf(inst->vidc_context, &buf);
 	if (rc) {
@@ -751,7 +751,7 @@ static int venc_map_user_to_kernel(struct venc_inst *inst,
 	mregion->ion_handle = ion_import_dma_buf(venc_ion_client, mregion->fd);
 	if (IS_ERR_OR_NULL(mregion->ion_handle)) {
 		rc = PTR_ERR(mregion->ion_handle);
-		WFD_MSG_ERR("Failed to get handle: %p, %d, %d, %d\n",
+		WFD_MSG_ERR("Failed to get handle: %pK, %d, %d, %d\n",
 			venc_ion_client, mregion->fd, mregion->offset, rc);
 		mregion->ion_handle = NULL;
 		goto venc_map_fail;
@@ -889,7 +889,7 @@ static long venc_set_output_buffer(struct v4l2_subdev *sd, void *arg)
 		.length = inst->num_output_planes,
 	};
 
-	WFD_MSG_DBG("Prepare %p with index, %d",
+	WFD_MSG_DBG("Prepare %pK with index, %d",
 		(void *)buf.m.planes[0].m.userptr, buf.index);
 	rc = msm_vidc_prepare_buf(inst->vidc_context, &buf);
 	if (rc) {
@@ -1040,7 +1040,7 @@ static long fill_outbuf(struct venc_inst *inst, struct mem_region *mregion)
 		.length = 1,
 	};
 
-	WFD_MSG_DBG("Fill buffer %p with index, %d",
+	WFD_MSG_DBG("Fill buffer %pK with index, %d",
 		(void *)buffer.m.planes[0].m.userptr, buffer.index);
 	rc = msm_vidc_qbuf(inst->vidc_context, &buffer);
 	if (!rc) {
@@ -1176,7 +1176,7 @@ static long venc_encode_frame(struct v4l2_subdev *sd, void *arg)
 		.length = 1,
 	};
 
-	WFD_MSG_DBG("Encode buffer %p with index, %d",
+	WFD_MSG_DBG("Encode buffer %pK with index, %d",
 		(void *)buffer.m.planes[0].m.userptr, buffer.index);
 	rc = msm_vidc_qbuf(inst->vidc_context, &buffer);
 	if (!rc) {

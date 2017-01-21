@@ -327,7 +327,7 @@ void dma_free_coherent(struct device *dev, size_t size,
 
 no_area:
 	spin_unlock_irqrestore(&consistent_lock, flags);
-	pr_err("%s: trying to free invalid coherent area: %p\n",
+	pr_err("%s: trying to free invalid coherent area: %pK\n",
 	       __func__, vaddr);
 	dump_stack();
 }

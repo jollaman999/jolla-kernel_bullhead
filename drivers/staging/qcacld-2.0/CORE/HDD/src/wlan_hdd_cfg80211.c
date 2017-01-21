@@ -5582,7 +5582,7 @@ static void wlan_hdd_cfg80211_link_layer_stats_callback(void *ctx,
                    "LL_STATS RESULTS RESPONSE num radio = %u",
                    linkLayerStatsResults->num_radio);
             hddLog(VOS_TRACE_LEVEL_INFO,
-                   "LL_STATS RESULTS RESPONSE result = %p",
+                   "LL_STATS RESULTS RESPONSE result = %pK",
                    linkLayerStatsResults->results);
 
             spin_lock(&hdd_context_lock);
@@ -7652,7 +7652,7 @@ void hdd_rssi_threshold_breached(void *hddctx,
 	ENTER();
 
 	if (wlan_hdd_validate_context(hdd_ctx) || !data) {
-		hddLog(LOGE, FL("HDD context is invalid or data(%p) is null"),
+		hddLog(LOGE, FL("HDD context is invalid or data(%pK) is null"),
 			data);
 		return;
 	}
@@ -10597,7 +10597,7 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
         return status;
     }
 
-    hddLog(VOS_TRACE_LEVEL_INFO_HIGH, "%s: pAdapter = %p, device mode = %d",
+    hddLog(VOS_TRACE_LEVEL_INFO_HIGH, "%s: pAdapter = %pK, device mode = %d",
            __func__, pAdapter, pAdapter->device_mode);
 
     if (vos_max_concurrent_connections_reached()) {
@@ -12880,7 +12880,7 @@ static eHalStatus hdd_cfg80211_scan_done_callback(tHalHandle halHandle,
     ENTER();
 
     hddLog(VOS_TRACE_LEVEL_INFO,
-            "%s called with halHandle = %p, pContext = %p,"
+            "%s called with halHandle = %pK, pContext = %pK,"
             "scanID = %d, returned status = %d",
             __func__, halHandle, pContext, (int) scanId, (int) status);
 
@@ -13039,7 +13039,7 @@ bool hdd_isConnectionInProgress(hdd_context_t *pHddCtx)
 				(WLAN_HDD_GET_STATION_CTX_PTR(pAdapter))->
 					conn_info.connState)) {
 				hddLog(LOGE,
-					FL("%p(%d) Connection is in progress"),
+					FL("%pK(%d) Connection is in progress"),
 					WLAN_HDD_GET_STATION_CTX_PTR(pAdapter),
 					pAdapter->sessionId);
 				return true;
@@ -13049,7 +13049,7 @@ bool hdd_isConnectionInProgress(hdd_context_t *pHddCtx)
 				WLAN_HDD_GET_HAL_CTX(pAdapter), pAdapter->sessionId))
 			{
 				hddLog(VOS_TRACE_LEVEL_ERROR,
-				"%s: %p(%d) Reassociation is in progress", __func__,
+				"%s: %pK(%d) Reassociation is in progress", __func__,
 				WLAN_HDD_GET_STATION_CTX_PTR(pAdapter), pAdapter->sessionId);
 				return VOS_TRUE;
 			}
@@ -14697,7 +14697,7 @@ static int __wlan_hdd_cfg80211_connect( struct wiphy *wiphy,
 #ifdef NL80211_KEY_LEN_PMK /* kernel supports key mgmt offload */
 #ifdef WLAN_FEATURE_ROAM_OFFLOAD
     if ((eHAL_STATUS_SUCCESS == status) && (req->psk)) {
-        hddLog(VOS_TRACE_LEVEL_ERROR, "%s: psk = %p", __func__, req->psk);
+        hddLog(VOS_TRACE_LEVEL_ERROR, "%s: psk = %pK", __func__, req->psk);
         /* since PMK is available only in cfg80211_connect(), we save it
          * even before we know connection succeeded or not */
         if (pHddCtx->cfg_ini->isRoamOffloadEnabled) {
@@ -16366,7 +16366,7 @@ static int __wlan_hdd_cfg80211_set_pmksa(struct wiphy *wiphy, struct net_device 
     }
 
     if (!pmksa->bssid || !pmksa->pmkid) {
-        hddLog(LOGE, FL("pmksa->bssid(%p) or pmksa->pmkid(%p) is NULL"),
+        hddLog(LOGE, FL("pmksa->bssid(%pK) or pmksa->pmkid(%pK) is NULL"),
                pmksa->bssid, pmksa->pmkid);
         return -EINVAL;
     }
@@ -16696,7 +16696,7 @@ static int __wlan_hdd_cfg80211_sched_scan_start(struct wiphy *wiphy,
            (WLAN_HDD_GET_STATION_CTX_PTR(pAdapter))->conn_info.connState))
     {
         hddLog(VOS_TRACE_LEVEL_ERROR,
-                "%s: %p(%d) Connection in progress: sched_scan_start denied (EBUSY)", __func__, \
+                "%s: %pK(%d) Connection in progress: sched_scan_start denied (EBUSY)", __func__, \
                 WLAN_HDD_GET_STATION_CTX_PTR(pAdapter), pAdapter->sessionId);
         return -EBUSY;
     }
@@ -18165,7 +18165,7 @@ void wlan_hdd_testmode_rx_event(void *buf, size_t buf_len)
 
     if (!buf || !buf_len) {
         VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                  "%s: buf or buf_len invalid, buf = %p buf_len = %zu",
+                  "%s: buf or buf_len invalid, buf = %pK buf_len = %zu",
                   __func__, buf, buf_len);
         return;
     }
@@ -18719,7 +18719,7 @@ wlan_hdd_cfg80211_extscan_get_capabilities_rsp(void *ctx,
 	ENTER();
 
 	if (wlan_hdd_validate_context(hdd_ctx) || !data) {
-		hddLog(LOGE, FL("HDD context is invalid or data(%p) is null"),
+		hddLog(LOGE, FL("HDD context is invalid or data(%pK) is null"),
 			data);
 		return;
 	}
@@ -18853,7 +18853,7 @@ wlan_hdd_cfg80211_extscan_cached_results_ind(void *ctx,
 
 	if (wlan_hdd_validate_context(pHddCtx) || !data) {
 		hddLog(LOGE,
-		FL("HDD context is invalid or data(%p) is null"), data);
+		FL("HDD context is invalid or data(%pK) is null"), data);
 	        return;
 	}
 
@@ -19077,7 +19077,7 @@ wlan_hdd_cfg80211_extscan_hotlist_match_ind(void *ctx,
 	ENTER();
 
 	if (wlan_hdd_validate_context(pHddCtx) || !data) {
-		hddLog(LOGE, FL("HDD context is invalid or data(%p) is null"),
+		hddLog(LOGE, FL("HDD context is invalid or data(%pK) is null"),
 				data);
 		return;
 	}
@@ -19211,7 +19211,7 @@ wlan_hdd_cfg80211_extscan_generic_rsp
 
 	if (wlan_hdd_validate_context(hdd_ctx) || !response) {
 		hddLog(LOGE,
-		       FL("HDD context is not valid or response(%p) is null"),
+		       FL("HDD context is not valid or response(%pK) is null"),
 		       response);
 		return;
 	}
@@ -19258,7 +19258,7 @@ wlan_hdd_cfg80211_extscan_hotlist_ssid_match_ind(void *ctx,
 
 	if (wlan_hdd_validate_context(hdd_ctx) || !event) {
 		hddLog(LOGE,
-		       FL("HDD context is not valid or event(%p) is null"),
+		       FL("HDD context is not valid or event(%pK) is null"),
 		       event);
 		return;
 	}
@@ -19401,7 +19401,7 @@ wlan_hdd_cfg80211_extscan_signif_wifi_change_results_ind(
     ENTER();
 
     if (wlan_hdd_validate_context(pHddCtx) || !pData) {
-        hddLog(LOGE, FL("HDD context is invalid or pData(%p) is null"),	pData);
+        hddLog(LOGE, FL("HDD context is invalid or pData(%pK) is null"),	pData);
         return;
     }
 
@@ -19519,7 +19519,7 @@ wlan_hdd_cfg80211_extscan_full_scan_result_event(void *ctx,
 	ENTER();
 
 	if (wlan_hdd_validate_context(pHddCtx) || !pData) {
-		hddLog(LOGE, FL("HDD context is invalid or pData(%p) is null"),
+		hddLog(LOGE, FL("HDD context is invalid or pData(%pK) is null"),
 			pData);
 		return;
 	}
@@ -19648,7 +19648,7 @@ wlan_hdd_cfg80211_extscan_epno_match_found(void *ctx,
 	ENTER();
 
 	if (wlan_hdd_validate_context(pHddCtx) || !data) {
-		hddLog(LOGE, FL("HDD context is invalid or data(%p) is null"),
+		hddLog(LOGE, FL("HDD context is invalid or data(%pK) is null"),
 			data);
 		return;
 	}
@@ -19759,7 +19759,7 @@ wlan_hdd_cfg80211_extscan_scan_res_available_event(void *ctx,
     ENTER();
 
     if (wlan_hdd_validate_context(pHddCtx) || !pData) {
-        hddLog(LOGE, FL("HDD context is invalid or pData(%p) is null"), pData);
+        hddLog(LOGE, FL("HDD context is invalid or pData(%pK) is null"), pData);
         return;
     }
 
@@ -19815,7 +19815,7 @@ wlan_hdd_cfg80211_extscan_scan_progress_event(void *ctx,
     ENTER();
 
     if (wlan_hdd_validate_context(pHddCtx) || !pData) {
-        hddLog(LOGE, FL("HDD context is invalid or pData(%p) is null"), pData);
+        hddLog(LOGE, FL("HDD context is invalid or pData(%pK) is null"), pData);
         return;
     }
 
@@ -19876,7 +19876,7 @@ wlan_hdd_cfg80211_passpoint_match_found(void *ctx,
 	ENTER();
 
 	if (wlan_hdd_validate_context(pHddCtx) || !data) {
-		hddLog(LOGE, FL("HDD context is invalid or data(%p) is null"),
+		hddLog(LOGE, FL("HDD context is invalid or data(%pK) is null"),
 			data);
 		return;
 	}

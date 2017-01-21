@@ -102,7 +102,7 @@ static void debug_print_probes(struct tracepoint_entry *entry)
 		return;
 
 	for (i = 0; entry->funcs[i].func; i++)
-		printk(KERN_DEBUG "Probe %d : %p\n", i, entry->funcs[i].func);
+		printk(KERN_DEBUG "Probe %d : %pK\n", i, entry->funcs[i].func);
 }
 
 static struct tracepoint_func *

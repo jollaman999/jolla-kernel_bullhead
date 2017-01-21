@@ -741,7 +741,7 @@ static void iwl_pcie_rx_handle(struct iwl_trans *trans)
 		rxb = rxq->queue[i];
 		rxq->queue[i] = NULL;
 
-		IWL_DEBUG_RX(trans, "rxbuf: HW = %d, SW = %d (%p)\n",
+		IWL_DEBUG_RX(trans, "rxbuf: HW = %d, SW = %d (%pK)\n",
 			     r, i, rxb);
 		iwl_pcie_rx_handle_rb(trans, rxb);
 
@@ -1062,7 +1062,7 @@ int iwl_pcie_alloc_ict(struct iwl_trans *trans)
 	IWL_DEBUG_ISR(trans, "ict dma addr %Lx\n",
 		      (unsigned long long)trans_pcie->ict_tbl_dma);
 
-	IWL_DEBUG_ISR(trans, "ict vir addr %p\n", trans_pcie->ict_tbl);
+	IWL_DEBUG_ISR(trans, "ict vir addr %pK\n", trans_pcie->ict_tbl);
 
 	/* reset table and index to all 0 */
 	memset(trans_pcie->ict_tbl, 0, ICT_SIZE);

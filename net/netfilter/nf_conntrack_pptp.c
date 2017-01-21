@@ -153,7 +153,7 @@ static int destroy_sibling_or_exp(struct net *net, struct nf_conn *ct,
 	h = nf_conntrack_find_get(net, zone, t);
 	if (h)  {
 		sibling = nf_ct_tuplehash_to_ctrack(h);
-		pr_debug("setting timeout of conntrack %p to 0\n", sibling);
+		pr_debug("setting timeout of conntrack %pK to 0\n", sibling);
 		sibling->proto.gre.timeout	  = 0;
 		sibling->proto.gre.stream_timeout = 0;
 		if (del_timer(&sibling->timeout))
@@ -163,7 +163,7 @@ static int destroy_sibling_or_exp(struct net *net, struct nf_conn *ct,
 	} else {
 		exp = nf_ct_expect_find_get(net, zone, t);
 		if (exp) {
-			pr_debug("unexpect_related of expect %p\n", exp);
+			pr_debug("unexpect_related of expect %pK\n", exp);
 			nf_ct_unexpect_related(exp);
 			nf_ct_expect_put(exp);
 			return 1;

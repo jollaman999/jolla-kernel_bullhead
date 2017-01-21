@@ -61,7 +61,7 @@ int v9fs_file_open(struct inode *inode, struct file *file)
 	struct p9_fid *fid;
 	int omode;
 
-	p9_debug(P9_DEBUG_VFS, "inode: %p file: %p\n", inode, file);
+	p9_debug(P9_DEBUG_VFS, "inode: %pK file: %pK\n", inode, file);
 	v9inode = V9FS_I(inode);
 	v9ses = v9fs_inode2v9ses(inode);
 	if (v9fs_proto_dotl(v9ses))
@@ -131,7 +131,7 @@ static int v9fs_file_lock(struct file *filp, int cmd, struct file_lock *fl)
 	int res = 0;
 	struct inode *inode = file_inode(filp);
 
-	p9_debug(P9_DEBUG_VFS, "filp: %p lock: %p\n", filp, fl);
+	p9_debug(P9_DEBUG_VFS, "filp: %pK lock: %pK\n", filp, fl);
 
 	/* No mandatory locks */
 	if (__mandatory_lock(inode) && fl->fl_type != F_UNLCK)
@@ -301,7 +301,7 @@ static int v9fs_file_lock_dotl(struct file *filp, int cmd, struct file_lock *fl)
 	struct inode *inode = file_inode(filp);
 	int ret = -ENOLCK;
 
-	p9_debug(P9_DEBUG_VFS, "filp: %p cmd:%d lock: %p name: %s\n",
+	p9_debug(P9_DEBUG_VFS, "filp: %pK cmd:%d lock: %pK name: %s\n",
 		 filp, cmd, fl, filp->f_path.dentry->d_name.name);
 
 	/* No mandatory locks */
@@ -337,7 +337,7 @@ static int v9fs_file_flock_dotl(struct file *filp, int cmd,
 	struct inode *inode = file_inode(filp);
 	int ret = -ENOLCK;
 
-	p9_debug(P9_DEBUG_VFS, "filp: %p cmd:%d lock: %p name: %s\n",
+	p9_debug(P9_DEBUG_VFS, "filp: %pK cmd:%d lock: %pK name: %s\n",
 		 filp, cmd, fl, filp->f_path.dentry->d_name.name);
 
 	/* No mandatory locks */
@@ -467,7 +467,7 @@ v9fs_file_write_internal(struct inode *inode, struct p9_fid *fid,
 	loff_t origin = *offset;
 	unsigned long pg_start, pg_end;
 
-	p9_debug(P9_DEBUG_VFS, "data %p count %d offset %x\n",
+	p9_debug(P9_DEBUG_VFS, "data %pK count %d offset %x\n",
 		 data, (int)count, (int)*offset);
 
 	clnt = fid->clnt;
@@ -549,7 +549,7 @@ static int v9fs_file_fsync(struct file *filp, loff_t start, loff_t end,
 		return retval;
 
 	mutex_lock(&inode->i_mutex);
-	p9_debug(P9_DEBUG_VFS, "filp %p datasync %x\n", filp, datasync);
+	p9_debug(P9_DEBUG_VFS, "filp %pK datasync %x\n", filp, datasync);
 
 	fid = filp->private_data;
 	v9fs_blank_wstat(&wstat);
@@ -572,7 +572,7 @@ int v9fs_file_fsync_dotl(struct file *filp, loff_t start, loff_t end,
 		return retval;
 
 	mutex_lock(&inode->i_mutex);
-	p9_debug(P9_DEBUG_VFS, "filp %p datasync %x\n", filp, datasync);
+	p9_debug(P9_DEBUG_VFS, "filp %pK datasync %x\n", filp, datasync);
 
 	fid = filp->private_data;
 
@@ -603,7 +603,7 @@ v9fs_vm_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
 	struct inode *inode = file_inode(filp);
 
 
-	p9_debug(P9_DEBUG_VFS, "page %p fid %lx\n",
+	p9_debug(P9_DEBUG_VFS, "page %pK fid %lx\n",
 		 page, (unsigned long)filp->private_data);
 
 	/* Update file times before taking page lock */

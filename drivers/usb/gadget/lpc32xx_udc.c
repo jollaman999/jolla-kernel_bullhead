@@ -527,7 +527,7 @@ static void proc_ep_show(struct seq_file *s, struct lpc32xx_ep *ep)
 		list_for_each_entry(req, &ep->queue, queue) {
 			u32 length = req->req.actual;
 
-			seq_printf(s, "\treq %p len %d/%d buf %p\n",
+			seq_printf(s, "\treq %pK len %d/%d buf %pK\n",
 				   &req->req, length,
 				   req->req.length, req->req.buf);
 		}
@@ -1476,7 +1476,7 @@ static void done(struct lpc32xx_ep *ep, struct lpc32xx_request *req, int status)
 	}
 
 	if (status && status != -ESHUTDOWN)
-		ep_dbg(ep, "%s done %p, status %d\n", ep->ep.name, req, status);
+		ep_dbg(ep, "%s done %pK, status %d\n", ep->ep.name, req, status);
 
 	ep->req_pending = 0;
 	spin_unlock(&udc->lock);
@@ -1859,7 +1859,7 @@ static int lpc32xx_ep_queue(struct usb_ep *_ep,
 				DD_SETUP_DMALENBYTES(req->req.length);
 	}
 
-	ep_dbg(ep, "%s queue req %p len %d buf %p (in=%d) z=%d\n", _ep->name,
+	ep_dbg(ep, "%s queue req %pK len %d buf %pK (in=%d) z=%d\n", _ep->name,
 	       _req, _req->length, _req->buf, ep->is_in, _req->zero);
 
 	spin_lock_irqsave(&udc->lock, flags);
@@ -3198,7 +3198,7 @@ static int __init lpc32xx_udc_probe(struct platform_device *pdev)
 		goto i2c_fail;
 	}
 	udc->udca_p_base = dma_handle;
-	dev_dbg(udc->dev, "DMA buffer(0x%x bytes), P:0x%08x, V:0x%p\n",
+	dev_dbg(udc->dev, "DMA buffer(0x%x bytes), P:0x%08x, V:0x%pK\n",
 		UDCA_BUFF_SIZE, udc->udca_p_base, udc->udca_v_base);
 
 	/* Setup the DD DMA memory pool */

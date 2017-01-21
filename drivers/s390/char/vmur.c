@@ -118,7 +118,7 @@ static struct urdev *urdev_alloc(struct ccw_device *cdev)
 
 static void urdev_free(struct urdev *urd)
 {
-	TRACE("urdev_free: %p\n", urd);
+	TRACE("urdev_free: %pK\n", urd);
 	if (urd->cdev)
 		put_device(&urd->cdev->dev);
 	kfree(urd);
@@ -176,7 +176,7 @@ static int ur_pm_suspend(struct ccw_device *cdev)
 {
 	struct urdev *urd = dev_get_drvdata(&cdev->dev);
 
-	TRACE("ur_pm_suspend: cdev=%p\n", cdev);
+	TRACE("ur_pm_suspend: cdev=%pK\n", cdev);
 	if (urd->open_flag) {
 		pr_err("Unit record device %s is busy, %s refusing to "
 		       "suspend.\n", dev_name(&cdev->dev), ur_banner);
@@ -234,7 +234,7 @@ static struct ccw1 *alloc_chan_prog(const char __user *ubuf, int rec_count,
 	void *kbuf;
 	int i;
 
-	TRACE("alloc_chan_prog(%p, %i, %i)\n", ubuf, rec_count, reclen);
+	TRACE("alloc_chan_prog(%pK, %i, %i)\n", ubuf, rec_count, reclen);
 
 	/*
 	 * We chain a NOP onto the writes to force CE+DE together.
@@ -273,7 +273,7 @@ static int do_ur_io(struct urdev *urd, struct ccw1 *cpa)
 	struct ccw_device *cdev = urd->cdev;
 	DECLARE_COMPLETION_ONSTACK(event);
 
-	TRACE("do_ur_io: cpa=%p\n", cpa);
+	TRACE("do_ur_io: cpa=%pK\n", cpa);
 
 	rc = mutex_lock_interruptible(&urd->io_mutex);
 	if (rc)
@@ -396,7 +396,7 @@ static struct urfile *urfile_alloc(struct urdev *urd)
 		return NULL;
 	urf->urd = urd;
 
-	TRACE("urfile_alloc: urd=%p urf=%p rl=%zu\n", urd, urf,
+	TRACE("urfile_alloc: urd=%pK urf=%pK rl=%zu\n", urd, urf,
 	      urf->dev_reclen);
 
 	return urf;
@@ -404,7 +404,7 @@ static struct urfile *urfile_alloc(struct urdev *urd)
 
 static void urfile_free(struct urfile *urf)
 {
-	TRACE("urfile_free: urf=%p urd=%p\n", urf, urf->urd);
+	TRACE("urfile_free: urf=%pK urd=%pK\n", urf, urf->urd);
 	kfree(urf);
 }
 
@@ -830,7 +830,7 @@ static int ur_probe(struct ccw_device *cdev)
 	struct urdev *urd;
 	int rc;
 
-	TRACE("ur_probe: cdev=%p\n", cdev);
+	TRACE("ur_probe: cdev=%pK\n", cdev);
 
 	mutex_lock(&vmur_mutex);
 	urd = urdev_alloc(cdev);
@@ -878,7 +878,7 @@ static int ur_set_online(struct ccw_device *cdev)
 	int minor, major, rc;
 	char node_id[16];
 
-	TRACE("ur_set_online: cdev=%p\n", cdev);
+	TRACE("ur_set_online: cdev=%pK\n", cdev);
 
 	mutex_lock(&vmur_mutex);
 	urd = urdev_get_from_cdev(cdev);
@@ -948,7 +948,7 @@ static int ur_set_offline_force(struct ccw_device *cdev, int force)
 	struct urdev *urd;
 	int rc;
 
-	TRACE("ur_set_offline: cdev=%p\n", cdev);
+	TRACE("ur_set_offline: cdev=%pK\n", cdev);
 	urd = urdev_get_from_cdev(cdev);
 	if (!urd)
 		/* ur_remove already deleted our urd */

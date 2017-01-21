@@ -794,7 +794,7 @@ void bpf_jit_compile(struct sk_filter *fp)
 		cjit = jit;
 	}
 	if (bpf_jit_enable > 1) {
-		pr_err("flen=%d proglen=%lu pass=%d image=%p\n",
+		pr_err("flen=%d proglen=%lu pass=%d image=%pK\n",
 		       fp->len, jit.end - jit.start, pass, jit.start);
 		if (jit.start) {
 			printk(KERN_ERR "JIT code:\n");

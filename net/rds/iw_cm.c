@@ -141,7 +141,7 @@ static void rds_iw_cm_fill_conn_param(struct rds_connection *conn,
 
 static void rds_iw_cq_event_handler(struct ib_event *event, void *data)
 {
-	rdsdebug("event %u data %p\n", event->event, data);
+	rdsdebug("event %u data %pK\n", event->event, data);
 }
 
 static void rds_iw_qp_event_handler(struct ib_event *event, void *data)
@@ -149,7 +149,7 @@ static void rds_iw_qp_event_handler(struct ib_event *event, void *data)
 	struct rds_connection *conn = data;
 	struct rds_iw_connection *ic = conn->c_transport_data;
 
-	rdsdebug("conn %p ic %p event %u\n", conn, ic, event->event);
+	rdsdebug("conn %pK ic %pK event %u\n", conn, ic, event->event);
 
 	switch (event->event) {
 	case IB_EVENT_COMM_EST:
@@ -338,7 +338,7 @@ static int rds_iw_setup_qp(struct rds_connection *conn)
 	 * the posted credit count. */
 	rds_iw_recv_refill(conn, GFP_KERNEL, GFP_HIGHUSER, 1);
 
-	rdsdebug("conn %p pd %p mr %p cq %p %p\n", conn, ic->i_pd, ic->i_mr,
+	rdsdebug("conn %pK pd %pK mr %pK cq %pK %pK\n", conn, ic->i_pd, ic->i_mr,
 		 ic->i_send_cq, ic->i_recv_cq);
 
 out:
@@ -529,7 +529,7 @@ int rds_iw_conn_connect(struct rds_connection *conn)
 		goto out;
 	}
 
-	rdsdebug("created cm id %p for conn %p\n", ic->i_cm_id, conn);
+	rdsdebug("created cm id %pK for conn %pK\n", ic->i_cm_id, conn);
 
 	src.sin_family = AF_INET;
 	src.sin_addr.s_addr = (__force u32)conn->c_laddr;
@@ -556,7 +556,7 @@ int rds_iw_conn_connect(struct rds_connection *conn)
 				(struct sockaddr *)&dest,
 				RDS_RDMA_RESOLVE_TIMEOUT_MS);
 	if (ret) {
-		rdsdebug("addr resolve failed for cm id %p: %d\n", ic->i_cm_id,
+		rdsdebug("addr resolve failed for cm id %pK: %d\n", ic->i_cm_id,
 			 ret);
 		rdma_destroy_id(ic->i_cm_id);
 		ic->i_cm_id = NULL;
@@ -577,21 +577,21 @@ void rds_iw_conn_shutdown(struct rds_connection *conn)
 	int err = 0;
 	struct ib_qp_attr qp_attr;
 
-	rdsdebug("cm %p pd %p cq %p %p qp %p\n", ic->i_cm_id,
+	rdsdebug("cm %pK pd %pK cq %pK %pK qp %pK\n", ic->i_cm_id,
 		 ic->i_pd, ic->i_send_cq, ic->i_recv_cq,
 		 ic->i_cm_id ? ic->i_cm_id->qp : NULL);
 
 	if (ic->i_cm_id) {
 		struct ib_device *dev = ic->i_cm_id->device;
 
-		rdsdebug("disconnecting cm %p\n", ic->i_cm_id);
+		rdsdebug("disconnecting cm %pK\n", ic->i_cm_id);
 		err = rdma_disconnect(ic->i_cm_id);
 		if (err) {
 			/* Actually this may happen quite frequently, when
 			 * an outgoing connect raced with an incoming connect.
 			 */
 			rdsdebug("rds_iw_conn_shutdown: failed to disconnect,"
-				   " cm: %p err %d\n", ic->i_cm_id, err);
+				   " cm: %pK err %d\n", ic->i_cm_id, err);
 		}
 
 		if (ic->i_cm_id->qp) {
@@ -721,7 +721,7 @@ int rds_iw_conn_alloc(struct rds_connection *conn, gfp_t gfp)
 	spin_unlock_irqrestore(&iw_nodev_conns_lock, flags);
 
 
-	rdsdebug("conn %p conn ic %p\n", conn, conn->c_transport_data);
+	rdsdebug("conn %pK conn ic %pK\n", conn, conn->c_transport_data);
 	return 0;
 }
 
@@ -733,7 +733,7 @@ void rds_iw_conn_free(void *arg)
 	struct rds_iw_connection *ic = arg;
 	spinlock_t	*lock_ptr;
 
-	rdsdebug("ic %p\n", ic);
+	rdsdebug("ic %pK\n", ic);
 
 	/*
 	 * Conn is either on a dev's list or on the nodev list.

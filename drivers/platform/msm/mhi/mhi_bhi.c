@@ -57,14 +57,14 @@ static ssize_t bhi_write(struct file *file,
 	if (bhi_ctxt->unaligned_image_loc == NULL)
 		return -ENOMEM;
 
-	mhi_log(MHI_MSG_INFO, "Unaligned Img Loc: %p\n",
+	mhi_log(MHI_MSG_INFO, "Unaligned Img Loc: %pK\n",
 			bhi_ctxt->unaligned_image_loc);
 	bhi_ctxt->image_loc =
 			(void *)((uintptr_t)bhi_ctxt->unaligned_image_loc +
 		 (align_len - (((uintptr_t)bhi_ctxt->unaligned_image_loc) %
 			       align_len)));
 
-	mhi_log(MHI_MSG_INFO, "Aligned Img Loc: %p\n", bhi_ctxt->image_loc);
+	mhi_log(MHI_MSG_INFO, "Aligned Img Loc: %pK\n", bhi_ctxt->image_loc);
 
 	bhi_ctxt->image_size = count;
 
@@ -75,7 +75,7 @@ static ssize_t bhi_write(struct file *file,
 	amount_copied = count;
 	wmb();
 	mhi_log(MHI_MSG_INFO,
-		"Copied image from user at addr: %p\n", bhi_ctxt->image_loc);
+		"Copied image from user at addr: %pK\n", bhi_ctxt->image_loc);
 	bhi_ctxt->phy_image_loc = dma_map_single(NULL,
 			bhi_ctxt->image_loc,
 			bhi_ctxt->image_size,
@@ -171,7 +171,7 @@ int bhi_probe(struct mhi_pcie_dev_info *mhi_pcie_device)
 	wmb();
 
 	mhi_log(MHI_MSG_INFO,
-		"Successfully registered char dev. bhi base is: 0x%p.\n",
+		"Successfully registered char dev. bhi base is: 0x%pK.\n",
 		bhi_ctxt->bhi_base);
 	ret_val = alloc_chrdev_region(&bhi_ctxt->bhi_dev, 0, 1, "bhi");
 	if (IS_ERR_VALUE(ret_val)) {

@@ -928,7 +928,7 @@ static int sd_prep_fn(struct request_queue *q, struct request *rq)
 						"Finishing %u sectors\n",
 						blk_rq_sectors(rq)));
 		SCSI_LOG_HLQUEUE(2, scmd_printk(KERN_INFO, SCpnt,
-						"Retry with 0x%p\n", SCpnt));
+						"Retry with 0x%pK\n", SCpnt));
 		goto out;
 	}
 

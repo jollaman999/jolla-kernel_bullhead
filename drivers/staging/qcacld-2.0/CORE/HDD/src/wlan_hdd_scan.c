@@ -556,7 +556,7 @@ static eHalStatus hdd_ScanRequestCallback(tHalHandle halHandle, void *pContext,
 
     ENTER();
 
-    hddLog(LOGW,"%s called with halHandle = %p, pContext = %p, scanID = %d,"
+    hddLog(LOGW,"%s called with halHandle = %pK, pContext = %pK, scanID = %d,"
            " returned status = %d", __func__, halHandle, pContext,
            (int) scanId, (int) status);
 
@@ -566,7 +566,7 @@ static eHalStatus hdd_ScanRequestCallback(tHalHandle halHandle, void *pContext,
        do some quick sanity before proceeding */
     if (pAdapter->dev != dev)
     {
-       hddLog(LOGW, "%s: device mismatch %p vs %p",
+       hddLog(LOGW, "%s: device mismatch %pK vs %pK",
                __func__, pAdapter->dev, dev);
         return eHAL_STATUS_SUCCESS;
     }
@@ -877,7 +877,7 @@ static eHalStatus hdd_CscanRequestCallback(tHalHandle halHandle, void *pContext,
     VOS_STATUS vos_status = VOS_STATUS_SUCCESS;
     ENTER();
 
-    hddLog(LOG1,"%s called with halHandle = %p, pContext = %p, scanID = %d,"
+    hddLog(LOG1,"%s called with halHandle = %pK, pContext = %pK, scanID = %d,"
            " returned status = %d", __func__, halHandle, pContext,
             (int) scanId, (int) status);
 

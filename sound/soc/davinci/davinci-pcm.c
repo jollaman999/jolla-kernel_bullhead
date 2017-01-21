@@ -806,7 +806,7 @@ static int davinci_pcm_preallocate_dma_buffer(struct snd_pcm *pcm, int stream,
 	buf->area = dma_alloc_writecombine(pcm->card->dev, size,
 					   &buf->addr, GFP_KERNEL);
 
-	pr_debug("davinci_pcm: preallocate_dma_buffer: area=%p, addr=%p, "
+	pr_debug("davinci_pcm: preallocate_dma_buffer: area=%pK, addr=%pK, "
 		"size=%d\n", (void *) buf->area, (void *) buf->addr, size);
 
 	if (!buf->area)

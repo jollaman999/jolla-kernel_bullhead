@@ -1002,7 +1002,7 @@ void saa7146_set_capture(struct saa7146_dev *dev, struct saa7146_buf *buf, struc
 	struct saa7146_vv *vv = dev->vv_data;
 	u32 vdma1_prot_addr;
 
-	DEB_CAP("buf:%p, next:%p\n", buf, next);
+	DEB_CAP("buf:%pK, next:%pK\n", buf, next);
 
 	vdma1_prot_addr = saa7146_read(dev, PROT_ADDR1);
 	if( 0 == vdma1_prot_addr ) {

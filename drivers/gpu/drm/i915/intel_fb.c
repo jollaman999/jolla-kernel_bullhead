@@ -165,7 +165,7 @@ static int intelfb_create(struct drm_fb_helper *helper,
 
 	/* Use default scratch pixmap (info->pixmap.flags = FB_PIXMAP_SYSTEM) */
 
-	DRM_DEBUG_KMS("allocated %dx%d fb: 0x%08x, bo %p\n",
+	DRM_DEBUG_KMS("allocated %dx%d fb: 0x%08x, bo %pK\n",
 		      fb->width, fb->height,
 		      obj->gtt_offset, obj);
 

@@ -269,7 +269,7 @@ static int cb710_probe(struct pci_dev *pdev,
 	} while (err);
 
 
-	dev_info(&pdev->dev, "id %d, IO 0x%p, IRQ %d\n",
+	dev_info(&pdev->dev, "id %d, IO 0x%pK, IRQ %d\n",
 		chip->platform_id, chip->iobase, pdev->irq);
 
 	if (val & CB710_SLOT_MMC) {	/* MMC/SD slot */

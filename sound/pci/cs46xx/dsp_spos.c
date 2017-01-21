@@ -919,7 +919,7 @@ static void _dsp_create_task_tree (struct snd_cs46xx *chip, u32 * task_data,
 	int i;
 
 	for (i = 0; i < size; ++i) {
-		if (debug_tree) printk ("addr %p, val %08x\n",spdst,task_data[i]);
+		if (debug_tree) printk ("addr %pK, val %08x\n",spdst,task_data[i]);
 		writel(task_data[i],spdst);
 		spdst += sizeof(u32);
 	}
@@ -933,7 +933,7 @@ static void _dsp_create_scb (struct snd_cs46xx *chip, u32 * scb_data, u32 dest)
 	int i;
 
 	for (i = 0; i < 0x10; ++i) {
-		if (debug_scb) printk ("addr %p, val %08x\n",spdst,scb_data[i]);
+		if (debug_scb) printk ("addr %pK, val %08x\n",spdst,scb_data[i]);
 		writel(scb_data[i],spdst);
 		spdst += sizeof(u32);
 	}

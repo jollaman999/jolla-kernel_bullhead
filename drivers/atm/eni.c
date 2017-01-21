@@ -168,7 +168,7 @@ static void dump_mem(struct eni_dev *eni_dev)
 	int i;
 
 	for (i = 0; i < eni_dev->free_len; i++)
-		printk(KERN_DEBUG "  %d: %p %d\n",i,
+		printk(KERN_DEBUG "  %d: %pK %d\n",i,
 		    eni_dev->free_list[i].start,
 		    1 << eni_dev->free_list[i].order);
 }
@@ -186,12 +186,12 @@ static void dump(struct atm_dev *dev)
 	printk(KERN_NOTICE "TX buffers\n");
 	for (i = 0; i < NR_CHAN; i++)
 		if (eni_dev->tx[i].send)
-			printk(KERN_NOTICE "  TX %d @ %p: %ld\n",i,
+			printk(KERN_NOTICE "  TX %d @ %pK: %ld\n",i,
 			    eni_dev->tx[i].send,eni_dev->tx[i].words*4);
 	printk(KERN_NOTICE "RX buffers\n");
 	for (i = 0; i < 1024; i++)
 		if (eni_dev->rx_map[i] && ENI_VCC(eni_dev->rx_map[i])->rx)
-			printk(KERN_NOTICE "  RX %d @ %p: %ld\n",i,
+			printk(KERN_NOTICE "  RX %d @ %pK: %ld\n",i,
 			    ENI_VCC(eni_dev->rx_map[i])->recv,
 			    ENI_VCC(eni_dev->rx_map[i])->words*4);
 	printk(KERN_NOTICE "----\n");
@@ -210,7 +210,7 @@ static void eni_put_free(struct eni_dev *eni_dev, void __iomem *start,
 	len = eni_dev->free_len;
 	while (size) {
 		if (len >= eni_dev->free_list_size) {
-			printk(KERN_CRIT "eni_put_free overflow (%p,%ld)\n",
+			printk(KERN_CRIT "eni_put_free overflow (%pK,%ld)\n",
 			    start,size);
 			break;
 		}
@@ -278,7 +278,7 @@ static void eni_free_mem(struct eni_dev *eni_dev, void __iomem *start,
 	list = eni_dev->free_list;
 	len = eni_dev->free_len;
 	for (order = -1; size; order++) size >>= 1;
-	DPRINTK("eni_free_mem: %p+0x%lx (order %d)\n",start,size,order);
+	DPRINTK("eni_free_mem: %pK+0x%lx (order %d)\n",start,size,order);
 	for (i = 0; i < len; i++)
 		if (((unsigned long) list[i].start) == ((unsigned long)start^(1 << order)) &&
 		    list[i].order == order) {
@@ -291,7 +291,7 @@ static void eni_free_mem(struct eni_dev *eni_dev, void __iomem *start,
 			continue;
 		}
 	if (len >= eni_dev->free_list_size) {
-		printk(KERN_ALERT "eni_free_mem overflow (%p,%d)\n",start,
+		printk(KERN_ALERT "eni_free_mem overflow (%pK,%d)\n",start,
 		    order);
 		return;
 	}
@@ -328,7 +328,7 @@ static void rx_ident_err(struct atm_vcc *vcc)
 	printk(KERN_ALERT "  host descr 0x%lx, rx pos 0x%lx, descr value "
 	    "0x%x\n",eni_vcc->descr,eni_vcc->rx_pos,
 	    (unsigned) readl(eni_vcc->recv+eni_vcc->descr*4));
-	printk(KERN_ALERT "  last %p, servicing %d\n",eni_vcc->last,
+	printk(KERN_ALERT "  last %pK, servicing %d\n",eni_vcc->last,
 	    eni_vcc->servicing);
 	EVENT("---dump ends here---\n",0,0);
 	printk(KERN_NOTICE "---recent events---\n");
@@ -1527,7 +1527,7 @@ static void eni_tasklet(unsigned long data)
 	unsigned long flags;
 	u32 events;
 
-	DPRINTK("eni_tasklet (dev %p)\n",dev);
+	DPRINTK("eni_tasklet (dev %pK)\n",dev);
 	spin_lock_irqsave(&eni_dev->lock,flags);
 	events = xchg(&eni_dev->events,0);
 	spin_unlock_irqrestore(&eni_dev->lock,flags);
@@ -2203,7 +2203,7 @@ static int eni_proc_read(struct atm_dev *dev,loff_t *pos,char *page)
 
 		if (--left) continue;
 		offset = (unsigned long) eni_dev->ram+eni_dev->base_diff;
-		return sprintf(page,"free      %p-%p (%6d bytes)\n",
+		return sprintf(page,"free      %pK-%pK (%6d bytes)\n",
 		    fe->start-offset,fe->start-offset+(1 << fe->order)-1,
 		    1 << fe->order);
 	}

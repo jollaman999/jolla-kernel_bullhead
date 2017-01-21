@@ -930,7 +930,7 @@ static void sm501_gpio_set(struct gpio_chip *chip, unsigned offset, int value)
 	unsigned long save;
 	unsigned long val;
 
-	dev_dbg(sm501_gpio_to_dev(smgpio)->dev, "%s(%p,%d)\n",
+	dev_dbg(sm501_gpio_to_dev(smgpio)->dev, "%s(%pK,%d)\n",
 		__func__, chip, offset);
 
 	spin_lock_irqsave(&smgpio->lock, save);
@@ -955,7 +955,7 @@ static int sm501_gpio_input(struct gpio_chip *chip, unsigned offset)
 	unsigned long save;
 	unsigned long ddr;
 
-	dev_dbg(sm501_gpio_to_dev(smgpio)->dev, "%s(%p,%d)\n",
+	dev_dbg(sm501_gpio_to_dev(smgpio)->dev, "%s(%pK,%d)\n",
 		__func__, chip, offset);
 
 	spin_lock_irqsave(&smgpio->lock, save);
@@ -982,7 +982,7 @@ static int sm501_gpio_output(struct gpio_chip *chip,
 	unsigned long val;
 	unsigned long ddr;
 
-	dev_dbg(sm501_gpio_to_dev(smgpio)->dev, "%s(%p,%d,%d)\n",
+	dev_dbg(sm501_gpio_to_dev(smgpio)->dev, "%s(%pK,%d,%d)\n",
 		__func__, chip, offset, value);
 
 	spin_lock_irqsave(&smgpio->lock, save);
@@ -1340,7 +1340,7 @@ static int sm501_init_dev(struct sm501_devdata *sm)
 	dramctrl = smc501_readl(sm->regs + SM501_DRAM_CONTROL);
 	mem_avail = sm501_mem_local[(dramctrl >> 13) & 0x7];
 
-	dev_info(sm->dev, "SM501 At %p: Version %08lx, %ld Mb, IRQ %d\n",
+	dev_info(sm->dev, "SM501 At %pK: Version %08lx, %ld Mb, IRQ %d\n",
 		 sm->regs, devid, (unsigned long)mem_avail >> 20, sm->irq);
 
 	sm->rev = devid & SM501_DEVICEID_REVMASK;

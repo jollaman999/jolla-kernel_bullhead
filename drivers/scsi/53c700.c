@@ -543,10 +543,10 @@ free_slot(struct NCR_700_command_slot *slot,
 	  struct NCR_700_Host_Parameters *hostdata)
 {
 	if((slot->state & NCR_700_SLOT_MASK) != NCR_700_SLOT_MAGIC) {
-		printk(KERN_ERR "53c700: SLOT %p is not MAGIC!!!\n", slot);
+		printk(KERN_ERR "53c700: SLOT %pK is not MAGIC!!!\n", slot);
 	}
 	if(slot->state == NCR_700_SLOT_FREE) {
-		printk(KERN_ERR "53c700: SLOT %p is FREE!!!\n", slot);
+		printk(KERN_ERR "53c700: SLOT %pK is FREE!!!\n", slot);
 	}
 	
 	slot->resume_offset = 0;
@@ -600,7 +600,7 @@ NCR_700_scsi_done(struct NCR_700_Host_Parameters *hostdata,
 		if (slot->flags == NCR_700_FLAG_AUTOSENSE) {
 			char *cmnd = NCR_700_get_sense_cmnd(SCp->device);
 #ifdef NCR_700_DEBUG
-			printk(" ORIGINAL CMD %p RETURNED %d, new return is %d sense is\n",
+			printk(" ORIGINAL CMD %pK RETURNED %d, new return is %d sense is\n",
 			       SCp, SCp->cmnd[7], result);
 			scsi_print_sense("53c700", SCp);
 
@@ -989,7 +989,7 @@ process_script_interrupt(__u32 dsps, __u32 dsp, struct scsi_cmnd *SCp,
 					NCR_700_get_sense_cmnd(SCp->device);
 #ifdef NCR_DEBUG
 				scsi_print_command(SCp);
-				printk("  cmd %p has status %d, requesting sense\n",
+				printk("  cmd %pK has status %d, requesting sense\n",
 				       SCp, hostdata->status[0]);
 #endif
 				/* we can destroy the command here
@@ -1120,7 +1120,7 @@ process_script_interrupt(__u32 dsps, __u32 dsp, struct scsi_cmnd *SCp,
 
 			slot = (struct NCR_700_command_slot *)SCp->host_scribble;
 			DDEBUG(KERN_DEBUG, SDp,
-				"reselection is tag %d, slot %p(%d)\n",
+				"reselection is tag %d, slot %pK(%d)\n",
 				hostdata->msgin[2], slot, slot->tag);
 		} else {
 			struct scsi_cmnd *SCp = scsi_find_tag(SDp, SCSI_NO_TAG);
@@ -1202,7 +1202,7 @@ process_script_interrupt(__u32 dsps, __u32 dsp, struct scsi_cmnd *SCp,
 				   && SG <= to32bit(&hostdata->slots[i].pSG[NCR_700_SG_SEGMENTS]))
 					break;
 			}
-			printk(KERN_INFO "IDENTIFIED SG segment as being %08x in slot %p, cmd %p, slot->resume_offset=%08x\n", SG, &hostdata->slots[i], hostdata->slots[i].cmnd, hostdata->slots[i].resume_offset);
+			printk(KERN_INFO "IDENTIFIED SG segment as being %08x in slot %pK, cmd %pK, slot->resume_offset=%08x\n", SG, &hostdata->slots[i], hostdata->slots[i].cmnd, hostdata->slots[i].resume_offset);
 			SCp =  hostdata->slots[i].cmnd;
 		}
 
@@ -1312,7 +1312,7 @@ process_selection(struct Scsi_Host *host, __u32 dsp)
 	if(hostdata->state == NCR_700_HOST_BUSY && SCp != NULL) {
 		struct NCR_700_command_slot *slot =
 			(struct NCR_700_command_slot *)SCp->host_scribble;
-		DEBUG(("  ID %d WARNING: RESELECTION OF BUSY HOST, saving cmd %p, slot %p, addr %x [%04x], resume %x!\n", id, hostdata->cmd, slot, dsp, dsp - hostdata->pScript, resume_offset));
+		DEBUG(("  ID %d WARNING: RESELECTION OF BUSY HOST, saving cmd %pK, slot %pK, addr %x [%04x], resume %x!\n", id, hostdata->cmd, slot, dsp, dsp - hostdata->pScript, resume_offset));
 		
 		switch(dsp - hostdata->pScript) {
 		case Ent_Disconnect1:
@@ -1403,7 +1403,7 @@ NCR_700_start_command(struct scsi_cmnd *SCp)
 		 * change the state to queued on this one */
 		slot->state = NCR_700_SLOT_QUEUED;
 
-		DEBUG(("scsi%d: host busy, queueing command %p, slot %p\n",
+		DEBUG(("scsi%d: host busy, queueing command %pK, slot %pK\n",
 		       SCp->device->host->host_no, slot->cmnd, slot));
 		return 0;
 	}
@@ -1537,7 +1537,7 @@ NCR_700_intr(int irq, void *dev_id)
 
 			hostdata->state = NCR_700_HOST_BUSY;
 
-			printk(KERN_ERR "scsi%d: Bus Reset detected, executing command %p, slot %p, dsp %08x[%04x]\n",
+			printk(KERN_ERR "scsi%d: Bus Reset detected, executing command %pK, slot %pK, dsp %08x[%04x]\n",
 			       host->host_no, SCp, SCp == NULL ? NULL : SCp->host_scribble, dsp, dsp - hostdata->pScript);
 
 			scsi_report_bus_reset(host, 0);
@@ -1556,7 +1556,7 @@ NCR_700_intr(int irq, void *dev_id)
 					continue;
 				
 				SCp = slot->cmnd;
-				printk(KERN_ERR " failing command because of reset, slot %p, cmnd %p\n",
+				printk(KERN_ERR " failing command because of reset, slot %pK, cmnd %pK\n",
 				       slot, SCp);
 				free_slot(slot, hostdata);
 				SCp->host_scribble = NULL;
@@ -1593,7 +1593,7 @@ NCR_700_intr(int irq, void *dev_id)
 #ifdef NCR_700_DEBUG
 				__u32 temp = NCR_700_readl(host, TEMP_REG);
 				int count = (hostdata->script[Ent_SendMessage/4] & 0xffffff) - ((NCR_700_readl(host, DBC_REG) & 0xffffff) + NCR_700_data_residual(host));
-				printk("scsi%d (%d:%d) PHASE MISMATCH IN SEND MESSAGE %d remain, return %p[%04x], phase %s\n", host->host_no, pun, lun, count, (void *)temp, temp - hostdata->pScript, sbcl_to_string(NCR_700_readb(host, SBCL_REG)));
+				printk("scsi%d (%d:%d) PHASE MISMATCH IN SEND MESSAGE %d remain, return %pK[%04x], phase %s\n", host->host_no, pun, lun, count, (void *)temp, temp - hostdata->pScript, sbcl_to_string(NCR_700_readb(host, SBCL_REG)));
 #endif
 				resume_offset = hostdata->pScript + Ent_SendMessagePhaseMismatch;
 			} else if(dsp >= to32bit(&slot->pSG[0].ins) &&
@@ -1734,7 +1734,7 @@ NCR_700_intr(int irq, void *dev_id)
 			if(hostdata->slots[j].state != NCR_700_SLOT_QUEUED)
 				continue;
 			if(NCR_700_start_command(hostdata->slots[j].cmnd)) {
-				DEBUG(("scsi%d: Issuing saved command slot %p, cmd %p\t\n",
+				DEBUG(("scsi%d: Issuing saved command slot %pK, cmd %pK\t\n",
 				       host->host_no, &hostdata->slots[j],
 				       hostdata->slots[j].cmnd));
 				hostdata->saved_slot_position = j + 1;
@@ -1822,7 +1822,7 @@ NCR_700_queuecommand_lck(struct scsi_cmnd *SCp, void (*done)(struct scsi_cmnd *)
 	if((hostdata->tag_negotiated &(1<<scmd_id(SCp)))
 	   && scsi_get_tag_type(SCp->device)) {
 		slot->tag = SCp->request->tag;
-		CDEBUG(KERN_DEBUG, SCp, "sending out tag %d, slot %p\n",
+		CDEBUG(KERN_DEBUG, SCp, "sending out tag %d, slot %pK\n",
 		       slot->tag, slot);
 	} else {
 		slot->tag = SCSI_NO_TAG;
@@ -1945,7 +1945,7 @@ NCR_700_bus_reset(struct scsi_cmnd * SCp)
 		(struct NCR_700_Host_Parameters *)SCp->device->host->hostdata[0];
 
 	scmd_printk(KERN_INFO, SCp,
-		"New error handler wants BUS reset, cmd %p\n\t", SCp);
+		"New error handler wants BUS reset, cmd %pK\n\t", SCp);
 	scsi_print_command(SCp);
 
 	/* In theory, eh_complete should always be null because the

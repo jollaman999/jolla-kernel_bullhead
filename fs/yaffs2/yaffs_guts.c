@@ -1655,7 +1655,7 @@ static void yaffs_free_obj(struct yaffs_obj *obj)
 {
 	struct yaffs_dev *dev = obj->my_dev;
 
-	yaffs_trace(YAFFS_TRACE_OS, "FreeObject %p inode %p",
+	yaffs_trace(YAFFS_TRACE_OS, "FreeObject %pK inode %pK",
 		obj, obj->my_inode);
 
 	if (!obj)

@@ -556,7 +556,7 @@ static int sensor_hub_probe(struct hid_device *hdev,
 			sd->hid_sensor_hub_client_devs[
 				sd->hid_sensor_client_cnt].pdata_size =
 						sizeof(*sd->hsdev);
-			hid_dbg(hdev, "Adding %s:%p\n", name, sd);
+			hid_dbg(hdev, "Adding %s:%pK\n", name, sd);
 			sd->hid_sensor_client_cnt++;
 		}
 	}

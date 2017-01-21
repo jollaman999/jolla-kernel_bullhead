@@ -173,8 +173,8 @@ void c2_ae_event(struct c2_dev *c2dev, u32 mq_index)
 
 	status = cm_event.status = c2_convert_cm_status(c2_wr_get_result(wr));
 
-	pr_debug("event received c2_dev=%p, event_id=%d, "
-		"resource_indicator=%d, user_context=%p, status = %d\n",
+	pr_debug("event received c2_dev=%pK, event_id=%d, "
+		"resource_indicator=%d, user_context=%pK, status = %d\n",
 		c2dev, event_id, resource_indicator, resource_user_context,
 		status);
 
@@ -186,7 +186,7 @@ void c2_ae_event(struct c2_dev *c2dev, u32 mq_index)
 		struct c2wr_ae_active_connect_results *res;
 
 		if (!cm_id) {
-			pr_debug("event received, but cm_id is <nul>, qp=%p!\n",
+			pr_debug("event received, but cm_id is <nul>, qp=%pK!\n",
 				qp);
 			goto ignore_it;
 		}
@@ -257,8 +257,8 @@ void c2_ae_event(struct c2_dev *c2dev, u32 mq_index)
 			break;
 		default:
 			BUG_ON(1);
-			pr_debug("%s:%d Unexpected event_id=%d on QP=%p, "
-				"CM_ID=%p\n",
+			pr_debug("%s:%d Unexpected event_id=%d on QP=%pK, "
+				"CM_ID=%pK\n",
 				__func__, __LINE__,
 				event_id, qp, cm_id);
 			break;

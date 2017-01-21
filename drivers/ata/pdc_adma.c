@@ -395,7 +395,7 @@ static inline void adma_packet_start(struct ata_queued_cmd *qc)
 	struct ata_port *ap = qc->ap;
 	void __iomem *chan = ADMA_PORT_REGS(ap);
 
-	VPRINTK("ENTER, ap %p\n", ap);
+	VPRINTK("ENTER, ap %pK\n", ap);
 
 	/* fire up the ADMA engine */
 	writew(aPIOMD4 | aGO, chan + ADMA_CONTROL);

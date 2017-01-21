@@ -267,7 +267,7 @@ static int hfa384x_cmd_issue(struct net_device *dev,
 		return -ENODEV;
 
 	if (entry->issued) {
-		printk(KERN_DEBUG "%s: driver bug - re-issuing command @%p\n",
+		printk(KERN_DEBUG "%s: driver bug - re-issuing command @%pK\n",
 		       dev->name, entry);
 	}
 
@@ -427,7 +427,7 @@ static int hfa384x_cmd(struct net_device *dev, u16 cmd, u16 param0,
 	spin_lock_irqsave(&local->cmdlock, flags);
 	if (!list_empty(&entry->list)) {
 		printk(KERN_DEBUG "%s: hfa384x_cmd: entry still in list? "
-		       "(entry=%p, type=%d, res=%d)\n", dev->name, entry,
+		       "(entry=%pK, type=%d, res=%d)\n", dev->name, entry,
 		       entry->type, res);
 		list_del_init(&entry->list);
 		local->cmd_queue_len--;
@@ -444,7 +444,7 @@ static int hfa384x_cmd(struct net_device *dev, u16 cmd, u16 param0,
 	if (entry->type != CMD_COMPLETED) {
 		u16 reg = HFA384X_INW(HFA384X_EVSTAT_OFF);
 		printk(KERN_DEBUG "%s: hfa384x_cmd: command was not "
-		       "completed (res=%d, entry=%p, type=%d, cmd=0x%04x, "
+		       "completed (res=%d, entry=%pK, type=%d, cmd=0x%04x, "
 		       "param0=0x%04x, EVSTAT=%04x INTEN=%04x)\n", dev->name,
 		       res, entry, entry->type, entry->cmd, entry->param0, reg,
 		       HFA384X_INW(HFA384X_INTEN_OFF));

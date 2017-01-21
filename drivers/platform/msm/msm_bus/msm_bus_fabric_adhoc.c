@@ -796,7 +796,7 @@ static int msm_bus_copy_node_info(struct msm_bus_node_device_type *pdata,
 
 	if (!bus_node || !pdata) {
 		ret = -ENXIO;
-		MSM_BUS_ERR("%s: Invalid pointers pdata %p, bus_node %p",
+		MSM_BUS_ERR("%s: Invalid pointers pdata %pK, bus_node %pK",
 			__func__, pdata, bus_node);
 		goto exit_copy_node_info;
 	}

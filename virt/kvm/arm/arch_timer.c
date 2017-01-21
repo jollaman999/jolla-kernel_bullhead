@@ -81,7 +81,7 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
 	 * interrupt at this point is a sure sign of some major
 	 * breakage.
 	 */
-	pr_warn("Unexpected interrupt %d on vcpu %p\n", irq, vcpu);
+	pr_warn("Unexpected interrupt %d on vcpu %pK\n", irq, vcpu);
 	return IRQ_HANDLED;
 }
 

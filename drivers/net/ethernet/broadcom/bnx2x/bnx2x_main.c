@@ -1047,7 +1047,7 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 			u32 *rx_bd = (u32 *)&fp->rx_desc_ring[j];
 			struct sw_rx_bd *sw_bd = &fp->rx_buf_ring[j];
 
-			BNX2X_ERR("fp%d: rx_bd[%x]=[%x:%x]  sw_bd=[%p]\n",
+			BNX2X_ERR("fp%d: rx_bd[%x]=[%x:%x]  sw_bd=[%pK]\n",
 				  i, j, rx_bd[1], rx_bd[0], sw_bd->data);
 		}
 
@@ -1057,7 +1057,7 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 			u32 *rx_sge = (u32 *)&fp->rx_sge_ring[j];
 			struct sw_rx_page *sw_page = &fp->rx_page_ring[j];
 
-			BNX2X_ERR("fp%d: rx_sge[%x]=[%x:%x]  sw_page=[%p]\n",
+			BNX2X_ERR("fp%d: rx_sge[%x]=[%x:%x]  sw_page=[%pK]\n",
 				  i, j, rx_sge[1], rx_sge[0], sw_page->page);
 		}
 
@@ -1083,7 +1083,7 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 				struct sw_tx_bd *sw_bd =
 					&txdata->tx_buf_ring[j];
 
-				BNX2X_ERR("fp%d: txdata %d, packet[%x]=[%p,%x]\n",
+				BNX2X_ERR("fp%d: txdata %d, packet[%x]=[%pK,%x]\n",
 					  i, cos, j, sw_bd->skb,
 					  sw_bd->first_bd);
 			}
@@ -5962,7 +5962,7 @@ static void bnx2x_init_eth_fp(struct bnx2x *bp, int fp_idx)
 	bnx2x_init_vlan_mac_fp_objs(fp, BNX2X_OBJ_TYPE_RX_TX);
 
 	DP(NETIF_MSG_IFUP,
-	   "queue[%d]:  bnx2x_init_sb(%p,%p)  cl_id %d  fw_sb %d  igu_sb %d\n",
+	   "queue[%d]:  bnx2x_init_sb(%pK,%pK)  cl_id %d  fw_sb %d  igu_sb %d\n",
 	   fp_idx, bp, fp->status_blk.e2_sb, fp->cl_id, fp->fw_sb_id,
 	   fp->igu_sb_id);
 }

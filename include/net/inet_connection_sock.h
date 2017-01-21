@@ -219,7 +219,7 @@ static inline void inet_csk_reset_xmit_timer(struct sock *sk, const int what,
 
 	if (when > max_when) {
 #ifdef INET_CSK_DEBUG
-		pr_debug("reset_xmit_timer: sk=%p %d when=0x%lx, caller=%p\n",
+		pr_debug("reset_xmit_timer: sk=%pK %d when=0x%lx, caller=%pK\n",
 			 sk, what, when, current_text_addr());
 #endif
 		when = max_when;

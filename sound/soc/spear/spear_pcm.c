@@ -106,7 +106,7 @@ spear_pcm_preallocate_dma_buffer(struct snd_pcm *pcm, int stream,
 		return -ENOMEM;
 
 	dev_info(buf->dev.dev,
-			" preallocate_dma_buffer: area=%p, addr=%p, size=%d\n",
+			" preallocate_dma_buffer: area=%pK, addr=%pK, size=%d\n",
 			(void *)buf->area, (void *)buf->addr, size);
 
 	buf->bytes = size;

@@ -61,7 +61,7 @@ void show_stack(struct task_struct *task, unsigned long *stack)
 
 	printk(KERN_NOTICE "Stack info:\n");
 	decode_address(buf, (unsigned int)stack);
-	printk(KERN_NOTICE " SP: [0x%p] %s\n", stack, buf);
+	printk(KERN_NOTICE " SP: [0x%pK] %s\n", stack, buf);
 
 	if (!access_ok(VERIFY_READ, stack, (unsigned int)endstack - (unsigned int)stack)) {
 		printk(KERN_NOTICE "Invalid stack pointer\n");
@@ -91,7 +91,7 @@ void show_stack(struct task_struct *task, unsigned long *stack)
 	}
 	if (fp) {
 		frame = fp;
-		printk(KERN_NOTICE " FP: (0x%p)\n", fp);
+		printk(KERN_NOTICE " FP: (0x%pK)\n", fp);
 	} else
 		frame = 0;
 
@@ -107,7 +107,7 @@ void show_stack(struct task_struct *task, unsigned long *stack)
 		if (j)
 			printk(KERN_NOTICE "Return addresses in stack:\n");
 		else
-			printk(KERN_NOTICE " Memory from 0x%08lx to %p", ((long unsigned int)stack & ~0xF), endstack);
+			printk(KERN_NOTICE " Memory from 0x%08lx to %pK", ((long unsigned int)stack & ~0xF), endstack);
 
 		fp = frame;
 		frame_no = 0;
@@ -117,7 +117,7 @@ void show_stack(struct task_struct *task, unsigned long *stack)
 
 			ret_addr = 0;
 			if (!j && i % 8 == 0)
-				printk(KERN_NOTICE "%p:", addr);
+				printk(KERN_NOTICE "%pK:", addr);
 
 			/* if it is an odd address, or zero, just skip it */
 			if (*addr & 0x1 || !*addr)

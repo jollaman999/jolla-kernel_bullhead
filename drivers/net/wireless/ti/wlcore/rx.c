@@ -192,7 +192,7 @@ static int wl1271_rx_handle_data(struct wl1271 *wl, u8 *data, u32 length,
 	wlcore_hw_set_rx_csum(wl, desc, skb);
 
 	seq_num = (le16_to_cpu(hdr->seq_ctrl) & IEEE80211_SCTL_SEQ) >> 4;
-	wl1271_debug(DEBUG_RX, "rx skb 0x%p: %d B %s seq %d hlid %d", skb,
+	wl1271_debug(DEBUG_RX, "rx skb 0x%pK: %d B %s seq %d hlid %d", skb,
 		     skb->len - desc->pad_len,
 		     beacon ? "beacon" : "",
 		     seq_num, *hlid);

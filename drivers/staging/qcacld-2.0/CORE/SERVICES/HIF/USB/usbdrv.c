@@ -410,11 +410,11 @@ static void usb_hif_flush_pending_transfers(HIF_USB_PIPE *pipe)
 					("urb_context is NULL\n"));
 			break;
 		}
-		AR_DEBUG_PRINTF(ATH_DEBUG_TRC, ("  pending urb ctxt: 0x%p\n",
+		AR_DEBUG_PRINTF(ATH_DEBUG_TRC, ("  pending urb ctxt: 0x%pK\n",
 						urb_context));
 		if (urb_context->urb != NULL) {
 			AR_DEBUG_PRINTF(ATH_DEBUG_TRC,
-					("  killing urb: 0x%p\n",
+					("  killing urb: 0x%pK\n",
 					 urb_context->urb));
 			/* killing the URB will cause the completion routines to
 			 * run
@@ -468,7 +468,7 @@ static void usb_hif_usb_recv_complete(struct urb *urb)
 	HIF_USB_PIPE *pipe = urb_context->pipe;
 
 	AR_DEBUG_PRINTF(USB_HIF_DEBUG_BULK_IN, (
-			 "+%s: recv pipe: %d, stat:%d,len:%d urb:0x%p\n",
+			 "+%s: recv pipe: %d, stat:%d,len:%d urb:0x%pK\n",
 			 __func__,
 			 pipe->logical_pipe_num,
 			 urb->status, urb->actual_length,
@@ -555,7 +555,7 @@ static void usb_hif_usb_recv_bundle_complete(struct urb *urb)
 	adf_nbuf_t new_skb = NULL;
 
 	AR_DEBUG_PRINTF(USB_HIF_DEBUG_BULK_IN, (
-			 "+%s: recv pipe: %d, stat:%d,len:%d urb:0x%p\n",
+			 "+%s: recv pipe: %d, stat:%d,len:%d urb:0x%pK\n",
 			 __func__,
 			 pipe->logical_pipe_num,
 			 urb->status, urb->actual_length,
@@ -763,7 +763,7 @@ static void usb_hif_post_recv_transfers(HIF_USB_PIPE *recv_pipe,
 				  usb_hif_usb_recv_complete, urb_context);
 
 		AR_DEBUG_PRINTF(USB_HIF_DEBUG_BULK_IN, (
-				 "athusb bulk recv submit:%d, 0x%X (ep:0x%2.2X), %d bytes, buf:0x%p\n",
+				 "athusb bulk recv submit:%d, 0x%X (ep:0x%2.2X), %d bytes, buf:0x%pK\n",
 				 recv_pipe->logical_pipe_num,
 				 recv_pipe->usb_pipe_handle,
 				 recv_pipe->ep_address, buffer_length,
@@ -826,7 +826,7 @@ static void usb_hif_post_recv_bundle_transfers(HIF_USB_PIPE *recv_pipe,
 				  urb_context);
 
 		AR_DEBUG_PRINTF(USB_HIF_DEBUG_BULK_IN, (
-				 "athusb bulk recv submit:%d, 0x%X (ep:0x%2.2X), %d bytes, buf:0x%p\n",
+				 "athusb bulk recv submit:%d, 0x%X (ep:0x%2.2X), %d bytes, buf:0x%pK\n",
 				 recv_pipe->logical_pipe_num,
 				 recv_pipe->usb_pipe_handle,
 				 recv_pipe->ep_address, buffer_length,
@@ -996,7 +996,7 @@ void usb_hif_io_comp_work(struct work_struct *work)
 		a_mem_trace(buf);
 		if (pipe->flags & HIF_USB_PIPE_FLAG_TX) {
 			AR_DEBUG_PRINTF(USB_HIF_DEBUG_BULK_OUT,
-					("+athusb xmit callback " "buf:0x%p\n",
+					("+athusb xmit callback " "buf:0x%pK\n",
 					 buf));
 			HtcHdr = (HTC_FRAME_HDR *) adf_nbuf_get_frag_vaddr(buf, 0);
 
@@ -1013,7 +1013,7 @@ void usb_hif_io_comp_work(struct work_struct *work)
 					("-athusb xmit callback\n"));
 		} else {
 			AR_DEBUG_PRINTF(USB_HIF_DEBUG_BULK_IN,
-					("+athusb recv callback buf:" "0x%p\n",
+					("+athusb recv callback buf:" "0x%pK\n",
 					 buf));
 			adf_nbuf_peek_header(buf, &data, &len);
 

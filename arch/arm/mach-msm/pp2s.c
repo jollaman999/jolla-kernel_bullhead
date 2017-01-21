@@ -265,7 +265,7 @@ static ssize_t register_read(
 	val = scnprintf(valfromreg_ptr, PAGE_SIZE, "%u", val);
 
 	LOG_DRVR_DEBUG(
-		"%s -> read %s (from addr %p) with %u bytes\n",
+		"%s -> read %s (from addr %pK) with %u bytes\n",
 		caller_ptr, valfromreg_ptr, reg_addr, val);
 
 	return val;
@@ -287,7 +287,7 @@ static ssize_t register_write(
 	writel_relaxed(val, reg_addr);
 
 	LOG_DRVR_DEBUG(
-		"%s -> wrote %u (to addr %p) with %u bytes\n",
+		"%s -> wrote %u (to addr %pK) with %u bytes\n",
 		caller_ptr, val, reg_addr, sizeof(val));
 
 	return strlen(valtoreg_ptr);

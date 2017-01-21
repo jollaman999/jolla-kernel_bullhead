@@ -596,15 +596,15 @@ static void init_pci_device_addresses(struct pm8001_hba_info *pm8001_ha)
 			pm8001_printk("PSPA OFFSET 0x%x\n",
 			pm8001_cr32(pm8001_ha, pcibar, offset + 0x90)));
 	PM8001_INIT_DBG(pm8001_ha,
-			pm8001_printk("addr - main cfg %p general status %p\n",
+			pm8001_printk("addr - main cfg %pK general status %pK\n",
 			pm8001_ha->main_cfg_tbl_addr,
 			pm8001_ha->general_stat_tbl_addr));
 	PM8001_INIT_DBG(pm8001_ha,
-			pm8001_printk("addr - inbnd %p obnd %p\n",
+			pm8001_printk("addr - inbnd %pK obnd %pK\n",
 			pm8001_ha->inbnd_q_tbl_addr,
 			pm8001_ha->outbnd_q_tbl_addr));
 	PM8001_INIT_DBG(pm8001_ha,
-			pm8001_printk("addr - pspa %p ivt %p\n",
+			pm8001_printk("addr - pspa %pK ivt %pK\n",
 			pm8001_ha->pspa_q_tbl_addr,
 			pm8001_ha->ivt_tbl_addr));
 }
@@ -1473,7 +1473,7 @@ mpi_ssp_completion(struct pm8001_hba_info *pm8001_ha , void *piomb)
 	if (unlikely((t->task_state_flags & SAS_TASK_STATE_ABORTED))) {
 		spin_unlock_irqrestore(&t->task_state_lock, flags);
 		PM8001_FAIL_DBG(pm8001_ha, pm8001_printk(
-			"task 0x%p done with io_status 0x%x resp 0x%x "
+			"task 0x%pK done with io_status 0x%x resp 0x%x "
 			"stat 0x%x but aborted by upper layer!\n",
 			t, status, ts->resp, ts->stat));
 		pm8001_ccb_task_free(pm8001_ha, t, ccb, tag);
@@ -1670,7 +1670,7 @@ static void mpi_ssp_event(struct pm8001_hba_info *pm8001_ha , void *piomb)
 	if (unlikely((t->task_state_flags & SAS_TASK_STATE_ABORTED))) {
 		spin_unlock_irqrestore(&t->task_state_lock, flags);
 		PM8001_FAIL_DBG(pm8001_ha, pm8001_printk(
-			"task 0x%p done with event 0x%x resp 0x%x "
+			"task 0x%pK done with event 0x%x resp 0x%x "
 			"stat 0x%x but aborted by upper layer!\n",
 			t, event, ts->resp, ts->stat));
 		pm8001_ccb_task_free(pm8001_ha, t, ccb, tag);
@@ -2036,7 +2036,7 @@ mpi_sata_completion(struct pm8001_hba_info *pm8001_ha, void *piomb)
 	if (unlikely((t->task_state_flags & SAS_TASK_STATE_ABORTED))) {
 		spin_unlock_irqrestore(&t->task_state_lock, flags);
 		PM8001_FAIL_DBG(pm8001_ha,
-			pm8001_printk("task 0x%p done with io_status 0x%x"
+			pm8001_printk("task 0x%pK done with io_status 0x%x"
 			" resp 0x%x stat 0x%x but aborted by upper layer!\n",
 			t, status, ts->resp, ts->stat));
 		pm8001_ccb_task_free(pm8001_ha, t, ccb, tag);
@@ -2287,7 +2287,7 @@ static void mpi_sata_event(struct pm8001_hba_info *pm8001_ha , void *piomb)
 	if (unlikely((t->task_state_flags & SAS_TASK_STATE_ABORTED))) {
 		spin_unlock_irqrestore(&t->task_state_lock, flags);
 		PM8001_FAIL_DBG(pm8001_ha,
-			pm8001_printk("task 0x%p done with io_status 0x%x"
+			pm8001_printk("task 0x%pK done with io_status 0x%x"
 			" resp 0x%x stat 0x%x but aborted by upper layer!\n",
 			t, event, ts->resp, ts->stat));
 		pm8001_ccb_task_free(pm8001_ha, t, ccb, tag);
@@ -2519,7 +2519,7 @@ mpi_smp_completion(struct pm8001_hba_info *pm8001_ha, void *piomb)
 	if (unlikely((t->task_state_flags & SAS_TASK_STATE_ABORTED))) {
 		spin_unlock_irqrestore(&t->task_state_lock, flags);
 		PM8001_FAIL_DBG(pm8001_ha, pm8001_printk(
-			"task 0x%p done with io_status 0x%x resp 0x%x"
+			"task 0x%pK done with io_status 0x%x resp 0x%x"
 			"stat 0x%x but aborted by upper layer!\n",
 			t, status, ts->resp, ts->stat));
 		pm8001_ccb_task_free(pm8001_ha, t, ccb, tag);
@@ -3878,7 +3878,7 @@ static int pm80xx_chip_sata_req(struct pm8001_hba_info *pm8001_ha,
 				spin_unlock_irqrestore(&task->task_state_lock,
 							flags);
 				PM8001_FAIL_DBG(pm8001_ha,
-					pm8001_printk("task 0x%p resp 0x%x "
+					pm8001_printk("task 0x%pK resp 0x%x "
 					" stat 0x%x but aborted by upper layer "
 					"\n", task, ts->resp, ts->stat));
 				pm8001_ccb_task_free(pm8001_ha, task, ccb, tag);

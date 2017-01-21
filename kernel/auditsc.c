@@ -882,7 +882,7 @@ static inline void audit_free_names(struct audit_context *context)
 		       context->name_count, context->put_count,
 		       context->ino_count);
 		list_for_each_entry(n, &context->names_list, list) {
-			printk(KERN_ERR "names[%d] = %p = %s\n", i++,
+			printk(KERN_ERR "names[%d] = %pK = %s\n", i++,
 			       n->name, n->name->name ?: "(null)");
 		}
 		dump_stack();
@@ -1705,7 +1705,7 @@ void __audit_getname(struct filename *name)
 
 	if (!context->in_syscall) {
 #if AUDIT_DEBUG == 2
-		printk(KERN_ERR "%s:%d(:%d): ignoring getname(%p)\n",
+		printk(KERN_ERR "%s:%d(:%d): ignoring getname(%pK)\n",
 		       __FILE__, __LINE__, context->serial, name);
 		dump_stack();
 #endif
@@ -1744,14 +1744,14 @@ void audit_putname(struct filename *name)
 	BUG_ON(!context);
 	if (!context->in_syscall) {
 #if AUDIT_DEBUG == 2
-		printk(KERN_ERR "%s:%d(:%d): final_putname(%p)\n",
+		printk(KERN_ERR "%s:%d(:%d): final_putname(%pK)\n",
 		       __FILE__, __LINE__, context->serial, name);
 		if (context->name_count) {
 			struct audit_names *n;
 			int i = 0;
 
 			list_for_each_entry(n, &context->names_list, list)
-				printk(KERN_ERR "name[%d] = %p = %s\n", i++,
+				printk(KERN_ERR "name[%d] = %pK = %s\n", i++,
 				       n->name, n->name->name ?: "(null)");
 			}
 #endif
@@ -1762,7 +1762,7 @@ void audit_putname(struct filename *name)
 		++context->put_count;
 		if (context->put_count > context->name_count) {
 			printk(KERN_ERR "%s:%d(:%d): major=%d"
-			       " in_syscall=%d putname(%p) name_count=%d"
+			       " in_syscall=%d putname(%pK) name_count=%d"
 			       " put_count=%d\n",
 			       __FILE__, __LINE__,
 			       context->serial, context->major,

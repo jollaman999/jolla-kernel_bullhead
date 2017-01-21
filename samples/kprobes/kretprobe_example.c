@@ -86,7 +86,7 @@ static int __init kretprobe_init(void)
 				ret);
 		return -1;
 	}
-	printk(KERN_INFO "Planted return probe at %s: %p\n",
+	printk(KERN_INFO "Planted return probe at %s: %pK\n",
 			my_kretprobe.kp.symbol_name, my_kretprobe.kp.addr);
 	return 0;
 }
@@ -94,7 +94,7 @@ static int __init kretprobe_init(void)
 static void __exit kretprobe_exit(void)
 {
 	unregister_kretprobe(&my_kretprobe);
-	printk(KERN_INFO "kretprobe at %p unregistered\n",
+	printk(KERN_INFO "kretprobe at %pK unregistered\n",
 			my_kretprobe.kp.addr);
 
 	/* nmissed > 0 suggests that maxactive was set too low. */

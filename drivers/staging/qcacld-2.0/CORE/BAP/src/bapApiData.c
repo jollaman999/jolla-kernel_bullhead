@@ -920,7 +920,7 @@ WLANBAP_TxCompCB
 #ifdef BAP_DEBUG
     /* Trace the bapContext referenced. */
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-              "WLAN BAP Context Monitor: bapContext value = %p in %s:%d. vosDataBuff=%p", bapContext, __func__, __LINE__, vosDataBuff );
+              "WLAN BAP Context Monitor: bapContext value = %pK in %s:%d. vosDataBuff=%pK", bapContext, __func__, __LINE__, vosDataBuff );
 #endif //BAP_DEBUG
 
     // Sanity check the log_link_handle value
@@ -1071,7 +1071,7 @@ WLANBAP_STAPktPending
 #ifdef BAP_DEBUG
     /* Trace the tBtampCtx being passed in. */
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-              "WLAN BAP Context Monitor: pBtampCtx value = %p in %s:%d", pBtampCtx, __func__, __LINE__ );
+              "WLAN BAP Context Monitor: pBtampCtx value = %pK in %s:%d", pBtampCtx, __func__, __LINE__ );
 #endif //BAP_DEBUG
 
     /*------------------------------------------------------------------------

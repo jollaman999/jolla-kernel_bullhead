@@ -626,7 +626,7 @@ int gigaset_isdn_icall(struct at_state_t *at_state)
 	/* scan application list for matching listeners */
 	spin_lock_irqsave(&bcs->aplock, flags);
 	if (bcs->ap != NULL || bcs->apconnstate != APCONN_NONE) {
-		dev_warn(cs->dev, "%s: channel not properly cleared (%p/%d)\n",
+		dev_warn(cs->dev, "%s: channel not properly cleared (%pK/%d)\n",
 			 __func__, bcs->ap, bcs->apconnstate);
 		bcs->ap = NULL;
 		bcs->apconnstate = APCONN_NONE;
@@ -1300,7 +1300,7 @@ static void do_connect_req(struct gigaset_capi_ctr *iif,
 	}
 	spin_lock_irqsave(&bcs->aplock, flags);
 	if (bcs->ap != NULL || bcs->apconnstate != APCONN_NONE)
-		dev_warn(cs->dev, "%s: channel not properly cleared (%p/%d)\n",
+		dev_warn(cs->dev, "%s: channel not properly cleared (%pK/%d)\n",
 			 __func__, bcs->ap, bcs->apconnstate);
 	ap->bcnext = NULL;
 	bcs->ap = ap;

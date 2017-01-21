@@ -665,7 +665,7 @@ static ssize_t soc_camera_read(struct file *file, char __user *buf,
 	struct soc_camera_device *icd = file->private_data;
 	struct soc_camera_host *ici = to_soc_camera_host(icd->parent);
 
-	dev_dbg(icd->pdev, "read called, buf %p\n", buf);
+	dev_dbg(icd->pdev, "read called, buf %pK\n", buf);
 
 	if (ici->ops->init_videobuf2 && icd->vb2_vidq.io_modes & VB2_READ)
 		return vb2_read(&icd->vb2_vidq, buf, count, ppos,

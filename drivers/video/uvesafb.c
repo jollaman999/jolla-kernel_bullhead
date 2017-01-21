@@ -576,8 +576,8 @@ static int uvesafb_vbe_getpmi(struct uvesafb_ktask *task,
 		printk(KERN_INFO "uvesafb: protected mode interface info at "
 				 "%04x:%04x\n",
 				 (u16)task->t.regs.es, (u16)task->t.regs.edi);
-		printk(KERN_INFO "uvesafb: pmi: set display start = %p, "
-				 "set palette = %p\n", par->pmi_start,
+		printk(KERN_INFO "uvesafb: pmi: set display start = %pK, "
+				 "set palette = %pK\n", par->pmi_start,
 				 par->pmi_pal);
 
 		if (par->pmi_base[3]) {
@@ -1807,7 +1807,7 @@ static int uvesafb_probe(struct platform_device *dev)
 		goto out_unmap;
 	}
 
-	printk(KERN_INFO "uvesafb: framebuffer at 0x%lx, mapped to 0x%p, "
+	printk(KERN_INFO "uvesafb: framebuffer at 0x%lx, mapped to 0x%pK, "
 			"using %dk, total %dk\n", info->fix.smem_start,
 			info->screen_base, info->fix.smem_len/1024,
 			par->vbe_ib.total_memory * 64);

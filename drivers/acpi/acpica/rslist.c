@@ -83,7 +83,7 @@ acpi_rs_convert_aml_to_resources(u8 * aml,
 	resource = *resource_ptr;
 	if (ACPI_IS_MISALIGNED(resource)) {
 		ACPI_WARNING((AE_INFO,
-			      "Misaligned resource pointer %p", resource));
+			      "Misaligned resource pointer %pK", resource));
 	}
 
 	/* Get the appropriate conversion info table */

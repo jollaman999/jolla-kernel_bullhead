@@ -508,7 +508,7 @@ static int stu300_set_clk(struct stu300_dev *dev, unsigned long clkrate)
 		   dev->virtbase + I2C_OAR2);
 
 	dev_dbg(&dev->pdev->dev, "Clock rate %lu Hz, I2C bus speed %d Hz "
-		"virtbase %p\n", clkrate, dev->speed, dev->virtbase);
+		"virtbase %pK\n", clkrate, dev->speed, dev->virtbase);
 
 	if (dev->speed > 100000)
 		/* Fast Mode I2C */
@@ -890,7 +890,7 @@ stu300_probe(struct platform_device *pdev)
 
 	dev->virtbase = devm_ioremap_resource(&pdev->dev, res);
 	dev_dbg(&pdev->dev, "initialize bus device I2C%d on virtual "
-		"base %p\n", bus_nr, dev->virtbase);
+		"base %pK\n", bus_nr, dev->virtbase);
 	if (IS_ERR(dev->virtbase))
 		return PTR_ERR(dev->virtbase);
 

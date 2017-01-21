@@ -2541,7 +2541,7 @@ static int snd_dbri_create(struct snd_card *card,
 		return -ENOMEM;
 	memset((void *)dbri->dma, 0, sizeof(struct dbri_dma));
 
-	dprintk(D_GEN, "DMA Cmd Block 0x%p (0x%08x)\n",
+	dprintk(D_GEN, "DMA Cmd Block 0x%pK (0x%08x)\n",
 		dbri->dma, dbri->dma_dvma);
 
 	/* Map the registers into memory. */
@@ -2650,7 +2650,7 @@ static int dbri_probe(struct platform_device *op)
 	if (err < 0)
 		goto _err;
 
-	printk(KERN_INFO "audio%d at %p (irq %d) is DBRI(%c)+CS4215(%d)\n",
+	printk(KERN_INFO "audio%d at %pK (irq %d) is DBRI(%c)+CS4215(%d)\n",
 	       dev, dbri->regs,
 	       dbri->irq, op->dev.of_node->name[9], dbri->mm.version);
 	dev++;

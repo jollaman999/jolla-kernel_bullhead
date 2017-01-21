@@ -117,7 +117,7 @@ static void irda_disconnect_indication(void *instance, void *sap,
 
 	self = instance;
 
-	IRDA_DEBUG(2, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(2, "%s(%pK)\n", __func__, self);
 
 	/* Don't care about it, but let's not leak it */
 	if(skb)
@@ -125,7 +125,7 @@ static void irda_disconnect_indication(void *instance, void *sap,
 
 	sk = instance;
 	if (sk == NULL) {
-		IRDA_DEBUG(0, "%s(%p) : BUG : sk is NULL\n",
+		IRDA_DEBUG(0, "%s(%pK) : BUG : sk is NULL\n",
 			   __func__, self);
 		return;
 	}
@@ -182,7 +182,7 @@ static void irda_connect_confirm(void *instance, void *sap,
 
 	self = instance;
 
-	IRDA_DEBUG(2, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(2, "%s(%pK)\n", __func__, self);
 
 	sk = instance;
 	if (sk == NULL) {
@@ -246,7 +246,7 @@ static void irda_connect_indication(void *instance, void *sap,
 
 	self = instance;
 
-	IRDA_DEBUG(2, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(2, "%s(%pK)\n", __func__, self);
 
 	sk = instance;
 	if (sk == NULL) {
@@ -374,7 +374,7 @@ static void irda_getvalue_confirm(int result, __u16 obj_id,
 		return;
 	}
 
-	IRDA_DEBUG(2, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(2, "%s(%pK)\n", __func__, self);
 
 	/* We probably don't need to make any more queries */
 	iriap_close(self->iriap);
@@ -540,7 +540,7 @@ static int irda_open_lsap(struct irda_sock *self, int pid)
  */
 static int irda_find_lsap_sel(struct irda_sock *self, char *name)
 {
-	IRDA_DEBUG(2, "%s(%p, %s)\n", __func__, self, name);
+	IRDA_DEBUG(2, "%s(%pK, %s)\n", __func__, self, name);
 
 	if (self->iriap) {
 		IRDA_WARNING("%s(): busy with a previous query\n",
@@ -782,7 +782,7 @@ static int irda_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 	struct irda_sock *self = irda_sk(sk);
 	int err;
 
-	IRDA_DEBUG(2, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(2, "%s(%pK)\n", __func__, self);
 
 	if (addr_len != sizeof(struct sockaddr_irda))
 		return -EINVAL;
@@ -974,7 +974,7 @@ static int irda_connect(struct socket *sock, struct sockaddr *uaddr,
 	struct irda_sock *self = irda_sk(sk);
 	int err;
 
-	IRDA_DEBUG(2, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(2, "%s(%pK)\n", __func__, self);
 
 	lock_sock(sk);
 	/* Don't allow connect for Ultra sockets */
@@ -1133,7 +1133,7 @@ static int irda_create(struct net *net, struct socket *sock, int protocol,
 		return -ENOMEM;
 
 	self = irda_sk(sk);
-	IRDA_DEBUG(2, "%s() : self is %p\n", __func__, self);
+	IRDA_DEBUG(2, "%s() : self is %pK\n", __func__, self);
 
 	init_waitqueue_head(&self->query_wait);
 
@@ -1195,7 +1195,7 @@ static int irda_create(struct net *net, struct socket *sock, int protocol,
  */
 static void irda_destroy_socket(struct irda_sock *self)
 {
-	IRDA_DEBUG(2, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(2, "%s(%pK)\n", __func__, self);
 
 	/* Unregister with IrLMP */
 	irlmp_unregister_client(self->ckey);
@@ -1737,7 +1737,7 @@ static int irda_shutdown(struct socket *sock, int how)
 	struct sock *sk = sock->sk;
 	struct irda_sock *self = irda_sk(sk);
 
-	IRDA_DEBUG(1, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(1, "%s(%pK)\n", __func__, self);
 
 	lock_sock(sk);
 
@@ -1914,7 +1914,7 @@ static int irda_setsockopt(struct socket *sock, int level, int optname,
 	struct ias_attrib *	ias_attr;	/* Attribute in IAS object */
 	int opt, free_ias = 0, err = 0;
 
-	IRDA_DEBUG(2, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(2, "%s(%pK)\n", __func__, self);
 
 	if (level != SOL_IRLMP)
 		return -ENOPROTOOPT;
@@ -2270,7 +2270,7 @@ static int irda_getsockopt(struct socket *sock, int level, int optname,
 	int err = 0;
 	int offset, total;
 
-	IRDA_DEBUG(2, "%s(%p)\n", __func__, self);
+	IRDA_DEBUG(2, "%s(%pK)\n", __func__, self);
 
 	if (level != SOL_IRLMP)
 		return -ENOPROTOOPT;

@@ -233,7 +233,7 @@ int tulip_poll(struct napi_struct *napi, int budget)
                                        if (tp->rx_buffers[entry].mapping !=
                                            le32_to_cpu(tp->rx_ring[entry].buffer1)) {
                                                dev_err(&dev->dev,
-						       "Internal fault: The skbuff addresses do not match in tulip_rx: %08x vs. %08llx %p / %p\n",
+						       "Internal fault: The skbuff addresses do not match in tulip_rx: %08x vs. %08llx %pK / %pK\n",
 						       le32_to_cpu(tp->rx_ring[entry].buffer1),
 						       (unsigned long long)tp->rx_buffers[entry].mapping,
 						       skb->head, temp);
@@ -459,7 +459,7 @@ static int tulip_rx(struct net_device *dev)
 				if (tp->rx_buffers[entry].mapping !=
 				    le32_to_cpu(tp->rx_ring[entry].buffer1)) {
 					dev_err(&dev->dev,
-						"Internal fault: The skbuff addresses do not match in tulip_rx: %08x vs. %Lx %p / %p\n",
+						"Internal fault: The skbuff addresses do not match in tulip_rx: %08x vs. %Lx %pK / %pK\n",
 						le32_to_cpu(tp->rx_ring[entry].buffer1),
 						(long long)tp->rx_buffers[entry].mapping,
 						skb->head, temp);

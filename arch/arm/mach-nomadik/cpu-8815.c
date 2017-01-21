@@ -180,7 +180,7 @@ static void __init cpu8815_timer_init_of(void)
 		return;
 	irq = irq_of_parse_and_map(mtu, 0);
 
-	pr_info("Remapped MTU @ %p, irq: %d\n", base, irq);
+	pr_info("Remapped MTU @ %pK, irq: %d\n", base, irq);
 
 	/* Configure timer sources in "system reset controller" ctrl reg */
 	src_cr = readl(base);

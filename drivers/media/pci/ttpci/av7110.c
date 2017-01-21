@@ -222,7 +222,7 @@ static void init_av7110_av(struct av7110 *av7110)
 
 static void recover_arm(struct av7110 *av7110)
 {
-	dprintk(4, "%p\n",av7110);
+	dprintk(4, "%pK\n",av7110);
 
 	av7110_bootarm(av7110);
 	msleep(100);
@@ -254,7 +254,7 @@ static int arm_thread(void *data)
 	u16 newloops = 0;
 	int timeout;
 
-	dprintk(4, "%p\n",av7110);
+	dprintk(4, "%pK\n",av7110);
 
 	for (;;) {
 		timeout = wait_event_interruptible_timeout(av7110->arm_wait,
@@ -713,7 +713,7 @@ static int dvb_osd_ioctl(struct file *file,
 	struct dvb_device *dvbdev = file->private_data;
 	struct av7110 *av7110 = dvbdev->priv;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (cmd == OSD_SEND_CMD)
 		return av7110_osd_cmd(av7110, (osd_cmd_t *) parg);
@@ -747,7 +747,7 @@ static inline int SetPIDs(struct av7110 *av7110, u16 vpid, u16 apid, u16 ttpid,
 {
 	u16 aflags = 0;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (vpid == 0x1fff || apid == 0x1fff ||
 	    ttpid == 0x1fff || subpid == 0x1fff || pcrpid == 0x1fff) {
@@ -769,7 +769,7 @@ int ChangePIDs(struct av7110 *av7110, u16 vpid, u16 apid, u16 ttpid,
 		u16 subpid, u16 pcrpid)
 {
 	int ret = 0;
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (mutex_lock_interruptible(&av7110->pid_mutex))
 		return -ERESTARTSYS;
@@ -809,7 +809,7 @@ static int StartHWFilter(struct dvb_demux_filter *dvbdmxfilter)
 //	u16 mode = 0x0320;
 	u16 mode = 0xb96a;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (av7110->full_ts)
 		return 0;
@@ -860,7 +860,7 @@ static int StopHWFilter(struct dvb_demux_filter *dvbdmxfilter)
 	int ret;
 	u16 handle;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (av7110->full_ts)
 		return 0;
@@ -898,7 +898,7 @@ static int dvb_feed_start_pid(struct dvb_demux_feed *dvbdmxfeed)
 	int i;
 	int ret = 0;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	npids[0] = npids[1] = npids[2] = npids[3] = npids[4] = 0xffff;
 	i = dvbdmxfeed->pes_type;
@@ -942,7 +942,7 @@ static int dvb_feed_stop_pid(struct dvb_demux_feed *dvbdmxfeed)
 
 	int ret = 0;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (dvbdmxfeed->pes_type <= 1) {
 		ret = av7110_av_stop(av7110, dvbdmxfeed->pes_type ?  RP_VIDEO : RP_AUDIO);
@@ -980,7 +980,7 @@ static int av7110_start_feed(struct dvb_demux_feed *feed)
 	struct av7110 *av7110 = demux->priv;
 	int ret = 0;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (!demux->dmx.frontend)
 		return -EINVAL;
@@ -1047,7 +1047,7 @@ static int av7110_stop_feed(struct dvb_demux_feed *feed)
 	struct dvb_demux *demux = feed->demux;
 	struct av7110 *av7110 = demux->priv;
 	int i, rc, ret = 0;
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (feed->type == DMX_TYPE_TS) {
 		if (feed->ts_type & TS_DECODER) {
@@ -1098,7 +1098,7 @@ static void restart_feeds(struct av7110 *av7110)
 	int feeding;
 	int i, j;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	mode = av7110->playing;
 	av7110->playing = 0;
@@ -1144,7 +1144,7 @@ static int dvb_get_stc(struct dmx_demux *demux, unsigned int num,
 	BUG_ON(!dvbdemux);
 	av7110 = dvbdemux->priv;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (num != 0)
 		return -EINVAL;
@@ -1207,7 +1207,7 @@ static int av7110_diseqc_send_burst(struct dvb_frontend* fe,
 /* simplified code from budget-core.c */
 static int stop_ts_capture(struct av7110 *budget)
 {
-	dprintk(2, "budget: %p\n", budget);
+	dprintk(2, "budget: %pK\n", budget);
 
 	if (--budget->feeding1)
 		return budget->feeding1;
@@ -1219,7 +1219,7 @@ static int stop_ts_capture(struct av7110 *budget)
 
 static int start_ts_capture(struct av7110 *budget)
 {
-	dprintk(2, "budget: %p\n", budget);
+	dprintk(2, "budget: %pK\n", budget);
 
 	if (budget->feeding1)
 		return ++budget->feeding1;
@@ -1237,7 +1237,7 @@ static int budget_start_feed(struct dvb_demux_feed *feed)
 	struct av7110 *budget = demux->priv;
 	int status;
 
-	dprintk(2, "av7110: %p\n", budget);
+	dprintk(2, "av7110: %pK\n", budget);
 
 	spin_lock(&budget->feedlock1);
 	feed->pusi_seen = 0; /* have a clean section start */
@@ -1252,7 +1252,7 @@ static int budget_stop_feed(struct dvb_demux_feed *feed)
 	struct av7110 *budget = demux->priv;
 	int status;
 
-	dprintk(2, "budget: %p\n", budget);
+	dprintk(2, "budget: %pK\n", budget);
 
 	spin_lock(&budget->feedlock1);
 	status = stop_ts_capture(budget);
@@ -1305,7 +1305,7 @@ static int av7110_register(struct av7110 *av7110)
 	struct dvb_demux *dvbdemux = &av7110->demux;
 	struct dvb_demux *dvbdemux1 = &av7110->demux1;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (av7110->registered)
 		return -1;
@@ -1398,7 +1398,7 @@ static void dvb_unregister(struct av7110 *av7110)
 	struct dvb_demux *dvbdemux = &av7110->demux;
 	struct dvb_demux *dvbdemux1 = &av7110->demux1;
 
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 	if (!av7110->registered)
 		return;
@@ -2376,7 +2376,7 @@ static int av7110_attach(struct saa7146_dev* dev,
 	struct task_struct *thread;
 	int ret, count = 0;
 
-	dprintk(4, "dev: %p\n", dev);
+	dprintk(4, "dev: %pK\n", dev);
 
 	/* Set RPS_IRQ to 1 to track rps1 activity.
 	 * Enabling this won't send any interrupt to PC CPU.
@@ -2766,7 +2766,7 @@ err_kfree_0:
 static int av7110_detach(struct saa7146_dev* saa)
 {
 	struct av7110 *av7110 = saa->ext_priv;
-	dprintk(4, "%p\n", av7110);
+	dprintk(4, "%pK\n", av7110);
 
 #if IS_ENABLED(CONFIG_INPUT_EVDEV)
 	av7110_ir_exit(av7110);

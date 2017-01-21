@@ -350,14 +350,14 @@ static int ipath_tid_update(struct ipath_portdata *pd, struct file *fp,
 				   dd->ipath_rcvtidbase +
 				   porttid * sizeof(*tidbase));
 
-	ipath_cdbg(VERBOSE, "Port%u %u tids, cursor %u, tidbase %p\n",
+	ipath_cdbg(VERBOSE, "Port%u %u tids, cursor %u, tidbase %pK\n",
 		   pd->port_port, cnt, tid, tidbase);
 
 	/* virtual address of first page in transfer */
 	vaddr = ti->tidvaddr;
 	if (!access_ok(VERIFY_WRITE, (void __user *) vaddr,
 		       cnt * PAGE_SIZE)) {
-		ipath_dbg("Fail vaddr %p, %u pages, !access_ok\n",
+		ipath_dbg("Fail vaddr %pK, %u pages, !access_ok\n",
 			  (void *)vaddr, cnt);
 		ret = -EFAULT;
 		goto done;
@@ -365,7 +365,7 @@ static int ipath_tid_update(struct ipath_portdata *pd, struct file *fp,
 	ret = ipath_get_user_pages(vaddr, cnt, pagep);
 	if (ret) {
 		if (ret == -EBUSY) {
-			ipath_dbg("Failed to lock addr %p, %u pages "
+			ipath_dbg("Failed to lock addr %pK, %u pages "
 				  "(already locked)\n",
 				  (void *) vaddr, cnt);
 			/*
@@ -377,7 +377,7 @@ static int ipath_tid_update(struct ipath_portdata *pd, struct file *fp,
 			ret = 0;
 		} else {
 			dev_info(&dd->pcidev->dev,
-				 "Failed to lock addr %p, %u pages: "
+				 "Failed to lock addr %pK, %u pages: "
 				 "errno %d\n", (void *) vaddr, cnt, -ret);
 			goto done;
 		}
@@ -416,7 +416,7 @@ static int ipath_tid_update(struct ipath_portdata *pd, struct file *fp,
 		physaddr = dd->ipath_physshadow[porttid + tid];
 		ipath_stats.sps_pagelocks++;
 		ipath_cdbg(VERBOSE,
-			   "TID %u, vaddr %lx, physaddr %llx pgp %p\n",
+			   "TID %u, vaddr %lx, physaddr %llx pgp %pK\n",
 			   tid, vaddr, (unsigned long long) physaddr,
 			   pagep[i]);
 		dd->ipath_f_put_tid(dd, &tidbase[tid], RCVHQ_RCV_TYPE_EXPECTED,
@@ -2050,7 +2050,7 @@ static int ipath_close(struct inode *in, struct file *fp)
 	unsigned port;
 	struct pid *pid;
 
-	ipath_cdbg(VERBOSE, "close on dev %lx, private data %p\n",
+	ipath_cdbg(VERBOSE, "close on dev %lx, private data %pK\n",
 		   (long)in->i_rdev, fp->private_data);
 
 	mutex_lock(&ipath_mutex);

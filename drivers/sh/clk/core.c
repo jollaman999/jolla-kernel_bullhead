@@ -242,7 +242,7 @@ void propagate_rate(struct clk *tclk)
 
 static void __clk_disable(struct clk *clk)
 {
-	if (WARN(!clk->usecount, "Trying to disable clock %p with 0 usecount\n",
+	if (WARN(!clk->usecount, "Trying to disable clock %pK with 0 usecount\n",
 		 clk))
 		return;
 
@@ -527,7 +527,7 @@ int clk_set_parent(struct clk *clk, struct clk *parent)
 		if (ret == 0) {
 			if (clk->ops->recalc)
 				clk->rate = clk->ops->recalc(clk);
-			pr_debug("set parent of %p to %p (new rate %ld)\n",
+			pr_debug("set parent of %pK to %pK (new rate %ld)\n",
 				 clk, clk->parent, clk->rate);
 			propagate_rate(clk);
 		}

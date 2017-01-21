@@ -566,7 +566,7 @@ static int grpci1_of_probe(struct platform_device *ofdev)
 
 	priv->regs = regs;
 	priv->irq = irq_of_parse_and_map(ofdev->dev.of_node, 0);
-	dev_info(&ofdev->dev, "host found at 0x%p, irq%d\n", regs, priv->irq);
+	dev_info(&ofdev->dev, "host found at 0x%pK, irq%d\n", regs, priv->irq);
 
 	/* Find PCI Memory, I/O and Configuration Space Windows */
 	priv->pci_area = ofdev->resource[1].start;

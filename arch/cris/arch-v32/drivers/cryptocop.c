@@ -288,7 +288,7 @@ const struct file_operations cryptocop_fops = {
 
 static void free_cdesc(struct cryptocop_dma_desc *cdesc)
 {
-	DEBUG(printk("free_cdesc: cdesc 0x%p, from_pool=%d\n", cdesc, cdesc->from_pool));
+	DEBUG(printk("free_cdesc: cdesc 0x%pK, from_pool=%d\n", cdesc, cdesc->from_pool));
 	kfree(cdesc->free_buf);
 
 	if (cdesc->from_pool) {
@@ -343,7 +343,7 @@ static struct cryptocop_dma_desc *alloc_cdesc(int alloc_flag)
 	cdesc->dma_descr->buf = NULL;
 	cdesc->dma_descr->after = NULL;
 
-	DEBUG_API(printk("alloc_cdesc: return 0x%p, cdesc->dma_descr=0x%p, from_pool=%d\n", cdesc, cdesc->dma_descr, cdesc->from_pool));
+	DEBUG_API(printk("alloc_cdesc: return 0x%pK, cdesc->dma_descr=0x%pK, from_pool=%d\n", cdesc, cdesc->dma_descr, cdesc->from_pool));
 	return cdesc;
 }
 
@@ -650,7 +650,7 @@ static int create_output_descriptors(struct cryptocop_operation *operation, int 
 
 static int append_input_descriptors(struct cryptocop_operation *operation, struct cryptocop_dma_desc **current_in_cdesc, struct cryptocop_dma_desc **current_out_cdesc, struct cryptocop_tfrm_ctx *tc, int alloc_flag)
 {
-	DEBUG(printk("append_input_descriptors, tc=0x%p, unit_no=%d\n", tc, tc->unit_no));
+	DEBUG(printk("append_input_descriptors, tc=0x%pK, unit_no=%d\n", tc, tc->unit_no));
 	if (tc->tcfg) {
 		int                        failed = 0;
 		struct cryptocop_dma_desc  *idescs = NULL;
@@ -658,7 +658,7 @@ static int append_input_descriptors(struct cryptocop_operation *operation, struc
 		if (tc->pad_descs) {
 			DEBUG(printk("append_input_descriptors: append pad descriptors to DMA out list.\n"));
 			while (tc->pad_descs) {
-				DEBUG(printk("append descriptor 0x%p\n", tc->pad_descs));
+				DEBUG(printk("append descriptor 0x%pK\n", tc->pad_descs));
 				(*current_out_cdesc)->next = tc->pad_descs;
 				tc->pad_descs = tc->pad_descs->next;
 				(*current_out_cdesc) = (*current_out_cdesc)->next;
@@ -694,7 +694,7 @@ static int append_input_descriptors(struct cryptocop_operation *operation, struc
 		}
 		DEBUG(printk("append_input_descriptors: append output descriptors to DMA in list.\n"));
 		while (idescs) {
-			DEBUG(printk("append descriptor 0x%p\n", idescs));
+			DEBUG(printk("append descriptor 0x%pK\n", idescs));
 			(*current_in_cdesc)->next = idescs;
 			idescs = idescs->next;
 			(*current_in_cdesc) = (*current_in_cdesc)->next;
@@ -812,7 +812,7 @@ static int cryptocop_setup_dma_list(struct cryptocop_operation *operation, struc
 	(*int_op) = (struct cryptocop_int_operation*)(((unsigned long int)(iop_alloc_ptr + DESCR_ALLOC_PAD + offsetof(struct cryptocop_int_operation, ctx_out)) & ~0x0000001F) - offsetof(struct cryptocop_int_operation, ctx_out));
 	DEBUG(memset((*int_op), 0xff, sizeof(struct cryptocop_int_operation)));
 	(*int_op)->alloc_ptr = iop_alloc_ptr;
-	DEBUG(printk("cryptocop_setup_dma_list: *int_op=0x%p, alloc_ptr=0x%p\n", *int_op, (*int_op)->alloc_ptr));
+	DEBUG(printk("cryptocop_setup_dma_list: *int_op=0x%pK, alloc_ptr=0x%pK\n", *int_op, (*int_op)->alloc_ptr));
 
 	(*int_op)->sid = operation->sid;
 	(*int_op)->cdesc_out = NULL;
@@ -1064,7 +1064,7 @@ static int cryptocop_setup_dma_list(struct cryptocop_operation *operation, struc
 			}
 
 			/* Detect source switch. */
-			DEBUG(printk("cryptocop_setup_dma_list: tc->active=%d tc->unit_no=%d tc->current_src=%d tc->previous_src=%d, tc->curr_src=0x%p, tc->prev_srv=0x%p\n", tc->active, tc->unit_no, tc->current_src, tc->previous_src, tc->curr_src, tc->prev_src));
+			DEBUG(printk("cryptocop_setup_dma_list: tc->active=%d tc->unit_no=%d tc->current_src=%d tc->previous_src=%d, tc->curr_src=0x%pK, tc->prev_srv=0x%pK\n", tc->active, tc->unit_no, tc->current_src, tc->previous_src, tc->curr_src, tc->prev_src));
 			if (tc->active && (tc->current_src != tc->previous_src)) {
 				/* Only allow source switch when both the old source unit and the new one have
 				 * no pending data to process (i.e. the consumed length must be a multiple of the
@@ -1289,10 +1289,10 @@ static int cryptocop_setup_dma_list(struct cryptocop_operation *operation, struc
 		goto error_cleanup;
 	}
 
-	DEBUG(printk("cryptocop_setup_dma_list: int_op=0x%p, *int_op=0x%p\n", int_op, *int_op));
+	DEBUG(printk("cryptocop_setup_dma_list: int_op=0x%pK, *int_op=0x%pK\n", int_op, *int_op));
 	(*int_op)->cdesc_out = out_cdesc_head.next;
 	(*int_op)->cdesc_in = in_cdesc_head.next;
-	DEBUG(printk("cryptocop_setup_dma_list: out_cdesc_head=0x%p in_cdesc_head=0x%p\n", (*int_op)->cdesc_out, (*int_op)->cdesc_in));
+	DEBUG(printk("cryptocop_setup_dma_list: out_cdesc_head=0x%pK in_cdesc_head=0x%pK\n", (*int_op)->cdesc_out, (*int_op)->cdesc_in));
 
 	setup_descr_chain(out_cdesc_head.next);
 	setup_descr_chain(in_cdesc_head.next);
@@ -1366,7 +1366,7 @@ static void delete_internal_operation(struct cryptocop_int_operation *iop)
 	struct cryptocop_dma_desc *cd = iop->cdesc_out;
 	struct cryptocop_dma_desc *next;
 
-	DEBUG(printk("delete_internal_operation: iop=0x%p, alloc_ptr=0x%p\n", iop, ptr));
+	DEBUG(printk("delete_internal_operation: iop=0x%pK, alloc_ptr=0x%pK\n", iop, ptr));
 
 	while (cd) {
 		next = cd->next;
@@ -1624,7 +1624,7 @@ int cryptocop_free_session(cryptocop_session_id sid)
 		list_del(node);
 		pj = list_entry(node, struct cryptocop_prio_job, node);
 		pj->oper->operation_status = -EAGAIN;  /* EAGAIN is not ideal for job/session terminated but it's the best choice I know of. */
-		DEBUG(printk("cryptocop_free_session: pj=0x%p, pj->oper=0x%p, pj->iop=0x%p\n", pj, pj->oper, pj->iop));
+		DEBUG(printk("cryptocop_free_session: pj=0x%pK, pj->oper=0x%pK, pj->iop=0x%pK\n", pj, pj->oper, pj->iop));
 		pj->oper->cb(pj->oper, pj->oper->cb_data);
 		delete_internal_operation(pj->iop);
 		kfree(pj);
@@ -1663,13 +1663,13 @@ static struct cryptocop_transform_ctx *get_transform_ctx(struct cryptocop_sessio
 {
 	struct cryptocop_transform_ctx *tc = sess->tfrm_ctx;
 
-	DEBUG(printk("get_transform_ctx, sess=0x%p, tid=%d\n", sess, tid));
+	DEBUG(printk("get_transform_ctx, sess=0x%pK, tid=%d\n", sess, tid));
 	assert(sess != NULL);
 	while (tc && tc->init.tid != tid){
-		DEBUG(printk("tc=0x%p, tc->next=0x%p\n", tc, tc->next));
+		DEBUG(printk("tc=0x%pK, tc->next=0x%pK\n", tc, tc->next));
 		tc = tc->next;
 	}
-	DEBUG(printk("get_transform_ctx, returning tc=0x%p\n", tc));
+	DEBUG(printk("get_transform_ctx, returning tc=0x%pK\n", tc));
 	return tc;
 }
 
@@ -1836,10 +1836,10 @@ static int cryptocop_job_queue_insert(cryptocop_queue_priority prio, struct cryp
 	struct cryptocop_prio_job     *pj = NULL;
 	unsigned long int             flags;
 
-	DEBUG(printk("cryptocop_job_queue_insert(%d, 0x%p)\n", prio, operation));
+	DEBUG(printk("cryptocop_job_queue_insert(%d, 0x%pK)\n", prio, operation));
 
 	if (!operation || !operation->cb){
-		DEBUG_API(printk("cryptocop_job_queue_insert oper=0x%p, NULL operation or callback\n", operation));
+		DEBUG_API(printk("cryptocop_job_queue_insert oper=0x%pK, NULL operation or callback\n", operation));
 		return -EINVAL;
 	}
 
@@ -1883,7 +1883,7 @@ static void cryptocop_do_tasklet(unsigned long unused)
 			assert(pj->oper != NULL);
 
 			/* Notify consumer of operation completeness. */
-			DEBUG(printk("cryptocop_do_tasklet: callback 0x%p, data 0x%p\n", pj->oper->cb, pj->oper->cb_data));
+			DEBUG(printk("cryptocop_do_tasklet: callback 0x%pK, data 0x%pK\n", pj->oper->cb, pj->oper->cb_data));
 
 			pj->oper->operation_status = 0; /* Job is completed. */
 			pj->oper->cb(pj->oper, pj->oper->cb_data);
@@ -2060,7 +2060,7 @@ static void cryptocop_job_queue_close(void)
 				list_del(node);
 
 				/* Call callback to notify consumer of job removal. */
-				DEBUG(printk("cryptocop_job_queue_close: callback 0x%p, data 0x%p\n", pj->oper->cb, pj->oper->cb_data));
+				DEBUG(printk("cryptocop_job_queue_close: callback 0x%pK, data 0x%pK\n", pj->oper->cb, pj->oper->cb_data));
 				pj->oper->operation_status = -EINTR; /* Job is terminated without completion. */
 				pj->oper->cb(pj->oper, pj->oper->cb_data);
 
@@ -2095,7 +2095,7 @@ static void cryptocop_job_queue_close(void)
 		cryptocop_running_job = NULL;
 
 		/* Call callback to notify consumer of job removal. */
-		DEBUG(printk("cryptocop_job_queue_close: callback 0x%p, data 0x%p\n", pj->oper->cb, pj->oper->cb_data));
+		DEBUG(printk("cryptocop_job_queue_close: callback 0x%pK, data 0x%pK\n", pj->oper->cb, pj->oper->cb_data));
 		pj->oper->operation_status = -EINTR; /* Job is terminated without completion. */
 		pj->oper->cb(pj->oper, pj->oper->cb_data);
 
@@ -2111,7 +2111,7 @@ static void cryptocop_job_queue_close(void)
 		pj = list_entry(node, struct cryptocop_prio_job, node);
 		list_del(node);
 		/* Call callback to notify consumer of job removal. */
-		DEBUG(printk("cryptocop_job_queue_close: callback 0x%p, data 0x%p\n", pj->oper->cb, pj->oper->cb_data));
+		DEBUG(printk("cryptocop_job_queue_close: callback 0x%pK, data 0x%pK\n", pj->oper->cb, pj->oper->cb_data));
 		pj->oper->operation_status = -EINTR; /* Job is terminated without completion. */
 		pj->oper->cb(pj->oper, pj->oper->cb_data);
 
@@ -2220,9 +2220,9 @@ static void cryptocop_start_job(void)
 	}
 	REG_WR(strcop, regi_strcop, rw_cfg, rw_cfg);
 
-	DEBUG(printk("cryptocop_start_job: starting DMA, new cryptocop_running_job=0x%p\n"
-		     "ctx_in: 0x%p, phys: 0x%p\n"
-		     "ctx_out: 0x%p, phys: 0x%p\n",
+	DEBUG(printk("cryptocop_start_job: starting DMA, new cryptocop_running_job=0x%pK\n"
+		     "ctx_in: 0x%pK, phys: 0x%pK\n"
+		     "ctx_out: 0x%pK, phys: 0x%pK\n",
 		     pj,
 		     &pj->iop->ctx_in, (char*)virt_to_phys(&pj->iop->ctx_in),
 		     &pj->iop->ctx_out, (char*)virt_to_phys(&pj->iop->ctx_out)));
@@ -2248,10 +2248,10 @@ static int cryptocop_job_setup(struct cryptocop_prio_job **pj, struct cryptocop_
 	*pj = kmalloc(sizeof (struct cryptocop_prio_job), alloc_flag);
 	if (!*pj) return -ENOMEM;
 
-	DEBUG(printk("cryptocop_job_setup: operation=0x%p\n", operation));
+	DEBUG(printk("cryptocop_job_setup: operation=0x%pK\n", operation));
 
 	(*pj)->oper = operation;
-	DEBUG(printk("cryptocop_job_setup, cb=0x%p cb_data=0x%p\n",  (*pj)->oper->cb, (*pj)->oper->cb_data));
+	DEBUG(printk("cryptocop_job_setup, cb=0x%pK cb_data=0x%pK\n",  (*pj)->oper->cb, (*pj)->oper->cb_data));
 
 	if (operation->use_dmalists) {
 		DEBUG(print_user_dma_lists(&operation->list_op));
@@ -2370,7 +2370,7 @@ static void ioctl_process_job_callback(struct cryptocop_operation *op, void*cb_d
 {
 	struct ioctl_job_cb_ctx *jc = (struct ioctl_job_cb_ctx *)cb_data;
 
-	DEBUG(printk("ioctl_process_job_callback: op=0x%p, cb_data=0x%p\n", op, cb_data));
+	DEBUG(printk("ioctl_process_job_callback: op=0x%pK, cb_data=0x%pK\n", op, cb_data));
 
 	jc->processed = 1;
 	wake_up(&cryptocop_ioc_process_wq);
@@ -2891,7 +2891,7 @@ static int cryptocop_ioctl_process(struct inode *inode, struct file *filp, unsig
 	cop->sid = oper.ses_id;
 	cop->tfrm_op.desc = &descs[0];
 
-	DEBUG(printk("cryptocop_ioctl_process: inserting job, cb_data=0x%p\n", cop->cb_data));
+	DEBUG(printk("cryptocop_ioctl_process: inserting job, cb_data=0x%pK\n", cop->cb_data));
 
 	if ((err = cryptocop_job_queue_insert_user_job(cop)) != 0) {
 		DEBUG_API(printk("cryptocop_ioctl_process: insert job %d\n", err));
@@ -3157,23 +3157,23 @@ static void print_dma_descriptors(struct cryptocop_int_operation *iop)
 	printk("iop:\n");
 	printk("\tsid: 0x%lld\n", iop->sid);
 
-	printk("\tcdesc_out: 0x%p\n", iop->cdesc_out);
-	printk("\tcdesc_in: 0x%p\n", iop->cdesc_in);
-	printk("\tddesc_out: 0x%p\n", iop->ddesc_out);
-	printk("\tddesc_in: 0x%p\n", iop->ddesc_in);
+	printk("\tcdesc_out: 0x%pK\n", iop->cdesc_out);
+	printk("\tcdesc_in: 0x%pK\n", iop->cdesc_in);
+	printk("\tddesc_out: 0x%pK\n", iop->ddesc_out);
+	printk("\tddesc_in: 0x%pK\n", iop->ddesc_in);
 
-	printk("\niop->ctx_out: 0x%p phys: 0x%p\n", &iop->ctx_out, (char*)virt_to_phys(&iop->ctx_out));
-	printk("\tnext: 0x%p\n"
-	       "\tsaved_data: 0x%p\n"
-	       "\tsaved_data_buf: 0x%p\n",
+	printk("\niop->ctx_out: 0x%pK phys: 0x%pK\n", &iop->ctx_out, (char*)virt_to_phys(&iop->ctx_out));
+	printk("\tnext: 0x%pK\n"
+	       "\tsaved_data: 0x%pK\n"
+	       "\tsaved_data_buf: 0x%pK\n",
 	       iop->ctx_out.next,
 	       iop->ctx_out.saved_data,
 	       iop->ctx_out.saved_data_buf);
 
-	printk("\niop->ctx_in: 0x%p phys: 0x%p\n", &iop->ctx_in, (char*)virt_to_phys(&iop->ctx_in));
-	printk("\tnext: 0x%p\n"
-	       "\tsaved_data: 0x%p\n"
-	       "\tsaved_data_buf: 0x%p\n",
+	printk("\niop->ctx_in: 0x%pK phys: 0x%pK\n", &iop->ctx_in, (char*)virt_to_phys(&iop->ctx_in));
+	printk("\tnext: 0x%pK\n"
+	       "\tsaved_data: 0x%pK\n"
+	       "\tsaved_data_buf: 0x%pK\n",
 	       iop->ctx_in.next,
 	       iop->ctx_in.saved_data,
 	       iop->ctx_in.saved_data_buf);
@@ -3181,13 +3181,13 @@ static void print_dma_descriptors(struct cryptocop_int_operation *iop)
 	i = 0;
 	while (cdesc_out) {
 		dma_descr_data *td;
-		printk("cdesc_out %d, desc=0x%p\n", i, cdesc_out->dma_descr);
-		printk("\n\tvirt_to_phys(desc): 0x%p\n", (char*)virt_to_phys(cdesc_out->dma_descr));
+		printk("cdesc_out %d, desc=0x%pK\n", i, cdesc_out->dma_descr);
+		printk("\n\tvirt_to_phys(desc): 0x%pK\n", (char*)virt_to_phys(cdesc_out->dma_descr));
 		td = cdesc_out->dma_descr;
-		printk("\n\tbuf: 0x%p\n"
-		       "\tafter: 0x%p\n"
+		printk("\n\tbuf: 0x%pK\n"
+		       "\tafter: 0x%pK\n"
 		       "\tmd: 0x%04x\n"
-		       "\tnext: 0x%p\n",
+		       "\tnext: 0x%pK\n",
 		       td->buf,
 		       td->after,
 		       td->md,
@@ -3209,13 +3209,13 @@ static void print_dma_descriptors(struct cryptocop_int_operation *iop)
 	i = 0;
 	while (cdesc_in) {
 		dma_descr_data *td;
-		printk("cdesc_in %d, desc=0x%p\n", i, cdesc_in->dma_descr);
-		printk("\n\tvirt_to_phys(desc): 0x%p\n", (char*)virt_to_phys(cdesc_in->dma_descr));
+		printk("cdesc_in %d, desc=0x%pK\n", i, cdesc_in->dma_descr);
+		printk("\n\tvirt_to_phys(desc): 0x%pK\n", (char*)virt_to_phys(cdesc_in->dma_descr));
 		td = cdesc_in->dma_descr;
-		printk("\n\tbuf: 0x%p\n"
-		       "\tafter: 0x%p\n"
+		printk("\n\tbuf: 0x%pK\n"
+		       "\tafter: 0x%pK\n"
 		       "\tmd: 0x%04x\n"
-		       "\tnext: 0x%p\n",
+		       "\tnext: 0x%pK\n",
 		       td->buf,
 		       td->after,
 		       td->md,
@@ -3241,17 +3241,17 @@ static void print_dma_descriptors(struct cryptocop_int_operation *iop)
 
 static void print_strcop_crypto_op(struct strcop_crypto_op *cop)
 {
-	printk("print_strcop_crypto_op, 0x%p\n", cop);
+	printk("print_strcop_crypto_op, 0x%pK\n", cop);
 
 	/* Indata. */
-	printk("indata=0x%p\n"
+	printk("indata=0x%pK\n"
 	       "inlen=%d\n"
 	       "do_cipher=%d\n"
 	       "decrypt=%d\n"
 	       "cipher_explicit=%d\n"
 	       "cipher_start=%d\n"
 	       "cipher_len=%d\n"
-	       "outdata=0x%p\n"
+	       "outdata=0x%pK\n"
 	       "outlen=%d\n",
 	       cop->indata,
 	       cop->inlen,
@@ -3285,7 +3285,7 @@ static void print_cryptocop_operation(struct cryptocop_operation *cop)
 	struct cryptocop_desc_cfg  *dc;
 	int                        i;
 
-	printk("print_cryptocop_operation, cop=0x%p\n\n", cop);
+	printk("print_cryptocop_operation, cop=0x%pK\n\n", cop);
 	printk("sid: %lld\n", cop->sid);
 	printk("operation_status=%d\n"
 	       "use_dmalists=%d\n"
@@ -3300,12 +3300,12 @@ static void print_cryptocop_operation(struct cryptocop_operation *cop)
 		print_user_dma_lists(&cop->list_op);
 	} else {
 		printk("cop->tfrm_op\n"
-		       "tfrm_cfg=0x%p\n"
-		       "desc=0x%p\n"
-		       "indata=0x%p\n"
+		       "tfrm_cfg=0x%pK\n"
+		       "desc=0x%pK\n"
+		       "indata=0x%pK\n"
 		       "incount=%d\n"
 		       "inlen=%d\n"
-		       "outdata=0x%p\n"
+		       "outdata=0x%pK\n"
 		       "outcount=%d\n"
 		       "outlen=%d\n\n",
 		       cop->tfrm_op.tfrm_cfg,
@@ -3319,11 +3319,11 @@ static void print_cryptocop_operation(struct cryptocop_operation *cop)
 
 		tc = cop->tfrm_op.tfrm_cfg;
 		while (tc){
-			printk("tfrm_cfg, 0x%p\n"
+			printk("tfrm_cfg, 0x%pK\n"
 			       "tid=%d\n"
 			       "flags=%d\n"
 			       "inject_ix=%d\n"
-			       "next=0x%p\n",
+			       "next=0x%pK\n",
 			       tc,
 			       tc->tid,
 			       tc->flags,
@@ -3333,21 +3333,21 @@ static void print_cryptocop_operation(struct cryptocop_operation *cop)
 		}
 		d = cop->tfrm_op.desc;
 		while (d){
-			printk("\n======================desc, 0x%p\n"
+			printk("\n======================desc, 0x%pK\n"
 			       "length=%d\n"
-			       "cfg=0x%p\n"
-			       "next=0x%p\n",
+			       "cfg=0x%pK\n"
+			       "next=0x%pK\n",
 			       d,
 			       d->length,
 			       d->cfg,
 			       d->next);
 			dc = d->cfg;
 			while (dc){
-				printk("=========desc_cfg, 0x%p\n"
+				printk("=========desc_cfg, 0x%pK\n"
 				       "tid=%d\n"
 				       "src=%d\n"
 				       "last=%d\n"
-				       "next=0x%p\n",
+				       "next=0x%pK\n",
 				       dc,
 				       dc->tid,
 				       dc->src,
@@ -3360,7 +3360,7 @@ static void print_cryptocop_operation(struct cryptocop_operation *cop)
 		printk("\n====iniov\n");
 		for (i = 0; i < cop->tfrm_op.incount; i++){
 			printk("indata[%d]\n"
-			       "base=0x%p\n"
+			       "base=0x%pK\n"
 			       "len=%d\n",
 			       i,
 			       cop->tfrm_op.indata[i].iov_base,
@@ -3369,7 +3369,7 @@ static void print_cryptocop_operation(struct cryptocop_operation *cop)
 		printk("\n====outiov\n");
 		for (i = 0; i < cop->tfrm_op.outcount; i++){
 			printk("outdata[%d]\n"
-			       "base=0x%p\n"
+			       "base=0x%pK\n"
 			       "len=%d\n",
 			       i,
 			       cop->tfrm_op.outdata[i].iov_base,
@@ -3385,20 +3385,20 @@ static void print_user_dma_lists(struct cryptocop_dma_list_operation *dma_op)
 	dma_descr_data *dd;
 	int i;
 
-	printk("print_user_dma_lists, dma_op=0x%p\n", dma_op);
+	printk("print_user_dma_lists, dma_op=0x%pK\n", dma_op);
 
-	printk("out_data_buf = 0x%p, phys_to_virt(out_data_buf) = 0x%p\n", dma_op->out_data_buf, phys_to_virt((unsigned long int)dma_op->out_data_buf));
-	printk("in_data_buf = 0x%p, phys_to_virt(in_data_buf) = 0x%p\n", dma_op->in_data_buf, phys_to_virt((unsigned long int)dma_op->in_data_buf));
+	printk("out_data_buf = 0x%pK, phys_to_virt(out_data_buf) = 0x%pK\n", dma_op->out_data_buf, phys_to_virt((unsigned long int)dma_op->out_data_buf));
+	printk("in_data_buf = 0x%pK, phys_to_virt(in_data_buf) = 0x%pK\n", dma_op->in_data_buf, phys_to_virt((unsigned long int)dma_op->in_data_buf));
 
 	printk("##############outlist\n");
 	dd = phys_to_virt((unsigned long int)dma_op->outlist);
 	i = 0;
 	while (dd != NULL) {
-		printk("#%d phys_to_virt(desc) 0x%p\n", i, dd);
-		printk("\n\tbuf: 0x%p\n"
-		       "\tafter: 0x%p\n"
+		printk("#%d phys_to_virt(desc) 0x%pK\n", i, dd);
+		printk("\n\tbuf: 0x%pK\n"
+		       "\tafter: 0x%pK\n"
 		       "\tmd: 0x%04x\n"
-		       "\tnext: 0x%p\n",
+		       "\tnext: 0x%pK\n",
 		       dd->buf,
 		       dd->after,
 		       dd->md,
@@ -3425,11 +3425,11 @@ static void print_user_dma_lists(struct cryptocop_dma_list_operation *dma_op)
 	dd = phys_to_virt((unsigned long int)dma_op->inlist);
 	i = 0;
 	while (dd != NULL) {
-		printk("#%d phys_to_virt(desc) 0x%p\n", i, dd);
-		printk("\n\tbuf: 0x%p\n"
-		       "\tafter: 0x%p\n"
+		printk("#%d phys_to_virt(desc) 0x%pK\n", i, dd);
+		printk("\n\tbuf: 0x%pK\n"
+		       "\tafter: 0x%pK\n"
 		       "\tmd: 0x%04x\n"
-		       "\tnext: 0x%p\n",
+		       "\tnext: 0x%pK\n",
 		       dd->buf,
 		       dd->after,
 		       dd->md,

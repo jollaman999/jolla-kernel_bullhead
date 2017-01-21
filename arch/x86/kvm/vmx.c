@@ -1112,7 +1112,7 @@ static void vmcs_clear(struct vmcs *vmcs)
 		      : "=qm"(error) : "a"(&phys_addr), "m"(phys_addr)
 		      : "cc", "memory");
 	if (error)
-		printk(KERN_ERR "kvm: vmclear fail: %p/%llx\n",
+		printk(KERN_ERR "kvm: vmclear fail: %pK/%llx\n",
 		       vmcs, phys_addr);
 }
 
@@ -1132,7 +1132,7 @@ static void vmcs_load(struct vmcs *vmcs)
 			: "=qm"(error) : "a"(&phys_addr), "m"(phys_addr)
 			: "cc", "memory");
 	if (error)
-		printk(KERN_ERR "kvm: vmptrld %p/%llx failed\n",
+		printk(KERN_ERR "kvm: vmptrld %pK/%llx failed\n",
 		       vmcs, phys_addr);
 }
 

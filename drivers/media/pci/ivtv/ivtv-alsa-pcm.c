@@ -81,7 +81,7 @@ static void ivtv_alsa_announce_pcm_data(struct snd_ivtv_card *itvsc,
 	int period_elapsed = 0;
 	int length;
 
-	dprintk("ivtv alsa announce ptr=%p data=%p num_bytes=%zd\n", itvsc,
+	dprintk("ivtv alsa announce ptr=%pK data=%pK num_bytes=%zd\n", itvsc,
 		pcm_data, num_bytes);
 
 	substream = itvsc->capture_pcm_substream;

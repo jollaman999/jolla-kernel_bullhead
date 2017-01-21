@@ -189,7 +189,7 @@ static int stub_send_ret_submit(struct stub_device *sdev)
 
 		/* 1. setup usbip_header */
 		setup_ret_submit_pdu(&pdu_header, urb);
-		usbip_dbg_stub_tx("setup txdata seqnum: %d urb: %p\n",
+		usbip_dbg_stub_tx("setup txdata seqnum: %d urb: %pK\n",
 				  pdu_header.base.seqnum, urb);
 		usbip_header_correct_endian(&pdu_header, 1);
 

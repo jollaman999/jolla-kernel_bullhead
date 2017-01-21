@@ -1377,7 +1377,7 @@ _sys_packet_req(unifi_priv_t *priv, const CSR_SIGNAL *signal,
 
     subs = &priv->sme_unidata_ind_filters[subscriptionHandle];
     unifi_trace(priv, UDBG1,
-                "_sys_packet_req: handle=%d, subs=%p, encap=%d\n",
+                "_sys_packet_req: handle=%d, subs=%pK, encap=%d\n",
                 subscriptionHandle, subs, subs->encapsulation);
 
     csrResult = unifi_net_data_malloc(priv, &bulkdata.d[0], frameLength);

@@ -195,10 +195,10 @@ static int nsp_queuecommand_lck(struct scsi_cmnd *SCpnt,
 	nsp_hw_data *data = (nsp_hw_data *)SCpnt->device->host->hostdata;
 
 	nsp_dbg(NSP_DEBUG_QUEUECOMMAND,
-		"SCpnt=0x%p target=%d lun=%d sglist=0x%p bufflen=%d sg_count=%d",
+		"SCpnt=0x%pK target=%d lun=%d sglist=0x%pK bufflen=%d sg_count=%d",
 		SCpnt, target, SCpnt->device->lun, scsi_sglist(SCpnt),
 		scsi_bufflen(SCpnt), scsi_sg_count(SCpnt));
-	//nsp_dbg(NSP_DEBUG_QUEUECOMMAND, "before CurrentSC=0x%p", data->CurrentSC);
+	//nsp_dbg(NSP_DEBUG_QUEUECOMMAND, "before CurrentSC=0x%pK", data->CurrentSC);
 
 	SCpnt->scsi_done	= done;
 
@@ -506,7 +506,7 @@ static void nsp_start_timer(struct scsi_cmnd *SCpnt, int time)
 	unsigned int base = SCpnt->device->host->io_port;
 	nsp_hw_data *data = (nsp_hw_data *)SCpnt->device->host->hostdata;
 
-	//nsp_dbg(NSP_DEBUG_INTR, "in SCpnt=0x%p, time=%d", SCpnt, time);
+	//nsp_dbg(NSP_DEBUG_INTR, "in SCpnt=0x%pK, time=%d", SCpnt, time);
 	data->TimerCount = time;
 	nsp_index_write(base, TIMERCOUNT, time);
 }
@@ -726,7 +726,7 @@ static void nsp_pio_read(struct scsi_cmnd *SCpnt)
 
 	ocount = data->FifoCount;
 
-	nsp_dbg(NSP_DEBUG_DATA_IO, "in SCpnt=0x%p resid=%d ocount=%d ptr=0x%p this_residual=%d buffers=0x%p nbuf=%d",
+	nsp_dbg(NSP_DEBUG_DATA_IO, "in SCpnt=0x%pK resid=%d ocount=%d ptr=0x%pK this_residual=%d buffers=0x%pK nbuf=%d",
 		SCpnt, scsi_get_resid(SCpnt), ocount, SCpnt->SCp.ptr,
 		SCpnt->SCp.this_residual, SCpnt->SCp.buffer,
 		SCpnt->SCp.buffers_residual);
@@ -741,7 +741,7 @@ static void nsp_pio_read(struct scsi_cmnd *SCpnt)
 
 
 		res = nsp_fifo_count(SCpnt) - ocount;
-		//nsp_dbg(NSP_DEBUG_DATA_IO, "ptr=0x%p this=0x%x ocount=0x%x res=0x%x", SCpnt->SCp.ptr, SCpnt->SCp.this_residual, ocount, res);
+		//nsp_dbg(NSP_DEBUG_DATA_IO, "ptr=0x%pK this=0x%x ocount=0x%x res=0x%x", SCpnt->SCp.ptr, SCpnt->SCp.this_residual, ocount, res);
 		if (res == 0) { /* if some data available ? */
 			if (stat == BUSPHASE_DATA_IN) { /* phase changed? */
 				//nsp_dbg(NSP_DEBUG_DATA_IO, " wait for data this=%d", SCpnt->SCp.this_residual);
@@ -783,7 +783,7 @@ static void nsp_pio_read(struct scsi_cmnd *SCpnt)
 		SCpnt->SCp.ptr		 += res;
 		SCpnt->SCp.this_residual -= res;
 		ocount			 += res;
-		//nsp_dbg(NSP_DEBUG_DATA_IO, "ptr=0x%p this_residual=0x%x ocount=0x%x", SCpnt->SCp.ptr, SCpnt->SCp.this_residual, ocount);
+		//nsp_dbg(NSP_DEBUG_DATA_IO, "ptr=0x%pK this_residual=0x%x ocount=0x%x", SCpnt->SCp.ptr, SCpnt->SCp.this_residual, ocount);
 
 		/* go to next scatter list if available */
 		if (SCpnt->SCp.this_residual	== 0 &&
@@ -795,7 +795,7 @@ static void nsp_pio_read(struct scsi_cmnd *SCpnt)
 			SCpnt->SCp.this_residual = SCpnt->SCp.buffer->length;
 			time_out = 1000;
 
-			//nsp_dbg(NSP_DEBUG_DATA_IO, "page: 0x%p, off: 0x%x", SCpnt->SCp.buffer->page, SCpnt->SCp.buffer->offset);
+			//nsp_dbg(NSP_DEBUG_DATA_IO, "page: 0x%pK, off: 0x%x", SCpnt->SCp.buffer->page, SCpnt->SCp.buffer->offset);
 		}
 	}
 
@@ -825,7 +825,7 @@ static void nsp_pio_write(struct scsi_cmnd *SCpnt)
 
 	ocount	 = data->FifoCount;
 
-	nsp_dbg(NSP_DEBUG_DATA_IO, "in fifocount=%d ptr=0x%p this_residual=%d buffers=0x%p nbuf=%d resid=0x%x",
+	nsp_dbg(NSP_DEBUG_DATA_IO, "in fifocount=%d ptr=0x%pK this_residual=%d buffers=0x%pK nbuf=%d resid=0x%x",
 		data->FifoCount, SCpnt->SCp.ptr, SCpnt->SCp.this_residual,
 		SCpnt->SCp.buffer, SCpnt->SCp.buffers_residual,
 		scsi_get_resid(SCpnt));
@@ -858,7 +858,7 @@ static void nsp_pio_write(struct scsi_cmnd *SCpnt)
 
 		res = min(SCpnt->SCp.this_residual, WFIFO_CRIT);
 
-		//nsp_dbg(NSP_DEBUG_DATA_IO, "ptr=0x%p this=0x%x res=0x%x", SCpnt->SCp.ptr, SCpnt->SCp.this_residual, res);
+		//nsp_dbg(NSP_DEBUG_DATA_IO, "ptr=0x%pK this=0x%x res=0x%x", SCpnt->SCp.ptr, SCpnt->SCp.this_residual, res);
 		switch (data->TransferMode) {
 		case MODE_IO32:
 			res &= ~(BIT(1)|BIT(0)); /* align 4 */
@@ -919,7 +919,7 @@ static int nsp_nexus(struct scsi_cmnd *SCpnt)
 	nsp_hw_data *data = (nsp_hw_data *)SCpnt->device->host->hostdata;
 	sync_data     *sync   = &(data->Sync[target]);
 
-	//nsp_dbg(NSP_DEBUG_DATA_IO, "in SCpnt=0x%p", SCpnt);
+	//nsp_dbg(NSP_DEBUG_DATA_IO, "in SCpnt=0x%pK", SCpnt);
 
 	/* setup synch transfer registers */
 	nsp_index_write(base, SYNCREG,	sync->SyncRegister);
@@ -964,8 +964,8 @@ static irqreturn_t nspintr(int irq, void *dev_id)
 	nsp_hw_data   *data;
 
 
-	//nsp_dbg(NSP_DEBUG_INTR, "dev_id=0x%p", dev_id);
-	//nsp_dbg(NSP_DEBUG_INTR, "host=0x%p", ((scsi_info_t *)dev_id)->host);
+	//nsp_dbg(NSP_DEBUG_INTR, "dev_id=0x%pK", dev_id);
+	//nsp_dbg(NSP_DEBUG_INTR, "host=0x%pK", ((scsi_info_t *)dev_id)->host);
 
 	if (                dev_id        != NULL &&
 	    ((scsi_info_t *)dev_id)->host != NULL  ) {
@@ -977,7 +977,7 @@ static irqreturn_t nspintr(int irq, void *dev_id)
 		return IRQ_NONE;
 	}
 
-	//nsp_dbg(NSP_DEBUG_INTR, "&nsp_data_base=0x%p, dev_id=0x%p", &nsp_data_base, dev_id);
+	//nsp_dbg(NSP_DEBUG_INTR, "&nsp_data_base=0x%pK, dev_id=0x%pK", &nsp_data_base, dev_id);
 
 	base = data->BaseAddress;
 	//nsp_dbg(NSP_DEBUG_INTR, "base=0x%x", base);
@@ -1405,7 +1405,7 @@ static int nsp_show_info(struct seq_file *m, struct Scsi_Host *host)
 
 
 	spin_lock_irqsave(&(data->Lock), flags);
-	SPRINTF("CurrentSC:             0x%p\n\n",      data->CurrentSC);
+	SPRINTF("CurrentSC:             0x%pK\n\n",      data->CurrentSC);
 	spin_unlock_irqrestore(&(data->Lock), flags);
 
 	SPRINTF("SDTR status\n");
@@ -1455,7 +1455,7 @@ static int nsp_show_info(struct seq_file *m, struct Scsi_Host *host)
 /*
 static int nsp_eh_abort(struct scsi_cmnd *SCpnt)
 {
-	nsp_dbg(NSP_DEBUG_BUSRESET, "SCpnt=0x%p", SCpnt);
+	nsp_dbg(NSP_DEBUG_BUSRESET, "SCpnt=0x%pK", SCpnt);
 
 	return nsp_eh_bus_reset(SCpnt);
 }*/
@@ -1485,7 +1485,7 @@ static int nsp_eh_bus_reset(struct scsi_cmnd *SCpnt)
 {
 	nsp_hw_data *data = (nsp_hw_data *)SCpnt->device->host->hostdata;
 
-	nsp_dbg(NSP_DEBUG_BUSRESET, "SCpnt=0x%p", SCpnt);
+	nsp_dbg(NSP_DEBUG_BUSRESET, "SCpnt=0x%pK", SCpnt);
 
 	return nsp_bus_reset(data);
 }
@@ -1521,18 +1521,18 @@ static int nsp_cs_probe(struct pcmcia_device *link)
 	link->priv = info;
 	data->ScsiInfo = info;
 
-	nsp_dbg(NSP_DEBUG_INIT, "info=0x%p", info);
+	nsp_dbg(NSP_DEBUG_INIT, "info=0x%pK", info);
 
 	ret = nsp_cs_config(link);
 
-	nsp_dbg(NSP_DEBUG_INIT, "link=0x%p", link);
+	nsp_dbg(NSP_DEBUG_INIT, "link=0x%pK", link);
 	return ret;
 } /* nsp_cs_attach */
 
 
 static void nsp_cs_detach(struct pcmcia_device *link)
 {
-	nsp_dbg(NSP_DEBUG_INIT, "in, link=0x%p", link);
+	nsp_dbg(NSP_DEBUG_INIT, "in, link=0x%pK", link);
 
 	((scsi_info_t *)link->priv)->stop = 1;
 	nsp_cs_release(link);
@@ -1663,7 +1663,7 @@ static void nsp_cs_release(struct pcmcia_device *link)
 		data = (nsp_hw_data *)info->host->hostdata;
 	}
 
-	nsp_dbg(NSP_DEBUG_INIT, "link=0x%p", link);
+	nsp_dbg(NSP_DEBUG_INIT, "link=0x%pK", link);
 
 	/* Unlink the device chain */
 	if (info->host != NULL) {

@@ -241,7 +241,7 @@ TRACE_EVENT(host1x_syncpt_wait_check,
 		__entry->min = min;
 	),
 
-	TP_printk("mem_id=%p, offset=%05x, id=%d, thresh=%d, current=%d",
+	TP_printk("mem_id=%pK, offset=%05x, id=%d, thresh=%d, current=%d",
 		__entry->mem_id, __entry->offset,
 		__entry->syncpt_id, __entry->thresh,
 		__entry->min)

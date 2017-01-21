@@ -1218,7 +1218,7 @@ int ft1000_close(struct net_device *net)
 
 	ft1000dev->status |= FT1000_STATUS_CLOSING;
 
-	DEBUG("ft1000_close: pInfo=%p, ft1000dev=%p\n", pInfo, ft1000dev);
+	DEBUG("ft1000_close: pInfo=%pK, ft1000dev=%pK\n", pInfo, ft1000dev);
 	netif_carrier_off(net);
 	netif_stop_queue(net);
 	ft1000dev->status &= ~FT1000_STATUS_CLOSING;

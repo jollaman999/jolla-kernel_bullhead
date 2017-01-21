@@ -404,7 +404,7 @@ static void ftgmac100_rx_drop_packet(struct ftgmac100 *priv)
 	bool done = false;
 
 	if (net_ratelimit())
-		netdev_dbg(netdev, "drop packet %p\n", rxdes);
+		netdev_dbg(netdev, "drop packet %pK\n", rxdes);
 
 	do {
 		if (ftgmac100_rxdes_last_segment(rxdes))
@@ -1289,7 +1289,7 @@ static int ftgmac100_probe(struct platform_device *pdev)
 		goto err_register_netdev;
 	}
 
-	netdev_info(netdev, "irq %d, mapped at %p\n", priv->irq, priv->base);
+	netdev_info(netdev, "irq %d, mapped at %pK\n", priv->irq, priv->base);
 
 	if (!is_valid_ether_addr(netdev->dev_addr)) {
 		eth_hw_addr_random(netdev);

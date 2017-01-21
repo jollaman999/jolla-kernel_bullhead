@@ -430,7 +430,7 @@ static int __init frame_info_init(void)
 	 * thread_saved_pc() and get_wchan() are not reliable.
 	 */
 	if (schedule_mfi.pc_offset < 0)
-		printk("Can't analyze schedule() prologue at %p\n", schedule);
+		printk("Can't analyze schedule() prologue at %pK\n", schedule);
 
 	return 0;
 }

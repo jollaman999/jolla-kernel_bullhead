@@ -1180,7 +1180,7 @@ static int ezusb_program(struct hermes *hw, const char *buf,
 
 	while (ch_addr < (addr + len)) {
 		pr_debug("Programming subblock of length %d "
-			 "to address 0x%08x. Data @ %p\n",
+			 "to address 0x%08x. Data @ %pK\n",
 			 ch_len, ch_addr, &buf[ch_addr - addr]);
 
 		err = ezusb_program_bytes(hw, &buf[ch_addr - addr],

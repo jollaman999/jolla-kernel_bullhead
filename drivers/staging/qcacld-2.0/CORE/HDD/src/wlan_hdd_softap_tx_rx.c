@@ -67,10 +67,10 @@
 #if 0
 static void hdd_softap_dump_sk_buff(struct sk_buff * skb)
 {
-  VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: head = %p ", __func__, skb->head);
-  //VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: data = %p ", __func__, skb->data);
-  VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: tail = %p ", __func__, skb->tail);
-  VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: end = %p ", __func__, skb->end);
+  VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: head = %pK ", __func__, skb->head);
+  //VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: data = %pK ", __func__, skb->data);
+  VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: tail = %pK ", __func__, skb->tail);
+  VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: end = %pK ", __func__, skb->end);
   VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: len = %d ", __func__, skb->len);
   VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: data_len = %d ", __func__, skb->data_len);
   VOS_TRACE( VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,"%s: mac_len = %d", __func__, skb->mac_len);
@@ -1112,7 +1112,7 @@ VOS_STATUS hdd_softap_tx_low_resource_cbk( vos_pkt_t *pVosPacket,
    v_U8_t STAId = WLAN_MAX_STA_COUNT;
 
    if ((pAdapter == NULL) || (WLAN_HDD_ADAPTER_MAGIC != pAdapter->magic)) {
-      hddLog(LOGE, FL("Invalid adapter %p"), pAdapter);
+      hddLog(LOGE, FL("Invalid adapter %pK"), pAdapter);
       return VOS_STATUS_E_FAILURE;
    }
 

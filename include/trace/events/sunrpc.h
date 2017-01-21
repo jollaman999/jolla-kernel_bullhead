@@ -26,7 +26,7 @@ DECLARE_EVENT_CLASS(rpc_task_status,
 		__entry->status = task->tk_status;
 	),
 
-	TP_printk("task:%p@%p, status %d",__entry->task, __entry->clnt, __entry->status)
+	TP_printk("task:%pK@%pK, status %d",__entry->task, __entry->clnt, __entry->status)
 );
 
 DEFINE_EVENT(rpc_task_status, rpc_call_status,
@@ -58,7 +58,7 @@ TRACE_EVENT(rpc_connect_status,
 		__entry->status = status;
 	),
 
-	TP_printk("task:%p@%p, status %d",__entry->task, __entry->clnt, __entry->status)
+	TP_printk("task:%pK@%pK, status %d",__entry->task, __entry->clnt, __entry->status)
 );
 
 DECLARE_EVENT_CLASS(rpc_task_running,
@@ -85,7 +85,7 @@ DECLARE_EVENT_CLASS(rpc_task_running,
 		__entry->flags = task->tk_flags;
 		),
 
-	TP_printk("task:%p@%p flags=%4.4x state=%4.4lx status=%d action=%pf",
+	TP_printk("task:%pK@%pK flags=%4.4x state=%4.4lx status=%d action=%pf",
 		__entry->task,
 		__entry->clnt,
 		__entry->flags,
@@ -145,7 +145,7 @@ DECLARE_EVENT_CLASS(rpc_task_queued,
 		__assign_str(q_name, rpc_qname(q));
 		),
 
-	TP_printk("task:%p@%p flags=%4.4x state=%4.4lx status=%d timeout=%lu queue=%s",
+	TP_printk("task:%pK@%pK flags=%4.4x state=%4.4lx status=%d timeout=%lu queue=%s",
 		__entry->task,
 		__entry->clnt,
 		__entry->flags,

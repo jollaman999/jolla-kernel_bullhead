@@ -238,7 +238,7 @@ static int stub_recv_cmd_unlink(struct stub_device *sdev,
 		if (priv->seqnum != pdu->u.cmd_unlink.seqnum)
 			continue;
 
-		dev_info(&priv->urb->dev->dev, "unlink urb %p\n",
+		dev_info(&priv->urb->dev->dev, "unlink urb %pK\n",
 			 priv->urb);
 
 		/*
@@ -279,7 +279,7 @@ static int stub_recv_cmd_unlink(struct stub_device *sdev,
 		ret = usb_unlink_urb(priv->urb);
 		if (ret != -EINPROGRESS)
 			dev_err(&priv->urb->dev->dev,
-				"failed to unlink a urb %p, ret %d\n",
+				"failed to unlink a urb %pK, ret %d\n",
 				priv->urb, ret);
 
 		return 0;

@@ -2013,7 +2013,7 @@ static int cp_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (rc)
 		goto err_out_iomap;
 
-	netdev_info(dev, "RTL-8139C+ at 0x%p, %pM, IRQ %d\n",
+	netdev_info(dev, "RTL-8139C+ at 0x%pK, %pM, IRQ %d\n",
 		    regs, dev->dev_addr, pdev->irq);
 
 	pci_set_drvdata(pdev, dev);

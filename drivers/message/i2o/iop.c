@@ -120,7 +120,7 @@ u32 i2o_cntxt_list_add(struct i2o_controller * c, void *ptr)
 
 	spin_unlock_irqrestore(&c->context_list_lock, flags);
 
-	osm_debug("%s: Add context to list %p -> %d\n", c->name, ptr, context);
+	osm_debug("%s: Add context to list %pK -> %d\n", c->name, ptr, context);
 
 	return entry->context;
 };
@@ -152,10 +152,10 @@ u32 i2o_cntxt_list_remove(struct i2o_controller * c, void *ptr)
 	spin_unlock_irqrestore(&c->context_list_lock, flags);
 
 	if (!context)
-		osm_warn("%s: Could not remove nonexistent ptr %p\n", c->name,
+		osm_warn("%s: Could not remove nonexistent ptr %pK\n", c->name,
 			 ptr);
 
-	osm_debug("%s: remove ptr from context list %d -> %p\n", c->name,
+	osm_debug("%s: remove ptr from context list %d -> %pK\n", c->name,
 		  context, ptr);
 
 	return context;
@@ -188,7 +188,7 @@ void *i2o_cntxt_list_get(struct i2o_controller *c, u32 context)
 	if (!ptr)
 		osm_warn("%s: context id %d not found\n", c->name, context);
 
-	osm_debug("%s: get ptr from context list %d -> %p\n", c->name, context,
+	osm_debug("%s: get ptr from context list %d -> %pK\n", c->name, context,
 		  ptr);
 
 	return ptr;
@@ -217,10 +217,10 @@ u32 i2o_cntxt_list_get_ptr(struct i2o_controller * c, void *ptr)
 	spin_unlock_irqrestore(&c->context_list_lock, flags);
 
 	if (!context)
-		osm_warn("%s: Could not find nonexistent ptr %p\n", c->name,
+		osm_warn("%s: Could not find nonexistent ptr %pK\n", c->name,
 			 ptr);
 
-	osm_debug("%s: get context id from context list %p -> %d\n", c->name,
+	osm_debug("%s: get context id from context list %pK -> %d\n", c->name,
 		  ptr, context);
 
 	return context;

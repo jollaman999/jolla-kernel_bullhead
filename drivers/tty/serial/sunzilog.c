@@ -1585,7 +1585,7 @@ static int __init sunzilog_init(void)
 		while (up) {
 			struct zilog_channel __iomem *channel;
 
-			/* printk (KERN_INFO "Enable IRQ for ZILOG Hardware %p\n", up); */
+			/* printk (KERN_INFO "Enable IRQ for ZILOG Hardware %pK\n", up); */
 			channel          = ZILOG_CHANNEL_FROM_PORT(&up->port);
 			up->flags       |= SUNZILOG_FLAG_ISR_HANDLER;
 			up->curregs[R9] |= MIE;
@@ -1622,7 +1622,7 @@ static void __exit sunzilog_exit(void)
 		while (up) {
 			struct zilog_channel __iomem *channel;
 
-			/* printk (KERN_INFO "Disable IRQ for ZILOG Hardware %p\n", up); */
+			/* printk (KERN_INFO "Disable IRQ for ZILOG Hardware %pK\n", up); */
 			channel          = ZILOG_CHANNEL_FROM_PORT(&up->port);
 			up->flags       &= ~SUNZILOG_FLAG_ISR_HANDLER;
 			up->curregs[R9] &= ~MIE;

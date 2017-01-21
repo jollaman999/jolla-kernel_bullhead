@@ -143,7 +143,7 @@ static int test_timeout(struct at_state_t *at_state)
 		return 0;
 
 	if (--at_state->timer_expires) {
-		gig_dbg(DEBUG_MCMD, "decreased timer of %p to %lu",
+		gig_dbg(DEBUG_MCMD, "decreased timer of %pK to %lu",
 			at_state, at_state->timer_expires);
 		return 0;
 	}

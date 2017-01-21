@@ -992,7 +992,7 @@ VOS_STATUS hdd_hostapd_SAPEventCB( tpSap_Event pSapEvent, v_PVOID_t usrDataForCa
             }
 
             VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO_MED,
-                      "The value of dfs_cac_block_tx[%d] for ApCtx[%p]",
+                      "The value of dfs_cac_block_tx[%d] for ApCtx[%pK]",
                       pHddApCtx->dfs_cac_block_tx, pHddApCtx);
 
             if ((NV_CHANNEL_DFS ==
@@ -5235,8 +5235,8 @@ hdd_adapter_t* hdd_wlan_create_ap_dev( hdd_context_t *pHddCtx, tSirMacAddr macAd
         pHostapdAdapter->pHddCtx = pHddCtx;
         pHostapdAdapter->magic = WLAN_HDD_ADAPTER_MAGIC;
 
-        hddLog(VOS_TRACE_LEVEL_DEBUG, "%s: pWlanHostapdDev = %p, "
-                                      "pHostapdAdapter = %p, "
+        hddLog(VOS_TRACE_LEVEL_DEBUG, "%s: pWlanHostapdDev = %pK, "
+                                      "pHostapdAdapter = %pK, "
                                       "concurrency_mode=0x%x", __func__,
                                       pWlanHostapdDev,
                                       pHostapdAdapter,

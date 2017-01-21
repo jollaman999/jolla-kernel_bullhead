@@ -423,7 +423,7 @@ static inline void bfq_get_entity(struct bfq_entity *entity)
 
 	if (bfqq != NULL) {
 		atomic_inc(&bfqq->ref);
-		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
+		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %pK %d",
 			     bfqq, atomic_read(&bfqq->ref));
 	}
 }
@@ -551,7 +551,7 @@ static void bfq_forget_entity(struct bfq_service_tree *st,
 	st->wsum -= entity->weight;
 	if (bfqq != NULL) {
 		sd = entity->sched_data;
-		bfq_log_bfqq(bfqq->bfqd, bfqq, "forget_entity: %p %d",
+		bfq_log_bfqq(bfqq->bfqd, bfqq, "forget_entity: %pK %d",
 			     bfqq, atomic_read(&bfqq->ref));
 		bfq_put_queue(bfqq);
 	}

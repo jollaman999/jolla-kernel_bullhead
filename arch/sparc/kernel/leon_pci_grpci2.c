@@ -727,7 +727,7 @@ static int grpci2_of_probe(struct platform_device *ofdev)
 	priv->irq = ofdev->archdata.irqs[0]; /* BASE IRQ */
 	priv->irq_mode = (capability & STS_IRQMODE) >> STS_IRQMODE_BIT;
 
-	printk(KERN_INFO "GRPCI2: host found at %p, irq%d\n", regs, priv->irq);
+	printk(KERN_INFO "GRPCI2: host found at %pK, irq%d\n", regs, priv->irq);
 
 	/* Byte twisting should be made configurable from kernel command line */
 	priv->bt_enabled = 1;

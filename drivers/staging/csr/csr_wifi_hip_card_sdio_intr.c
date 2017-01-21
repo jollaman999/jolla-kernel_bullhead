@@ -1727,14 +1727,14 @@ static CsrResult process_bulk_data_command(card_t *card, const u8 *cmdptr,
           UNIFI_SDIO_READ : UNIFI_SDIO_WRITE;
 
     unifi_trace(card->ospriv, UDBG4,
-                "Bulk %c %s len=%d, handle %d - slot=%d %p+(%d)\n",
+                "Bulk %c %s len=%d, handle %d - slot=%d %pK+(%d)\n",
                 (dir == UNIFI_SDIO_READ)?'R' : 'W',
                 lookup_bulkcmd_name(cmd),
                 len,
                 bdcmd.buffer_handle,
                 slot, bdslot->os_data_ptr, offset);
 #ifdef CSR_WIFI_HIP_NOISY
-    unifi_error(card->ospriv, "Bulk %s len=%d, handle %d - slot=%d %p+(%d)\n",
+    unifi_error(card->ospriv, "Bulk %s len=%d, handle %d - slot=%d %pK+(%d)\n",
                 lookup_bulkcmd_name(cmd),
                 len,
                 bdcmd.buffer_handle,
@@ -1792,7 +1792,7 @@ static CsrResult process_bulk_data_command(card_t *card, const u8 *cmdptr,
     if (r != CSR_RESULT_SUCCESS)
     {
         unifi_error(card->ospriv,
-                    "Failed: %s hlen=%d, slen=%d, handle %d - slot=%d %p+0x%X\n",
+                    "Failed: %s hlen=%d, slen=%d, handle %d - slot=%d %pK+0x%X\n",
                     lookup_bulkcmd_name(cmd),
                     len,                    /* Header length */
                     bdslot->data_length,    /* Length stored in slot */
@@ -2336,7 +2336,7 @@ static CsrResult process_fh_traffic_queue(card_t *card, s32 *processed)
         /* Sanity check: MA-PACKET.req must have a valid bulk data */
         if ((csptr->bulkdata[0].data_length == 0) || (csptr->bulkdata[0].os_data_ptr == NULL))
         {
-            unifi_error(card->ospriv, "MA-PACKET.req with empty bulk data (%d bytes in %p)\n",
+            unifi_error(card->ospriv, "MA-PACKET.req with empty bulk data (%d bytes in %pK)\n",
                         csptr->bulkdata[0].data_length, csptr->bulkdata[0].os_data_ptr);
             dump(packed_sigptr, signal_length);
             return CSR_RESULT_FAILURE;
@@ -2470,7 +2470,7 @@ static CsrResult flush_fh_buffer(card_t *card)
     len = card->fh_buffer.ptr - card->fh_buffer.buf;
 
 #ifdef CSR_WIFI_HIP_NOISY
-    unifi_error(card->ospriv, "fh_buffer is at %p, ptr= %p\n",
+    unifi_error(card->ospriv, "fh_buffer is at %pK, ptr= %pK\n",
                 card->fh_buffer.buf, card->fh_buffer.ptr);
 #endif /* CSR_WIFI_HIP_NOISY */
 

@@ -3533,7 +3533,7 @@ static void try_to_wake_up_local(struct task_struct *p)
 	struct rq *rq = task_rq(p);
 
 	if (rq != this_rq() || p == current) {
-		printk_deferred("%s: Failed to wakeup task %d (%s), rq = %p, this_rq = %p, p = %p, current = %p\n",
+		printk_deferred("%s: Failed to wakeup task %d (%s), rq = %pK, this_rq = %pK, p = %pK, current = %pK\n",
 			__func__, task_pid_nr(p), p->comm, rq,
 			this_rq(), p, current);
 		return;
@@ -4011,7 +4011,7 @@ context_switch(struct rq *rq, struct task_struct *prev,
 
 #ifdef CONFIG_ARCH_WANTS_CTXSW_LOGGING
 	start = sched_clock();
-	dlog("%s: n_mm: %p, finish pts at %llu\n", __func__, mm, start);
+	dlog("%s: n_mm: %pK, finish pts at %llu\n", __func__, mm, start);
 #endif
 	/*
 	 * For paravirt, this is coupled with an exit in switch_to to
@@ -5037,7 +5037,7 @@ need_resched:
 	raw_spin_lock_irq(&rq->lock);
 
 #ifdef CONFIG_ARCH_WANTS_CTXSW_LOGGING
-	dlog("%s: locked %p at %llu\n", __func__, &rq->lock, sched_clock());
+	dlog("%s: locked %pK at %llu\n", __func__, &rq->lock, sched_clock());
 #endif
 
 	switch_count = &prev->nivcsw;

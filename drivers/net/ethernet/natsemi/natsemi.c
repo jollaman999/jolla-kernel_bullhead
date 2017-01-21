@@ -1861,14 +1861,14 @@ static void dump_ring(struct net_device *dev)
 
 	if (netif_msg_pktdata(np)) {
 		int i;
-		printk(KERN_DEBUG "  Tx ring at %p:\n", np->tx_ring);
+		printk(KERN_DEBUG "  Tx ring at %pK:\n", np->tx_ring);
 		for (i = 0; i < TX_RING_SIZE; i++) {
 			printk(KERN_DEBUG " #%d desc. %#08x %#08x %#08x.\n",
 				i, np->tx_ring[i].next_desc,
 				np->tx_ring[i].cmd_status,
 				np->tx_ring[i].addr);
 		}
-		printk(KERN_DEBUG "  Rx ring %p:\n", np->rx_ring);
+		printk(KERN_DEBUG "  Rx ring %pK:\n", np->rx_ring);
 		for (i = 0; i < RX_RING_SIZE; i++) {
 			printk(KERN_DEBUG " #%d desc. %#08x %#08x %#08x.\n",
 				i, np->rx_ring[i].next_desc,

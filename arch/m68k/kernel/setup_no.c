@@ -221,9 +221,9 @@ void __init setup_arch(char **cmdline_p)
 	printk(KERN_INFO "Motorola M5235EVB support (C)2005 Syn-tech Systems, Inc. (Jate Sujjavanich)\n");
 #endif
 
-	pr_debug("KERNEL -> TEXT=0x%p-0x%p DATA=0x%p-0x%p BSS=0x%p-0x%p\n",
+	pr_debug("KERNEL -> TEXT=0x%pK-0x%pK DATA=0x%pK-0x%pK BSS=0x%pK-0x%pK\n",
 		 _stext, _etext, _sdata, _edata, __bss_start, __bss_stop);
-	pr_debug("MEMORY -> ROMFS=0x%p-0x%06lx MEM=0x%06lx-0x%06lx\n ",
+	pr_debug("MEMORY -> ROMFS=0x%pK-0x%06lx MEM=0x%06lx-0x%06lx\n ",
 		 __bss_stop, memory_start, memory_start, memory_end);
 
 	/* Keep a copy of command line */

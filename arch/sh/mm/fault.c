@@ -67,7 +67,7 @@ static void show_pte(struct mm_struct *mm, unsigned long addr)
 			pgd = swapper_pg_dir;
 	}
 
-	printk(KERN_ALERT "pgd = %p\n", pgd);
+	printk(KERN_ALERT "pgd = %pK\n", pgd);
 	pgd += pgd_index(addr);
 	printk(KERN_ALERT "[%08lx] *pgd=%0*Lx", addr,
 	       (u32)(sizeof(*pgd) * 2), (u64)pgd_val(*pgd));

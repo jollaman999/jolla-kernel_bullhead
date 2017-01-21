@@ -1021,7 +1021,7 @@ static int sh_veu_open(struct file *file)
 
 	pm_runtime_get_sync(veu->dev);
 
-	dev_dbg(veu->dev, "Created instance %p\n", veu_file);
+	dev_dbg(veu->dev, "Created instance %pK\n", veu_file);
 
 	return 0;
 }
@@ -1031,7 +1031,7 @@ static int sh_veu_release(struct file *file)
 	struct sh_veu_dev *veu = video_drvdata(file);
 	struct sh_veu_file *veu_file = file->private_data;
 
-	dev_dbg(veu->dev, "Releasing instance %p\n", veu_file);
+	dev_dbg(veu->dev, "Releasing instance %pK\n", veu_file);
 
 	if (veu_file == veu->capture) {
 		veu->capture = NULL;

@@ -355,37 +355,37 @@ static enum task_disposition sas_scsi_find_task(struct sas_task *task)
 	}
 
 	for (i = 0; i < 5; i++) {
-		SAS_DPRINTK("%s: aborting task 0x%p\n", __func__, task);
+		SAS_DPRINTK("%s: aborting task 0x%pK\n", __func__, task);
 		res = si->dft->lldd_abort_task(task);
 
 		spin_lock_irqsave(&task->task_state_lock, flags);
 		if (task->task_state_flags & SAS_TASK_STATE_DONE) {
 			spin_unlock_irqrestore(&task->task_state_lock, flags);
-			SAS_DPRINTK("%s: task 0x%p is done\n", __func__,
+			SAS_DPRINTK("%s: task 0x%pK is done\n", __func__,
 				    task);
 			return TASK_IS_DONE;
 		}
 		spin_unlock_irqrestore(&task->task_state_lock, flags);
 
 		if (res == TMF_RESP_FUNC_COMPLETE) {
-			SAS_DPRINTK("%s: task 0x%p is aborted\n",
+			SAS_DPRINTK("%s: task 0x%pK is aborted\n",
 				    __func__, task);
 			return TASK_IS_ABORTED;
 		} else if (si->dft->lldd_query_task) {
-			SAS_DPRINTK("%s: querying task 0x%p\n",
+			SAS_DPRINTK("%s: querying task 0x%pK\n",
 				    __func__, task);
 			res = si->dft->lldd_query_task(task);
 			switch (res) {
 			case TMF_RESP_FUNC_SUCC:
-				SAS_DPRINTK("%s: task 0x%p at LU\n",
+				SAS_DPRINTK("%s: task 0x%pK at LU\n",
 					    __func__, task);
 				return TASK_IS_AT_LU;
 			case TMF_RESP_FUNC_COMPLETE:
-				SAS_DPRINTK("%s: task 0x%p not at LU\n",
+				SAS_DPRINTK("%s: task 0x%pK not at LU\n",
 					    __func__, task);
 				return TASK_IS_NOT_AT_LU;
 			case TMF_RESP_FUNC_FAILED:
-                                SAS_DPRINTK("%s: task 0x%p failed to abort\n",
+                                SAS_DPRINTK("%s: task 0x%pK failed to abort\n",
                                                 __func__, task);
                                 return TASK_ABORT_FAILED;
                         }
@@ -655,19 +655,19 @@ static void sas_eh_handle_sas_errors(struct Scsi_Host *shost, struct list_head *
 		spin_unlock_irqrestore(&task->task_state_lock, flags);
 
 		if (need_reset) {
-			SAS_DPRINTK("%s: task 0x%p requests reset\n",
+			SAS_DPRINTK("%s: task 0x%pK requests reset\n",
 				    __func__, task);
 			goto reset;
 		}
 
-		SAS_DPRINTK("trying to find task 0x%p\n", task);
+		SAS_DPRINTK("trying to find task 0x%pK\n", task);
 		res = sas_scsi_find_task(task);
 
 		cmd->eh_eflags = 0;
 
 		switch (res) {
 		case TASK_IS_NOT_AT_HA:
-			SAS_DPRINTK("%s: task 0x%p is not at ha: %s\n",
+			SAS_DPRINTK("%s: task 0x%pK is not at ha: %s\n",
 				    __func__, task,
 				    cmd->retries ? "retry" : "aborted");
 			if (cmd->retries)
@@ -675,17 +675,17 @@ static void sas_eh_handle_sas_errors(struct Scsi_Host *shost, struct list_head *
 			sas_eh_finish_cmd(cmd);
 			continue;
 		case TASK_IS_DONE:
-			SAS_DPRINTK("%s: task 0x%p is done\n", __func__,
+			SAS_DPRINTK("%s: task 0x%pK is done\n", __func__,
 				    task);
 			sas_eh_defer_cmd(cmd);
 			continue;
 		case TASK_IS_ABORTED:
-			SAS_DPRINTK("%s: task 0x%p is aborted\n",
+			SAS_DPRINTK("%s: task 0x%pK is aborted\n",
 				    __func__, task);
 			sas_eh_defer_cmd(cmd);
 			continue;
 		case TASK_IS_AT_LU:
-			SAS_DPRINTK("task 0x%p is at LU: lu recover\n", task);
+			SAS_DPRINTK("task 0x%pK is at LU: lu recover\n", task);
  reset:
 			tmf_resp = sas_recover_lu(task->dev, cmd);
 			if (tmf_resp == TMF_RESP_FUNC_COMPLETE) {
@@ -700,7 +700,7 @@ static void sas_eh_handle_sas_errors(struct Scsi_Host *shost, struct list_head *
 			/* fallthrough */
 		case TASK_IS_NOT_AT_LU:
 		case TASK_ABORT_FAILED:
-			SAS_DPRINTK("task 0x%p is not at LU: I_T recover\n",
+			SAS_DPRINTK("task 0x%pK is not at LU: I_T recover\n",
 				    task);
 			tmf_resp = sas_recover_I_T(task->dev);
 			if (tmf_resp == TMF_RESP_FUNC_COMPLETE ||
@@ -862,7 +862,7 @@ out:
 
 enum blk_eh_timer_return sas_scsi_timed_out(struct scsi_cmnd *cmd)
 {
-	scmd_printk(KERN_DEBUG, cmd, "command %p timed out\n", cmd);
+	scmd_printk(KERN_DEBUG, cmd, "command %pK timed out\n", cmd);
 
 	return BLK_EH_NOT_HANDLED;
 }

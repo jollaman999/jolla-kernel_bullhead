@@ -145,7 +145,7 @@ static int sp_probe(struct platform_device *pdev)
 		goto exit_free;
 	}
 
-	dev_info(&pdev->dev, "%s device registered (reg_base=%p, irq=%d)\n",
+	dev_info(&pdev->dev, "%s device registered (reg_base=%pK, irq=%d)\n",
 		 DRV_NAME, priv->reg_base, dev->irq);
 	return 0;
 

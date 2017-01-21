@@ -115,7 +115,7 @@ static void pmi_notify_handlers(struct work_struct *work)
 
 	spin_lock(&data->handler_spinlock);
 	list_for_each_entry(handler, &data->handler, node) {
-		pr_debug("pmi: notifying handler %p\n", handler);
+		pr_debug("pmi: notifying handler %pK\n", handler);
 		if (handler->type == data->msg.type)
 			handler->handle_pmi_message(data->msg);
 	}
@@ -171,7 +171,7 @@ static int pmi_of_probe(struct platform_device *dev)
 		goto error_cleanup_iomap;
 	}
 
-	printk(KERN_INFO "pmi: found pmi device at addr %p.\n", data->pmi_reg);
+	printk(KERN_INFO "pmi: found pmi device at addr %pK.\n", data->pmi_reg);
 
 	goto out;
 
@@ -269,7 +269,7 @@ void pmi_unregister_handler(struct pmi_handler *handler)
 	if (!data)
 		return;
 
-	pr_debug("pmi: unregistering handler %p\n", handler);
+	pr_debug("pmi: unregistering handler %pK\n", handler);
 
 	spin_lock(&data->handler_spinlock);
 	list_del(&handler->node);

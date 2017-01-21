@@ -211,7 +211,7 @@ static int cc770_platform_probe(struct platform_device *pdev)
 		goto exit_free_cc770;
 
 	dev_dbg(&pdev->dev,
-		 "reg_base=0x%p irq=%d clock=%d cpu_interface=0x%02x "
+		 "reg_base=0x%pK irq=%d clock=%d cpu_interface=0x%02x "
 		 "bus_config=0x%02x clkout=0x%02x\n",
 		 priv->reg_base, dev->irq, priv->can.clock.freq,
 		 priv->cpu_interface, priv->bus_config, priv->clkout);

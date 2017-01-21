@@ -401,7 +401,7 @@ static int dib8000_set_output_mode(struct dvb_frontend *fe, int mode)
 	fifo_threshold = 1792;
 	smo_mode = (dib8000_read_word(state, 299) & 0x0050) | (1 << 1);
 
-	dprintk("-I-	Setting output mode for demod %p to %d",
+	dprintk("-I-	Setting output mode for demod %pK to %d",
 			&state->fe[0], mode);
 
 	switch (mode) {
@@ -436,7 +436,7 @@ static int dib8000_set_output_mode(struct dvb_frontend *fe, int mode)
 		break;
 
 	default:
-		dprintk("Unhandled output_mode passed to be set for demod %p",
+		dprintk("Unhandled output_mode passed to be set for demod %pK",
 				&state->fe[0]);
 		return -EINVAL;
 	}
@@ -3727,7 +3727,7 @@ int dib8000_set_slave_frontend(struct dvb_frontend *fe, struct dvb_frontend *fe_
 	while ((index_frontend < MAX_NUMBER_OF_FRONTENDS) && (state->fe[index_frontend] != NULL))
 		index_frontend++;
 	if (index_frontend < MAX_NUMBER_OF_FRONTENDS) {
-		dprintk("set slave fe %p to index %i", fe_slave, index_frontend);
+		dprintk("set slave fe %pK to index %i", fe_slave, index_frontend);
 		state->fe[index_frontend] = fe_slave;
 		return 0;
 	}
@@ -3745,7 +3745,7 @@ int dib8000_remove_slave_frontend(struct dvb_frontend *fe)
 	while ((index_frontend < MAX_NUMBER_OF_FRONTENDS) && (state->fe[index_frontend] != NULL))
 		index_frontend++;
 	if (index_frontend != 1) {
-		dprintk("remove slave fe %p (index %i)", state->fe[index_frontend-1], index_frontend-1);
+		dprintk("remove slave fe %pK (index %i)", state->fe[index_frontend-1], index_frontend-1);
 		state->fe[index_frontend] = NULL;
 		return 0;
 	}

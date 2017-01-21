@@ -40,7 +40,7 @@ int cachefiles_check_object_type(struct cachefiles_object *object)
 	else
 		snprintf(type, 3, "%02x", object->fscache.cookie->def->type);
 
-	_enter("%p{%s}", object, type);
+	_enter("%pK{%s}", object, type);
 
 	/* attempt to install a type label directly */
 	ret = vfs_setxattr(dentry, cachefiles_xattr_cache, type, 2,
@@ -112,7 +112,7 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object,
 	ASSERT(object->fscache.cookie);
 	ASSERT(dentry);
 
-	_enter("%p,#%d", object, auxdata->len);
+	_enter("%pK,#%d", object, auxdata->len);
 
 	/* attempt to install the cache metadata directly */
 	_debug("SET %s #%u", object->fscache.cookie->def->name, auxdata->len);
@@ -141,7 +141,7 @@ int cachefiles_update_object_xattr(struct cachefiles_object *object,
 	ASSERT(object->fscache.cookie);
 	ASSERT(dentry);
 
-	_enter("%p,#%d", object, auxdata->len);
+	_enter("%pK,#%d", object, auxdata->len);
 
 	/* attempt to install the cache metadata directly */
 	_debug("SET %s #%u", object->fscache.cookie->def->name, auxdata->len);
@@ -169,7 +169,7 @@ int cachefiles_check_object_xattr(struct cachefiles_object *object,
 	struct dentry *dentry = object->dentry;
 	int ret;
 
-	_enter("%p,#%d", object, auxdata->len);
+	_enter("%pK,#%d", object, auxdata->len);
 
 	ASSERT(dentry);
 	ASSERT(dentry->d_inode);

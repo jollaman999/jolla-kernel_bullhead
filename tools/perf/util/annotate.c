@@ -892,7 +892,7 @@ fallback:
 		 filename, sym->name, map->unmap_ip(map, sym->start),
 		 map->unmap_ip(map, sym->end));
 
-	pr_debug("annotating [%p] %30s : [%p] %30s\n",
+	pr_debug("annotating [%pK] %30s : [%pK] %30s\n",
 		 dso, dso->long_name, sym, sym->name);
 
 	snprintf(command, sizeof(command),

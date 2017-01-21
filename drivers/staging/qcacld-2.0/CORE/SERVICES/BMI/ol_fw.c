@@ -1076,7 +1076,7 @@ void ol_ramdump_handler(struct ol_softc *scn)
 			fw_ram_seg_addr[i] = (scn->ramdump[i])->mem;
 			pr_err("FW %s start addr = %#08x\n",
 				fw_ram_seg_name[i], *reg);
-			pr_err("Memory addr for %s = %p\n",
+			pr_err("Memory addr for %s = %pK\n",
 				fw_ram_seg_name[i],
 				(scn->ramdump[i])->mem);
 			(scn->ramdump[i])->start_addr = *reg;
@@ -1235,7 +1235,7 @@ void ol_target_failure(void *instance, A_STATUS status)
 	    {
 	        printk("HifDiagReadiMem FW dbglog_data failed\n");
 	    } else {
-	        printk("dbglog_hdr.dbuf=%u dbglog_data=%p dbglog_buf.buffer=%u dbglog_buf.length=%u\n",
+	        printk("dbglog_hdr.dbuf=%u dbglog_data=%pK dbglog_buf.buffer=%u dbglog_buf.length=%u\n",
 	                dbglog_hdr.dbuf, dbglog_data, dbglog_buf.buffer, dbglog_buf.length);
 
 

@@ -441,9 +441,9 @@ void __init mem_init(void)
 		"    vmalloc : 0x%08lx - 0x%08lx   (%4ld MB)\n"
 		"    lowmem  : 0x%08lx - 0x%08lx   (%4ld MB)\n"
 		"    modules : 0x%08lx - 0x%08lx   (%4ld MB)\n"
-		"      .init : 0x%p" " - 0x%p" "   (%4d kB)\n"
-		"      .text : 0x%p" " - 0x%p" "   (%4d kB)\n"
-		"      .data : 0x%p" " - 0x%p" "   (%4d kB)\n",
+		"      .init : 0x%pK" " - 0x%pK" "   (%4d kB)\n"
+		"      .text : 0x%pK" " - 0x%pK" "   (%4d kB)\n"
+		"      .data : 0x%pK" " - 0x%pK" "   (%4d kB)\n",
 
 		VECTORS_BASE, VECTORS_BASE + PAGE_SIZE,
 		DIV_ROUND_UP(PAGE_SIZE, SZ_1K),

@@ -123,10 +123,10 @@ static struct afs_cell *afs_cell_alloc(const char *name, unsigned namelen,
 	}
 	cell->anonymous_key = key;
 
-	_debug("anon key %p{%x}",
+	_debug("anon key %pK{%x}",
 	       cell->anonymous_key, key_serial(cell->anonymous_key));
 
-	_leave(" = %p", cell);
+	_leave(" = %pK", cell);
 	return cell;
 
 bad_address:
@@ -192,7 +192,7 @@ struct afs_cell *afs_cell_create(const char *name, unsigned namesz,
 	up_write(&afs_proc_cells_sem);
 	up_write(&afs_cells_sem);
 
-	_leave(" = %p", cell);
+	_leave(" = %pK", cell);
 	return cell;
 
 error:
@@ -210,7 +210,7 @@ duplicate_name:
 	up_write(&afs_cells_sem);
 
 	if (retref) {
-		_leave(" = %p", cell);
+		_leave(" = %pK", cell);
 		return cell;
 	}
 
@@ -306,7 +306,7 @@ struct afs_cell *afs_cell_lookup(const char *name, unsigned namesz,
 
 	read_unlock(&afs_cells_lock);
 	up_read(&afs_cells_sem);
-	_leave(" = %p", cell);
+	_leave(" = %pK", cell);
 	return cell;
 
 create_cell:
@@ -315,7 +315,7 @@ create_cell:
 
 	cell = afs_cell_create(name, namesz, NULL, true);
 
-	_leave(" = %p", cell);
+	_leave(" = %pK", cell);
 	return cell;
 }
 
@@ -345,7 +345,7 @@ void afs_put_cell(struct afs_cell *cell)
 	if (!cell)
 		return;
 
-	_enter("%p{%d,%s}", cell, atomic_read(&cell->usage), cell->name);
+	_enter("%pK{%d,%s}", cell, atomic_read(&cell->usage), cell->name);
 
 	ASSERTCMP(atomic_read(&cell->usage), >, 0);
 
@@ -376,7 +376,7 @@ void afs_put_cell(struct afs_cell *cell)
  */
 static void afs_cell_destroy(struct afs_cell *cell)
 {
-	_enter("%p{%d,%s}", cell, atomic_read(&cell->usage), cell->name);
+	_enter("%pK{%d,%s}", cell, atomic_read(&cell->usage), cell->name);
 
 	ASSERTCMP(atomic_read(&cell->usage), >=, 0);
 	ASSERT(list_empty(&cell->link));

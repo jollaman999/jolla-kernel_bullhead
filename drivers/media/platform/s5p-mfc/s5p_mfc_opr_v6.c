@@ -38,7 +38,7 @@
 #undef writel
 #define writel(v, r)							\
 	do {								\
-		pr_err("MFCWRITE(%p): %08x\n", r, (unsigned int)v);	\
+		pr_err("MFCWRITE(%pK): %08x\n", r, (unsigned int)v);	\
 	__raw_writel(v, r);						\
 	} while (0)
 #endif /* S5P_MFC_DEBUG_REGWRITE */
@@ -365,7 +365,7 @@ static int s5p_mfc_set_dec_frame_buffer_v6(struct s5p_mfc_ctx *ctx)
 	buf_addr1 = ctx->bank1.dma;
 	buf_size1 = ctx->bank1.size;
 
-	mfc_debug(2, "Buf1: %p (%d)\n", (void *)buf_addr1, buf_size1);
+	mfc_debug(2, "Buf1: %pK (%d)\n", (void *)buf_addr1, buf_size1);
 	mfc_debug(2, "Total DPB COUNT: %d\n", ctx->total_dpb_count);
 	mfc_debug(2, "Setting display delay to %d\n", ctx->display_delay);
 
@@ -488,7 +488,7 @@ static int s5p_mfc_set_enc_ref_buffer_v6(struct s5p_mfc_ctx *ctx)
 	buf_addr1 = ctx->bank1.dma;
 	buf_size1 = ctx->bank1.size;
 
-	mfc_debug(2, "Buf1: %p (%d)\n", (void *)buf_addr1, buf_size1);
+	mfc_debug(2, "Buf1: %pK (%d)\n", (void *)buf_addr1, buf_size1);
 
 	for (i = 0; i < ctx->pb_count; i++) {
 		WRITEL(buf_addr1, S5P_FIMV_E_LUMA_DPB_V6 + (4 * i));
@@ -1532,7 +1532,7 @@ static void s5p_mfc_try_run_v6(struct s5p_mfc_dev *dev)
 	int new_ctx;
 	unsigned int ret = 0;
 
-	mfc_debug(1, "Try run dev: %p\n", dev);
+	mfc_debug(1, "Try run dev: %pK\n", dev);
 
 	/* Check whether hardware is not running */
 	if (test_and_set_bit(0, &dev->hw_lock) != 0) {
@@ -1556,7 +1556,7 @@ static void s5p_mfc_try_run_v6(struct s5p_mfc_dev *dev)
 
 	mfc_debug(1, "New context: %d\n", new_ctx);
 	ctx = dev->ctx[new_ctx];
-	mfc_debug(1, "Seting new context to %p\n", ctx);
+	mfc_debug(1, "Seting new context to %pK\n", ctx);
 	/* Got context to run in ctx */
 	mfc_debug(1, "ctx->dst_queue_cnt=%d ctx->dpb_count=%d ctx->src_queue_cnt=%d\n",
 		ctx->dst_queue_cnt, ctx->pb_count, ctx->src_queue_cnt);

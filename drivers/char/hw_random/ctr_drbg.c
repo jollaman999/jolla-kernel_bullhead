@@ -74,7 +74,7 @@ static int ctr_aes_init(struct ctr_drbg_ctx_s *ctx)
 	if (IS_ERR(ctx->aes_ctx.tfm) || (NULL == ctx->aes_ctx.tfm)) {
 		pr_info("%s: qcom-ecb(aes) failed", __func__);
 		ctx->aes_ctx.tfm = crypto_alloc_ablkcipher("ecb(aes)", 0, 0);
-		pr_info("ctx->aes_ctx.tfm = %p\n", ctx->aes_ctx.tfm);
+		pr_info("ctx->aes_ctx.tfm = %pK\n", ctx->aes_ctx.tfm);
 		if (IS_ERR(ctx->aes_ctx.tfm) || (NULL == ctx->aes_ctx.tfm)) {
 			pr_err("%s: qcom-ecb(aes) failed\n", __func__);
 			status = -E_FAILURE;

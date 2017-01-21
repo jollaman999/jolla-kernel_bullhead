@@ -323,7 +323,7 @@ static int ath_open(struct hci_uart *hu)
 	struct ath_struct *ath;
 	struct uart_state *state;
 
-	BT_DBG("hu %p, bsi %p", hu, bsi);
+	BT_DBG("hu %pK, bsi %pK", hu, bsi);
 
 	if (!bsi) {
 		BT_ERR("HCIATH3K bluesleep info does not exist");
@@ -370,7 +370,7 @@ static int ath_flush(struct hci_uart *hu)
 {
 	struct ath_struct *ath = hu->priv;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	skb_queue_purge(&ath->txq);
 
@@ -382,7 +382,7 @@ static int ath_close(struct hci_uart *hu)
 {
 	struct ath_struct *ath = hu->priv;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	skb_queue_purge(&ath->txq);
 
@@ -426,7 +426,7 @@ static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
 		}
 	}
 
-	BT_DBG("hu %p skb %p", hu, skb);
+	BT_DBG("hu %pK skb %pK", hu, skb);
 
 	/* Prepend skb with frame type */
 	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);

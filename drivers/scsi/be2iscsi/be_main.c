@@ -1121,7 +1121,7 @@ free_io_sgl_handle(struct beiscsi_hba *phba, struct sgl_handle *psgl_handle)
 		 */
 		 beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_IO,
 			     "BM_%d : Double Free in IO SGL io_sgl_free_index=%d,"
-			     "value there=%p\n", phba->io_sgl_free_index,
+			     "value there=%pK\n", phba->io_sgl_free_index,
 			     phba->io_sgl_hndl_base
 			     [phba->io_sgl_free_index]);
 		return;
@@ -1188,7 +1188,7 @@ free_wrb_handle(struct beiscsi_hba *phba, struct hwi_wrb_context *pwrb_context,
 
 	beiscsi_log(phba, KERN_INFO,
 		    BEISCSI_LOG_IO | BEISCSI_LOG_CONFIG,
-		    "BM_%d : FREE WRB: pwrb_handle=%p free_index=0x%x"
+		    "BM_%d : FREE WRB: pwrb_handle=%pK free_index=0x%x"
 		    "wrb_handles_available=%d\n",
 		    pwrb_handle, pwrb_context->free_index,
 		    pwrb_context->wrb_handles_available);
@@ -2811,7 +2811,7 @@ static int hwi_init_async_pdu_ctx(struct beiscsi_hba *phba)
 	if (mem_descr->mem_array[0].virtual_address) {
 		beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_INIT,
 			    "BM_%d : hwi_init_async_pdu_ctx"
-			    " HWI_MEM_ASYNC_HEADER_BUF va=%p\n",
+			    " HWI_MEM_ASYNC_HEADER_BUF va=%pK\n",
 			    mem_descr->mem_array[0].virtual_address);
 	} else
 		beiscsi_log(phba, KERN_WARNING, BEISCSI_LOG_INIT,
@@ -2828,7 +2828,7 @@ static int hwi_init_async_pdu_ctx(struct beiscsi_hba *phba)
 	if (mem_descr->mem_array[0].virtual_address) {
 		beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_INIT,
 			    "BM_%d : hwi_init_async_pdu_ctx"
-			    " HWI_MEM_ASYNC_HEADER_RING va=%p\n",
+			    " HWI_MEM_ASYNC_HEADER_RING va=%pK\n",
 			    mem_descr->mem_array[0].virtual_address);
 	} else
 		beiscsi_log(phba, KERN_WARNING, BEISCSI_LOG_INIT,
@@ -2842,7 +2842,7 @@ static int hwi_init_async_pdu_ctx(struct beiscsi_hba *phba)
 	if (mem_descr->mem_array[0].virtual_address) {
 		beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_INIT,
 			    "BM_%d : hwi_init_async_pdu_ctx"
-			    " HWI_MEM_ASYNC_HEADER_HANDLE va=%p\n",
+			    " HWI_MEM_ASYNC_HEADER_HANDLE va=%pK\n",
 			    mem_descr->mem_array[0].virtual_address);
 	} else
 		beiscsi_log(phba, KERN_WARNING, BEISCSI_LOG_INIT,
@@ -2859,7 +2859,7 @@ static int hwi_init_async_pdu_ctx(struct beiscsi_hba *phba)
 	if (mem_descr->mem_array[0].virtual_address) {
 		beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_INIT,
 			    "BM_%d : hwi_init_async_pdu_ctx"
-			    " HWI_MEM_ASYNC_DATA_RING va=%p\n",
+			    " HWI_MEM_ASYNC_DATA_RING va=%pK\n",
 			    mem_descr->mem_array[0].virtual_address);
 	} else
 		beiscsi_log(phba, KERN_WARNING, BEISCSI_LOG_INIT,
@@ -2889,7 +2889,7 @@ static int hwi_init_async_pdu_ctx(struct beiscsi_hba *phba)
 	if (mem_descr->mem_array[0].virtual_address) {
 		beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_INIT,
 			    "BM_%d : hwi_init_async_pdu_ctx"
-			    " HWI_MEM_ASYNC_DATA_BUF va=%p\n",
+			    " HWI_MEM_ASYNC_DATA_BUF va=%pK\n",
 			    mem_descr->mem_array[0].virtual_address);
 	} else
 		beiscsi_log(phba, KERN_WARNING, BEISCSI_LOG_INIT,
@@ -3637,7 +3637,7 @@ static int hwi_init_controller(struct beiscsi_hba *phba)
 		phwi_ctrlr->phwi_ctxt = (struct hwi_context_memory *)phba->
 		    init_mem[HWI_MEM_ADDN_CONTEXT].mem_array[0].virtual_address;
 		beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_INIT,
-			    "BM_%d :  phwi_ctrlr->phwi_ctxt=%p\n",
+			    "BM_%d :  phwi_ctrlr->phwi_ctxt=%pK\n",
 			    phwi_ctrlr->phwi_ctxt);
 	} else {
 		beiscsi_log(phba, KERN_ERR, BEISCSI_LOG_INIT,
@@ -3881,7 +3881,7 @@ static void hwi_enable_intr(struct beiscsi_hba *phba)
 	if (!enabled) {
 		reg |= MEMBAR_CTRL_INT_CTRL_HOSTINTR_MASK;
 		beiscsi_log(phba, KERN_INFO, BEISCSI_LOG_INIT,
-			    "BM_%d : reg =x%08x addr=%p\n", reg, addr);
+			    "BM_%d : reg =x%08x addr=%pK\n", reg, addr);
 		iowrite32(reg, addr);
 	}
 
@@ -5142,7 +5142,7 @@ static int __init beiscsi_module_init(void)
 		       "beiscsi_module_init - Unable to  register beiscsi transport.\n");
 		return -ENOMEM;
 	}
-	printk(KERN_INFO "In beiscsi_module_init, tt=%p\n",
+	printk(KERN_INFO "In beiscsi_module_init, tt=%pK\n",
 	       &beiscsi_iscsi_transport);
 
 	ret = pci_register_driver(&beiscsi_pci_driver);

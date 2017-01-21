@@ -142,7 +142,7 @@ WLAN_BAPReset
     tHalHandle     hHal = NULL;
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
-    VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH, "%s: btampHandle value: %p", __func__,  btampHandle);
+    VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH, "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if (btampHandle == NULL)
@@ -289,7 +289,7 @@ WLAN_BAPFlush
     ptBtampContext btampContext = (ptBtampContext) btampHandle;
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
-    VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH, "%s: btampHandle value: %p", __func__,  btampHandle);
+    VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH, "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if (btampHandle == NULL) {
@@ -362,7 +362,7 @@ WLAN_EnhancedBAPFlush
     ptBtampContext btampContext;
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
-    VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH, "%s: btampHandle value: %p", __func__,  btampHandle);
+    VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH, "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     /* Validate params */
@@ -442,7 +442,7 @@ WLAN_BAPReadConnectionAcceptTimeout
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIEvent))
@@ -511,7 +511,7 @@ WLAN_BAPWriteConnectionAcceptTimeout
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIWriteConnectionAcceptTimeout)
@@ -602,7 +602,7 @@ WLAN_BAPReadLinkSupervisionTimeout
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIReadLinkSupervisionTimeout) ||
@@ -694,7 +694,7 @@ WLAN_BAPWriteLinkSupervisionTimeout
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIWriteLinkSupervisionTimeout) ||
@@ -786,7 +786,7 @@ WLAN_BAPReadLogicalLinkAcceptTimeout
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIEvent))
@@ -855,7 +855,7 @@ WLAN_BAPWriteLogicalLinkAcceptTimeout
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIWriteLogicalLinkAcceptTimeout)
@@ -943,7 +943,7 @@ WLAN_BAPSetEventMaskPage2
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCISetEventMaskPage2)
@@ -1018,7 +1018,7 @@ WLAN_BAPReadLocationData
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIEvent))
@@ -1100,7 +1100,7 @@ WLAN_BAPWriteLocationData
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIWriteLocationData)
@@ -1181,7 +1181,7 @@ WLAN_BAPReadFlowControlMode
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIEvent))
@@ -1386,7 +1386,7 @@ WLAN_BAPSetShortRangeMode
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIEvent))
@@ -1527,7 +1527,7 @@ WLAN_BAPVendorSpecificCmd0
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIEvent))
@@ -1627,7 +1627,7 @@ WLAN_BAPVendorSpecificCmd1
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-               "%s: btampHandle value: %p", __func__,  btampHandle);
+               "%s: btampHandle value: %pK", __func__,  btampHandle);
 
     /* Validate params */
     if ((NULL == btampHandle) || (NULL == pBapHCIEvent))

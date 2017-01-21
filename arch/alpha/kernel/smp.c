@@ -163,7 +163,7 @@ smp_callin(void)
 	wmb();
 	smp_secondary_alive = 1;
 
-	DBGS(("smp_callin: commencing CPU %d current %p active_mm %p\n",
+	DBGS(("smp_callin: commencing CPU %d current %pK active_mm %pK\n",
 	      cpuid, current, current->active_mm));
 
 	preempt_disable();

@@ -969,7 +969,7 @@ send_action_frame:
                 }
                 nBytes += noaLen;
                 limLog( pMac, LOGE,
-                        FL("noaLen=%d origLen=%d pP2PIe=%p"
+                        FL("noaLen=%d origLen=%d pP2PIe=%pK"
                         " nBytes=%d nBytesToCopy=%zu "),
                                    noaLen,origLen,pP2PIe,nBytes,
                    ((pP2PIe + origLen + 2) - (v_U8_t *)pMbMsg->data));

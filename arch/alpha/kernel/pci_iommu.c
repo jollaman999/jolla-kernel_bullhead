@@ -268,7 +268,7 @@ pci_map_single_1(struct pci_dev *pdev, void *cpu_addr, size_t size,
 	    && paddr + size <= __direct_map_size) {
 		ret = paddr + __direct_map_base;
 
-		DBGA2("pci_map_single: [%p,%zx] -> direct %llx from %pf\n",
+		DBGA2("pci_map_single: [%pK,%zx] -> direct %llx from %pf\n",
 		      cpu_addr, size, ret, __builtin_return_address(0));
 
 		return ret;
@@ -279,7 +279,7 @@ pci_map_single_1(struct pci_dev *pdev, void *cpu_addr, size_t size,
 	if (dac_allowed) {
 		ret = paddr + alpha_mv.pci_dac_offset;
 
-		DBGA2("pci_map_single: [%p,%zx] -> DAC %llx from %pf\n",
+		DBGA2("pci_map_single: [%pK,%zx] -> DAC %llx from %pf\n",
 		      cpu_addr, size, ret, __builtin_return_address(0));
 
 		return ret;
@@ -316,7 +316,7 @@ pci_map_single_1(struct pci_dev *pdev, void *cpu_addr, size_t size,
 	ret = arena->dma_base + dma_ofs * PAGE_SIZE;
 	ret += (unsigned long)cpu_addr & ~PAGE_MASK;
 
-	DBGA2("pci_map_single: [%p,%zx] np %ld -> sg %llx from %pf\n",
+	DBGA2("pci_map_single: [%pK,%zx] np %ld -> sg %llx from %pf\n",
 	      cpu_addr, size, npages, ret, __builtin_return_address(0));
 
 	return ret;
@@ -464,7 +464,7 @@ try_again:
 		goto try_again;
 	}
 
-	DBGA2("pci_alloc_consistent: %zx -> [%p,%llx] from %pf\n",
+	DBGA2("pci_alloc_consistent: %zx -> [%pK,%llx] from %pf\n",
 	      size, cpu_addr, *dma_addrp, __builtin_return_address(0));
 
 	return cpu_addr;
@@ -570,7 +570,7 @@ sg_fill(struct device *dev, struct scatterlist *leader, struct scatterlist *end,
 		out->dma_address = paddr + __direct_map_base;
 		out->dma_length = size;
 
-		DBGA("    sg_fill: [%p,%lx] -> direct %llx\n",
+		DBGA("    sg_fill: [%pK,%lx] -> direct %llx\n",
 		     __va(paddr), size, out->dma_address);
 
 		return 0;
@@ -582,7 +582,7 @@ sg_fill(struct device *dev, struct scatterlist *leader, struct scatterlist *end,
 		out->dma_address = paddr + alpha_mv.pci_dac_offset;
 		out->dma_length = size;
 
-		DBGA("    sg_fill: [%p,%lx] -> DAC %llx\n",
+		DBGA("    sg_fill: [%pK,%lx] -> DAC %llx\n",
 		     __va(paddr), size, out->dma_address);
 
 		return 0;
@@ -608,7 +608,7 @@ sg_fill(struct device *dev, struct scatterlist *leader, struct scatterlist *end,
 	out->dma_address = arena->dma_base + dma_ofs*PAGE_SIZE + paddr;
 	out->dma_length = size;
 
-	DBGA("    sg_fill: [%p,%lx] -> sg %llx np %ld\n",
+	DBGA("    sg_fill: [%pK,%lx] -> sg %llx np %ld\n",
 	     __va(paddr), size, out->dma_address, npages);
 
 	/* All virtually contiguous.  We need to find the length of each
@@ -635,11 +635,11 @@ sg_fill(struct device *dev, struct scatterlist *leader, struct scatterlist *end,
 			*ptes++ = mk_iommu_pte(paddr);
 
 #if DEBUG_ALLOC > 0
-		DBGA("    (%ld) [%p,%x] np %ld\n",
+		DBGA("    (%ld) [%pK,%x] np %ld\n",
 		     last_sg - leader, SG_ENT_VIRT_ADDRESS(last_sg),
 		     last_sg->length, npages);
 		while (++last_sg <= sg) {
-			DBGA("        (%ld) [%p,%x] cont\n",
+			DBGA("        (%ld) [%pK,%x] cont\n",
 			     last_sg - leader, SG_ENT_VIRT_ADDRESS(last_sg),
 			     last_sg->length);
 		}

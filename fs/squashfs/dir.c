@@ -141,7 +141,7 @@ static int squashfs_readdir(struct file *file, void *dirent, filldir_t filldir)
 			i_ino = squashfs_i(inode)->parent;
 		}
 
-		TRACE("Calling filldir(%p, %s, %d, %lld, %d, %d)\n",
+		TRACE("Calling filldir(%pK, %s, %d, %lld, %d, %d)\n",
 				dirent, name, size, file->f_pos, i_ino,
 				squashfs_filetype_table[1]);
 
@@ -206,7 +206,7 @@ static int squashfs_readdir(struct file *file, void *dirent, filldir_t filldir)
 				((short) le16_to_cpu(dire->inode_number));
 			type = le16_to_cpu(dire->type);
 
-			TRACE("Calling filldir(%p, %s, %d, %lld, %x:%x, %d, %d)"
+			TRACE("Calling filldir(%pK, %s, %d, %lld, %x:%x, %d, %d)"
 					"\n", dirent, dire->name, size,
 					file->f_pos,
 					le32_to_cpu(dirh.start_block),

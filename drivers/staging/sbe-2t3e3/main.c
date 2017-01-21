@@ -80,7 +80,7 @@ int t3e3_if_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	for (skb2 = skb; skb2 != NULL; skb2 = NULL) {
 		if (skb2->len) {
 			dev_dbg(&sc->pdev->dev,
-				"sending mbuf (len = %d, next = %p)\n",
+				"sending mbuf (len = %d, next = %pK)\n",
 				skb2->len, NULL);
 
 			sc->ether.tx_free_cnt--;

@@ -374,7 +374,7 @@ tape_generic_online(struct tape_device *device,
 {
 	int rc;
 
-	DBF_LH(6, "tape_enable_device(%p, %p)\n", device, discipline);
+	DBF_LH(6, "tape_enable_device(%pK, %pK)\n", device, discipline);
 
 	if (device->tape_state != TS_INIT) {
 		DBF_LH(3, "Tapestate not INIT (%d)\n", device->tape_state);
@@ -449,7 +449,7 @@ int tape_generic_pm_suspend(struct ccw_device *cdev)
 		return -ENODEV;
 	}
 
-	DBF_LH(3, "(%08x): tape_generic_pm_suspend(%p)\n",
+	DBF_LH(3, "(%08x): tape_generic_pm_suspend(%pK)\n",
 		device->cdev_id, device);
 
 	if (device->medium_state != MS_UNLOADED) {
@@ -493,7 +493,7 @@ tape_generic_offline(struct ccw_device *cdev)
 		return -ENODEV;
 	}
 
-	DBF_LH(3, "(%08x): tape_generic_offline(%p)\n",
+	DBF_LH(3, "(%08x): tape_generic_offline(%pK)\n",
 		device->cdev_id, device);
 
 	spin_lock_irq(get_ccwdev_lock(device->cdev));
@@ -563,7 +563,7 @@ tape_get_device(struct tape_device *device)
 	int count;
 
 	count = atomic_inc_return(&device->ref_count);
-	DBF_EVENT(4, "tape_get_device(%p) = %i\n", device, count);
+	DBF_EVENT(4, "tape_get_device(%pK) = %i\n", device, count);
 	return device;
 }
 
@@ -579,7 +579,7 @@ tape_put_device(struct tape_device *device)
 	int count;
 
 	count = atomic_dec_return(&device->ref_count);
-	DBF_EVENT(4, "tape_put_device(%p) -> %i\n", device, count);
+	DBF_EVENT(4, "tape_put_device(%pK) -> %i\n", device, count);
 	BUG_ON(count < 0);
 	if (count == 0) {
 		kfree(device->modeset_byte);
@@ -671,7 +671,7 @@ tape_generic_remove(struct ccw_device *cdev)
 	if (!device) {
 		return;
 	}
-	DBF_LH(3, "(%08x): tape_generic_remove(%p)\n", device->cdev_id, cdev);
+	DBF_LH(3, "(%08x): tape_generic_remove(%pK)\n", device->cdev_id, cdev);
 
 	spin_lock_irq(get_ccwdev_lock(device->cdev));
 	switch (device->tape_state) {
@@ -752,7 +752,7 @@ tape_alloc_request(int cplength, int datasize)
 			return ERR_PTR(-ENOMEM);
 		}
 	}
-	DBF_LH(6, "New request %p(%p/%p)\n", request, request->cpaddr,
+	DBF_LH(6, "New request %pK(%pK/%pK)\n", request, request->cpaddr,
 		request->cpdata);
 
 	return request;
@@ -764,7 +764,7 @@ tape_alloc_request(int cplength, int datasize)
 void
 tape_free_request (struct tape_request * request)
 {
-	DBF_LH(6, "Free request %p\n", request);
+	DBF_LH(6, "Free request %pK\n", request);
 
 	if (request->device)
 		tape_put_device(request->device);
@@ -806,7 +806,7 @@ __tape_start_next_request(struct tape_device *device)
 	struct tape_request *request;
 	int rc;
 
-	DBF_LH(6, "__tape_start_next_request(%p)\n", device);
+	DBF_LH(6, "__tape_start_next_request(%pK)\n", device);
 	/*
 	 * Try to start each request on request queue until one is
 	 * started successful.
@@ -861,7 +861,7 @@ tape_delayed_next_request(struct work_struct *work)
 	struct tape_device *device =
 		container_of(work, struct tape_device, tape_dnr.work);
 
-	DBF_LH(6, "tape_delayed_next_request(%p)\n", device);
+	DBF_LH(6, "tape_delayed_next_request(%pK)\n", device);
 	spin_lock_irq(get_ccwdev_lock(device->cdev));
 	__tape_start_next_request(device);
 	spin_unlock_irq(get_ccwdev_lock(device->cdev));
@@ -889,7 +889,7 @@ __tape_end_request(
 	struct tape_request *	request,
 	int			rc)
 {
-	DBF_LH(6, "__tape_end_request(%p, %p, %i)\n", device, request, rc);
+	DBF_LH(6, "__tape_end_request(%pK, %pK, %i)\n", device, request, rc);
 	if (request) {
 		request->rc = rc;
 		request->status = TAPE_REQUEST_DONE;
@@ -967,10 +967,10 @@ __tape_start_request(struct tape_device *device, struct tape_request *request)
 		if (rc)
 			return rc;
 
-		DBF_LH(5, "Request %p added for execution.\n", request);
+		DBF_LH(5, "Request %pK added for execution.\n", request);
 		list_add(&request->list, &device->req_queue);
 	} else {
-		DBF_LH(5, "Request %p add to queue.\n", request);
+		DBF_LH(5, "Request %pK add to queue.\n", request);
 		request->status = TAPE_REQUEST_QUEUED;
 		list_add_tail(&request->list, &device->req_queue);
 	}
@@ -986,7 +986,7 @@ tape_do_io_async(struct tape_device *device, struct tape_request *request)
 {
 	int rc;
 
-	DBF_LH(6, "tape_do_io_async(%p, %p)\n", device, request);
+	DBF_LH(6, "tape_do_io_async(%pK, %pK)\n", device, request);
 
 	spin_lock_irq(get_ccwdev_lock(device->cdev));
 	/* Add request to request queue and try to start it. */
@@ -1109,7 +1109,7 @@ __tape_do_irq (struct ccw_device *cdev, unsigned long intparm, struct irb *irb)
 	}
 	request = (struct tape_request *) intparm;
 
-	DBF_LH(6, "__tape_do_irq(device=%p, request=%p)\n", device, request);
+	DBF_LH(6, "__tape_do_irq(device=%pK, request=%pK)\n", device, request);
 
 	/* On special conditions irb is an error pointer */
 	if (IS_ERR(irb)) {

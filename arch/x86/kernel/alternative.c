@@ -256,7 +256,7 @@ void __init_or_module apply_alternatives(struct alt_instr *start,
 	u8 *instr, *replacement;
 	u8 insnbuf[MAX_PATCH_LEN];
 
-	DPRINTK("%s: alt table %p -> %p\n", __func__, start, end);
+	DPRINTK("%s: alt table %pK -> %pK\n", __func__, start, end);
 	/*
 	 * The scan order should be from start to end. A later scanned
 	 * alternative code can overwrite a previous scanned alternative code.
@@ -371,7 +371,7 @@ void __init_or_module alternatives_smp_module_add(struct module *mod,
 	smp->locks_end	= locks_end;
 	smp->text	= text;
 	smp->text_end	= text_end;
-	DPRINTK("%s: locks %p -> %p, text %p -> %p, name %s\n",
+	DPRINTK("%s: locks %pK -> %pK, text %pK -> %pK, name %s\n",
 		__func__, smp->locks, smp->locks_end,
 		smp->text, smp->text_end, smp->name);
 

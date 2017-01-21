@@ -962,7 +962,7 @@ WLANBAP_CreateNewPhyLinkCtx
 
   *hBtampContext = pBtampCtx;
   VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_ERROR,
-                 "Btamp Ctxt = %p", pBtampCtx);
+                 "Btamp Ctxt = %pK", pBtampCtx);
 
   return VOS_STATUS_SUCCESS;
 #else // defined(BTAMP_MULTIPLE_PHY_LINKS)
@@ -1097,7 +1097,7 @@ WLANBAP_CreateNewLogLinkCtx
 #ifdef BAP_DEBUG
   /* Trace the tBtampCtx being passed in. */
   VOS_TRACE( VOS_MODULE_ID_BAP, VOS_TRACE_LEVEL_INFO_HIGH,
-            "WLAN BAP Context Monitor: pBtampContext value = %p in %s:%d", pBtampContext, __func__, __LINE__ );
+            "WLAN BAP Context Monitor: pBtampContext value = %pK in %s:%d", pBtampContext, __func__, __LINE__ );
 #endif //BAP_DEBUG
 
   /*------------------------------------------------------------------------

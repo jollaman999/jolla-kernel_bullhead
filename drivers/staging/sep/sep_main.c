@@ -202,9 +202,9 @@ static int sep_allocate_dmatables_region(struct sep_device *sep,
 
 	void *tmp_region = NULL;
 
-	dev_dbg(&sep->pdev->dev, "[PID%d] dma_ctx = 0x%p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] dma_ctx = 0x%pK\n",
 				current->pid, dma_ctx);
-	dev_dbg(&sep->pdev->dev, "[PID%d] dmatables_region = 0x%p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] dmatables_region = 0x%pK\n",
 				current->pid, dmatables_region);
 
 	if (!dma_ctx || !dmatables_region) {
@@ -365,7 +365,7 @@ static int sep_map_and_alloc_shared_area(struct sep_device *sep)
 		return -ENOMEM;
 	}
 	dev_dbg(&sep->pdev->dev,
-		"[PID%d] shared_addr %zx bytes @%p (bus %llx)\n",
+		"[PID%d] shared_addr %zx bytes @%pK (bus %llx)\n",
 				current->pid,
 				sep->shared_size, sep->shared_addr,
 				(unsigned long long)sep->shared_bus);
@@ -433,7 +433,7 @@ static int sep_open(struct inode *inode, struct file *filp)
 	priv->device = sep;
 	filp->private_data = priv;
 
-	dev_dbg(&sep_dev->pdev->dev, "[PID%d] priv is 0x%p\n",
+	dev_dbg(&sep_dev->pdev->dev, "[PID%d] priv is 0x%pK\n",
 					current->pid, priv);
 
 	/* Anyone can open; locking takes place at transaction level */
@@ -707,7 +707,7 @@ static int sep_mmap(struct file *filp, struct vm_area_struct *vma)
 		goto end_function_with_error;
 	}
 
-	dev_dbg(&sep->pdev->dev, "[PID%d] shared_addr is %p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] shared_addr is %pK\n",
 					current->pid, sep->shared_addr);
 
 	/* Get bus address */
@@ -871,9 +871,9 @@ static unsigned long sep_set_time(struct sep_device *sep)
 
 	dev_dbg(&sep->pdev->dev, "[PID%d] time.tv_sec is %lu\n",
 					current->pid, time.tv_sec);
-	dev_dbg(&sep->pdev->dev, "[PID%d] time_addr is %p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] time_addr is %pK\n",
 					current->pid, time_addr);
-	dev_dbg(&sep->pdev->dev, "[PID%d] sep->shared_addr is %p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] sep->shared_addr is %pK\n",
 					current->pid, sep->shared_addr);
 
 	return time.tv_sec;
@@ -1626,7 +1626,7 @@ static void sep_build_lli_table(struct sep_device *sep,
 		curr_table_data_size += lli_array_ptr[array_counter].block_size;
 
 		dev_dbg(&sep->pdev->dev,
-			"[PID%d] lli_table_ptr is %p\n",
+			"[PID%d] lli_table_ptr is %pK\n",
 				current->pid, lli_table_ptr);
 		dev_dbg(&sep->pdev->dev,
 			"[PID%d] lli_table_ptr->bus_address: %08lx\n",
@@ -1694,7 +1694,7 @@ static void sep_build_lli_table(struct sep_device *sep,
 static dma_addr_t sep_shared_area_virt_to_bus(struct sep_device *sep,
 	void *virt_address)
 {
-	dev_dbg(&sep->pdev->dev, "[PID%d] sh virt to phys v %p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] sh virt to phys v %pK\n",
 					current->pid, virt_address);
 	dev_dbg(&sep->pdev->dev, "[PID%d] sh virt to phys p %08lx\n",
 		current->pid,
@@ -2662,10 +2662,10 @@ int sep_prepare_input_output_dma_table_in_dcb(struct sep_device *sep,
 	dev_dbg(&sep->pdev->dev, "[PID%d] is_kva %x\n",
 		current->pid, is_kva);
 
-	dev_dbg(&sep->pdev->dev, "[PID%d] src_sg %p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] src_sg %pK\n",
 		current->pid, src_sg);
 
-	dev_dbg(&sep->pdev->dev, "[PID%d] dst_sg %p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] dst_sg %pK\n",
 		current->pid, dst_sg);
 
 	if (!dma_ctx) {
@@ -2689,7 +2689,7 @@ int sep_prepare_input_output_dma_table_in_dcb(struct sep_device *sep,
 		  goto end_function;
 		}
 		dev_dbg(&sep->pdev->dev,
-			"[PID%d] Created DMA context addr at 0x%p\n",
+			"[PID%d] Created DMA context addr at 0x%pK\n",
 			current->pid, *dma_ctx);
 	}
 
@@ -3035,7 +3035,7 @@ static long sep_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 	dev_dbg(&sep->pdev->dev, "[PID%d] ioctl cmd 0x%x\n",
 		current->pid, cmd);
-	dev_dbg(&sep->pdev->dev, "[PID%d] dma context addr 0x%p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] dma context addr 0x%pK\n",
 		current->pid, *dma_ctx);
 
 	/* Make sure we own this device */
@@ -3807,9 +3807,9 @@ static ssize_t sep_write(struct file *filp,
 	struct sep_queue_info *my_queue_elem = NULL;
 	bool my_secure_dma; /* are we using secure_dma (IMR)? */
 
-	dev_dbg(&sep->pdev->dev, "[PID%d] sep dev is 0x%p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] sep dev is 0x%pK\n",
 		current->pid, sep);
-	dev_dbg(&sep->pdev->dev, "[PID%d] private_data is 0x%p\n",
+	dev_dbg(&sep->pdev->dev, "[PID%d] private_data is 0x%pK\n",
 		current->pid, private_data);
 
 	error = sep_fastcall_args_get(sep, &call_hdr, buf_user, count_user);
@@ -4165,7 +4165,7 @@ static int sep_probe(struct pci_dev *pdev,
 	}
 
 	dev_dbg(&sep->pdev->dev,
-		"Register area start %llx end %llx virtual %p\n",
+		"Register area start %llx end %llx virtual %pK\n",
 		(unsigned long long)sep->reg_physical_addr,
 		(unsigned long long)sep->reg_physical_end,
 		sep->reg_addr);

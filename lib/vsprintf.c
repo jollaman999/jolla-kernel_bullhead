@@ -1097,7 +1097,7 @@ char *address_val(char *buf, char *end, const void *addr,
 int kptr_restrict __read_mostly;
 
 /*
- * Show a '%p' thing.  A kernel extension is that the '%p' is followed
+ * Show a '%pK' thing.  A kernel extension is that the '%pK' is followed
  * by an extra set of alphanumeric characters that are extended format
  * specifiers.
  *

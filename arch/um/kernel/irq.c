@@ -93,7 +93,7 @@ static int activate_fd(int irq, int fd, int type, void *dev_id)
 		if ((irq_fd->fd == fd) && (irq_fd->type == type)) {
 			printk(KERN_ERR "Registering fd %d twice\n", fd);
 			printk(KERN_ERR "Irqs : %d, %d\n", irq_fd->irq, irq);
-			printk(KERN_ERR "Ids : 0x%p, 0x%p\n", irq_fd->id,
+			printk(KERN_ERR "Ids : 0x%pK, 0x%pK\n", irq_fd->id,
 			       dev_id);
 			goto out_unlock;
 		}

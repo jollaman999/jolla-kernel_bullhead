@@ -335,7 +335,7 @@ acpi_ds_call_control_method(struct acpi_thread_state *thread,
 	ACPI_FUNCTION_TRACE_PTR(ds_call_control_method, this_walk_state);
 
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "Calling method %p, currentstate=%p\n",
+			  "Calling method %pK, currentstate=%pK\n",
 			  this_walk_state->prev_op, this_walk_state));
 
 	/*
@@ -412,7 +412,7 @@ acpi_ds_call_control_method(struct acpi_thread_state *thread,
 	this_walk_state->num_operands = 0;
 
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "**** Begin nested execution of [%4.4s] **** WalkState=%p\n",
+			  "**** Begin nested execution of [%4.4s] **** WalkState=%pK\n",
 			  method_node->name.ascii, next_walk_state));
 
 	/* Invoke an internal method if necessary */
@@ -463,12 +463,12 @@ acpi_ds_restart_control_method(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_TRACE_PTR(ds_restart_control_method, walk_state);
 
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "****Restart [%4.4s] Op %p ReturnValueFromCallee %p\n",
+			  "****Restart [%4.4s] Op %pK ReturnValueFromCallee %pK\n",
 			  acpi_ut_get_node_name(walk_state->method_node),
 			  walk_state->method_call_op, return_desc));
 
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "    ReturnFromThisMethodUsed?=%X ResStack %p Walk %p\n",
+			  "    ReturnFromThisMethodUsed?=%X ResStack %pK Walk %pK\n",
 			  walk_state->return_used,
 			  walk_state->results, walk_state));
 

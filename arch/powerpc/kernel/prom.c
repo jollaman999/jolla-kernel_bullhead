@@ -124,7 +124,7 @@ static void __init move_device_tree(void)
 		p = __va(memblock_alloc(size, PAGE_SIZE));
 		memcpy(p, initial_boot_params, size);
 		initial_boot_params = (struct boot_param_header *)p;
-		DBG("Moved device tree to 0x%p\n", p);
+		DBG("Moved device tree to 0x%pK\n", p);
 	}
 
 	DBG("<- move_device_tree\n");
@@ -600,7 +600,7 @@ void __init early_init_devtree(void *params)
 {
 	phys_addr_t limit;
 
-	DBG(" -> early_init_devtree(%p)\n", params);
+	DBG(" -> early_init_devtree(%pK)\n", params);
 
 	/* Setup flat device-tree pointer */
 	initial_boot_params = params;

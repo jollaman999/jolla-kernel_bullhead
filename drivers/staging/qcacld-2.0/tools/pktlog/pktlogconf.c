@@ -41,7 +41,7 @@ int pktlog_enable(char *sysctl_name, unsigned filter)
 
     fp = fopen(sysctl_name, "w");
 
-    printf("Open status of the pktlog_enable:%p %s\n", fp, sysctl_name);
+    printf("Open status of the pktlog_enable:%pK %s\n", fp, sysctl_name);
     if (fp != NULL) {
         fprintf(fp, "%i", filter);
         fclose(fp);

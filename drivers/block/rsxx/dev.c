@@ -198,7 +198,7 @@ static void rsxx_make_request(struct request_queue *q, struct bio *bio)
 
 	disk_stats_start(card, bio);
 
-	dev_dbg(CARD_TO_DEV(card), "BIO[%c]: meta: %p addr8: x%llx size: %d\n",
+	dev_dbg(CARD_TO_DEV(card), "BIO[%c]: meta: %pK addr8: x%llx size: %d\n",
 		 bio_data_dir(bio) ? 'W' : 'R', bio_meta,
 		 (u64)bio->bi_sector << 9, bio->bi_size);
 

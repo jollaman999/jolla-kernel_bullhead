@@ -518,7 +518,7 @@ static void snd_disconnect(struct usb_interface *intf)
 		return;
 
 	cdev = caiaqdev(card);
-	dev_dbg(dev, "%s(%p)\n", __func__, intf);
+	dev_dbg(dev, "%s(%pK)\n", __func__, intf);
 
 	snd_card_disconnect(card);
 

@@ -558,10 +558,10 @@ bttv_risc_hook(struct bttv *btv, int slot, struct btcx_riscmem *risc,
 	unsigned long next = btv->main.dma + ((slot+2) << 2);
 
 	if (NULL == risc) {
-		d2printk("%d: risc=%p slot[%d]=NULL\n", btv->c.nr, risc, slot);
+		d2printk("%d: risc=%pK slot[%d]=NULL\n", btv->c.nr, risc, slot);
 		btv->main.cpu[slot+1] = cpu_to_le32(next);
 	} else {
-		d2printk("%d: risc=%p slot[%d]=%08llx irq=%d\n",
+		d2printk("%d: risc=%pK slot[%d]=%08llx irq=%d\n",
 			 btv->c.nr, risc, slot,
 			 (unsigned long long)risc->dma, irqflags);
 		cmd = BT848_RISC_JUMP;

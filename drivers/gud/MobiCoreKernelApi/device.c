@@ -205,7 +205,7 @@ bool mcore_device_free_contiguous_wsm(struct mcore_device_t *dev,
 
 	if (ret) {
 		MCDRV_DBG_VERBOSE(mc_kapi,
-				  "freeWsm virt_addr=0x%p, handle=%d",
+				  "freeWsm virt_addr=0x%pK, handle=%d",
 				  wsm->virt_addr, wsm->handle);
 
 		/* ignore return code */

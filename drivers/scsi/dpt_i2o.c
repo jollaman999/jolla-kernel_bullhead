@@ -1063,7 +1063,7 @@ static int adpt_install_hba(struct scsi_host_template* sht, struct pci_dev* pDev
 
 	if(raptorFlag == 0){
 		printk(KERN_INFO "Adaptec I2O RAID controller"
-				 " %d at %p size=%x irq=%d%s\n", 
+				 " %d at %pK size=%x irq=%d%s\n", 
 			hba_count-1, base_addr_virt,
 			hba_map0_area_size, pDev->irq,
 			dma64 ? " (64-bit DMA)" : "");
@@ -1071,8 +1071,8 @@ static int adpt_install_hba(struct scsi_host_template* sht, struct pci_dev* pDev
 		printk(KERN_INFO"Adaptec I2O RAID controller %d irq=%d%s\n",
 			hba_count-1, pDev->irq,
 			dma64 ? " (64-bit DMA)" : "");
-		printk(KERN_INFO"     BAR0 %p - size= %x\n",base_addr_virt,hba_map0_area_size);
-		printk(KERN_INFO"     BAR1 %p - size= %x\n",msg_addr_virt,hba_map1_area_size);
+		printk(KERN_INFO"     BAR0 %pK - size= %x\n",base_addr_virt,hba_map0_area_size);
+		printk(KERN_INFO"     BAR1 %pK - size= %x\n",msg_addr_virt,hba_map1_area_size);
 	}
 
 	if (request_irq (pDev->irq, adpt_isr, IRQF_SHARED, pHba->name, pHba)) {
@@ -1820,7 +1820,7 @@ static int adpt_i2o_passthru(adpt_hba* pHba, u32 __user *arg)
 //		the queue empties and stops.  We need a way to restart the queue
 		rcode = adpt_i2o_post_wait(pHba, msg, size, FOREVER);
 		if (rcode != 0)
-			printk("adpt_i2o_passthru: post wait failed %d %p\n",
+			printk("adpt_i2o_passthru: post wait failed %d %pK\n",
 					rcode, reply);
 //		pHba->state &= ~DPTI_STATE_IOCTL;
 		if(pHba->host)
@@ -1866,7 +1866,7 @@ static int adpt_i2o_passthru(adpt_hba* pHba, u32 __user *arg)
 				sg_size = sg[j].flag_count & 0xffffff; 
 				// sg_simple_element API is 32 bit
 				if (copy_to_user((void __user *)(ulong)sg[j].addr_bus,sg_list[j], sg_size)) {
-					printk(KERN_WARNING"%s: Could not copy %p TO user %x\n",pHba->name, sg_list[j], sg[j].addr_bus);
+					printk(KERN_WARNING"%s: Could not copy %pK TO user %x\n",pHba->name, sg_list[j], sg[j].addr_bus);
 					rcode = -EFAULT;
 					goto cleanup;
 				}
@@ -2201,7 +2201,7 @@ static irqreturn_t adpt_isr(int irq, void *dev_id)
 				cmd = adpt_cmd_from_context(pHba,
 							readl(reply+12));
 				if(cmd != NULL) {
-					printk(KERN_WARNING"%s: Apparent SCSI cmd in Post Wait Context - cmd=%p context=%x\n", pHba->name, cmd, context);
+					printk(KERN_WARNING"%s: Apparent SCSI cmd in Post Wait Context - cmd=%pK context=%x\n", pHba->name, cmd, context);
 				}
 			}
 			adpt_i2o_post_wait_complete(context, status);
@@ -3416,7 +3416,7 @@ static int adpt_i2o_issue_params(int cmd, adpt_hba* pHba, int tid,
 	msg[8] = (u32)resblk_pa;
 
 	if ((wait_status = adpt_i2o_post_wait(pHba, msg, sizeof(msg), 20))) {
-		printk("adpt_i2o_issue_params: post_wait failed (%p)\n", resblk_va);
+		printk("adpt_i2o_issue_params: post_wait failed (%pK)\n", resblk_va);
    		return wait_status; 	/* -DetailedStatus */
 	}
 

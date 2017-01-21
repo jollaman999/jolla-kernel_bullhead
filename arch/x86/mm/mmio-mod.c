@@ -283,7 +283,7 @@ void mmiotrace_ioremap(resource_size_t offset, unsigned long size,
 	if (!is_enabled()) /* recheck and proper locking in *_core() */
 		return;
 
-	pr_debug("ioremap_*(0x%llx, 0x%lx) = %p\n",
+	pr_debug("ioremap_*(0x%llx, 0x%lx) = %pK\n",
 		 (unsigned long long)offset, size, addr);
 	if ((filter_offset) && (offset != filter_offset))
 		return;
@@ -302,7 +302,7 @@ static void iounmap_trace_core(volatile void __iomem *addr)
 	struct remap_trace *tmp;
 	struct remap_trace *found_trace = NULL;
 
-	pr_debug("Unmapping %p.\n", addr);
+	pr_debug("Unmapping %pK.\n", addr);
 
 	spin_lock_irq(&trace_lock);
 	if (!is_enabled())

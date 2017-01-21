@@ -3756,7 +3756,7 @@ eHalStatus limSendDisassocCnf(tpAniSirGlobal pMac)
                  eSIR_MAC_DISASSOC_DUE_TO_FTHANDOFF_REASON))
         {
             PELOGE(limLog(pMac, LOGE,
-                   FL("FT Preauth Session (%p,%d) Cleanup"),
+                   FL("FT Preauth Session (%pK,%d) Cleanup"),
                    psessionEntry, psessionEntry->peSessionId););
 
 #if defined WLAN_FEATURE_VOWIFI_11R

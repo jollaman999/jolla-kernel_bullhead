@@ -450,7 +450,7 @@ try_again:
 
 	ret = pcol_add_page(pcol, page, len);
 	if (ret) {
-		EXOFS_DBGMSG2("Failed pcol_add_page pages[i]=%p "
+		EXOFS_DBGMSG2("Failed pcol_add_page pages[i]=%pK "
 			  "this_len=0x%zx nr_pages=%u length=0x%lx\n",
 			  page, len, pcol->nr_pages, pcol->length);
 

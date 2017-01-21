@@ -308,7 +308,7 @@ static void spi_sh_work(struct work_struct *work)
 
 		spin_unlock_irqrestore(&ss->lock, flags);
 		list_for_each_entry(t, &mesg->transfers, transfer_list) {
-			pr_debug("tx_buf = %p, rx_buf = %p\n",
+			pr_debug("tx_buf = %pK, rx_buf = %pK\n",
 					t->tx_buf, t->rx_buf);
 			pr_debug("len = %d, delay_usecs = %d\n",
 					t->len, t->delay_usecs);

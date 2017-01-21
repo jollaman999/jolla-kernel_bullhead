@@ -259,7 +259,7 @@ static int tce_build_wsp(struct iommu_table *tbl, long index, long npages,
 		rpn = __pa(uaddr) >> TCE_SHIFT;
 		*tcep = proto_tce | (rpn & TCE_RPN_MASK) << TCE_RPN_SHIFT;
 
-		dma_debug("[DMA] TCE %p set to 0x%016llx (dma addr: 0x%lx)\n",
+		dma_debug("[DMA] TCE %pK set to 0x%016llx (dma addr: 0x%lx)\n",
 			  tcep, *tcep, (tbl->it_offset + index) << IOMMU_PAGE_SHIFT);
 
 		uaddr += TCE_PAGE_SIZE;
@@ -286,7 +286,7 @@ static void tce_free_wsp(struct iommu_table *tbl, long index, long npages)
 		/* We don't use it->base as the table can be scattered */
 		tcep = (u64 *)page_address(ptbl->tces[index >> 16]);
 		tcep += (index & 0xffff);
-		dma_debug("[DMA] TCE %p cleared\n", tcep);
+		dma_debug("[DMA] TCE %pK cleared\n", tcep);
 		*tcep = 0;
 #ifndef CONFIG_WSP_DD1_WORKAROUND_DD1_TCE_BUGS
 		/* Don't write there since it would pollute other MMIO accesses */
@@ -344,7 +344,7 @@ static struct wsp_dma_table *wsp_pci_create_dma32_table(struct wsp_phb *phb,
 			goto fail;
 		memset(page_address(tbl->tces[i]), 0, 0x80000);
 
-		pr_debug(" TCE table %d at : %p\n", i, page_address(tbl->tces[i]));
+		pr_debug(" TCE table %d at : %pK\n", i, page_address(tbl->tces[i]));
 
 		/* Table size. We currently set it to be the whole 256M region */
 		tvt_data0 = 2ull << IODA_TVT0_TCE_TABLE_SIZE_SHIFT;
@@ -675,7 +675,7 @@ static int __init wsp_setup_one_phb(struct device_node *np)
 	 */
 	hose->cfg_data = of_iomap(hose->dn, 0);
 
-	pr_debug("PCIe registers mapped at 0x%p\n", hose->cfg_data);
+	pr_debug("PCIe registers mapped at 0x%pK\n", hose->cfg_data);
 
 	/* Get the ranges of the device-tree */
 	pci_process_bridge_OF_ranges(hose, np, 0);

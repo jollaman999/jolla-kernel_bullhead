@@ -279,7 +279,7 @@ static int dlm_recoverd(void *arg)
 
 	ls = dlm_find_lockspace_local(arg);
 	if (!ls) {
-		log_print("dlm_recoverd: no lockspace %p", arg);
+		log_print("dlm_recoverd: no lockspace %pK", arg);
 		return -1;
 	}
 

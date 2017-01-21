@@ -82,7 +82,7 @@ static void do_test(unsigned long size)
 		pr_err("could not ioremap, aborting.\n");
 		return;
 	}
-	mmiotrace_printk("ioremap returned %p.\n", p);
+	mmiotrace_printk("ioremap returned %pK.\n", p);
 	do_write_test(p);
 	do_read_test(p);
 	if (read_far && read_far < size - 4)

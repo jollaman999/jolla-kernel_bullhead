@@ -3380,7 +3380,7 @@ static int __init scsi_debug_init(void)
 		dif_size = sdebug_store_sectors * sizeof(struct sd_dif_tuple);
 		dif_storep = vmalloc(dif_size);
 
-		printk(KERN_ERR "scsi_debug_init: dif_storep %u bytes @ %p\n",
+		printk(KERN_ERR "scsi_debug_init: dif_storep %u bytes @ %pK\n",
 		       dif_size, dif_storep);
 
 		if (dif_storep == NULL) {

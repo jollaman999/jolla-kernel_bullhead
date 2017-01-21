@@ -53,7 +53,7 @@ struct ib_pd *ehca_alloc_pd(struct ib_device *device,
 
 	pd = kmem_cache_zalloc(pd_cache, GFP_KERNEL);
 	if (!pd) {
-		ehca_err(device, "device=%p context=%p out of memory",
+		ehca_err(device, "device=%pK context=%pK out of memory",
 			 device, context);
 		return ERR_PTR(-ENOMEM);
 	}

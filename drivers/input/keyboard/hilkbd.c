@@ -306,7 +306,7 @@ static int hil_probe_chip(struct parisc_device *dev)
 		return -ENODEV;
 
 	if (!dev->irq) {
-		printk(KERN_WARNING "HIL: IRQ not found for HIL bus at 0x%p\n",
+		printk(KERN_WARNING "HIL: IRQ not found for HIL bus at 0x%pK\n",
 			(void *)dev->hpa.start);
 		return -ENODEV;
 	}

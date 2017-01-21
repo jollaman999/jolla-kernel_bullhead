@@ -835,7 +835,7 @@ static int smtcfb_pci_probe(struct pci_dev *pdev,
 #ifdef __BIG_ENDIAN
 		if (sfb->fb.var.bits_per_pixel == 32) {
 			sfb->lfb += 0x800000;
-			dev_info(&pdev->dev, "sfb->lfb=%p", sfb->lfb);
+			dev_info(&pdev->dev, "sfb->lfb=%pK", sfb->lfb);
 		}
 #endif
 		if (!smtc_RegBaseAddress) {

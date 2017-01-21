@@ -581,7 +581,7 @@ static void stb0899_set_mclk(struct stb0899_state *state, u32 Mclk)
 	struct stb0899_internal *internal = &state->internal;
 	u8 mdiv = 0;
 
-	dprintk(state->verbose, FE_DEBUG, 1, "state->config=%p", state->config);
+	dprintk(state->verbose, FE_DEBUG, 1, "state->config=%pK", state->config);
 	mdiv = ((6 * Mclk) / state->config->xtal_freq) - 1;
 	dprintk(state->verbose, FE_DEBUG, 1, "mdiv=%d", mdiv);
 

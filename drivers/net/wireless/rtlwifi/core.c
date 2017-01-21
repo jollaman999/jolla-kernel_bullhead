@@ -173,7 +173,7 @@ static int rtl_op_add_interface(struct ieee80211_hw *hw,
 
 	if (mac->vif) {
 		RT_TRACE(rtlpriv, COMP_ERR, DBG_WARNING,
-			 "vif has been set!! mac->vif = 0x%p\n", mac->vif);
+			 "vif has been set!! mac->vif = 0x%pK\n", mac->vif);
 		return -EOPNOTSUPP;
 	}
 

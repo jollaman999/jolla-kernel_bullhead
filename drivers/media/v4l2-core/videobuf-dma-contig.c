@@ -50,7 +50,7 @@ static int __videobuf_dc_alloc(struct device *dev,
 		return -ENOMEM;
 	}
 
-	dev_dbg(dev, "dma mapped data is at %p (%ld)\n", mem->vaddr, mem->size);
+	dev_dbg(dev, "dma mapped data is at %pK (%ld)\n", mem->vaddr, mem->size);
 
 	return 0;
 }
@@ -67,7 +67,7 @@ static void videobuf_vm_open(struct vm_area_struct *vma)
 {
 	struct videobuf_mapping *map = vma->vm_private_data;
 
-	dev_dbg(map->q->dev, "vm_open %p [count=%u,vma=%08lx-%08lx]\n",
+	dev_dbg(map->q->dev, "vm_open %pK [count=%u,vma=%08lx-%08lx]\n",
 		map, map->count, vma->vm_start, vma->vm_end);
 
 	map->count++;
@@ -79,14 +79,14 @@ static void videobuf_vm_close(struct vm_area_struct *vma)
 	struct videobuf_queue *q = map->q;
 	int i;
 
-	dev_dbg(q->dev, "vm_close %p [count=%u,vma=%08lx-%08lx]\n",
+	dev_dbg(q->dev, "vm_close %pK [count=%u,vma=%08lx-%08lx]\n",
 		map, map->count, vma->vm_start, vma->vm_end);
 
 	map->count--;
 	if (0 == map->count) {
 		struct videobuf_dma_contig_memory *mem;
 
-		dev_dbg(q->dev, "munmap %p q=%p\n", map, q);
+		dev_dbg(q->dev, "munmap %pK q=%pK\n", map, q);
 		videobuf_queue_lock(q);
 
 		/* We need first to cancel streams, before unmapping */
@@ -113,7 +113,7 @@ static void videobuf_vm_close(struct vm_area_struct *vma)
 				/* vfree is not atomic - can't be
 				   called with IRQ's disabled
 				 */
-				dev_dbg(q->dev, "buf[%d] freeing %p\n",
+				dev_dbg(q->dev, "buf[%d] freeing %pK\n",
 					i, mem->vaddr);
 
 				__videobuf_dc_free(q->dev, mem);
@@ -323,7 +323,7 @@ static int __videobuf_mmap_mapper(struct videobuf_queue *q,
 	vma->vm_flags |= VM_DONTEXPAND;
 	vma->vm_private_data = map;
 
-	dev_dbg(q->dev, "mmap %p: q=%p %08lx-%08lx (%lx) pgoff %08lx buf %d\n",
+	dev_dbg(q->dev, "mmap %pK: q=%pK %08lx-%08lx (%lx) pgoff %08lx buf %d\n",
 		map, q, vma->vm_start, vma->vm_end,
 		(long int)buf->bsize, vma->vm_pgoff, buf->i);
 

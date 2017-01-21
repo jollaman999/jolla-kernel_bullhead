@@ -99,7 +99,7 @@ int snd_device_free(struct snd_card *card, void *device_data)
 		kfree(dev);
 		return 0;
 	}
-	snd_printd("device free %p (from %pF), not found\n", device_data,
+	snd_printd("device free %pK (from %pF), not found\n", device_data,
 		   __builtin_return_address(0));
 	return -ENXIO;
 }
@@ -136,7 +136,7 @@ int snd_device_disconnect(struct snd_card *card, void *device_data)
 		}
 		return 0;
 	}
-	snd_printd("device disconnect %p (from %pF), not found\n", device_data,
+	snd_printd("device disconnect %pK (from %pF), not found\n", device_data,
 		   __builtin_return_address(0));
 	return -ENXIO;
 }

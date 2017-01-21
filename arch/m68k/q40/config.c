@@ -84,7 +84,7 @@ static int __init q40_debug_setup(char *arg)
 {
 	/* useful for early debugging stages - writes kernel messages into SRAM */
 	if (MACH_IS_Q40 && !strncmp(arg, "mem", 3)) {
-		/*printk("using NVRAM debug, q40_mem_cptr=%p\n",q40_mem_cptr);*/
+		/*printk("using NVRAM debug, q40_mem_cptr=%pK\n",q40_mem_cptr);*/
 		_cpleft = 2000 - ((long)q40_mem_cptr-0xff020000) / 4;
 		register_console(&q40_console_driver);
 	}

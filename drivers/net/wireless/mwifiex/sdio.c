@@ -903,7 +903,7 @@ mwifiex_sdio_interrupt(struct sdio_func *func)
 
 	card = sdio_get_drvdata(func);
 	if (!card || !card->adapter) {
-		pr_debug("int: func=%p card=%p adapter=%p\n",
+		pr_debug("int: func=%pK card=%pK adapter=%pK\n",
 			 func, card, card ? card->adapter : NULL);
 		return;
 	}
@@ -1466,7 +1466,7 @@ static int mwifiex_sdio_host_to_card(struct mwifiex_adapter *adapter,
 
 		if (pkt_len <= INTF_HEADER_LEN ||
 		    pkt_len > MWIFIEX_UPLD_SIZE)
-			dev_err(adapter->dev, "%s: payload=%p, nb=%d\n",
+			dev_err(adapter->dev, "%s: payload=%pK, nb=%d\n",
 				__func__, payload, pkt_len);
 	}
 

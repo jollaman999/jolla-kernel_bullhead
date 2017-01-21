@@ -296,7 +296,7 @@ static void internal_copy_pointers_items(struct buffer_info *dest_bi,
 	nr_src = B_NR_ITEMS(src);
 
 	RFALSE(dest == NULL || src == NULL,
-	       "src (%p) or dest (%p) buffer is 0", src, dest);
+	       "src (%pK) or dest (%pK) buffer is 0", src, dest);
 	RFALSE(last_first != FIRST_TO_LAST && last_first != LAST_TO_FIRST,
 	       "invalid last_first parameter (%d)", last_first);
 	RFALSE(nr_src < cpy_num - 1,
@@ -413,7 +413,7 @@ static void internal_insert_key(struct buffer_info *dest_bi, int dest_position_b
 	struct reiserfs_key *key;
 
 	RFALSE(dest == NULL || src == NULL,
-	       "source(%p) or dest(%p) buffer is 0", src, dest);
+	       "source(%pK) or dest(%pK) buffer is 0", src, dest);
 	RFALSE(dest_position_before < 0 || src_position < 0,
 	       "source(%d) or dest(%d) key number less than 0",
 	       src_position, dest_position_before);
@@ -543,7 +543,7 @@ static void internal_shift_right(int mode,	/* INTERNAL_FROM_S_TO_R | INTERNAL_FR
 		if (nr == pointer_amount - 1) {
 			RFALSE(src_bi.bi_bh != PATH_H_PBUFFER(tb->tb_path, h) /*tb->S[h] */ ||
 			       dest_bi.bi_bh != tb->R[h],
-			       "src (%p) must be == tb->S[h](%p) when it disappears",
+			       "src (%pK) must be == tb->S[h](%pK) when it disappears",
 			       src_bi.bi_bh, PATH_H_PBUFFER(tb->tb_path, h));
 			/* when S[h] disappers replace left delemiting key as well */
 			if (tb->CFL[h])
@@ -618,7 +618,7 @@ static void balance_internal_when_delete(struct tree_balance *tb,
 			       || B_FREE_SPACE(tbSh) !=
 			       MAX_CHILD_SIZE(tbSh) - DC_SIZE,
 			       "buffer must have only 0 keys (%d)", n);
-			RFALSE(bi.bi_parent, "root has parent (%p)",
+			RFALSE(bi.bi_parent, "root has parent (%pK)",
 			       bi.bi_parent);
 
 			/* choose a new root */
@@ -711,7 +711,7 @@ static void balance_internal_when_delete(struct tree_balance *tb,
 static void replace_lkey(struct tree_balance *tb, int h, struct item_head *key)
 {
 	RFALSE(tb->L[h] == NULL || tb->CFL[h] == NULL,
-	       "L[h](%p) and CFL[h](%p) must exist in replace_lkey",
+	       "L[h](%pK) and CFL[h](%pK) must exist in replace_lkey",
 	       tb->L[h], tb->CFL[h]);
 
 	if (B_NR_ITEMS(PATH_H_PBUFFER(tb->tb_path, h)) == 0)
@@ -726,7 +726,7 @@ static void replace_lkey(struct tree_balance *tb, int h, struct item_head *key)
 static void replace_rkey(struct tree_balance *tb, int h, struct item_head *key)
 {
 	RFALSE(tb->R[h] == NULL || tb->CFR[h] == NULL,
-	       "R[h](%p) and CFR[h](%p) must exist in replace_rkey",
+	       "R[h](%pK) and CFR[h](%pK) must exist in replace_rkey",
 	       tb->R[h], tb->CFR[h]);
 	RFALSE(B_NR_ITEMS(tb->R[h]) == 0,
 	       "R[h] can not be empty if it exists (item number=%d)",

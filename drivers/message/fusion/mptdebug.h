@@ -164,7 +164,7 @@ DBG_DUMP_PUT_MSG_FRAME(MPT_ADAPTER *ioc, u32 *mfp)
 
 	if (!(ioc->debug_level & MPT_DEBUG_MSG_FRAME))
 		return;
-	printk(KERN_DEBUG "%s: About to Put msg frame @ %p:\n",
+	printk(KERN_DEBUG "%s: About to Put msg frame @ %pK:\n",
 		ioc->name, mfp);
 	n = ioc->req_sz/4 - 1;
 	while (mfp[n] == 0)

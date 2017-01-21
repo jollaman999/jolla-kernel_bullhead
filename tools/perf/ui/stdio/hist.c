@@ -198,7 +198,7 @@ static size_t callchain__fprintf_graph(FILE *fp, struct rb_root *root,
 			if (chain->ms.sym)
 				ret += fprintf(fp, " %s\n", chain->ms.sym->name);
 			else
-				ret += fprintf(fp, " %p\n", (void *)(long)chain->ip);
+				ret += fprintf(fp, " %pK\n", (void *)(long)chain->ip);
 
 			if (++entries_printed == callchain_param.print_limit)
 				break;
@@ -232,7 +232,7 @@ static size_t __callchain__fprintf_flat(FILE *fp,
 		if (chain->ms.sym)
 			ret += fprintf(fp, "                %s\n", chain->ms.sym->name);
 		else
-			ret += fprintf(fp, "                %p\n",
+			ret += fprintf(fp, "                %pK\n",
 					(void *)(long)chain->ip);
 	}
 

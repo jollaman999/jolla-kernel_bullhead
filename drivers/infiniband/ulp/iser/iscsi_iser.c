@@ -371,7 +371,7 @@ iscsi_iser_conn_bind(struct iscsi_cls_session *cls_session,
 	/* binds the iSER connection retrieved from the previously
 	 * connected ep_handle to the iSCSI layer connection. exchanges
 	 * connection pointers */
-	iser_info("binding iscsi/iser conn %p %p to ib_conn %p\n",
+	iser_info("binding iscsi/iser conn %pK %pK to ib_conn %pK\n",
 		  conn, conn->dd_data, ib_conn);
 	iser_conn = conn->dd_data;
 	ib_conn->iser_conn = iser_conn;
@@ -597,7 +597,7 @@ iscsi_iser_ep_poll(struct iscsi_endpoint *ep, int timeout_ms)
 	     ib_conn->state == ISER_CONN_DOWN))
 		rc = -1;
 
-	iser_info("ib conn %p rc = %d\n", ib_conn, rc);
+	iser_info("ib conn %pK rc = %d\n", ib_conn, rc);
 
 	if (rc > 0)
 		return 1; /* success, this is the equivalent of POLLOUT */
@@ -624,7 +624,7 @@ iscsi_iser_ep_disconnect(struct iscsi_endpoint *ep)
 		iscsi_suspend_tx(ib_conn->iser_conn->iscsi_conn);
 
 
-	iser_info("ib conn %p state %d\n", ib_conn, ib_conn->state);
+	iser_info("ib conn %pK state %d\n", ib_conn, ib_conn->state);
 	iser_conn_terminate(ib_conn);
 }
 

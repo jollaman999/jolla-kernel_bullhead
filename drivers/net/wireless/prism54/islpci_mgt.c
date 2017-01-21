@@ -365,7 +365,7 @@ islpci_mgt_receive(struct net_device *ndev)
 
 #if VERBOSE > SHOW_ERROR_MESSAGES
 		DEBUG(SHOW_PIMFOR_FRAMES,
-		      "frame: header: %p, data: %p, size: %d\n",
+		      "frame: header: %pK, data: %pK, size: %d\n",
 		      frame->header, frame->data, size);
 #endif
 

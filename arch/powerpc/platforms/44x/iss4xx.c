@@ -110,7 +110,7 @@ static int smp_iss4xx_kick_cpu(int cpu)
 	 * fishy but will work fine for now
 	 */
 	spin_table = (u32 *)__va(*spin_table_addr_prop);
-	pr_debug("CPU%d: Spin table mapped at %p\n", cpu, spin_table);
+	pr_debug("CPU%d: Spin table mapped at %pK\n", cpu, spin_table);
 
 	spin_table[3] = cpu;
 	smp_wmb();

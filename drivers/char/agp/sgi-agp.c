@@ -301,7 +301,7 @@ static int agp_sgi_init(void)
 				continue;
 		}
 		sgi_tioca_agp_bridges[j] = agp_alloc_bridge();
-		printk(KERN_INFO PFX "bridge %d = 0x%p\n", j,
+		printk(KERN_INFO PFX "bridge %d = 0x%pK\n", j,
 		       sgi_tioca_agp_bridges[j]);
 		if (sgi_tioca_agp_bridges[j]) {
 			sgi_tioca_agp_bridges[j]->dev = pdev;

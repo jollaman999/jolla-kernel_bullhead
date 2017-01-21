@@ -91,7 +91,7 @@ static void dump_insn(FILE *fp, struct insn *insn)
 	dump_field(fp, "immediate2", "\t",	&insn->immediate2);
 	fprintf(fp, "\t.attr = %x, .opnd_bytes = %d, .addr_bytes = %d,\n",
 		insn->attr, insn->opnd_bytes, insn->addr_bytes);
-	fprintf(fp, "\t.length = %d, .x86_64 = %d, .kaddr = %p}\n",
+	fprintf(fp, "\t.length = %d, .x86_64 = %d, .kaddr = %pK}\n",
 		insn->length, insn->x86_64, insn->kaddr);
 }
 

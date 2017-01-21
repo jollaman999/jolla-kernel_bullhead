@@ -144,12 +144,12 @@ static int nst_seq_show(struct seq_file *seq, void *v)
 	status = ktime_to_us(ktime_sub(now, nst->st_status_time));
 
 	/* get_task_comm isn't exported.  oh well. */
-	seq_printf(seq, "%p:\n"
+	seq_printf(seq, "%pK:\n"
 		   "  pid:          %lu\n"
 		   "  tgid:         %lu\n"
 		   "  process name: %s\n"
 		   "  node:         %u\n"
-		   "  sc:           %p\n"
+		   "  sc:           %pK\n"
 		   "  message id:   %d\n"
 		   "  message type: %u\n"
 		   "  message key:  0x%08x\n"
@@ -349,7 +349,7 @@ static void sc_show_sock_container(struct seq_file *seq,
 
 	/* XXX sigh, inet-> doesn't have sparse annotation so any
 	 * use of it here generates a warning with -Wbitwise */
-	seq_printf(seq, "%p:\n"
+	seq_printf(seq, "%pK:\n"
 		   "  krefs:           %d\n"
 		   "  sock:            %pI4:%u -> "
 				      "%pI4:%u\n"

@@ -2292,7 +2292,7 @@ megaraid_mbox_dpc(unsigned long devp)
 		// Make sure f/w has completed a valid command
 		if (scb->state != SCB_ISSUED) {
 			con_log(CL_ANN, (KERN_CRIT
-			"megaraid critical err: invalid command %d:%d:%p\n",
+			"megaraid critical err: invalid command %d:%d:%pK\n",
 				scb->sno, scb->state, scp));
 			BUG();
 			continue;	// Must never happen!

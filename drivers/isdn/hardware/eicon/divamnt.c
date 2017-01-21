@@ -234,7 +234,7 @@ static int __init maint_init(void)
 		goto out;
 	}
 
-	printk(KERN_INFO "%s: trace buffer = %p - %d kBytes, %s (Major: %d)\n",
+	printk(KERN_INFO "%s: trace buffer = %pK - %d kBytes, %s (Major: %d)\n",
 	       DRIVERLNAME, buffer, (buffer_length / 1024),
 	       (diva_dbg_mem == 0) ? "internal" : "external", major);
 

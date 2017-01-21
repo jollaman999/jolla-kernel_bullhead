@@ -977,7 +977,7 @@ static int rpmsg_probe(struct virtio_device *vdev)
 		goto vqs_del;
 	}
 
-	dev_dbg(&vdev->dev, "buffers: va %p, dma 0x%llx\n", bufs_va,
+	dev_dbg(&vdev->dev, "buffers: va %pK, dma 0x%llx\n", bufs_va,
 					(unsigned long long)vrp->bufs_dma);
 
 	/* half of the buffers is dedicated for RX */

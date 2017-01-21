@@ -620,7 +620,7 @@ void eeh_save_bars(struct eeh_dev *edev)
 int __init eeh_ops_register(struct eeh_ops *ops)
 {
 	if (!ops->name) {
-		pr_warning("%s: Invalid EEH ops name for %p\n",
+		pr_warning("%s: Invalid EEH ops name for %pK\n",
 			__func__, ops);
 		return -EINVAL;
 	}

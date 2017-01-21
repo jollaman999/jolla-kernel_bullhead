@@ -137,7 +137,7 @@ void iwch_ev_dispatch(struct cxio_rdev *rdev_p, struct sk_buff *skb)
 	if ((CQE_OPCODE(rsp_msg->cqe) == T3_TERMINATE) &&
 	    (CQE_STATUS(rsp_msg->cqe) == 0)) {
 		if (SQ_TYPE(rsp_msg->cqe)) {
-			PDBG("%s QPID 0x%x ep %p disconnecting\n",
+			PDBG("%s QPID 0x%x ep %pK disconnecting\n",
 			     __func__, qhp->wq.qpid, qhp->ep);
 			iwch_ep_disconnect(qhp->ep, 0, GFP_ATOMIC);
 		} else {

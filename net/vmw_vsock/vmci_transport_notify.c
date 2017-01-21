@@ -295,7 +295,7 @@ static int vmci_transport_send_read_notification(struct sock *sk)
 		}
 
 		if (retries >= VMCI_TRANSPORT_MAX_DGRAM_RESENDS)
-			pr_err("%p unable to send read notify to peer\n", sk);
+			pr_err("%pK unable to send read notify to peer\n", sk);
 		else
 #if defined(VSOCK_OPTIMIZATION_WAITING_NOTIFY)
 			PKT_FIELD(vsk, peer_waiting_write) = false;
@@ -591,7 +591,7 @@ vmci_transport_notify_pkt_send_post_enqueue(
 		}
 
 		if (retries >= VMCI_TRANSPORT_MAX_DGRAM_RESENDS) {
-			pr_err("%p unable to send wrote notify to peer\n", sk);
+			pr_err("%pK unable to send wrote notify to peer\n", sk);
 			return err;
 		} else {
 #if defined(VSOCK_OPTIMIZATION_WAITING_NOTIFY)

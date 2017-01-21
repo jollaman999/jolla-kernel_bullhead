@@ -433,7 +433,7 @@ void mwifiex_11n_delete_tx_ba_stream_tbl_entry(struct mwifiex_private *priv,
 	    mwifiex_is_tx_ba_stream_ptr_valid(priv, tx_ba_tsr_tbl))
 		return;
 
-	dev_dbg(priv->adapter->dev, "info: tx_ba_tsr_tbl %p\n", tx_ba_tsr_tbl);
+	dev_dbg(priv->adapter->dev, "info: tx_ba_tsr_tbl %pK\n", tx_ba_tsr_tbl);
 
 	list_del(&tx_ba_tsr_tbl->list);
 

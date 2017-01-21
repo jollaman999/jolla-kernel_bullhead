@@ -143,7 +143,7 @@ static bool __td_dma_done_ack(struct timb_dma_chan *td_chan)
 	u32 isr;
 	bool done = false;
 
-	dev_dbg(chan2dev(&td_chan->chan), "Checking irq: %d, td: %p\n", id, td);
+	dev_dbg(chan2dev(&td_chan->chan), "Checking irq: %d, td: %pK\n", id, td);
 
 	isr = ioread32(td->membase + TIMBDMA_ISR) & (1 << id);
 	if (isr) {
@@ -201,7 +201,7 @@ static int td_fill_desc(struct timb_dma_chan *td_chan, u8 *dma_desc,
 		return -EINVAL;
 	}
 
-	dev_dbg(chan2dev(&td_chan->chan), "desc: %p, addr: 0x%llx\n",
+	dev_dbg(chan2dev(&td_chan->chan), "desc: %pK, addr: 0x%llx\n",
 		dma_desc, (unsigned long long)sg_dma_address(sg));
 
 	dma_desc[7] = (sg_dma_address(sg) >> 24) & 0xff;
@@ -233,7 +233,7 @@ static void __td_start_dma(struct timb_dma_chan *td_chan)
 		desc_node);
 
 	dev_dbg(chan2dev(&td_chan->chan),
-		"td_chan: %p, chan: %d, membase: %p\n",
+		"td_chan: %pK, chan: %d, membase: %pK\n",
 		td_chan, td_chan->chan.chan_id, td_chan->membase);
 
 	if (td_chan->direction == DMA_DEV_TO_MEM) {
@@ -413,7 +413,7 @@ out:
 
 static void td_free_desc(struct timb_dma_desc *td_desc)
 {
-	dev_dbg(chan2dev(td_desc->txd.chan), "Freeing desc: %p\n", td_desc);
+	dev_dbg(chan2dev(td_desc->txd.chan), "Freeing desc: %pK\n", td_desc);
 	dma_unmap_single(chan2dmadev(td_desc->txd.chan), td_desc->txd.phys,
 		td_desc->desc_list_len, DMA_TO_DEVICE);
 
@@ -424,7 +424,7 @@ static void td_free_desc(struct timb_dma_desc *td_desc)
 static void td_desc_put(struct timb_dma_chan *td_chan,
 	struct timb_dma_desc *td_desc)
 {
-	dev_dbg(chan2dev(&td_chan->chan), "Putting desc: %p\n", td_desc);
+	dev_dbg(chan2dev(&td_chan->chan), "Putting desc: %pK\n", td_desc);
 
 	spin_lock_bh(&td_chan->lock);
 	list_add(&td_desc->desc_node, &td_chan->free_list);
@@ -444,7 +444,7 @@ static struct timb_dma_desc *td_desc_get(struct timb_dma_chan *td_chan)
 			ret = td_desc;
 			break;
 		}
-		dev_dbg(chan2dev(&td_chan->chan), "desc %p not ACKed\n",
+		dev_dbg(chan2dev(&td_chan->chan), "desc %pK not ACKed\n",
 			td_desc);
 	}
 	spin_unlock_bh(&td_chan->lock);
@@ -501,7 +501,7 @@ static void td_free_chan_resources(struct dma_chan *chan)
 	spin_unlock_bh(&td_chan->lock);
 
 	list_for_each_entry_safe(td_desc, _td_desc, &list, desc_node) {
-		dev_dbg(chan2dev(chan), "%s: Freeing desc: %p\n", __func__,
+		dev_dbg(chan2dev(chan), "%s: Freeing desc: %pK\n", __func__,
 			td_desc);
 		td_free_desc(td_desc);
 	}
@@ -700,7 +700,7 @@ static int td_probe(struct platform_device *pdev)
 		goto err_release_region;
 	}
 
-	dev_dbg(&pdev->dev, "Allocated TD: %p\n", td);
+	dev_dbg(&pdev->dev, "Allocated TD: %pK\n", td);
 
 	td->membase = ioremap(iomem->start, resource_size(iomem));
 	if (!td->membase) {
@@ -767,7 +767,7 @@ static int td_probe(struct platform_device *pdev)
 			(i / 2) * TIMBDMA_INSTANCE_OFFSET +
 			(pchan->rx ? 0 : TIMBDMA_INSTANCE_TX_OFFSET);
 
-		dev_dbg(&pdev->dev, "Chan: %d, membase: %p\n",
+		dev_dbg(&pdev->dev, "Chan: %d, membase: %pK\n",
 			i, td_chan->membase);
 
 		list_add_tail(&td_chan->chan.device_node, &td->dma.channels);

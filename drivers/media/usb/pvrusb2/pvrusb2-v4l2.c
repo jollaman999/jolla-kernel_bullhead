@@ -921,7 +921,7 @@ static void pvr2_v4l2_destroy_no_lock(struct pvr2_v4l2 *vp)
 		vp->dev_radio = NULL;
 	}
 
-	pvr2_trace(PVR2_TRACE_STRUCT,"Destroying pvr2_v4l2 id=%p",vp);
+	pvr2_trace(PVR2_TRACE_STRUCT,"Destroying pvr2_v4l2 id=%pK",vp);
 	pvr2_channel_done(&vp->channel);
 	kfree(vp);
 }
@@ -1039,7 +1039,7 @@ static int pvr2_v4l2_release(struct file *file)
 	fhp->vhead = NULL;
 	pvr2_channel_done(&fhp->channel);
 	pvr2_trace(PVR2_TRACE_STRUCT,
-		   "Destroying pvr_v4l2_fh id=%p",fhp);
+		   "Destroying pvr_v4l2_fh id=%pK",fhp);
 	if (fhp->input_map) {
 		kfree(fhp->input_map);
 		fhp->input_map = NULL;
@@ -1083,7 +1083,7 @@ static int pvr2_v4l2_open(struct file *file)
 	init_waitqueue_head(&fhp->wait_data);
 	fhp->pdi = dip;
 
-	pvr2_trace(PVR2_TRACE_STRUCT,"Creating pvr_v4l2_fh id=%p",fhp);
+	pvr2_trace(PVR2_TRACE_STRUCT,"Creating pvr_v4l2_fh id=%pK",fhp);
 	pvr2_channel_init(&fhp->channel,vp->channel.mc_head);
 
 	if (dip->v4l_type == VFL_TYPE_RADIO) {
@@ -1102,7 +1102,7 @@ static int pvr2_v4l2_open(struct file *file)
 	if (ret) {
 		pvr2_channel_done(&fhp->channel);
 		pvr2_trace(PVR2_TRACE_STRUCT,
-			   "Destroying pvr_v4l2_fh id=%p (input mask error)",
+			   "Destroying pvr_v4l2_fh id=%pK (input mask error)",
 			   fhp);
 
 		kfree(fhp);
@@ -1119,7 +1119,7 @@ static int pvr2_v4l2_open(struct file *file)
 	if (!fhp->input_map) {
 		pvr2_channel_done(&fhp->channel);
 		pvr2_trace(PVR2_TRACE_STRUCT,
-			   "Destroying pvr_v4l2_fh id=%p (input map failure)",
+			   "Destroying pvr_v4l2_fh id=%pK (input map failure)",
 			   fhp);
 		kfree(fhp);
 		return -ENOMEM;
@@ -1380,7 +1380,7 @@ struct pvr2_v4l2 *pvr2_v4l2_create(struct pvr2_context *mnp)
 	vp = kzalloc(sizeof(*vp),GFP_KERNEL);
 	if (!vp) return vp;
 	pvr2_channel_init(&vp->channel,mnp);
-	pvr2_trace(PVR2_TRACE_STRUCT,"Creating pvr2_v4l2 id=%p",vp);
+	pvr2_trace(PVR2_TRACE_STRUCT,"Creating pvr2_v4l2 id=%pK",vp);
 
 	vp->channel.check_func = pvr2_v4l2_internal_check;
 
@@ -1397,7 +1397,7 @@ struct pvr2_v4l2 *pvr2_v4l2_create(struct pvr2_context *mnp)
 
 	return vp;
  fail:
-	pvr2_trace(PVR2_TRACE_STRUCT,"Failure creating pvr2_v4l2 id=%p",vp);
+	pvr2_trace(PVR2_TRACE_STRUCT,"Failure creating pvr2_v4l2 id=%pK",vp);
 	pvr2_v4l2_destroy_no_lock(vp);
 	return NULL;
 }

@@ -299,7 +299,7 @@ static void hdd_wmm_free_context (hdd_wmm_qos_context_t* pQosContext)
    hdd_adapter_t* pAdapter;
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO_LOW,
-             "%s: Entered, context %p",
+             "%s: Entered, context %pK",
              __func__, pQosContext);
 
    if (unlikely((NULL == pQosContext) ||
@@ -347,7 +347,7 @@ static void hdd_wmm_notify_app (hdd_wmm_qos_context_t* pQosContext)
    char buf[MAX_NOTIFY_LEN+1];
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO_LOW,
-             "%s: Entered, context %p",
+             "%s: Entered, context %pK",
              __func__, pQosContext);
 
    if (unlikely((NULL == pQosContext) ||
@@ -572,7 +572,7 @@ static eHalStatus hdd_wmm_sme_callback (tHalHandle hHal,
    VOS_STATUS status;
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO_LOW,
-             "%s: Entered, context %p",
+             "%s: Entered, context %pK",
              __func__, pQosContext);
 
    if (unlikely((NULL == pQosContext) ||
@@ -589,7 +589,7 @@ static eHalStatus hdd_wmm_sme_callback (tHalHandle hHal,
    pAc = &pAdapter->hddWmmStatus.wmmAcStatus[acType];
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO_LOW,
-             "%s: status %d flowid %d info %p",
+             "%s: status %d flowid %d info %pK",
              __func__, smeStatus, qosFlowId, pCurrentQosInfo);
 
    switch (smeStatus)
@@ -1254,7 +1254,7 @@ static void __hdd_wmm_do_implicit_qos(struct work_struct *work)
    hdd_context_t *hdd_ctx;
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO_LOW,
-             "%s: Entered, context %p",
+             "%s: Entered, context %pK",
              __func__, pQosContext);
 
    if (unlikely(HDD_WMM_CTX_MAGIC != pQosContext->magic))
@@ -1277,7 +1277,7 @@ static void __hdd_wmm_do_implicit_qos(struct work_struct *work)
    pAc = &pAdapter->hddWmmStatus.wmmAcStatus[acType];
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO_LOW,
-             "%s: pAdapter %p acType %d",
+             "%s: pAdapter %pK acType %d",
              __func__, pAdapter, acType);
 
    if (!pAc->wmmAcAccessNeeded)
@@ -2075,7 +2075,7 @@ VOS_STATUS hdd_wmm_acquire_access( hdd_adapter_t* pAdapter,
 
    // we need to establish implicit QoS
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO,
-             "%s: Need to schedule implicit QoS for TL AC %d, pAdapter is %p",
+             "%s: Need to schedule implicit QoS for TL AC %d, pAdapter is %pK",
              __func__, acType, pAdapter);
 
    pAdapter->hddWmmStatus.wmmAcStatus[acType].wmmAcAccessNeeded = VOS_TRUE;
@@ -2107,7 +2107,7 @@ VOS_STATUS hdd_wmm_acquire_access( hdd_adapter_t* pAdapter,
 #endif
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO,
-             "%s: Scheduling work for AC %d, context %p",
+             "%s: Scheduling work for AC %d, context %pK",
              __func__, acType, pQosContext);
 
    schedule_work(&pQosContext->wmmAcSetupImplicitQos);
@@ -2539,7 +2539,7 @@ hdd_wlan_wmm_status_e hdd_wmm_addts( hdd_adapter_t* pAdapter,
    pQosContext->magic = HDD_WMM_CTX_MAGIC;
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO,
-             "%s: Setting up QoS, context %p",
+             "%s: Setting up QoS, context %pK",
              __func__, pQosContext);
 
    mutex_lock(&pAdapter->hddWmmStatus.wmmLock);
@@ -2653,7 +2653,7 @@ hdd_wlan_wmm_status_e hdd_wmm_delts( hdd_adapter_t* pAdapter,
 
 
    VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO_LOW,
-             "%s: found handle 0x%x, flow %d, AC %d, context %p",
+             "%s: found handle 0x%x, flow %d, AC %d, context %pK",
              __func__, handle, qosFlowId, acType, pQosContext);
 
 #ifndef WLAN_MDM_CODE_REDUCTION_OPT
@@ -2739,7 +2739,7 @@ hdd_wlan_wmm_status_e hdd_wmm_checkts( hdd_adapter_t* pAdapter,
       if (pQosContext->handle == handle)
       {
          VOS_TRACE(VOS_MODULE_ID_HDD, WMM_TRACE_LEVEL_INFO_LOW,
-                   "%s: found handle 0x%x, context %p",
+                   "%s: found handle 0x%x, context %pK",
                    __func__, handle, pQosContext);
 
          status = pQosContext->lastStatus;

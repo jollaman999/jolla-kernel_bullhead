@@ -98,7 +98,7 @@ acpi_ex_check_object_type(acpi_object_type type_needed,
 
 	if (type_needed != this_type) {
 		ACPI_ERROR((AE_INFO,
-			    "Needed type [%s], found [%s] %p",
+			    "Needed type [%s], found [%s] %pK",
 			    acpi_ut_get_type_name(type_needed),
 			    acpi_ut_get_type_name(this_type), object));
 
@@ -170,7 +170,7 @@ acpi_ex_resolve_operands(u16 opcode,
 	 */
 	while (GET_CURRENT_ARG_TYPE(arg_types)) {
 		if (!stack_ptr || !*stack_ptr) {
-			ACPI_ERROR((AE_INFO, "Null stack entry at %p",
+			ACPI_ERROR((AE_INFO, "Null stack entry at %pK",
 				    stack_ptr));
 
 			return_ACPI_STATUS(AE_AML_INTERNAL);
@@ -252,7 +252,7 @@ acpi_ex_resolve_operands(u16 opcode,
 				default:
 
 					ACPI_ERROR((AE_INFO,
-						    "Unknown Reference Class 0x%2.2X in %p",
+						    "Unknown Reference Class 0x%2.2X in %pK",
 						    obj_desc->reference.class,
 						    obj_desc));
 
@@ -265,7 +265,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 			/* Invalid descriptor */
 
-			ACPI_ERROR((AE_INFO, "Invalid descriptor %p [%s]",
+			ACPI_ERROR((AE_INFO, "Invalid descriptor %pK [%s]",
 				    obj_desc,
 				    acpi_ut_get_descriptor_name(obj_desc)));
 
@@ -417,7 +417,7 @@ acpi_ex_resolve_operands(u16 opcode,
 			if (ACPI_FAILURE(status)) {
 				if (status == AE_TYPE) {
 					ACPI_ERROR((AE_INFO,
-						    "Needed [Integer/String/Buffer], found [%s] %p",
+						    "Needed [Integer/String/Buffer], found [%s] %pK",
 						    acpi_ut_get_object_type_name
 						    (obj_desc), obj_desc));
 
@@ -443,7 +443,7 @@ acpi_ex_resolve_operands(u16 opcode,
 			if (ACPI_FAILURE(status)) {
 				if (status == AE_TYPE) {
 					ACPI_ERROR((AE_INFO,
-						    "Needed [Integer/String/Buffer], found [%s] %p",
+						    "Needed [Integer/String/Buffer], found [%s] %pK",
 						    acpi_ut_get_object_type_name
 						    (obj_desc), obj_desc));
 
@@ -470,7 +470,7 @@ acpi_ex_resolve_operands(u16 opcode,
 			if (ACPI_FAILURE(status)) {
 				if (status == AE_TYPE) {
 					ACPI_ERROR((AE_INFO,
-						    "Needed [Integer/String/Buffer], found [%s] %p",
+						    "Needed [Integer/String/Buffer], found [%s] %pK",
 						    acpi_ut_get_object_type_name
 						    (obj_desc), obj_desc));
 
@@ -499,7 +499,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 			default:
 				ACPI_ERROR((AE_INFO,
-					    "Needed [Integer/String/Buffer], found [%s] %p",
+					    "Needed [Integer/String/Buffer], found [%s] %pK",
 					    acpi_ut_get_object_type_name
 					    (obj_desc), obj_desc));
 
@@ -536,7 +536,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 			default:
 				ACPI_ERROR((AE_INFO,
-					    "Needed [Integer/String/Buffer], found [%s] %p",
+					    "Needed [Integer/String/Buffer], found [%s] %pK",
 					    acpi_ut_get_object_type_name
 					    (obj_desc), obj_desc));
 
@@ -563,7 +563,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 			default:
 				ACPI_ERROR((AE_INFO,
-					    "Needed [Buffer/String/Package/Reference], found [%s] %p",
+					    "Needed [Buffer/String/Package/Reference], found [%s] %pK",
 					    acpi_ut_get_object_type_name
 					    (obj_desc), obj_desc));
 
@@ -585,7 +585,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 			default:
 				ACPI_ERROR((AE_INFO,
-					    "Needed [Buffer/String/Package], found [%s] %p",
+					    "Needed [Buffer/String/Package], found [%s] %pK",
 					    acpi_ut_get_object_type_name
 					    (obj_desc), obj_desc));
 
@@ -606,7 +606,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 			default:
 				ACPI_ERROR((AE_INFO,
-					    "Needed [Region/Buffer], found [%s] %p",
+					    "Needed [Region/Buffer], found [%s] %pK",
 					    acpi_ut_get_object_type_name
 					    (obj_desc), obj_desc));
 
@@ -652,7 +652,7 @@ acpi_ex_resolve_operands(u16 opcode,
 				}
 
 				ACPI_ERROR((AE_INFO,
-					    "Needed Integer/Buffer/String/Package/Ref/Ddb], found [%s] %p",
+					    "Needed Integer/Buffer/String/Package/Ref/Ddb], found [%s] %pK",
 					    acpi_ut_get_object_type_name
 					    (obj_desc), obj_desc));
 

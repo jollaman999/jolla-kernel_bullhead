@@ -278,7 +278,7 @@ int saa7134_buffer_queue(struct saa7134_dev *dev,
 	struct saa7134_buf *next = NULL;
 
 	assert_spin_locked(&dev->slock);
-	dprintk("buffer_queue %p\n",buf);
+	dprintk("buffer_queue %pK\n",buf);
 	if (NULL == q->curr) {
 		if (!q->need_two) {
 			q->curr = buf;
@@ -304,7 +304,7 @@ void saa7134_buffer_finish(struct saa7134_dev *dev,
 			   unsigned int state)
 {
 	assert_spin_locked(&dev->slock);
-	dprintk("buffer_finish %p\n",q->curr);
+	dprintk("buffer_finish %pK\n",q->curr);
 
 	/* finish current buffer */
 	q->curr->vb.state = state;
@@ -324,7 +324,7 @@ void saa7134_buffer_next(struct saa7134_dev *dev,
 	if (!list_empty(&q->queue)) {
 		/* activate next one from queue */
 		buf = list_entry(q->queue.next,struct saa7134_buf,vb.queue);
-		dprintk("buffer_next %p [prev=%p/next=%p]\n",
+		dprintk("buffer_next %pK [prev=%pK/next=%pK]\n",
 			buf,q->queue.prev,q->queue.next);
 		list_del(&buf->vb.queue);
 		if (!list_empty(&q->queue))
@@ -332,11 +332,11 @@ void saa7134_buffer_next(struct saa7134_dev *dev,
 					  vb.queue);
 		q->curr = buf;
 		buf->activate(dev,buf,next);
-		dprintk("buffer_next #2 prev=%p/next=%p\n",
+		dprintk("buffer_next #2 prev=%pK/next=%pK\n",
 			q->queue.prev,q->queue.next);
 	} else {
 		/* nothing to do -- just stop DMA */
-		dprintk("buffer_next %p\n",NULL);
+		dprintk("buffer_next %pK\n",NULL);
 		saa7134_set_dmabits(dev);
 		del_timer(&q->timeout);
 
@@ -362,7 +362,7 @@ void saa7134_buffer_timeout(unsigned long data)
 	/* flag current buffer as failed,
 	   try to start over with the next one. */
 	if (q->curr) {
-		dprintk("timeout on %p\n",q->curr);
+		dprintk("timeout on %pK\n",q->curr);
 		saa7134_buffer_finish(dev,q,VIDEOBUF_ERROR);
 	}
 	saa7134_buffer_next(dev,q);

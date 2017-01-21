@@ -203,7 +203,7 @@ resource_size_t pcibios_align_resource(void *data, const struct resource *res,
 {
 	resource_size_t mask, align, start = res->start;
 
-	DBG_RES("pcibios_align_resource(%s, (%p) [%lx,%lx]/%x, 0x%lx, 0x%lx)\n",
+	DBG_RES("pcibios_align_resource(%s, (%pK) [%lx,%lx]/%x, 0x%lx, 0x%lx)\n",
 		pci_name(((struct pci_dev *) data)),
 		res->parent, res->start, res->end,
 		(int) res->flags, size, alignment);

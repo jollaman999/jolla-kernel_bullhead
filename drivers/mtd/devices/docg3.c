@@ -226,7 +226,7 @@ static void doc_read_data_area(struct docg3 *docg3, void *buf, int len,
 	u16 data16, *dst16;
 	u8 data8, *dst8;
 
-	doc_dbg("doc_read_data_area(buf=%p, len=%d)\n", buf, len);
+	doc_dbg("doc_read_data_area(buf=%pK, len=%d)\n", buf, len);
 	cdr = len & 0x1;
 	len4 = len - cdr;
 
@@ -270,7 +270,7 @@ static void doc_write_data_area(struct docg3 *docg3, const void *buf, int len)
 	u16 *src16;
 	u8 *src8;
 
-	doc_dbg("doc_write_data_area(buf=%p, len=%d)\n", buf, len);
+	doc_dbg("doc_write_data_area(buf=%pK, len=%d)\n", buf, len);
 	cdr = len & 0x3;
 	len4 = len - cdr;
 
@@ -876,7 +876,7 @@ static int doc_read_oob(struct mtd_info *mtd, loff_t from,
 	if (oobbuf && ops->mode == MTD_OPS_PLACE_OOB)
 		oobbuf += ops->ooboffs;
 
-	doc_dbg("doc_read_oob(from=%lld, mode=%d, data=(%p:%zu), oob=(%p:%zu))\n",
+	doc_dbg("doc_read_oob(from=%lld, mode=%d, data=(%pK:%zu), oob=(%pK:%zu))\n",
 		from, ops->mode, buf, len, oobbuf, ooblen);
 	if (ooblen % DOC_LAYOUT_OOB_SIZE)
 		return -EINVAL;
@@ -1062,7 +1062,7 @@ static int doc_get_erase_count(struct docg3 *docg3, loff_t from)
 	int ret, plane1_erase_count, plane2_erase_count;
 	int block0, block1, page, ofs;
 
-	doc_dbg("doc_get_erase_count(from=%lld, buf=%p)\n", from, buf);
+	doc_dbg("doc_get_erase_count(from=%lld, buf=%pK)\n", from, buf);
 	if (from % DOC_LAYOUT_PAGE_SIZE)
 		return -EINVAL;
 	calc_block_sector(from, &block0, &block1, &page, &ofs, docg3->reliable);
@@ -1429,7 +1429,7 @@ static int doc_write_oob(struct mtd_info *mtd, loff_t ofs,
 	if (oobbuf && ops->mode == MTD_OPS_PLACE_OOB)
 		oobbuf += ops->ooboffs;
 
-	doc_dbg("doc_write_oob(from=%lld, mode=%d, data=(%p:%zu), oob=(%p:%zu))\n",
+	doc_dbg("doc_write_oob(from=%lld, mode=%d, data=(%pK:%zu), oob=(%pK:%zu))\n",
 		ofs, ops->mode, buf, len, oobbuf, ooblen);
 	switch (ops->mode) {
 	case MTD_OPS_PLACE_OOB:
@@ -1912,7 +1912,7 @@ doc_probe_device(struct docg3_cascade *cascade, int floor, struct device *dev)
 
 	switch (chip_id) {
 	case DOC_CHIPID_G3:
-		doc_info("Found a G3 DiskOnChip at addr %p, floor %d\n",
+		doc_info("Found a G3 DiskOnChip at addr %pK, floor %d\n",
 			 docg3->cascade->base, floor);
 		break;
 	default:

@@ -265,7 +265,7 @@ static struct drm_buf *savage_freelist_get(struct drm_device * dev)
 		return tail->buf;
 	}
 
-	DRM_DEBUG("returning NULL, tail->buf=%p!\n", tail->buf);
+	DRM_DEBUG("returning NULL, tail->buf=%pK!\n", tail->buf);
 	return NULL;
 }
 

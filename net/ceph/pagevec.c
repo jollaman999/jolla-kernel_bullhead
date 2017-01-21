@@ -209,21 +209,21 @@ void ceph_zero_page_vector_range(int off, int len, struct page **pages)
 	/* leading partial page? */
 	if (off) {
 		int end = min((int)PAGE_CACHE_SIZE, off + len);
-		dout("zeroing %d %p head from %d\n", i, pages[i],
+		dout("zeroing %d %pK head from %d\n", i, pages[i],
 		     (int)off);
 		zero_user_segment(pages[i], off, end);
 		len -= (end - off);
 		i++;
 	}
 	while (len >= PAGE_CACHE_SIZE) {
-		dout("zeroing %d %p len=%d\n", i, pages[i], len);
+		dout("zeroing %d %pK len=%d\n", i, pages[i], len);
 		zero_user_segment(pages[i], 0, PAGE_CACHE_SIZE);
 		len -= PAGE_CACHE_SIZE;
 		i++;
 	}
 	/* trailing partial page? */
 	if (len) {
-		dout("zeroing %d %p tail to %d\n", i, pages[i], (int)len);
+		dout("zeroing %d %pK tail to %d\n", i, pages[i], (int)len);
 		zero_user_segment(pages[i], 0, len);
 	}
 }

@@ -350,7 +350,7 @@ static ssize_t sysfs_test_status(struct device *dev, struct device_attribute *at
 	spin_lock(&rttest_lock);
 
 	curr += sprintf(curr,
-		"O: %4d, E:%8d, S: 0x%08lx, P: %4d, N: %4d, B: %p, M:",
+		"O: %4d, E:%8d, S: 0x%08lx, P: %4d, N: %4d, B: %pK, M:",
 		td->opcode, td->event, tsk->state,
 			(MAX_RT_PRIO - 1) - tsk->prio,
 			(MAX_RT_PRIO - 1) - tsk->normal_prio,
@@ -361,7 +361,7 @@ static ssize_t sysfs_test_status(struct device *dev, struct device_attribute *at
 
 	spin_unlock(&rttest_lock);
 
-	curr += sprintf(curr, ", T: %p, R: %p\n", tsk,
+	curr += sprintf(curr, ", T: %pK, R: %pK\n", tsk,
 			mutexes[td->dev.id].owner);
 
 	return curr - buf;

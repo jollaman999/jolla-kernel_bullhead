@@ -161,7 +161,7 @@ static int egpio_get(struct gpio_chip *chip, unsigned offset)
 	reg   = egpio->reg_start + egpio_pos(ei, offset);
 
 	value = egpio_readw(ei, reg);
-	pr_debug("readw(%p + %x) = %x\n",
+	pr_debug("readw(%pK + %x) = %x\n",
 			ei->base_addr, reg << ei->bus_shift, value);
 	return value & bit;
 }
@@ -289,7 +289,7 @@ static int __init egpio_probe(struct platform_device *pdev)
 	ei->base_addr = ioremap_nocache(res->start, resource_size(res));
 	if (!ei->base_addr)
 		goto fail;
-	pr_debug("EGPIO phys=%08x virt=%p\n", (u32)res->start, ei->base_addr);
+	pr_debug("EGPIO phys=%08x virt=%pK\n", (u32)res->start, ei->base_addr);
 
 	if ((pdata->bus_width != 16) && (pdata->bus_width != 32))
 		goto fail;

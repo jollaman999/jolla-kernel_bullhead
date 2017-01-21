@@ -359,7 +359,7 @@ static irqreturn_t scsi_sun3_intr(int irq, void *dummy)
 		if(csr & CSR_DMA_BUSERR) {
 			printk("scsi%d: bus error in dma\n", default_instance->host_no);
 #ifdef SUN3_SCSI_DEBUG
-			printk("scsi: residual %x count %x addr %p dmaaddr %x\n", 
+			printk("scsi: residual %x count %x addr %pK dmaaddr %x\n", 
 			       dregs->fifo_count,
 			       dregs->dma_count_lo | (dregs->dma_count_hi << 16),
 			       sun3_dma_orig_addr,
@@ -417,7 +417,7 @@ static unsigned long sun3scsi_dma_setup(void *data, unsigned long count, int wri
 	sun3_dma_orig_count = count;
 	
 #ifdef SUN3_SCSI_DEBUG
-	printk("scsi: dma_setup addr %p count %x\n", addr, count);
+	printk("scsi: dma_setup addr %pK count %x\n", addr, count);
 #endif
 
 //	dregs->fifo_count = 0;
@@ -475,7 +475,7 @@ static int sun3scsi_dma_start(unsigned long count, char *data)
 
 	csr = dregs->csr;
 #ifdef SUN3_SCSI_DEBUG
-	printk("scsi: dma_start data %p count %x csr %x fifo %x\n", data, count, csr, dregs->fifo_count);
+	printk("scsi: dma_start data %pK count %x csr %x fifo %x\n", data, count, csr, dregs->fifo_count);
 #endif
 	
 	dregs->dma_count_hi = (sun3_dma_orig_count >> 16);

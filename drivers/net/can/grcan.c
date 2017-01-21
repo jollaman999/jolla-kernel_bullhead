@@ -1639,7 +1639,7 @@ static int grcan_setup_netdev(struct platform_device *ofdev,
 	netif_napi_add(dev, &priv->napi, grcan_poll, GRCAN_NAPI_WEIGHT);
 
 	SET_NETDEV_DEV(dev, &ofdev->dev);
-	dev_info(&ofdev->dev, "regs=0x%p, irq=%d, clock=%d\n",
+	dev_info(&ofdev->dev, "regs=0x%pK, irq=%d, clock=%d\n",
 		 priv->regs, dev->irq, priv->can.clock.freq);
 
 	err = register_candev(dev);

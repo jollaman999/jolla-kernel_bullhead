@@ -51,13 +51,13 @@ EXPORT_SYMBOL_GPL(rds_inc_init);
 
 static void rds_inc_addref(struct rds_incoming *inc)
 {
-	rdsdebug("addref inc %p ref %d\n", inc, atomic_read(&inc->i_refcount));
+	rdsdebug("addref inc %pK ref %d\n", inc, atomic_read(&inc->i_refcount));
 	atomic_inc(&inc->i_refcount);
 }
 
 void rds_inc_put(struct rds_incoming *inc)
 {
-	rdsdebug("put inc %p ref %d\n", inc, atomic_read(&inc->i_refcount));
+	rdsdebug("put inc %pK ref %d\n", inc, atomic_read(&inc->i_refcount));
 	if (atomic_dec_and_test(&inc->i_refcount)) {
 		BUG_ON(!list_empty(&inc->i_item));
 
@@ -78,7 +78,7 @@ static void rds_recv_rcvbuf_delta(struct rds_sock *rs, struct sock *sk,
 	rs->rs_rcv_bytes += delta;
 	now_congested = rs->rs_rcv_bytes > rds_sk_rcvbuf(rs);
 
-	rdsdebug("rs %p (%pI4:%u) recv bytes %d buf %d "
+	rdsdebug("rs %pK (%pI4:%u) recv bytes %d buf %d "
 	  "now_cong %d delta %d\n",
 	  rs, &rs->rs_bound_addr,
 	  ntohs(rs->rs_bound_port), rs->rs_rcv_bytes,
@@ -164,7 +164,7 @@ void rds_recv_incoming(struct rds_connection *conn, __be32 saddr, __be32 daddr,
 	inc->i_conn = conn;
 	inc->i_rx_jiffies = jiffies;
 
-	rdsdebug("conn %p next %llu inc %p seq %llu len %u sport %u dport %u "
+	rdsdebug("conn %pK next %llu inc %pK seq %llu len %u sport %u dport %u "
 		 "flags 0x%x rx_jiffies %lu\n", conn,
 		 (unsigned long long)conn->c_next_rx_seq,
 		 inc,
@@ -223,7 +223,7 @@ void rds_recv_incoming(struct rds_connection *conn, __be32 saddr, __be32 daddr,
 	/* serialize with rds_release -> sock_orphan */
 	write_lock_irqsave(&rs->rs_recv_lock, flags);
 	if (!sock_flag(sk, SOCK_DEAD)) {
-		rdsdebug("adding inc %p to rs %p's recv queue\n", inc, rs);
+		rdsdebug("adding inc %pK to rs %pK's recv queue\n", inc, rs);
 		rds_stats_inc(s_recv_queued);
 		rds_recv_rcvbuf_delta(rs, sk, inc->i_conn->c_lcong,
 				      be32_to_cpu(inc->i_hdr.h_len),
@@ -285,7 +285,7 @@ static int rds_still_queued(struct rds_sock *rs, struct rds_incoming *inc,
 	}
 	write_unlock_irqrestore(&rs->rs_recv_lock, flags);
 
-	rdsdebug("inc %p rs %p still %d dropped %d\n", inc, rs, ret, drop);
+	rdsdebug("inc %pK rs %pK still %d dropped %d\n", inc, rs, ret, drop);
 	return ret;
 }
 
@@ -435,7 +435,7 @@ int rds_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,
 					(!list_empty(&rs->rs_notify_queue) ||
 					 rs->rs_cong_notify ||
 					 rds_next_incoming(rs, &inc)), timeo);
-			rdsdebug("recvmsg woke inc %p timeo %ld\n", inc,
+			rdsdebug("recvmsg woke inc %pK timeo %ld\n", inc,
 				 timeo);
 			if (timeo > 0 || timeo == MAX_SCHEDULE_TIMEOUT)
 				continue;
@@ -446,7 +446,7 @@ int rds_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,
 			break;
 		}
 
-		rdsdebug("copying inc %p from %pI4:%u to user\n", inc,
+		rdsdebug("copying inc %pK from %pI4:%u to user\n", inc,
 			 &inc->i_conn->c_faddr,
 			 ntohs(inc->i_hdr.h_sport));
 		ret = inc->i_conn->c_trans->inc_copy_to_user(inc, msg->msg_iov,

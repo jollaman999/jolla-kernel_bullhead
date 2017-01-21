@@ -2812,7 +2812,7 @@ static struct request *cfq_check_fifo(struct cfq_queue *cfqq)
 	if (time_before(jiffies, rq_fifo_time(rq)))
 		rq = NULL;
 
-	cfq_log_cfqq(cfqq->cfqd, cfqq, "fifo=%p", rq);
+	cfq_log_cfqq(cfqq->cfqd, cfqq, "fifo=%pK", rq);
 	return rq;
 }
 
@@ -4168,7 +4168,7 @@ static struct cfq_queue *
 cfq_merge_cfqqs(struct cfq_data *cfqd, struct cfq_io_cq *cic,
 		struct cfq_queue *cfqq)
 {
-	cfq_log_cfqq(cfqd, cfqq, "merging with queue %p", cfqq->new_cfqq);
+	cfq_log_cfqq(cfqd, cfqq, "merging with queue %pK", cfqq->new_cfqq);
 	cic_set_cfqq(cic, cfqq->new_cfqq, 1);
 	cfq_mark_cfqq_coop(cfqq->new_cfqq);
 	cfq_put_queue(cfqq);

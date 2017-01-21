@@ -58,7 +58,7 @@ static void sbecom_proc_get_brdinfo(ci_t *ci, struct sbe_brd_info *bip)
 
 	sbecom_get_brdinfo (ci, bip, bsn);
 
-	pr_devel(">> sbecom_get_brdinfo: returned, first_if %p <%s> last_if %p <%s>\n",
+	pr_devel(">> sbecom_get_brdinfo: returned, first_if %pK <%s> last_if %pK <%s>\n",
 		 bip->first_iname, bip->first_iname,
 		 bip->last_iname, bip->last_iname);
 }
@@ -134,7 +134,7 @@ static int sbecom_proc_get_sbe_info(struct seq_file *m, void *v)
 	seq_printf(m, "Interface:     %s -> %s\n",
 		   bip->first_iname, bip->last_iname);
 #else
-	seq_printf(m, "Interface:     <not available> 1st %p lst %p\n",
+	seq_printf(m, "Interface:     <not available> 1st %pK lst %pK\n",
 		   bip->first_iname, bip->last_iname);
 #endif
 

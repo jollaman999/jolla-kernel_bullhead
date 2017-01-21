@@ -29,7 +29,7 @@ _queue_message(struct mISDNstack *st, struct sk_buff *skb)
 	struct mISDNhead	*hh = mISDN_HEAD_P(skb);
 
 	if (*debug & DEBUG_QUEUE_FUNC)
-		printk(KERN_DEBUG "%s prim(%x) id(%x) %p\n",
+		printk(KERN_DEBUG "%s prim(%x) id(%x) %pK\n",
 		       __func__, hh->prim, hh->id, skb);
 	skb_queue_tail(&st->msgq, skb);
 	if (likely(!test_bit(mISDN_STACK_STOPPED, &st->status))) {
@@ -153,7 +153,7 @@ send_msg_to_layer(struct mISDNstack *st, struct sk_buff *skb)
 
 	lm = hh->prim & MISDN_LAYERMASK;
 	if (*debug & DEBUG_QUEUE_FUNC)
-		printk(KERN_DEBUG "%s prim(%x) id(%x) %p\n",
+		printk(KERN_DEBUG "%s prim(%x) id(%x) %pK\n",
 		       __func__, hh->prim, hh->id, skb);
 	if (lm == 0x1) {
 		if (!hlist_empty(&st->l1sock.head)) {

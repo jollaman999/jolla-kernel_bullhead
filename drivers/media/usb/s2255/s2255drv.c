@@ -532,7 +532,7 @@ static void s2255_fwchunk_complete(struct urb *urb)
 	struct s2255_fw *data = urb->context;
 	struct usb_device *udev = urb->dev;
 	int len;
-	dprintk(100, "%s: udev %p urb %p", __func__, udev, urb);
+	dprintk(100, "%s: udev %pK urb %pK", __func__, udev, urb);
 	if (urb->status) {
 		dev_err(&udev->dev, "URB failed with status %d\n", urb->status);
 		atomic_set(&data->fw_state, S2255_FW_FAILED);
@@ -603,7 +603,7 @@ static int s2255_got_frame(struct s2255_channel *channel, int jpgsize)
 	v4l2_get_timestamp(&buf->vb.ts);
 	s2255_fillbuff(channel, buf, jpgsize);
 	wake_up(&buf->vb.done);
-	dprintk(2, "%s: [buf/i] [%p/%d]\n", __func__, buf, buf->vb.i);
+	dprintk(2, "%s: [buf/i] [%pK/%d]\n", __func__, buf, buf->vb.i);
 unlock:
 	spin_unlock_irqrestore(&dev->slock, flags);
 	return rc;
@@ -2093,7 +2093,7 @@ static int save_frame(struct s2255_dev *dev, struct s2255_pipeinfo *pipe_info)
 
 
 	if (frm->lpvbits == NULL) {
-		dprintk(1, "s2255 frame buffer == NULL.%p %p %d %d",
+		dprintk(1, "s2255 frame buffer == NULL.%pK %pK %d %d",
 			frm, dev, dev->cc, idx);
 		return -ENOMEM;
 	}
@@ -2211,7 +2211,7 @@ static int s2255_create_sys_buffers(struct s2255_channel *channel)
 	for (i = 0; i < SYS_FRAMES; i++) {
 		/* allocate the frames */
 		channel->buffer.frame[i].lpvbits = vmalloc(reqsize);
-		dprintk(1, "valloc %p chan %d, idx %lu, pdata %p\n",
+		dprintk(1, "valloc %pK chan %d, idx %lu, pdata %pK\n",
 			&channel->buffer.frame[i], channel->idx, i,
 			channel->buffer.frame[i].lpvbits);
 		channel->buffer.frame[i].size = reqsize;
@@ -2239,7 +2239,7 @@ static int s2255_release_sys_buffers(struct s2255_channel *channel)
 	dprintk(1, "release sys buffers\n");
 	for (i = 0; i < SYS_FRAMES; i++) {
 		if (channel->buffer.frame[i].lpvbits) {
-			dprintk(1, "vfree %p\n",
+			dprintk(1, "vfree %pK\n",
 				channel->buffer.frame[i].lpvbits);
 			vfree(channel->buffer.frame[i].lpvbits);
 		}
@@ -2254,7 +2254,7 @@ static int s2255_board_init(struct s2255_dev *dev)
 	int fw_ver;
 	int j;
 	struct s2255_pipeinfo *pipe = &dev->pipe;
-	dprintk(4, "board init: %p", dev);
+	dprintk(4, "board init: %pK", dev);
 	memset(pipe, 0, sizeof(*pipe));
 	pipe->dev = dev;
 	pipe->cur_transfer_size = S2255_USB_XFER_SIZE;
@@ -2302,7 +2302,7 @@ static int s2255_board_init(struct s2255_dev *dev)
 static int s2255_board_shutdown(struct s2255_dev *dev)
 {
 	u32 i;
-	dprintk(1, "%s: dev: %p", __func__,  dev);
+	dprintk(1, "%s: dev: %pK", __func__,  dev);
 
 	for (i = 0; i < MAX_CHANNELS; i++) {
 		if (dev->channel[i].b_acquire)
@@ -2323,7 +2323,7 @@ static void read_pipe_completion(struct urb *purb)
 	int status;
 	int pipe;
 	pipe_info = purb->context;
-	dprintk(100, "%s: urb:%p, status %d\n", __func__, purb,
+	dprintk(100, "%s: urb:%pK, status %d\n", __func__, purb,
 		purb->status);
 	if (pipe_info == NULL) {
 		dev_err(&purb->dev->dev, "no context!\n");
@@ -2526,7 +2526,7 @@ static int s2255_probe(struct usb_interface *interface,
 		retval = -ENODEV;
 		goto errorUDEV;
 	}
-	dprintk(1, "dev: %p, udev %p interface %p\n", dev,
+	dprintk(1, "dev: %pK, udev %pK interface %pK\n", dev,
 		dev->udev, interface);
 	dev->interface = interface;
 	/* set up the endpoint information  */

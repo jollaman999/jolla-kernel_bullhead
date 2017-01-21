@@ -702,7 +702,7 @@ nv10_graph_create_pipe(struct nv10_graph_chan *chan)
 		u32 *__end_addr = pipe_state->pipe_##addr + \
 				ARRAY_SIZE(pipe_state->pipe_##addr); \
 		if (pipe_state_addr != __end_addr) \
-			nv_error(priv, "incomplete pipe init for 0x%x :  %p/%p\n", \
+			nv_error(priv, "incomplete pipe init for 0x%x :  %pK/%pK\n", \
 				addr, pipe_state_addr, __end_addr); \
 	} while (0)
 #define NV_WRITE_PIPE_INIT(value) *(pipe_state_addr++) = value

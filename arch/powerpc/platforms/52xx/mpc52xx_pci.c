@@ -242,7 +242,7 @@ mpc52xx_pci_setup(struct pci_controller *hose,
 	u32 tmp;
 	int iwcr0 = 0, iwcr1 = 0, iwcr2 = 0;
 
-	pr_debug("mpc52xx_pci_setup(hose=%p, pci_regs=%p)\n", hose, pci_regs);
+	pr_debug("mpc52xx_pci_setup(hose=%pK, pci_regs=%pK)\n", hose, pci_regs);
 
 	/* pci_process_bridge_OF_ranges() found all our addresses for us;
 	 * now store them in the right places */
@@ -293,7 +293,7 @@ mpc52xx_pci_setup(struct pci_controller *hose,
 		return;
 	}
 	pr_debug(".io_resource={.start=%llx,.end=%llx,.flags=%llx} "
-	         ".io_base_phys=0x%p\n",
+	         ".io_base_phys=0x%pK\n",
 	         (unsigned long long)res->start,
 		 (unsigned long long)res->end,
 		 (unsigned long long)res->flags, (void*)hose->io_base_phys);

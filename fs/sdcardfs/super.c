@@ -129,7 +129,7 @@ static int sdcardfs_remount_fs2(struct vfsmount *mnt, struct super_block *sb,
 		       "sdcardfs: remount flags 0x%x unsupported\n", *flags);
 		err = -EINVAL;
 	}
-	printk(KERN_INFO "Remount options were %s for vfsmnt %p.\n", options, mnt);
+	printk(KERN_INFO "Remount options were %s for vfsmnt %pK.\n", options, mnt);
 	err = parse_options_remount(sb, options, *flags & ~MS_SILENT, mnt->data);
 
 

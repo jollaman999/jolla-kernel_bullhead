@@ -261,7 +261,7 @@ static int afs_parse_device_name(struct afs_mount_params *params,
 	params->volnamesz = suffix ?
 		suffix - params->volname : strlen(params->volname);
 
-	_debug("cell %*.*s [%p]",
+	_debug("cell %*.*s [%pK]",
 	       cellnamesz, cellnamesz, cellname ?: "", params->cell);
 
 	/* lookup the cell record */
@@ -276,7 +276,7 @@ static int afs_parse_device_name(struct afs_mount_params *params,
 		params->cell = cell;
 	}
 
-	_debug("CELL:%s [%p] VOLUME:%*.*s SUFFIX:%s TYPE:%d%s",
+	_debug("CELL:%s [%pK] VOLUME:%*.*s SUFFIX:%s TYPE:%d%s",
 	       params->cell->name, params->cell,
 	       params->volnamesz, params->volnamesz, params->volname,
 	       suffix ?: "-", params->type, params->force ? " FORCE" : "");
@@ -362,7 +362,7 @@ static struct dentry *afs_mount(struct file_system_type *fs_type,
 	struct afs_super_info *as;
 	int ret;
 
-	_enter(",,%s,%p", dev_name, options);
+	_enter(",,%s,%pK", dev_name, options);
 
 	memset(&params, 0, sizeof(params));
 
@@ -434,7 +434,7 @@ static struct dentry *afs_mount(struct file_system_type *fs_type,
 
 	afs_put_cell(params.cell);
 	kfree(new_opts);
-	_leave(" = 0 [%p]", sb);
+	_leave(" = 0 [%pK]", sb);
 	return dget(sb->s_root);
 
 error:
@@ -495,7 +495,7 @@ static struct inode *afs_alloc_inode(struct super_block *sb)
 	vnode->flags		= 1 << AFS_VNODE_UNSET;
 	vnode->cb_promised	= false;
 
-	_leave(" = %p", &vnode->vfs_inode);
+	_leave(" = %pK", &vnode->vfs_inode);
 	return &vnode->vfs_inode;
 }
 
@@ -513,9 +513,9 @@ static void afs_destroy_inode(struct inode *inode)
 {
 	struct afs_vnode *vnode = AFS_FS_I(inode);
 
-	_enter("%p{%x:%u}", inode, vnode->fid.vid, vnode->fid.vnode);
+	_enter("%pK{%x:%u}", inode, vnode->fid.vid, vnode->fid.vnode);
 
-	_debug("DESTROY INODE %p", inode);
+	_debug("DESTROY INODE %pK", inode);
 
 	ASSERTCMP(vnode->server, ==, NULL);
 

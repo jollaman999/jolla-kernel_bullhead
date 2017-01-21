@@ -73,7 +73,7 @@ struct ipoib_ah *ipoib_create_ah(struct net_device *dev,
 		ah = (struct ipoib_ah *)vah;
 	} else {
 		ah->ah = vah;
-		ipoib_dbg(netdev_priv(dev), "Created ah %p\n", ah->ah);
+		ipoib_dbg(netdev_priv(dev), "Created ah %pK\n", ah->ah);
 	}
 
 	return ah;
@@ -570,7 +570,7 @@ void ipoib_send(struct net_device *dev, struct sk_buff *skb,
 		hlen  = 0;
 	}
 
-	ipoib_dbg_data(priv, "sending packet, length=%d address=%p qpn=0x%06x\n",
+	ipoib_dbg_data(priv, "sending packet, length=%d address=%pK qpn=0x%06x\n",
 		       skb->len, address, qpn);
 
 	/*

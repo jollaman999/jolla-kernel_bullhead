@@ -3281,7 +3281,7 @@ int wlcore_set_key(struct wl1271 *wl, enum set_key_cmd cmd,
 
 	wl1271_debug(DEBUG_MAC80211, "mac80211 set key");
 
-	wl1271_debug(DEBUG_CRYPT, "CMD: 0x%x sta: %p", cmd, sta);
+	wl1271_debug(DEBUG_CRYPT, "CMD: 0x%x sta: %pK", cmd, sta);
 	wl1271_debug(DEBUG_CRYPT, "Key: algo:0x%x, id:%d, len:%d flags 0x%x",
 		     key_conf->cipher, key_conf->keyidx,
 		     key_conf->keylen, key_conf->flags);

@@ -248,7 +248,7 @@ static void ipmi_msg_handler(struct ipmi_recv_msg *msg, void *user_msg_data)
 
 	if (msg->user != ipmi_device->user_interface) {
 		dev_warn(&pnp_dev->dev, "Unexpected response is returned. "
-			"returned user %p, expected user %p\n",
+			"returned user %pK, expected user %pK\n",
 			msg->user, ipmi_device->user_interface);
 		ipmi_free_recv_msg(msg);
 		return;

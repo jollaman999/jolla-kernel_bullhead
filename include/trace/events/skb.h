@@ -29,7 +29,7 @@ TRACE_EVENT(kfree_skb,
 		__entry->protocol = ntohs(skb->protocol);
 	),
 
-	TP_printk("skbaddr=%p protocol=%u location=%p",
+	TP_printk("skbaddr=%pK protocol=%u location=%pK",
 		__entry->skbaddr, __entry->protocol, __entry->location)
 );
 
@@ -47,7 +47,7 @@ TRACE_EVENT(consume_skb,
 		__entry->skbaddr = skb;
 	),
 
-	TP_printk("skbaddr=%p", __entry->skbaddr)
+	TP_printk("skbaddr=%pK", __entry->skbaddr)
 );
 
 TRACE_EVENT(skb_copy_datagram_iovec,
@@ -66,7 +66,7 @@ TRACE_EVENT(skb_copy_datagram_iovec,
 		__entry->len = len;
 	),
 
-	TP_printk("skbaddr=%p len=%d", __entry->skbaddr, __entry->len)
+	TP_printk("skbaddr=%pK len=%d", __entry->skbaddr, __entry->len)
 );
 
 #endif /* _TRACE_SKB_H */

@@ -318,14 +318,14 @@ static int init_chip_first(struct ipath_devdata *dd)
 		 */
 		dd->ipath_4kalign = ALIGN(dd->ipath_piosize4k,
 					  dd->ipath_palign);
-		ipath_dbg("%u 2k(%x) piobufs @ %p, %u 4k(%x) @ %p "
+		ipath_dbg("%u 2k(%x) piobufs @ %pK, %u 4k(%x) @ %pK "
 			  "(%x aligned)\n",
 			  dd->ipath_piobcnt2k, dd->ipath_piosize2k,
 			  dd->ipath_pio2kbase, dd->ipath_piobcnt4k,
 			  dd->ipath_piosize4k, dd->ipath_pio4kbase,
 			  dd->ipath_4kalign);
 	}
-	else ipath_dbg("%u 2k piobufs @ %p\n",
+	else ipath_dbg("%u 2k piobufs @ %pK\n",
 		       dd->ipath_piobcnt2k, dd->ipath_pio2kbase);
 
 done:
@@ -593,7 +593,7 @@ static int init_housekeeping(struct ipath_devdata *dd, int reinit)
 		ipath_read_kreg32(dd, dd->ipath_kregs->kr_counterregbase);
 	dd->ipath_uregbase =
 		ipath_read_kreg32(dd, dd->ipath_kregs->kr_userregbase);
-	ipath_cdbg(VERBOSE, "ipath_kregbase %p, sendbase %x usrbase %x, "
+	ipath_cdbg(VERBOSE, "ipath_kregbase %pK, sendbase %x usrbase %x, "
 		   "cntrbase %x\n", dd->ipath_kregbase, dd->ipath_sregbase,
 		   dd->ipath_uregbase, dd->ipath_cregbase);
 	if ((dd->ipath_revision & 0xffffffff) == 0xffffffff

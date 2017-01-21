@@ -126,7 +126,7 @@ static struct ia64_pal_retval pal_cache_flush(struct kvm_vcpu *vcpu)
 	kvm_get_pal_call_data(vcpu, &gr28, &gr29, &gr30, &gr31);
 
 	if (gr31 != 0)
-		printk(KERN_ERR"vcpu:%p called cache_flush error!\n", vcpu);
+		printk(KERN_ERR"vcpu:%pK called cache_flush error!\n", vcpu);
 
 	/* Always call Host Pal in int=1 */
 	gr30 &= ~PAL_CACHE_FLUSH_CHK_INTRS;
@@ -146,7 +146,7 @@ static struct ia64_pal_retval pal_cache_flush(struct kvm_vcpu *vcpu)
 						&result.v0);
 	local_irq_restore(psr);
 	if (result.status != 0)
-		printk(KERN_ERR"vcpu:%p crashed due to cache_flush err:%ld"
+		printk(KERN_ERR"vcpu:%pK crashed due to cache_flush err:%ld"
 				"in1:%lx,in2:%lx\n",
 				vcpu, result.status, gr29, gr30);
 

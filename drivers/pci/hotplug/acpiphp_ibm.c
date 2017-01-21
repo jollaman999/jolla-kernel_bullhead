@@ -326,7 +326,7 @@ static int ibm_get_table_from_acpi(char **bufp)
 		goto read_table_done;
 
 	lbuf = kzalloc(size, GFP_KERNEL);
-	dbg("%s: element count: %i, ASL table size: %i, &table = 0x%p\n",
+	dbg("%s: element count: %i, ASL table size: %i, &table = 0x%pK\n",
 			__func__, package->package.count, size, lbuf);
 
 	if (lbuf) {
@@ -412,7 +412,7 @@ static acpi_status __init ibm_find_acpi_device(acpi_handle handle,
 	if (info->current_status && (info->valid & ACPI_VALID_HID) &&
 			(!strcmp(info->hardware_id.string, IBM_HARDWARE_ID1) ||
 			 !strcmp(info->hardware_id.string, IBM_HARDWARE_ID2))) {
-		dbg("found hardware: %s, handle: %p\n",
+		dbg("found hardware: %s, handle: %pK\n",
 			info->hardware_id.string, handle);
 		*phandle = handle;
 		/* returning non-zero causes the search to stop

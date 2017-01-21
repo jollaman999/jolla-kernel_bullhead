@@ -847,7 +847,7 @@ static int wlan_hdd_request_remain_on_channel( struct wiphy *wiphy,
                 wlan_hdd_roc_request_enqueue(pAdapter, pRemainChanCtx);
                 schedule_delayed_work(&pAdapter->roc_work,
                 msecs_to_jiffies(pHddCtx->cfg_ini->p2p_listen_defer_interval));
-                hddLog(LOG1, "Defer interval is %hu, pAdapter %p",
+                hddLog(LOG1, "Defer interval is %hu, pAdapter %pK",
                        pHddCtx->cfg_ini->p2p_listen_defer_interval, pAdapter);
                 return 0;
             }
@@ -2241,7 +2241,7 @@ void hdd_sendMgmtFrameOverMonitorIface( hdd_adapter_t *pMonAdapter,
      {
          VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_FATAL,
                    "HDD [%d]: Insufficient headroom, "
-                   "head[%p], data[%p], req[%d]",
+                   "head[%pK], data[%pK], req[%d]",
                    __LINE__, skb->head, skb->data, nFrameLength);
          kfree_skb(skb);
          return ;

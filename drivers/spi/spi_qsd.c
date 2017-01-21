@@ -809,14 +809,14 @@ static int msm_spi_bam_pipe_connect(struct msm_spi *dd,
 
 	ret = sps_connect(pipe->handle, config);
 	if (ret) {
-		dev_err(dd->dev, "%s: sps_connect(%s:0x%p):%d",
+		dev_err(dd->dev, "%s: sps_connect(%s:0x%pK):%d",
 				__func__, pipe->name, pipe->handle, ret);
 		return ret;
 	}
 
 	ret = sps_register_event(pipe->handle, &event);
 	if (ret) {
-		dev_err(dd->dev, "%s sps_register_event(hndl:0x%p %s):%d",
+		dev_err(dd->dev, "%s sps_register_event(hndl:0x%pK %s):%d",
 				__func__, pipe->handle, pipe->name, ret);
 		msm_spi_bam_pipe_disconnect(dd, pipe);
 		return ret;
@@ -1836,7 +1836,7 @@ static int msm_spi_transfer_one_message(struct spi_master *master,
 		     (tr->bits_per_word < 4 || tr->bits_per_word > 32)) ||
 		    (tr->tx_buf == NULL && tr->rx_buf == NULL)) {
 			dev_err(dd->dev,
-				"Invalid transfer: %d Hz, %d bpw tx=%p, rx=%p\n",
+				"Invalid transfer: %d Hz, %d bpw tx=%pK, rx=%pK\n",
 				tr->speed_hz, tr->bits_per_word,
 				tr->tx_buf, tr->rx_buf);
 			status_error = -EINVAL;

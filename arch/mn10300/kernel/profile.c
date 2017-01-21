@@ -42,7 +42,7 @@ static __init int profile_init(void)
 
 	printk(KERN_INFO "Profiling initiated on timer 11, priority 0, %uHz\n",
 	       MN10300_IOCLK / 8 / (TM11BR + 1));
-	printk(KERN_INFO "Profile histogram stored %p-%p\n",
+	printk(KERN_INFO "Profile histogram stored %pK-%pK\n",
 	       prof_buffer, (u8 *)(prof_buffer + prof_len) - 1);
 
 	return 0;

@@ -579,7 +579,7 @@ static int plx_pci_add_card(struct pci_dev *pdev,
 
 			card->channels++;
 
-			dev_info(&pdev->dev, "Channel #%d at 0x%p, irq %d "
+			dev_info(&pdev->dev, "Channel #%d at 0x%pK, irq %d "
 				 "registered as %s\n", i + 1, priv->reg_base,
 				 dev->irq, dev->name);
 		} else {

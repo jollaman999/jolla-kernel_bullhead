@@ -120,7 +120,7 @@ int scsi_tgt_uspace_send_cmd(struct scsi_cmnd *cmd, u64 itn_id,
 	ev.p.cmd_req.attribute = cmd->tag;
 	ev.p.cmd_req.tag = tag;
 
-	dprintk("%p %d %u %x %llx\n", cmd, shost->host_no,
+	dprintk("%pK %d %u %x %llx\n", cmd, shost->host_no,
 		ev.p.cmd_req.data_len, cmd->tag,
 		(unsigned long long) ev.p.cmd_req.tag);
 
@@ -143,7 +143,7 @@ int scsi_tgt_uspace_send_status(struct scsi_cmnd *cmd, u64 itn_id, u64 tag)
 	ev.p.cmd_done.tag = tag;
 	ev.p.cmd_done.result = cmd->result;
 
-	dprintk("%p %d %llu %u %x\n", cmd, shost->host_no,
+	dprintk("%pK %d %llu %u %x\n", cmd, shost->host_no,
 		(unsigned long long) ev.p.cmd_req.tag,
 		ev.p.cmd_req.data_len, cmd->tag);
 

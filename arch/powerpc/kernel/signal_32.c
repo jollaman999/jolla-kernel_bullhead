@@ -1059,13 +1059,13 @@ int handle_rt_signal32(unsigned long sig, struct k_sigaction *ka,
 
 badframe:
 #ifdef DEBUG_SIG
-	printk("badframe in handle_rt_signal, regs=%p frame=%p newsp=%lx\n",
+	printk("badframe in handle_rt_signal, regs=%pK frame=%pK newsp=%lx\n",
 	       regs, frame, newsp);
 #endif
 	if (show_unhandled_signals)
 		printk_ratelimited(KERN_INFO
 				   "%s[%d]: bad frame in handle_rt_signal32: "
-				   "%p nip %08lx lr %08lx\n",
+				   "%pK nip %08lx lr %08lx\n",
 				   current->comm, current->pid,
 				   addr, regs->nip, regs->link);
 
@@ -1291,7 +1291,7 @@ long sys_rt_sigreturn(int r3, int r4, int r5, int r6, int r7, int r8,
 	if (show_unhandled_signals)
 		printk_ratelimited(KERN_INFO
 				   "%s[%d]: bad frame in sys_rt_sigreturn: "
-				   "%p nip %08lx lr %08lx\n",
+				   "%pK nip %08lx lr %08lx\n",
 				   current->comm, current->pid,
 				   rt_sf, regs->nip, regs->link);
 
@@ -1382,7 +1382,7 @@ int sys_debug_setcontext(struct ucontext __user *ctx,
 	if (do_setcontext(ctx, regs, 1)) {
 		if (show_unhandled_signals)
 			printk_ratelimited(KERN_INFO "%s[%d]: bad frame in "
-					   "sys_debug_setcontext: %p nip %08lx "
+					   "sys_debug_setcontext: %pK nip %08lx "
 					   "lr %08lx\n",
 					   current->comm, current->pid,
 					   ctx, regs->nip, regs->link);
@@ -1487,13 +1487,13 @@ int handle_signal32(unsigned long sig, struct k_sigaction *ka,
 
 badframe:
 #ifdef DEBUG_SIG
-	printk("badframe in handle_signal, regs=%p frame=%p newsp=%lx\n",
+	printk("badframe in handle_signal, regs=%pK frame=%pK newsp=%lx\n",
 	       regs, frame, newsp);
 #endif
 	if (show_unhandled_signals)
 		printk_ratelimited(KERN_INFO
 				   "%s[%d]: bad frame in handle_signal32: "
-				   "%p nip %08lx lr %08lx\n",
+				   "%pK nip %08lx lr %08lx\n",
 				   current->comm, current->pid,
 				   frame, regs->nip, regs->link);
 
@@ -1566,7 +1566,7 @@ badframe:
 	if (show_unhandled_signals)
 		printk_ratelimited(KERN_INFO
 				   "%s[%d]: bad frame in sys_sigreturn: "
-				   "%p nip %08lx lr %08lx\n",
+				   "%pK nip %08lx lr %08lx\n",
 				   current->comm, current->pid,
 				   addr, regs->nip, regs->link);
 

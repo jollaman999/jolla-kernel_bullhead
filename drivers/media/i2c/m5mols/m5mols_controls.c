@@ -463,7 +463,7 @@ static int m5mols_s_ctrl(struct v4l2_ctrl *ctrl)
 		return 0;
 	}
 
-	v4l2_dbg(1, m5mols_debug, sd, "%s: %s, val: %d, priv: %p\n",
+	v4l2_dbg(1, m5mols_debug, sd, "%s: %s, val: %d, priv: %pK\n",
 		 __func__, ctrl->name, ctrl->val, ctrl->priv);
 
 	if (ctrl_mode && ctrl_mode != info->mode) {

@@ -11,7 +11,7 @@ mcrfs(u32 *ccr, u32 crfD, u32 crfS)
 	u32 value, clear;
 
 #ifdef DEBUG
-	printk("%s: %p (%08x) %d %d\n", __func__, ccr, *ccr, crfD, crfS);
+	printk("%s: %pK (%08x) %d %d\n", __func__, ccr, *ccr, crfD, crfS);
 #endif
 
 	clear = 15 << ((7 - crfS) << 2);

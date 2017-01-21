@@ -297,7 +297,7 @@ static int i460_insert_memory_small_io_page (struct agp_memory *mem,
 	int i, j, k, num_entries;
 	void *temp;
 
-	pr_debug("i460_insert_memory_small_io_page(mem=%p, pg_start=%ld, type=%d, paddr0=0x%lx)\n",
+	pr_debug("i460_insert_memory_small_io_page(mem=%pK, pg_start=%ld, type=%d, paddr0=0x%lx)\n",
 		 mem, pg_start, type, page_to_phys(mem->pages[0]));
 
 	if (type >= AGP_USER_TYPES || mem->type >= AGP_USER_TYPES)
@@ -338,7 +338,7 @@ static int i460_remove_memory_small_io_page(struct agp_memory *mem,
 {
 	int i;
 
-	pr_debug("i460_remove_memory_small_io_page(mem=%p, pg_start=%ld, type=%d)\n",
+	pr_debug("i460_remove_memory_small_io_page(mem=%pK, pg_start=%ld, type=%d)\n",
 		 mem, pg_start, type);
 
 	pg_start = I460_IOPAGES_PER_KPAGE * pg_start;

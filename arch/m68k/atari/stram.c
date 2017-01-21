@@ -148,12 +148,12 @@ void atari_stram_free(void *addr)
 	res = lookup_resource(&stram_pool, start);
 	if (!res) {
 		pr_err("atari_stram_free: trying to free nonexistent region "
-		       "at %p\n", addr);
+		       "at %pK\n", addr);
 		return;
 	}
 
 	size = resource_size(res);
-	pr_debug("atari_stram_free: free %lu bytes at %p\n", size, addr);
+	pr_debug("atari_stram_free: free %lu bytes at %pK\n", size, addr);
 	release_resource(res);
 	kfree(res);
 }

@@ -373,7 +373,7 @@ static inline void dump_registers (const amb_dev * dev) {
 static inline void dump_loader_block (volatile loader_block * lb) {
 #ifdef DEBUG_AMBASSADOR
   unsigned int i;
-  PRINTDB (DBG_LOAD, "lb @ %p; res: %d, cmd: %d, pay:",
+  PRINTDB (DBG_LOAD, "lb @ %pK; res: %d, cmd: %d, pay:",
 	   lb, be32_to_cpu (lb->result), be32_to_cpu (lb->command));
   for (i = 0; i < MAX_COMMAND_DATA; ++i)
     PRINTDM (DBG_LOAD, " %08x", be32_to_cpu (lb->payload.data[i]));
@@ -387,7 +387,7 @@ static inline void dump_loader_block (volatile loader_block * lb) {
 static inline void dump_command (command * cmd) {
 #ifdef DEBUG_AMBASSADOR
   unsigned int i;
-  PRINTDB (DBG_CMD, "cmd @ %p, req: %08x, pars:",
+  PRINTDB (DBG_CMD, "cmd @ %pK, req: %08x, pars:",
 	   cmd, /*be32_to_cpu*/ (cmd->request));
   for (i = 0; i < 3; ++i)
     PRINTDM (DBG_CMD, " %08x", /*be32_to_cpu*/ (cmd->args.par[i]));
@@ -451,7 +451,7 @@ static void tx_complete (amb_dev * dev, tx_out * tx) {
   tx_simple * tx_descr = bus_to_virt (tx->handle);
   struct sk_buff * skb = tx_descr->skb;
   
-  PRINTD (DBG_FLOW|DBG_TX, "tx_complete %p %p", dev, tx);
+  PRINTD (DBG_FLOW|DBG_TX, "tx_complete %pK %pK", dev, tx);
   
   // VC layer stats
   atomic_inc(&ATM_SKB(skb)->vcc->stats->tx);
@@ -475,7 +475,7 @@ static void rx_complete (amb_dev * dev, rx_out * rx) {
   u16 status = be16_to_cpu (rx->status);
   u16 rx_len = be16_to_cpu (rx->length);
   
-  PRINTD (DBG_FLOW|DBG_RX, "rx_complete %p %p (len=%hu)", dev, rx, rx_len);
+  PRINTD (DBG_FLOW|DBG_RX, "rx_complete %pK %pK (len=%hu)", dev, rx, rx_len);
   
   // XXX move this in and add to VC stats ???
   if (!status) {
@@ -558,7 +558,7 @@ static int command_do (amb_dev * dev, command * cmd) {
   volatile amb_cq_ptrs * ptrs = &cq->ptrs;
   command * my_slot;
   
-  PRINTD (DBG_FLOW|DBG_CMD, "command_do %p", dev);
+  PRINTD (DBG_FLOW|DBG_CMD, "command_do %pK", dev);
   
   if (test_bit (dead, &dev->flags))
     return 0;
@@ -569,7 +569,7 @@ static int command_do (amb_dev * dev, command * cmd) {
   if (cq->pending < cq->maximum) {
     // remember my slot for later
     my_slot = ptrs->in;
-    PRINTD (DBG_CMD, "command in slot %p", my_slot);
+    PRINTD (DBG_CMD, "command in slot %pK", my_slot);
     
     dump_command (cmd);
     
@@ -592,7 +592,7 @@ static int command_do (amb_dev * dev, command * cmd) {
     
     // wait for my slot to be reached (all waiters are here or above, until...)
     while (ptrs->out != my_slot) {
-      PRINTD (DBG_CMD, "wait: command slot (now at %p)", ptrs->out);
+      PRINTD (DBG_CMD, "wait: command slot (now at %pK)", ptrs->out);
       set_current_state(TASK_UNINTERRUPTIBLE);
       schedule();
     }
@@ -628,7 +628,7 @@ static int tx_give (amb_dev * dev, tx_in * tx) {
   amb_txq * txq = &dev->txq;
   unsigned long flags;
   
-  PRINTD (DBG_FLOW|DBG_TX, "tx_give %p", dev);
+  PRINTD (DBG_FLOW|DBG_TX, "tx_give %pK", dev);
 
   if (test_bit (dead, &dev->flags))
     return 0;
@@ -636,7 +636,7 @@ static int tx_give (amb_dev * dev, tx_in * tx) {
   spin_lock_irqsave (&txq->lock, flags);
   
   if (txq->pending < txq->maximum) {
-    PRINTD (DBG_TX, "TX in slot %p", txq->in.ptr);
+    PRINTD (DBG_TX, "TX in slot %pK", txq->in.ptr);
 
     *txq->in.ptr = *tx;
     txq->pending++;
@@ -660,7 +660,7 @@ static int tx_take (amb_dev * dev) {
   amb_txq * txq = &dev->txq;
   unsigned long flags;
   
-  PRINTD (DBG_FLOW|DBG_TX, "tx_take %p", dev);
+  PRINTD (DBG_FLOW|DBG_TX, "tx_take %pK", dev);
   
   spin_lock_irqsave (&txq->lock, flags);
   
@@ -688,12 +688,12 @@ static int rx_give (amb_dev * dev, rx_in * rx, unsigned char pool) {
   amb_rxq * rxq = &dev->rxq[pool];
   unsigned long flags;
   
-  PRINTD (DBG_FLOW|DBG_RX, "rx_give %p[%hu]", dev, pool);
+  PRINTD (DBG_FLOW|DBG_RX, "rx_give %pK[%hu]", dev, pool);
   
   spin_lock_irqsave (&rxq->lock, flags);
   
   if (rxq->pending < rxq->maximum) {
-    PRINTD (DBG_RX, "RX in slot %p", rxq->in.ptr);
+    PRINTD (DBG_RX, "RX in slot %pK", rxq->in.ptr);
 
     *rxq->in.ptr = *rx;
     rxq->pending++;
@@ -713,7 +713,7 @@ static int rx_take (amb_dev * dev, unsigned char pool) {
   amb_rxq * rxq = &dev->rxq[pool];
   unsigned long flags;
   
-  PRINTD (DBG_FLOW|DBG_RX, "rx_take %p[%hu]", dev, pool);
+  PRINTD (DBG_FLOW|DBG_RX, "rx_take %pK[%hu]", dev, pool);
   
   spin_lock_irqsave (&rxq->lock, flags);
   
@@ -745,7 +745,7 @@ static int rx_take (amb_dev * dev, unsigned char pool) {
 static void drain_rx_pool (amb_dev * dev, unsigned char pool) {
   amb_rxq * rxq = &dev->rxq[pool];
   
-  PRINTD (DBG_FLOW|DBG_POOL, "drain_rx_pool %p %hu", dev, pool);
+  PRINTD (DBG_FLOW|DBG_POOL, "drain_rx_pool %pK %hu", dev, pool);
   
   if (test_bit (dead, &dev->flags))
     return;
@@ -771,7 +771,7 @@ static void drain_rx_pool (amb_dev * dev, unsigned char pool) {
 static void drain_rx_pools (amb_dev * dev) {
   unsigned char pool;
   
-  PRINTD (DBG_FLOW|DBG_POOL, "drain_rx_pools %p", dev);
+  PRINTD (DBG_FLOW|DBG_POOL, "drain_rx_pools %pK", dev);
   
   for (pool = 0; pool < NUM_RX_POOLS; ++pool)
     drain_rx_pool (dev, pool);
@@ -783,7 +783,7 @@ static void fill_rx_pool (amb_dev * dev, unsigned char pool,
   rx_in rx;
   amb_rxq * rxq;
   
-  PRINTD (DBG_FLOW|DBG_POOL, "fill_rx_pool %p %hu %x", dev, pool, priority);
+  PRINTD (DBG_FLOW|DBG_POOL, "fill_rx_pool %pK %hu %x", dev, pool, priority);
   
   if (test_bit (dead, &dev->flags))
     return;
@@ -801,7 +801,7 @@ static void fill_rx_pool (amb_dev * dev, unsigned char pool,
       return;
     }
     // cast needed as there is no %? for pointer differences
-    PRINTD (DBG_SKB, "allocated skb at %p, head %p, area %li",
+    PRINTD (DBG_SKB, "allocated skb at %pK, head %pK, area %li",
 	    skb, skb->head, (long) skb_end_offset(skb));
     rx.handle = virt_to_bus (skb);
     rx.host_address = cpu_to_be32 (virt_to_bus (skb->data));
@@ -817,7 +817,7 @@ static void fill_rx_pool (amb_dev * dev, unsigned char pool,
 static void fill_rx_pools (amb_dev * dev) {
   unsigned char pool;
   
-  PRINTD (DBG_FLOW|DBG_POOL, "fill_rx_pools %p", dev);
+  PRINTD (DBG_FLOW|DBG_POOL, "fill_rx_pools %pK", dev);
   
   for (pool = 0; pool < NUM_RX_POOLS; ++pool)
     fill_rx_pool (dev, pool, GFP_ATOMIC);
@@ -846,7 +846,7 @@ static void interrupts_off (amb_dev * dev) {
 static irqreturn_t interrupt_handler(int irq, void *dev_id) {
   amb_dev * dev = dev_id;
   
-  PRINTD (DBG_IRQ|DBG_FLOW, "interrupt_handler: %p", dev_id);
+  PRINTD (DBG_IRQ|DBG_FLOW, "interrupt_handler: %pK", dev_id);
   
   {
     u32 interrupt = rd_plain (dev, offsetof(amb_mem, interrupt));
@@ -880,7 +880,7 @@ static irqreturn_t interrupt_handler(int irq, void *dev_id) {
     }
   }
   
-  PRINTD (DBG_IRQ|DBG_FLOW, "interrupt_handler done: %p", dev_id);
+  PRINTD (DBG_IRQ|DBG_FLOW, "interrupt_handler done: %pK", dev_id);
   return IRQ_HANDLED;
 }
 
@@ -1278,7 +1278,7 @@ static void amb_close (struct atm_vcc * atm_vcc) {
     }
     // forget the rxer - no more skbs will be pushed
     if (atm_vcc != dev->rxer[vci])
-      PRINTK (KERN_ERR, "%s vcc=%p rxer[vci]=%p",
+      PRINTK (KERN_ERR, "%s vcc=%pK rxer[vci]=%pK",
 	      "arghhh! we're going to die!",
 	      vcc, dev->rxer[vci]);
     dev->rxer[vci] = NULL;
@@ -1317,7 +1317,7 @@ static int amb_send (struct atm_vcc * atm_vcc, struct sk_buff * skb) {
   if (test_bit (dead, &dev->flags))
     return -EIO;
   
-  PRINTD (DBG_FLOW|DBG_TX, "amb_send vc %x data %p len %u",
+  PRINTD (DBG_FLOW|DBG_TX, "amb_send vc %x data %pK len %u",
 	  vc, tx_data, tx_len);
   
   dump_skb (">>>", vc, skb);
@@ -1352,7 +1352,7 @@ static int amb_send (struct atm_vcc * atm_vcc, struct sk_buff * skb) {
     kfree (tx_descr);
     return -ENOMEM;
   }
-  PRINTD (DBG_TX, "fragment list allocated at %p", tx_descr);
+  PRINTD (DBG_TX, "fragment list allocated at %pK", tx_descr);
   
   tx_descr->skb = skb;
   
@@ -1396,7 +1396,7 @@ static void amb_free_rx_skb (struct atm_vcc * atm_vcc, struct sk_buff * skb) {
   // than dev_kfree_skb at this point so we are least covered as far
   // as buffer locking goes. There may be bugs if pcap clones RX skbs.
 
-  PRINTD (DBG_FLOW|DBG_SKB, "amb_rx_free skb %p (atm_vcc %p, vcc %p)",
+  PRINTD (DBG_FLOW|DBG_SKB, "amb_rx_free skb %pK (atm_vcc %pK, vcc %pK)",
 	  skb, atm_vcc, vcc);
   
   rx.handle = virt_to_bus (skb);
@@ -1515,7 +1515,7 @@ static int create_queues(amb_dev *dev, unsigned int cmds, unsigned int txs,
   void * memory;
   void * limit;
   
-  PRINTD (DBG_FLOW, "create_queues %p", dev);
+  PRINTD (DBG_FLOW, "create_queues %pK", dev);
   
   total += cmds * sizeof(command);
   
@@ -1536,9 +1536,9 @@ static int create_queues(amb_dev *dev, unsigned int cmds, unsigned int txs,
   }
   
   limit = memory + total;
-  PRINTD (DBG_INIT, "queues from %p to %p", memory, limit);
+  PRINTD (DBG_INIT, "queues from %pK to %pK", memory, limit);
   
-  PRINTD (DBG_CMD, "command queue at %p", memory);
+  PRINTD (DBG_CMD, "command queue at %pK", memory);
   
   {
     command * cmd = memory;
@@ -1556,7 +1556,7 @@ static int create_queues(amb_dev *dev, unsigned int cmds, unsigned int txs,
     memory = cq->ptrs.limit;
   }
   
-  PRINTD (DBG_TX, "TX queue pair at %p", memory);
+  PRINTD (DBG_TX, "TX queue pair at %pK", memory);
   
   {
     tx_in * in = memory;
@@ -1582,7 +1582,7 @@ static int create_queues(amb_dev *dev, unsigned int cmds, unsigned int txs,
     memory = txq->out.limit;
   }
   
-  PRINTD (DBG_RX, "RX queue pairs at %p", memory);
+  PRINTD (DBG_RX, "RX queue pairs at %pK", memory);
   
   for (pool = 0; pool < NUM_RX_POOLS; ++pool) {
     rx_in * in = memory;
@@ -1614,7 +1614,7 @@ static int create_queues(amb_dev *dev, unsigned int cmds, unsigned int txs,
   if (memory == limit) {
     return 0;
   } else {
-    PRINTK (KERN_ERR, "bad queue alloc %p != %p (tell maintainer)", memory, limit);
+    PRINTK (KERN_ERR, "bad queue alloc %pK != %pK (tell maintainer)", memory, limit);
     kfree (limit - total);
     return -ENOMEM;
   }
@@ -1628,9 +1628,9 @@ static void destroy_queues (amb_dev * dev) {
   void * memory = dev->cq.ptrs.start;
   // includes txq.in, txq.out, rxq[].in and rxq[].out
   
-  PRINTD (DBG_FLOW, "destroy_queues %p", dev);
+  PRINTD (DBG_FLOW, "destroy_queues %pK", dev);
   
-  PRINTD (DBG_INIT, "freeing queues at %p", memory);
+  PRINTD (DBG_INIT, "freeing queues at %pK", memory);
   kfree (memory);
   
   return;
@@ -1989,7 +1989,7 @@ static int amb_talk(amb_dev *dev)
   unsigned char pool;
   unsigned long timeout;
   
-  PRINTD (DBG_FLOW, "amb_talk %p", dev);
+  PRINTD (DBG_FLOW, "amb_talk %pK", dev);
   
   a.command_start = bus_addr (dev->cq.ptrs.start);
   a.command_end   = bus_addr (dev->cq.ptrs.limit);
@@ -2213,7 +2213,7 @@ static int amb_probe(struct pci_dev *pci_dev,
 	}
 
 	PRINTD (DBG_INFO, "found Madge ATM adapter (amb) at"
-		" IO %llx, IRQ %u, MEM %p",
+		" IO %llx, IRQ %u, MEM %pK",
 		(unsigned long long)pci_resource_start(pci_dev, 1),
 		irq, bus_to_virt(pci_resource_start(pci_dev, 0)));
 
@@ -2256,7 +2256,7 @@ static int amb_probe(struct pci_dev *pci_dev,
 		goto out_free_irq;
 	}
 
-	PRINTD (DBG_INFO, "registered Madge ATM adapter (no. %d) (%p) at %p",
+	PRINTD (DBG_INFO, "registered Madge ATM adapter (no. %d) (%pK) at %pK",
 		dev->atm_dev->number, dev, dev->atm_dev);
 		dev->atm_dev->dev_data = (void *) dev;
 
@@ -2298,7 +2298,7 @@ static void amb_remove_one(struct pci_dev *pci_dev)
 
 	dev = pci_get_drvdata(pci_dev);
 
-	PRINTD(DBG_INFO|DBG_INIT, "closing %p (atm_dev = %p)", dev, dev->atm_dev);
+	PRINTD(DBG_INFO|DBG_INIT, "closing %pK (atm_dev = %pK)", dev, dev->atm_dev);
 	del_timer_sync(&dev->housekeeping);
 	// the drain should not be necessary
 	drain_rx_pools(dev);

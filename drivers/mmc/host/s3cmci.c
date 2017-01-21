@@ -461,7 +461,7 @@ static void do_pio_read(struct s3cmci_host *host)
 			}
 
 			dbg(host, dbg_pio,
-			    "pio_read(): new target: [%i]@[%p]\n",
+			    "pio_read(): new target: [%i]@[%pK]\n",
 			    host->pio_bytes, host->pio_ptr);
 		}
 
@@ -539,7 +539,7 @@ static void do_pio_write(struct s3cmci_host *host)
 			}
 
 			dbg(host, dbg_pio,
-			    "pio_write(): new source: [%i]@[%p]\n",
+			    "pio_write(): new source: [%i]@[%pK]\n",
 			    host->pio_bytes, host->pio_ptr);
 
 		}
@@ -1814,7 +1814,7 @@ static int s3cmci_probe(struct platform_device *pdev)
 	mmc->max_segs		= 128;
 
 	dbg(host, dbg_debug,
-	    "probe: mode:%s mapped mci_base:%p irq:%u irq_cd:%u dma:%u.\n",
+	    "probe: mode:%s mapped mci_base:%pK irq:%u irq_cd:%u dma:%u.\n",
 	    (host->is2440?"2440":""),
 	    host->base, host->irq, host->irq_cd, host->dma);
 

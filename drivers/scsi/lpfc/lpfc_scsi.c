@@ -2191,7 +2191,7 @@ lpfc_bg_setup_bpl_prot(struct lpfc_hba *phba, struct scsi_cmnd *sc,
 
 	if (!sgpe || !sgde) {
 		lpfc_printf_log(phba, KERN_ERR, LOG_FCP,
-				"9020 Invalid s/g entry: data=0x%p prot=0x%p\n",
+				"9020 Invalid s/g entry: data=0x%pK prot=0x%pK\n",
 				sgpe, sgde);
 		return 0;
 	}
@@ -2572,7 +2572,7 @@ lpfc_bg_setup_sgl_prot(struct lpfc_hba *phba, struct scsi_cmnd *sc,
 
 	if (!sgpe || !sgde) {
 		lpfc_printf_log(phba, KERN_ERR, LOG_FCP,
-				"9082 Invalid s/g entry: data=0x%p prot=0x%p\n",
+				"9082 Invalid s/g entry: data=0x%pK prot=0x%pK\n",
 				sgpe, sgde);
 		return 0;
 	}
@@ -4177,7 +4177,7 @@ lpfc_scsi_cmd_iocb_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pIocbIn,
 		uint32_t *lp = (uint32_t *)cmd->sense_buffer;
 
 		lpfc_printf_vlog(vport, KERN_INFO, LOG_FCP,
-				 "0710 Iodone <%d/%d> cmd %p, error "
+				 "0710 Iodone <%d/%d> cmd %pK, error "
 				 "x%x SNS x%x x%x Data: x%x x%x\n",
 				 cmd->device->id, cmd->device->lun, cmd,
 				 cmd->result, *lp, *(lp + 3), cmd->retries,
@@ -5063,7 +5063,7 @@ lpfc_chk_tgt_mapped(struct lpfc_vport *vport, struct scsi_cmnd *cmnd)
 
 	if (!rdata) {
 		lpfc_printf_vlog(vport, KERN_INFO, LOG_FCP,
-			"0797 Tgt Map rport failure: rdata x%p\n", rdata);
+			"0797 Tgt Map rport failure: rdata x%pK\n", rdata);
 		return FAILED;
 	}
 	pnode = rdata->pnode;
@@ -5159,7 +5159,7 @@ lpfc_device_reset_handler(struct scsi_cmnd *cmnd)
 
 	if (!rdata) {
 		lpfc_printf_vlog(vport, KERN_ERR, LOG_FCP,
-			"0798 Device Reset rport failure: rdata x%p\n", rdata);
+			"0798 Device Reset rport failure: rdata x%pK\n", rdata);
 		return FAILED;
 	}
 	pnode = rdata->pnode;
@@ -5170,7 +5170,7 @@ lpfc_device_reset_handler(struct scsi_cmnd *cmnd)
 	status = lpfc_chk_tgt_mapped(vport, cmnd);
 	if (status == FAILED) {
 		lpfc_printf_vlog(vport, KERN_ERR, LOG_FCP,
-			"0721 Device Reset rport failure: rdata x%p\n", rdata);
+			"0721 Device Reset rport failure: rdata x%pK\n", rdata);
 		return FAILED;
 	}
 
@@ -5226,7 +5226,7 @@ lpfc_target_reset_handler(struct scsi_cmnd *cmnd)
 
 	if (!rdata) {
 		lpfc_printf_vlog(vport, KERN_ERR, LOG_FCP,
-			"0799 Target Reset rport failure: rdata x%p\n", rdata);
+			"0799 Target Reset rport failure: rdata x%pK\n", rdata);
 		return FAILED;
 	}
 	pnode = rdata->pnode;
@@ -5237,7 +5237,7 @@ lpfc_target_reset_handler(struct scsi_cmnd *cmnd)
 	status = lpfc_chk_tgt_mapped(vport, cmnd);
 	if (status == FAILED) {
 		lpfc_printf_vlog(vport, KERN_ERR, LOG_FCP,
-			"0722 Target Reset rport failure: rdata x%p\n", rdata);
+			"0722 Target Reset rport failure: rdata x%pK\n", rdata);
 		return FAILED;
 	}
 

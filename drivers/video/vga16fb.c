@@ -1332,7 +1332,7 @@ static int vga16fb_probe(struct platform_device *dev)
 		goto err_ioremap;
 	}
 
-	printk(KERN_INFO "vga16fb: mapped to 0x%p\n", info->screen_base);
+	printk(KERN_INFO "vga16fb: mapped to 0x%pK\n", info->screen_base);
 	par = info->par;
 
 	par->isVGA = screen_info.orig_video_isVGA;

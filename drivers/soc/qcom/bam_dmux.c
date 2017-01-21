@@ -378,10 +378,10 @@ static inline void verify_tx_queue_is_empty(const char *func)
 				pr_err("%s: tx pool not empty\n", func);
 			reported = 1;
 		}
-		BAM_DMUX_LOG("%s: node=%p ts=%u.%09lu\n", __func__,
+		BAM_DMUX_LOG("%s: node=%pK ts=%u.%09lu\n", __func__,
 			&info->list_node, info->ts_sec, info->ts_nsec);
 		if (!in_global_reset)
-			pr_err("%s: node=%p ts=%u.%09lu\n", __func__,
+			pr_err("%s: node=%pK ts=%u.%09lu\n", __func__,
 			&info->list_node, info->ts_sec, info->ts_nsec);
 	}
 	spin_unlock_irqrestore(&bam_tx_pool_spinlock, flags);
@@ -430,7 +430,7 @@ static void __queue_rx(gfp_t alloc_flags)
 		info->dma_address = dma_map_single(dma_dev, ptr, info->len,
 							bam_ops->dma_from);
 		if (info->dma_address == 0 || info->dma_address == ~0) {
-			DMUX_LOG_KERR("%s: dma_map_single failure %p for %p\n",
+			DMUX_LOG_KERR("%s: dma_map_single failure %pK for %pK\n",
 				__func__, (void *)info->dma_address, ptr);
 			goto fail_skb;
 		}
@@ -831,14 +831,14 @@ static void bam_mux_write_done(struct work_struct *work)
 	if (unlikely(info != info_expected)) {
 		struct tx_pkt_info *errant_pkt;
 
-		DMUX_LOG_KERR("%s: bam_tx_pool mismatch .next=%p,"
-				" list_node=%p, ts=%u.%09lu\n",
+		DMUX_LOG_KERR("%s: bam_tx_pool mismatch .next=%pK,"
+				" list_node=%pK, ts=%u.%09lu\n",
 				__func__, bam_tx_pool.next, &info->list_node,
 				info->ts_sec, info->ts_nsec
 				);
 
 		list_for_each_entry(errant_pkt, &bam_tx_pool, list_node) {
-			DMUX_LOG_KERR("%s: node=%p ts=%u.%09lu\n", __func__,
+			DMUX_LOG_KERR("%s: node=%pK ts=%u.%09lu\n", __func__,
 			&errant_pkt->list_node, errant_pkt->ts_sec,
 			errant_pkt->ts_nsec);
 
@@ -958,7 +958,7 @@ int msm_bam_dmux_write(uint32_t id, struct sk_buff *skb)
 
 	hdr->pad_len = skb->len - (sizeof(struct bam_mux_hdr) + hdr->pkt_len);
 
-	DBG("%s: data %p, tail %p skb len %d pkt len %d pad len %d\n",
+	DBG("%s: data %pK, tail %pK skb len %d pkt len %d pad len %d\n",
 	    __func__, skb->data, skb_tail_pointer(skb), skb->len,
 	    hdr->pkt_len, hdr->pad_len);
 
@@ -1297,7 +1297,7 @@ static void rx_switch_to_interrupt_mode(void)
 
 		mutex_lock(&bam_rx_pool_mutexlock);
 		if (unlikely(list_empty(&bam_rx_pool))) {
-			DMUX_LOG_KERR("%s: have iovec %p but rx pool empty\n",
+			DMUX_LOG_KERR("%s: have iovec %pK but rx pool empty\n",
 				__func__, (void *)(uintptr_t)iov.addr);
 			mutex_unlock(&bam_rx_pool_mutexlock);
 			continue;
@@ -1305,12 +1305,12 @@ static void rx_switch_to_interrupt_mode(void)
 		info = list_first_entry(&bam_rx_pool, struct rx_pkt_info,
 							list_node);
 		if (info->dma_address != iov.addr) {
-			DMUX_LOG_KERR("%s: iovec %p != dma %p\n",
+			DMUX_LOG_KERR("%s: iovec %pK != dma %pK\n",
 				__func__,
 				(void *)(uintptr_t)iov.addr,
 				(void *)(uintptr_t)info->dma_address);
 			list_for_each_entry(info, &bam_rx_pool, list_node) {
-				DMUX_LOG_KERR("%s: dma %p\n", __func__,
+				DMUX_LOG_KERR("%s: dma %pK\n", __func__,
 					(void *)(uintptr_t)info->dma_address);
 				if (iov.addr == info->dma_address)
 					break;
@@ -1388,7 +1388,7 @@ static void rx_timer_work_func(struct work_struct *work)
 			mutex_lock(&bam_rx_pool_mutexlock);
 			if (unlikely(list_empty(&bam_rx_pool))) {
 				DMUX_LOG_KERR(
-					"%s: have iovec %p but rx pool empty\n",
+					"%s: have iovec %pK but rx pool empty\n",
 					__func__, (void *)(uintptr_t)iov.addr);
 				mutex_unlock(&bam_rx_pool_mutexlock);
 				continue;
@@ -1396,13 +1396,13 @@ static void rx_timer_work_func(struct work_struct *work)
 			info = list_first_entry(&bam_rx_pool,
 					struct rx_pkt_info,	list_node);
 			if (info->dma_address != iov.addr) {
-				DMUX_LOG_KERR("%s: iovec %p != dma %p\n",
+				DMUX_LOG_KERR("%s: iovec %pK != dma %pK\n",
 					__func__,
 					(void *)(uintptr_t)iov.addr,
 					(void *)(uintptr_t)info->dma_address);
 				list_for_each_entry(info, &bam_rx_pool,
 						list_node) {
-					DMUX_LOG_KERR("%s: dma %p\n", __func__,
+					DMUX_LOG_KERR("%s: dma %pK\n", __func__,
 						(void *)(uintptr_t)
 							info->dma_address);
 					if (iov.addr == info->dma_address)
@@ -2661,7 +2661,7 @@ static int bam_dmux_probe(struct platform_device *pdev)
 		no_cpu_affinity = of_property_read_bool(pdev->dev.of_node,
 						"qcom,no-cpu-affinity");
 		BAM_DMUX_LOG(
-			"%s: base:%p size:%x irq:%d satellite:%d num_buffs:%d dl_mtu:%x cpu-affinity:%d\n",
+			"%s: base:%pK size:%x irq:%d satellite:%d num_buffs:%d dl_mtu:%x cpu-affinity:%d\n",
 						__func__,
 						(void *)(uintptr_t)a2_phys_base,
 						a2_phys_size,

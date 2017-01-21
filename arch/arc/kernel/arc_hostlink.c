@@ -52,7 +52,7 @@ static struct miscdevice arc_hl_dev = {
 
 static int __init arc_hl_init(void)
 {
-	pr_info("ARC Hostlink driver mmap at 0x%p\n", __HOSTLINK__);
+	pr_info("ARC Hostlink driver mmap at 0x%pK\n", __HOSTLINK__);
 	return misc_register(&arc_hl_dev);
 }
 module_init(arc_hl_init);

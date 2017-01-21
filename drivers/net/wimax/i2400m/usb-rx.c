@@ -197,7 +197,7 @@ struct sk_buff *i2400mu_rx(struct i2400mu *i2400mu, struct sk_buff *rx_skb)
 	struct usb_endpoint_descriptor *epd;
 	const size_t max_pkt_size = 512;
 
-	d_fnstart(4, dev, "(i2400mu %p)\n", i2400mu);
+	d_fnstart(4, dev, "(i2400mu %pK)\n", i2400mu);
 	do_autopm = atomic_read(&i2400mu->do_autopm);
 	result = do_autopm ?
 		usb_autopm_get_interface(i2400mu->usb_iface) : 0;
@@ -298,7 +298,7 @@ retry:
 out:
 	if (do_autopm)
 		usb_autopm_put_interface(i2400mu->usb_iface);
-	d_fnend(4, dev, "(i2400mu %p) = %p\n", i2400mu, rx_skb);
+	d_fnend(4, dev, "(i2400mu %pK) = %pK\n", i2400mu, rx_skb);
 	return rx_skb;
 
 error_reset:
@@ -340,7 +340,7 @@ int i2400mu_rxd(void *_i2400mu)
 	struct sk_buff *rx_skb;
 	unsigned long flags;
 
-	d_fnstart(4, dev, "(i2400mu %p)\n", i2400mu);
+	d_fnstart(4, dev, "(i2400mu %pK)\n", i2400mu);
 	spin_lock_irqsave(&i2400m->rx_lock, flags);
 	BUG_ON(i2400mu->rx_kthread != NULL);
 	i2400mu->rx_kthread = current;
@@ -397,7 +397,7 @@ out:
 	spin_lock_irqsave(&i2400m->rx_lock, flags);
 	i2400mu->rx_kthread = NULL;
 	spin_unlock_irqrestore(&i2400m->rx_lock, flags);
-	d_fnend(4, dev, "(i2400mu %p) = %d\n", i2400mu, result);
+	d_fnend(4, dev, "(i2400mu %pK) = %d\n", i2400mu, result);
 	return result;
 
 error_reset:
@@ -420,10 +420,10 @@ void i2400mu_rx_kick(struct i2400mu *i2400mu)
 	struct i2400m *i2400m = &i2400mu->i2400m;
 	struct device *dev = &i2400mu->usb_iface->dev;
 
-	d_fnstart(3, dev, "(i2400mu %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400mu %pK)\n", i2400m);
 	atomic_inc(&i2400mu->rx_pending_count);
 	wake_up_all(&i2400mu->rx_wq);
-	d_fnend(3, dev, "(i2400m %p) = void\n", i2400m);
+	d_fnend(3, dev, "(i2400m %pK) = void\n", i2400m);
 }
 
 

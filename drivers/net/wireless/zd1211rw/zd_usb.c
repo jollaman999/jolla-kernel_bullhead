@@ -449,21 +449,21 @@ static void int_urb_complete(struct urb *urb)
 	case -ENOENT:
 	case -ECONNRESET:
 	case -EPIPE:
-		dev_dbg_f(urb_dev(urb), "urb %p error %d\n", urb, urb->status);
+		dev_dbg_f(urb_dev(urb), "urb %pK error %d\n", urb, urb->status);
 		return;
 	default:
-		dev_dbg_f(urb_dev(urb), "urb %p error %d\n", urb, urb->status);
+		dev_dbg_f(urb_dev(urb), "urb %pK error %d\n", urb, urb->status);
 		goto resubmit;
 	}
 
 	if (urb->actual_length < sizeof(hdr)) {
-		dev_dbg_f(urb_dev(urb), "error: urb %p to small\n", urb);
+		dev_dbg_f(urb_dev(urb), "error: urb %pK to small\n", urb);
 		goto resubmit;
 	}
 
 	hdr = urb->transfer_buffer;
 	if (hdr->type != USB_INT_TYPE) {
-		dev_dbg_f(urb_dev(urb), "error: urb %p wrong type\n", urb);
+		dev_dbg_f(urb_dev(urb), "error: urb %pK wrong type\n", urb);
 		goto resubmit;
 	}
 
@@ -483,7 +483,7 @@ static void int_urb_complete(struct urb *urb)
 		zd_mac_tx_failed(urb);
 		break;
 	default:
-		dev_dbg_f(urb_dev(urb), "error: urb %p unknown id %x\n", urb,
+		dev_dbg_f(urb_dev(urb), "error: urb %pK unknown id %x\n", urb,
 			(unsigned int)hdr->id);
 		goto resubmit;
 	}
@@ -491,7 +491,7 @@ static void int_urb_complete(struct urb *urb)
 resubmit:
 	r = usb_submit_urb(urb, GFP_ATOMIC);
 	if (r) {
-		dev_dbg_f(urb_dev(urb), "error: resubmit urb %p err code %d\n",
+		dev_dbg_f(urb_dev(urb), "error: resubmit urb %pK err code %d\n",
 			  urb, r);
 		/* TODO: add worker to reset intr->urb */
 	}
@@ -564,7 +564,7 @@ int zd_usb_enable_int(struct zd_usb *usb)
 	urb->transfer_dma = intr->buffer_dma;
 	urb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 
-	dev_dbg_f(zd_usb_dev(usb), "submit urb %p\n", intr->urb);
+	dev_dbg_f(zd_usb_dev(usb), "submit urb %pK\n", intr->urb);
 	r = usb_submit_urb(urb, GFP_KERNEL);
 	if (r) {
 		dev_dbg_f(zd_usb_dev(usb),
@@ -608,7 +608,7 @@ void zd_usb_disable_int(struct zd_usb *usb)
 	spin_unlock_irqrestore(&intr->lock, flags);
 
 	usb_kill_urb(urb);
-	dev_dbg_f(zd_usb_dev(usb), "urb %p killed\n", urb);
+	dev_dbg_f(zd_usb_dev(usb), "urb %pK killed\n", urb);
 	usb_free_urb(urb);
 
 	if (buffer)
@@ -676,10 +676,10 @@ static void rx_urb_complete(struct urb *urb)
 	case -ENOENT:
 	case -ECONNRESET:
 	case -EPIPE:
-		dev_dbg_f(urb_dev(urb), "urb %p error %d\n", urb, urb->status);
+		dev_dbg_f(urb_dev(urb), "urb %pK error %d\n", urb, urb->status);
 		return;
 	default:
-		dev_dbg_f(urb_dev(urb), "urb %p error %d\n", urb, urb->status);
+		dev_dbg_f(urb_dev(urb), "urb %pK error %d\n", urb, urb->status);
 		goto resubmit;
 	}
 
@@ -720,7 +720,7 @@ static void rx_urb_complete(struct urb *urb)
 resubmit:
 	r = usb_submit_urb(urb, GFP_ATOMIC);
 	if (r)
-		dev_dbg_f(urb_dev(urb), "urb %p resubmit error %d\n", urb, r);
+		dev_dbg_f(urb_dev(urb), "urb %pK resubmit error %d\n", urb, r);
 }
 
 static struct urb *alloc_rx_urb(struct zd_usb *usb)
@@ -992,10 +992,10 @@ static void tx_urb_complete(struct urb *urb)
 	case -ENOENT:
 	case -ECONNRESET:
 	case -EPIPE:
-		dev_dbg_f(urb_dev(urb), "urb %p error %d\n", urb, urb->status);
+		dev_dbg_f(urb_dev(urb), "urb %pK error %d\n", urb, urb->status);
 		break;
 	default:
-		dev_dbg_f(urb_dev(urb), "urb %p error %d\n", urb, urb->status);
+		dev_dbg_f(urb_dev(urb), "urb %pK error %d\n", urb, urb->status);
 		goto resubmit;
 	}
 free_urb:
@@ -1009,7 +1009,7 @@ resubmit:
 	r = usb_submit_urb(urb, GFP_ATOMIC);
 	if (r) {
 		usb_unanchor_urb(urb);
-		dev_dbg_f(urb_dev(urb), "error resubmit urb %p %d\n", urb, r);
+		dev_dbg_f(urb_dev(urb), "error resubmit urb %pK %d\n", urb, r);
 		goto free_urb;
 	}
 }
@@ -1054,7 +1054,7 @@ int zd_usb_tx(struct zd_usb *usb, struct sk_buff *skb)
 
 	r = usb_submit_urb(urb, GFP_ATOMIC);
 	if (r) {
-		dev_dbg_f(zd_usb_dev(usb), "error submit urb %p %d\n", urb, r);
+		dev_dbg_f(zd_usb_dev(usb), "error submit urb %pK %d\n", urb, r);
 		usb_unanchor_urb(urb);
 		skb_unlink(skb, &tx->submitted_skbs);
 		goto error;
