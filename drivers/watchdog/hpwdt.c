@@ -259,7 +259,7 @@ static int cru_detect(unsigned long map_entry,
 		pr_debug("CRU Base Address:   0x%lx\n", physical_bios_base);
 		pr_debug("CRU Offset Address: 0x%lx\n", physical_bios_offset);
 		pr_debug("CRU Length:         0x%lx\n", cru_length);
-		pr_debug("CRU Mapped Address: %p\n", &cru_rom_addr);
+		pr_debug("CRU Mapped Address: %pK\n", &cru_rom_addr);
 	}
 	iounmap(bios32_map);
 	return retval;

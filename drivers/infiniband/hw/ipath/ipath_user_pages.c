@@ -44,7 +44,7 @@ static void __ipath_release_user_pages(struct page **p, size_t num_pages,
 	size_t i;
 
 	for (i = 0; i < num_pages; i++) {
-		ipath_cdbg(MM, "%lu/%lu put_page %p\n", (unsigned long) i,
+		ipath_cdbg(MM, "%lu/%lu put_page %pK\n", (unsigned long) i,
 			   (unsigned long) num_pages, p[i]);
 		if (dirty)
 			set_page_dirty_lock(p[i]);

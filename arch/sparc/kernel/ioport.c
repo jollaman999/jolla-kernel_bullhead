@@ -206,7 +206,7 @@ static void __iomem *_sparc_alloc_io(unsigned int busno, unsigned long phys,
 	res->name = tack;
 
 	va = _sparc_ioremap(res, busno, phys, size);
-	/* printk("ioremap(0x%x:%08lx[0x%lx])=%p\n", busno, phys, size, va); */ /* P3 diag */
+	/* printk("ioremap(0x%x:%08lx[0x%lx])=%pK\n", busno, phys, size, va); */ /* P3 diag */
 	return va;
 }
 
@@ -321,12 +321,12 @@ static void sbus_free_coherent(struct device *dev, size_t n, void *p,
 
 	if ((res = lookup_resource(&_sparc_dvma,
 	    (unsigned long)p)) == NULL) {
-		printk("sbus_free_consistent: cannot free %p\n", p);
+		printk("sbus_free_consistent: cannot free %pK\n", p);
 		return;
 	}
 
 	if (((unsigned long)p & (PAGE_SIZE-1)) != 0) {
-		printk("sbus_free_consistent: unaligned va %p\n", p);
+		printk("sbus_free_consistent: unaligned va %pK\n", p);
 		return;
 	}
 
@@ -487,12 +487,12 @@ static void pci32_free_coherent(struct device *dev, size_t n, void *p,
 
 	if ((res = lookup_resource(&_sparc_dvma,
 	    (unsigned long)p)) == NULL) {
-		printk("pci_free_consistent: cannot free %p\n", p);
+		printk("pci_free_consistent: cannot free %pK\n", p);
 		return;
 	}
 
 	if (((unsigned long)p & (PAGE_SIZE-1)) != 0) {
-		printk("pci_free_consistent: unaligned va %p\n", p);
+		printk("pci_free_consistent: unaligned va %pK\n", p);
 		return;
 	}
 

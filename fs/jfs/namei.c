@@ -84,7 +84,7 @@ static int jfs_create(struct inode *dip, struct dentry *dentry, umode_t mode,
 	struct inode *iplist[2];
 	struct tblock *tblk;
 
-	jfs_info("jfs_create: dip:0x%p name:%s", dip, dentry->d_name.name);
+	jfs_info("jfs_create: dip:0x%pK name:%s", dip, dentry->d_name.name);
 
 	dquot_initialize(dip);
 
@@ -216,7 +216,7 @@ static int jfs_mkdir(struct inode *dip, struct dentry *dentry, umode_t mode)
 	struct inode *iplist[2];
 	struct tblock *tblk;
 
-	jfs_info("jfs_mkdir: dip:0x%p name:%s", dip, dentry->d_name.name);
+	jfs_info("jfs_mkdir: dip:0x%pK name:%s", dip, dentry->d_name.name);
 
 	dquot_initialize(dip);
 
@@ -352,7 +352,7 @@ static int jfs_rmdir(struct inode *dip, struct dentry *dentry)
 	struct inode *iplist[2];
 	struct tblock *tblk;
 
-	jfs_info("jfs_rmdir: dip:0x%p name:%s", dip, dentry->d_name.name);
+	jfs_info("jfs_rmdir: dip:0x%pK name:%s", dip, dentry->d_name.name);
 
 	/* Init inode for quota operations. */
 	dquot_initialize(dip);
@@ -480,7 +480,7 @@ static int jfs_unlink(struct inode *dip, struct dentry *dentry)
 	s64 new_size = 0;
 	int commit_flag;
 
-	jfs_info("jfs_unlink: dip:0x%p name:%s", dip, dentry->d_name.name);
+	jfs_info("jfs_unlink: dip:0x%pK name:%s", dip, dentry->d_name.name);
 
 	/* Init inode for quota operations. */
 	dquot_initialize(dip);
@@ -628,7 +628,7 @@ static s64 commitZeroLink(tid_t tid, struct inode *ip)
 	int filetype;
 	struct tblock *tblk;
 
-	jfs_info("commitZeroLink: tid = %d, ip = 0x%p", tid, ip);
+	jfs_info("commitZeroLink: tid = %d, ip = 0x%pK", tid, ip);
 
 	filetype = ip->i_mode & S_IFMT;
 	switch (filetype) {
@@ -693,7 +693,7 @@ void jfs_free_zero_link(struct inode *ip)
 {
 	int type;
 
-	jfs_info("jfs_free_zero_link: ip = 0x%p", ip);
+	jfs_info("jfs_free_zero_link: ip = 0x%pK", ip);
 
 	/* return if not reg or symbolic link or if size is
 	 * already ok.
@@ -891,7 +891,7 @@ static int jfs_symlink(struct inode *dip, struct dentry *dentry,
 
 	struct inode *iplist[2];
 
-	jfs_info("jfs_symlink: dip:0x%p name:%s", dip, name);
+	jfs_info("jfs_symlink: dip:0x%pK name:%s", dip, name);
 
 	dquot_initialize(dip);
 
@@ -965,7 +965,7 @@ static int jfs_symlink(struct inode *dip, struct dentry *dentry,
 	 * write source path name in a single extent
 	 */
 	else {
-		jfs_info("jfs_symlink: allocate extent ip:0x%p", ip);
+		jfs_info("jfs_symlink: allocate extent ip:0x%pK", ip);
 
 		ip->i_op = &jfs_symlink_inode_operations;
 		ip->i_mapping->a_ops = &jfs_aops;

@@ -124,7 +124,7 @@ static struct bsg_command *bsg_alloc_command(struct bsg_device *bd)
 
 	bc->bd = bd;
 	INIT_LIST_HEAD(&bc->list);
-	dprintk("%s: returning free cmd %p\n", bd->name, bc);
+	dprintk("%s: returning free cmd %pK\n", bd->name, bc);
 	return bc;
 out:
 	spin_unlock_irq(&bd->lock);
@@ -339,7 +339,7 @@ static void bsg_rq_end_io(struct request *rq, int uptodate)
 	struct bsg_device *bd = bc->bd;
 	unsigned long flags;
 
-	dprintk("%s: finished rq %p bc %p, bio %p stat %d\n",
+	dprintk("%s: finished rq %pK bc %pK, bio %pK stat %d\n",
 		bd->name, rq, bc, bc->bio, uptodate);
 
 	bc->hdr.duration = jiffies_to_msecs(jiffies - bc->hdr.duration);
@@ -373,7 +373,7 @@ static void bsg_add_command(struct bsg_device *bd, struct request_queue *q,
 	list_add_tail(&bc->list, &bd->busy_list);
 	spin_unlock_irq(&bd->lock);
 
-	dprintk("%s: queueing rq %p, bc %p\n", bd->name, rq, bc);
+	dprintk("%s: queueing rq %pK, bc %pK\n", bd->name, rq, bc);
 
 	rq->end_io_data = bc;
 	blk_execute_rq_nowait(q, NULL, rq, at_head, bsg_rq_end_io);
@@ -419,7 +419,7 @@ static struct bsg_command *bsg_get_done_cmd(struct bsg_device *bd)
 		}
 	} while (1);
 
-	dprintk("%s: returning done %p\n", bd->name, bc);
+	dprintk("%s: returning done %pK\n", bd->name, bc);
 
 	return bc;
 }
@@ -429,7 +429,7 @@ static int blk_complete_sgv4_hdr_rq(struct request *rq, struct sg_io_v4 *hdr,
 {
 	int ret = 0;
 
-	dprintk("rq %p bio %p 0x%x\n", rq, bio, rq->errors);
+	dprintk("rq %pK bio %pK 0x%x\n", rq, bio, rq->errors);
 	/*
 	 * fill in all the output members
 	 */

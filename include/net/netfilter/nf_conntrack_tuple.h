@@ -81,7 +81,7 @@ struct nf_conntrack_tuple_mask {
 static inline void nf_ct_dump_tuple_ip(const struct nf_conntrack_tuple *t)
 {
 #ifdef DEBUG
-	printk("tuple %p: %u %pI4:%hu -> %pI4:%hu\n",
+	printk("tuple %pK: %u %pI4:%hu -> %pI4:%hu\n",
 	       t, t->dst.protonum,
 	       &t->src.u3.ip, ntohs(t->src.u.all),
 	       &t->dst.u3.ip, ntohs(t->dst.u.all));
@@ -91,7 +91,7 @@ static inline void nf_ct_dump_tuple_ip(const struct nf_conntrack_tuple *t)
 static inline void nf_ct_dump_tuple_ipv6(const struct nf_conntrack_tuple *t)
 {
 #ifdef DEBUG
-	printk("tuple %p: %u %pI6 %hu -> %pI6 %hu\n",
+	printk("tuple %pK: %u %pI6 %hu -> %pI6 %hu\n",
 	       t, t->dst.protonum,
 	       t->src.u3.all, ntohs(t->src.u.all),
 	       t->dst.u3.all, ntohs(t->dst.u.all));

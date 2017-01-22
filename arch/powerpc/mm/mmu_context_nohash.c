@@ -100,7 +100,7 @@ static unsigned int steal_context_smp(unsigned int id)
 				id = first_context;
 			continue;
 		}
-		pr_hardcont(" | steal %d from 0x%p", id, mm);
+		pr_hardcont(" | steal %d from 0x%pK", id, mm);
 
 		/* Mark this mm has having no context anymore */
 		mm->context.id = MMU_NO_CONTEXT;
@@ -144,7 +144,7 @@ static unsigned int steal_context_up(unsigned int id)
 	/* Pick up the victim mm */
 	mm = context_mm[id];
 
-	pr_hardcont(" | steal %d from 0x%p", id, mm);
+	pr_hardcont(" | steal %d from 0x%pK", id, mm);
 
 	/* Flush the TLB for that context */
 	local_flush_tlb_mm(mm);
@@ -169,7 +169,7 @@ static void context_check_map(void)
 		if (!used)
 			nrf++;
 		if (used != (context_mm[id] != NULL))
-			pr_err("MMU: Context %d is %s and MM is %p !\n",
+			pr_err("MMU: Context %d is %s and MM is %pK !\n",
 			       id, used ? "used" : "free", context_mm[id]);
 		if (context_mm[id] != NULL)
 			nact += context_mm[id]->context.active;
@@ -197,14 +197,14 @@ void switch_mmu_context(struct mm_struct *prev, struct mm_struct *next)
 	/* No lockless fast path .. yet */
 	raw_spin_lock(&context_lock);
 
-	pr_hard("[%d] activating context for mm @%p, active=%d, id=%d",
+	pr_hard("[%d] activating context for mm @%pK, active=%d, id=%d",
 		cpu, next, next->context.active, next->context.id);
 
 #ifdef CONFIG_SMP
 	/* Mark us active and the previous one not anymore */
 	next->context.active++;
 	if (prev) {
-		pr_hardcont(" (old=0x%p a=%d)", prev, prev->context.active);
+		pr_hardcont(" (old=0x%pK a=%d)", prev, prev->context.active);
 		WARN_ON(prev->context.active < 1);
 		prev->context.active--;
 	}
@@ -217,7 +217,7 @@ void switch_mmu_context(struct mm_struct *prev, struct mm_struct *next)
 	if (likely(id != MMU_NO_CONTEXT)) {
 #ifdef DEBUG_MAP_CONSISTENCY
 		if (context_mm[id] != next)
-			pr_err("MMU: mm 0x%p has id %d but context_mm[%d] says 0x%p\n",
+			pr_err("MMU: mm 0x%pK has id %d but context_mm[%d] says 0x%pK\n",
 			       next, id, id, context_mm[id]);
 #endif
 		goto ctxt_ok;
@@ -287,7 +287,7 @@ void switch_mmu_context(struct mm_struct *prev, struct mm_struct *next)
  */
 int init_new_context(struct task_struct *t, struct mm_struct *mm)
 {
-	pr_hard("initing context for mm @%p\n", mm);
+	pr_hard("initing context for mm @%pK\n", mm);
 
 	mm->context.id = MMU_NO_CONTEXT;
 	mm->context.active = 0;

@@ -397,7 +397,7 @@ void old_reloc(unsigned long rl)
 
 #ifdef DEBUG
 	printk("Relocation of variable at DATASEG+%x "
-		"(address %p, currently %x) into segment %s\n",
+		"(address %pK, currently %x) into segment %s\n",
 		r.reloc.offset, ptr, (int)*ptr, segment[r.reloc.type]);
 #endif
 	

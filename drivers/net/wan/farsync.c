@@ -922,7 +922,7 @@ fst_tx_dma(struct fst_card_info *card, unsigned char *skb,
 	 * This routine will setup the DMA and start it.
 	 */
 
-	dbg(DBG_TX, "In fst_tx_dma %p %p %d\n", skb, mem, len);
+	dbg(DBG_TX, "In fst_tx_dma %pK %pK %d\n", skb, mem, len);
 	if (card->dmatx_in_progress) {
 		dbg(DBG_ASS, "In fst_tx_dma while dma in progress\n");
 	}
@@ -1486,7 +1486,7 @@ fst_intr(int dummy, void *dev_id)
 	 * return if not
 	 * Note that the call to clear the interrupt is important
 	 */
-	dbg(DBG_INTR, "intr: %d %p\n", card->irq, card);
+	dbg(DBG_INTR, "intr: %d %pK\n", card->irq, card);
 	if (card->state != FST_RUNNING) {
 		pr_err("Interrupt received for card %d in a non running state (%d)\n",
 		       card->card_no, card->state);
@@ -1997,7 +1997,7 @@ fst_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 	unsigned long flags;
 	void *buf;
 
-	dbg(DBG_IOCTL, "ioctl: %x, %p\n", cmd, ifr->ifr_data);
+	dbg(DBG_IOCTL, "ioctl: %x, %pK\n", cmd, ifr->ifr_data);
 
 	port = dev_to_port(dev);
 	card = port->card;
@@ -2486,7 +2486,7 @@ fst_add_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		kfree(card);
 		return -ENODEV;
 	}
-	dbg(DBG_PCI, "kernel mem %p, ctlmem %p\n", card->mem, card->ctlmem);
+	dbg(DBG_PCI, "kernel mem %pK, ctlmem %pK\n", card->mem, card->ctlmem);
 
 	/* Register the interrupt handler */
 	if (request_irq(pdev->irq, fst_intr, IRQF_SHARED, FST_DEV_NAME, card)) {

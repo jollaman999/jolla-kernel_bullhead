@@ -315,7 +315,7 @@ int __init fadump_reserve_mem(void)
 		fw_dump.fadumphdr_addr =
 				fdm_active->rmr_region.destination_address +
 				fdm_active->rmr_region.source_len;
-		pr_debug("fadumphdr_addr = %p\n",
+		pr_debug("fadumphdr_addr = %pK\n",
 				(void *) fw_dump.fadumphdr_addr);
 	} else {
 		/* Reserve the memory at the top of memory. */
@@ -631,7 +631,7 @@ static int __init fadump_build_cpu_notes(const struct fadump_mem_struct *fdm)
 	}
 	fw_dump.cpu_notes_buf = __pa(note_buf);
 
-	pr_debug("Allocated buffer for cpu notes of size %ld at %p\n",
+	pr_debug("Allocated buffer for cpu notes of size %ld at %pK\n",
 			(num_cpus * sizeof(note_buf_t)), note_buf);
 
 	if (fw_dump.fadumphdr_addr)

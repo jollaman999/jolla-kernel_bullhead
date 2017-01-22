@@ -952,7 +952,7 @@ static void storvsc_on_io_completion(struct hv_device *device,
 			SRB_STATUS_AUTOSENSE_VALID) {
 			/* autosense data available */
 			dev_warn(&device->device,
-				 "stor pkt %p autosense data valid - len %d\n",
+				 "stor pkt %pK autosense data valid - len %d\n",
 				 request,
 				 vstor_packet->vm_srb.sense_info_length);
 

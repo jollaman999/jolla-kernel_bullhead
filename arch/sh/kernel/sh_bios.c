@@ -81,7 +81,7 @@ void sh_bios_vbr_init(void)
 
 	if (vbr) {
 		gdb_vbr_vector = (void *)(vbr + 0x100);
-		printk(KERN_NOTICE "Setting GDB trap vector to %p\n",
+		printk(KERN_NOTICE "Setting GDB trap vector to %pK\n",
 		       gdb_vbr_vector);
 	} else
 		printk(KERN_NOTICE "SH-BIOS not detected\n");

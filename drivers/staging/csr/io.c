@@ -178,7 +178,7 @@ uf_register_netdev(unifi_priv_t *priv, int interfaceTag)
      * Allocates a device number and registers device with the network
      * stack.
      */
-    unifi_trace(priv, UDBG5, "uf_register_netdev: netdev %d - 0x%p\n",
+    unifi_trace(priv, UDBG5, "uf_register_netdev: netdev %d - 0x%pK\n",
             interfaceTag, priv->netdev[interfaceTag]);
     r = register_netdev(priv->netdev[interfaceTag]);
     if (r) {
@@ -231,7 +231,7 @@ uf_unregister_netdev(unifi_priv_t *priv)
         netInterface_priv_t *interfacePriv = priv->interfacePriv[i];
         if (interfacePriv->netdev_registered) {
             unifi_trace(priv, UDBG5,
-                    "uf_unregister_netdev: netdev %d - 0x%p\n",
+                    "uf_unregister_netdev: netdev %d - 0x%pK\n",
                     i, priv->netdev[i]);
 
             /* ... and the netdev */
@@ -969,7 +969,7 @@ uf_sdio_inserted(CsrSdioFunction *sdio_ctx)
 {
 	unifi_priv_t *priv;
 
-	unifi_trace(NULL, UDBG5, "uf_sdio_inserted(0x%p), slot_id=%d, dev=%p\n",
+	unifi_trace(NULL, UDBG5, "uf_sdio_inserted(0x%pK), slot_id=%d, dev=%pK\n",
 		      sdio_ctx, active_slot, os_devices[active_slot]);
 
 	priv = register_unifi_sdio(sdio_ctx, active_slot, os_devices[active_slot]);

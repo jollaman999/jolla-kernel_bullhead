@@ -56,7 +56,7 @@ static int avma1cs_probe(struct pcmcia_device *p_dev)
 
 static void avma1cs_detach(struct pcmcia_device *link)
 {
-	dev_dbg(&link->dev, "avma1cs_detach(0x%p)\n", link);
+	dev_dbg(&link->dev, "avma1cs_detach(0x%pK)\n", link);
 	avma1cs_release(link);
 	kfree(link->priv);
 } /* avma1cs_detach */
@@ -79,7 +79,7 @@ static int avma1cs_config(struct pcmcia_device *link)
 	IsdnCard_t	icard;
 	int busy = 0;
 
-	dev_dbg(&link->dev, "avma1cs_config(0x%p)\n", link);
+	dev_dbg(&link->dev, "avma1cs_config(0x%pK)\n", link);
 
 	devname[0] = 0;
 	if (link->prod_id[1])
@@ -137,7 +137,7 @@ static void avma1cs_release(struct pcmcia_device *link)
 {
 	unsigned long minor = (unsigned long) link->priv;
 
-	dev_dbg(&link->dev, "avma1cs_release(0x%p)\n", link);
+	dev_dbg(&link->dev, "avma1cs_release(0x%pK)\n", link);
 
 	/* now unregister function with hisax */
 	HiSax_closecard(minor);

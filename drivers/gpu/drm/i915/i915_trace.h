@@ -30,7 +30,7 @@ TRACE_EVENT(i915_gem_object_create,
 			   __entry->size = obj->base.size;
 			   ),
 
-	    TP_printk("obj=%p, size=%u", __entry->obj, __entry->size)
+	    TP_printk("obj=%pK, size=%u", __entry->obj, __entry->size)
 );
 
 TRACE_EVENT(i915_gem_object_bind,
@@ -51,7 +51,7 @@ TRACE_EVENT(i915_gem_object_bind,
 			   __entry->mappable = mappable;
 			   ),
 
-	    TP_printk("obj=%p, offset=%08x size=%x%s",
+	    TP_printk("obj=%pK, offset=%08x size=%x%s",
 		      __entry->obj, __entry->offset, __entry->size,
 		      __entry->mappable ? ", mappable" : "")
 );
@@ -72,7 +72,7 @@ TRACE_EVENT(i915_gem_object_unbind,
 			   __entry->size = obj->gtt_space->size;
 			   ),
 
-	    TP_printk("obj=%p, offset=%08x size=%x",
+	    TP_printk("obj=%pK, offset=%08x size=%x",
 		      __entry->obj, __entry->offset, __entry->size)
 );
 
@@ -92,7 +92,7 @@ TRACE_EVENT(i915_gem_object_change_domain,
 			   __entry->write_domain = obj->base.write_domain | (old_write << 16);
 			   ),
 
-	    TP_printk("obj=%p, read=%02x=>%02x, write=%02x=>%02x",
+	    TP_printk("obj=%pK, read=%02x=>%02x, write=%02x=>%02x",
 		      __entry->obj,
 		      __entry->read_domains >> 16,
 		      __entry->read_domains & 0xffff,
@@ -116,7 +116,7 @@ TRACE_EVENT(i915_gem_object_pwrite,
 			   __entry->len = len;
 			   ),
 
-	    TP_printk("obj=%p, offset=%u, len=%u",
+	    TP_printk("obj=%pK, offset=%u, len=%u",
 		      __entry->obj, __entry->offset, __entry->len)
 );
 
@@ -136,7 +136,7 @@ TRACE_EVENT(i915_gem_object_pread,
 			   __entry->len = len;
 			   ),
 
-	    TP_printk("obj=%p, offset=%u, len=%u",
+	    TP_printk("obj=%pK, offset=%u, len=%u",
 		      __entry->obj, __entry->offset, __entry->len)
 );
 
@@ -158,7 +158,7 @@ TRACE_EVENT(i915_gem_object_fault,
 			   __entry->write = write;
 			   ),
 
-	    TP_printk("obj=%p, %s index=%u %s",
+	    TP_printk("obj=%pK, %s index=%u %s",
 		      __entry->obj,
 		      __entry->gtt ? "GTT" : "CPU",
 		      __entry->index,
@@ -177,7 +177,7 @@ DECLARE_EVENT_CLASS(i915_gem_object,
 			   __entry->obj = obj;
 			   ),
 
-	    TP_printk("obj=%p", __entry->obj)
+	    TP_printk("obj=%pK", __entry->obj)
 );
 
 DEFINE_EVENT(i915_gem_object, i915_gem_object_clflush,
@@ -385,7 +385,7 @@ TRACE_EVENT(i915_flip_request,
 		    __entry->obj = obj;
 		    ),
 
-	    TP_printk("plane=%d, obj=%p", __entry->plane, __entry->obj)
+	    TP_printk("plane=%d, obj=%pK", __entry->plane, __entry->obj)
 );
 
 TRACE_EVENT(i915_flip_complete,
@@ -403,7 +403,7 @@ TRACE_EVENT(i915_flip_complete,
 		    __entry->obj = obj;
 		    ),
 
-	    TP_printk("plane=%d, obj=%p", __entry->plane, __entry->obj)
+	    TP_printk("plane=%d, obj=%pK", __entry->plane, __entry->obj)
 );
 
 TRACE_EVENT(i915_reg_rw,

@@ -22,7 +22,7 @@ csum_tcpudp_nofold(__be32 saddr, __be32 daddr, unsigned short len,
 	     "|| shl  .s1   %1,8,%1\n"
 #endif
 	     "addu    .l1   %1,%0,%0\n"
-	     "add     .l1   %P0,%p0,%2\n"
+	     "add     .l1   %P0,%pK0,%2\n"
 	     : "=&a"(tmp), "+a"(len), "+a"(sum)
 	     : "a" (saddr), "a" (daddr), "a" (proto));
 	return sum;

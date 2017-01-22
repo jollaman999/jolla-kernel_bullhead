@@ -1102,7 +1102,7 @@ static int sh_hdmi_display_on(struct sh_mobile_lcdc_entity *entity)
 {
 	struct sh_hdmi *hdmi = entity_to_sh_hdmi(entity);
 
-	dev_dbg(hdmi->dev, "%s(%p): state %x\n", __func__, hdmi,
+	dev_dbg(hdmi->dev, "%s(%pK): state %x\n", __func__, hdmi,
 		hdmi->hp_state);
 
 	/*
@@ -1126,7 +1126,7 @@ static void sh_hdmi_display_off(struct sh_mobile_lcdc_entity *entity)
 {
 	struct sh_hdmi *hdmi = entity_to_sh_hdmi(entity);
 
-	dev_dbg(hdmi->dev, "%s(%p)\n", __func__, hdmi);
+	dev_dbg(hdmi->dev, "%s(%pK)\n", __func__, hdmi);
 	/* PS mode e->a */
 	hdmi_bit_set(hdmi, 0xFC, 0x10, HDMI_SYSTEM_CTRL);
 }
@@ -1178,7 +1178,7 @@ static void sh_hdmi_edid_work_fn(struct work_struct *work)
 	struct sh_mobile_lcdc_chan *ch = hdmi->entity.lcdc;
 	int ret;
 
-	dev_dbg(hdmi->dev, "%s(%p): begin, hotplug status %d\n", __func__, hdmi,
+	dev_dbg(hdmi->dev, "%s(%pK): begin, hotplug status %d\n", __func__, hdmi,
 		hdmi->hp_state);
 
 	if (hdmi->hp_state == HDMI_HOTPLUG_CONNECTED) {
@@ -1219,7 +1219,7 @@ out:
 	if (ret < 0 && ret != -EAGAIN)
 		hdmi->hp_state = HDMI_HOTPLUG_DISCONNECTED;
 
-	dev_dbg(hdmi->dev, "%s(%p): end\n", __func__, hdmi);
+	dev_dbg(hdmi->dev, "%s(%pK): end\n", __func__, hdmi);
 }
 
 static void sh_hdmi_htop1_init(struct sh_hdmi *hdmi)

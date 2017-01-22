@@ -446,7 +446,7 @@ static int __init pnpbios_probe_system(void)
 		if (check->fields.signature != PNP_SIGNATURE)
 			continue;
 		printk(KERN_INFO
-		       "PnPBIOS: Found PnP BIOS installation structure at 0x%p\n",
+		       "PnPBIOS: Found PnP BIOS installation structure at 0x%pK\n",
 		       check);
 		length = check->fields.length;
 		if (!length) {

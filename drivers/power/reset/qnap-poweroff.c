@@ -79,7 +79,7 @@ static int qnap_power_off_probe(struct platform_device *pdev)
 	if (pm_power_off) {
 		lookup_symbol_name((ulong)pm_power_off, symname);
 		dev_err(&pdev->dev,
-			"pm_power_off already claimed %p %s",
+			"pm_power_off already claimed %pK %s",
 			pm_power_off, symname);
 		return -EBUSY;
 	}

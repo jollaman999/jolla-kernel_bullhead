@@ -550,7 +550,7 @@ static void bt878_remove(struct pci_dev *pci_dev)
 	pci_write_config_byte(bt->dev, PCI_COMMAND, command);
 
 	free_irq(bt->irq, bt);
-	printk(KERN_DEBUG "bt878_mem: 0x%p.\n", bt->bt878_mem);
+	printk(KERN_DEBUG "bt878_mem: 0x%pK.\n", bt->bt878_mem);
 	if (bt->bt878_mem)
 		iounmap(bt->bt878_mem);
 

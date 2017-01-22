@@ -137,7 +137,7 @@ int avcs_core_open(void)
 	if (!avtimer.core_handle_q)
 		avtimer.core_handle_q = apr_register("ADSP", "CORE",
 					aprv2_core_fn_q, TEMP_PORT, NULL);
-	pr_debug("%s: Open_q %p\n", __func__, avtimer.core_handle_q);
+	pr_debug("%s: Open_q %pK\n", __func__, avtimer.core_handle_q);
 	if (!avtimer.core_handle_q) {
 		pr_err("%s: Unable to register CORE\n", __func__);
 		return -EINVAL;

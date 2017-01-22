@@ -174,7 +174,7 @@ int rxrpc_client_sendmsg(struct kiocb *iocb, struct rxrpc_sock *rx,
 		return PTR_ERR(call);
 	}
 
-	_debug("CALL %d USR %lx ST %d on CONN %p",
+	_debug("CALL %d USR %lx ST %d on CONN %pK",
 	       call->debug_id, call->user_call_ID, call->state, call->conn);
 
 	if (call->state >= RXRPC_CALL_COMPLETE) {
@@ -219,7 +219,7 @@ int rxrpc_kernel_send_data(struct rxrpc_call *call, struct msghdr *msg,
 
 	lock_sock(&call->socket->sk);
 
-	_debug("CALL %d USR %lx ST %d on CONN %p",
+	_debug("CALL %d USR %lx ST %d on CONN %pK",
 	       call->debug_id, call->user_call_ID, call->state, call->conn);
 
 	if (call->state >= RXRPC_CALL_COMPLETE) {
@@ -255,7 +255,7 @@ void rxrpc_kernel_abort_call(struct rxrpc_call *call, u32 abort_code)
 
 	lock_sock(&call->socket->sk);
 
-	_debug("CALL %d USR %lx ST %d on CONN %p",
+	_debug("CALL %d USR %lx ST %d on CONN %pK",
 	       call->debug_id, call->user_call_ID, call->state, call->conn);
 
 	if (call->state < RXRPC_CALL_COMPLETE)
@@ -456,7 +456,7 @@ static void rxrpc_queue_packet(struct rxrpc_call *call, struct sk_buff *skb,
 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
 	int ret;
 
-	_net("queue skb %p [%d]", skb, call->acks_head);
+	_net("queue skb %pK [%d]", skb, call->acks_head);
 
 	ASSERT(call->acks_window != NULL);
 	call->acks_window[call->acks_head] = (unsigned long) skb;
@@ -501,7 +501,7 @@ static void rxrpc_queue_packet(struct rxrpc_call *call, struct sk_buff *skb,
 		/* the packet may be freed by rxrpc_process_call() before this
 		 * returns */
 		ret = rxrpc_send_packet(call->conn->trans, skb);
-		_net("sent skb %p", skb);
+		_net("sent skb %pK", skb);
 	} else {
 		_debug("failed to delete ACK timer");
 	}
@@ -561,7 +561,7 @@ static int rxrpc_send_data(struct kiocb *iocb,
 		if (segment > len)
 			segment = len;
 
-		_debug("SEGMENT %d @%p", segment, from);
+		_debug("SEGMENT %d @%pK", segment, from);
 
 		if (!skb) {
 			size_t size, chunk, max, space;
@@ -602,7 +602,7 @@ static int rxrpc_send_data(struct kiocb *iocb,
 
 			rxrpc_new_skb(skb);
 
-			_debug("ALLOC SEND %p", skb);
+			_debug("ALLOC SEND %pK", skb);
 
 			ASSERTCMP(skb->mark, ==, 0);
 

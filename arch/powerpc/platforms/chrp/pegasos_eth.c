@@ -124,7 +124,7 @@ static int Enable_SRAM(void)
 		return -ENOMEM;
 
 #ifdef BE_VERBOSE
-	printk("Pegasos II/Marvell MV64361: register remapped from %p to %p\n",
+	printk("Pegasos II/Marvell MV64361: register remapped from %pK to %pK\n",
 		(void *)PEGASOS2_MARVELL_REGBASE, (void *)mv643xx_reg_base);
 #endif
 
@@ -148,7 +148,7 @@ static int Enable_SRAM(void)
 
 #ifdef BE_VERBOSE
 	printk("Pegasos II/Marvell MV64361: register unmapped\n");
-	printk("Pegasos II/Marvell MV64361: SRAM at %p, size=%x\n", (void*) PEGASOS2_SRAM_BASE, PEGASOS2_SRAM_SIZE);
+	printk("Pegasos II/Marvell MV64361: SRAM at %pK, size=%x\n", (void*) PEGASOS2_SRAM_BASE, PEGASOS2_SRAM_SIZE);
 #endif
 
 	iounmap(mv643xx_reg_base);

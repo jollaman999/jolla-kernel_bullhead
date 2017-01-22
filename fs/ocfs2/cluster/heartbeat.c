@@ -633,7 +633,7 @@ static void o2hb_fire_callbacks(struct o2hb_callback *hbcall,
 
 	list_for_each(iter, &hbcall->list) {
 		f = list_entry(iter, struct o2hb_callback_func, hc_item);
-		mlog(ML_HEARTBEAT, "calling funcs %p\n", f);
+		mlog(ML_HEARTBEAT, "calling funcs %pK\n", f);
 		(f->hc_func)(node, idx, f->hc_data);
 	}
 }
@@ -2547,7 +2547,7 @@ int o2hb_register_callback(const char *region_uuid,
 	up_write(&o2hb_callback_sem);
 	ret = 0;
 out:
-	mlog(ML_CLUSTER, "returning %d on behalf of %p for funcs %p\n",
+	mlog(ML_CLUSTER, "returning %d on behalf of %pK for funcs %pK\n",
 	     ret, __builtin_return_address(0), hc);
 	return ret;
 }
@@ -2558,7 +2558,7 @@ void o2hb_unregister_callback(const char *region_uuid,
 {
 	BUG_ON(hc->hc_magic != O2HB_CB_MAGIC);
 
-	mlog(ML_CLUSTER, "on behalf of %p for funcs %p\n",
+	mlog(ML_CLUSTER, "on behalf of %pK for funcs %pK\n",
 	     __builtin_return_address(0), hc);
 
 	/* XXX Can this happen _with_ a region reference? */

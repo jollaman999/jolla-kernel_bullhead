@@ -119,7 +119,7 @@ again:
 		if (!gru->gs_gts[i] || is_kernel_context(gru->gs_gts[i]))
 			continue;
 		inuse_asid = gru->gs_gts[i]->ts_gms->ms_asids[gid].mt_asid;
-		gru_dbg(grudev, "gid %d, gts %p, gms %p, inuse 0x%x, cxt %d\n",
+		gru_dbg(grudev, "gid %d, gts %pK, gms %pK, inuse 0x%x, cxt %d\n",
 			gru->gs_gid, gru->gs_gts[i], gru->gs_gts[i]->ts_gms,
 			inuse_asid, i);
 		if (inuse_asid == asid) {
@@ -264,7 +264,7 @@ static int gru_load_mm_tracker(struct gru_state *gru,
 	spin_unlock(&gms->ms_asid_lock);
 
 	gru_dbg(grudev,
-		"gid %d, gts %p, gms %p, ctxnum %d, asid 0x%x, asidmap 0x%lx\n",
+		"gid %d, gts %pK, gms %pK, ctxnum %d, asid 0x%x, asidmap 0x%lx\n",
 		gru->gs_gid, gts, gms, gts->ts_ctxnum, asid,
 		gms->ms_asidmap[0]);
 	return asid;
@@ -283,7 +283,7 @@ static void gru_unload_mm_tracker(struct gru_state *gru,
 	spin_lock(&gru->gs_asid_lock);
 	BUG_ON((asids->mt_ctxbitmap & ctxbitmap) != ctxbitmap);
 	asids->mt_ctxbitmap ^= ctxbitmap;
-	gru_dbg(grudev, "gid %d, gts %p, gms %p, ctxnum 0x%d, asidmap 0x%lx\n",
+	gru_dbg(grudev, "gid %d, gts %pK, gms %pK, ctxnum 0x%d, asidmap 0x%lx\n",
 		gru->gs_gid, gts, gms, gts->ts_ctxnum, gms->ms_asidmap[0]);
 	spin_unlock(&gru->gs_asid_lock);
 	spin_unlock(&gms->ms_asid_lock);
@@ -358,7 +358,7 @@ struct gru_thread_state *gru_alloc_gts(struct vm_area_struct *vma,
 		gts->ts_gms = gms;
 	}
 
-	gru_dbg(grudev, "alloc gts %p\n", gts);
+	gru_dbg(grudev, "alloc gts %pK\n", gts);
 	return gts;
 
 err:
@@ -380,7 +380,7 @@ struct gru_vma_data *gru_alloc_vma_data(struct vm_area_struct *vma, int tsid)
 	STAT(vdata_alloc);
 	INIT_LIST_HEAD(&vdata->vd_head);
 	spin_lock_init(&vdata->vd_lock);
-	gru_dbg(grudev, "alloc vdata %p\n", vdata);
+	gru_dbg(grudev, "alloc vdata %pK\n", vdata);
 	return vdata;
 }
 
@@ -396,7 +396,7 @@ struct gru_thread_state *gru_find_thread_state(struct vm_area_struct *vma,
 	spin_lock(&vdata->vd_lock);
 	gts = gru_find_current_gts_nolock(vdata, tsid);
 	spin_unlock(&vdata->vd_lock);
-	gru_dbg(grudev, "vma %p, gts %p\n", vma, gts);
+	gru_dbg(grudev, "vma %pK, gts %pK\n", vma, gts);
 	return gts;
 }
 
@@ -427,7 +427,7 @@ struct gru_thread_state *gru_alloc_thread_state(struct vm_area_struct *vma,
 		list_add(&gts->ts_next, &vdata->vd_head);
 	}
 	spin_unlock(&vdata->vd_lock);
-	gru_dbg(grudev, "vma %p, gts %p\n", vma, gts);
+	gru_dbg(grudev, "vma %pK, gts %pK\n", vma, gts);
 	return gts;
 }
 
@@ -439,7 +439,7 @@ static void gru_free_gru_context(struct gru_thread_state *gts)
 	struct gru_state *gru;
 
 	gru = gts->ts_gru;
-	gru_dbg(grudev, "gts %p, gid %d\n", gts, gru->gs_gid);
+	gru_dbg(grudev, "gts %pK, gid %d\n", gts, gru->gs_gid);
 
 	spin_lock(&gru->gs_lock);
 	gru->gs_gts[gts->ts_ctxnum] = NULL;
@@ -562,7 +562,7 @@ void gru_unload_context(struct gru_thread_state *gts, int savestate)
 		zap_vma_ptes(gts->ts_vma, UGRUADDR(gts), GRU_GSEG_PAGESIZE);
 	cch = get_cch(gru->gs_gru_base_vaddr, ctxnum);
 
-	gru_dbg(grudev, "gts %p, cbrmap 0x%lx, dsrmap 0x%lx\n",
+	gru_dbg(grudev, "gts %pK, cbrmap 0x%lx, dsrmap 0x%lx\n",
 		gts, gts->ts_cbr_map, gts->ts_dsr_map);
 	lock_cch_handle(cch);
 	if (cch_interrupt_sync(cch))
@@ -633,7 +633,7 @@ void gru_load_context(struct gru_thread_state *gts)
 	err = cch_allocate(cch);
 	if (err) {
 		gru_dbg(grudev,
-			"err %d: cch %p, gts %p, cbr 0x%lx, dsr 0x%lx\n",
+			"err %d: cch %pK, gts %pK, cbr 0x%lx, dsr 0x%lx\n",
 			err, cch, gts, gts->ts_cbr_map, gts->ts_dsr_map);
 		BUG();
 	}
@@ -645,7 +645,7 @@ void gru_load_context(struct gru_thread_state *gts)
 		BUG();
 	unlock_cch_handle(cch);
 
-	gru_dbg(grudev, "gid %d, gts %p, cbrmap 0x%lx, dsrmap 0x%lx, tie %d, tis %d\n",
+	gru_dbg(grudev, "gid %d, gts %pK, cbrmap 0x%lx, dsrmap 0x%lx, tie %d, tis %d\n",
 		gts->ts_gru->gs_gid, gts, gts->ts_cbr_map, gts->ts_dsr_map,
 		(gts->ts_user_options == GRU_OPT_MISS_FMM_INTR), gts->ts_tlb_int_select);
 }
@@ -845,7 +845,7 @@ void gru_steal_context(struct gru_thread_state *gts)
 		STAT(steal_context_failed);
 	}
 	gru_dbg(grudev,
-		"stole gid %d, ctxnum %d from gts %p. Need cb %d, ds %d;"
+		"stole gid %d, ctxnum %d from gts %pK. Need cb %d, ds %d;"
 		" avail cb %ld, ds %ld\n",
 		gru->gs_gid, ctxnum, ngts, cbr, dsr, hweight64(gru->gs_cbr_map),
 		hweight64(gru->gs_dsr_map));
@@ -907,7 +907,7 @@ again:
 
 		STAT(assign_context);
 		gru_dbg(grudev,
-			"gseg %p, gts %p, gid %d, ctx %d, cbr %d, dsr %d\n",
+			"gseg %pK, gts %pK, gid %d, ctx %d, cbr %d, dsr %d\n",
 			gseg_virtual_address(gts->ts_gru, gts->ts_ctxnum), gts,
 			gts->ts_gru->gs_gid, gts->ts_ctxnum,
 			gts->ts_cbr_au_count, gts->ts_dsr_au_count);
@@ -932,7 +932,7 @@ int gru_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 	unsigned long paddr, vaddr;
 
 	vaddr = (unsigned long)vmf->virtual_address;
-	gru_dbg(grudev, "vma %p, vaddr 0x%lx (0x%lx)\n",
+	gru_dbg(grudev, "vma %pK, vaddr 0x%lx (0x%lx)\n",
 		vma, vaddr, GSEG_BASE(vaddr));
 	STAT(nopfn);
 

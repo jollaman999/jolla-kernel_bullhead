@@ -225,7 +225,7 @@ int rproc_alloc_vring(struct rproc_vdev *rvdev, int i)
 	}
 	notifyid = ret;
 
-	dev_dbg(dev, "vring%d: va %p dma %llx size %x idr %d\n", i, va,
+	dev_dbg(dev, "vring%d: va %pK dma %llx size %x idr %d\n", i, va,
 				(unsigned long long)dma, size, notifyid);
 
 	rvring->va = va;
@@ -446,7 +446,7 @@ static int rproc_handle_trace(struct rproc *rproc, struct fw_rsc_trace *rsc,
 
 	rproc->num_traces++;
 
-	dev_dbg(dev, "%s added: va %p, da 0x%x, len 0x%x\n", name, ptr,
+	dev_dbg(dev, "%s added: va %pK, da 0x%x, len 0x%x\n", name, ptr,
 						rsc->da, rsc->len);
 
 	return 0;
@@ -588,7 +588,7 @@ static int rproc_handle_carveout(struct rproc *rproc,
 		goto free_carv;
 	}
 
-	dev_dbg(dev, "carveout va %p, dma %llx, len 0x%x\n", va,
+	dev_dbg(dev, "carveout va %pK, dma %llx, len 0x%x\n", va,
 					(unsigned long long)dma, rsc->len);
 
 	/*

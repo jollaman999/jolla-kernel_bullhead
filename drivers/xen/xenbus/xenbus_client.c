@@ -626,7 +626,7 @@ static int xenbus_unmap_ring_vfree_pv(struct xenbus_device *dev, void *vaddr)
 
 	if (!node) {
 		xenbus_dev_error(dev, -ENOENT,
-				 "can't find mapped virtual address %p", vaddr);
+				 "can't find mapped virtual address %pK", vaddr);
 		return GNTST_bad_virt_addr;
 	}
 
@@ -668,7 +668,7 @@ static int xenbus_unmap_ring_vfree_hvm(struct xenbus_device *dev, void *vaddr)
 
 	if (!node) {
 		xenbus_dev_error(dev, -ENOENT,
-				 "can't find mapped virtual address %p", vaddr);
+				 "can't find mapped virtual address %pK", vaddr);
 		return GNTST_bad_virt_addr;
 	}
 
@@ -677,7 +677,7 @@ static int xenbus_unmap_ring_vfree_hvm(struct xenbus_device *dev, void *vaddr)
 	if (!rv)
 		free_xenballooned_pages(1, &node->page);
 	else
-		WARN(1, "Leaking %p\n", vaddr);
+		WARN(1, "Leaking %pK\n", vaddr);
 
 	kfree(node);
 	return rv;

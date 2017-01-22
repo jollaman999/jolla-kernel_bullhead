@@ -155,7 +155,7 @@ static int ti_st_open(struct hci_dev *hdev)
 	struct ti_st *hst;
 	int err, i;
 
-	BT_DBG("%s %p", hdev->name, hdev);
+	BT_DBG("%s %pK", hdev->name, hdev);
 
 	if (test_and_set_bit(HCI_RUNNING, &hdev->flags))
 		return -EBUSY;
@@ -306,7 +306,7 @@ static int bt_ti_probe(struct platform_device *pdev)
 	if (!hdev)
 		return -ENOMEM;
 
-	BT_DBG("hdev %p", hdev);
+	BT_DBG("hdev %pK", hdev);
 
 	hst->hdev = hdev;
 	hdev->bus = HCI_UART;
@@ -323,7 +323,7 @@ static int bt_ti_probe(struct platform_device *pdev)
 		return err;
 	}
 
-	BT_DBG("HCI device registered (hdev %p)", hdev);
+	BT_DBG("HCI device registered (hdev %pK)", hdev);
 
 	dev_set_drvdata(&pdev->dev, hst);
 	return err;

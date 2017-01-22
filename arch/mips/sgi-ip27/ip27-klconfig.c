@@ -27,7 +27,7 @@ klinfo_t *find_component(lboard_t *brd, klinfo_t *kli, unsigned char struct_type
 				break;
 		index = j;
 		if (index == KLCF_NUM_COMPS(brd)) {
-			printk("find_component: Bad pointer: 0x%p\n", kli);
+			printk("find_component: Bad pointer: 0x%pK\n", kli);
 			return (klinfo_t *)NULL;
 		}
 		index++;		/* next component */

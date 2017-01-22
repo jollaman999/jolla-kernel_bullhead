@@ -75,7 +75,7 @@
  * Debugging helpers
  */
 
-#define DMSG(stuff...) do {printk(KERN_DEBUG "hermes @ %p: " , hw->iobase); \
+#define DMSG(stuff...) do {printk(KERN_DEBUG "hermes @ %pK: " , hw->iobase); \
 			printk(stuff); } while (0)
 
 #undef HERMES_DEBUG
@@ -162,7 +162,7 @@ static int hermes_doicmd_wait(struct hermes *hw, u16 cmd,
 	}
 
 	if (!(reg & HERMES_EV_CMD)) {
-		printk(KERN_ERR "hermes @ %p: "
+		printk(KERN_ERR "hermes @ %pK: "
 		       "Timeout waiting for card to reset (reg=0x%04x)!\n",
 		       hw->iobase, reg);
 		err = -ETIMEDOUT;
@@ -262,13 +262,13 @@ static int hermes_docmd_wait(struct hermes *hw, u16 cmd, u16 parm0,
 	if (err) {
 		if (!hermes_present(hw)) {
 			if (net_ratelimit())
-				printk(KERN_WARNING "hermes @ %p: "
+				printk(KERN_WARNING "hermes @ %pK: "
 				       "Card removed while issuing command "
 				       "0x%04x.\n", hw->iobase, cmd);
 			err = -ENODEV;
 		} else
 			if (net_ratelimit())
-				printk(KERN_ERR "hermes @ %p: "
+				printk(KERN_ERR "hermes @ %pK: "
 				       "Error %d issuing command 0x%04x.\n",
 				       hw->iobase, err, cmd);
 		goto out;
@@ -283,7 +283,7 @@ static int hermes_docmd_wait(struct hermes *hw, u16 cmd, u16 parm0,
 	}
 
 	if (!hermes_present(hw)) {
-		printk(KERN_WARNING "hermes @ %p: Card removed "
+		printk(KERN_WARNING "hermes @ %pK: Card removed "
 		       "while waiting for command 0x%04x completion.\n",
 		       hw->iobase, cmd);
 		err = -ENODEV;
@@ -291,7 +291,7 @@ static int hermes_docmd_wait(struct hermes *hw, u16 cmd, u16 parm0,
 	}
 
 	if (!(reg & HERMES_EV_CMD)) {
-		printk(KERN_ERR "hermes @ %p: Timeout waiting for "
+		printk(KERN_ERR "hermes @ %pK: Timeout waiting for "
 		       "command 0x%04x completion.\n", hw->iobase, cmd);
 		err = -ETIMEDOUT;
 		goto out;
@@ -336,14 +336,14 @@ static int hermes_allocate(struct hermes *hw, u16 size, u16 *fid)
 	}
 
 	if (!hermes_present(hw)) {
-		printk(KERN_WARNING "hermes @ %p: "
+		printk(KERN_WARNING "hermes @ %pK: "
 		       "Card removed waiting for frame allocation.\n",
 		       hw->iobase);
 		return -ENODEV;
 	}
 
 	if (!(reg & HERMES_EV_ALLOC)) {
-		printk(KERN_ERR "hermes @ %p: "
+		printk(KERN_ERR "hermes @ %pK: "
 		       "Timeout waiting for frame allocation\n",
 		       hw->iobase);
 		return -ETIMEDOUT;
@@ -400,7 +400,7 @@ static int hermes_bap_seek(struct hermes *hw, int bap, u16 id, u16 offset)
 	}
 
 	if (reg != offset) {
-		printk(KERN_ERR "hermes @ %p: BAP%d offset %s: "
+		printk(KERN_ERR "hermes @ %pK: BAP%d offset %s: "
 		       "reg=0x%x id=0x%x offset=0x%x\n", hw->iobase, bap,
 		       (reg & HERMES_OFFSET_BUSY) ? "timeout" : "error",
 		       reg, id, offset);
@@ -509,11 +509,11 @@ static int hermes_read_ltv(struct hermes *hw, int bap, u16 rid,
 		*length = rlength;
 
 	if (rtype != rid)
-		printk(KERN_WARNING "hermes @ %p: %s(): "
+		printk(KERN_WARNING "hermes @ %pK: %s(): "
 		       "rid (0x%04x) does not match type (0x%04x)\n",
 		       hw->iobase, __func__, rid, rtype);
 	if (HERMES_RECLEN_TO_BYTES(rlength) > bufsize)
-		printk(KERN_WARNING "hermes @ %p: "
+		printk(KERN_WARNING "hermes @ %pK: "
 		       "Truncating LTV record from %d to %d bytes. "
 		       "(rid=0x%04x, len=0x%04x)\n", hw->iobase,
 		       HERMES_RECLEN_TO_BYTES(rlength), bufsize, rid, rlength);

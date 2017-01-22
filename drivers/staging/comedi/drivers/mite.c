@@ -333,7 +333,7 @@ int mite_buf_change(struct mite_dma_descriptor_ring *ring,
 
 	n_links = async->prealloc_bufsz >> PAGE_SHIFT;
 
-	MDPRINTK("ring->hw_dev=%p, n_links=0x%04x\n", ring->hw_dev, n_links);
+	MDPRINTK("ring->hw_dev=%pK, n_links=0x%04x\n", ring->hw_dev, n_links);
 
 	ring->descriptors =
 	    dma_alloc_coherent(ring->hw_dev,
@@ -735,7 +735,7 @@ void mite_dump_regs(struct mite_channel *mite_chan)
 	int channel = mite_chan->channel;
 
 	pr_debug("mite_dump_regs ch%i\n", channel);
-	pr_debug("mite address is  =%p\n", mite_io_addr);
+	pr_debug("mite address is  =%pK\n", mite_io_addr);
 
 	offset = MITE_CHOR(channel);
 	value = readl(mite_io_addr + offset);

@@ -323,7 +323,7 @@ static inline int check_io_access(struct pt_regs *regs)
 
 			--nip;
 			rb = (*nip >> 11) & 0x1f;
-			printk(KERN_DEBUG "%s bad port %lx at %p\n",
+			printk(KERN_DEBUG "%s bad port %lx at %pK\n",
 			       (*nip & 0x100)? "OUT to": "IN from",
 			       regs->gpr[rb] - _IO_BASE, nip);
 			regs->msr |= MSR_RI;
@@ -1214,7 +1214,7 @@ bail:
 
 void StackOverflow(struct pt_regs *regs)
 {
-	printk(KERN_CRIT "Kernel stack overflow in process %p, r1=%lx\n",
+	printk(KERN_CRIT "Kernel stack overflow in process %pK, r1=%lx\n",
 	       current, regs->gpr[1]);
 	debugger(regs);
 	show_regs(regs);
@@ -1231,7 +1231,7 @@ void nonrecoverable_exception(struct pt_regs *regs)
 
 void trace_syscall(struct pt_regs *regs)
 {
-	printk("Task: %p(%d), PC: %08lX/%08lX, Syscall: %3ld, Result: %s%ld    %s\n",
+	printk("Task: %pK(%d), PC: %08lX/%08lX, Syscall: %3ld, Result: %s%ld    %s\n",
 	       current, task_pid_nr(current), regs->nip, regs->link, regs->gpr[0],
 	       regs->ccr&0x10000000?"Error=":"", regs->gpr[3], print_tainted());
 }

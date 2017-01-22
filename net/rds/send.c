@@ -800,7 +800,7 @@ static int rds_send_queue_rm(struct rds_sock *rs, struct rds_connection *conn,
 		set_bit(RDS_MSG_ON_CONN, &rm->m_flags);
 		spin_unlock(&conn->c_lock);
 
-		rdsdebug("queued msg %p len %d, rs %p bytes %d seq %llu\n",
+		rdsdebug("queued msg %pK len %d, rs %pK bytes %d seq %llu\n",
 			 rm, len, rs, rs->rs_snd_bytes,
 			 (unsigned long long)be64_to_cpu(rm->m_inc.i_hdr.h_sequence));
 
@@ -1010,14 +1010,14 @@ int rds_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,
 		goto out;
 
 	if (rm->rdma.op_active && !conn->c_trans->xmit_rdma) {
-		printk_ratelimited(KERN_NOTICE "rdma_op %p conn xmit_rdma %p\n",
+		printk_ratelimited(KERN_NOTICE "rdma_op %pK conn xmit_rdma %pK\n",
 			       &rm->rdma, conn->c_trans->xmit_rdma);
 		ret = -EOPNOTSUPP;
 		goto out;
 	}
 
 	if (rm->atomic.op_active && !conn->c_trans->xmit_atomic) {
-		printk_ratelimited(KERN_NOTICE "atomic_op %p conn xmit_atomic %p\n",
+		printk_ratelimited(KERN_NOTICE "atomic_op %pK conn xmit_atomic %pK\n",
 			       &rm->atomic, conn->c_trans->xmit_atomic);
 		ret = -EOPNOTSUPP;
 		goto out;

@@ -36,7 +36,7 @@ static inline int __vringh_get_head(const struct vringh *vrh,
 
 	err = getu16(&avail_idx, &vrh->vring.avail->idx);
 	if (err) {
-		vringh_bad("Failed to access avail idx at %p",
+		vringh_bad("Failed to access avail idx at %pK",
 			   &vrh->vring.avail->idx);
 		return err;
 	}
@@ -51,7 +51,7 @@ static inline int __vringh_get_head(const struct vringh *vrh,
 
 	err = getu16(&head, &vrh->vring.avail->ring[i]);
 	if (err) {
-		vringh_bad("Failed to read head: idx %d address %p",
+		vringh_bad("Failed to read head: idx %d address %pK",
 			   *last_avail_idx, &vrh->vring.avail->ring[i]);
 		return err;
 	}
@@ -310,7 +310,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
 		}
 
 		if (count++ == vrh->vring.num) {
-			vringh_bad("Descriptor loop in %p", descs);
+			vringh_bad("Descriptor loop in %pK", descs);
 			err = -ELOOP;
 			goto fail;
 		}
@@ -320,7 +320,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
 		else {
 			iov = riov;
 			if (unlikely(wiov && wiov->i)) {
-				vringh_bad("Readable desc %p after writable",
+				vringh_bad("Readable desc %pK after writable",
 					   &descs[i]);
 				err = -EINVAL;
 				goto fail;
@@ -412,7 +412,7 @@ static inline int __vringh_complete(struct vringh *vrh,
 		err = putused(&used_ring->ring[off], used, num_used);
 
 	if (err) {
-		vringh_bad("Failed to write %u used entries %u at %p",
+		vringh_bad("Failed to write %u used entries %u at %pK",
 			   num_used, off, &used_ring->ring[off]);
 		return err;
 	}
@@ -422,7 +422,7 @@ static inline int __vringh_complete(struct vringh *vrh,
 
 	err = putu16(&vrh->vring.used->idx, used_idx + num_used);
 	if (err) {
-		vringh_bad("Failed to update used index at %p",
+		vringh_bad("Failed to update used index at %pK",
 			   &vrh->vring.used->idx);
 		return err;
 	}
@@ -449,7 +449,7 @@ static inline int __vringh_need_notify(struct vringh *vrh,
 		u16 flags;
 		err = getu16(&flags, &vrh->vring.avail->flags);
 		if (err) {
-			vringh_bad("Failed to get flags at %p",
+			vringh_bad("Failed to get flags at %pK",
 				   &vrh->vring.avail->flags);
 			return err;
 		}
@@ -459,7 +459,7 @@ static inline int __vringh_need_notify(struct vringh *vrh,
 	/* Modern: we know when other side wants to know. */
 	err = getu16(&used_event, &vring_used_event(&vrh->vring));
 	if (err) {
-		vringh_bad("Failed to get used event idx at %p",
+		vringh_bad("Failed to get used event idx at %pK",
 			   &vring_used_event(&vrh->vring));
 		return err;
 	}
@@ -486,14 +486,14 @@ static inline bool __vringh_notify_enable(struct vringh *vrh,
 	if (!vrh->event_indices) {
 		/* Old-school; update flags. */
 		if (putu16(&vrh->vring.used->flags, 0) != 0) {
-			vringh_bad("Clearing used flags %p",
+			vringh_bad("Clearing used flags %pK",
 				   &vrh->vring.used->flags);
 			return true;
 		}
 	} else {
 		if (putu16(&vring_avail_event(&vrh->vring),
 			   vrh->last_avail_idx) != 0) {
-			vringh_bad("Updating avail event index %p",
+			vringh_bad("Updating avail event index %pK",
 				   &vring_avail_event(&vrh->vring));
 			return true;
 		}
@@ -504,7 +504,7 @@ static inline bool __vringh_notify_enable(struct vringh *vrh,
 	virtio_mb(vrh->weak_barriers);
 
 	if (getu16(&avail, &vrh->vring.avail->idx) != 0) {
-		vringh_bad("Failed to check avail idx at %p",
+		vringh_bad("Failed to check avail idx at %pK",
 			   &vrh->vring.avail->idx);
 		return true;
 	}
@@ -521,7 +521,7 @@ static inline void __vringh_notify_disable(struct vringh *vrh,
 	if (!vrh->event_indices) {
 		/* Old-school; update flags. */
 		if (putu16(&vrh->vring.used->flags, VRING_USED_F_NO_NOTIFY)) {
-			vringh_bad("Setting used flags %p",
+			vringh_bad("Setting used flags %pK",
 				   &vrh->vring.used->flags);
 		}
 	}

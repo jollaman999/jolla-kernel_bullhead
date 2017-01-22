@@ -354,7 +354,7 @@ static int qib_tid_update(struct qib_ctxtdata *rcd, struct file *fp,
 		 * themselves.
 		 */
 		qib_devinfo(dd->pcidev,
-			 "Failed to lock addr %p, %u pages: "
+			 "Failed to lock addr %pK, %u pages: "
 			 "errno %d\n", (void *) vaddr, cnt, -ret);
 		goto done;
 	}

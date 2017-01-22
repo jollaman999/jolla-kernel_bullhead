@@ -306,7 +306,7 @@ void __dma_free_coherent(size_t size, void *vaddr)
 
  no_area:
 	spin_unlock_irqrestore(&consistent_lock, flags);
-	printk(KERN_ERR "%s: trying to free invalid coherent area: %p\n",
+	printk(KERN_ERR "%s: trying to free invalid coherent area: %pK\n",
 	       __func__, vaddr);
 	dump_stack();
 }

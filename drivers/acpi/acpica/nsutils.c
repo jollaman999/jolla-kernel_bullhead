@@ -89,7 +89,7 @@ acpi_ns_print_node_pathname(struct acpi_namespace_node *node,
 			acpi_os_printf("%s ", message);
 		}
 
-		acpi_os_printf("[%s] (Node %p)", (char *)buffer.pointer, node);
+		acpi_os_printf("[%s] (Node %pK)", (char *)buffer.pointer, node);
 		ACPI_FREE(buffer.pointer);
 	}
 }
@@ -317,10 +317,10 @@ acpi_status acpi_ns_build_internal_name(struct acpi_namestring_info *info)
 
 	if (info->fully_qualified) {
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "Returning [%p] (abs) \"\\%s\"\n",
+				  "Returning [%pK] (abs) \"\\%s\"\n",
 				  internal_name, internal_name));
 	} else {
-		ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Returning [%p] (rel) \"%s\"\n",
+		ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Returning [%pK] (rel) \"%s\"\n",
 				  internal_name, internal_name));
 	}
 

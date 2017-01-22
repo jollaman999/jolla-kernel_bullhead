@@ -80,7 +80,7 @@ void __iomem *sun3_ioremap(unsigned long phys, unsigned long size,
 		return NULL;
 
 #ifdef SUN3_KMAP_DEBUG
-	printk("ioremap: got virt %p size %lx(%lx)\n",
+	printk("ioremap: got virt %pK size %lx(%lx)\n",
 	       area->addr, size, area->size);
 #endif
 

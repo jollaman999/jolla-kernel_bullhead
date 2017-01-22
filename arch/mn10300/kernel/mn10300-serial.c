@@ -1391,7 +1391,7 @@ static void mn10300_serial_set_termios(struct uart_port *_port,
 	struct mn10300_serial_port *port =
 		container_of(_port, struct mn10300_serial_port, uart);
 
-	_enter("%s,%p,%p", port->name, new, old);
+	_enter("%s,%pK,%pK", port->name, new, old);
 
 	mn10300_serial_change_speed(port, new, old);
 

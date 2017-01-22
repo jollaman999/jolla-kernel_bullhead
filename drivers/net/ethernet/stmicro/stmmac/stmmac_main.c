@@ -218,7 +218,7 @@ static void stmmac_clk_csr_set(struct stmmac_priv *priv)
 static void print_pkt(unsigned char *buf, int len)
 {
 	int j;
-	pr_info("len = %d byte, buf addr: 0x%p", len, buf);
+	pr_info("len = %d byte, buf addr: 0x%pK", len, buf);
 	for (j = 0; j < len; j++) {
 		if ((j % 16) == 0)
 			pr_info("\n %03x:", j);
@@ -1068,7 +1068,7 @@ static void init_dma_desc_rings(struct net_device *dev)
 		if (stmmac_init_rx_buffers(priv, p, i))
 			break;
 
-		DBG(probe, INFO, "[%p]\t[%p]\t[%x]\n", priv->rx_skbuff[i],
+		DBG(probe, INFO, "[%pK]\t[%pK]\t[%x]\n", priv->rx_skbuff[i],
 		    priv->rx_skbuff[i]->data, priv->rx_skbuff_dma[i]);
 	}
 	priv->cur_rx = 0;
@@ -1798,7 +1798,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
 
 #ifdef STMMAC_XMIT_DEBUG
 	if ((skb->len > ETH_FRAME_LEN) || nfrags)
-		pr_debug("%s: [entry %d]: skb addr %p len: %d nopagedlen: %d\n"
+		pr_debug("%s: [entry %d]: skb addr %pK len: %d nopagedlen: %d\n"
 			 "\tn_frags: %d - ip_summed: %d - %s gso\n"
 			 "\ttx_count_frames %d\n", __func__, entry,
 			 skb, skb->len, nopaged_len, nfrags, skb->ip_summed,
@@ -1895,7 +1895,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
 
 #ifdef STMMAC_XMIT_DEBUG
 	if (netif_msg_pktdata(priv)) {
-		pr_info("%s: curr %d dirty=%d entry=%d, first=%p, nfrags=%d",
+		pr_info("%s: curr %d dirty=%d entry=%d, first=%pK, nfrags=%d",
 			__func__, (priv->cur_tx % txsize),
 			(priv->dirty_tx % txsize), entry, first, nfrags);
 		if (priv->extend_desc)
@@ -2059,7 +2059,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit)
 					 frame_len, status);
 
 			if (netif_msg_hw(priv))
-				pr_debug("\tdesc: %p [entry %d] buff=0x%x\n",
+				pr_debug("\tdesc: %pK [entry %d] buff=0x%x\n",
 					 p, entry, p->des2);
 #endif
 			skb = priv->rx_skbuff[entry];

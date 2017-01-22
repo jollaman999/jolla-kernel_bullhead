@@ -622,7 +622,7 @@ static void mpc_rcvd_sweep_resp(struct mpcg_info *mpcginfo)
 	struct mpc_group  *grp = priv->mpcg;
 	struct channel	  *ch = priv->channel[CTCM_WRITE];
 
-	CTCM_PR_DEBUG("%s: ch=0x%p id=%s\n", __func__, ch, ch->id);
+	CTCM_PR_DEBUG("%s: ch=0x%pK id=%s\n", __func__, ch, ch->id);
 	CTCM_D3_DUMP((char *)mpcginfo->sweep, TH_SWEEP_LENGTH);
 
 	grp->sweep_rsp_pend_num--;
@@ -655,7 +655,7 @@ static void ctcmpc_send_sweep_resp(struct channel *rch)
 	struct sk_buff *sweep_skb;
 	struct channel *ch  = priv->channel[CTCM_WRITE];
 
-	CTCM_PR_DEBUG("%s: ch=0x%p id=%s\n", __func__, rch, rch->id);
+	CTCM_PR_DEBUG("%s: ch=0x%pK id=%s\n", __func__, rch, rch->id);
 
 	sweep_skb = __dev_alloc_skb(MPC_BUFSIZE_DEFAULT, GFP_ATOMIC | GFP_DMA);
 	if (sweep_skb == NULL) {
@@ -711,7 +711,7 @@ static void mpc_rcvd_sweep_req(struct mpcg_info *mpcginfo)
 
 	if (do_debug)
 		CTCM_DBF_TEXT_(MPC_TRACE, CTC_DBF_DEBUG,
-			" %s(): ch=0x%p id=%s\n", __func__, ch, ch->id);
+			" %s(): ch=0x%pK id=%s\n", __func__, ch, ch->id);
 
 	if (grp->in_sweep == 0) {
 		grp->in_sweep = 1;
@@ -949,7 +949,7 @@ void mpc_channel_action(struct channel *ch, int direction, int action)
 		return;
 	}
 
-	CTCM_PR_DEBUG("enter %s: ch=0x%p id=%s\n", __func__, ch, ch->id);
+	CTCM_PR_DEBUG("enter %s: ch=0x%pK id=%s\n", __func__, ch, ch->id);
 
 	CTCM_DBF_TEXT_(MPC_TRACE, CTC_DBF_NOTICE,
 		"%s: %i / Grp:%s total_channels=%i, active_channels: "
@@ -1038,7 +1038,7 @@ done:
 		grp->active_channels[CTCM_READ],
 		grp->active_channels[CTCM_WRITE]);
 
-	CTCM_PR_DEBUG("exit %s: ch=0x%p id=%s\n", __func__, ch, ch->id);
+	CTCM_PR_DEBUG("exit %s: ch=0x%pK id=%s\n", __func__, ch, ch->id);
 }
 
 /**
@@ -1232,7 +1232,7 @@ done:
 		fsm_event(grp->fsm, MPCG_EVENT_INOP, dev);
 	}
 
-	CTCM_PR_DEBUG("exit %s: %s: ch=0x%p id=%s\n",
+	CTCM_PR_DEBUG("exit %s: %s: ch=0x%pK id=%s\n",
 			__func__, dev->name, ch, ch->id);
 }
 
@@ -1269,7 +1269,7 @@ void ctcmpc_bh(unsigned long thischan)
 		if (skb == skb_peek(&ch->io_queue))
 			break;
 	}
-	CTCM_PR_DEBUG("exit %s: %s: ch=0x%p id=%s\n",
+	CTCM_PR_DEBUG("exit %s: %s: ch=0x%pK id=%s\n",
 			__func__, dev->name, ch, ch->id);
 	return;
 }
@@ -1282,7 +1282,7 @@ struct mpc_group *ctcmpc_init_mpc_group(struct ctcm_priv *priv)
 	struct mpc_group *grp;
 
 	CTCM_DBF_TEXT_(MPC_SETUP, CTC_DBF_INFO,
-			"Enter %s(%p)", CTCM_FUNTAIL, priv);
+			"Enter %s(%pK)", CTCM_FUNTAIL, priv);
 
 	grp = kzalloc(sizeof(struct mpc_group), GFP_KERNEL);
 	if (grp == NULL)
@@ -1565,7 +1565,7 @@ static int mpc_validate_xid(struct mpcg_info *mpcginfo)
 	__u64   their_id = 0;
 	int	len = TH_HEADER_LENGTH + PDU_HEADER_LENGTH;
 
-	CTCM_PR_DEBUG("Enter %s: xid=%p\n", __func__, xid);
+	CTCM_PR_DEBUG("Enter %s: xid=%pK\n", __func__, xid);
 
 	if (xid == NULL) {
 		rc = 1;
@@ -1683,7 +1683,7 @@ static void mpc_action_side_xid(fsm_instance *fsm, void *arg, int side)
 	unsigned long saveflags = 0;	/* avoids compiler warning with
 					   spin_unlock_irqrestore */
 
-	CTCM_PR_DEBUG("Enter %s: cp=%i ch=0x%p id=%s\n",
+	CTCM_PR_DEBUG("Enter %s: cp=%i ch=0x%pK id=%s\n",
 			__func__, smp_processor_id(), ch, ch->id);
 
 	if (ctcm_checkalloc_buffer(ch))
@@ -1726,7 +1726,7 @@ static void mpc_action_side_xid(fsm_instance *fsm, void *arg, int side)
 
 	if (!(ch->xid_th && ch->xid && ch->xid_id))
 		CTCM_DBF_TEXT_(MPC_TRACE, CTC_DBF_INFO,
-			"%s(%s): xid_th=%p, xid=%p, xid_id=%p",
+			"%s(%s): xid_th=%pK, xid=%pK, xid_id=%pK",
 			CTCM_FUNTAIL, ch->id, ch->xid_th, ch->xid, ch->xid_id);
 
 	if (side == XSIDE) {
@@ -1823,7 +1823,7 @@ static void mpc_action_side_xid(fsm_instance *fsm, void *arg, int side)
 	}
 
 done:
-	CTCM_PR_DEBUG("Exit %s: ch=0x%p id=%s\n",
+	CTCM_PR_DEBUG("Exit %s: ch=0x%pK id=%s\n",
 				__func__, ch, ch->id);
 	return;
 
@@ -1858,7 +1858,7 @@ static void mpc_action_doxid0(fsm_instance *fsm, int event, void *arg)
 	struct ctcm_priv   *priv = dev->ml_priv;
 	struct mpc_group   *grp  = priv->mpcg;
 
-	CTCM_PR_DEBUG("Enter %s: cp=%i ch=0x%p id=%s\n",
+	CTCM_PR_DEBUG("Enter %s: cp=%i ch=0x%pK id=%s\n",
 			__func__, smp_processor_id(), ch, ch->id);
 
 	if (ch->xid == NULL) {
@@ -2035,7 +2035,7 @@ static void mpc_action_rcvd_xid7(fsm_instance *fsm, int event, void *arg)
 	struct ctcm_priv   *priv    = dev->ml_priv;
 	struct mpc_group   *grp     = priv->mpcg;
 
-	CTCM_PR_DEBUG("Enter %s: cp=%i ch=0x%p id=%s\n",
+	CTCM_PR_DEBUG("Enter %s: cp=%i ch=0x%pK id=%s\n",
 		__func__, smp_processor_id(), ch, ch->id);
 	CTCM_PR_DEBUG("%s: outstanding_xid7: %i, outstanding_xid7_p2: %i\n",
 		__func__, grp->outstanding_xid7, grp->outstanding_xid7_p2);

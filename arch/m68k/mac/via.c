@@ -169,9 +169,9 @@ void __init via_init(void)
 			panic("UNKNOWN VIA TYPE");
 	}
 
-	printk(KERN_INFO "VIA1 at %p is a 6522 or clone\n", via1);
+	printk(KERN_INFO "VIA1 at %pK is a 6522 or clone\n", via1);
 
-	printk(KERN_INFO "VIA2 at %p is ", via2);
+	printk(KERN_INFO "VIA2 at %pK is ", via2);
 	if (rbv_present) {
 		printk("an RBV\n");
 	} else if (oss_present) {

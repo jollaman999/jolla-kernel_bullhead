@@ -1488,7 +1488,7 @@ static void work_fn_tx(struct work_struct *work)
 		return;
 	}
 
-	dev_dbg(port->dev, "%s: %p: %d...%d, cookie %d\n", __func__,
+	dev_dbg(port->dev, "%s: %pK: %d...%d, cookie %d\n", __func__,
 		xmit->buf, xmit->tail, xmit->head, s->cookie_tx);
 
 	dma_async_issue_pending(chan);
@@ -1654,7 +1654,7 @@ static void sci_request_dma(struct uart_port *port)
 
 	s->cookie_tx = -EINVAL;
 	chan = dma_request_channel(mask, filter, param);
-	dev_dbg(port->dev, "%s: TX: got channel %p\n", __func__, chan);
+	dev_dbg(port->dev, "%s: TX: got channel %pK\n", __func__, chan);
 	if (chan) {
 		s->chan_tx = chan;
 		sg_init_table(&s->sg_tx, 1);
@@ -1666,7 +1666,7 @@ static void sci_request_dma(struct uart_port *port)
 		if (!nent)
 			sci_tx_dma_release(s, false);
 		else
-			dev_dbg(port->dev, "%s: mapped %d@%p to %x\n", __func__,
+			dev_dbg(port->dev, "%s: mapped %d@%pK to %x\n", __func__,
 				sg_dma_len(&s->sg_tx),
 				port->state->xmit.buf, sg_dma_address(&s->sg_tx));
 
@@ -1681,7 +1681,7 @@ static void sci_request_dma(struct uart_port *port)
 	param->shdma_slave.slave_id = s->cfg->dma_slave_rx;
 
 	chan = dma_request_channel(mask, filter, param);
-	dev_dbg(port->dev, "%s: RX: got channel %p\n", __func__, chan);
+	dev_dbg(port->dev, "%s: RX: got channel %pK\n", __func__, chan);
 	if (chan) {
 		dma_addr_t dma[2];
 		void *buf[2];

@@ -335,7 +335,7 @@ static int setup_frame(int sig, struct k_sigaction *ka,
 
 	set_fs(USER_DS);
 
-	pr_debug("SIG deliver (%s:%d): sp=%p pc=%08lx pr=%08lx\n",
+	pr_debug("SIG deliver (%s:%d): sp=%pK pc=%08lx pr=%08lx\n",
 		 current->comm, task_pid_nr(current), frame, regs->pc, regs->pr);
 
 	return 0;
@@ -418,7 +418,7 @@ static int setup_rt_frame(int sig, struct k_sigaction *ka, siginfo_t *info,
 
 	set_fs(USER_DS);
 
-	pr_debug("SIG deliver (%s:%d): sp=%p pc=%08lx pr=%08lx\n",
+	pr_debug("SIG deliver (%s:%d): sp=%pK pc=%08lx pr=%08lx\n",
 		 current->comm, task_pid_nr(current), frame, regs->pc, regs->pr);
 
 	return 0;

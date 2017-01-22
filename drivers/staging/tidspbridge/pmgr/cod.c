@@ -362,7 +362,7 @@ int cod_get_sym_value(struct cod_manager *cod_mgr_obj, char *str_sym,
 {
 	struct dbll_sym_val *dbll_sym;
 
-	dev_dbg(bridge, "%s: cod_mgr_obj: %p str_sym: %s pul_value: %p\n",
+	dev_dbg(bridge, "%s: cod_mgr_obj: %pK str_sym: %s pul_value: %pK\n",
 		__func__, cod_mgr_obj, str_sym, pul_value);
 	if (cod_mgr_obj->base_lib) {
 		if (!cod_mgr_obj->fxns.

@@ -978,10 +978,10 @@ static void corkscrew_timeout(struct net_device *dev)
 	pr_debug("  Flags; bus-master %d, full %d; dirty %d current %d.\n",
 	       vp->full_bus_master_tx, vp->tx_full, vp->dirty_tx,
 	       vp->cur_tx);
-	pr_debug("  Down list %8.8x vs. %p.\n", inl(ioaddr + DownListPtr),
+	pr_debug("  Down list %8.8x vs. %pK.\n", inl(ioaddr + DownListPtr),
 	       &vp->tx_ring[0]);
 	for (i = 0; i < TX_RING_SIZE; i++) {
-		pr_debug("  %d: %p  length %8.8x status %8.8x\n", i,
+		pr_debug("  %d: %pK  length %8.8x status %8.8x\n", i,
 		       &vp->tx_ring[i],
 		       vp->tx_ring[i].length, vp->tx_ring[i].status);
 	}
@@ -1383,7 +1383,7 @@ static int boomerang_rx(struct net_device *dev)
 				/* Remove this checking code for final release. */
 				if (isa_bus_to_virt(vp->rx_ring[entry].addr) != temp)
 					pr_warning("%s: Warning -- the skbuff addresses do not match"
-					     " in boomerang_rx: %p vs. %p / %p.\n",
+					     " in boomerang_rx: %pK vs. %pK / %pK.\n",
 					     dev->name,
 					     isa_bus_to_virt(vp->
 							 rx_ring[entry].

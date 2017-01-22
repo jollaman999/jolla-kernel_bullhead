@@ -431,7 +431,7 @@ void compaq_nvram_init (void __iomem *rom_start)
 	if (rom_start) {
 		compaq_int15_entry_point = (rom_start + ROM_INT15_PHY_ADDR - ROM_PHY_ADDR);
 	}
-	dbg("int15 entry  = %p\n", compaq_int15_entry_point);
+	dbg("int15 entry  = %pK\n", compaq_int15_entry_point);
 
 	/* initialize our int15 lock */
 	spin_lock_init(&int15_lock);

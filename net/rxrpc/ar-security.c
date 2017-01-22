@@ -60,7 +60,7 @@ static struct rxrpc_security *rxrpc_security_lookup(u8 security_index)
 	sec = NULL;
 out:
 	up_read(&rxrpc_security_sem);
-	_leave(" = %p [%s]", sec, sec ? sec->name : "");
+	_leave(" = %pK [%s]", sec, sec ? sec->name : "");
 	return sec;
 }
 

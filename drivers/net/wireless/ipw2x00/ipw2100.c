@@ -2905,7 +2905,7 @@ static int __ipw2100_tx_process(struct ipw2100_priv *priv)
 #ifdef CONFIG_IPW2100_DEBUG
 	{
 		i = txq->oldest;
-		IPW_DEBUG_TX("TX%d V=%p P=%04X T=%04X L=%d\n", i,
+		IPW_DEBUG_TX("TX%d V=%pK P=%04X T=%04X L=%d\n", i,
 			     &txq->drv[i],
 			     (u32) (txq->nic + i * sizeof(struct ipw2100_bd)),
 			     txq->drv[i].host_addr, txq->drv[i].buf_length);
@@ -2913,7 +2913,7 @@ static int __ipw2100_tx_process(struct ipw2100_priv *priv)
 		if (packet->type == DATA) {
 			i = (i + 1) % txq->entries;
 
-			IPW_DEBUG_TX("TX%d V=%p P=%04X T=%04X L=%d\n", i,
+			IPW_DEBUG_TX("TX%d V=%pK P=%04X T=%04X L=%d\n", i,
 				     &txq->drv[i],
 				     (u32) (txq->nic + i *
 					    sizeof(struct ipw2100_bd)),
@@ -3036,7 +3036,7 @@ static void ipw2100_tx_send_commands(struct ipw2100_priv *priv)
 
 		packet = list_entry(element, struct ipw2100_tx_packet, list);
 
-		IPW_DEBUG_TX("using TBD at virt=%p, phys=%04X\n",
+		IPW_DEBUG_TX("using TBD at virt=%pK, phys=%04X\n",
 			     &txq->drv[txq->next],
 			     (u32) (txq->nic + txq->next *
 				      sizeof(struct ipw2100_bd)));
@@ -4408,7 +4408,7 @@ static void bd_queue_initialize(struct ipw2100_priv *priv,
 {
 	IPW_DEBUG_INFO("enter\n");
 
-	IPW_DEBUG_INFO("initializing bd queue at virt=%p, phys=%08x\n", q->drv,
+	IPW_DEBUG_INFO("initializing bd queue at virt=%pK, phys=%08x\n", q->drv,
 		       (u32) q->nic);
 
 	write_register(priv->net_dev, base, q->nic);
@@ -8434,7 +8434,7 @@ static int ipw2100_get_firmware(struct ipw2100_priv *priv,
 		       priv->net_dev->name, fw_name);
 		return rc;
 	}
-	IPW_DEBUG_INFO("firmware data %p size %zd\n", fw->fw_entry->data,
+	IPW_DEBUG_INFO("firmware data %pK size %zd\n", fw->fw_entry->data,
 		       fw->fw_entry->size);
 
 	ipw2100_mod_firmware_load(fw);

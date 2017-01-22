@@ -2002,7 +2002,7 @@ static int davinci_emac_probe(struct platform_device *pdev)
 
 	if (netif_msg_probe(priv)) {
 		dev_notice(emac_dev, "DaVinci EMAC Probe found device "\
-			   "(regs: %p, irq: %d)\n",
+			   "(regs: %pK, irq: %d)\n",
 			   (void *)priv->emac_base_phys, ndev->irq);
 	}
 

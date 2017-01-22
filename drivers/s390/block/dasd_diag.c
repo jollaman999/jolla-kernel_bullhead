@@ -168,7 +168,7 @@ dasd_start_diag(struct dasd_ccw_req * cqr)
 
 	device = cqr->startdev;
 	if (cqr->retries < 0) {
-		DBF_DEV_EVENT(DBF_ERR, device, "DIAG start_IO: request %p "
+		DBF_DEV_EVENT(DBF_ERR, device, "DIAG start_IO: request %pK "
 			    "- no retry left)", cqr);
 		cqr->status = DASD_CQR_ERROR;
 		return -EIO;
@@ -294,7 +294,7 @@ static void dasd_ext_handler(struct ext_code ext_code,
 	} else {
 		cqr->status = DASD_CQR_QUEUED;
 		DBF_DEV_EVENT(DBF_DEBUG, device, "interrupt status for "
-			      "request %p was %d (%d retries left)", cqr,
+			      "request %pK was %d (%d retries left)", cqr,
 			      ext_code.subcode & 0xff, cqr->retries);
 		dasd_diag_erp(device);
 	}

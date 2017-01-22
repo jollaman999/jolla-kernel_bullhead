@@ -745,7 +745,7 @@ static int cafe_nand_probe(struct pci_dev *pdev,
 	else
 		cafe_writel(cafe, 0, NAND_DMA_ADDR1);
 
-	cafe_dev_dbg(&cafe->pdev->dev, "Set DMA address to %x (virt %p)\n",
+	cafe_dev_dbg(&cafe->pdev->dev, "Set DMA address to %x (virt %pK)\n",
 		cafe_readl(cafe, NAND_DMA_ADDR0), cafe->dmabuf);
 
 	/* Enable NAND IRQ in global IRQ mask register */

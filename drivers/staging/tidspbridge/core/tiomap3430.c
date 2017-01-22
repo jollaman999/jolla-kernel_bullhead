@@ -229,7 +229,7 @@ static void bad_page_dump(u32 pa, struct page *pg)
 {
 	pr_emerg("DSPBRIDGE: MAP function: COUNT 0 FOR PA 0x%x\n", pa);
 	pr_emerg("Bad page state in process '%s'\n"
-		 "page:%p flags:0x%0*lx mapping:%p mapcount:%d count:%d\n"
+		 "page:%pK flags:0x%0*lx mapping:%pK mapcount:%d count:%d\n"
 		 "Backtrace:\n",
 		 current->comm, pg, (int)(2 * sizeof(unsigned long)),
 		 (unsigned long)pg->flags, pg->mapping,
@@ -845,7 +845,7 @@ static int bridge_dev_create(struct bridge_dev_context
 			pt_attrs->l1_base_va, pt_attrs->l1_size,
 			pt_attrs->l2_base_pa, pt_attrs->l2_base_va,
 			pt_attrs->l2_size);
-		dev_dbg(bridge, "pt_attrs %p L2 NumPages %x pg_info %p\n",
+		dev_dbg(bridge, "pt_attrs %pK L2 NumPages %x pg_info %pK\n",
 			pt_attrs, pt_attrs->l2_num_pages, pt_attrs->pg_info);
 	}
 	if ((pt_attrs != NULL) && (pt_attrs->l1_base_va != 0) &&
@@ -1142,7 +1142,7 @@ static int bridge_brd_mem_map(struct bridge_dev_context *dev_ctxt,
 	u32 mpu_addr, pa;
 
 	dev_dbg(bridge,
-		"%s hDevCtxt %p, pa %x, va %x, size %x, ul_map_attr %x\n",
+		"%s hDevCtxt %pK, pa %x, va %x, size %x, ul_map_attr %x\n",
 		__func__, dev_ctxt, ul_mpu_addr, virt_addr, ul_num_bytes,
 		ul_map_attr);
 	if (ul_num_bytes == 0)
@@ -1370,7 +1370,7 @@ static int bridge_brd_mem_un_map(struct bridge_dev_context *dev_ctxt,
 	rem_bytes_l2 = 0;
 	l1_base_va = pt->l1_base_va;
 	pte_addr_l1 = hw_mmu_pte_addr_l1(l1_base_va, va_curr);
-	dev_dbg(bridge, "%s dev_ctxt %p, va %x, NumBytes %x l1_base_va %x, "
+	dev_dbg(bridge, "%s dev_ctxt %pK, va %x, NumBytes %x l1_base_va %x, "
 		"pte_addr_l1 %x\n", __func__, dev_ctxt, virt_addr,
 		ul_num_bytes, l1_base_va, pte_addr_l1);
 

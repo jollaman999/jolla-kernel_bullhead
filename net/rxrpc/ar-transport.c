@@ -64,7 +64,7 @@ static struct rxrpc_transport *rxrpc_alloc_transport(struct rxrpc_local *local,
 		}
 	}
 
-	_leave(" = %p", trans);
+	_leave(" = %pK", trans);
 	return trans;
 }
 
@@ -126,7 +126,7 @@ success:
 	     trans->local->debug_id,
 	     trans->peer->debug_id);
 
-	_leave(" = %p {u=%d}", trans, usage);
+	_leave(" = %pK {u=%d}", trans, usage);
 	return trans;
 
 	/* we found the transport in the list immediately */
@@ -172,7 +172,7 @@ struct rxrpc_transport *rxrpc_find_transport(struct rxrpc_local *local,
 found_extant_transport:
 	atomic_inc(&trans->usage);
 	read_unlock_bh(&rxrpc_transport_lock);
-	_leave(" = %p", trans);
+	_leave(" = %pK", trans);
 	return trans;
 }
 
@@ -181,7 +181,7 @@ found_extant_transport:
  */
 void rxrpc_put_transport(struct rxrpc_transport *trans)
 {
-	_enter("%p{u=%d}", trans, atomic_read(&trans->usage));
+	_enter("%pK{u=%d}", trans, atomic_read(&trans->usage));
 
 	ASSERTCMP(atomic_read(&trans->usage), >, 0);
 

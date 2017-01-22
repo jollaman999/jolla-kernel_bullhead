@@ -128,7 +128,7 @@ static void dwc2_qh_init(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 	}
 
 	dev_vdbg(hsotg->dev, "DWC OTG HCD QH Initialized\n");
-	dev_vdbg(hsotg->dev, "DWC OTG HCD QH - qh = %p\n", qh);
+	dev_vdbg(hsotg->dev, "DWC OTG HCD QH - qh = %pK\n", qh);
 	dev_vdbg(hsotg->dev, "DWC OTG HCD QH - Device Address = %d\n",
 		 dwc2_hcd_get_dev_addr(&urb->pipe_info));
 	dev_vdbg(hsotg->dev, "DWC OTG HCD QH - Endpoint %d, %s\n",

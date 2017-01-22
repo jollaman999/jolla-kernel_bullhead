@@ -746,7 +746,7 @@ static int tcm_loop_queue_data_in(struct se_cmd *se_cmd)
 				struct tcm_loop_cmd, tl_se_cmd);
 	struct scsi_cmnd *sc = tl_cmd->sc;
 
-	pr_debug("tcm_loop_queue_data_in() called for scsi_cmnd: %p"
+	pr_debug("tcm_loop_queue_data_in() called for scsi_cmnd: %pK"
 		     " cdb: 0x%02x\n", sc, sc->cmnd[0]);
 
 	sc->result = SAM_STAT_GOOD;
@@ -764,7 +764,7 @@ static int tcm_loop_queue_status(struct se_cmd *se_cmd)
 				struct tcm_loop_cmd, tl_se_cmd);
 	struct scsi_cmnd *sc = tl_cmd->sc;
 
-	pr_debug("tcm_loop_queue_status() called for scsi_cmnd: %p"
+	pr_debug("tcm_loop_queue_status() called for scsi_cmnd: %pK"
 			" cdb: 0x%02x\n", sc, sc->cmnd[0]);
 
 	if (se_cmd->sense_buffer &&

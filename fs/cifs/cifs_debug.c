@@ -39,7 +39,7 @@ cifs_dump_mem(char *label, void *data, int length)
 	char *charptr = data;
 	char buf[10], line[80];
 
-	printk(KERN_DEBUG "%s: dump of %d bytes of data at 0x%p\n",
+	printk(KERN_DEBUG "%s: dump of %d bytes of data at 0x%pK\n",
 		label, length, data);
 	for (i = 0; i < length; i += 16) {
 		line[0] = 0;
@@ -82,7 +82,7 @@ void cifs_dump_detail(void *buf)
 	cifs_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d\n",
 		 smb->Command, smb->Status.CifsError,
 		 smb->Flags, smb->Flags2, smb->Mid, smb->Pid);
-	cifs_dbg(VFS, "smb buf %p len %u\n", smb, smbCalcSize(smb));
+	cifs_dbg(VFS, "smb buf %pK len %u\n", smb, smbCalcSize(smb));
 #endif /* CONFIG_CIFS_DEBUG2 */
 }
 
@@ -99,14 +99,14 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
 	spin_lock(&GlobalMid_Lock);
 	list_for_each(tmp, &server->pending_mid_q) {
 		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
-		cifs_dbg(VFS, "State: %d Cmd: %d Pid: %d Cbdata: %p Mid %llu\n",
+		cifs_dbg(VFS, "State: %d Cmd: %d Pid: %d Cbdata: %pK Mid %llu\n",
 			 mid_entry->mid_state,
 			 le16_to_cpu(mid_entry->command),
 			 mid_entry->pid,
 			 mid_entry->callback_data,
 			 mid_entry->mid);
 #ifdef CONFIG_CIFS_STATS2
-		cifs_dbg(VFS, "IsLarge: %d buf: %p time rcv: %ld now: %ld\n",
+		cifs_dbg(VFS, "IsLarge: %d buf: %pK time rcv: %ld now: %ld\n",
 			 mid_entry->large_buf,
 			 mid_entry->resp_buf,
 			 mid_entry->when_received,
@@ -237,7 +237,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
 				mid_entry = list_entry(tmp3, struct mid_q_entry,
 					qhead);
 				seq_printf(m, "\tState: %d com: %d pid:"
-					      " %d cbdata: %p mid %llu\n",
+					      " %d cbdata: %pK mid %llu\n",
 					      mid_entry->mid_state,
 					      le16_to_cpu(mid_entry->command),
 					      mid_entry->pid,

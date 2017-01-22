@@ -274,7 +274,7 @@ int vpu_clock_enable(void *clkh, u32 clk_group)
 	int rc = 0;
 
 	if (!clk_ctr) {
-		pr_err("Invalid param: %p\n", clk_ctr);
+		pr_err("Invalid param: %pK\n", clk_ctr);
 		return -EINVAL;
 	}
 
@@ -335,7 +335,7 @@ void vpu_clock_disable(void *clkh, u32 clk_group)
 	struct vpu_clk_control *clk_ctr = (struct vpu_clk_control *)clkh;
 
 	if (!clk_ctr) {
-		pr_err("Invalid param: %p\n", clk_ctr);
+		pr_err("Invalid param: %pK\n", clk_ctr);
 		return;
 	}
 
@@ -357,7 +357,7 @@ int vpu_clock_scale(void *clkh, enum vpu_power_mode mode)
 	int i, rc = 0;
 
 	if (!clk_ctr) {
-		pr_err("Invalid param: %p\n", clk_ctr);
+		pr_err("Invalid param: %pK\n", clk_ctr);
 		return -EINVAL;
 	}
 
@@ -392,7 +392,7 @@ int vpu_clock_gating_off(void *clkh)
 	int rc = 0;
 
 	if (!clk_ctr) {
-		pr_err("Invalid param: %p\n", clk_ctr);
+		pr_err("Invalid param: %pK\n", clk_ctr);
 		return -EINVAL;
 	}
 
@@ -427,7 +427,7 @@ void vpu_clock_gating_on(void *clkh)
 	struct vpu_clk_control *clk_ctr = (struct vpu_clk_control *)clkh;
 
 	if (!clk_ctr) {
-		pr_err("Invalid param: %p\n", clk_ctr);
+		pr_err("Invalid param: %pK\n", clk_ctr);
 		return;
 	}
 

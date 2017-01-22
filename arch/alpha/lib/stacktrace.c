@@ -51,7 +51,7 @@ display_stored_regs(instr * pro_pc, unsigned char * sp)
 	int reg;
 	unsigned long value;
 
-	printk("Prologue [<%p>], Frame %p:\n", pro_pc, sp);
+	printk("Prologue [<%pK>], Frame %pK:\n", pro_pc, sp);
 	while (!BB_END(*pro_pc))
 		if (STK_PUSH_MATCH(*pro_pc)) {
 			reg = (*pro_pc & MEM_REG) >> 21;

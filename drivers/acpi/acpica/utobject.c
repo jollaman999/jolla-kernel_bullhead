@@ -354,7 +354,7 @@ u8 acpi_ut_valid_internal_object(void *object)
 
 	default:
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "%p is not not an ACPI operand obj [%s]\n",
+				  "%pK is not not an ACPI operand obj [%s]\n",
 				  object, acpi_ut_get_descriptor_name(object)));
 		break;
 	}
@@ -397,7 +397,7 @@ void *acpi_ut_allocate_object_desc_dbg(const char *module_name,
 	memset(object, 0, sizeof(union acpi_operand_object));
 	ACPI_SET_DESCRIPTOR_TYPE(object, ACPI_DESC_TYPE_OPERAND);
 
-	ACPI_DEBUG_PRINT((ACPI_DB_ALLOCATIONS, "%p Size %X\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_ALLOCATIONS, "%pK Size %X\n",
 			  object, (u32) sizeof(union acpi_operand_object)));
 
 	return_PTR(object);
@@ -423,7 +423,7 @@ void acpi_ut_delete_object_desc(union acpi_operand_object *object)
 
 	if (ACPI_GET_DESCRIPTOR_TYPE(object) != ACPI_DESC_TYPE_OPERAND) {
 		ACPI_ERROR((AE_INFO,
-			    "%p is not an ACPI Operand object [%s]", object,
+			    "%pK is not an ACPI Operand object [%s]", object,
 			    acpi_ut_get_descriptor_name(object)));
 		return_VOID;
 	}
@@ -533,7 +533,7 @@ acpi_ut_get_simple_object_size(union acpi_operand_object *internal_object,
 			 */
 			ACPI_ERROR((AE_INFO,
 				    "Cannot convert to external object - "
-				    "unsupported Reference Class [%s] 0x%X in object %p",
+				    "unsupported Reference Class [%s] 0x%X in object %pK",
 				    acpi_ut_get_reference_name(internal_object),
 				    internal_object->reference.class,
 				    internal_object));
@@ -545,7 +545,7 @@ acpi_ut_get_simple_object_size(union acpi_operand_object *internal_object,
 	default:
 
 		ACPI_ERROR((AE_INFO, "Cannot convert to external object - "
-			    "unsupported type [%s] 0x%X in object %p",
+			    "unsupported type [%s] 0x%X in object %pK",
 			    acpi_ut_get_object_type_name(internal_object),
 			    internal_object->common.type, internal_object));
 		status = AE_TYPE;

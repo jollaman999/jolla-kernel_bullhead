@@ -103,7 +103,7 @@ acpi_ns_attach_object(struct acpi_namespace_node *node,
 
 		/* Not a name handle */
 
-		ACPI_ERROR((AE_INFO, "Invalid handle %p [%s]",
+		ACPI_ERROR((AE_INFO, "Invalid handle %pK [%s]",
 			    node, acpi_ut_get_descriptor_name(node)));
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
@@ -112,7 +112,7 @@ acpi_ns_attach_object(struct acpi_namespace_node *node,
 
 	if (node->object == object) {
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "Obj %p already installed in NameObj %p\n",
+				  "Obj %pK already installed in NameObj %pK\n",
 				  object, node));
 
 		return_ACPI_STATUS(AE_OK);
@@ -151,7 +151,7 @@ acpi_ns_attach_object(struct acpi_namespace_node *node,
 		object_type = type;
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Installing %p into Node %p [%4.4s]\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Installing %pK into Node %pK [%4.4s]\n",
 			  obj_desc, node, acpi_ut_get_node_name(node)));
 
 	/* Detach an existing attached object if present */
@@ -237,7 +237,7 @@ void acpi_ns_detach_object(struct acpi_namespace_node *node)
 
 	node->type = ACPI_TYPE_ANY;
 
-	ACPI_DEBUG_PRINT((ACPI_DB_NAMES, "Node %p [%4.4s] Object %p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_NAMES, "Node %pK [%4.4s] Object %pK\n",
 			  node, acpi_ut_get_node_name(node), obj_desc));
 
 	/* Remove one reference on the object (and all subobjects) */

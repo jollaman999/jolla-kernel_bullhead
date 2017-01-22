@@ -442,7 +442,7 @@ static int __if_usb_submit_rx_urb(struct if_usb_card *cardp,
 
 	cardp->rx_urb->transfer_flags |= URB_ZERO_PACKET;
 
-	lbtf_deb_usb2(&cardp->udev->dev, "Pointer for rx_urb %p\n",
+	lbtf_deb_usb2(&cardp->udev->dev, "Pointer for rx_urb %pK\n",
 		cardp->rx_urb);
 	ret = usb_submit_urb(cardp->rx_urb, GFP_ATOMIC);
 	if (ret) {

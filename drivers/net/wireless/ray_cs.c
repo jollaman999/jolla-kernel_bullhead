@@ -307,7 +307,7 @@ static int ray_probe(struct pcmcia_device *p_dev)
 	local->card_status = CARD_INSERTED;
 	local->authentication_state = UNAUTHENTICATED;
 	local->num_multi = 0;
-	dev_dbg(&p_dev->dev, "ray_attach p_dev = %p,  dev = %p,  local = %p, intr = %p\n",
+	dev_dbg(&p_dev->dev, "ray_attach p_dev = %pK,  dev = %pK,  local = %pK, intr = %pK\n",
 	      p_dev, dev, local, &ray_interrupt);
 
 	/* Raylink entries in the device structure */
@@ -423,9 +423,9 @@ static int ray_config(struct pcmcia_device *link)
 	local->amem = ioremap(link->resource[4]->start,
 			resource_size(link->resource[4]));
 
-	dev_dbg(&link->dev, "ray_config sram=%p\n", local->sram);
-	dev_dbg(&link->dev, "ray_config rmem=%p\n", local->rmem);
-	dev_dbg(&link->dev, "ray_config amem=%p\n", local->amem);
+	dev_dbg(&link->dev, "ray_config sram=%pK\n", local->sram);
+	dev_dbg(&link->dev, "ray_config rmem=%pK\n", local->rmem);
+	dev_dbg(&link->dev, "ray_config amem=%pK\n", local->amem);
 	if (ray_init(dev) < 0) {
 		ray_release(link);
 		return -ENODEV;
@@ -474,7 +474,7 @@ static int ray_init(struct net_device *dev)
 	struct ccs __iomem *pccs;
 	ray_dev_t *local = netdev_priv(dev);
 	struct pcmcia_device *link = local->finder;
-	dev_dbg(&link->dev, "ray_init(0x%p)\n", dev);
+	dev_dbg(&link->dev, "ray_init(0x%pK)\n", dev);
 	if (!(pcmcia_dev_present(link))) {
 		dev_dbg(&link->dev, "ray_init - device not present\n");
 		return -1;
@@ -786,7 +786,7 @@ static int ray_dev_init(struct net_device *dev)
 	ray_dev_t *local = netdev_priv(dev);
 	struct pcmcia_device *link = local->finder;
 
-	dev_dbg(&link->dev, "ray_dev_init(dev=%p)\n", dev);
+	dev_dbg(&link->dev, "ray_dev_init(dev=%pK)\n", dev);
 	if (!(pcmcia_dev_present(link))) {
 		dev_dbg(&link->dev, "ray_dev_init - device not present\n");
 		return -1;
@@ -821,7 +821,7 @@ static int ray_dev_config(struct net_device *dev, struct ifmap *map)
 	ray_dev_t *local = netdev_priv(dev);
 	struct pcmcia_device *link = local->finder;
 	/* Dummy routine to satisfy device structure */
-	dev_dbg(&link->dev, "ray_dev_config(dev=%p,ifmap=%p)\n", dev, map);
+	dev_dbg(&link->dev, "ray_dev_config(dev=%pK,ifmap=%pK)\n", dev, map);
 	if (!(pcmcia_dev_present(link))) {
 		dev_dbg(&link->dev, "ray_dev_config - device not present\n");
 		return -1;
@@ -844,7 +844,7 @@ static netdev_tx_t ray_dev_start_xmit(struct sk_buff *skb,
 		return NETDEV_TX_OK;
 	}
 
-	dev_dbg(&link->dev, "ray_dev_start_xmit(skb=%p, dev=%p)\n", skb, dev);
+	dev_dbg(&link->dev, "ray_dev_start_xmit(skb=%pK, dev=%pK)\n", skb, dev);
 	if (local->authentication_state == NEED_TO_AUTH) {
 		dev_dbg(&link->dev, "ray_cs Sending authentication request.\n");
 		if (!build_auth_frame(local, local->auth_id, OPEN_AUTH_REQUEST)) {
@@ -885,7 +885,7 @@ static int ray_hw_xmit(unsigned char *data, int len, struct net_device *dev,
 	struct tx_msg __iomem *ptx;	/* Address of xmit buffer in PC space */
 	short int addr;		/* Address of xmit buffer in card space */
 
-	pr_debug("ray_hw_xmit(data=%p, len=%d, dev=%p)\n", data, len, dev);
+	pr_debug("ray_hw_xmit(data=%pK, len=%d, dev=%pK)\n", data, len, dev);
 	if (len + TX_HEADER_LENGTH > TX_BUF_SIZE) {
 		printk(KERN_INFO "ray_hw_xmit packet too large: %d bytes\n",
 		       len);
@@ -1558,7 +1558,7 @@ static int interrupt_ecf(ray_dev_t *local, int ccs)
 		dev_dbg(&link->dev, "ray_cs interrupt_ecf - device not present\n");
 		return -1;
 	}
-	dev_dbg(&link->dev, "interrupt_ecf(local=%p, ccs = 0x%x\n", local, ccs);
+	dev_dbg(&link->dev, "interrupt_ecf(local=%pK, ccs = 0x%x\n", local, ccs);
 
 	while (i &&
 	       (readb(local->amem + CIS_OFFSET + ECF_INTR_OFFSET) &
@@ -1760,7 +1760,7 @@ static void ray_update_multi_list(struct net_device *dev, int all)
 		dev_dbg(&link->dev, "ray_update_multi_list - device not present\n");
 		return;
 	} else
-		dev_dbg(&link->dev, "ray_update_multi_list(%p)\n", dev);
+		dev_dbg(&link->dev, "ray_update_multi_list(%pK)\n", dev);
 	if ((ccsindex = get_free_ccs(local)) < 0) {
 		dev_dbg(&link->dev, "ray_update_multi - No free ccs\n");
 		return;
@@ -1803,7 +1803,7 @@ static void set_multicast_list(struct net_device *dev)
 	ray_dev_t *local = netdev_priv(dev);
 	UCHAR promisc;
 
-	pr_debug("ray_cs set_multicast_list(%p)\n", dev);
+	pr_debug("ray_cs set_multicast_list(%pK)\n", dev);
 
 	if (dev->flags & IFF_PROMISC) {
 		if (local->sparm.b5.a_promiscuous_mode == 0) {
@@ -1851,7 +1851,7 @@ static irqreturn_t ray_interrupt(int irq, void *dev_id)
 	if (dev == NULL)	/* Note that we want interrupts with dev->start == 0 */
 		return IRQ_NONE;
 
-	pr_debug("ray_cs: interrupt for *dev=%p\n", dev);
+	pr_debug("ray_cs: interrupt for *dev=%pK\n", dev);
 
 	local = netdev_priv(dev);
 	link = local->finder;
@@ -2303,7 +2303,7 @@ static void untranslate(ray_dev_t *local, struct sk_buff *skb, int len)
 		       "type = %08x, xsap = %02x%02x%02x, org = %02x02x02x\n",
 		       ntohs(type), psnap->dsap, psnap->ssap, psnap->ctrl,
 		       psnap->org[0], psnap->org[1], psnap->org[2]);
-		printk(KERN_DEBUG "untranslate skb->data = %p\n", skb->data);
+		printk(KERN_DEBUG "untranslate skb->data = %pK\n", skb->data);
 	}
 #endif
 
@@ -2350,7 +2350,7 @@ static void untranslate(ray_dev_t *local, struct sk_buff *skb, int len)
 	}
 /* TBD reserve  skb_reserve(skb, delta); */
 	skb_pull(skb, delta);
-	pr_debug("untranslate after skb_pull(%d), skb->data = %p\n", delta,
+	pr_debug("untranslate after skb_pull(%d), skb->data = %pK\n", delta,
 	      skb->data);
 	memcpy(peth->h_dest, destaddr, ADDRLEN);
 	memcpy(peth->h_source, srcaddr, ADDRLEN);

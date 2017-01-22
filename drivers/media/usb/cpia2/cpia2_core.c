@@ -2269,7 +2269,7 @@ int cpia2_allocate_buffers(struct camera_data *cam)
 	cam->buffers[i].num = i;
 	cam->curbuff = cam->buffers;
 	cam->workbuff = cam->curbuff->next;
-	DBG("buffers=%p, curbuff=%p, workbuff=%p\n", cam->buffers, cam->curbuff,
+	DBG("buffers=%pK, curbuff=%pK, workbuff=%pK\n", cam->buffers, cam->curbuff,
 	    cam->workbuff);
 	return 0;
 }

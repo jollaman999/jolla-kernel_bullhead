@@ -63,7 +63,7 @@ void hpfs_del_pos(struct inode *inode, loff_t *pos)
 	}
 	return;
 	not_f:
-	/*printk("HPFS: warning: position pointer %p->%08x not found\n", pos, (int)*pos);*/
+	/*printk("HPFS: warning: position pointer %pK->%08x not found\n", pos, (int)*pos);*/
 	return;
 }
 

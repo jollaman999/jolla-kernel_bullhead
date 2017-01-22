@@ -105,7 +105,7 @@ static unsigned long get_plt_size(const Elf32_Ehdr *hdr,
 
 		if (sechdrs[i].sh_type == SHT_RELA) {
 			pr_debug("Found relocations in section %u\n", i);
-			pr_debug("Ptr: %p.  Number: %u\n",
+			pr_debug("Ptr: %pK.  Number: %u\n",
 				 (void *)hdr + sechdrs[i].sh_offset,
 				 sechdrs[i].sh_size / sizeof(Elf32_Rela));
 

@@ -314,7 +314,7 @@ done(struct goku_ep *ep, struct goku_request *req, int status)
 #ifndef USB_TRACE
 	if (status && status != -ESHUTDOWN)
 #endif
-		VDBG(dev, "complete %s req %p stat %d len %u/%u\n",
+		VDBG(dev, "complete %s req %pK stat %d len %u/%u\n",
 			ep->ep.name, &req->req, status,
 			req->req.actual, req->req.length);
 
@@ -386,7 +386,7 @@ static int write_fifo(struct goku_ep *ep, struct goku_request *req)
 	}
 #if 0		/* printk seemed to trash is_last...*/
 //#ifdef USB_TRACE
-	VDBG(dev, "wrote %s %u bytes%s IN %u left %p\n",
+	VDBG(dev, "wrote %s %u bytes%s IN %u left %pK\n",
 		ep->ep.name, count, is_last ? "/last" : "",
 		req->req.length - req->req.actual, req);
 #endif
@@ -446,7 +446,7 @@ top:
 		req->req.actual += size;
 		is_short = (size < ep->ep.maxpacket);
 #ifdef USB_TRACE
-		VDBG(ep->dev, "read %s %u bytes%s OUT req %p %u/%u\n",
+		VDBG(ep->dev, "read %s %u bytes%s OUT req %pK %u/%u\n",
 			ep->ep.name, size, is_short ? "/S" : "",
 			req, req->req.actual, req->req.length);
 #endif
@@ -621,7 +621,7 @@ stop:
 	req->req.actual++;
 
 #ifdef USB_TRACE
-	VDBG(dev, "done %s %s dma, %u/%u bytes, req %p\n",
+	VDBG(dev, "done %s %s dma, %u/%u bytes, req %pK\n",
 		ep->ep.name, ep->is_in ? "IN" : "OUT",
 		req->req.actual, req->req.length, req);
 #endif
@@ -738,7 +738,7 @@ goku_queue(struct usb_ep *_ep, struct usb_request *_req, gfp_t gfp_flags)
 	}
 
 #ifdef USB_TRACE
-	VDBG(dev, "%s queue req %p, len %u buf %p\n",
+	VDBG(dev, "%s queue req %pK, len %u buf %pK\n",
 			_ep->name, _req, _req->length, _req->buf);
 #endif
 
@@ -822,7 +822,7 @@ static int goku_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 	if (dev->ep0state == EP0_SUSPEND)
 		return -EBUSY;
 
-	VDBG(dev, "%s %s %s %s %p\n", __func__, _ep->name,
+	VDBG(dev, "%s %s %s %s %pK\n", __func__, _ep->name,
 		ep->is_in ? "IN" : "OUT",
 		ep->dma ? "dma" : "pio",
 		_req);
@@ -1190,7 +1190,7 @@ static int udc_proc_read(struct seq_file *m, void *v)
 				tmp = req->req.actual;
 
 			if (seq_printf(m,
-				"\treq %p len %u/%u buf %p\n",
+				"\treq %pK len %u/%u buf %pK\n",
 				&req->req, tmp, req->req.length,
 				req->req.buf) < 0)
 				goto done;
@@ -1768,7 +1768,7 @@ static int goku_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_set_drvdata(pdev, dev);
 	INFO(dev, "%s\n", driver_desc);
 	INFO(dev, "version: " DRIVER_VERSION " %s\n", dmastr());
-	INFO(dev, "irq %d, pci mem %p\n", pdev->irq, base);
+	INFO(dev, "irq %d, pci mem %pK\n", pdev->irq, base);
 
 	/* init to known state, then setup irqs */
 	udc_reset(dev);

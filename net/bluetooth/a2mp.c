@@ -230,7 +230,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
 
 		list_for_each_entry(chan, &conn->chan_l, list) {
 
-			BT_DBG("chan %p state %s", chan,
+			BT_DBG("chan %pK state %s", chan,
 			       state_to_string(chan->state));
 
 			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
@@ -420,7 +420,7 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
 	if (!hcon)
 		goto done;
 
-	BT_DBG("Created hcon %p: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
+	BT_DBG("Created hcon %pK: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
 
 	mgr->bredr_chan->remote_amp_id = rsp->id;
 
@@ -676,7 +676,7 @@ static void a2mp_chan_state_change_cb(struct l2cap_chan *chan, int state)
 	if (!mgr)
 		return;
 
-	BT_DBG("chan %p state %s", chan, state_to_string(state));
+	BT_DBG("chan %pK state %s", chan, state_to_string(state));
 
 	chan->state = state;
 
@@ -717,7 +717,7 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
 	if (!chan)
 		return NULL;
 
-	BT_DBG("chan %p", chan);
+	BT_DBG("chan %pK", chan);
 
 	chan->chan_type = L2CAP_CHAN_CONN_FIX_A2MP;
 	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
@@ -759,7 +759,7 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
 /* AMP Manager functions */
 struct amp_mgr *amp_mgr_get(struct amp_mgr *mgr)
 {
-	BT_DBG("mgr %p orig refcnt %d", mgr, atomic_read(&mgr->kref.refcount));
+	BT_DBG("mgr %pK orig refcnt %d", mgr, atomic_read(&mgr->kref.refcount));
 
 	kref_get(&mgr->kref);
 
@@ -770,7 +770,7 @@ static void amp_mgr_destroy(struct kref *kref)
 {
 	struct amp_mgr *mgr = container_of(kref, struct amp_mgr, kref);
 
-	BT_DBG("mgr %p", mgr);
+	BT_DBG("mgr %pK", mgr);
 
 	mutex_lock(&amp_mgr_list_lock);
 	list_del(&mgr->list);
@@ -782,7 +782,7 @@ static void amp_mgr_destroy(struct kref *kref)
 
 int amp_mgr_put(struct amp_mgr *mgr)
 {
-	BT_DBG("mgr %p orig refcnt %d", mgr, atomic_read(&mgr->kref.refcount));
+	BT_DBG("mgr %pK orig refcnt %d", mgr, atomic_read(&mgr->kref.refcount));
 
 	return kref_put(&mgr->kref, &amp_mgr_destroy);
 }
@@ -796,7 +796,7 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn, bool locked)
 	if (!mgr)
 		return NULL;
 
-	BT_DBG("conn %p mgr %p", conn, mgr);
+	BT_DBG("conn %pK mgr %pK", conn, mgr);
 
 	mgr->l2cap_conn = conn;
 
@@ -835,7 +835,7 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
 		return NULL;
 	}
 
-	BT_DBG("mgr: %p chan %p", mgr, mgr->a2mp_chan);
+	BT_DBG("mgr: %pK chan %pK", mgr, mgr->a2mp_chan);
 
 	return mgr->a2mp_chan;
 }
@@ -866,7 +866,7 @@ void a2mp_send_getinfo_rsp(struct hci_dev *hdev)
 	if (!mgr)
 		return;
 
-	BT_DBG("%s mgr %p", hdev->name, mgr);
+	BT_DBG("%s mgr %pK", hdev->name, mgr);
 
 	rsp.id = hdev->id;
 	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
@@ -895,7 +895,7 @@ void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status)
 	if (!mgr)
 		return;
 
-	BT_DBG("%s mgr %p", hdev->name, mgr);
+	BT_DBG("%s mgr %pK", hdev->name, mgr);
 
 	len = sizeof(struct a2mp_amp_assoc_rsp) + loc_assoc->len;
 	rsp = kzalloc(len, GFP_KERNEL);
@@ -932,7 +932,7 @@ void a2mp_send_create_phy_link_req(struct hci_dev *hdev, u8 status)
 
 	len = sizeof(*req) + loc_assoc->len;
 
-	BT_DBG("%s mgr %p assoc_len %zu", hdev->name, mgr, len);
+	BT_DBG("%s mgr %pK assoc_len %zu", hdev->name, mgr, len);
 
 	req = kzalloc(len, GFP_KERNEL);
 	if (!req) {
@@ -973,7 +973,7 @@ void a2mp_send_create_phy_link_rsp(struct hci_dev *hdev, u8 status)
 		rsp.status = A2MP_STATUS_SUCCESS;
 	}
 
-	BT_DBG("%s mgr %p hs_hcon %p status %u", hdev->name, mgr, hs_hcon,
+	BT_DBG("%s mgr %pK hs_hcon %pK status %u", hdev->name, mgr, hs_hcon,
 	       status);
 
 	rsp.local_id = hdev->id;
@@ -987,7 +987,7 @@ void a2mp_discover_amp(struct l2cap_chan *chan)
 	struct amp_mgr *mgr = conn->hcon->amp_mgr;
 	struct a2mp_discov_req req;
 
-	BT_DBG("chan %p conn %p mgr %p", chan, conn, mgr);
+	BT_DBG("chan %pK conn %pK mgr %pK", chan, conn, mgr);
 
 	if (!mgr) {
 		mgr = amp_mgr_create(conn, true);

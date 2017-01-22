@@ -58,7 +58,7 @@ __wsum csum_partial(const void *p, int len, __wsum __sum)
 	const void *marker = endMarker - (len % 16);
 #if 0
 	if((int)buff & 0x3)
-		printk("unaligned buff %p\n", buff);
+		printk("unaligned buff %pK\n", buff);
 	__delay(900); /* extra delay of 90 us to test performance hit */
 #endif
 	BITON;

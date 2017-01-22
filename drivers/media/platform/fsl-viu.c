@@ -331,7 +331,7 @@ static int restart_video_queue(struct viu_dmaqueue *vidq)
 	dprintk(1, "%s vidq=0x%08lx\n", __func__, (unsigned long)vidq);
 	if (!list_empty(&vidq->active)) {
 		buf = list_entry(vidq->active.next, struct viu_buf, vb.queue);
-		dprintk(2, "restart_queue [%p/%d]: restart dma\n",
+		dprintk(2, "restart_queue [%pK/%d]: restart dma\n",
 			buf, buf->vb.i);
 
 		viu_stop_dma(vidq->dev);
@@ -360,7 +360,7 @@ static int restart_video_queue(struct viu_dmaqueue *vidq)
 
 			buf->vb.state = VIDEOBUF_ACTIVE;
 			mod_timer(&vidq->timeout, jiffies+BUFFER_TIMEOUT);
-			dprintk(2, "[%p/%d] restart_queue - first active\n",
+			dprintk(2, "[%pK/%d] restart_queue - first active\n",
 				buf, buf->vb.i);
 
 		} else if (prev->vb.width  == buf->vb.width  &&
@@ -368,7 +368,7 @@ static int restart_video_queue(struct viu_dmaqueue *vidq)
 			   prev->fmt       == buf->fmt) {
 			list_move_tail(&buf->vb.queue, &vidq->active);
 			buf->vb.state = VIDEOBUF_ACTIVE;
-			dprintk(2, "[%p/%d] restart_queue - move to active\n",
+			dprintk(2, "[%pK/%d] restart_queue - move to active\n",
 				buf, buf->vb.i);
 		} else {
 			return 0;
@@ -388,7 +388,7 @@ static void viu_vid_timeout(unsigned long data)
 		list_del(&buf->vb.queue);
 		buf->vb.state = VIDEOBUF_ERROR;
 		wake_up(&buf->vb.done);
-		dprintk(1, "viu/0: [%p/%d] timeout\n", buf, buf->vb.i);
+		dprintk(1, "viu/0: [%pK/%d] timeout\n", buf, buf->vb.i);
 	}
 
 	restart_video_queue(vidq);
@@ -439,7 +439,7 @@ inline int buffer_activate(struct viu_dev *dev, struct viu_buf *buf)
 	/* setup the DMA base address */
 	reg_val.field_base_addr = videobuf_to_dma_contig(&buf->vb);
 
-	dprintk(1, "buffer_activate [%p/%d]: dma addr 0x%lx\n",
+	dprintk(1, "buffer_activate [%pK/%d]: dma addr 0x%lx\n",
 		buf, buf->vb.i, (unsigned long)reg_val.field_base_addr);
 
 	/* interlace is on by default, set horizontal DMA increment */
@@ -537,14 +537,14 @@ static void buffer_queue(struct videobuf_queue *vq, struct videobuf_buffer *vb)
 	if (!list_empty(&vidq->queued)) {
 		dprintk(1, "adding vb queue=0x%08lx\n",
 				(unsigned long)&buf->vb.queue);
-		dprintk(1, "vidq pointer 0x%p, queued 0x%p\n",
+		dprintk(1, "vidq pointer 0x%pK, queued 0x%pK\n",
 				vidq, &vidq->queued);
-		dprintk(1, "dev %p, queued: self %p, next %p, head %p\n",
+		dprintk(1, "dev %pK, queued: self %pK, next %pK, head %pK\n",
 			dev, &vidq->queued, vidq->queued.next,
 			vidq->queued.prev);
 		list_add_tail(&buf->vb.queue, &vidq->queued);
 		buf->vb.state = VIDEOBUF_QUEUED;
-		dprintk(2, "[%p/%d] buffer_queue - append to queued\n",
+		dprintk(2, "[%pK/%d] buffer_queue - append to queued\n",
 			buf, buf->vb.i);
 	} else if (list_empty(&vidq->active)) {
 		dprintk(1, "adding vb active=0x%08lx\n",
@@ -552,7 +552,7 @@ static void buffer_queue(struct videobuf_queue *vq, struct videobuf_buffer *vb)
 		list_add_tail(&buf->vb.queue, &vidq->active);
 		buf->vb.state = VIDEOBUF_ACTIVE;
 		mod_timer(&vidq->timeout, jiffies+BUFFER_TIMEOUT);
-		dprintk(2, "[%p/%d] buffer_queue - first active\n",
+		dprintk(2, "[%pK/%d] buffer_queue - first active\n",
 			buf, buf->vb.i);
 
 		buffer_activate(dev, buf);
@@ -565,12 +565,12 @@ static void buffer_queue(struct videobuf_queue *vq, struct videobuf_buffer *vb)
 		    prev->fmt       == buf->fmt) {
 			list_add_tail(&buf->vb.queue, &vidq->active);
 			buf->vb.state = VIDEOBUF_ACTIVE;
-			dprintk(2, "[%p/%d] buffer_queue - append to active\n",
+			dprintk(2, "[%pK/%d] buffer_queue - append to active\n",
 				buf, buf->vb.i);
 		} else {
 			list_add_tail(&buf->vb.queue, &vidq->queued);
 			buf->vb.state = VIDEOBUF_QUEUED;
-			dprintk(2, "[%p/%d] buffer_queue - first queued\n",
+			dprintk(2, "[%pK/%d] buffer_queue - first queued\n",
 				buf, buf->vb.i);
 		}
 	}
@@ -1061,14 +1061,14 @@ inline void viu_activate_next_buf(struct viu_dev *dev,
 	if (!list_empty(&vidq->active)) {
 		buf = list_entry(vidq->active.next, struct viu_buf,
 					vb.queue);
-		dprintk(1, "start another queued buffer: 0x%p\n", buf);
+		dprintk(1, "start another queued buffer: 0x%pK\n", buf);
 		buffer_activate(dev, buf);
 	} else if (!list_empty(&vidq->queued)) {
 		buf = list_entry(vidq->queued.next, struct viu_buf,
 					vb.queue);
 		list_del(&buf->vb.queue);
 
-		dprintk(1, "start another queued buffer: 0x%p\n", buf);
+		dprintk(1, "start another queued buffer: 0x%pK\n", buf);
 		list_add_tail(&buf->vb.queue, &vidq->active);
 		buf->vb.state = VIDEOBUF_ACTIVE;
 		buffer_activate(dev, buf);
@@ -1174,7 +1174,7 @@ static void viu_capture_intr(struct viu_dev *dev, u32 status)
 		dev->field = 0;
 		buf = list_entry(vidq->active.next,
 				 struct viu_buf, vb.queue);
-		dprintk(1, "viu/0: [%p/%d] 0x%lx/0x%lx: dma complete\n",
+		dprintk(1, "viu/0: [%pK/%d] 0x%lx/0x%lx: dma complete\n",
 			buf, buf->vb.i,
 			(unsigned long)videobuf_to_dma_contig(&buf->vb),
 			(unsigned long)in_be32(&vr->field_base_addr));

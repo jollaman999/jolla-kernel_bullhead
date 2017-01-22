@@ -379,7 +379,7 @@ int autofs4_wait(struct autofs_sb_info *sbi, struct dentry *dentry,
 
 	/* If this is a direct mount request create a dummy name */
 	if (IS_ROOT(dentry) && autofs_type_trigger(sbi->type))
-		qstr.len = sprintf(name, "%p", dentry);
+		qstr.len = sprintf(name, "%pK", dentry);
 	else {
 		qstr.len = autofs4_getpath(sbi, dentry, &name);
 		if (!qstr.len) {

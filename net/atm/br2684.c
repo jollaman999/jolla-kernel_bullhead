@@ -153,7 +153,7 @@ static int atm_dev_event(struct notifier_block *this, unsigned long event,
 	struct atm_vcc *atm_vcc;
 	unsigned long flags;
 
-	pr_debug("event=%ld dev=%p\n", event, atm_dev);
+	pr_debug("event=%ld dev=%pK\n", event, atm_dev);
 
 	read_lock_irqsave(&devs_lock, flags);
 	list_for_each(lh, &br2684_devs) {
@@ -185,7 +185,7 @@ static void br2684_pop(struct atm_vcc *vcc, struct sk_buff *skb)
 {
 	struct br2684_vcc *brvcc = BR2684_VCC(vcc);
 
-	pr_debug("(vcc %p ; net_dev %p )\n", vcc, brvcc->device);
+	pr_debug("(vcc %pK ; net_dev %pK )\n", vcc, brvcc->device);
 	brvcc->old_pop(vcc, skb);
 
 	/* If the queue space just went up from zero, wake */
@@ -251,7 +251,7 @@ static int br2684_xmit_vcc(struct sk_buff *skb, struct net_device *dev,
 	skb_debug(skb);
 
 	ATM_SKB(skb)->vcc = atmvcc = brvcc->atmvcc;
-	pr_debug("atm_skb(%p)->vcc(%p)->dev(%p)\n", skb, atmvcc, atmvcc->dev);
+	pr_debug("atm_skb(%pK)->vcc(%pK)->dev(%pK)\n", skb, atmvcc, atmvcc->dev);
 	atomic_add(skb->truesize, &sk_atm(atmvcc)->sk_wmem_alloc);
 	ATM_SKB(skb)->atm_options = atmvcc->atm_options;
 	dev->stats.tx_packets++;
@@ -296,7 +296,7 @@ static netdev_tx_t br2684_start_xmit(struct sk_buff *skb,
 	struct atm_vcc *atmvcc;
 	netdev_tx_t ret = NETDEV_TX_OK;
 
-	pr_debug("skb_dst(skb)=%p\n", skb_dst(skb));
+	pr_debug("skb_dst(skb)=%pK\n", skb_dst(skb));
 	read_lock(&devs_lock);
 	brvcc = pick_outgoing_vcc(skb, brdev);
 	if (brvcc == NULL) {
@@ -408,7 +408,7 @@ packet_fails_filter(__be16 type, struct br2684_vcc *brvcc, struct sk_buff *skb)
 
 static void br2684_close_vcc(struct br2684_vcc *brvcc)
 {
-	pr_debug("removing VCC %p from dev %p\n", brvcc, brvcc->device);
+	pr_debug("removing VCC %pK from dev %pK\n", brvcc, brvcc->device);
 	write_lock_irq(&devs_lock);
 	list_del(&brvcc->brvccs);
 	write_unlock_irq(&devs_lock);
@@ -443,7 +443,7 @@ static void br2684_push(struct atm_vcc *atmvcc, struct sk_buff *skb)
 
 	skb_debug(skb);
 	atm_return(atmvcc, skb->truesize);
-	pr_debug("skb from brdev %p\n", brdev);
+	pr_debug("skb from brdev %pK\n", brdev);
 	if (brvcc->encaps == e_llc) {
 
 		if (skb->len > 7 && skb->data[7] == 0x01)
@@ -574,7 +574,7 @@ static int br2684_regvcc(struct atm_vcc *atmvcc, void __user * arg)
 		err = -EINVAL;
 		goto error;
 	}
-	pr_debug("vcc=%p, encaps=%d, brvcc=%p\n", atmvcc, be.encaps, brvcc);
+	pr_debug("vcc=%pK, encaps=%d, brvcc=%pK\n", atmvcc, be.encaps, brvcc);
 	if (list_empty(&brdev->brvccs) && !brdev->mac_was_set) {
 		unsigned char *esi = atmvcc->dev->esi;
 		if (esi[0] | esi[1] | esi[2] | esi[3] | esi[4] | esi[5])

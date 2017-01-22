@@ -691,7 +691,7 @@ int sys_rt_sigreturn(unsigned long r3, unsigned long r4, unsigned long r5,
 
 badframe:
 #if DEBUG_SIG
-	printk("badframe in sys_rt_sigreturn, regs=%p uc=%p &uc->uc_mcontext=%p\n",
+	printk("badframe in sys_rt_sigreturn, regs=%pK uc=%pK &uc->uc_mcontext=%pK\n",
 	       regs, uc, &uc->uc_mcontext);
 #endif
 	if (show_unhandled_signals)
@@ -799,7 +799,7 @@ int handle_rt_signal64(int signr, struct k_sigaction *ka, siginfo_t *info,
 
 badframe:
 #if DEBUG_SIG
-	printk("badframe in setup_rt_frame, regs=%p frame=%p newsp=%lx\n",
+	printk("badframe in setup_rt_frame, regs=%pK frame=%pK newsp=%lx\n",
 	       regs, frame, newsp);
 #endif
 	if (show_unhandled_signals)

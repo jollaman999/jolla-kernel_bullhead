@@ -54,7 +54,7 @@ int wimax_gnl_doit_state_get(struct sk_buff *skb, struct genl_info *info)
 	int result, ifindex;
 	struct wimax_dev *wimax_dev;
 
-	d_fnstart(3, NULL, "(skb %p info %p)\n", skb, info);
+	d_fnstart(3, NULL, "(skb %pK info %pK)\n", skb, info);
 	result = -ENODEV;
 	if (info->attrs[WIMAX_GNL_STGET_IFIDX] == NULL) {
 		printk(KERN_ERR "WIMAX_GNL_OP_STATE_GET: can't find IFIDX "
@@ -69,7 +69,7 @@ int wimax_gnl_doit_state_get(struct sk_buff *skb, struct genl_info *info)
 	result = wimax_state_get(wimax_dev);
 	dev_put(wimax_dev->net_dev);
 error_no_wimax_dev:
-	d_fnend(3, NULL, "(skb %p info %p) = %d\n", skb, info, result);
+	d_fnend(3, NULL, "(skb %pK info %pK) = %d\n", skb, info, result);
 	return result;
 }
 

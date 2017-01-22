@@ -302,7 +302,7 @@ ext4_xattr_block_get(struct inode *inode, int name_index, const char *name,
 	int error;
 	struct mb_cache *ext4_mb_cache = EXT4_GET_MB_CACHE(inode);
 
-	ea_idebug(inode, "name=%d.%s, buffer=%p, buffer_size=%ld",
+	ea_idebug(inode, "name=%d.%s, buffer=%pK, buffer_size=%ld",
 		  name_index, name, buffer, (long)buffer_size);
 
 	error = -ENODATA;
@@ -450,7 +450,7 @@ ext4_xattr_block_list(struct dentry *dentry, char *buffer, size_t buffer_size)
 	int error;
 	struct mb_cache *ext4_mb_cache = EXT4_GET_MB_CACHE(inode);
 
-	ea_idebug(inode, "buffer=%p, buffer_size=%ld",
+	ea_idebug(inode, "buffer=%pK, buffer_size=%ld",
 		  buffer, (long)buffer_size);
 
 	error = 0;
@@ -759,7 +759,7 @@ ext4_xattr_block_find(struct inode *inode, struct ext4_xattr_info *i,
 	struct super_block *sb = inode->i_sb;
 	int error;
 
-	ea_idebug(inode, "name=%d.%s, value=%p, value_len=%ld",
+	ea_idebug(inode, "name=%d.%s, value=%pK, value_len=%ld",
 		  i->name_index, i->name, i->value, (long)i->value_len);
 
 	if (EXT4_I(inode)->i_file_acl) {

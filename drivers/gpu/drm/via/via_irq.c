@@ -265,7 +265,7 @@ void via_driver_irq_preinstall(struct drm_device *dev)
 	drm_via_irq_t *cur_irq;
 	int i;
 
-	DRM_DEBUG("dev_priv: %p\n", dev_priv);
+	DRM_DEBUG("dev_priv: %pK\n", dev_priv);
 	if (dev_priv) {
 		cur_irq = dev_priv->via_irqs;
 

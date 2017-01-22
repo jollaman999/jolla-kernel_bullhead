@@ -2028,7 +2028,7 @@ xlog_write_setup_ophdr(
 		break;
 	default:
 		xfs_warn(log->l_mp,
-			"Bad XFS transaction clientid 0x%x in ticket 0x%p",
+			"Bad XFS transaction clientid 0x%x in ticket 0x%pK",
 			ophdr->oh_clientid, ticket);
 		return NULL;
 	}
@@ -3675,7 +3675,7 @@ xlog_verify_iclog(
 		}
 		if (clientid != XFS_TRANSACTION && clientid != XFS_LOG)
 			xfs_warn(log->l_mp,
-				"%s: invalid clientid %d op 0x%p offset 0x%lx",
+				"%s: invalid clientid %d op 0x%pK offset 0x%lx",
 				__func__, clientid, ophead,
 				(unsigned long)field_offset);
 

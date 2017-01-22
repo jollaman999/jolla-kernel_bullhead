@@ -283,7 +283,7 @@ static void iblock_bio_done(struct bio *bio, int err)
 		err = -EIO;
 
 	if (err != 0) {
-		pr_err("test_bit(BIO_UPTODATE) failed for bio: %p,"
+		pr_err("test_bit(BIO_UPTODATE) failed for bio: %pK,"
 			" err: %d\n", bio, err);
 		/*
 		 * Bump the ib_bio_err_cnt and release bio.

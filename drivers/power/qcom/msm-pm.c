@@ -263,7 +263,7 @@ static bool __ref msm_pm_spm_power_collapse(
 	msm_pm_boot_config_before_pc(cpu, virt_to_phys(entry));
 
 	if (MSM_PM_DEBUG_RESET_VECTOR & msm_pm_debug_mask)
-		pr_info("CPU%u: %s: program vector to %p\n",
+		pr_info("CPU%u: %s: program vector to %pK\n",
 			cpu, __func__, entry);
 
 	msm_jtag_save_state();

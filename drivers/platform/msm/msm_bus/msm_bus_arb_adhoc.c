@@ -766,7 +766,7 @@ static void unregister_client_adhoc(uint32_t cl)
 		curr = 0;
 	}
 
-	MSM_BUS_DBG("%s: Unregistering client %p", __func__, client);
+	MSM_BUS_DBG("%s: Unregistering client %pK", __func__, client);
 
 	for (i = 0; i < pdata->usecase->num_paths; i++) {
 		src = client->pdata->usecase[curr].vectors[i].src;
@@ -1007,7 +1007,7 @@ static int update_bw_adhoc(struct msm_bus_client_handle *cl, u64 ab, u64 ib)
 	rt_mutex_lock(&msm_bus_adhoc_lock);
 
 	if (!cl) {
-		MSM_BUS_ERR("%s: Invalid client handle %p", __func__, cl);
+		MSM_BUS_ERR("%s: Invalid client handle %pK", __func__, cl);
 		ret = -ENXIO;
 		goto exit_update_request;
 	}
@@ -1052,7 +1052,7 @@ static void unregister_adhoc(struct msm_bus_client_handle *cl)
 		goto exit_unregister_client;
 	}
 
-	MSM_BUS_DBG("%s: Unregistering client %p", __func__, cl);
+	MSM_BUS_DBG("%s: Unregistering client %pK", __func__, cl);
 
 	remove_path(cl->mas, cl->slv, cl->cur_ib, cl->cur_ab,
 				cl->first_hop, cl->active_only);
@@ -1105,7 +1105,7 @@ register_adhoc(uint32_t mas, uint32_t slv, char *name, bool active_only)
 		goto exit_register;
 	}
 
-	MSM_BUS_DBG("%s:Client handle %p %s", __func__, client,
+	MSM_BUS_DBG("%s:Client handle %pK %s", __func__, client,
 						client->name);
 	msm_bus_dbg_add_client(client);
 exit_register:

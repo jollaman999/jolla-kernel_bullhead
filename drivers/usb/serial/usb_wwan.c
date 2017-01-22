@@ -248,7 +248,7 @@ int usb_wwan_write(struct tty_struct *tty, struct usb_serial_port *port,
 			err = usb_submit_urb(this_urb, GFP_ATOMIC);
 			if (err) {
 				dev_dbg(&port->dev,
-					"usb_submit_urb %p (write bulk) failed (%d)\n",
+					"usb_submit_urb %pK (write bulk) failed (%d)\n",
 					this_urb, err);
 				usb_unanchor_urb(this_urb);
 				clear_bit(i, &portdata->out_busy);
@@ -842,7 +842,7 @@ int usb_wwan_resume(struct usb_serial *serial)
 			usb_anchor_urb(urb, &portdata->submitted);
 			err = usb_submit_urb(urb, GFP_ATOMIC);
 			if (err < 0) {
-				dev_err(&port->dev, "%s: Error %d for bulk URB[%d]: %p %d\n",
+				dev_err(&port->dev, "%s: Error %d for bulk URB[%d]: %pK %d\n",
 					__func__, err, j, urb, i);
 				usb_unanchor_urb(urb);
 				intfdata->suspended = 1;

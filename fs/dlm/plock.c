@@ -224,7 +224,7 @@ static int dlm_plock_callback(struct plock_op *op)
 		 * in a low-memory situation), we're better off ignoring
 		 * this failure than trying to recover.
 		 */
-		log_print("dlm_plock_callback: vfs lock error %llx file %p fl %p",
+		log_print("dlm_plock_callback: vfs lock error %llx file %pK fl %pK",
 			  (unsigned long long)op->info.number, file, fl);
 	}
 

@@ -653,7 +653,7 @@ static struct spi_master * fsl_espi_probe(struct device *dev,
 	if (ret < 0)
 		goto unreg_master;
 
-	dev_info(dev, "at 0x%p (irq = %d)\n", reg_base, mpc8xxx_spi->irq);
+	dev_info(dev, "at 0x%pK (irq = %d)\n", reg_base, mpc8xxx_spi->irq);
 
 	return master;
 

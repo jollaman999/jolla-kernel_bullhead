@@ -86,7 +86,7 @@ int jfs_commit_inode(struct inode *inode, int wait)
 	tid_t tid;
 	static int noisy = 5;
 
-	jfs_info("In jfs_commit_inode, inode = 0x%p", inode);
+	jfs_info("In jfs_commit_inode, inode = 0x%pK", inode);
 
 	/*
 	 * Don't commit if inode has been committed since last being
@@ -100,7 +100,7 @@ int jfs_commit_inode(struct inode *inode, int wait)
 		 * partitions and may think inode is dirty
 		 */
 		if (!special_file(inode->i_mode) && noisy) {
-			jfs_err("jfs_commit_inode(0x%p) called on "
+			jfs_err("jfs_commit_inode(0x%pK) called on "
 				   "read-only volume", inode);
 			jfs_err("Is remount racy?");
 			noisy--;
@@ -148,7 +148,7 @@ int jfs_write_inode(struct inode *inode, struct writeback_control *wbc)
 
 void jfs_evict_inode(struct inode *inode)
 {
-	jfs_info("In jfs_evict_inode, inode = 0x%p", inode);
+	jfs_info("In jfs_evict_inode, inode = 0x%pK", inode);
 
 	if (!inode->i_nlink && !is_bad_inode(inode)) {
 		dquot_initialize(inode);

@@ -50,7 +50,7 @@ int jffs2_read_dnode(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
 	}
 	crc = crc32(0, ri, sizeof(*ri)-8);
 
-	jffs2_dbg(1, "Node read from %08x: node_crc %08x, calculated CRC %08x. dsize %x, csize %x, offset %x, buf %p\n",
+	jffs2_dbg(1, "Node read from %08x: node_crc %08x, calculated CRC %08x. dsize %x, csize %x, offset %x, buf %pK\n",
 		  ref_offset(fd->raw), je32_to_cpu(ri->node_crc),
 		  crc, je32_to_cpu(ri->dsize), je32_to_cpu(ri->csize),
 		  je32_to_cpu(ri->offset), buf);
@@ -110,7 +110,7 @@ int jffs2_read_dnode(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
 		decomprbuf = readbuf;
 	}
 
-	jffs2_dbg(2, "Read %d bytes to %p\n", je32_to_cpu(ri->csize),
+	jffs2_dbg(2, "Read %d bytes to %pK\n", je32_to_cpu(ri->csize),
 		  readbuf);
 	ret = jffs2_flash_read(c, (ref_offset(fd->raw)) + sizeof(*ri),
 			       je32_to_cpu(ri->csize), &readlen, readbuf);
@@ -129,7 +129,7 @@ int jffs2_read_dnode(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
 	}
 	jffs2_dbg(2, "Data CRC matches calculated CRC %08x\n", crc);
 	if (ri->compr != JFFS2_COMPR_NONE) {
-		jffs2_dbg(2, "Decompress %d bytes from %p to %d bytes at %p\n",
+		jffs2_dbg(2, "Decompress %d bytes from %pK to %d bytes at %pK\n",
 			  je32_to_cpu(ri->csize), readbuf,
 			  je32_to_cpu(ri->dsize), decomprbuf);
 		ret = jffs2_decompress(c, f, ri->compr | (ri->usercompr << 8), readbuf, decomprbuf, je32_to_cpu(ri->csize), je32_to_cpu(ri->dsize));

@@ -269,10 +269,10 @@ void __init iop_init(void)
 	int i;
 
 	if (iop_scc_present) {
-		printk("IOP: detected SCC IOP at %p\n", iop_base[IOP_NUM_SCC]);
+		printk("IOP: detected SCC IOP at %pK\n", iop_base[IOP_NUM_SCC]);
 	}
 	if (iop_ism_present) {
-		printk("IOP: detected ISM IOP at %p\n", iop_base[IOP_NUM_ISM]);
+		printk("IOP: detected ISM IOP at %pK\n", iop_base[IOP_NUM_ISM]);
 		iop_start(iop_base[IOP_NUM_ISM]);
 		iop_alive(iop_base[IOP_NUM_ISM]); /* clears the alive flag */
 	}
@@ -351,7 +351,7 @@ void iop_complete_message(struct iop_msg *msg)
 	int i,offset;
 
 #ifdef DEBUG_IOP
-	printk("iop_complete(%p): iop %d chan %d\n", msg, msg->iop_num, msg->channel);
+	printk("iop_complete(%pK): iop %d chan %d\n", msg, msg->iop_num, msg->channel);
 #endif
 
 	offset = IOP_ADDR_RECV_MSG + (msg->channel * IOP_MSG_LEN);

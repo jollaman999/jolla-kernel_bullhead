@@ -302,7 +302,7 @@ acpi_ds_build_internal_buffer_obj(struct acpi_walk_state *walk_state,
 	if (byte_list) {
 		if (byte_list->common.aml_opcode != AML_INT_BYTELIST_OP) {
 			ACPI_ERROR((AE_INFO,
-				    "Expecting bytelist, found AML opcode 0x%X in op %p",
+				    "Expecting bytelist, found AML opcode 0x%X in op %pK",
 				    byte_list->common.aml_opcode, byte_list));
 
 			acpi_ut_remove_reference(obj_desc);

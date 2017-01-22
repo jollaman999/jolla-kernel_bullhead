@@ -175,7 +175,7 @@ dsp_cmx_debug(struct dsp *dsp)
 	}
 	printk(KERN_DEBUG "-----Current Conf:\n");
 	list_for_each_entry(conf, &conf_ilist, list) {
-		printk(KERN_DEBUG "* Conf %d (%p)\n", conf->id, conf);
+		printk(KERN_DEBUG "* Conf %d (%pK)\n", conf->id, conf);
 		list_for_each_entry(member, &conf->mlist, list) {
 			printk(KERN_DEBUG
 			       "  - member = %s (slot_tx %d, bank_tx %d, "
@@ -1339,7 +1339,7 @@ dsp_cmx_send_member(struct dsp *dsp, int len, s32 *c, int members)
 
 #ifdef CMX_DEBUG
 	printk(KERN_DEBUG
-	       "SEND members=%d dsp=%s, conf=%p, rx_R=%05x rx_W=%05x\n",
+	       "SEND members=%d dsp=%s, conf=%pK, rx_R=%05x rx_W=%05x\n",
 	       members, dsp->name, conf, dsp->rx_R, dsp->rx_W);
 #endif
 
@@ -1391,7 +1391,7 @@ dsp_cmx_send_member(struct dsp *dsp, int len, s32 *c, int members)
 	if (!dsp->tx_mix && t != tt) {
 		/* -> send tx-data and continue when not enough */
 #ifdef CMX_TX_DEBUG
-		sprintf(debugbuf, "TX sending (%04x-%04x)%p: ", t, tt, p);
+		sprintf(debugbuf, "TX sending (%04x-%04x)%pK: ", t, tt, p);
 #endif
 		while (r != rr && t != tt) {
 #ifdef CMX_TX_DEBUG
@@ -1898,7 +1898,7 @@ dsp_cmx_send(void *arg)
 
 		/* copy transmit data to tx-buffer */
 #ifdef CMX_TX_DEBUG
-		sprintf(debugbuf, "TX getting (%04x-%04x)%p: ", w, ww, p);
+		sprintf(debugbuf, "TX getting (%04x-%04x)%pK: ", w, ww, p);
 #endif
 		while (w != ww) {
 #ifdef CMX_TX_DEBUG

@@ -128,7 +128,7 @@ static int ecryptfs_init_lower_file(struct dentry *dentry,
 				      cred);
 	if (rc) {
 		printk(KERN_ERR "Error opening lower file "
-		       "for lower_dentry [0x%p] and lower_mnt [0x%p]; "
+		       "for lower_dentry [0x%pK] and lower_mnt [0x%pK]; "
 		       "rc = [%d]\n", lower_dentry, lower_mnt, rc);
 		(*lower_file) = NULL;
 	}

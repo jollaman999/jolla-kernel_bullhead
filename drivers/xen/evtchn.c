@@ -109,7 +109,7 @@ static irqreturn_t evtchn_interrupt(int irq, void *data)
 	u = get_port_user(port);
 
 	WARN(!get_port_enabled(port),
-	     "Interrupt for port %d, but apparently not enabled; per-user %p\n",
+	     "Interrupt for port %d, but apparently not enabled; per-user %pK\n",
 	     port, u);
 
 	disable_irq_nosync(irq);

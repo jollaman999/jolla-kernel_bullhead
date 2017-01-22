@@ -478,7 +478,7 @@ int iommu_map_sg(struct device *dev, struct iommu_table *tbl,
 		/* Handle failure */
 		if (unlikely(entry == DMA_ERROR_CODE)) {
 			if (printk_ratelimit())
-				dev_info(dev, "iommu_alloc failed, tbl %p "
+				dev_info(dev, "iommu_alloc failed, tbl %pK "
 					 "vaddr %lx npages %lu\n", tbl, vaddr,
 					 npages);
 			goto failure;
@@ -771,8 +771,8 @@ dma_addr_t iommu_map_page(struct device *dev, struct iommu_table *tbl,
 					 attrs);
 		if (dma_handle == DMA_ERROR_CODE) {
 			if (printk_ratelimit())  {
-				dev_info(dev, "iommu_alloc failed, tbl %p "
-					 "vaddr %p npages %d\n", tbl, vaddr,
+				dev_info(dev, "iommu_alloc failed, tbl %pK "
+					 "vaddr %pK npages %d\n", tbl, vaddr,
 					 npages);
 			}
 		} else

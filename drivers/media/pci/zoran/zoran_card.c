@@ -978,7 +978,7 @@ static int zr36057_init (struct zoran *zr)
 
 	dprintk(1,
 		KERN_INFO
-		"%s: %s - initializing card[%d], zr=%p\n",
+		"%s: %s - initializing card[%d], zr=%pK\n",
 		ZR_DEVNAME(zr), __func__, zr->id, zr);
 
 	/* default setup of all parameters which will persist between opens */

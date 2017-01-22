@@ -31,7 +31,7 @@ static int cachefiles_read_waiter(wait_queue_t *wait, unsigned mode,
 
 	ASSERT(key);
 
-	_enter("{%lu},%u,%d,{%p,%u}",
+	_enter("{%lu},%u,%d,{%pK,%u}",
 	       monitor->netfs_page->index, mode, sync,
 	       key->flags, key->bit_nr);
 
@@ -39,7 +39,7 @@ static int cachefiles_read_waiter(wait_queue_t *wait, unsigned mode,
 	    key->bit_nr != PG_locked)
 		return 0;
 
-	_debug("--- monitor %p %lx ---", page, page->flags);
+	_debug("--- monitor %pK %lx ---", page, page->flags);
 
 	if (!PageUptodate(page) && !PageError(page)) {
 		/* unlocked, not uptodate and not erronous? */
@@ -124,7 +124,7 @@ static int cachefiles_read_reissue(struct cachefiles_object *object,
 	 * the monitor may miss the event - so we have to ensure that we do get
 	 * one in such a case */
 	if (trylock_page(backpage)) {
-		_debug("jumpstart %p {%lx}", backpage, backpage->flags);
+		_debug("jumpstart %pK {%lx}", backpage, backpage->flags);
 		unlock_page(backpage);
 	}
 
@@ -239,7 +239,7 @@ static int cachefiles_read_backing_file_one(struct cachefiles_object *object,
 
 	pagevec_reinit(pagevec);
 
-	_debug("read back %p{%lu,%d}",
+	_debug("read back %pK{%lu,%d}",
 	       netpage, netpage->index, page_count(netpage));
 
 	monitor = kzalloc(sizeof(*monitor), cachefiles_gfp);
@@ -278,7 +278,7 @@ static int cachefiles_read_backing_file_one(struct cachefiles_object *object,
 	/* we've installed a new backing page, so now we need to add it
 	 * to the LRU list and start it reading */
 installed_new_backing_page:
-	_debug("- new %p", newpage);
+	_debug("- new %pK", newpage);
 
 	backpage = newpage;
 	newpage = NULL;
@@ -308,7 +308,7 @@ monitor_backing_page:
 	 * the monitor may miss the event - so we have to ensure that we do get
 	 * one in such a case */
 	if (trylock_page(backpage)) {
-		_debug("jumpstart %p {%lx}", backpage, backpage->flags);
+		_debug("jumpstart %pK {%lx}", backpage, backpage->flags);
 		unlock_page(backpage);
 	}
 	goto success;
@@ -331,7 +331,7 @@ backing_page_already_present:
 
 	if (!trylock_page(backpage))
 		goto monitor_backing_page;
-	_debug("read %p {%lx}", backpage, backpage->flags);
+	_debug("read %pK {%lx}", backpage, backpage->flags);
 	goto read_backing_page;
 
 	/* the backing page is already up to date, attach the netfs
@@ -413,7 +413,7 @@ int cachefiles_read_or_alloc_page(struct fscache_retrieval *op,
 	cache = container_of(object->fscache.cache,
 			     struct cachefiles_cache, cache);
 
-	_enter("{%p},{%lx},,,", object, page->index);
+	_enter("{%pK},{%lx},,,", object, page->index);
 
 	if (!object->backer)
 		goto enobufs;
@@ -493,7 +493,7 @@ static int cachefiles_read_backing_file(struct cachefiles_object *object,
 	list_for_each_entry_safe(netpage, _n, list, lru) {
 		list_del(&netpage->lru);
 
-		_debug("read back %p{%lu,%d}",
+		_debug("read back %pK{%lu,%d}",
 		       netpage, netpage->index, page_count(netpage));
 
 		if (!monitor) {
@@ -529,7 +529,7 @@ static int cachefiles_read_backing_file(struct cachefiles_object *object,
 		/* we've installed a new backing page, so now we need to add it
 		 * to the LRU list and start it reading */
 	installed_new_backing_page:
-		_debug("- new %p", newpage);
+		_debug("- new %pK", newpage);
 
 		backpage = newpage;
 		newpage = NULL;
@@ -577,7 +577,7 @@ static int cachefiles_read_backing_file(struct cachefiles_object *object,
 		 * installed, so the monitor may miss the event - so we have to
 		 * ensure that we do get one in such a case */
 		if (trylock_page(backpage)) {
-			_debug("2unlock %p {%lx}", backpage, backpage->flags);
+			_debug("2unlock %pK {%lx}", backpage, backpage->flags);
 			unlock_page(backpage);
 		}
 
@@ -591,7 +591,7 @@ static int cachefiles_read_backing_file(struct cachefiles_object *object,
 		/* if the backing page is already present, it can be in one of
 		 * three states: read in progress, read failed or read okay */
 	backing_page_already_present:
-		_debug("- present %p", backpage);
+		_debug("- present %pK", backpage);
 
 		if (PageError(backpage))
 			goto io_error;
@@ -599,7 +599,7 @@ static int cachefiles_read_backing_file(struct cachefiles_object *object,
 		if (PageUptodate(backpage))
 			goto backing_page_already_uptodate;
 
-		_debug("- not ready %p{%lx}", backpage, backpage->flags);
+		_debug("- not ready %pK{%lx}", backpage, backpage->flags);
 
 		if (!trylock_page(backpage))
 			goto monitor_backing_page;
@@ -835,7 +835,7 @@ int cachefiles_allocate_page(struct fscache_retrieval *op,
 	cache = container_of(object->fscache.cache,
 			     struct cachefiles_cache, cache);
 
-	_enter("%p,{%lx},", object, page->index);
+	_enter("%pK,{%lx},", object, page->index);
 
 	ret = cachefiles_has_space(cache, 0, 1);
 	if (ret == 0)
@@ -875,7 +875,7 @@ int cachefiles_allocate_pages(struct fscache_retrieval *op,
 	cache = container_of(object->fscache.cache,
 			     struct cachefiles_cache, cache);
 
-	_enter("%p,,,%d,", object, *nr_pages);
+	_enter("%pK,,,%d,", object, *nr_pages);
 
 	ret = cachefiles_has_space(cache, 0, *nr_pages);
 	if (ret == 0) {
@@ -923,7 +923,7 @@ int cachefiles_write_page(struct fscache_storage *op, struct page *page)
 	object = container_of(op->op.object,
 			      struct cachefiles_object, fscache);
 
-	_enter("%p,%p{%lx},,,", object, page, page->index);
+	_enter("%pK,%pK{%lx},,,", object, page, page->index);
 
 	if (!object->backer) {
 		_leave(" = -ENOBUFS");
@@ -1000,7 +1000,7 @@ void cachefiles_uncache_page(struct fscache_object *_object, struct page *page)
 	cache = container_of(object->fscache.cache,
 			     struct cachefiles_cache, cache);
 
-	_enter("%p,{%lu}", object, page->index);
+	_enter("%pK,{%lu}", object, page->index);
 
 	spin_unlock(&object->fscache.cookie->lock);
 }

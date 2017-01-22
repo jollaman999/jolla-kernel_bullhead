@@ -231,7 +231,7 @@ static int qca1530_clk_prepare(struct clk *clk, int mode)
 	else
 		clk_disable_unprepare(clk);
 
-	pr_debug("Configured clock (%p): mode=%d ret=%d", clk, mode, ret);
+	pr_debug("Configured clock (%pK): mode=%d ret=%d", clk, mode, ret);
 
 	return ret;
 }
@@ -346,7 +346,7 @@ static int qca1530_clk_init(struct platform_device *pdev)
 			goto err_0;
 		}
 	} else
-		pr_debug("Ref to clock %s obtained: %p",
+		pr_debug("Ref to clock %s obtained: %pK",
 				QCA1530_RTC_CLK_ID, qca1530_data.rtc_clk);
 
 	qca1530_data.tcxo_clk = devm_clk_get(&pdev->dev, QCA1530_TCXO_CLK_ID);
@@ -362,7 +362,7 @@ static int qca1530_clk_init(struct platform_device *pdev)
 			goto err_1;
 		}
 	} else
-		pr_debug("Ref to clock %s obtained: %p",
+		pr_debug("Ref to clock %s obtained: %pK",
 				QCA1530_TCXO_CLK_ID, qca1530_data.tcxo_clk);
 
 	ret = qca1530_init_gpio(pdev, &qca1530_data.rtc_clk_gpio,
@@ -431,14 +431,14 @@ static int qca1530_pwr_set_regulator(struct regulator *reg, int mode)
 {
 	int ret;
 
-	pr_debug("Setting regulator: mode=%d regulator=%p", mode, reg);
+	pr_debug("Setting regulator: mode=%d regulator=%pK", mode, reg);
 
 	if (mode) {
 		ret = regulator_enable(reg);
 		if (ret)
 			pr_err("Failed to enable regulator, rc=%d", ret);
 		else
-			pr_debug("Regulator %p was enabled (%d)", reg, ret);
+			pr_debug("Regulator %pK was enabled (%d)", reg, ret);
 
 	} else {
 		if (!regulator_is_enabled(reg)) {
@@ -449,12 +449,12 @@ static int qca1530_pwr_set_regulator(struct regulator *reg, int mode)
 				pr_err("Failed to disable regulator, rc=%d",
 					ret);
 			else
-				pr_debug("Regulator %p was disabled (%d)", reg,
+				pr_debug("Regulator %pK was disabled (%d)", reg,
 					ret);
 		}
 	}
 
-	pr_debug("Regulator set result: regulator=%p mode=%d ret=%d", reg, mode,
+	pr_debug("Regulator set result: regulator=%pK mode=%d ret=%d", reg, mode,
 		ret);
 
 	return ret;
@@ -488,7 +488,7 @@ static int qca1530_pwr_init_regulator(
 		} else
 			pr_err("Failed to get regulator, ret=%d", ret);
 	} else {
-		pr_debug("Ref to regulator %s obtained: %p", name, pwr);
+		pr_debug("Ref to regulator %s obtained: %pK", name, pwr);
 		*ppwr = pwr;
 		ret = 0;
 	}
@@ -575,7 +575,7 @@ static int qca1530_pwr_init(struct platform_device *pdev)
 			pr_err("Failed to enable power, rc=%d", ret);
 			goto err_0;
 		}
-		pr_debug("Configured: reg=%p gpio=%d",
+		pr_debug("Configured: reg=%pK gpio=%d",
 			qca1530_data.pwr_reg,
 			qca1530_data.pwr_gpio);
 	} else {
@@ -764,7 +764,7 @@ static int qca1530_xlna_init(struct platform_device *pdev)
 			if (ret)
 				pr_warn("Failed to set voltage, ret=%d", ret);
 			else
-				pr_debug("Regulator %p voltage was set (%d)",
+				pr_debug("Regulator %pK voltage was set (%d)",
 					qca1530_data.xlna_reg, ret);
 		}
 
@@ -777,7 +777,7 @@ static int qca1530_xlna_init(struct platform_device *pdev)
 				pr_warn("Failed to set optimum mode, ret=%d",
 					ret);
 			else
-				pr_debug("Optimum mode for %p was set (%d)",
+				pr_debug("Optimum mode for %pK was set (%d)",
 					qca1530_data.xlna_reg, ret);
 		}
 	}
@@ -793,7 +793,7 @@ static int qca1530_xlna_init(struct platform_device *pdev)
 			pr_err("Failed to enable xLNA, rc=%d", ret);
 			goto err_0;
 		}
-		pr_debug("Configured: reg=%p gpio=%d",
+		pr_debug("Configured: reg=%pK gpio=%d",
 			qca1530_data.xlna_reg,
 			qca1530_data.xlna_gpio);
 	} else {
@@ -1022,7 +1022,7 @@ static int qca1530_create_sysfs_node(void)
 	pr_debug("Creating sysfs node");
 
 	qca1530_kobject = kobject_create_and_add(SYSFS_NODE_NAME, kernel_kobj);
-	pr_debug("qca1530_kobject=%p", qca1530_kobject);
+	pr_debug("qca1530_kobject=%pK", qca1530_kobject);
 	if (!qca1530_kobject)
 		return -ENOMEM;
 

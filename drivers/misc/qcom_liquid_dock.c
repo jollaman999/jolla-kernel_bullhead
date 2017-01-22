@@ -88,7 +88,7 @@ static void dock_detected_work(struct work_struct *w)
 			gpio_direction_output(dock->dock_eth_reset, 1);
 
 		if (device_attach(&dock->usb3_pdev->dev) != 1) {
-			dev_err(dock->dev, "Could not add USB driver 0x%p\n",
+			dev_err(dock->dev, "Could not add USB driver 0x%pK\n",
 				dock->usb3_pdev);
 			return;
 		}

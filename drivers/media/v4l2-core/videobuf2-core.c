@@ -230,7 +230,7 @@ static int __vb2_queue_alloc(struct vb2_queue *q, enum v4l2_memory memory,
 			 */
 			ret = call_qop(q, buf_init, vb);
 			if (ret) {
-				dprintk(1, "Buffer %d %p initialization"
+				dprintk(1, "Buffer %d %pK initialization"
 					" failed\n", buffer, vb);
 				__vb2_buf_mem_free(vb);
 				kfree(vb);

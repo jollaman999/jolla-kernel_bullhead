@@ -51,7 +51,7 @@ irnet_ctrl_write(irnet_socket *	ap,
   char *	next;		/* Next command to process */
   int		length;		/* Length of current command */
 
-  DENTER(CTRL_TRACE, "(ap=0x%p, count=%Zd)\n", ap, count);
+  DENTER(CTRL_TRACE, "(ap=0x%pK, count=%Zd)\n", ap, count);
 
   /* Check for overflow... */
   DABORT(count >= IRNET_MAX_COMMAND, -ENOMEM,
@@ -194,7 +194,7 @@ irnet_get_discovery_log(irnet_socket *	ap)
   if(ap->discoveries == NULL)
     ap->disco_number = -1;
 
-  DEBUG(CTRL_INFO, "Got the log (0x%p), size is %d\n",
+  DEBUG(CTRL_INFO, "Got the log (0x%pK), size is %d\n",
 	ap->discoveries, ap->disco_number);
 }
 
@@ -218,7 +218,7 @@ irnet_read_discovery_log(irnet_socket *ap, char *event, int buf_size)
 {
   int		done_event = 0;
 
-  DENTER(CTRL_TRACE, "(ap=0x%p, event=0x%p)\n",
+  DENTER(CTRL_TRACE, "(ap=0x%pK, event=0x%pK)\n",
 	 ap, event);
 
   /* Test if we have some work to do or we have already finished */
@@ -256,7 +256,7 @@ irnet_read_discovery_log(irnet_socket *ap, char *event, int buf_size)
   if(ap->disco_index >= ap->disco_number)
     {
       /* No more items : remove the log and signal termination */
-      DEBUG(CTRL_INFO, "Cleaning up log (0x%p)\n",
+      DEBUG(CTRL_INFO, "Cleaning up log (0x%pK)\n",
 	    ap->discoveries);
       if(ap->discoveries != NULL)
 	{
@@ -285,7 +285,7 @@ irnet_ctrl_read(irnet_socket *	ap,
   char		event[75];
   ssize_t	ret = 0;
 
-  DENTER(CTRL_TRACE, "(ap=0x%p, count=%Zd)\n", ap, count);
+  DENTER(CTRL_TRACE, "(ap=0x%pK, count=%Zd)\n", ap, count);
 
 #ifdef INITIAL_DISCOVERY
   /* Check if we have read the log */
@@ -425,7 +425,7 @@ irnet_ctrl_poll(irnet_socket *	ap,
 {
   unsigned int mask;
 
-  DENTER(CTRL_TRACE, "(ap=0x%p)\n", ap);
+  DENTER(CTRL_TRACE, "(ap=0x%pK)\n", ap);
 
   poll_wait(file, &irnet_events.rwait, wait);
   mask = POLLOUT | POLLWRNORM;
@@ -469,7 +469,7 @@ dev_irnet_open(struct inode *	inode,
   struct irnet_socket *	ap;
   int			err;
 
-  DENTER(FS_TRACE, "(file=0x%p)\n", file);
+  DENTER(FS_TRACE, "(file=0x%pK)\n", file);
 
 #ifdef SECURE_DEVIRNET
   /* This could (should?) be enforced by the permissions on /dev/irnet. */
@@ -514,7 +514,7 @@ dev_irnet_open(struct inode *	inode,
   /* Put our stuff where we will be able to find it later */
   file->private_data = ap;
 
-  DEXIT(FS_TRACE, " - ap=0x%p\n", ap);
+  DEXIT(FS_TRACE, " - ap=0x%pK\n", ap);
 
   return 0;
 }
@@ -531,7 +531,7 @@ dev_irnet_close(struct inode *	inode,
 {
   irnet_socket *	ap = file->private_data;
 
-  DENTER(FS_TRACE, "(file=0x%p, ap=0x%p)\n",
+  DENTER(FS_TRACE, "(file=0x%pK, ap=0x%pK)\n",
 	 file, ap);
   DABORT(ap == NULL, 0, FS_ERROR, "ap is NULL !!!\n");
 
@@ -568,7 +568,7 @@ dev_irnet_write(struct file *	file,
 {
   irnet_socket *	ap = file->private_data;
 
-  DPASS(FS_TRACE, "(file=0x%p, ap=0x%p, count=%Zd)\n",
+  DPASS(FS_TRACE, "(file=0x%pK, ap=0x%pK, count=%Zd)\n",
 	file, ap, count);
   DABORT(ap == NULL, -ENXIO, FS_ERROR, "ap is NULL !!!\n");
 
@@ -592,7 +592,7 @@ dev_irnet_read(struct file *	file,
 {
   irnet_socket *	ap = file->private_data;
 
-  DPASS(FS_TRACE, "(file=0x%p, ap=0x%p, count=%Zd)\n",
+  DPASS(FS_TRACE, "(file=0x%pK, ap=0x%pK, count=%Zd)\n",
 	file, ap, count);
   DABORT(ap == NULL, -ENXIO, FS_ERROR, "ap is NULL !!!\n");
 
@@ -614,7 +614,7 @@ dev_irnet_poll(struct file *	file,
   irnet_socket *	ap = file->private_data;
   unsigned int		mask;
 
-  DENTER(FS_TRACE, "(file=0x%p, ap=0x%p)\n",
+  DENTER(FS_TRACE, "(file=0x%pK, ap=0x%pK)\n",
 	 file, ap);
 
   mask = POLLOUT | POLLWRNORM;
@@ -645,7 +645,7 @@ dev_irnet_ioctl(
   int			val;
   void __user *argp = (void __user *)arg;
 
-  DENTER(FS_TRACE, "(file=0x%p, ap=0x%p, cmd=0x%X)\n",
+  DENTER(FS_TRACE, "(file=0x%pK, ap=0x%pK, cmd=0x%X)\n",
 	 file, ap, cmd);
 
   /* Basic checks... */
@@ -854,7 +854,7 @@ irnet_prepare_skb(irnet_socket *	ap,
   int			islcp;		/* Protocol == LCP */
   int			needaddr;	/* Need PPP address */
 
-  DENTER(PPP_TRACE, "(ap=0x%p, skb=0x%p)\n",
+  DENTER(PPP_TRACE, "(ap=0x%pK, skb=0x%pK)\n",
 	 ap, skb);
 
   /* Extract PPP protocol from the frame */
@@ -922,7 +922,7 @@ ppp_irnet_send(struct ppp_channel *	chan,
   irnet_socket *	self = (struct irnet_socket *) chan->private;
   int			ret;
 
-  DENTER(PPP_TRACE, "(channel=0x%p, ap/self=0x%p)\n",
+  DENTER(PPP_TRACE, "(channel=0x%pK, ap/self=0x%pK)\n",
 	 chan, self);
 
   /* Check if things are somewhat valid... */
@@ -1027,7 +1027,7 @@ ppp_irnet_ioctl(struct ppp_channel *	chan,
   u32			accm[8];
   void __user *argp = (void __user *)arg;
 
-  DENTER(PPP_TRACE, "(channel=0x%p, ap=0x%p, cmd=0x%X)\n",
+  DENTER(PPP_TRACE, "(channel=0x%pK, ap=0x%pK, cmd=0x%X)\n",
 	 chan, ap, cmd);
 
   /* Basic checks... */

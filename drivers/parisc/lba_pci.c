@@ -164,9 +164,9 @@ lba_dump_res(struct resource *r, int d)
 	if (NULL == r)
 		return;
 
-	printk(KERN_DEBUG "(%p)", r->parent);
+	printk(KERN_DEBUG "(%pK)", r->parent);
 	for (i = d; i ; --i) printk(" ");
-	printk(KERN_DEBUG "%p [%lx,%lx]/%lx\n", r,
+	printk(KERN_DEBUG "%pK [%lx,%lx]/%lx\n", r,
 		(long)r->start, (long)r->end, r->flags);
 	lba_dump_res(r->child, d+2);
 	lba_dump_res(r->sibling, d);
@@ -683,7 +683,7 @@ lba_fixup_bus(struct pci_bus *bus)
 #endif
 	struct lba_device *ldev = LBA_DEV(parisc_walk_tree(bus->bridge));
 
-	DBG("lba_fixup_bus(0x%p) bus %d platform_data 0x%p\n",
+	DBG("lba_fixup_bus(0x%pK) bus %d platform_data 0x%pK\n",
 		bus, (int)bus->busn_res.start, bus->bridge->platform_data);
 
 	/*
@@ -892,7 +892,7 @@ LBA_PORT_IN(32, 0)
 #define LBA_PORT_OUT(size, mask) \
 static void lba_astro_out##size (struct pci_hba_data *d, u16 addr, u##size val) \
 { \
-	DBG_PORT("%s(0x%p, 0x%x, 0x%x)\n", __func__, d, addr, val); \
+	DBG_PORT("%s(0x%pK, 0x%x, 0x%x)\n", __func__, d, addr, val); \
 	WRITE_REG##size(val, astro_iop_base + addr); \
 	if (LBA_DEV(d)->hw_rev < 3) \
 		lba_t32 = READ_U32(d->base_addr + LBA_FUNC_ID); \
@@ -934,7 +934,7 @@ static struct pci_port_ops lba_astro_port_ops = {
 static u##size lba_pat_in##size (struct pci_hba_data *l, u16 addr) \
 { \
 	u##size t; \
-	DBG_PORT("%s(0x%p, 0x%x) ->", __func__, l, addr); \
+	DBG_PORT("%s(0x%pK, 0x%x) ->", __func__, l, addr); \
 	t = READ_REG##size(PIOP_TO_GMMIO(LBA_DEV(l), addr)); \
 	DBG_PORT(" 0x%x\n", t); \
 	return (t); \
@@ -950,7 +950,7 @@ LBA_PORT_IN(32, 0)
 static void lba_pat_out##size (struct pci_hba_data *l, u16 addr, u##size val) \
 { \
 	void __iomem *where = PIOP_TO_GMMIO(LBA_DEV(l), addr); \
-	DBG_PORT("%s(0x%p, 0x%x, 0x%x)\n", __func__, l, addr, val); \
+	DBG_PORT("%s(0x%pK, 0x%x, 0x%x)\n", __func__, l, addr, val); \
 	WRITE_REG##size(val, where); \
 	/* flush the I/O down to the elroy at least */ \
 	lba_t32 = READ_U32(l->base_addr + LBA_FUNC_ID); \

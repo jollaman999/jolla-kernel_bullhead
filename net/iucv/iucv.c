@@ -1959,7 +1959,7 @@ static int iucv_pm_restore(struct device *dev)
 	int rc = 0;
 
 #ifdef CONFIG_PM_DEBUG
-	printk(KERN_WARNING "iucv_pm_restore %p\n", iucv_path_table);
+	printk(KERN_WARNING "iucv_pm_restore %pK\n", iucv_path_table);
 #endif
 	if ((iucv_pm_state != IUCV_PM_RESTORING) && iucv_path_table)
 		pr_warning("Suspending Linux did not completely close all IUCV "

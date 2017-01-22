@@ -127,7 +127,7 @@ static __init int map_switcher(void)
 	memcpy(switcher_vma->addr, start_switcher_text,
 	       end_switcher_text - start_switcher_text);
 
-	printk(KERN_INFO "lguest: mapped switcher at %p\n",
+	printk(KERN_INFO "lguest: mapped switcher at %pK\n",
 	       switcher_vma->addr);
 	/* And we succeeded... */
 	return 0;

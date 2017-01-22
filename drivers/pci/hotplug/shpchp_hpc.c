@@ -1010,7 +1010,7 @@ int shpc_init(struct controller *ctrl, struct pci_dev *pdev)
 		rc = -1;
 		goto abort;
 	}
-	ctrl_dbg(ctrl, "ctrl->creg %p\n", ctrl->creg);
+	ctrl_dbg(ctrl, "ctrl->creg %pK\n", ctrl->creg);
 
 	mutex_init(&ctrl->crit_sect);
 	mutex_init(&ctrl->cmd_lock);

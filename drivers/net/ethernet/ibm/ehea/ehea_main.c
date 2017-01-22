@@ -127,7 +127,7 @@ void ehea_dump(void *adr, int len, char *msg)
 	int x;
 	unsigned char *deb = adr;
 	for (x = 0; x < len; x += 16) {
-		pr_info("%s adr=%p ofs=%04x %016llx %016llx\n",
+		pr_info("%s adr=%pK ofs=%04x %016llx %016llx\n",
 			msg, deb, x, *((u64 *)&deb[0]), *((u64 *)&deb[8]));
 		deb += 16;
 	}
@@ -1235,13 +1235,13 @@ static void ehea_neq_tasklet(unsigned long data)
 	u64 event_mask;
 
 	eqe = ehea_poll_eq(adapter->neq);
-	pr_debug("eqe=%p\n", eqe);
+	pr_debug("eqe=%pK\n", eqe);
 
 	while (eqe) {
 		pr_debug("*eqe=%lx\n", (unsigned long) eqe->entry);
 		ehea_parse_eqe(adapter, eqe->entry);
 		eqe = ehea_poll_eq(adapter->neq);
-		pr_debug("next eqe=%p\n", eqe);
+		pr_debug("next eqe=%pK\n", eqe);
 	}
 
 	event_mask = EHEA_BMASK_SET(NELR_PORTSTATE_CHG, 1)

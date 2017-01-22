@@ -162,7 +162,7 @@ struct inode *afs_iget_autocell(struct inode *dir, const char *dev_name,
 		return ERR_PTR(-ENOMEM);
 	}
 
-	_debug("GOT INODE %p { ino=%lu, vl=%x, vn=%x, u=%x }",
+	_debug("GOT INODE %pK { ino=%lu, vl=%x, vn=%x, u=%x }",
 	       inode, inode->i_ino, data.fid.vid, data.fid.vnode,
 	       data.fid.unique);
 
@@ -188,7 +188,7 @@ struct inode *afs_iget_autocell(struct inode *dir, const char *dev_name,
 	set_bit(AFS_VNODE_MOUNTPOINT, &vnode->flags);
 	inode->i_flags |= S_AUTOMOUNT | S_NOATIME;
 	unlock_new_inode(inode);
-	_leave(" = %p", inode);
+	_leave(" = %pK", inode);
 	return inode;
 }
 
@@ -217,14 +217,14 @@ struct inode *afs_iget(struct super_block *sb, struct key *key,
 		return ERR_PTR(-ENOMEM);
 	}
 
-	_debug("GOT INODE %p { vl=%x vn=%x, u=%x }",
+	_debug("GOT INODE %pK { vl=%x vn=%x, u=%x }",
 	       inode, fid->vid, fid->vnode, fid->unique);
 
 	vnode = AFS_FS_I(inode);
 
 	/* deal with an existing inode */
 	if (!(inode->i_state & I_NEW)) {
-		_leave(" = %p", inode);
+		_leave(" = %pK", inode);
 		return inode;
 	}
 
@@ -270,7 +270,7 @@ struct inode *afs_iget(struct super_block *sb, struct key *key,
 	clear_bit(AFS_VNODE_UNSET, &vnode->flags);
 	inode->i_flags |= S_NOATIME;
 	unlock_new_inode(inode);
-	_leave(" = %p [CB { v=%u t=%u }]", inode, vnode->cb_version, vnode->cb_type);
+	_leave(" = %pK [CB { v=%u t=%u }]", inode, vnode->cb_version, vnode->cb_type);
 	return inode;
 
 	/* failure */
@@ -418,7 +418,7 @@ void afs_evict_inode(struct inode *inode)
 	       vnode->cb_expiry,
 	       vnode->cb_type);
 
-	_debug("CLEAR INODE %p", inode);
+	_debug("CLEAR INODE %pK", inode);
 
 	ASSERTCMP(inode->i_ino, ==, vnode->fid.vnode);
 

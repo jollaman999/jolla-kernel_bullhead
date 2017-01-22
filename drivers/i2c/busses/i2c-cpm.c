@@ -552,7 +552,7 @@ static int cpm_i2c_setup(struct cpm_i2c *cpm)
 
 	cpm_reset_i2c_params(cpm);
 
-	dev_dbg(&cpm->ofdev->dev, "i2c_ram 0x%p, i2c_addr 0x%04x, freq %d\n",
+	dev_dbg(&cpm->ofdev->dev, "i2c_ram 0x%pK, i2c_addr 0x%04x, freq %d\n",
 		cpm->i2c_ram, cpm->i2c_addr, cpm->freq);
 	dev_dbg(&cpm->ofdev->dev, "tbase 0x%04x, rbase 0x%04x\n",
 		(u8 __iomem *)cpm->tbase - DPRAM_BASE,

@@ -514,7 +514,7 @@ static void privcmd_close(struct vm_area_struct *vma)
 
 static int privcmd_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 {
-	printk(KERN_DEBUG "privcmd_fault: vma=%p %lx-%lx, pgoff=%lx, uv=%p\n",
+	printk(KERN_DEBUG "privcmd_fault: vma=%pK %lx-%lx, pgoff=%lx, uv=%pK\n",
 	       vma, vma->vm_start, vma->vm_end,
 	       vmf->pgoff, vmf->virtual_address);
 

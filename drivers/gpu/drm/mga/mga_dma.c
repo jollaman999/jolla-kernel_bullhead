@@ -233,7 +233,7 @@ static void mga_freelist_print(struct drm_device *dev)
 	DRM_INFO("current freelist:\n");
 
 	for (entry = dev_priv->head->next; entry; entry = entry->next) {
-		DRM_INFO("   %p   idx=%2d  age=0x%x 0x%06lx\n",
+		DRM_INFO("   %pK   idx=%2d  age=0x%x 0x%06lx\n",
 			 entry, entry->buf->idx, entry->age.head,
 			 (unsigned long)(entry->age.head - dev_priv->primary->offset));
 	}
@@ -577,7 +577,7 @@ static int mga_do_agp_dma_bootstrap(struct drm_device *dev,
 
 	if (!dev_priv->warp->handle ||
 	    !dev_priv->primary->handle || !dev->agp_buffer_map->handle) {
-		DRM_ERROR("failed to ioremap agp regions! (%p, %p, %p)\n",
+		DRM_ERROR("failed to ioremap agp regions! (%pK, %pK, %pK)\n",
 			  dev_priv->warp->handle, dev_priv->primary->handle,
 			  dev->agp_buffer_map->handle);
 		return -ENOMEM;

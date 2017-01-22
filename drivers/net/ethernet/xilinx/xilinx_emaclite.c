@@ -1153,7 +1153,7 @@ static int xemaclite_of_probe(struct platform_device *ofdev)
 	if (!request_mem_region(ndev->mem_start,
 				ndev->mem_end - ndev->mem_start + 1,
 				DRIVER_NAME)) {
-		dev_err(dev, "Couldn't lock memory region at %p\n",
+		dev_err(dev, "Couldn't lock memory region at %pK\n",
 			(void *)ndev->mem_start);
 		rc = -EBUSY;
 		goto error2;

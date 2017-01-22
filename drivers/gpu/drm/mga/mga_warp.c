@@ -116,7 +116,7 @@ int mga_warp_install_microcode(drm_mga_private_t *dev_priv)
 	     rec = ihex_next_binrec(rec)) {
 		unsigned int src_size, dst_size;
 
-		DRM_DEBUG(" pcbase = 0x%08lx  vcbase = %p\n", pcbase, vcbase);
+		DRM_DEBUG(" pcbase = 0x%08lx  vcbase = %pK\n", pcbase, vcbase);
 		dev_priv->warp_pipe_phys[where] = pcbase;
 		src_size = be16_to_cpu(rec->len);
 		dst_size = WARP_UCODE_SIZE(src_size);

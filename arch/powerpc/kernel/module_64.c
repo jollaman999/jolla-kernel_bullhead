@@ -145,7 +145,7 @@ static unsigned long get_stubs_size(const Elf64_Ehdr *hdr,
 	for (i = 1; i < hdr->e_shnum; i++) {
 		if (sechdrs[i].sh_type == SHT_RELA) {
 			DEBUGP("Found relocations in section %u\n", i);
-			DEBUGP("Ptr: %p.  Number: %lu\n",
+			DEBUGP("Ptr: %pK.  Number: %lu\n",
 			       (void *)sechdrs[i].sh_addr,
 			       sechdrs[i].sh_size / sizeof(Elf64_Rela));
 
@@ -275,11 +275,11 @@ static inline int create_stub(Elf64_Shdr *sechdrs,
 	/* Stub uses address relative to r2. */
 	reladdr = (unsigned long)entry - my_r2(sechdrs, me);
 	if (reladdr > 0x7FFFFFFF || reladdr < -(0x80000000L)) {
-		printk("%s: Address %p of stub out of range of %p.\n",
+		printk("%s: Address %pK of stub out of range of %pK.\n",
 		       me->name, (void *)reladdr, (void *)my_r2);
 		return 0;
 	}
-	DEBUGP("Stub %p get data from reladdr %li\n", entry, reladdr);
+	DEBUGP("Stub %pK get data from reladdr %li\n", entry, reladdr);
 
 	*loc1 = PPC_HA(reladdr);
 	*loc2 = PPC_LO(reladdr);
@@ -350,7 +350,7 @@ int apply_relocate_add(Elf64_Shdr *sechdrs,
 		sym = (Elf64_Sym *)sechdrs[symindex].sh_addr
 			+ ELF64_R_SYM(rela[i].r_info);
 
-		DEBUGP("RELOC at %p: %li-type as %s (%lu) + %li\n",
+		DEBUGP("RELOC at %pK: %li-type as %s (%lu) + %li\n",
 		       location, (long)ELF64_R_TYPE(rela[i].r_info),
 		       strtab + sym->st_name, (unsigned long)sym->st_value,
 		       (long)rela[i].r_addend);

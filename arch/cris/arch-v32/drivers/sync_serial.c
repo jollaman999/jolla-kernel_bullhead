@@ -1005,7 +1005,7 @@ static ssize_t sync_serial_write(struct file *file, const char *buf,
 	 * |_________|___________________|________________________|
 	 *           ^ rd_ptr            ^ wr_ptr
 	 */
-	DEBUGWRITE(printk(KERN_DEBUG "W d%d c %lu a: %p c: %p\n",
+	DEBUGWRITE(printk(KERN_DEBUG "W d%d c %lu a: %pK c: %pK\n",
 			  port->port_nbr, count, port->active_tr_descr,
 			  port->catch_tr_descr));
 
@@ -1042,7 +1042,7 @@ static ssize_t sync_serial_write(struct file *file, const char *buf,
 	if (copy_from_user(wr_ptr, buf, trunc_count))
 		return -EFAULT;
 
-	DEBUGOUTBUF(printk(KERN_DEBUG "%-4d + %-4d = %-4d     %p %p %p\n",
+	DEBUGOUTBUF(printk(KERN_DEBUG "%-4d + %-4d = %-4d     %pK %pK %pK\n",
 			   out_buf_count, trunc_count,
 			   port->out_buf_count, port->out_buffer,
 			   wr_ptr, buf_stop_ptr));
@@ -1243,7 +1243,7 @@ static void start_dma_out(struct sync_port *port,
 	port->active_tr_descr->eol = 1;
 	port->prev_tr_descr->eol = 0;
 
-	DEBUGTRDMA(printk(KERN_DEBUG "Inserting eolr:%p eol@:%p\n",
+	DEBUGTRDMA(printk(KERN_DEBUG "Inserting eolr:%pK eol@:%pK\n",
 		port->prev_tr_descr, port->active_tr_descr));
 	port->prev_tr_descr = port->active_tr_descr;
 	port->active_tr_descr = phys_to_virt((int) port->active_tr_descr->next);
@@ -1338,7 +1338,7 @@ static irqreturn_t tr_interrupt(int irq, void *dev_id)
 			sent = port->catch_tr_descr->after -
 				port->catch_tr_descr->buf;
 			DEBUGTXINT(printk(KERN_DEBUG "%-4d - %-4d = %-4d\t"
-					  "in descr %p (ac: %p)\n",
+					  "in descr %pK (ac: %pK)\n",
 					  port->out_buf_count, sent,
 					  port->out_buf_count - sent,
 					  port->catch_tr_descr,
@@ -1362,7 +1362,7 @@ static irqreturn_t tr_interrupt(int irq, void *dev_id)
 				sent = port->catch_tr_descr->after -
 					port->catch_tr_descr->buf;
 				DEBUGOUTBUF(printk(KERN_DEBUG
-					"traversing descr %p -%d (%d)\n",
+					"traversing descr %pK -%d (%d)\n",
 					port->catch_tr_descr,
 					sent,
 					port->out_buf_count));
@@ -1378,7 +1378,7 @@ static irqreturn_t tr_interrupt(int irq, void *dev_id)
 			sent = port->catch_tr_descr->after -
 				port->catch_tr_descr->buf;
 			DEBUGOUTBUF(printk(KERN_DEBUG
-				"eol at descr %p -%d (%d)\n",
+				"eol at descr %pK -%d (%d)\n",
 				port->catch_tr_descr,
 				sent,
 				port->out_buf_count));
@@ -1396,7 +1396,7 @@ static irqreturn_t tr_interrupt(int irq, void *dev_id)
 			reg_sser_rw_tr_cfg tr_cfg =
 				REG_RD(sser, port->regi_sser, rw_tr_cfg);
 			DEBUGTXINT(printk(KERN_DEBUG
-				"tr_int DMA stop %d, set catch @ %p\n",
+				"tr_int DMA stop %d, set catch @ %pK\n",
 				port->out_buf_count,
 				port->active_tr_descr));
 			if (port->out_buf_count != 0)

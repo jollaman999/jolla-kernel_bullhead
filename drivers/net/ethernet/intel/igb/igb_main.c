@@ -406,7 +406,7 @@ static void igb_dump(struct igb_adapter *adapter)
 		struct igb_tx_buffer *buffer_info;
 		tx_ring = adapter->tx_ring[n];
 		buffer_info = &tx_ring->tx_buffer_info[tx_ring->next_to_clean];
-		pr_info(" %5d %5X %5X %016llX %04X %p %016llX\n",
+		pr_info(" %5d %5X %5X %016llX %04X %pK %016llX\n",
 			n, tx_ring->next_to_use, tx_ring->next_to_clean,
 			(u64)dma_unmap_addr(buffer_info, dma),
 			dma_unmap_len(buffer_info, len),
@@ -457,7 +457,7 @@ static void igb_dump(struct igb_adapter *adapter)
 				next_desc = "";
 
 			pr_info("T [0x%03X]    %016llX %016llX %016llX"
-				" %04X  %p %016llX %p%s\n", i,
+				" %04X  %pK %016llX %pK%s\n", i,
 				le64_to_cpu(u0->a),
 				le64_to_cpu(u0->b),
 				(u64)dma_unmap_addr(buffer_info, dma),
@@ -6101,7 +6101,7 @@ static bool igb_clean_tx_irq(struct igb_q_vector *q_vector)
 				"  next_to_clean        <%x>\n"
 				"buffer_info[next_to_clean]\n"
 				"  time_stamp           <%lx>\n"
-				"  next_to_watch        <%p>\n"
+				"  next_to_watch        <%pK>\n"
 				"  jiffies              <%lx>\n"
 				"  desc.status          <%x>\n",
 				tx_ring->queue_index,

@@ -93,7 +93,7 @@ static char *iflags[] = {
 static void __init
 dump_component(pcomponent *p)
 {
-	printk("[%p]:class<%s>type<%s>flags<%s>ver<%d>rev<%d>",
+	printk("[%pK]:class<%s>type<%s>flags<%s>ver<%d>rev<%d>",
 	       p, classes[p->class], types[p->type],
 	       iflags[p->iflags], p->vers, p->rev);
 	printk("key<%08lx>\n\tamask<%08lx>cdsize<%d>ilen<%d>iname<%s>\n",

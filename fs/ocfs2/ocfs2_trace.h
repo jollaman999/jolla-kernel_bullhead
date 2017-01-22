@@ -66,7 +66,7 @@ DECLARE_EVENT_CLASS(ocfs2__pointer,
 	TP_fast_assign(
 		__entry->pointer = pointer;
 	),
-	TP_printk("%p", __entry->pointer)
+	TP_printk("%pK", __entry->pointer)
 );
 
 #define DEFINE_OCFS2_POINTER_EVENT(name)	\
@@ -1135,7 +1135,7 @@ DECLARE_EVENT_CLASS(ocfs2__get_block,
 		__entry->bh_result = bh_result;
 		__entry->create = create;
 	),
-	TP_printk("%llu %llu %p %d",
+	TP_printk("%llu %llu %pK %d",
 		  __entry->ino, __entry->iblock,
 		  __entry->bh_result, __entry->create)
 );
@@ -1208,7 +1208,7 @@ TRACE_EVENT(ocfs2_write_begin_nolock,
 		__entry->clusters = clusters;
 		__entry->extents_to_split = extents_to_split;
 	),
-	TP_printk("%llu %lld %u %llu %u %u %p %u %u",
+	TP_printk("%llu %lld %u %llu %u %u %pK %u %u",
 		  __entry->ino, __entry->i_size, __entry->i_clusters,
 		  __entry->pos, __entry->len,
 		  __entry->flags, __entry->page, __entry->clusters,
@@ -1259,7 +1259,7 @@ TRACE_EVENT(ocfs2_fault,
 		__entry->page = page;
 		__entry->pgoff = pgoff;
 	),
-	TP_printk("%llu %p %p %lu",
+	TP_printk("%llu %pK %pK %lu",
 		  __entry->ino, __entry->area, __entry->page, __entry->pgoff)
 );
 
@@ -1291,7 +1291,7 @@ DECLARE_EVENT_CLASS(ocfs2__file_ops,
 		__assign_str(d_name, d_name);
 		__entry->para = para;
 	),
-	TP_printk("%p %p %p %llu %llu %.*s", __entry->inode, __entry->file,
+	TP_printk("%pK %pK %pK %llu %llu %.*s", __entry->inode, __entry->file,
 		  __entry->dentry, __entry->ino, __entry->para,
 		  __entry->d_len, __get_str(d_name))
 );
@@ -1432,7 +1432,7 @@ TRACE_EVENT(ocfs2_setattr,
 		__entry->ia_uid = ia_uid;
 		__entry->ia_gid = ia_gid;
 	),
-	TP_printk("%p %p %llu %.*s %u %u %u %u", __entry->inode,
+	TP_printk("%pK %pK %llu %.*s %u %u %u %u", __entry->inode,
 		  __entry->dentry, __entry->ino, __entry->d_len,
 		  __get_str(d_name), __entry->ia_valid, __entry->ia_mode,
 		  __entry->ia_uid, __entry->ia_gid)
@@ -1510,7 +1510,7 @@ TRACE_EVENT(ocfs2_iget_end,
 		__entry->inode = inode;
 		__entry->ino = ino;
 	),
-	TP_printk("%p %llu", __entry->inode, __entry->ino)
+	TP_printk("%pK %llu", __entry->inode, __entry->ino)
 );
 
 TRACE_EVENT(ocfs2_find_actor,
@@ -1529,7 +1529,7 @@ TRACE_EVENT(ocfs2_find_actor,
 		__entry->args = args;
 		__entry->fi_blkno = fi_blkno;
 	),
-	TP_printk("%p %llu %p %llu", __entry->inode, __entry->ino,
+	TP_printk("%pK %llu %pK %llu", __entry->inode, __entry->ino,
 		  __entry->args, __entry->fi_blkno)
 );
 
@@ -1557,7 +1557,7 @@ TRACE_EVENT(ocfs2_inode_is_valid_to_delete,
 		__entry->ino = ino;
 		__entry->flags = flags;
 	),
-	TP_printk("%p %p %llu %u", __entry->task, __entry->dc_task,
+	TP_printk("%pK %pK %llu %u", __entry->task, __entry->dc_task,
 		  __entry->ino, __entry->flags)
 );
 
@@ -1589,7 +1589,7 @@ TRACE_EVENT(ocfs2_inode_revalidate,
 		__entry->ino = ino;
 		__entry->flags = flags;
 	),
-	TP_printk("%p %llu %u", __entry->inode, __entry->ino, __entry->flags)
+	TP_printk("%pK %llu %u", __entry->inode, __entry->ino, __entry->flags)
 );
 
 DEFINE_OCFS2_ULL_EVENT(ocfs2_mark_inode_dirty);
@@ -1618,7 +1618,7 @@ TRACE_EVENT(ocfs2_read_virt_blocks,
 		__entry->flags = flags;
 		__entry->validate = validate;
 	),
-	TP_printk("%p %llu %d %p %x %p", __entry->inode, __entry->vblock,
+	TP_printk("%pK %llu %d %pK %x %pK", __entry->inode, __entry->vblock,
 		  __entry->nr, __entry->bhs, __entry->flags, __entry->validate)
 );
 
@@ -1674,7 +1674,7 @@ TRACE_EVENT(ocfs2_fill_super,
 		__entry->data = data;
 		__entry->silent = silent;
 	),
-	TP_printk("%p %p %d", __entry->sb,
+	TP_printk("%pK %pK %d", __entry->sb,
 		  __entry->data, __entry->silent)
 );
 
@@ -1705,7 +1705,7 @@ TRACE_EVENT(ocfs2_statfs,
 		__entry->sb = sb;
 		__entry->buf = buf;
 	),
-	TP_printk("%p %p", __entry->sb, __entry->buf)
+	TP_printk("%pK %pK", __entry->sb, __entry->buf)
 );
 
 DEFINE_OCFS2_POINTER_EVENT(ocfs2_dismount_volume);
@@ -2094,7 +2094,7 @@ TRACE_EVENT(ocfs2_find_files_on_disk,
 		__entry->blkno = blkno;
 		__entry->dir = dir;
 	),
-	TP_printk("%.*s %p %llu", __entry->namelen, __get_str(name),
+	TP_printk("%.*s %pK %llu", __entry->namelen, __get_str(name),
 		  __entry->blkno, __entry->dir)
 );
 
@@ -2177,7 +2177,7 @@ DECLARE_EVENT_CLASS(ocfs2__dentry_ops,
 		__entry->dir_blkno = dir_blkno;
 		__entry->extra = extra;
 	),
-	TP_printk("%p %p %.*s %llu %llu", __entry->dir, __entry->dentry,
+	TP_printk("%pK %pK %.*s %llu %llu", __entry->dir, __entry->dentry,
 		  __entry->name_len, __get_str(name),
 		  __entry->dir_blkno, __entry->extra)
 );
@@ -2224,7 +2224,7 @@ TRACE_EVENT(ocfs2_mknod,
 		__entry->dev = dev;
 		__entry->mode = mode;
 	),
-	TP_printk("%p %p %.*s %llu %lu %d", __entry->dir, __entry->dentry,
+	TP_printk("%pK %pK %.*s %llu %lu %d", __entry->dir, __entry->dentry,
 		  __entry->name_len, __get_str(name),
 		  __entry->dir_blkno, __entry->dev, __entry->mode)
 );
@@ -2285,7 +2285,7 @@ TRACE_EVENT(ocfs2_rename,
 		__entry->new_len = new_len;
 		__assign_str(new_name, new_name);
 	),
-	TP_printk("%p %p %p %p %.*s %.*s",
+	TP_printk("%pK %pK %pK %pK %.*s %.*s",
 		  __entry->old_dir, __entry->old_dentry,
 		  __entry->new_dir, __entry->new_dentry,
 		  __entry->old_len, __get_str(old_name),
@@ -2322,7 +2322,7 @@ TRACE_EVENT(ocfs2_rename_over_existing,
 		__entry->new_bh = new_bh;
 		__entry->newdi_blkno = newdi_blkno;
 	),
-	TP_printk("%llu %p %llu", __entry->new_blkno, __entry->new_bh,
+	TP_printk("%llu %pK %llu", __entry->new_blkno, __entry->new_bh,
 		  __entry->newdi_blkno)
 );
 
@@ -2346,7 +2346,7 @@ TRACE_EVENT(ocfs2_symlink_begin,
 		__entry->len = len;
 		__assign_str(name, name);
 	),
-	TP_printk("%p %p %s %.*s", __entry->dir, __entry->dentry,
+	TP_printk("%pK %pK %s %.*s", __entry->dir, __entry->dentry,
 		  __entry->symname, __entry->len, __get_str(name))
 );
 
@@ -2405,7 +2405,7 @@ TRACE_EVENT(ocfs2_dentry_revalidate,
 		__entry->len = len;
 		__assign_str(name, name);
 	),
-	TP_printk("%p %.*s", __entry->dentry, __entry->len, __get_str(name))
+	TP_printk("%pK %.*s", __entry->dentry, __entry->len, __get_str(name))
 );
 
 TRACE_EVENT(ocfs2_dentry_revalidate_negative,
@@ -2466,7 +2466,7 @@ TRACE_EVENT(ocfs2_dentry_attach_lock,
 		__entry->parent = parent;
 		__entry->fsdata = fsdata;
 	),
-	TP_printk("%.*s %llu %p", __entry->len, __get_str(name),
+	TP_printk("%.*s %llu %pK", __entry->len, __get_str(name),
 		  __entry->parent, __entry->fsdata)
 );
 
@@ -2503,7 +2503,7 @@ TRACE_EVENT(ocfs2_get_dentry_begin,
 		__entry->handle = handle;
 		__entry->blkno = blkno;
 	),
-	TP_printk("%p %p %llu", __entry->sb, __entry->handle, __entry->blkno)
+	TP_printk("%pK %pK %llu", __entry->sb, __entry->handle, __entry->blkno)
 );
 
 DEFINE_OCFS2_INT_INT_EVENT(ocfs2_get_dentry_test_bit);
@@ -2530,7 +2530,7 @@ TRACE_EVENT(ocfs2_get_parent,
 		__assign_str(name, name);
 		__entry->ino = ino;
 	),
-	TP_printk("%p %.*s %llu", __entry->child, __entry->len,
+	TP_printk("%pK %.*s %llu", __entry->child, __entry->len,
 		  __get_str(name), __entry->ino)
 );
 
@@ -2556,7 +2556,7 @@ TRACE_EVENT(ocfs2_encode_fh_begin,
 		__entry->len = len;
 		__entry->connectable = connectable;
 	),
-	TP_printk("%p %.*s %p %d %d", __entry->dentry, __entry->name_len,
+	TP_printk("%pK %.*s %pK %d %d", __entry->dentry, __entry->name_len,
 		  __get_str(name), __entry->fh, __entry->len,
 		  __entry->connectable)
 );
@@ -2611,7 +2611,7 @@ TRACE_EVENT(ocfs2_complete_recovery_slot,
 		__entry->tl_ino = tl_ino;
 		__entry->qrec = qrec;
 	),
-	TP_printk("%d %llu %llu %p", __entry->slot, __entry->la_ino,
+	TP_printk("%d %llu %llu %pK", __entry->slot, __entry->la_ino,
 		  __entry->tl_ino, __entry->qrec)
 );
 
@@ -2637,7 +2637,7 @@ TRACE_EVENT(ocfs2_recovery_thread,
 		__entry->recovery_thread = recovery_thread;
 		__entry->map_set = map_set;
 	),
-	TP_printk("%d %d %d %p %d", __entry->node_num,
+	TP_printk("%d %d %d %pK %d", __entry->node_num,
 		   __entry->osb_node_num, __entry->disable,
 		   __entry->recovery_thread, __entry->map_set)
 );
@@ -2691,7 +2691,7 @@ TRACE_EVENT(ocfs2_write_block,
 		__entry->block = block;
 		__entry->ci = ci;
 	),
-	TP_printk("%llu %p", __entry->block, __entry->ci)
+	TP_printk("%llu %pK", __entry->block, __entry->ci)
 );
 
 TRACE_EVENT(ocfs2_read_blocks_begin,
@@ -2710,7 +2710,7 @@ TRACE_EVENT(ocfs2_read_blocks_begin,
 		__entry->nr = nr;
 		__entry->flags = flags;
 	),
-	TP_printk("%p %llu %u %d", __entry->ci, __entry->block,
+	TP_printk("%pK %llu %u %d", __entry->ci, __entry->block,
 		  __entry->nr, __entry->flags)
 );
 
@@ -2735,7 +2735,7 @@ TRACE_EVENT(ocfs2_buffer_cached_end,
 		__entry->index = index;
 		__entry->item = item;
 	),
-	TP_printk("%d %p", __entry->index, __entry->item)
+	TP_printk("%d %pK", __entry->index, __entry->item)
 );
 
 DEFINE_OCFS2_ULL_ULL_UINT_EVENT(ocfs2_append_cache_array);

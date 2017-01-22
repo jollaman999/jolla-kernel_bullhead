@@ -1894,7 +1894,7 @@ xfs_dir2_node_addname_int(
 					(unsigned long long)ifbno, lastfbno);
 				if (fblk) {
 					xfs_alert(mp,
-				" fblk 0x%p blkno %llu index %d magic 0x%x",
+				" fblk 0x%pK blkno %llu index %d magic 0x%x",
 						fblk,
 						(unsigned long long)fblk->blkno,
 						fblk->index,

@@ -182,7 +182,7 @@ smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
 		if (rc == -EAGAIN) {
 			i++;
 			if (i >= 14 || (!server->noblocksnd && (i > 2))) {
-				cifs_dbg(VFS, "sends on sock %p stuck for 15 seconds\n",
+				cifs_dbg(VFS, "sends on sock %pK stuck for 15 seconds\n",
 					 ssocket);
 				rc = -EAGAIN;
 				break;

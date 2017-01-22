@@ -475,7 +475,7 @@ void acpi_ex_release_all_mutexes(struct acpi_thread_state *thread)
 		obj_desc->mutex.acquisition_depth = 0;
 
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "Force-releasing held mutex: %p\n",
+				  "Force-releasing held mutex: %pK\n",
 				  obj_desc));
 
 		/* Release the mutex, special case for Global Lock */

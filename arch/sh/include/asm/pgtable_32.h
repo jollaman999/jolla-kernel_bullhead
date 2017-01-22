@@ -430,7 +430,7 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
 
 #ifdef CONFIG_X2TLB
 #define pte_ERROR(e) \
-	printk("%s:%d: bad pte %p(%08lx%08lx).\n", __FILE__, __LINE__, \
+	printk("%s:%d: bad pte %pK(%08lx%08lx).\n", __FILE__, __LINE__, \
 	       &(e), (e).pte_high, (e).pte_low)
 #define pgd_ERROR(e) \
 	printk("%s:%d: bad pgd %016llx.\n", __FILE__, __LINE__, pgd_val(e))

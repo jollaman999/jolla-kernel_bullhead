@@ -670,7 +670,7 @@ static int hwicap_setup(struct device *dev, int id,
 	mutex_init(&drvdata->sem);
 	drvdata->is_open = 0;
 
-	dev_info(dev, "ioremap %llx to %p with size %llx\n",
+	dev_info(dev, "ioremap %llx to %pK with size %llx\n",
 		 (unsigned long long) drvdata->mem_start,
 		 drvdata->base_address,
 		 (unsigned long long) drvdata->mem_size);

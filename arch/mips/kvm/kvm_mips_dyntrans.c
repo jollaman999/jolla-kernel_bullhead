@@ -106,7 +106,7 @@ kvm_mips_trans_mfc0(uint32_t inst, uint32_t *opc, struct kvm_vcpu *vcpu)
 		mips32_SyncICache((unsigned long) opc, 32);
 		local_irq_restore(flags);
 	} else {
-		kvm_err("%s: Invalid address: %p\n", __func__, opc);
+		kvm_err("%s: Invalid address: %pK\n", __func__, opc);
 		return -EFAULT;
 	}
 
@@ -141,7 +141,7 @@ kvm_mips_trans_mtc0(uint32_t inst, uint32_t *opc, struct kvm_vcpu *vcpu)
 		mips32_SyncICache((unsigned long) opc, 32);
 		local_irq_restore(flags);
 	} else {
-		kvm_err("%s: Invalid address: %p\n", __func__, opc);
+		kvm_err("%s: Invalid address: %pK\n", __func__, opc);
 		return -EFAULT;
 	}
 

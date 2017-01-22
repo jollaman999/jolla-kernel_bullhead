@@ -97,12 +97,12 @@ static unsigned long *find_frame_creation(unsigned long *pc)
 
 		frame_size = get_frame_size(instr);
 		if ((frame_size < 8) || (frame_size & 3)) {
-			pr_debug("    Invalid frame size %d at 0x%p\n",
+			pr_debug("    Invalid frame size %d at 0x%pK\n",
 				 frame_size, pc);
 			return NULL;
 		}
 
-		pr_debug("    Found frame creation at 0x%p, size %d\n", pc,
+		pr_debug("    Found frame creation at 0x%pK, size %d\n", pc,
 			 frame_size);
 		return pc;
 	}
@@ -191,7 +191,7 @@ static void microblaze_unwind_inner(struct task_struct *task,
 {
 	int ofs = 0;
 
-	pr_debug("    Unwinding with PC=%p, FP=%p\n", (void *)pc, (void *)fp);
+	pr_debug("    Unwinding with PC=%pK, FP=%pK\n", (void *)pc, (void *)fp);
 	if (!pc || !fp || (pc & 3) || (fp & 3)) {
 		pr_debug("    Invalid state for unwind, aborting\n");
 		return;
@@ -247,7 +247,7 @@ static void microblaze_unwind_inner(struct task_struct *task,
 		} else {
 			/* Have we reached userland? */
 			if (unlikely(pc == task_pt_regs(task)->pc)) {
-				pr_info("[<%p>] PID %lu [%s]\n",
+				pr_info("[<%pK>] PID %lu [%s]\n",
 					(void *) pc,
 					(unsigned long) task->pid,
 					task->comm);
@@ -271,7 +271,7 @@ static void microblaze_unwind_inner(struct task_struct *task,
 			break;
 		}
 
-		pr_debug("    Next PC=%p, next FP=%p\n",
+		pr_debug("    Next PC=%pK, next FP=%pK\n",
 			 (void *)next_pc, (void *)next_fp);
 	}
 }

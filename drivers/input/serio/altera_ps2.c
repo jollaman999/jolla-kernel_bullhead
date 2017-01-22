@@ -137,7 +137,7 @@ static int altera_ps2_probe(struct platform_device *pdev)
 		goto err_unmap;
 	}
 
-	dev_info(&pdev->dev, "base %p, irq %d\n", ps2if->base, ps2if->irq);
+	dev_info(&pdev->dev, "base %pK, irq %d\n", ps2if->base, ps2if->irq);
 
 	serio_register_port(ps2if->io);
 	platform_set_drvdata(pdev, ps2if);

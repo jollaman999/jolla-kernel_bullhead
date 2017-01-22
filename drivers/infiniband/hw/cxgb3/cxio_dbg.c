@@ -116,7 +116,7 @@ void cxio_dump_wqe(union t3_wr *wqe)
 	if (size == 0)
 		size = 8;
 	while (size > 0) {
-		PDBG("WQE %p: %016llx\n", data,
+		PDBG("WQE %pK: %016llx\n", data,
 		     (unsigned long long) be64_to_cpu(*data));
 		size--;
 		data++;
@@ -129,7 +129,7 @@ void cxio_dump_wce(struct t3_cqe *wce)
 	int size = sizeof(*wce);
 
 	while (size > 0) {
-		PDBG("WCE %p: %016llx\n", data,
+		PDBG("WCE %pK: %016llx\n", data,
 		     (unsigned long long) be64_to_cpu(*data));
 		size -= 8;
 		data++;

@@ -541,7 +541,7 @@ decode_negTokenInit(unsigned char *security_blob, int length,
 		return 0;
 	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)
 		   || (tag != ASN1_EOC)) {
-		cifs_dbg(FYI, "cls = %d con = %d tag = %d end = %p (%d) exit 0\n",
+		cifs_dbg(FYI, "cls = %d con = %d tag = %d end = %pK (%d) exit 0\n",
 			 cls, con, tag, end, *end);
 		return 0;
 	}
@@ -552,7 +552,7 @@ decode_negTokenInit(unsigned char *security_blob, int length,
 		return 0;
 	} else if ((cls != ASN1_UNI) || (con != ASN1_CON)
 		   || (tag != ASN1_SEQ)) {
-		cifs_dbg(FYI, "cls = %d con = %d tag = %d end = %p (%d) exit 1\n",
+		cifs_dbg(FYI, "cls = %d con = %d tag = %d end = %pK (%d) exit 1\n",
 			 cls, con, tag, end, *end);
 		return 0;
 	}
@@ -563,7 +563,7 @@ decode_negTokenInit(unsigned char *security_blob, int length,
 		return 0;
 	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)
 		   || (tag != ASN1_EOC)) {
-		cifs_dbg(FYI, "cls = %d con = %d tag = %d end = %p (%d) exit 0\n",
+		cifs_dbg(FYI, "cls = %d con = %d tag = %d end = %pK (%d) exit 0\n",
 			 cls, con, tag, end, *end);
 		return 0;
 	}
@@ -575,7 +575,7 @@ decode_negTokenInit(unsigned char *security_blob, int length,
 		return 0;
 	} else if ((cls != ASN1_UNI) || (con != ASN1_CON)
 		   || (tag != ASN1_SEQ)) {
-		cifs_dbg(FYI, "cls = %d con = %d tag = %d end = %p (%d) exit 1\n",
+		cifs_dbg(FYI, "cls = %d con = %d tag = %d end = %pK (%d) exit 1\n",
 			 cls, con, tag, end, *end);
 		return 0;
 	}

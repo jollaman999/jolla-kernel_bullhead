@@ -163,7 +163,7 @@ static int ixgbe_fcoe_ddp_setup(struct net_device *netdev, u16 xid,
 	fcoe = &adapter->fcoe;
 	ddp = &fcoe->ddp[xid];
 	if (ddp->sgl) {
-		e_err(drv, "xid 0x%x w/ non-null sgl=%p nents=%d\n",
+		e_err(drv, "xid 0x%x w/ non-null sgl=%pK nents=%d\n",
 		      xid, ddp->sgl, ddp->sgc);
 		return 0;
 	}

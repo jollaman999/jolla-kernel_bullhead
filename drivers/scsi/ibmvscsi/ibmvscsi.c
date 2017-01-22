@@ -544,12 +544,12 @@ static void free_event_struct(struct event_pool *pool,
 				       struct srp_event_struct *evt)
 {
 	if (!valid_event_struct(pool, evt)) {
-		dev_err(evt->hostdata->dev, "Freeing invalid event_struct %p "
-			"(not in pool %p)\n", evt, pool->events);
+		dev_err(evt->hostdata->dev, "Freeing invalid event_struct %pK "
+			"(not in pool %pK)\n", evt, pool->events);
 		return;
 	}
 	if (atomic_inc_return(&evt->free) != 1) {
-		dev_err(evt->hostdata->dev, "Freeing event_struct %p "
+		dev_err(evt->hostdata->dev, "Freeing event_struct %pK "
 			"which is not in use!\n", evt);
 		return;
 	}
@@ -1802,13 +1802,13 @@ static void ibmvscsi_handle_crq(struct viosrp_crq *crq,
 	 * actually sent
 	 */
 	if (!valid_event_struct(&hostdata->pool, evt_struct)) {
-		dev_err(hostdata->dev, "returned correlation_token 0x%p is invalid!\n",
+		dev_err(hostdata->dev, "returned correlation_token 0x%pK is invalid!\n",
 		       (void *)crq->IU_data_ptr);
 		return;
 	}
 
 	if (atomic_read(&evt_struct->free)) {
-		dev_err(hostdata->dev, "received duplicate correlation_token 0x%p!\n",
+		dev_err(hostdata->dev, "received duplicate correlation_token 0x%pK!\n",
 			(void *)crq->IU_data_ptr);
 		return;
 	}

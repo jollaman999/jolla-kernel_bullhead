@@ -22,7 +22,7 @@ DECLARE_EVENT_CLASS(ppc64_interrupt_class,
 		__entry->regs = regs;
 	),
 
-	TP_printk("pt_regs=%p", __entry->regs)
+	TP_printk("pt_regs=%pK", __entry->regs)
 );
 
 DEFINE_EVENT(ppc64_interrupt_class, irq_entry,

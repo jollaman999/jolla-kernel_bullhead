@@ -1632,7 +1632,7 @@ find_mad_agent(struct ib_mad_port_private *port_priv,
 			atomic_inc(&mad_agent->refcount);
 		else {
 			printk(KERN_NOTICE PFX "No receive handler for client "
-			       "%p on port %d\n",
+			       "%pK on port %d\n",
 			       &mad_agent->agent, port_priv->port_num);
 			mad_agent = NULL;
 		}

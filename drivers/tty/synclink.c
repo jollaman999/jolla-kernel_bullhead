@@ -8074,7 +8074,7 @@ static int synclink_init_one (struct pci_dev *dev,
 	struct mgsl_struct *info;
 
 	if (pci_enable_device(dev)) {
-		printk("error enabling pci device %p\n", dev);
+		printk("error enabling pci device %pK\n", dev);
 		return -EIO;
 	}
 

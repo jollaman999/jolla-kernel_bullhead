@@ -74,7 +74,7 @@ static int to_atmarpd(enum atmarp_ctrl_type type, int itf, __be32 ip)
 
 static void link_vcc(struct clip_vcc *clip_vcc, struct atmarp_entry *entry)
 {
-	pr_debug("%p to entry %p (neigh %p)\n", clip_vcc, entry, entry->neigh);
+	pr_debug("%pK to entry %pK (neigh %pK)\n", clip_vcc, entry, entry->neigh);
 	clip_vcc->entry = entry;
 	clip_vcc->xoff = 0;	/* @@@ may overrun buffer by one packet */
 	clip_vcc->next = entry->vccs;
@@ -88,7 +88,7 @@ static void unlink_clip_vcc(struct clip_vcc *clip_vcc)
 	struct clip_vcc **walk;
 
 	if (!entry) {
-		pr_crit("!clip_vcc->entry (clip_vcc %p)\n", clip_vcc);
+		pr_crit("!clip_vcc->entry (clip_vcc %pK)\n", clip_vcc);
 		return;
 	}
 	netif_tx_lock_bh(entry->neigh->dev);	/* block clip_start_xmit() */
@@ -111,7 +111,7 @@ static void unlink_clip_vcc(struct clip_vcc *clip_vcc)
 				pr_crit("neigh_update failed with %d\n", error);
 			goto out;
 		}
-	pr_crit("ATMARP: failed (entry %p, vcc 0x%p)\n", entry, clip_vcc);
+	pr_crit("ATMARP: failed (entry %pK, vcc 0x%pK)\n", entry, clip_vcc);
 out:
 	netif_tx_unlock_bh(entry->neigh->dev);
 }
@@ -128,7 +128,7 @@ static int neigh_check_cb(struct neighbour *n)
 		unsigned long exp = cv->last_use + cv->idle_timeout;
 
 		if (cv->idle_timeout && time_after(jiffies, exp)) {
-			pr_debug("releasing vcc %p->%p of entry %p\n",
+			pr_debug("releasing vcc %pK->%pK of entry %pK\n",
 				 cv, cv->vcc, entry);
 			vcc_release_async(cv->vcc, -ETIMEDOUT);
 		}
@@ -149,7 +149,7 @@ static int neigh_check_cb(struct neighbour *n)
 		return 0;
 	}
 
-	pr_debug("expired neigh %p\n", n);
+	pr_debug("expired neigh %pK\n", n);
 	return 1;
 }
 
@@ -171,8 +171,8 @@ static int clip_arp_rcv(struct sk_buff *skb)
 		dev_kfree_skb_any(skb);
 		return 0;
 	}
-	pr_debug("pushing to %p\n", vcc);
-	pr_debug("using %p\n", CLIP_VCC(vcc)->old_push);
+	pr_debug("pushing to %pK\n", vcc);
+	pr_debug("using %pK\n", CLIP_VCC(vcc)->old_push);
 	CLIP_VCC(vcc)->old_push(vcc, skb);
 	return 0;
 }
@@ -199,7 +199,7 @@ static void clip_push(struct atm_vcc *vcc, struct sk_buff *skb)
 	}
 
 	if (!skb) {
-		pr_debug("removing VCC %p\n", clip_vcc);
+		pr_debug("removing VCC %pK\n", clip_vcc);
 		if (clip_vcc->entry)
 			unlink_clip_vcc(clip_vcc);
 		clip_vcc->old_push(vcc, NULL);	/* pass on the bad news */
@@ -248,7 +248,7 @@ static void clip_pop(struct atm_vcc *vcc, struct sk_buff *skb)
 	int old;
 	unsigned long flags;
 
-	pr_debug("(vcc %p)\n", vcc);
+	pr_debug("(vcc %pK)\n", vcc);
 	clip_vcc->old_pop(vcc, skb);
 	/* skb->dev == NULL in outbound ARP packets */
 	if (!dev)
@@ -266,7 +266,7 @@ static void clip_neigh_solicit(struct neighbour *neigh, struct sk_buff *skb)
 {
 	__be32 *ip = (__be32 *) neigh->primary_key;
 
-	pr_debug("(neigh %p, skb %p)\n", neigh, skb);
+	pr_debug("(neigh %pK, skb %pK)\n", neigh, skb);
 	to_atmarpd(act_need, PRIV(neigh->dev)->number, *ip);
 }
 
@@ -334,7 +334,7 @@ static netdev_tx_t clip_start_xmit(struct sk_buff *skb,
 	int old;
 	unsigned long flags;
 
-	pr_debug("(skb %p)\n", skb);
+	pr_debug("(skb %pK)\n", skb);
 	if (!dst) {
 		pr_err("skb_dst(skb) == NULL\n");
 		dev_kfree_skb(skb);
@@ -368,9 +368,9 @@ static netdev_tx_t clip_start_xmit(struct sk_buff *skb,
 		}
 		goto out_release_neigh;
 	}
-	pr_debug("neigh %p, vccs %p\n", entry, entry->vccs);
+	pr_debug("neigh %pK, vccs %pK\n", entry, entry->vccs);
 	ATM_SKB(skb)->vcc = vcc = entry->vccs->vcc;
-	pr_debug("using neighbour %p, vcc %p\n", n, vcc);
+	pr_debug("using neighbour %pK, vcc %pK\n", n, vcc);
 	if (entry->vccs->encap) {
 		void *here;
 
@@ -381,7 +381,7 @@ static netdev_tx_t clip_start_xmit(struct sk_buff *skb,
 	atomic_add(skb->truesize, &sk_atm(vcc)->sk_wmem_alloc);
 	ATM_SKB(skb)->atm_options = vcc->atm_options;
 	entry->vccs->last_use = jiffies;
-	pr_debug("atm_skb(%p)->vcc(%p)->dev(%p)\n", skb, vcc, vcc->dev);
+	pr_debug("atm_skb(%pK)->vcc(%pK)->dev(%pK)\n", skb, vcc, vcc->dev);
 	old = xchg(&entry->vccs->xoff, 1);	/* assume XOFF ... */
 	if (old) {
 		pr_warning("XOFF->XOFF transition\n");
@@ -418,7 +418,7 @@ static int clip_mkip(struct atm_vcc *vcc, int timeout)
 	clip_vcc = kmalloc(sizeof(struct clip_vcc), GFP_KERNEL);
 	if (!clip_vcc)
 		return -ENOMEM;
-	pr_debug("%p vcc %p\n", clip_vcc, vcc);
+	pr_debug("%pK vcc %pK\n", clip_vcc, vcc);
 	clip_vcc->vcc = vcc;
 	vcc->user_back = clip_vcc;
 	set_bit(ATM_VF_IS_CLIP, &vcc->flags);

@@ -271,7 +271,7 @@ static void recv_tasklet(unsigned long arg)
 	/* Process all packets in the RX queue */
 	while ((skb = skb_dequeue(&fmdev->rx_q))) {
 		if (skb->len < sizeof(struct fm_event_msg_hdr)) {
-			fmerr("skb(%p) has only %d bytes, "
+			fmerr("skb(%pK) has only %d bytes, "
 				"at least need %zu bytes to decode\n", skb,
 				skb->len, sizeof(struct fm_event_msg_hdr));
 			kfree_skb(skb);
@@ -327,7 +327,7 @@ static void recv_tasklet(unsigned long arg)
 			kfree_skb(skb);
 			atomic_set(&fmdev->tx_cnt, 1);
 		} else {
-			fmerr("Nobody claimed SKB(%p),purging\n", skb);
+			fmerr("Nobody claimed SKB(%pK),purging\n", skb);
 		}
 
 		/*
@@ -376,7 +376,7 @@ static void send_tasklet(unsigned long arg)
 	if (len < 0) {
 		kfree_skb(skb);
 		fmdev->resp_comp = NULL;
-		fmerr("TX tasklet failed to send skb(%p)\n", skb);
+		fmerr("TX tasklet failed to send skb(%pK)\n", skb);
 		atomic_set(&fmdev->tx_cnt, 1);
 	} else {
 		fmdev->last_tx_jiffies = jiffies;
@@ -1455,7 +1455,7 @@ static long fm_st_receive(void *arg, struct sk_buff *skb)
 	}
 
 	if (skb->cb[0] != FM_PKT_LOGICAL_CHAN_NUMBER) {
-		fmerr("Received SKB (%p) is not FM Channel 8 pkt\n", skb);
+		fmerr("Received SKB (%pK) is not FM Channel 8 pkt\n", skb);
 		return -EINVAL;
 	}
 

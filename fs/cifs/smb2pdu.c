@@ -669,7 +669,7 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
 	int rc = 0;
 	struct TCP_Server_Info *server;
 
-	cifs_dbg(FYI, "disconnect session %p\n", ses);
+	cifs_dbg(FYI, "disconnect session %pK\n", ses);
 
 	if (ses && (ses->server))
 		server = ses->server;
@@ -1732,7 +1732,7 @@ num_entries(char *bufstart, char *end_of_buf, char **lastentry, size_t size)
 
 		len = le32_to_cpu(entryptr->FileNameLength);
 		if ((char *)entryptr + len + size > end_of_buf) {
-			cifs_dbg(VFS, "directory entry name would overflow frame end of buf %p\n",
+			cifs_dbg(VFS, "directory entry name would overflow frame end of buf %pK\n",
 				 end_of_buf);
 			break;
 		}
@@ -1858,7 +1858,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
 			num_entries(srch_inf->srch_entries_start, end_of_smb,
 				    &srch_inf->last_entry, info_buf_size);
 	srch_inf->index_of_last_entry += srch_inf->entries_in_buffer;
-	cifs_dbg(FYI, "num entries %d last_index %lld srch start %p srch end %p\n",
+	cifs_dbg(FYI, "num entries %d last_index %lld srch start %pK srch end %pK\n",
 		 srch_inf->entries_in_buffer, srch_inf->index_of_last_entry,
 		 srch_inf->srch_entries_start, srch_inf->last_entry);
 	if (resp_buftype == CIFS_LARGE_BUFFER)

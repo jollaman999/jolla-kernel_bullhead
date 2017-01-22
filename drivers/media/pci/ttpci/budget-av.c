@@ -1371,7 +1371,7 @@ static void budget_av_irq(struct saa7146_dev *dev, u32 * isr)
 {
 	struct budget_av *budget_av = (struct budget_av *) dev->ext_priv;
 
-	dprintk(8, "dev: %p, budget_av: %p\n", dev, budget_av);
+	dprintk(8, "dev: %pK, budget_av: %pK\n", dev, budget_av);
 
 	if (*isr & MASK_10)
 		ttpci_budget_irq10_handler(dev, isr);
@@ -1382,7 +1382,7 @@ static int budget_av_detach(struct saa7146_dev *dev)
 	struct budget_av *budget_av = (struct budget_av *) dev->ext_priv;
 	int err;
 
-	dprintk(2, "dev: %p\n", dev);
+	dprintk(2, "dev: %pK\n", dev);
 
 	if (1 == budget_av->has_saa7113) {
 		saa7146_setgpio(dev, 0, SAA7146_GPIO_OUTLO);
@@ -1453,7 +1453,7 @@ static int budget_av_attach(struct saa7146_dev *dev, struct saa7146_pci_extensio
 	u8 *mac;
 	int err;
 
-	dprintk(2, "dev: %p\n", dev);
+	dprintk(2, "dev: %pK\n", dev);
 
 	if (!(budget_av = kzalloc(sizeof(struct budget_av), GFP_KERNEL)))
 		return -ENOMEM;

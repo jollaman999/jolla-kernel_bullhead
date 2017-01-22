@@ -312,7 +312,7 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
 	if (prefetch_invalid_gpte(vcpu, sp, spte, gpte))
 		return false;
 
-	pgprintk("%s: gpte %llx spte %p\n", __func__, (u64)gpte, spte);
+	pgprintk("%s: gpte %llx spte %pK\n", __func__, (u64)gpte, spte);
 
 	gfn = gpte_to_gfn(gpte);
 	pte_access = sp->role.access & gpte_access(vcpu, gpte);

@@ -709,7 +709,7 @@ static int tcm_qla2xxx_queue_tm_rsp(struct se_cmd *se_cmd)
 	struct qla_tgt_mgmt_cmd *mcmd = container_of(se_cmd,
 				struct qla_tgt_mgmt_cmd, se_cmd);
 
-	pr_debug("queue_tm_rsp: mcmd: %p func: 0x%02x response: 0x%02x\n",
+	pr_debug("queue_tm_rsp: mcmd: %pK func: 0x%02x response: 0x%02x\n",
 			mcmd, se_tmr->function, se_tmr->response);
 	/*
 	 * Do translation between TCM TM response codes and
@@ -773,7 +773,7 @@ static void tcm_qla2xxx_clear_nacl_from_fcport_map(struct qla_tgt_sess *sess)
 			       node, GFP_ATOMIC);
 	}
 
-	pr_debug("Removed from fcport_map: %p for WWNN: 0x%016LX, port_id: 0x%06x\n",
+	pr_debug("Removed from fcport_map: %pK for WWNN: 0x%016LX, port_id: 0x%06x\n",
 	    se_nacl, nacl->nport_wwnn, nacl->nport_id);
 	/*
 	 * Now clear the se_nacl and session pointers from our HW lport lookup
@@ -1154,7 +1154,7 @@ static struct qla_tgt_sess *tcm_qla2xxx_find_sess_by_s_id(
 		pr_debug("Unable to locate s_id: 0x%06x\n", key);
 		return NULL;
 	}
-	pr_debug("find_sess_by_s_id: located se_nacl: %p, initiatorname: %s\n",
+	pr_debug("find_sess_by_s_id: located se_nacl: %pK, initiatorname: %s\n",
 	    se_nacl, se_nacl->initiatorname);
 
 	nacl = container_of(se_nacl, struct tcm_qla2xxx_nacl, se_node_acl);
@@ -1230,7 +1230,7 @@ static void tcm_qla2xxx_set_sess_by_s_id(
 	qla_tgt_sess->se_sess = se_sess;
 	nacl->qla_tgt_sess = qla_tgt_sess;
 
-	pr_debug("Setup nacl->qla_tgt_sess %p by s_id for se_nacl: %p, initiatorname: %s\n",
+	pr_debug("Setup nacl->qla_tgt_sess %pK by s_id for se_nacl: %pK, initiatorname: %s\n",
 	    nacl->qla_tgt_sess, new_se_nacl, new_se_nacl->initiatorname);
 }
 
@@ -1334,7 +1334,7 @@ static void tcm_qla2xxx_set_sess_by_loop_id(
 	if (nacl->qla_tgt_sess != qla_tgt_sess)
 		nacl->qla_tgt_sess = qla_tgt_sess;
 
-	pr_debug("Setup nacl->qla_tgt_sess %p by loop_id for se_nacl: %p, initiatorname: %s\n",
+	pr_debug("Setup nacl->qla_tgt_sess %pK by loop_id for se_nacl: %pK, initiatorname: %s\n",
 	    nacl->qla_tgt_sess, new_se_nacl, new_se_nacl->initiatorname);
 }
 
@@ -1483,7 +1483,7 @@ static void tcm_qla2xxx_update_sess(struct qla_tgt_sess *sess, port_id_t s_id,
 
 
 	if (sess->loop_id != loop_id || sess->s_id.b24 != s_id.b24)
-		pr_info("Updating session %p from port %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x loop_id %d -> %d s_id %x:%x:%x -> %x:%x:%x\n",
+		pr_info("Updating session %pK from port %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x loop_id %d -> %d s_id %x:%x:%x -> %x:%x:%x\n",
 			sess,
 			sess->port_name[0], sess->port_name[1],
 			sess->port_name[2], sess->port_name[3],

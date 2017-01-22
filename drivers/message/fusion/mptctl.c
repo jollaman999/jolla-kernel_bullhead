@@ -208,7 +208,7 @@ mptctl_reply(MPT_ADAPTER *ioc, MPT_FRAME_HDR *req, MPT_FRAME_HDR *reply)
 		return 0;
 
 	dctlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "completing mpi function "
-	    "(0x%02X), req=%p, reply=%p\n", ioc->name,  req->u.hdr.Function,
+	    "(0x%02X), req=%pK, reply=%pK\n", ioc->name,  req->u.hdr.Function,
 	    req, reply));
 
 	/*
@@ -289,7 +289,7 @@ mptctl_taskmgmt_reply(MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf, MPT_FRAME_HDR *mr)
 		return 0;
 
 	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		"TaskMgmt completed (mf=%p, mr=%p)\n",
+		"TaskMgmt completed (mf=%pK, mr=%pK)\n",
 		ioc->name, mf, mr));
 
 	ioc->taskmgmt_cmds.status |= MPT_MGMT_STATUS_COMMAND_GOOD;
@@ -343,7 +343,7 @@ mptctl_do_taskmgmt(MPT_ADAPTER *ioc, u8 tm_type, u8 bus_id, u8 target_id)
 		goto tm_done;
 	}
 
-	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "TaskMgmt request (mf=%p)\n",
+	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "TaskMgmt request (mf=%pK)\n",
 		ioc->name, mf));
 
 	pScsiTm = (SCSITaskMgmt_t *) mf;
@@ -394,7 +394,7 @@ mptctl_do_taskmgmt(MPT_ADAPTER *ioc, u8 tm_type, u8 bus_id, u8 target_id)
 			dfailprintk(ioc,
 				printk(MYIOC_s_ERR_FMT
 				"TaskMgmt send_handshake FAILED!"
-				" (ioc %p, mf %p, rc=%d) \n", ioc->name,
+				" (ioc %pK, mf %pK, rc=%d) \n", ioc->name,
 				ioc, mf, retval));
 			mpt_free_msg_frame(ioc, mf);
 			mpt_clear_taskmgmt_in_progress_flag(ioc);
@@ -630,7 +630,7 @@ __mptctl_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 	if (copy_from_user(&khdr, uhdr, sizeof(khdr))) {
 		printk(KERN_ERR MYNAM "%s::mptctl_ioctl() @%d - "
-				"Unable to copy mpt_ioctl_header data @ %p\n",
+				"Unable to copy mpt_ioctl_header data @ %pK\n",
 				__FILE__, __LINE__, uhdr);
 		return -EFAULT;
 	}
@@ -713,7 +713,7 @@ static int mptctl_do_reset(unsigned long arg)
 
 	if (copy_from_user(&krinfo, urinfo, sizeof(struct mpt_ioctl_diag_reset))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_do_reset - "
-				"Unable to copy mpt_ioctl_diag_reset struct @ %p\n",
+				"Unable to copy mpt_ioctl_diag_reset struct @ %pK\n",
 				__FILE__, __LINE__, urinfo);
 		return -EFAULT;
 	}
@@ -761,7 +761,7 @@ mptctl_fw_download(unsigned long arg)
 
 	if (copy_from_user(&kfwdl, ufwdl, sizeof(struct mpt_fw_xfer))) {
 		printk(KERN_ERR MYNAM "%s@%d::_ioctl_fwdl - "
-				"Unable to copy mpt_fw_xfer struct @ %p\n",
+				"Unable to copy mpt_fw_xfer struct @ %pK\n",
 				__FILE__, __LINE__, ufwdl);
 		return -EFAULT;
 	}
@@ -822,7 +822,7 @@ mptctl_do_fw_download(int ioc, char __user *ufwbuf, size_t fwlen)
 
 	dctlprintk(iocp, printk(MYIOC_s_DEBUG_FMT
 	    "mptctl_do_fwdl called. mptctl_id = %xh.\n", iocp->name, mptctl_id));
-	dctlprintk(iocp, printk(MYIOC_s_DEBUG_FMT "DbG: kfwdl.bufp  = %p\n",
+	dctlprintk(iocp, printk(MYIOC_s_DEBUG_FMT "DbG: kfwdl.bufp  = %pK\n",
 	    iocp->name, ufwbuf));
 	dctlprintk(iocp, printk(MYIOC_s_DEBUG_FMT "DbG: kfwdl.fwlen = %d\n",
 	    iocp->name, (int)fwlen));
@@ -898,7 +898,7 @@ mptctl_do_fw_download(int ioc, char __user *ufwbuf, size_t fwlen)
 		goto fwdl_out;
 	}
 
-	dctlprintk(iocp, printk(MYIOC_s_DEBUG_FMT "DbG: sgl buffer = %p, sgfrags = %d\n",
+	dctlprintk(iocp, printk(MYIOC_s_DEBUG_FMT "DbG: sgl buffer = %pK, sgfrags = %d\n",
 	    iocp->name, sgl, numfrags));
 
 	/*
@@ -924,7 +924,7 @@ mptctl_do_fw_download(int ioc, char __user *ufwbuf, size_t fwlen)
 			n++;
 			if (copy_from_user(bl->kptr, ufwbuf+fw_bytes_copied, bl->len)) {
 				printk(MYIOC_s_ERR_FMT "%s@%d::_ioctl_fwdl - "
-					"Unable to copy f/w buffer hunk#%d @ %p\n",
+					"Unable to copy f/w buffer hunk#%d @ %pK\n",
 					iocp->name, __FILE__, __LINE__, n, ufwbuf);
 				goto fwdl_out;
 			}
@@ -1270,7 +1270,7 @@ mptctl_getiocinfo (unsigned long arg, unsigned int data_size)
 
 	if (copy_from_user(karg, uarg, data_size)) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_getiocinfo - "
-			"Unable to read in mpt_ioctl_iocinfo struct @ %p\n",
+			"Unable to read in mpt_ioctl_iocinfo struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		kfree(karg);
 		return -EFAULT;
@@ -1368,7 +1368,7 @@ mptctl_getiocinfo (unsigned long arg, unsigned int data_size)
 	 */
 	if (copy_to_user((char __user *)arg, karg, data_size)) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_getiocinfo - "
-			"Unable to write out mpt_ioctl_iocinfo struct @ %p\n",
+			"Unable to write out mpt_ioctl_iocinfo struct @ %pK\n",
 			ioc->name, __FILE__, __LINE__, uarg);
 		kfree(karg);
 		return -EFAULT;
@@ -1407,7 +1407,7 @@ mptctl_gettargetinfo (unsigned long arg)
 
 	if (copy_from_user(&karg, uarg, sizeof(struct mpt_ioctl_targetinfo))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_gettargetinfo - "
-			"Unable to read in mpt_ioctl_targetinfo struct @ %p\n",
+			"Unable to read in mpt_ioctl_targetinfo struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -1484,7 +1484,7 @@ mptctl_gettargetinfo (unsigned long arg)
 	if (copy_to_user((char __user *)arg, &karg,
 				sizeof(struct mpt_ioctl_targetinfo))) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_gettargetinfo - "
-			"Unable to write out mpt_ioctl_targetinfo struct @ %p\n",
+			"Unable to write out mpt_ioctl_targetinfo struct @ %pK\n",
 			ioc->name, __FILE__, __LINE__, uarg);
 		kfree(pmem);
 		return -EFAULT;
@@ -1494,7 +1494,7 @@ mptctl_gettargetinfo (unsigned long arg)
 	 */
 	if (copy_to_user(uarg->targetInfo, pmem, numBytes)) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_gettargetinfo - "
-			"Unable to write out mpt_ioctl_targetinfo struct @ %p\n",
+			"Unable to write out mpt_ioctl_targetinfo struct @ %pK\n",
 			ioc->name, __FILE__, __LINE__, pdata);
 		kfree(pmem);
 		return -EFAULT;
@@ -1523,7 +1523,7 @@ mptctl_readtest (unsigned long arg)
 
 	if (copy_from_user(&karg, uarg, sizeof(struct mpt_ioctl_test))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_readtest - "
-			"Unable to read in mpt_ioctl_test struct @ %p\n",
+			"Unable to read in mpt_ioctl_test struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -1555,7 +1555,7 @@ mptctl_readtest (unsigned long arg)
 	 */
 	if (copy_to_user((char __user *)arg, &karg, sizeof(struct mpt_ioctl_test))) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_readtest - "
-			"Unable to write out mpt_ioctl_test struct @ %p\n",
+			"Unable to write out mpt_ioctl_test struct @ %pK\n",
 			ioc->name, __FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -1584,7 +1584,7 @@ mptctl_eventquery (unsigned long arg)
 
 	if (copy_from_user(&karg, uarg, sizeof(struct mpt_ioctl_eventquery))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_eventquery - "
-			"Unable to read in mpt_ioctl_eventquery struct @ %p\n",
+			"Unable to read in mpt_ioctl_eventquery struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -1605,7 +1605,7 @@ mptctl_eventquery (unsigned long arg)
 	 */
 	if (copy_to_user((char __user *)arg, &karg, sizeof(struct mpt_ioctl_eventquery))) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_eventquery - "
-			"Unable to write out mpt_ioctl_eventquery struct @ %p\n",
+			"Unable to write out mpt_ioctl_eventquery struct @ %pK\n",
 			ioc->name, __FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -1623,7 +1623,7 @@ mptctl_eventenable (unsigned long arg)
 
 	if (copy_from_user(&karg, uarg, sizeof(struct mpt_ioctl_eventenable))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_eventenable - "
-			"Unable to read in mpt_ioctl_eventenable struct @ %p\n",
+			"Unable to read in mpt_ioctl_eventenable struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -1672,7 +1672,7 @@ mptctl_eventreport (unsigned long arg)
 
 	if (copy_from_user(&karg, uarg, sizeof(struct mpt_ioctl_eventreport))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_eventreport - "
-			"Unable to read in mpt_ioctl_eventreport struct @ %p\n",
+			"Unable to read in mpt_ioctl_eventreport struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -1706,7 +1706,7 @@ mptctl_eventreport (unsigned long arg)
 	numBytes = max * sizeof(MPT_IOCTL_EVENTS);
 	if (copy_to_user(uarg->eventData, ioc->events, numBytes)) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_eventreport - "
-			"Unable to write out mpt_ioctl_eventreport struct @ %p\n",
+			"Unable to write out mpt_ioctl_eventreport struct @ %pK\n",
 			ioc->name, __FILE__, __LINE__, ioc->events);
 		return -EFAULT;
 	}
@@ -1726,7 +1726,7 @@ mptctl_replace_fw (unsigned long arg)
 
 	if (copy_from_user(&karg, uarg, sizeof(struct mpt_ioctl_replace_fw))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_replace_fw - "
-			"Unable to read in mpt_ioctl_replace_fw struct @ %p\n",
+			"Unable to read in mpt_ioctl_replace_fw struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -1765,7 +1765,7 @@ mptctl_replace_fw (unsigned long arg)
 	if (copy_from_user(ioc->cached_fw, uarg->newImage, newFwSize)) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_replace_fw - "
 				"Unable to read in mpt_ioctl_replace_fw image "
-				"@ %p\n", ioc->name, __FILE__, __LINE__, uarg);
+				"@ %pK\n", ioc->name, __FILE__, __LINE__, uarg);
 		mpt_free_fw_memory(ioc);
 		return -EFAULT;
 	}
@@ -1800,7 +1800,7 @@ mptctl_mpt_command (unsigned long arg)
 
 	if (copy_from_user(&karg, uarg, sizeof(struct mpt_ioctl_command))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_mpt_command - "
-			"Unable to read in mpt_ioctl_command struct @ %p\n",
+			"Unable to read in mpt_ioctl_command struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -1902,7 +1902,7 @@ mptctl_do_mpt_command (struct mpt_ioctl_command karg, void __user *mfPtr)
 	 */
 	if (copy_from_user(mf, mfPtr, karg.dataSgeOffset * 4)) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_do_mpt_command - "
-			"Unable to read MF from mpt_ioctl_command struct @ %p\n",
+			"Unable to read MF from mpt_ioctl_command struct @ %pK\n",
 			ioc->name, __FILE__, __LINE__, mfPtr);
 		function = -1;
 		rc = -EFAULT;
@@ -1914,7 +1914,7 @@ mptctl_do_mpt_command (struct mpt_ioctl_command karg, void __user *mfPtr)
 
 	/* Verify that this request is allowed.
 	 */
-	dctlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "sending mpi function (0x%02X), req=%p\n",
+	dctlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "sending mpi function (0x%02X), req=%pK\n",
 	    ioc->name, hdr->Function, mf));
 
 	switch (function) {
@@ -2226,7 +2226,7 @@ mptctl_do_mpt_command (struct mpt_ioctl_command karg, void __user *mfPtr)
 					printk(MYIOC_s_ERR_FMT
 						"%s@%d::mptctl_do_mpt_command - Unable "
 						"to read user data "
-						"struct @ %p\n",
+						"struct @ %pK\n",
 						ioc->name, __FILE__, __LINE__,karg.dataOutBufPtr);
 					rc =  -EFAULT;
 					goto done_free_mem;
@@ -2278,7 +2278,7 @@ mptctl_do_mpt_command (struct mpt_ioctl_command karg, void __user *mfPtr)
 				sizeof(SCSITaskMgmt_t), (u32*)mf, CAN_SLEEP);
 			if (rc != 0) {
 				dfailprintk(ioc, printk(MYIOC_s_ERR_FMT
-				    "send_handshake FAILED! (ioc %p, mf %p)\n",
+				    "send_handshake FAILED! (ioc %pK, mf %pK)\n",
 				    ioc->name, ioc, mf));
 				mpt_clear_taskmgmt_in_progress_flag(ioc);
 				rc = -ENODATA;
@@ -2339,7 +2339,7 @@ retry_wait:
 				 ioc->ioctl_cmds.reply, sz)){
 				 printk(MYIOC_s_ERR_FMT
 				     "%s@%d::mptctl_do_mpt_command - "
-				 "Unable to write out reply frame %p\n",
+				 "Unable to write out reply frame %pK\n",
 				 ioc->name, __FILE__, __LINE__, karg.replyFrameBufPtr);
 				 rc =  -ENODATA;
 				 goto done_free_mem;
@@ -2355,7 +2355,7 @@ retry_wait:
 			if (copy_to_user(karg.senseDataPtr,
 				ioc->ioctl_cmds.sense, sz)) {
 				printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_do_mpt_command - "
-				"Unable to write sense data to user %p\n",
+				"Unable to write sense data to user %pK\n",
 				ioc->name, __FILE__, __LINE__,
 				karg.senseDataPtr);
 				rc =  -ENODATA;
@@ -2373,7 +2373,7 @@ retry_wait:
 		if (copy_to_user(karg.dataInBufPtr,
 				 bufIn.kptr, karg.dataInSize)) {
 			printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_do_mpt_command - "
-				"Unable to write data to user %p\n",
+				"Unable to write data to user %pK\n",
 				ioc->name, __FILE__, __LINE__,
 				karg.dataInBufPtr);
 			rc =  -ENODATA;
@@ -2447,7 +2447,7 @@ mptctl_hp_hostinfo(unsigned long arg, unsigned int data_size)
 
 	if (copy_from_user(&karg, uarg, sizeof(hp_host_info_t))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_hp_host_info - "
-			"Unable to read in hp_host_info struct @ %p\n",
+			"Unable to read in hp_host_info struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -2649,7 +2649,7 @@ retry_wait:
 	 */
 	if (copy_to_user((char __user *)arg, &karg, sizeof(hp_host_info_t))) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_hpgethostinfo - "
-			"Unable to write out hp_host_info @ %p\n",
+			"Unable to write out hp_host_info @ %pK\n",
 			ioc->name, __FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -2687,7 +2687,7 @@ mptctl_hp_targetinfo(unsigned long arg)
 
 	if (copy_from_user(&karg, uarg, sizeof(hp_target_info_t))) {
 		printk(KERN_ERR MYNAM "%s@%d::mptctl_hp_targetinfo - "
-			"Unable to read in hp_host_targetinfo struct @ %p\n",
+			"Unable to read in hp_host_targetinfo struct @ %pK\n",
 				__FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}
@@ -2800,7 +2800,7 @@ mptctl_hp_targetinfo(unsigned long arg)
 	 */
 	if (copy_to_user((char __user *)arg, &karg, sizeof(hp_target_info_t))) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_hp_target_info - "
-			"Unable to write out mpt_ioctl_targetinfo struct @ %p\n",
+			"Unable to write out mpt_ioctl_targetinfo struct @ %pK\n",
 			ioc->name, __FILE__, __LINE__, uarg);
 		return -EFAULT;
 	}

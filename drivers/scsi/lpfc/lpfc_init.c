@@ -2432,7 +2432,7 @@ lpfc_cleanup(struct lpfc_vport *vport)
 						&vport->fc_nodes, nlp_listp) {
 				lpfc_printf_vlog(ndlp->vport, KERN_ERR,
 						LOG_NODE,
-						"0282 did:x%x ndlp:x%p "
+						"0282 did:x%x ndlp:x%pK "
 						"usgmap:x%x refcnt:%d\n",
 						ndlp->nlp_DID, (void *)ndlp,
 						ndlp->nlp_usg_map,
@@ -5968,7 +5968,7 @@ lpfc_setup_bg(struct lpfc_hba *phba, struct Scsi_Host *shost)
 			if (_dump_buf_data) {
 				lpfc_printf_log(phba, KERN_ERR, LOG_BG,
 					"9043 BLKGRD: allocated %d pages for "
-				       "_dump_buf_data at 0x%p\n",
+				       "_dump_buf_data at 0x%pK\n",
 				       (1 << pagecnt), _dump_buf_data);
 				_dump_buf_data_order = pagecnt;
 				memset(_dump_buf_data, 0,
@@ -5983,7 +5983,7 @@ lpfc_setup_bg(struct lpfc_hba *phba, struct Scsi_Host *shost)
 			       "memory for hexdump\n");
 	} else
 		lpfc_printf_log(phba, KERN_ERR, LOG_BG,
-			"9045 BLKGRD: already allocated _dump_buf_data=0x%p"
+			"9045 BLKGRD: already allocated _dump_buf_data=0x%pK"
 		       "\n", _dump_buf_data);
 	if (!_dump_buf_dif) {
 		while (pagecnt) {
@@ -5992,7 +5992,7 @@ lpfc_setup_bg(struct lpfc_hba *phba, struct Scsi_Host *shost)
 			if (_dump_buf_dif) {
 				lpfc_printf_log(phba, KERN_ERR, LOG_BG,
 					"9046 BLKGRD: allocated %d pages for "
-				       "_dump_buf_dif at 0x%p\n",
+				       "_dump_buf_dif at 0x%pK\n",
 				       (1 << pagecnt), _dump_buf_dif);
 				_dump_buf_dif_order = pagecnt;
 				memset(_dump_buf_dif, 0,
@@ -6007,7 +6007,7 @@ lpfc_setup_bg(struct lpfc_hba *phba, struct Scsi_Host *shost)
 			       "memory for hexdump\n");
 	} else
 		lpfc_printf_log(phba, KERN_ERR, LOG_BG,
-			"9048 BLKGRD: already allocated _dump_buf_dif=0x%p\n",
+			"9048 BLKGRD: already allocated _dump_buf_dif=0x%pK\n",
 		       _dump_buf_dif);
 }
 
@@ -10998,14 +10998,14 @@ lpfc_exit(void)
 		fc_release_transport(lpfc_vport_transport_template);
 	if (_dump_buf_data) {
 		printk(KERN_ERR	"9062 BLKGRD: freeing %lu pages for "
-				"_dump_buf_data at 0x%p\n",
+				"_dump_buf_data at 0x%pK\n",
 				(1L << _dump_buf_data_order), _dump_buf_data);
 		free_pages((unsigned long)_dump_buf_data, _dump_buf_data_order);
 	}
 
 	if (_dump_buf_dif) {
 		printk(KERN_ERR	"9049 BLKGRD: freeing %lu pages for "
-				"_dump_buf_dif at 0x%p\n",
+				"_dump_buf_dif at 0x%pK\n",
 				(1L << _dump_buf_dif_order), _dump_buf_dif);
 		free_pages((unsigned long)_dump_buf_dif, _dump_buf_dif_order);
 	}

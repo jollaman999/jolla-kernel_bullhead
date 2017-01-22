@@ -94,7 +94,7 @@ generic_create_cred(struct rpc_auth *auth, struct auth_cred *acred, int flags)
 	gcred->acred.machine_cred = acred->machine_cred;
 	gcred->acred.principal = acred->principal;
 
-	dprintk("RPC:       allocated %s cred %p for uid %d gid %d\n",
+	dprintk("RPC:       allocated %s cred %pK for uid %d gid %d\n",
 			gcred->acred.machine_cred ? "machine" : "generic",
 			gcred,
 			from_kuid(&init_user_ns, acred->uid),
@@ -107,7 +107,7 @@ generic_free_cred(struct rpc_cred *cred)
 {
 	struct generic_cred *gcred = container_of(cred, struct generic_cred, gc_base);
 
-	dprintk("RPC:       generic_free_cred %p\n", gcred);
+	dprintk("RPC:       generic_free_cred %pK\n", gcred);
 	if (gcred->acred.group_info != NULL)
 		put_group_info(gcred->acred.group_info);
 	kfree(gcred);

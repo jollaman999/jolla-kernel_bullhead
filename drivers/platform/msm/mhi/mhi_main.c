@@ -108,7 +108,7 @@ int mhi_init_pcie_device(struct mhi_pcie_dev_info *mhi_pcie_dev)
 		goto mhi_pcie_read_ep_config_err;
 	}
 
-	mhi_log(MHI_MSG_INFO, "Device BAR0 address is at 0x%p\n",
+	mhi_log(MHI_MSG_INFO, "Device BAR0 address is at 0x%pK\n",
 			mhi_pcie_dev->core.bar0_base);
 	ret_val = pci_request_region(pcie_device, 0, "mhi");
 	if (ret_val)
@@ -1429,7 +1429,7 @@ void mhi_process_db(struct mhi_device_ctxt *mhi_dev_ctxt,
 		  uintptr_t chan, u32 val)
 {
 	mhi_log(MHI_MSG_VERBOSE,
-			"db.set addr: %p io_offset 0x%lx val:0x%x\n",
+			"db.set addr: %pK io_offset 0x%lx val:0x%x\n",
 			io_addr, chan, val);
 
 	mhi_update_ctxt(mhi_dev_ctxt, io_addr, chan, val);
@@ -1472,7 +1472,7 @@ void mhi_reg_write(struct mhi_device_ctxt *mhi_dev_ctxt,
 		   void __iomem *io_addr,
 		   uintptr_t io_offset, u32 val)
 {
-	mhi_log(MHI_MSG_VERBOSE, "d.s 0x%p off: 0x%lx 0x%x\n",
+	mhi_log(MHI_MSG_VERBOSE, "d.s 0x%pK off: 0x%lx 0x%x\n",
 					io_addr, io_offset, val);
 	iowrite32(val, io_addr + io_offset);
 	wmb();

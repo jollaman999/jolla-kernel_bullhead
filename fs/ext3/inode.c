@@ -65,7 +65,7 @@ int ext3_forget(handle_t *handle, int is_metadata, struct inode *inode,
 	trace_ext3_forget(inode, is_metadata, blocknr);
 	BUFFER_TRACE(bh, "enter");
 
-	jbd_debug(4, "forgetting bh %p: is_metadata = %d, mode %o, "
+	jbd_debug(4, "forgetting bh %pK: is_metadata = %d, mode %o, "
 		  "data mode %lx\n",
 		  bh, is_metadata, inode->i_mode,
 		  test_opt(inode->i_sb, DATA_FLAGS));
@@ -169,7 +169,7 @@ static int truncate_restart_transaction(handle_t *handle, struct inode *inode)
 {
 	int ret;
 
-	jbd_debug(2, "restarting handle %p\n", handle);
+	jbd_debug(2, "restarting handle %pK\n", handle);
 	/*
 	 * Drop truncate_mutex to avoid deadlock with ext3_get_blocks_handle
 	 * At this moment, get_block can be called only for blocks inside
@@ -3519,7 +3519,7 @@ void ext3_dirty_inode(struct inode *inode, int flags)
 		printk(KERN_EMERG "%s: transactions do not match!\n",
 		       __func__);
 	} else {
-		jbd_debug(5, "marking dirty.  outer handle=%p\n",
+		jbd_debug(5, "marking dirty.  outer handle=%pK\n",
 				current_handle);
 		ext3_mark_inode_dirty(handle, inode);
 	}

@@ -2299,7 +2299,7 @@ static int self_check_in_wl_tree(const struct ubi_device *ubi,
 		return 0;
 
 	ubi_err(ubi->ubi_num,
-		"self-check failed for PEB %d, EC %d, RB-tree %p ",
+		"self-check failed for PEB %d, EC %d, RB-tree %pK ",
 		e->pnum, e->ec, root);
 	dump_stack();
 	return -EINVAL;

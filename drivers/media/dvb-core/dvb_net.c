@@ -315,7 +315,7 @@ static int handle_ule_extensions( struct dvb_net_priv *p )
 			return l;	/* Stop extension header processing and discard SNDU. */
 		total_ext_len += l;
 #ifdef ULE_DEBUG
-		dprintk("handle_ule_extensions: ule_next_hdr=%p, ule_sndu_type=%i, "
+		dprintk("handle_ule_extensions: ule_next_hdr=%pK, ule_sndu_type=%i, "
 			"l=%i, total_ext_len=%i\n", p->ule_next_hdr,
 			(int) p->ule_sndu_type, l, total_ext_len);
 #endif
@@ -774,7 +774,7 @@ static void dvb_net_ule( struct net_device *dev, const u8 *buf, size_t buf_len )
 			// printk(KERN_WARNING "More data in current TS: [%#x %#x %#x %#x]\n",
 			//	*(from_where + 0), *(from_where + 1),
 			//	*(from_where + 2), *(from_where + 3));
-			// printk(KERN_WARNING "ts @ %p, stopped @ %p:\n", ts, from_where + 0);
+			// printk(KERN_WARNING "ts @ %pK, stopped @ %pK:\n", ts, from_where + 0);
 			// hexdump(ts, 188);
 		} else {
 			new_ts = 1;
@@ -796,10 +796,10 @@ static int dvb_net_ts_callback(const u8 *buffer1, size_t buffer1_len,
 	struct net_device *dev = feed->priv;
 
 	if (buffer2)
-		printk(KERN_WARNING "buffer2 not NULL: %p.\n", buffer2);
+		printk(KERN_WARNING "buffer2 not NULL: %pK.\n", buffer2);
 	if (buffer1_len > 32768)
 		printk(KERN_WARNING "length > 32k: %zu.\n", buffer1_len);
-	/* printk("TS callback: %u bytes, %u TS cells @ %p.\n",
+	/* printk("TS callback: %u bytes, %u TS cells @ %pK.\n",
 		  buffer1_len, buffer1_len / TS_SZ, buffer1); */
 	dvb_net_ule(dev, buffer1, buffer1_len);
 	return 0;

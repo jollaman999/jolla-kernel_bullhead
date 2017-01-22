@@ -300,12 +300,12 @@ static int qfec_rbd_init(struct net_device *dev, struct buf_desc *p_bd)
 		return 0;
 
 	/* debug messages */
-	QFEC_LOG(QFEC_LOG_DBG2, "%s: %p bd\n", __func__, p_bd);
+	QFEC_LOG(QFEC_LOG_DBG2, "%s: %pK bd\n", __func__, p_bd);
 
-	QFEC_LOG(QFEC_LOG_DBG2, "%s: %p skb\n", __func__, skb);
+	QFEC_LOG(QFEC_LOG_DBG2, "%s: %pK skb\n", __func__, skb);
 
 	QFEC_LOG(QFEC_LOG_DBG2,
-		"%s: %p p_bd, %p data, %p skb_put, %p virt, %p p_buf, %p p\n",
+		"%s: %pK p_bd, %pK data, %pK skb_put, %pK virt, %pK p_buf, %pK p\n",
 		__func__, (void *)p_bd,
 		(void *)skb->data, v, /*(void *)skb_put(skb, ETH_BUF_SIZE), */
 		(void *)qfec_bd_virt_get(p_bd), (void *)qfec_bd_pbuf_get(p_bd),
@@ -1368,7 +1368,7 @@ static int qfec_mem_alloc(struct net_device *dev)
 	struct qfec_priv   *priv = netdev_priv(dev);
 	int bd_size;
 
-	QFEC_LOG(QFEC_LOG_DBG, "%s: %p dev\n", __func__, dev);
+	QFEC_LOG(QFEC_LOG_DBG, "%s: %pK dev\n", __func__, dev);
 
 	if (qfec_hw_feature_enhanced_des(priv) &&
 	    qfec_hw_feature_advanced_tstamp(priv))
@@ -2165,7 +2165,7 @@ static int qfec_open(struct net_device *dev)
 	int                 res = 0;
 	uint32_t            bd_flag = 0;
 
-	QFEC_LOG(QFEC_LOG_DBG, "%s: %p dev\n", __func__, dev);
+	QFEC_LOG(QFEC_LOG_DBG, "%s: %pK dev\n", __func__, dev);
 
 	if (!dev)  {
 		res = -EINVAL;
@@ -2926,7 +2926,7 @@ static int qfec_map_resource(struct platform_device *plat,
 	if (!*addr)
 		return -ENOMEM;
 
-	QFEC_LOG(QFEC_LOG_DBG, " %s: io mapped from %p to %p\n",
+	QFEC_LOG(QFEC_LOG_DBG, " %s: io mapped from %pK to %pK\n",
 		__func__, (void *)res->start, *addr);
 
 	*priv_res = res;

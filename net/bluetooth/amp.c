@@ -21,7 +21,7 @@
 /* Remote AMP Controllers interface */
 void amp_ctrl_get(struct amp_ctrl *ctrl)
 {
-	BT_DBG("ctrl %p orig refcnt %d", ctrl,
+	BT_DBG("ctrl %pK orig refcnt %d", ctrl,
 	       atomic_read(&ctrl->kref.refcount));
 
 	kref_get(&ctrl->kref);
@@ -31,7 +31,7 @@ static void amp_ctrl_destroy(struct kref *kref)
 {
 	struct amp_ctrl *ctrl = container_of(kref, struct amp_ctrl, kref);
 
-	BT_DBG("ctrl %p", ctrl);
+	BT_DBG("ctrl %pK", ctrl);
 
 	kfree(ctrl->assoc);
 	kfree(ctrl);
@@ -39,7 +39,7 @@ static void amp_ctrl_destroy(struct kref *kref)
 
 int amp_ctrl_put(struct amp_ctrl *ctrl)
 {
-	BT_DBG("ctrl %p orig refcnt %d", ctrl,
+	BT_DBG("ctrl %pK orig refcnt %d", ctrl,
 	       atomic_read(&ctrl->kref.refcount));
 
 	return kref_put(&ctrl->kref, &amp_ctrl_destroy);
@@ -60,7 +60,7 @@ struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr, u8 id)
 	list_add(&ctrl->list, &mgr->amp_ctrls);
 	mutex_unlock(&mgr->amp_ctrls_lock);
 
-	BT_DBG("mgr %p ctrl %p", mgr, ctrl);
+	BT_DBG("mgr %pK ctrl %pK", mgr, ctrl);
 
 	return ctrl;
 }
@@ -69,7 +69,7 @@ void amp_ctrl_list_flush(struct amp_mgr *mgr)
 {
 	struct amp_ctrl *ctrl, *n;
 
-	BT_DBG("mgr %p", mgr);
+	BT_DBG("mgr %pK", mgr);
 
 	mutex_lock(&mgr->amp_ctrls_lock);
 	list_for_each_entry_safe(ctrl, n, &mgr->amp_ctrls, list) {
@@ -83,7 +83,7 @@ struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id)
 {
 	struct amp_ctrl *ctrl;
 
-	BT_DBG("mgr %p id %d", mgr, id);
+	BT_DBG("mgr %pK id %d", mgr, id);
 
 	mutex_lock(&mgr->amp_ctrls_lock);
 	list_for_each_entry(ctrl, &mgr->amp_ctrls, list) {
@@ -117,7 +117,7 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
 	if (!hcon)
 		return NULL;
 
-	BT_DBG("hcon %p dst %pMR", hcon, dst);
+	BT_DBG("hcon %pK dst %pMR", hcon, dst);
 
 	hcon->state = BT_CONNECT;
 	hcon->attempt++;
@@ -175,7 +175,7 @@ int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
 	if (!hci_conn_check_link_mode(conn))
 		return -EACCES;
 
-	BT_DBG("conn %p key_type %d", conn, conn->key_type);
+	BT_DBG("conn %pK key_type %d", conn, conn->key_type);
 
 	/* Legacy key */
 	if (conn->key_type < 3) {
@@ -188,7 +188,7 @@ int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
 
 	key = hci_find_link_key(hdev, &conn->dst);
 	if (!key) {
-		BT_DBG("No Link key for conn %p dst %pMR", conn, &conn->dst);
+		BT_DBG("No Link key for conn %pK dst %pMR", conn, &conn->dst);
 		return -EACCES;
 	}
 
@@ -287,7 +287,7 @@ static bool amp_write_rem_assoc_frag(struct hci_dev *hdev,
 		return false;
 	}
 
-	BT_DBG("hcon %p ctrl %p frag_len %u assoc_len %u rem_len %u",
+	BT_DBG("hcon %pK ctrl %pK frag_len %u assoc_len %u rem_len %u",
 	       hcon, ctrl, frag_len, ctrl->assoc_len, ctrl->assoc_rem_len);
 
 	cp->phy_handle = hcon->handle;
@@ -332,7 +332,7 @@ void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle)
 	if (!hcon)
 		return;
 
-	BT_DBG("%s phy handle 0x%2.2x hcon %p", hdev->name, handle, hcon);
+	BT_DBG("%s phy handle 0x%2.2x hcon %pK", hdev->name, handle, hcon);
 
 	amp_write_rem_assoc_frag(hdev, hcon);
 }
@@ -344,7 +344,7 @@ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
 
 	cp.phy_handle = hcon->handle;
 
-	BT_DBG("%s hcon %p phy handle 0x%2.2x", hdev->name, hcon,
+	BT_DBG("%s hcon %pK phy handle 0x%2.2x", hdev->name, hcon,
 	       hcon->handle);
 
 	if (phylink_gen_key(mgr->l2cap_conn->hcon, cp.key, &cp.key_len,
@@ -363,7 +363,7 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
 
 	cp.phy_handle = hcon->handle;
 
-	BT_DBG("%s hcon %p phy handle 0x%2.2x", hdev->name, hcon,
+	BT_DBG("%s hcon %pK phy handle 0x%2.2x", hdev->name, hcon,
 	       hcon->handle);
 
 	if (phylink_gen_key(mgr->l2cap_conn->hcon, cp.key, &cp.key_len,
@@ -381,7 +381,7 @@ void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon)
 	struct amp_mgr *mgr = hs_hcon->amp_mgr;
 	struct l2cap_chan *bredr_chan;
 
-	BT_DBG("bredr_hcon %p hs_hcon %p mgr %p", bredr_hcon, hs_hcon, mgr);
+	BT_DBG("bredr_hcon %pK hs_hcon %pK mgr %pK", bredr_hcon, hs_hcon, mgr);
 
 	if (!bredr_hdev || !mgr || !mgr->bredr_chan)
 		return;
@@ -409,7 +409,7 @@ void amp_create_logical_link(struct l2cap_chan *chan)
 	struct hci_cp_create_accept_logical_link cp;
 	struct hci_dev *hdev;
 
-	BT_DBG("chan %p hs_hcon %p dst %pMR", chan, hs_hcon, chan->conn->dst);
+	BT_DBG("chan %pK hs_hcon %pK dst %pMR", chan, hs_hcon, chan->conn->dst);
 
 	if (!hs_hcon)
 		return;
@@ -450,7 +450,7 @@ void amp_disconnect_logical_link(struct hci_chan *hchan)
 	struct hci_cp_disconn_logical_link cp;
 
 	if (hcon->state != BT_CONNECTED) {
-		BT_DBG("hchan %p not connected", hchan);
+		BT_DBG("hchan %pK not connected", hchan);
 		return;
 	}
 
@@ -460,7 +460,7 @@ void amp_disconnect_logical_link(struct hci_chan *hchan)
 
 void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason)
 {
-	BT_DBG("hchan %p", hchan);
+	BT_DBG("hchan %pK", hchan);
 
 	hci_chan_del(hchan);
 }

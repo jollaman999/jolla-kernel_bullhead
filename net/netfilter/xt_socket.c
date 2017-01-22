@@ -159,7 +159,7 @@ xt_socket_get4_sk(const struct sk_buff *skb, struct xt_action_param *par)
 				   saddr, daddr, sport, dport,
 				   par->in, NFT_LOOKUP_ANY);
 
-	pr_debug("proto %hhu %pI4:%hu -> %pI4:%hu (orig %pI4:%hu) sock %p\n",
+	pr_debug("proto %hhu %pI4:%hu -> %pI4:%hu (orig %pI4:%hu) sock %pK\n",
 		 protocol, &saddr, ntohs(sport),
 		 &daddr, ntohs(dport),
 		 &iph->daddr, hp ? ntohs(hp->dest) : 0, sk);
@@ -321,7 +321,7 @@ xt_socket_get6_sk(const struct sk_buff *skb, struct xt_action_param *par)
 				   par->in, NFT_LOOKUP_ANY);
 
 	pr_debug("proto %hhd %pI6:%hu -> %pI6:%hu "
-		 "(orig %pI6:%hu) sock %p\n",
+		 "(orig %pI6:%hu) sock %pK\n",
 		 tproto, saddr, ntohs(sport),
 		 daddr, ntohs(dport),
 		 &iph->daddr, hp ? ntohs(hp->dest) : 0, sk);

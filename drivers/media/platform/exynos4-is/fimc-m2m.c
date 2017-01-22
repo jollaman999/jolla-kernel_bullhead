@@ -219,7 +219,7 @@ static void fimc_buf_queue(struct vb2_buffer *vb)
 {
 	struct fimc_ctx *ctx = vb2_get_drv_priv(vb->vb2_queue);
 
-	dbg("ctx: %p, ctx->state: 0x%x", ctx, ctx->state);
+	dbg("ctx: %pK, ctx->state: 0x%x", ctx, ctx->state);
 
 	if (ctx->m2m_ctx)
 		v4l2_m2m_buf_queue(ctx->m2m_ctx, vb);

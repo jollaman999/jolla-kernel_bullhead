@@ -31,43 +31,43 @@
 void ucc_fast_dump_regs(struct ucc_fast_private * uccf)
 {
 	printk(KERN_INFO "UCC%u Fast registers:\n", uccf->uf_info->ucc_num);
-	printk(KERN_INFO "Base address: 0x%p\n", uccf->uf_regs);
+	printk(KERN_INFO "Base address: 0x%pK\n", uccf->uf_regs);
 
-	printk(KERN_INFO "gumr  : addr=0x%p, val=0x%08x\n",
+	printk(KERN_INFO "gumr  : addr=0x%pK, val=0x%08x\n",
 		  &uccf->uf_regs->gumr, in_be32(&uccf->uf_regs->gumr));
-	printk(KERN_INFO "upsmr : addr=0x%p, val=0x%08x\n",
+	printk(KERN_INFO "upsmr : addr=0x%pK, val=0x%08x\n",
 		  &uccf->uf_regs->upsmr, in_be32(&uccf->uf_regs->upsmr));
-	printk(KERN_INFO "utodr : addr=0x%p, val=0x%04x\n",
+	printk(KERN_INFO "utodr : addr=0x%pK, val=0x%04x\n",
 		  &uccf->uf_regs->utodr, in_be16(&uccf->uf_regs->utodr));
-	printk(KERN_INFO "udsr  : addr=0x%p, val=0x%04x\n",
+	printk(KERN_INFO "udsr  : addr=0x%pK, val=0x%04x\n",
 		  &uccf->uf_regs->udsr, in_be16(&uccf->uf_regs->udsr));
-	printk(KERN_INFO "ucce  : addr=0x%p, val=0x%08x\n",
+	printk(KERN_INFO "ucce  : addr=0x%pK, val=0x%08x\n",
 		  &uccf->uf_regs->ucce, in_be32(&uccf->uf_regs->ucce));
-	printk(KERN_INFO "uccm  : addr=0x%p, val=0x%08x\n",
+	printk(KERN_INFO "uccm  : addr=0x%pK, val=0x%08x\n",
 		  &uccf->uf_regs->uccm, in_be32(&uccf->uf_regs->uccm));
-	printk(KERN_INFO "uccs  : addr=0x%p, val=0x%02x\n",
+	printk(KERN_INFO "uccs  : addr=0x%pK, val=0x%02x\n",
 		  &uccf->uf_regs->uccs, in_8(&uccf->uf_regs->uccs));
-	printk(KERN_INFO "urfb  : addr=0x%p, val=0x%08x\n",
+	printk(KERN_INFO "urfb  : addr=0x%pK, val=0x%08x\n",
 		  &uccf->uf_regs->urfb, in_be32(&uccf->uf_regs->urfb));
-	printk(KERN_INFO "urfs  : addr=0x%p, val=0x%04x\n",
+	printk(KERN_INFO "urfs  : addr=0x%pK, val=0x%04x\n",
 		  &uccf->uf_regs->urfs, in_be16(&uccf->uf_regs->urfs));
-	printk(KERN_INFO "urfet : addr=0x%p, val=0x%04x\n",
+	printk(KERN_INFO "urfet : addr=0x%pK, val=0x%04x\n",
 		  &uccf->uf_regs->urfet, in_be16(&uccf->uf_regs->urfet));
-	printk(KERN_INFO "urfset: addr=0x%p, val=0x%04x\n",
+	printk(KERN_INFO "urfset: addr=0x%pK, val=0x%04x\n",
 		  &uccf->uf_regs->urfset, in_be16(&uccf->uf_regs->urfset));
-	printk(KERN_INFO "utfb  : addr=0x%p, val=0x%08x\n",
+	printk(KERN_INFO "utfb  : addr=0x%pK, val=0x%08x\n",
 		  &uccf->uf_regs->utfb, in_be32(&uccf->uf_regs->utfb));
-	printk(KERN_INFO "utfs  : addr=0x%p, val=0x%04x\n",
+	printk(KERN_INFO "utfs  : addr=0x%pK, val=0x%04x\n",
 		  &uccf->uf_regs->utfs, in_be16(&uccf->uf_regs->utfs));
-	printk(KERN_INFO "utfet : addr=0x%p, val=0x%04x\n",
+	printk(KERN_INFO "utfet : addr=0x%pK, val=0x%04x\n",
 		  &uccf->uf_regs->utfet, in_be16(&uccf->uf_regs->utfet));
-	printk(KERN_INFO "utftt : addr=0x%p, val=0x%04x\n",
+	printk(KERN_INFO "utftt : addr=0x%pK, val=0x%04x\n",
 		  &uccf->uf_regs->utftt, in_be16(&uccf->uf_regs->utftt));
-	printk(KERN_INFO "utpt  : addr=0x%p, val=0x%04x\n",
+	printk(KERN_INFO "utpt  : addr=0x%pK, val=0x%04x\n",
 		  &uccf->uf_regs->utpt, in_be16(&uccf->uf_regs->utpt));
-	printk(KERN_INFO "urtry : addr=0x%p, val=0x%08x\n",
+	printk(KERN_INFO "urtry : addr=0x%pK, val=0x%08x\n",
 		  &uccf->uf_regs->urtry, in_be32(&uccf->uf_regs->urtry));
-	printk(KERN_INFO "guemr : addr=0x%p, val=0x%02x\n",
+	printk(KERN_INFO "guemr : addr=0x%pK, val=0x%02x\n",
 		  &uccf->uf_regs->guemr, in_8(&uccf->uf_regs->guemr));
 }
 EXPORT_SYMBOL(ucc_fast_dump_regs);

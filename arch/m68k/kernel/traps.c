@@ -562,7 +562,7 @@ static inline void bus_error030 (struct frame *fp)
 		mmusr = temp;
 
 #ifdef DEBUG
-		printk("mmusr is %#x for addr %#lx in task %p\n",
+		printk("mmusr is %#x for addr %#lx in task %pK\n",
 		       mmusr, addr, current);
 		printk("descriptor address is %#lx, contents %#lx\n",
 		       __va(desc), *(unsigned long *)__va(desc));
@@ -676,7 +676,7 @@ static inline void bus_error030 (struct frame *fp)
 	mmusr = temp;
 
 #ifdef DEBUG
-	printk ("mmusr is %#x for addr %#lx in task %p\n",
+	printk ("mmusr is %#x for addr %#lx in task %pK\n",
 		mmusr, addr, current);
 	printk ("descriptor address is %#lx, contents %#lx\n",
 		__va(desc), *(unsigned long *)__va(desc));
@@ -888,13 +888,13 @@ void show_registers(struct pt_regs *regs)
 
 	print_modules();
 	printk("PC: [<%08lx>] %pS\n", regs->pc, (void *)regs->pc);
-	printk("SR: %04x  SP: %p  a2: %08lx\n", regs->sr, regs, regs->a2);
+	printk("SR: %04x  SP: %pK  a2: %08lx\n", regs->sr, regs, regs->a2);
 	printk("d0: %08lx    d1: %08lx    d2: %08lx    d3: %08lx\n",
 	       regs->d0, regs->d1, regs->d2, regs->d3);
 	printk("d4: %08lx    d5: %08lx    a0: %08lx    a1: %08lx\n",
 	       regs->d4, regs->d5, regs->a0, regs->a1);
 
-	printk("Process %s (pid: %d, task=%p)\n",
+	printk("Process %s (pid: %d, task=%pK)\n",
 		current->comm, task_pid_nr(current), current);
 	addr = (unsigned long)&fp->un;
 	printk("Frame format=%X ", regs->format);

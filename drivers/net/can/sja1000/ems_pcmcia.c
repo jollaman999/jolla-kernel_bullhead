@@ -236,7 +236,7 @@ static int ems_pcmcia_add_card(struct pcmcia_device *pdev, unsigned long base)
 			card->channels++;
 
 			printk(KERN_INFO "%s: registered %s on channel "
-			       "#%d at 0x%p, irq %d\n", DRV_NAME, dev->name,
+			       "#%d at 0x%pK, irq %d\n", DRV_NAME, dev->name,
 			       i, priv->reg_base, dev->irq);
 		} else
 			free_sja1000dev(dev);

@@ -58,7 +58,7 @@ void *dma_alloc_coherent(struct device *dev, size_t size,
 
 done:
 	*dma_handle = virt_to_bus((void *) addr);
-	printk("dma_alloc_coherent() = %p [%x]\n", ret, *dma_handle);
+	printk("dma_alloc_coherent() = %pK [%x]\n", ret, *dma_handle);
 	return ret;
 }
 EXPORT_SYMBOL(dma_alloc_coherent);

@@ -694,7 +694,7 @@ int ext2_empty_dir (struct inode * inode)
 			if (de->rec_len == 0) {
 				ext2_error(inode->i_sb, __func__,
 					"zero-length directory entry");
-				printk("kaddr=%p, de=%p\n", kaddr, de);
+				printk("kaddr=%pK, de=%pK\n", kaddr, de);
 				goto not_empty;
 			}
 			if (de->inode != 0) {

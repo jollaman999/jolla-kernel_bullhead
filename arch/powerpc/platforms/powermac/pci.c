@@ -975,7 +975,7 @@ static int __init pmac_add_bridge(struct device_node *dev)
 		hose->last_busno);
 #endif /* CONFIG_PPC32 */
 
-	DBG(" ->Hose at 0x%p, cfg_addr=0x%p,cfg_data=0x%p\n",
+	DBG(" ->Hose at 0x%pK, cfg_addr=0x%pK,cfg_data=0x%pK\n",
 		hose, hose->cfg_addr, hose->cfg_data);
 
 	/* Interpret the "ranges" property */

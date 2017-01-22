@@ -756,7 +756,7 @@ int proc_begin_dma(void *hprocessor, void *pmpu_addr, u32 ul_size,
 	}
 
 	if (memory_give_ownership(map_obj, (u32) pmpu_addr, ul_size, dir)) {
-		pr_err("%s: InValid address parameters %p %x\n",
+		pr_err("%s: InValid address parameters %pK %x\n",
 			       __func__, pmpu_addr, ul_size);
 		status = -EFAULT;
 	}
@@ -796,7 +796,7 @@ int proc_end_dma(void *hprocessor, void *pmpu_addr, u32 ul_size,
 	}
 
 	if (memory_regain_ownership(map_obj, (u32) pmpu_addr, ul_size, dir)) {
-		pr_err("%s: InValid address parameters %p %x\n",
+		pr_err("%s: InValid address parameters %pK %x\n",
 		       __func__, pmpu_addr, ul_size);
 		status = -EFAULT;
 	}
@@ -1322,8 +1322,8 @@ int proc_map(void *hprocessor, void *pmpu_addr, u32 ul_size,
 		goto func_end;
 
 func_end:
-	dev_dbg(bridge, "%s: hprocessor %p, pmpu_addr %p, ul_size %x, "
-		"req_addr %p, ul_map_attr %x, pp_map_addr %p, va_align %x, "
+	dev_dbg(bridge, "%s: hprocessor %pK, pmpu_addr %pK, ul_size %x, "
+		"req_addr %pK, ul_map_attr %x, pp_map_addr %pK, va_align %x, "
 		"pa_align %x, size_align %x status 0x%x\n", __func__,
 		hprocessor, pmpu_addr, ul_size, req_addr, ul_map_attr,
 		pp_map_addr, va_align, pa_align, size_align, status);
@@ -1446,7 +1446,7 @@ int proc_reserve_memory(void *hprocessor, u32 ul_size,
 	}
 
 func_end:
-	dev_dbg(bridge, "%s: hprocessor: 0x%p ul_size: 0x%x pp_rsv_addr: 0x%p "
+	dev_dbg(bridge, "%s: hprocessor: 0x%pK ul_size: 0x%x pp_rsv_addr: 0x%pK "
 		"status 0x%x\n", __func__, hprocessor,
 		ul_size, pp_rsv_addr, status);
 	return status;
@@ -1632,7 +1632,7 @@ unmap_failed:
 	mutex_unlock(&proc_lock);
 
 func_end:
-	dev_dbg(bridge, "%s: hprocessor: 0x%p map_addr: 0x%p status: 0x%x\n",
+	dev_dbg(bridge, "%s: hprocessor: 0x%pK map_addr: 0x%pK status: 0x%x\n",
 		__func__, hprocessor, map_addr, status);
 	return status;
 }
@@ -1681,7 +1681,7 @@ int proc_un_reserve_memory(void *hprocessor, void *prsv_addr,
 	spin_unlock(&pr_ctxt->dmm_rsv_lock);
 
 func_end:
-	dev_dbg(bridge, "%s: hprocessor: 0x%p prsv_addr: 0x%p status: 0x%x\n",
+	dev_dbg(bridge, "%s: hprocessor: 0x%pK prsv_addr: 0x%pK status: 0x%x\n",
 		__func__, hprocessor, prsv_addr, status);
 	return status;
 }

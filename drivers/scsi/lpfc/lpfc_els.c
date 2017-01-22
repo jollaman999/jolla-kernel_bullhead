@@ -1537,7 +1537,7 @@ lpfc_plogi_confirm_nport(struct lpfc_hba *phba, uint32_t *prsp,
 	memset(&rrq.xri_bitmap, 0, sizeof(new_ndlp->active_rrqs.xri_bitmap));
 
 	lpfc_printf_vlog(vport, KERN_INFO, LOG_ELS,
-		 "3178 PLOGI confirm: ndlp %p x%x: new_ndlp %p\n",
+		 "3178 PLOGI confirm: ndlp %pK x%x: new_ndlp %pK\n",
 		 ndlp, ndlp->nlp_DID, new_ndlp);
 
 	if (!new_ndlp) {

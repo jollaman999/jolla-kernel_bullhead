@@ -34,7 +34,7 @@ void ecryptfs_dump_auth_tok(struct ecryptfs_auth_tok *auth_tok)
 	char salt[ECRYPTFS_SALT_SIZE * 2 + 1];
 	char sig[ECRYPTFS_SIG_SIZE_HEX + 1];
 
-	ecryptfs_printk(KERN_DEBUG, "Auth tok at mem loc [%p]:\n",
+	ecryptfs_printk(KERN_DEBUG, "Auth tok at mem loc [%pK]:\n",
 			auth_tok);
 	if (auth_tok->flags & ECRYPTFS_PRIVATE_KEY) {
 		ecryptfs_printk(KERN_DEBUG, " * private key type\n");

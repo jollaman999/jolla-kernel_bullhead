@@ -148,7 +148,7 @@ void dsp_clk_init(void)
 
 	iva2_clk = clk_get(&dspbridge_device.dev, "iva2_ck");
 	if (IS_ERR(iva2_clk))
-		dev_err(bridge, "failed to get iva2 clock %p\n", iva2_clk);
+		dev_err(bridge, "failed to get iva2 clock %pK\n", iva2_clk);
 	else
 		clk_prepare(iva2_clk);
 
@@ -157,7 +157,7 @@ void dsp_clk_init(void)
 	ssi.ick = clk_get(&dspbridge_device.dev, "ssi_ick");
 
 	if (IS_ERR(ssi.sst_fck) || IS_ERR(ssi.ssr_fck) || IS_ERR(ssi.ick)) {
-		dev_err(bridge, "failed to get ssi: sst %p, ssr %p, ick %p\n",
+		dev_err(bridge, "failed to get ssi: sst %pK, ssr %pK, ick %pK\n",
 					ssi.sst_fck, ssi.ssr_fck, ssi.ick);
 	} else {
 		clk_prepare(ssi.sst_fck);

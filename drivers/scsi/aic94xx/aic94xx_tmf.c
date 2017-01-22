@@ -421,7 +421,7 @@ int asd_abort_task(struct sas_task *task)
 	if (task->task_state_flags & SAS_TASK_STATE_DONE) {
 		spin_unlock_irqrestore(&task->task_state_lock, flags);
 		res = TMF_RESP_FUNC_COMPLETE;
-		ASD_DPRINTK("%s: task 0x%p done\n", __func__, task);
+		ASD_DPRINTK("%s: task 0x%pK done\n", __func__, task);
 		goto out_done;
 	}
 	spin_unlock_irqrestore(&task->task_state_lock, flags);
@@ -485,7 +485,7 @@ int asd_abort_task(struct sas_task *task)
 	if (task->task_state_flags & SAS_TASK_STATE_DONE) {
 		spin_unlock_irqrestore(&task->task_state_lock, flags);
 		res = TMF_RESP_FUNC_COMPLETE;
-		ASD_DPRINTK("%s: task 0x%p done\n", __func__, task);
+		ASD_DPRINTK("%s: task 0x%pK done\n", __func__, task);
 		goto out_done;
 	}
 	spin_unlock_irqrestore(&task->task_state_lock, flags);
@@ -548,12 +548,12 @@ int asd_abort_task(struct sas_task *task)
 		mb();
 		asd_ascb_free(tascb);
 	}
-	ASD_DPRINTK("task 0x%p aborted, res: 0x%x\n", task, res);
+	ASD_DPRINTK("task 0x%pK aborted, res: 0x%x\n", task, res);
 	return res;
 
  out_free:
 	asd_ascb_free(ascb);
-	ASD_DPRINTK("task 0x%p aborted, res: 0x%x\n", task, res);
+	ASD_DPRINTK("task 0x%pK aborted, res: 0x%x\n", task, res);
 	return res;
 }
 

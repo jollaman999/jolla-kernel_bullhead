@@ -205,7 +205,7 @@ int64_t cvmx_bootmem_phy_alloc(uint64_t req_size, uint64_t address_min,
 
 	if (cvmx_bootmem_desc->major_version > 3) {
 		cvmx_dprintf("ERROR: Incompatible bootmem descriptor "
-			     "version: %d.%d at addr: %p\n",
+			     "version: %d.%d at addr: %pK\n",
 			     (int)cvmx_bootmem_desc->major_version,
 			     (int)cvmx_bootmem_desc->minor_version,
 			     cvmx_bootmem_desc);
@@ -407,7 +407,7 @@ int __cvmx_bootmem_phy_free(uint64_t phy_addr, uint64_t size, uint32_t flags)
 #endif
 	if (cvmx_bootmem_desc->major_version > 3) {
 		cvmx_dprintf("ERROR: Incompatible bootmem descriptor "
-			     "version: %d.%d at addr: %p\n",
+			     "version: %d.%d at addr: %pK\n",
 			     (int)cvmx_bootmem_desc->major_version,
 			     (int)cvmx_bootmem_desc->minor_version,
 			     cvmx_bootmem_desc);
@@ -540,7 +540,7 @@ struct cvmx_bootmem_named_block_desc *
 
 #ifdef DEBUG
 	cvmx_dprintf
-	    ("cvmx_bootmem_phy_named_block_find: named_block_array_ptr: %p\n",
+	    ("cvmx_bootmem_phy_named_block_find: named_block_array_ptr: %pK\n",
 	     named_block_array_ptr);
 #endif
 	if (cvmx_bootmem_desc->major_version == 3) {
@@ -559,7 +559,7 @@ struct cvmx_bootmem_named_block_desc *
 		}
 	} else {
 		cvmx_dprintf("ERROR: Incompatible bootmem descriptor "
-			     "version: %d.%d at addr: %p\n",
+			     "version: %d.%d at addr: %pK\n",
 			     (int)cvmx_bootmem_desc->major_version,
 			     (int)cvmx_bootmem_desc->minor_version,
 			     cvmx_bootmem_desc);
@@ -576,7 +576,7 @@ int cvmx_bootmem_phy_named_block_free(char *name, uint32_t flags)
 
 	if (cvmx_bootmem_desc->major_version != 3) {
 		cvmx_dprintf("ERROR: Incompatible bootmem descriptor version: "
-			     "%d.%d at addr: %p\n",
+			     "%d.%d at addr: %pK\n",
 			     (int)cvmx_bootmem_desc->major_version,
 			     (int)cvmx_bootmem_desc->minor_version,
 			     cvmx_bootmem_desc);
@@ -634,7 +634,7 @@ int64_t cvmx_bootmem_phy_named_block_alloc(uint64_t size, uint64_t min_addr,
 #endif
 	if (cvmx_bootmem_desc->major_version != 3) {
 		cvmx_dprintf("ERROR: Incompatible bootmem descriptor version: "
-			     "%d.%d at addr: %p\n",
+			     "%d.%d at addr: %pK\n",
 			     (int)cvmx_bootmem_desc->major_version,
 			     (int)cvmx_bootmem_desc->minor_version,
 			     cvmx_bootmem_desc);

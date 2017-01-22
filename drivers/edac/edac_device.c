@@ -40,13 +40,13 @@ static LIST_HEAD(edac_device_list);
 #ifdef CONFIG_EDAC_DEBUG
 static void edac_device_dump_device(struct edac_device_ctl_info *edac_dev)
 {
-	edac_dbg(3, "\tedac_dev = %p dev_idx=%d\n",
+	edac_dbg(3, "\tedac_dev = %pK dev_idx=%d\n",
 		 edac_dev, edac_dev->dev_idx);
-	edac_dbg(4, "\tedac_dev->edac_check = %p\n", edac_dev->edac_check);
-	edac_dbg(3, "\tdev = %p\n", edac_dev->dev);
+	edac_dbg(4, "\tedac_dev->edac_check = %pK\n", edac_dev->edac_check);
+	edac_dbg(3, "\tdev = %pK\n", edac_dev->dev);
 	edac_dbg(3, "\tmod_name:ctl_name = %s:%s\n",
 		 edac_dev->mod_name, edac_dev->ctl_name);
-	edac_dbg(3, "\tpvt_info = %p\n\n", edac_dev->pvt_info);
+	edac_dbg(3, "\tpvt_info = %pK\n\n", edac_dev->pvt_info);
 }
 #endif				/* CONFIG_EDAC_DEBUG */
 
@@ -156,7 +156,7 @@ struct edac_device_ctl_info *edac_device_alloc_ctl_info(
 	/* Name of this edac device */
 	snprintf(dev_ctl->name,sizeof(dev_ctl->name),"%s",edac_device_name);
 
-	edac_dbg(4, "edac_dev=%p next after end=%p\n",
+	edac_dbg(4, "edac_dev=%pK next after end=%pK\n",
 		 dev_ctl, pvt + sz_private);
 
 	/* Initialize every Instance */
@@ -178,7 +178,7 @@ struct edac_device_ctl_info *edac_device_alloc_ctl_info(
 			snprintf(blk->name, sizeof(blk->name),
 				 "%s%d", edac_block_name, block+offset_value);
 
-			edac_dbg(4, "instance=%d inst_p=%p block=#%d block_p=%p name='%s'\n",
+			edac_dbg(4, "instance=%d inst_p=%pK block=#%d block_p=%pK name='%s'\n",
 				 instance, inst, block, blk, blk->name);
 
 			/* if there are NO attributes OR no attribute pointer
@@ -192,7 +192,7 @@ struct edac_device_ctl_info *edac_device_alloc_ctl_info(
 			attrib_p = &dev_attrib[block*nr_instances*nr_attrib];
 			blk->block_attributes = attrib_p;
 
-			edac_dbg(4, "THIS BLOCK_ATTRIB=%p\n",
+			edac_dbg(4, "THIS BLOCK_ATTRIB=%pK\n",
 				 blk->block_attributes);
 
 			/* Initialize every user specified attribute in this
@@ -212,7 +212,7 @@ struct edac_device_ctl_info *edac_device_alloc_ctl_info(
 
 				attrib->block = blk;	/* up link */
 
-				edac_dbg(4, "alloc-attrib=%p attrib_name='%s' attrib-spec=%p spec-name=%s\n",
+				edac_dbg(4, "alloc-attrib=%pK attrib_name='%s' attrib-spec=%pK spec-name=%s\n",
 					 attrib, attrib->attr.name,
 					 &attrib_spec[attr],
 					 attrib_spec[attr].attr.name

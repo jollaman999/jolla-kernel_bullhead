@@ -492,7 +492,7 @@ int exofs_add_link(struct dentry *dentry, struct inode *inode)
 		exofs_put_page(page);
 	}
 
-	EXOFS_ERR("exofs_add_link: BAD dentry=%p or inode=0x%lx\n",
+	EXOFS_ERR("exofs_add_link: BAD dentry=%pK or inode=0x%lx\n",
 		  dentry, inode->i_ino);
 	return -EINVAL;
 
@@ -639,7 +639,7 @@ int exofs_empty_dir(struct inode *inode)
 			if (de->rec_len == 0) {
 				EXOFS_ERR("ERROR: exofs_empty_dir: "
 					  "zero-length directory entry"
-					  "kaddr=%p, de=%p\n", kaddr, de);
+					  "kaddr=%pK, de=%pK\n", kaddr, de);
 				goto not_empty;
 			}
 			if (de->inode_no != 0) {

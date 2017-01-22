@@ -39,7 +39,7 @@ void afs_init_callback_state(struct afs_server *server)
 {
 	struct afs_vnode *vnode;
 
-	_enter("{%p}", server);
+	_enter("{%pK}", server);
 
 	spin_lock(&server->cb_lock);
 
@@ -194,7 +194,7 @@ found:
 void afs_break_callbacks(struct afs_server *server, size_t count,
 			 struct afs_callback callbacks[])
 {
-	_enter("%p,%zu,", server, count);
+	_enter("%pK,%zu,", server, count);
 
 	ASSERT(server != NULL);
 	ASSERTCMP(count, <=, AFSCBMAX);
@@ -224,7 +224,7 @@ static void afs_do_give_up_callback(struct afs_server *server,
 {
 	struct afs_callback *cb;
 
-	_enter("%p,%p", server, vnode);
+	_enter("%pK,%pK", server, vnode);
 
 	cb = &server->cb_break[server->cb_break_head];
 	cb->fid		= vnode->fid;
@@ -294,7 +294,7 @@ void afs_give_up_callback(struct afs_vnode *vnode)
 
 	_enter("%d", vnode->cb_promised);
 
-	_debug("GIVE UP INODE %p", &vnode->vfs_inode);
+	_debug("GIVE UP INODE %pK", &vnode->vfs_inode);
 
 	if (!vnode->cb_promised) {
 		_leave(" [not promised]");

@@ -329,10 +329,10 @@ static void sdc_enable_channel(struct mx3fb_info *mx3_fbi)
 	dma_cookie_t cookie;
 
 	if (mx3_fbi->txd)
-		dev_dbg(mx3fb->dev, "mx3fbi %p, desc %p, sg %p\n", mx3_fbi,
+		dev_dbg(mx3fb->dev, "mx3fbi %pK, desc %pK, sg %pK\n", mx3_fbi,
 			to_tx_desc(mx3_fbi->txd), to_tx_desc(mx3_fbi->txd)->sg);
 	else
-		dev_dbg(mx3fb->dev, "mx3fbi %p, txd = NULL\n", mx3_fbi);
+		dev_dbg(mx3fb->dev, "mx3fbi %pK, txd = NULL\n", mx3_fbi);
 
 	/* This enables the channel */
 	if (mx3_fbi->cookie < 0) {
@@ -348,7 +348,7 @@ static void sdc_enable_channel(struct mx3fb_info *mx3_fbi)
 		mx3_fbi->txd->callback		= mx3fb_dma_done;
 
 		cookie = mx3_fbi->txd->tx_submit(mx3_fbi->txd);
-		dev_dbg(mx3fb->dev, "%d: Submit %p #%d [%c]\n", __LINE__,
+		dev_dbg(mx3fb->dev, "%d: Submit %pK #%d [%c]\n", __LINE__,
 		       mx3_fbi->txd, cookie, list_empty(&ichan->queue) ? '-' : '+');
 	} else {
 		if (!mx3_fbi->txd || !mx3_fbi->txd->tx_submit) {
@@ -360,7 +360,7 @@ static void sdc_enable_channel(struct mx3fb_info *mx3_fbi)
 		/* Just re-activate the same buffer */
 		dma_async_issue_pending(dma_chan);
 		cookie = mx3_fbi->cookie;
-		dev_dbg(mx3fb->dev, "%d: Re-submit %p #%d [%c]\n", __LINE__,
+		dev_dbg(mx3fb->dev, "%d: Re-submit %pK #%d [%c]\n", __LINE__,
 		       mx3_fbi->txd, cookie, list_empty(&ichan->queue) ? '-' : '+');
 	}
 
@@ -1038,7 +1038,7 @@ static int mx3fb_blank(int blank, struct fb_info *fbi)
 {
 	struct mx3fb_info *mx3_fbi = fbi->par;
 
-	dev_dbg(fbi->device, "%s, blank = %d, base %p, len %u\n", __func__,
+	dev_dbg(fbi->device, "%s, blank = %d, base %pK, len %u\n", __func__,
 		blank, fbi->screen_base, fbi->fix.smem_len);
 
 	if (mx3_fbi->blank == blank)
@@ -1144,7 +1144,7 @@ static int mx3fb_pan_display(struct fb_var_screeninfo *var,
 	 * should switch to another buffer
 	 */
 	cookie = txd->tx_submit(txd);
-	dev_dbg(fbi->device, "%d: Submit %p #%d\n", __LINE__, txd, cookie);
+	dev_dbg(fbi->device, "%d: Submit %pK #%d\n", __LINE__, txd, cookie);
 	if (cookie < 0) {
 		dev_err(fbi->device,
 			"Error updating SDC buf %d to address=0x%08lX\n",
@@ -1279,7 +1279,7 @@ static int mx3fb_map_video_memory(struct fb_info *fbi, unsigned int mem_len,
 	if (lock)
 		mutex_unlock(&fbi->mm_lock);
 
-	dev_dbg(fbi->device, "allocated fb @ p=0x%08x, v=0x%p, size=%d.\n",
+	dev_dbg(fbi->device, "allocated fb @ p=0x%08x, v=0x%pK, size=%d.\n",
 		(uint32_t) fbi->fix.smem_start, fbi->screen_base, fbi->fix.smem_len);
 
 	fbi->screen_size = fbi->fix.smem_len;
@@ -1508,7 +1508,7 @@ static int mx3fb_probe(struct platform_device *pdev)
 		goto eremap;
 	}
 
-	pr_debug("Remapped %pR at %p\n", sdc_reg, mx3fb->reg_base);
+	pr_debug("Remapped %pR at %pK\n", sdc_reg, mx3fb->reg_base);
 
 	/* IDMAC interface */
 	dmaengine_get();

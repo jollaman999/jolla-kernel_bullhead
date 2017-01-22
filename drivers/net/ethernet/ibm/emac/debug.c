@@ -48,7 +48,7 @@ static void emac_desc_dump(struct emac_instance *p)
 
 	printk("** EMAC %s RX BDs **\n"
 	       " rx_slot = %d flags = 0x%lx rx_skb_size = %d rx_sync_size = %d\n"
-	       " rx_sg_skb = 0x%p\n",
+	       " rx_sg_skb = 0x%pK\n",
 	       p->ofdev->dev.of_node->full_name,
 	       p->rx_slot, p->commac.flags, p->rx_skb_size,
 	       p->rx_sync_size, p->rx_sg_skb);

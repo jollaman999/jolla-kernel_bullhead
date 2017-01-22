@@ -1161,7 +1161,7 @@ static int vortex_probe1(struct device *gendev, void __iomem *ioaddr, int irq,
 	if (print_info)
 		pr_info("See Documentation/networking/vortex.txt\n");
 
-	pr_info("%s: 3Com %s %s at %p.\n",
+	pr_info("%s: 3Com %s %s at %pK.\n",
 	       print_name,
 	       pdev ? "PCI" : "EISA",
 	       vci->name,
@@ -1332,7 +1332,7 @@ static int vortex_probe1(struct device *gendev, void __iomem *ioaddr, int irq,
 		}
 
 		if (print_info) {
-			pr_info("%s: CardBus functions mapped %16.16llx->%p\n",
+			pr_info("%s: CardBus functions mapped %16.16llx->%pK\n",
 				print_name,
 				(unsigned long long)pci_resource_start(pdev, 2),
 				vp->cb_fn_base);
@@ -2771,7 +2771,7 @@ dump_tx_ring(struct net_device *dev)
 					vp->full_bus_master_tx,
 					vp->dirty_tx, vp->dirty_tx % TX_RING_SIZE,
 					vp->cur_tx, vp->cur_tx % TX_RING_SIZE);
-			pr_err("  Transmit list %8.8x vs. %p.\n",
+			pr_err("  Transmit list %8.8x vs. %pK.\n",
 				   ioread32(ioaddr + DownListPtr),
 				   &vp->tx_ring[vp->dirty_tx % TX_RING_SIZE]);
 			issue_and_wait(dev, DownStall);
@@ -2783,7 +2783,7 @@ dump_tx_ring(struct net_device *dev)
 #else
 				length = le32_to_cpu(vp->tx_ring[i].length);
 #endif
-				pr_err("  %d: @%p  length %8.8x status %8.8x\n",
+				pr_err("  %d: @%pK  length %8.8x status %8.8x\n",
 					   i, &vp->tx_ring[i], length,
 					   le32_to_cpu(vp->tx_ring[i].status));
 			}

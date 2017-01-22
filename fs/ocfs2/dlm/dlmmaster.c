@@ -236,7 +236,7 @@ static void __dlm_put_mle(struct dlm_master_list_entry *mle)
 	if (!atomic_read(&mle->mle_refs.refcount)) {
 		/* this may or may not crash, but who cares.
 		 * it's a BUG. */
-		mlog(ML_ERROR, "bad mle: %p\n", mle);
+		mlog(ML_ERROR, "bad mle: %pK\n", mle);
 		dlm_print_one_mle(mle);
 		BUG();
 	} else
@@ -786,7 +786,7 @@ lookup:
 		goto lookup;
 	}
 
-	mlog(0, "no lockres found, allocated our own: %p\n", res);
+	mlog(0, "no lockres found, allocated our own: %pK\n", res);
 
 	if (flags & LKM_LOCAL) {
 		/* caller knows it's safe to assume it's not mastered elsewhere
@@ -1097,7 +1097,7 @@ recheck:
 
 		/*
 		if (atomic_read(&mle->mle_refs.refcount) < 2)
-			mlog(ML_ERROR, "mle (%p) refs=%d, name=%.*s\n", mle,
+			mlog(ML_ERROR, "mle (%pK) refs=%d, name=%.*s\n", mle,
 			atomic_read(&mle->mle_refs.refcount),
 			res->lockname.len, res->lockname.name);
 		*/
@@ -3417,7 +3417,7 @@ void dlm_force_free_mles(struct dlm_ctxt *dlm)
 			mle = hlist_entry(list, struct dlm_master_list_entry,
 					  master_hash_node);
 			if (mle->type != DLM_MLE_BLOCK) {
-				mlog(ML_ERROR, "bad mle: %p\n", mle);
+				mlog(ML_ERROR, "bad mle: %pK\n", mle);
 				dlm_print_one_mle(mle);
 			}
 			atomic_set(&mle->woken, 1);

@@ -908,7 +908,7 @@ static int az6027_frontend_attach(struct dvb_usb_adapter *adap)
 	az6027_frontend_poweron(adap);
 	az6027_frontend_reset(adap);
 
-	deb_info("adap = %p, dev = %p\n", adap, adap->dev);
+	deb_info("adap = %pK, dev = %pK\n", adap, adap->dev);
 	adap->fe_adap[0].fe = stb0899_attach(&az6027_stb0899_config, &adap->dev->i2c_adap);
 
 	if (adap->fe_adap[0].fe) {

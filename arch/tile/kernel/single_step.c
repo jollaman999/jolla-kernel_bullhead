@@ -392,7 +392,7 @@ void single_step_once(struct pt_regs *regs)
 
 	pc = (tile_bundle_bits __user *)(regs->pc);
 	if (get_user(bundle, pc) != 0) {
-		pr_err("Couldn't read instruction at %p trying to step\n", pc);
+		pr_err("Couldn't read instruction at %pK trying to step\n", pc);
 		return;
 	}
 

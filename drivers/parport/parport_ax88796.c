@@ -211,7 +211,7 @@ parport_ax88796_init_state(struct pardevice *d, struct parport_state *s)
 
 	memset(s, 0, sizeof(struct parport_state));
 
-	dev_dbg(dd->dev, "init_state: %p: state=%p\n", d, s);
+	dev_dbg(dd->dev, "init_state: %pK: state=%pK\n", d, s);
 	s->u.ax88796.cpr = readb(dd->spp_cpr);
 }
 
@@ -220,7 +220,7 @@ parport_ax88796_save_state(struct parport *p, struct parport_state *s)
 {
 	struct ax_drvdata *dd = pp_to_drv(p);
 
-	dev_dbg(dd->dev, "save_state: %p: state=%p\n", p, s);
+	dev_dbg(dd->dev, "save_state: %pK: state=%pK\n", p, s);
 	s->u.ax88796.cpr = readb(dd->spp_cpr);
 }
 
@@ -229,7 +229,7 @@ parport_ax88796_restore_state(struct parport *p, struct parport_state *s)
 {
 	struct ax_drvdata *dd = pp_to_drv(p);
 
-	dev_dbg(dd->dev, "restore_state: %p: state=%p\n", p, s);
+	dev_dbg(dd->dev, "restore_state: %pK: state=%pK\n", p, s);
 	writeb(s->u.ax88796.cpr, dd->spp_cpr);
 }
 

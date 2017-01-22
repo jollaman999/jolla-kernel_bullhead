@@ -40,7 +40,7 @@ static int gpio_input_event(
 		if (ip->input_devs->dev[devnr] == dev)
 			break;
 	if (devnr == ip->input_devs->count) {
-		pr_err("gpio_input_event: unknown device %p\n", dev);
+		pr_err("gpio_input_event: unknown device %pK\n", dev);
 		return -EIO;
 	}
 

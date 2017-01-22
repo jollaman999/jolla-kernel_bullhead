@@ -154,7 +154,7 @@ static int c_can_pci_probe(struct pci_dev *pdev,
 		goto out_free_c_can;
 	}
 
-	dev_dbg(&pdev->dev, "%s device registered (regs=%p, irq=%d)\n",
+	dev_dbg(&pdev->dev, "%s device registered (regs=%pK, irq=%d)\n",
 		 KBUILD_MODNAME, priv->regs, dev->irq);
 
 	return 0;

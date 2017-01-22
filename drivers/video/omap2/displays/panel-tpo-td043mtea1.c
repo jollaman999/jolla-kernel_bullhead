@@ -549,7 +549,7 @@ static int tpo_td043_spi_suspend(struct device *dev)
 {
 	struct tpo_td043_device *tpo_td043 = dev_get_drvdata(dev);
 
-	dev_dbg(dev, "tpo_td043_spi_suspend, tpo %p\n", tpo_td043);
+	dev_dbg(dev, "tpo_td043_spi_suspend, tpo %pK\n", tpo_td043);
 
 	tpo_td043->power_on_resume = tpo_td043->powered_on;
 	tpo_td043_power_off(tpo_td043);

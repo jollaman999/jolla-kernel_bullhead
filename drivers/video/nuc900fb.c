@@ -97,7 +97,7 @@ static int nuc900fb_check_var(struct fb_var_screeninfo *var,
 						   mach_info->default_display;
 	int i;
 
-	dev_dbg(fbi->dev, "check_var(var=%p, info=%p)\n", var, info);
+	dev_dbg(fbi->dev, "check_var(var=%pK, info=%pK)\n", var, info);
 
 	/* validate x/y resolution */
 	/* choose default mode if possible */
@@ -393,7 +393,7 @@ static int nuc900fb_map_video_memory(struct fb_info *info)
 	dma_addr_t map_dma;
 	unsigned long map_size = PAGE_ALIGN(info->fix.smem_len);
 
-	dev_dbg(fbi->dev, "nuc900fb_map_video_memory(fbi=%p) map_size %lu\n",
+	dev_dbg(fbi->dev, "nuc900fb_map_video_memory(fbi=%pK) map_size %lu\n",
 		fbi, map_size);
 
 	info->screen_base = dma_alloc_writecombine(fbi->dev, map_size,

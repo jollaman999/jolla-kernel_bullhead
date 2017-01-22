@@ -390,7 +390,7 @@ bool GetTs(struct rtllib_device *ieee, struct ts_common_info **ppTS,
 
 				RTLLIB_DEBUG(RTLLIB_DL_TS, "to init current TS"
 					     ", UP:%d, Dir:%d, addr: %pM"
-					     " ppTs=%p\n", UP, Dir,
+					     " ppTs=%pK\n", UP, Dir,
 					      Addr, *ppTS);
 				pTSInfo->field.ucTrafficType = 0;
 				pTSInfo->field.ucTSID = UP;

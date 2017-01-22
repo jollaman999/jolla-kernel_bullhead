@@ -1026,7 +1026,7 @@ static void pdc_packet_start(struct ata_queued_cmd *qc)
 	unsigned int port_no = ap->port_no;
 	u8 seq = (u8) (port_no + 1);
 
-	VPRINTK("ENTER, ap %p\n", ap);
+	VPRINTK("ENTER, ap %pK\n", ap);
 
 	writel(0x00000001, host_mmio + (seq * 4));
 	readl(host_mmio + (seq * 4));	/* flush */

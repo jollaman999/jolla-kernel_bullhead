@@ -375,7 +375,7 @@ static int at76_usbdfu_download(struct usb_device *udev, u8 *buf, u32 size,
 	int bsize = 0;
 	int blockno = 0;
 
-	at76_dbg(DBG_DFU, "%s( %p, %u, %d)", __func__, buf, size,
+	at76_dbg(DBG_DFU, "%s( %pK, %u, %d)", __func__, buf, size,
 		 manifest_sync_timeout);
 
 	if (!size) {
@@ -1761,7 +1761,7 @@ static void at76_mac80211_tx(struct ieee80211_hw *hw,
 		wiphy_err(priv->hw->wiphy, "error in tx submit urb: %d\n", ret);
 		if (ret == -EINVAL)
 			wiphy_err(priv->hw->wiphy,
-				  "-EINVAL: tx urb %p hcpriv %p complete %p\n",
+				  "-EINVAL: tx urb %pK hcpriv %pK complete %pK\n",
 				  priv->tx_urb,
 				  priv->tx_urb->hcpriv, priv->tx_urb->complete);
 	}

@@ -1218,7 +1218,7 @@ static inline void bnx2x_init_fcoe_fp(struct bnx2x *bp)
 			     bnx2x_sp_mapping(bp, q_rdata), q_type);
 
 	DP(NETIF_MSG_IFUP,
-	   "queue[%d]: bnx2x_init_sb(%p,%p) cl_id %d fw_sb %d igu_sb %d\n",
+	   "queue[%d]: bnx2x_init_sb(%pK,%pK) cl_id %d fw_sb %d igu_sb %d\n",
 	   fp->index, bp, fp->status_blk.e2_sb, fp->cl_id, fp->fw_sb_id,
 	   fp->igu_sb_id);
 }

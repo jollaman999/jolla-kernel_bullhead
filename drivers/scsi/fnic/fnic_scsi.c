@@ -742,7 +742,7 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic,
 	if (!sc) {
 		shost_printk(KERN_ERR, fnic->lport->host,
 			  "icmnd_cmpl sc is null - "
-			  "hdr status = %s tag = 0x%x desc = 0x%p\n",
+			  "hdr status = %s tag = 0x%x desc = 0x%pK\n",
 			  fnic_fcpio_status_to_str(hdr_status), id, desc);
 		FNIC_TRACE(fnic_fcpio_icmnd_cmpl_handler,
 			  fnic->lport->host->host_no, id,
@@ -764,7 +764,7 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic,
 		spin_unlock_irqrestore(io_lock, flags);
 		shost_printk(KERN_ERR, fnic->lport->host,
 			  "icmnd_cmpl io_req is null - "
-			  "hdr status = %s tag = 0x%x sc 0x%p\n",
+			  "hdr status = %s tag = 0x%x sc 0x%pK\n",
 			  fnic_fcpio_status_to_str(hdr_status), id, sc);
 		return;
 	}
@@ -785,7 +785,7 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic,
 			CMD_FLAGS(sc) |= FNIC_IO_DONE;
 			FNIC_SCSI_DBG(KERN_INFO, fnic->lport->host,
 				  "icmnd_cmpl ABTS pending hdr status = %s "
-				  "sc  0x%p scsi_status %x  residual %d\n",
+				  "sc  0x%pK scsi_status %x  residual %d\n",
 				  fnic_fcpio_status_to_str(hdr_status), sc,
 				  icmnd_cmpl->scsi_status,
 				  icmnd_cmpl->residual);
@@ -796,7 +796,7 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic,
 		default:
 			FNIC_SCSI_DBG(KERN_INFO, fnic->lport->host,
 					  "icmnd_cmpl abts pending "
-					  "hdr status = %s tag = 0x%x sc = 0x%p\n",
+					  "hdr status = %s tag = 0x%x sc = 0x%pK\n",
 					  fnic_fcpio_status_to_str(hdr_status),
 					  id, sc);
 			break;
@@ -963,7 +963,7 @@ static void fnic_fcpio_itmf_cmpl_handler(struct fnic *fnic,
 		CMD_FLAGS(sc) |= FNIC_IO_ABT_TERM_REQ_NULL;
 		shost_printk(KERN_ERR, fnic->lport->host,
 			  "itmf_cmpl io_req is null - "
-			  "hdr status = %s tag = 0x%x sc 0x%p\n",
+			  "hdr status = %s tag = 0x%x sc 0x%pK\n",
 			  fnic_fcpio_status_to_str(hdr_status), id, sc);
 		return;
 	}
@@ -1359,7 +1359,7 @@ static void fnic_rport_exch_reset(struct fnic *fnic, u32 port_id)
 		if ((CMD_FLAGS(sc) & FNIC_DEVICE_RESET) &&
 			(!(CMD_FLAGS(sc) & FNIC_DEV_RST_ISSUED))) {
 			FNIC_SCSI_DBG(KERN_DEBUG, fnic->lport->host,
-			"fnic_rport_exch_reset dev rst not pending sc 0x%p\n",
+			"fnic_rport_exch_reset dev rst not pending sc 0x%pK\n",
 			sc);
 			spin_unlock_irqrestore(io_lock, flags);
 			continue;
@@ -1383,7 +1383,7 @@ static void fnic_rport_exch_reset(struct fnic *fnic, u32 port_id)
 		if (!(CMD_FLAGS(sc) & FNIC_IO_ISSUED)) {
 			shost_printk(KERN_ERR, fnic->lport->host,
 				  "rport_exch_reset "
-				  "IO not yet issued %p tag 0x%x flags "
+				  "IO not yet issued %pK tag 0x%x flags "
 				  "%x state %d\n",
 				  sc, tag, CMD_FLAGS(sc), CMD_STATE(sc));
 		}
@@ -1393,7 +1393,7 @@ static void fnic_rport_exch_reset(struct fnic *fnic, u32 port_id)
 		if (CMD_FLAGS(sc) & FNIC_DEVICE_RESET) {
 			abt_tag = (tag | FNIC_TAG_DEV_RST);
 			FNIC_SCSI_DBG(KERN_DEBUG, fnic->lport->host,
-			"fnic_rport_exch_reset dev rst sc 0x%p\n",
+			"fnic_rport_exch_reset dev rst sc 0x%pK\n",
 			sc);
 		}
 
@@ -1449,7 +1449,7 @@ void fnic_terminate_rport_io(struct fc_rport *rport)
 
 	FNIC_SCSI_DBG(KERN_DEBUG,
 		      fnic->lport->host, "fnic_terminate_rport_io called"
-		      " wwpn 0x%llx, wwnn0x%llx, rport 0x%p, portid 0x%06x\n",
+		      " wwpn 0x%llx, wwnn0x%llx, rport 0x%pK, portid 0x%06x\n",
 		      rport->port_name, rport->node_name, rport,
 		      rport->port_id);
 
@@ -1479,7 +1479,7 @@ void fnic_terminate_rport_io(struct fc_rport *rport)
 		if ((CMD_FLAGS(sc) & FNIC_DEVICE_RESET) &&
 			(!(CMD_FLAGS(sc) & FNIC_DEV_RST_ISSUED))) {
 			FNIC_SCSI_DBG(KERN_DEBUG, fnic->lport->host,
-			"fnic_terminate_rport_io dev rst not pending sc 0x%p\n",
+			"fnic_terminate_rport_io dev rst not pending sc 0x%pK\n",
 			sc);
 			spin_unlock_irqrestore(io_lock, flags);
 			continue;
@@ -1501,7 +1501,7 @@ void fnic_terminate_rport_io(struct fc_rport *rport)
 		if (!(CMD_FLAGS(sc) & FNIC_IO_ISSUED)) {
 			FNIC_SCSI_DBG(KERN_INFO, fnic->lport->host,
 				  "fnic_terminate_rport_io "
-				  "IO not yet issued %p tag 0x%x flags "
+				  "IO not yet issued %pK tag 0x%x flags "
 				  "%x state %d\n",
 				  sc, tag, CMD_FLAGS(sc), CMD_STATE(sc));
 		}
@@ -1511,7 +1511,7 @@ void fnic_terminate_rport_io(struct fc_rport *rport)
 		if (CMD_FLAGS(sc) & FNIC_DEVICE_RESET) {
 			abt_tag = (tag | FNIC_TAG_DEV_RST);
 			FNIC_SCSI_DBG(KERN_DEBUG, fnic->lport->host,
-			"fnic_terminate_rport_io dev rst sc 0x%p\n", sc);
+			"fnic_terminate_rport_io dev rst sc 0x%pK\n", sc);
 		}
 
 		BUG_ON(io_req->abts_done);
@@ -1818,7 +1818,7 @@ static int fnic_clean_pending_aborts(struct fnic *fnic,
 		if ((CMD_FLAGS(sc) & FNIC_DEVICE_RESET) &&
 			(!(CMD_FLAGS(sc) & FNIC_DEV_RST_ISSUED))) {
 			FNIC_SCSI_DBG(KERN_INFO, fnic->lport->host,
-				"%s dev rst not pending sc 0x%p\n", __func__,
+				"%s dev rst not pending sc 0x%pK\n", __func__,
 				sc);
 			spin_unlock_irqrestore(io_lock, flags);
 			continue;
@@ -1844,7 +1844,7 @@ static int fnic_clean_pending_aborts(struct fnic *fnic,
 		if (CMD_FLAGS(sc) & FNIC_DEVICE_RESET) {
 			abt_tag |= FNIC_TAG_DEV_RST;
 			FNIC_SCSI_DBG(KERN_INFO, fnic->lport->host,
-				  "%s: dev rst sc 0x%p\n", __func__, sc);
+				  "%s: dev rst sc 0x%pK\n", __func__, sc);
 		}
 
 		CMD_ABTS_STATUS(sc) = FCPIO_INVALID_CODE;
@@ -2003,7 +2003,7 @@ int fnic_device_reset(struct scsi_cmnd *sc)
 
 	rport = starget_to_rport(scsi_target(sc->device));
 	FNIC_SCSI_DBG(KERN_DEBUG, fnic->lport->host,
-		      "Device reset called FCID 0x%x, LUN 0x%x sc 0x%p\n",
+		      "Device reset called FCID 0x%x, LUN 0x%x sc 0x%pK\n",
 		      rport->port_id, sc->device->lun, sc);
 
 	if (lp->state != LPORT_ST_READY || !(lp->link_up))
@@ -2075,7 +2075,7 @@ int fnic_device_reset(struct scsi_cmnd *sc)
 	if (!io_req) {
 		spin_unlock_irqrestore(io_lock, flags);
 		FNIC_SCSI_DBG(KERN_DEBUG, fnic->lport->host,
-				"io_req is null tag 0x%x sc 0x%p\n", tag, sc);
+				"io_req is null tag 0x%x sc 0x%pK\n", tag, sc);
 		goto fnic_device_reset_end;
 	}
 	io_req->dr_done = NULL;
@@ -2117,7 +2117,7 @@ int fnic_device_reset(struct scsi_cmnd *sc)
 				spin_unlock_irqrestore(io_lock, flags);
 				FNIC_SCSI_DBG(KERN_DEBUG, fnic->lport->host,
 				"Abort and terminate issued on Device reset "
-				"tag 0x%x sc 0x%p\n", tag, sc);
+				"tag 0x%x sc 0x%pK\n", tag, sc);
 				break;
 			}
 		}

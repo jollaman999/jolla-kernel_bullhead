@@ -54,7 +54,7 @@ bool __fscache_maybe_release_page(struct fscache_cookie *cookie,
 	struct page *xpage;
 	void *val;
 
-	_enter("%p,%p,%x", cookie, page, gfp);
+	_enter("%pK,%pK,%x", cookie, page, gfp);
 
 try_again:
 	rcu_read_lock();
@@ -183,7 +183,7 @@ int __fscache_attr_changed(struct fscache_cookie *cookie)
 	struct fscache_operation *op;
 	struct fscache_object *object;
 
-	_enter("%p", cookie);
+	_enter("%pK", cookie);
 
 	ASSERTCMP(cookie->def->type, !=, FSCACHE_COOKIE_TYPE_INDEX);
 
@@ -376,7 +376,7 @@ int __fscache_read_or_alloc_page(struct fscache_cookie *cookie,
 	struct fscache_object *object;
 	int ret;
 
-	_enter("%p,%p,,,", cookie, page);
+	_enter("%pK,%pK,,,", cookie, page);
 
 	fscache_stat(&fscache_n_retrievals);
 
@@ -503,7 +503,7 @@ int __fscache_read_or_alloc_pages(struct fscache_cookie *cookie,
 	struct fscache_object *object;
 	int ret;
 
-	_enter("%p,,%d,,,", cookie, *nr_pages);
+	_enter("%pK,,%d,,,", cookie, *nr_pages);
 
 	fscache_stat(&fscache_n_retrievals);
 
@@ -613,7 +613,7 @@ int __fscache_alloc_page(struct fscache_cookie *cookie,
 	struct fscache_object *object;
 	int ret;
 
-	_enter("%p,%p,,,", cookie, page);
+	_enter("%pK,%pK,,,", cookie, page);
 
 	fscache_stat(&fscache_n_allocs);
 
@@ -855,7 +855,7 @@ int __fscache_write_page(struct fscache_cookie *cookie,
 	struct fscache_object *object;
 	int ret;
 
-	_enter("%p,%x,", cookie, (u32) page->flags);
+	_enter("%pK,%x,", cookie, (u32) page->flags);
 
 	ASSERTCMP(cookie->def->type, !=, FSCACHE_COOKIE_TYPE_INDEX);
 	ASSERT(PageFsCache(page));
@@ -979,7 +979,7 @@ void __fscache_uncache_page(struct fscache_cookie *cookie, struct page *page)
 {
 	struct fscache_object *object;
 
-	_enter(",%p", page);
+	_enter(",%pK", page);
 
 	ASSERTCMP(cookie->def->type, !=, FSCACHE_COOKIE_TYPE_INDEX);
 	ASSERTCMP(page, !=, NULL);
@@ -1038,7 +1038,7 @@ void fscache_mark_page_cached(struct fscache_retrieval *op, struct page *page)
 	atomic_inc(&fscache_n_marks);
 #endif
 
-	_debug("- mark %p{%lx}", page, page->index);
+	_debug("- mark %pK{%lx}", page, page->index);
 	if (TestSetPageFsCache(page)) {
 		static bool once_only;
 		if (!once_only) {
@@ -1088,7 +1088,7 @@ void __fscache_uncache_all_inode_pages(struct fscache_cookie *cookie,
 	pgoff_t next;
 	int i;
 
-	_enter("%p,%p", cookie, inode);
+	_enter("%pK,%pK", cookie, inode);
 
 	if (!mapping || mapping->nrpages == 0) {
 		_leave(" [no pages]");

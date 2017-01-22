@@ -139,7 +139,7 @@ static void afs_data_delivered(struct sk_buff *skb)
 		_debug("DLVR NULL [%d]", atomic_read(&afs_outstanding_skbs));
 		dump_stack();
 	} else {
-		_debug("DLVR %p{%u} [%d]",
+		_debug("DLVR %pK{%u} [%d]",
 		       skb, skb->mark, atomic_read(&afs_outstanding_skbs));
 		if (atomic_dec_return(&afs_outstanding_skbs) == -1)
 			BUG();
@@ -156,7 +156,7 @@ static void afs_free_skb(struct sk_buff *skb)
 		_debug("FREE NULL [%d]", atomic_read(&afs_outstanding_skbs));
 		dump_stack();
 	} else {
-		_debug("FREE %p{%u} [%d]",
+		_debug("FREE %pK{%u} [%d]",
 		       skb, skb->mark, atomic_read(&afs_outstanding_skbs));
 		if (atomic_dec_return(&afs_outstanding_skbs) == -1)
 			BUG();
@@ -169,7 +169,7 @@ static void afs_free_skb(struct sk_buff *skb)
  */
 static void afs_free_call(struct afs_call *call)
 {
-	_debug("DONE %p{%s} [%d]",
+	_debug("DONE %pK{%s} [%d]",
 	       call, call->type->name, atomic_read(&afs_outstanding_calls));
 	if (atomic_dec_return(&afs_outstanding_calls) == -1)
 		BUG();
@@ -195,7 +195,7 @@ struct afs_call *afs_alloc_flat_call(const struct afs_call_type *type,
 	if (!call)
 		goto nomem_call;
 
-	_debug("CALL %p{%s} [%d]",
+	_debug("CALL %pK{%s} [%d]",
 	       call, type->name, atomic_read(&afs_outstanding_calls));
 	atomic_inc(&afs_outstanding_calls);
 
@@ -321,7 +321,7 @@ int afs_make_call(struct in_addr *addr, struct afs_call *call, gfp_t gfp,
 	ASSERT(call->type != NULL);
 	ASSERT(call->type->name != NULL);
 
-	_debug("____MAKE %p{%s,%x} [%d]____",
+	_debug("____MAKE %pK{%s,%x} [%d]____",
 	       call, call->type->name, key_serial(call->key),
 	       atomic_read(&afs_outstanding_calls));
 
@@ -402,9 +402,9 @@ static void afs_rx_interceptor(struct sock *sk, unsigned long user_call_ID,
 {
 	struct afs_call *call = (struct afs_call *) user_call_ID;
 
-	_enter("%p,,%u", call, skb->mark);
+	_enter("%pK,,%u", call, skb->mark);
 
-	_debug("ICPT %p{%u} [%d]",
+	_debug("ICPT %pK{%u} [%d]",
 	       skb, skb->mark, atomic_read(&afs_outstanding_skbs));
 
 	ASSERTCMP(sk, ==, afs_socket->sk);
@@ -692,7 +692,7 @@ static void afs_collect_incoming_call(struct work_struct *work)
 			skb_queue_head_init(&call->rx_queue);
 			call->state = AFS_CALL_AWAIT_OP_ID;
 
-			_debug("CALL %p{%s} [%d]",
+			_debug("CALL %pK{%s} [%d]",
 			       call, call->type->name,
 			       atomic_read(&afs_outstanding_calls));
 			atomic_inc(&afs_outstanding_calls);

@@ -108,7 +108,7 @@ static int autofs4_dir_open(struct inode *inode, struct file *file)
 	struct dentry *dentry = file->f_path.dentry;
 	struct autofs_sb_info *sbi = autofs4_sbi(dentry->d_sb);
 
-	DPRINTK("file=%p dentry=%p %.*s",
+	DPRINTK("file=%pK dentry=%pK %.*s",
 		file, dentry, dentry->d_name.len, dentry->d_name.name);
 
 	if (autofs4_oz_mode(sbi))
@@ -139,7 +139,7 @@ static void autofs4_dentry_release(struct dentry *de)
 	struct autofs_info *ino = autofs4_dentry_ino(de);
 	struct autofs_sb_info *sbi = autofs4_sbi(de->d_sb);
 
-	DPRINTK("releasing %p", de);
+	DPRINTK("releasing %pK", de);
 
 	if (!ino)
 		return;
@@ -326,7 +326,7 @@ static struct vfsmount *autofs4_d_automount(struct path *path)
 	struct autofs_info *ino = autofs4_dentry_ino(dentry);
 	int status;
 
-	DPRINTK("dentry=%p %.*s",
+	DPRINTK("dentry=%pK %.*s",
 		dentry, dentry->d_name.len, dentry->d_name.name);
 
 	/* The daemon never triggers a mount. */
@@ -414,7 +414,7 @@ static int autofs4_d_manage(struct dentry *dentry, bool rcu_walk)
 	struct autofs_info *ino = autofs4_dentry_ino(dentry);
 	int status;
 
-	DPRINTK("dentry=%p %.*s",
+	DPRINTK("dentry=%pK %.*s",
 		dentry, dentry->d_name.len, dentry->d_name.name);
 
 	/* The daemon never waits. */
@@ -669,7 +669,7 @@ static int autofs4_dir_rmdir(struct inode *dir, struct dentry *dentry)
 	struct autofs_info *ino = autofs4_dentry_ino(dentry);
 	struct autofs_info *p_ino;
 	
-	DPRINTK("dentry %p, removing %.*s",
+	DPRINTK("dentry %pK, removing %.*s",
 		dentry, dentry->d_name.len, dentry->d_name.name);
 
 	if (!autofs4_oz_mode(sbi))
@@ -712,7 +712,7 @@ static int autofs4_dir_mkdir(struct inode *dir, struct dentry *dentry, umode_t m
 	if (!autofs4_oz_mode(sbi))
 		return -EACCES;
 
-	DPRINTK("dentry %p, creating %.*s",
+	DPRINTK("dentry %pK, creating %.*s",
 		dentry, dentry->d_name.len, dentry->d_name.name);
 
 	BUG_ON(!ino);
@@ -829,7 +829,7 @@ static int autofs4_root_ioctl_unlocked(struct inode *inode, struct file *filp,
 	struct autofs_sb_info *sbi = autofs4_sbi(inode->i_sb);
 	void __user *p = (void __user *)arg;
 
-	DPRINTK("cmd = 0x%08x, arg = 0x%08lx, sbi = %p, pgrp = %u",
+	DPRINTK("cmd = 0x%08x, arg = 0x%08lx, sbi = %pK, pgrp = %u",
 		cmd,arg,sbi,task_pgrp_nr(current));
 
 	if (_IOC_TYPE(cmd) != _IOC_TYPE(AUTOFS_IOC_FIRST) ||

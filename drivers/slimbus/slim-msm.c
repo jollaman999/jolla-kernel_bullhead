@@ -684,7 +684,7 @@ int msm_slim_rx_msgq_get(struct msm_slim_ctrl *dev, u32 *data, int offset)
 	index = (iovec.addr - mem->phys_base) / 4;
 	*(data + offset) = *((u32 *)mem->base + index);
 
-	pr_debug("buf = 0x%p, data = 0x%x\n", (u32 *)mem->base + index, *data);
+	pr_debug("buf = 0x%pK, data = 0x%x\n", (u32 *)mem->base + index, *data);
 
 	/* Add buffer back to the queue */
 	(void)msm_slim_post_rx_msgq(dev, index);

@@ -576,8 +576,8 @@ static void nlm_complain_hosts(struct net *net)
 
 		if (ln->nrhosts == 0)
 			return;
-		printk(KERN_WARNING "lockd: couldn't shutdown host module for net %p!\n", net);
-		dprintk("lockd: %lu hosts left in net %p:\n", ln->nrhosts, net);
+		printk(KERN_WARNING "lockd: couldn't shutdown host module for net %pK!\n", net);
+		dprintk("lockd: %lu hosts left in net %pK:\n", ln->nrhosts, net);
 	} else {
 		if (nrhosts == 0)
 			return;
@@ -588,7 +588,7 @@ static void nlm_complain_hosts(struct net *net)
 	for_each_host(host, chain, nlm_server_hosts) {
 		if (net && host->net != net)
 			continue;
-		dprintk("       %s (cnt %d use %d exp %ld net %p)\n",
+		dprintk("       %s (cnt %d use %d exp %ld net %pK)\n",
 			host->h_name, atomic_read(&host->h_count),
 			host->h_inuse, host->h_expires, host->net);
 	}
@@ -603,7 +603,7 @@ nlm_shutdown_hosts_net(struct net *net)
 	mutex_lock(&nlm_host_mutex);
 
 	/* First, make all hosts eligible for gc */
-	dprintk("lockd: nuking all hosts in net %p...\n", net);
+	dprintk("lockd: nuking all hosts in net %pK...\n", net);
 	for_each_host(host, chain, nlm_server_hosts) {
 		if (net && host->net != net)
 			continue;
@@ -644,7 +644,7 @@ nlm_gc_hosts(struct net *net)
 	struct hlist_node *next;
 	struct nlm_host	*host;
 
-	dprintk("lockd: host garbage collection for net %p\n", net);
+	dprintk("lockd: host garbage collection for net %pK\n", net);
 	for_each_host(host, chain, nlm_server_hosts) {
 		if (net && host->net != net)
 			continue;
@@ -660,7 +660,7 @@ nlm_gc_hosts(struct net *net)
 		if (atomic_read(&host->h_count) || host->h_inuse
 		 || time_before(jiffies, host->h_expires)) {
 			dprintk("nlm_gc_hosts skipping %s "
-				"(cnt %d use %d exp %ld net %p)\n",
+				"(cnt %d use %d exp %ld net %pK)\n",
 				host->h_name, atomic_read(&host->h_count),
 				host->h_inuse, host->h_expires, host->net);
 			continue;

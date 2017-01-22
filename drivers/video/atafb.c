@@ -3176,7 +3176,7 @@ int __init atafb_init(void)
 			kernel_set_cachemode(screen_base, screen_len,
 					     IOMAP_WRITETHROUGH);
 		}
-		printk("atafb: screen_base %p real_screen_base %p screen_len %d\n",
+		printk("atafb: screen_base %pK real_screen_base %pK screen_len %d\n",
 			screen_base, real_screen_base, screen_len);
 #ifdef ATAFB_EXT
 	} else {

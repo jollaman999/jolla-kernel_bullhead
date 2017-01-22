@@ -393,7 +393,7 @@ static int hexium_detach(struct saa7146_dev *dev)
 {
 	struct hexium *hexium = (struct hexium *) dev->ext_priv;
 
-	DEB_EE("dev:%p\n", dev);
+	DEB_EE("dev:%pK\n", dev);
 
 	saa7146_unregister_device(&hexium->video_dev, dev);
 	saa7146_vv_release(dev);

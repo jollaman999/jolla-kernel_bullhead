@@ -793,7 +793,7 @@ static int ftl_read(partition_t *part, caddr_t buffer,
     int ret;
     size_t offset, retlen;
 
-    pr_debug("ftl_cs: ftl_read(0x%p, 0x%lx, %ld)\n",
+    pr_debug("ftl_cs: ftl_read(0x%pK, 0x%lx, %ld)\n",
 	  part, sector, nblocks);
     if (!(part->state & FTL_FORMATTED)) {
 	printk(KERN_NOTICE "ftl_cs: bad partition\n");
@@ -842,7 +842,7 @@ static int set_bam_entry(partition_t *part, uint32_t log_addr,
     int ret;
     size_t retlen, offset;
 
-    pr_debug("ftl_cs: set_bam_entry(0x%p, 0x%x, 0x%x)\n",
+    pr_debug("ftl_cs: set_bam_entry(0x%pK, 0x%x, 0x%x)\n",
 	  part, log_addr, virt_addr);
     bsize = 1 << part->header.EraseUnitSize;
     eun = log_addr / bsize;
@@ -907,7 +907,7 @@ static int ftl_write(partition_t *part, caddr_t buffer,
     int ret;
     size_t retlen, offset;
 
-    pr_debug("ftl_cs: ftl_write(0x%p, %ld, %ld)\n",
+    pr_debug("ftl_cs: ftl_write(0x%pK, %ld, %ld)\n",
 	  part, sector, nblocks);
     if (!(part->state & FTL_FORMATTED)) {
 	printk(KERN_NOTICE "ftl_cs: bad partition\n");

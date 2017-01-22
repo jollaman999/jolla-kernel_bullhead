@@ -2028,7 +2028,7 @@ il3945_read_ucode(struct il_priv *il)
 	memcpy(il->ucode_code.v_addr, src, len);
 	src += len;
 
-	D_INFO("uCode instr buf vaddr = 0x%p, paddr = 0x%08x\n",
+	D_INFO("uCode instr buf vaddr = 0x%pK, paddr = 0x%08x\n",
 	       il->ucode_code.v_addr, (u32) il->ucode_code.p_addr);
 
 	/* Runtime data (2nd block)
@@ -3689,7 +3689,7 @@ il3945_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	D_INFO("pci_resource_len = 0x%08llx\n",
 	       (unsigned long long)pci_resource_len(pdev, 0));
-	D_INFO("pci_resource_base = %p\n", il->hw_base);
+	D_INFO("pci_resource_base = %pK\n", il->hw_base);
 
 	/* We disable the RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state */

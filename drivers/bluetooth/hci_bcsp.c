@@ -340,7 +340,7 @@ static struct sk_buff *bcsp_dequeue(struct hci_uart *hu)
 
 static int bcsp_flush(struct hci_uart *hu)
 {
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 	return 0;
 }
 
@@ -554,7 +554,7 @@ static int bcsp_recv(struct hci_uart *hu, void *data, int count)
 	struct bcsp_struct *bcsp = hu->priv;
 	unsigned char *ptr;
 
-	BT_DBG("hu %p count %d rx_state %d rx_count %ld", 
+	BT_DBG("hu %pK count %d rx_state %d rx_count %ld", 
 		hu, count, bcsp->rx_state, bcsp->rx_count);
 
 	ptr = data;
@@ -672,7 +672,7 @@ static void bcsp_timed_event(unsigned long arg)
 	struct sk_buff *skb;
 	unsigned long flags;
 
-	BT_DBG("hu %p retransmitting %u pkts", hu, bcsp->unack.qlen);
+	BT_DBG("hu %pK retransmitting %u pkts", hu, bcsp->unack.qlen);
 
 	spin_lock_irqsave_nested(&bcsp->unack.lock, flags, SINGLE_DEPTH_NESTING);
 
@@ -690,7 +690,7 @@ static int bcsp_open(struct hci_uart *hu)
 {
 	struct bcsp_struct *bcsp;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	bcsp = kzalloc(sizeof(*bcsp), GFP_KERNEL);
 	if (!bcsp)
@@ -718,7 +718,7 @@ static int bcsp_close(struct hci_uart *hu)
 	struct bcsp_struct *bcsp = hu->priv;
 	hu->priv = NULL;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	skb_queue_purge(&bcsp->unack);
 	skb_queue_purge(&bcsp->rel);

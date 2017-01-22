@@ -3980,7 +3980,7 @@ dasd_eckd_dump_ccw_range(struct ccw1 *from, struct ccw1 *to, char *page)
 	len = 0;
 	while (from <= to) {
 		len += sprintf(page + len, PRINTK_HEADER
-			       " CCW %p: %08X %08X DAT:",
+			       " CCW %pK: %08X %08X DAT:",
 			       from, ((int *) from)[0], ((int *) from)[1]);
 
 		/* get pointer to data (consider IDALs) */
@@ -4044,14 +4044,14 @@ static void dasd_eckd_dump_sense_ccw(struct dasd_device *device,
 		      " I/O status report for device %s:\n",
 		      dev_name(&device->cdev->dev));
 	len += sprintf(page + len, PRINTK_HEADER
-		       " in req: %p CC:%02X FC:%02X AC:%02X SC:%02X DS:%02X "
+		       " in req: %pK CC:%02X FC:%02X AC:%02X SC:%02X DS:%02X "
 		       "CS:%02X RC:%d\n",
 		       req, scsw_cc(&irb->scsw), scsw_fctl(&irb->scsw),
 		       scsw_actl(&irb->scsw), scsw_stctl(&irb->scsw),
 		       scsw_dstat(&irb->scsw), scsw_cstat(&irb->scsw),
 		       req ? req->intrc : 0);
 	len += sprintf(page + len, PRINTK_HEADER
-		       " device %s: Failing CCW: %p\n",
+		       " device %s: Failing CCW: %pK\n",
 		       dev_name(&device->cdev->dev),
 		       (void *) (addr_t) irb->scsw.cmd.cpa);
 	if (irb->esw.esw0.erw.cons) {
@@ -4095,7 +4095,7 @@ static void dasd_eckd_dump_sense_ccw(struct dasd_device *device,
 		for (last = first; last->flags & (CCW_FLAG_CC | CCW_FLAG_DC); last++);
 		to = min(first + 6, last);
 		len = sprintf(page, PRINTK_HEADER
-			      " Related CP in req: %p\n", req);
+			      " Related CP in req: %pK\n", req);
 		dasd_eckd_dump_ccw_range(first, to, page + len);
 		printk(KERN_ERR "%s", page);
 
@@ -4148,7 +4148,7 @@ static void dasd_eckd_dump_sense_tcw(struct dasd_device *device,
 		      " I/O status report for device %s:\n",
 		      dev_name(&device->cdev->dev));
 	len += sprintf(page + len, PRINTK_HEADER
-		       " in req: %p CC:%02X FC:%02X AC:%02X SC:%02X DS:%02X "
+		       " in req: %pK CC:%02X FC:%02X AC:%02X SC:%02X DS:%02X "
 		       "CS:%02X fcxs:%02X schxs:%02X RC:%d\n",
 		       req, scsw_cc(&irb->scsw), scsw_fctl(&irb->scsw),
 		       scsw_actl(&irb->scsw), scsw_stctl(&irb->scsw),
@@ -4156,7 +4156,7 @@ static void dasd_eckd_dump_sense_tcw(struct dasd_device *device,
 		       irb->scsw.tm.fcxs, irb->scsw.tm.schxs,
 		       req ? req->intrc : 0);
 	len += sprintf(page + len, PRINTK_HEADER
-		       " device %s: Failing TCW: %p\n",
+		       " device %s: Failing TCW: %pK\n",
 		       dev_name(&device->cdev->dev),
 		       (void *) (addr_t) irb->scsw.tm.tcw);
 

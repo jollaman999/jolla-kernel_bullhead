@@ -459,7 +459,7 @@ static int probes_seq_show(struct seq_file *m, void *v)
 	int i;
 
 	seq_printf(m, "%c:%s/%s", c, tu->call.class->system, tu->call.name);
-	seq_printf(m, " %s:0x%p", tu->filename, (void *)tu->offset);
+	seq_printf(m, " %s:0x%pK", tu->filename, (void *)tu->offset);
 
 	for (i = 0; i < tu->nr_args; i++)
 		seq_printf(m, " %s=%s", tu->args[i].name, tu->args[i].comm);

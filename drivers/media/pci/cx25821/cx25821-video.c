@@ -375,7 +375,7 @@ static int cx25821_buffer_prepare(struct videobuf_queue *q, struct videobuf_buff
 		}
 	}
 
-	dprintk(2, "[%p/%d] buffer_prep - %dx%d %dbpp \"%s\" - dma=0x%08lx\n",
+	dprintk(2, "[%pK/%d] buffer_prep - %dx%d %dbpp \"%s\" - dma=0x%08lx\n",
 		buf, buf->vb.i, chan->width, chan->height, chan->fmt->depth,
 		chan->fmt->name, (unsigned long)buf->risc.dma);
 
@@ -424,7 +424,7 @@ static void buffer_queue(struct videobuf_queue *vq, struct videobuf_buffer *vb)
 	if (!list_empty(&q->queued)) {
 		list_add_tail(&buf->vb.queue, &q->queued);
 		buf->vb.state = VIDEOBUF_QUEUED;
-		dprintk(2, "[%p/%d] buffer_queue - append to queued\n", buf,
+		dprintk(2, "[%pK/%d] buffer_queue - append to queued\n", buf,
 				buf->vb.i);
 
 	} else if (list_empty(&q->active)) {
@@ -433,7 +433,7 @@ static void buffer_queue(struct videobuf_queue *vq, struct videobuf_buffer *vb)
 		buf->vb.state = VIDEOBUF_ACTIVE;
 		buf->count = q->count++;
 		mod_timer(&q->timeout, jiffies + BUFFER_TIMEOUT);
-		dprintk(2, "[%p/%d] buffer_queue - first active, buf cnt = %d, q->count = %d\n",
+		dprintk(2, "[%pK/%d] buffer_queue - first active, buf cnt = %d, q->count = %d\n",
 				buf, buf->vb.i, buf->count, q->count);
 	} else {
 		prev = list_entry(q->active.prev, struct cx25821_buffer,
@@ -448,13 +448,13 @@ static void buffer_queue(struct videobuf_queue *vq, struct videobuf_buffer *vb)
 
 			/* 64 bit bits 63-32 */
 			prev->risc.jmp[2] = cpu_to_le32(0);
-			dprintk(2, "[%p/%d] buffer_queue - append to active, buf->count=%d\n",
+			dprintk(2, "[%pK/%d] buffer_queue - append to active, buf->count=%d\n",
 					buf, buf->vb.i, buf->count);
 
 		} else {
 			list_add_tail(&buf->vb.queue, &q->queued);
 			buf->vb.state = VIDEOBUF_QUEUED;
-			dprintk(2, "[%p/%d] buffer_queue - first queued\n", buf,
+			dprintk(2, "[%pK/%d] buffer_queue - first queued\n", buf,
 					buf->vb.i);
 		}
 	}

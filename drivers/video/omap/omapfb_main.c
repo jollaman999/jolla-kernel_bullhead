@@ -173,7 +173,7 @@ static int ctrl_init(struct omapfb_device *fbdev)
 
 #ifdef DEBUG
 	for (i = 0; i < fbdev->mem_desc.region_cnt; i++) {
-		dev_dbg(fbdev->dev, "region%d phys %08x virt %p size=%lu\n",
+		dev_dbg(fbdev->dev, "region%d phys %08x virt %pK size=%lu\n",
 			 i,
 			 fbdev->mem_desc.region[i].paddr,
 			 fbdev->mem_desc.region[i].vaddr,

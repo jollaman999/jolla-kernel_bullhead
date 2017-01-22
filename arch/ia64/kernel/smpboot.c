@@ -435,7 +435,7 @@ smp_callin (void)
 	 * Allow the master to continue.
 	 */
 	cpu_set(cpuid, cpu_callin_map);
-	Dprintk("Stack on CPU %d at about %p\n",cpuid, &cpuid);
+	Dprintk("Stack on CPU %d at about %pK\n",cpuid, &cpuid);
 }
 
 

@@ -284,7 +284,7 @@ acpi_ps_get_next_namepath(struct acpi_walk_state *walk_state,
 
 		method_desc = acpi_ns_get_attached_object(node);
 		ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
-				  "Control Method - %p Desc %p Path=%p\n", node,
+				  "Control Method - %pK Desc %pK Path=%pK\n", node,
 				  method_desc, path));
 
 		name_op = acpi_ps_alloc_op(AML_INT_NAMEPATH_OP);
@@ -304,13 +304,13 @@ acpi_ps_get_next_namepath(struct acpi_walk_state *walk_state,
 
 		if (!method_desc) {
 			ACPI_ERROR((AE_INFO,
-				    "Control Method %p has no attached object",
+				    "Control Method %pK has no attached object",
 				    node));
 			return_ACPI_STATUS(AE_AML_INTERNAL);
 		}
 
 		ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
-				  "Control Method - %p Args %X\n",
+				  "Control Method - %pK Args %X\n",
 				  node, method_desc->method.param_count));
 
 		/* Get the number of arguments to expect */

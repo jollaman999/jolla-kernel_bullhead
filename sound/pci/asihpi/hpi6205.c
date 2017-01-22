@@ -557,7 +557,7 @@ static u16 create_adapter_obj(struct hpi_adapter_obj *pao,
 			(void *)&phw->p_interface_buffer))
 		phw->p_interface_buffer = NULL;
 
-	HPI_DEBUG_LOG(DEBUG, "interface buffer address %p\n",
+	HPI_DEBUG_LOG(DEBUG, "interface buffer address %pK\n",
 		phw->p_interface_buffer);
 
 	if (phw->p_interface_buffer) {

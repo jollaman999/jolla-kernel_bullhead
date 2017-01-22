@@ -2188,7 +2188,7 @@ int bnx2x_iov_nic_init(struct bnx2x *bp)
 			(base_vf_cid & (ILT_PAGE_CIDS-1));
 
 		DP(BNX2X_MSG_IOV,
-		   "VF[%d] Max IGU SBs: %d, base vf cid 0x%x, base cid 0x%x, base cxt %p\n",
+		   "VF[%d] Max IGU SBs: %d, base vf cid 0x%x, base cid 0x%x, base cxt %pK\n",
 		   vf->abs_vfid, vf_sb_count(vf), base_vf_cid,
 		   BNX2X_FIRST_VF_CID + base_vf_cid, base_cxt);
 
@@ -2748,7 +2748,7 @@ int bnx2x_vf_acquire(struct bnx2x *bp, struct bnx2x_virtf *vf,
 		q->cxt = &((base_cxt + i)->eth);
 		q->cid = BNX2X_FIRST_VF_CID + base_vf_cid + i;
 
-		DP(BNX2X_MSG_IOV, "VFQ[%d:%d]: index %d, cid 0x%x, cxt %p\n",
+		DP(BNX2X_MSG_IOV, "VFQ[%d:%d]: index %d, cid 0x%x, cxt %pK\n",
 		   vf->abs_vfid, i, q->index, q->cid, q->cxt);
 
 		/* init SP objects */

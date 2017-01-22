@@ -51,7 +51,7 @@ static void p54_dump_tx_queue(struct p54_common *priv)
 
 		free = range->start_addr - prev_addr;
 		wiphy_debug(priv->hw->wiphy,
-			    "| [%02d] => [skb:%p skb_len:0x%04x "
+			    "| [%02d] => [skb:%pK skb_len:0x%04x "
 			    "hdr:{flags:%02x len:%04x req_id:%04x type:%02x} "
 			    "mem:{start:%04x end:%04x, free:%d}]\n",
 			    i++, skb, skb->len,

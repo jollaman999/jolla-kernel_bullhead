@@ -331,7 +331,7 @@ long mobicore_log_setup(void)
 #endif
 	fc_log.as_in.param[2] = log_size;
 
-	MCDRV_DBG(mcd, "fc_log virt=%p phys=0x%llX",
+	MCDRV_DBG(mcd, "fc_log virt=%pK phys=0x%llX",
 		  log_buf, (u64)phys_log_buf);
 	mc_fastcall(&fc_log);
 	MCDRV_DBG(mcd, "fc_log out ret=0x%08x", fc_log.as_out.ret);

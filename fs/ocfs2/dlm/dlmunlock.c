@@ -618,7 +618,7 @@ enum dlm_status dlmunlock(struct dlm_ctxt *dlm, struct dlm_lockstatus *lksb,
 retry:
 	call_ast = 0;
 	/* need to retry up here because owner may have changed */
-	mlog(0, "lock=%p res=%p\n", lock, res);
+	mlog(0, "lock=%pK res=%pK\n", lock, res);
 
 	spin_lock(&res->spinlock);
 	is_master = (res->owner == dlm->node_num);
@@ -657,7 +657,7 @@ retry:
 	}
 
 	if (call_ast) {
-		mlog(0, "calling unlockast(%p, %d)\n", data, status);
+		mlog(0, "calling unlockast(%pK, %d)\n", data, status);
 		if (is_master) {
 			/* it is possible that there is one last bast
 			 * pending.  make sure it is flushed, then

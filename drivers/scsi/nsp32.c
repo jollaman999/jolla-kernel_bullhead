@@ -1476,7 +1476,7 @@ static int nsp32_show_info(struct seq_file *m, struct Scsi_Host *host)
 	SPRINTF("OEM:                   %ld, %s\n",     (mode_reg & (OEM0|OEM1)), nsp32_model[model]);
 
 	spin_lock_irqsave(&(data->Lock), flags);
-	SPRINTF("CurrentSC:             0x%p\n\n",      data->CurrentSC);
+	SPRINTF("CurrentSC:             0x%pK\n\n",      data->CurrentSC);
 	spin_unlock_irqrestore(&(data->Lock), flags);
 
 
@@ -3311,7 +3311,7 @@ static int nsp32_suspend(struct pci_dev *pdev, pm_message_t state)
 {
 	struct Scsi_Host *host = pci_get_drvdata(pdev);
 
-	nsp32_msg(KERN_INFO, "pci-suspend: pdev=0x%p, state=%ld, slot=%s, host=0x%p", pdev, state, pci_name(pdev), host);
+	nsp32_msg(KERN_INFO, "pci-suspend: pdev=0x%pK, state=%ld, slot=%s, host=0x%pK", pdev, state, pci_name(pdev), host);
 
 	pci_save_state     (pdev);
 	pci_disable_device (pdev);
@@ -3327,7 +3327,7 @@ static int nsp32_resume(struct pci_dev *pdev)
 	nsp32_hw_data    *data = (nsp32_hw_data *)host->hostdata;
 	unsigned short    reg;
 
-	nsp32_msg(KERN_INFO, "pci-resume: pdev=0x%p, slot=%s, host=0x%p", pdev, pci_name(pdev), host);
+	nsp32_msg(KERN_INFO, "pci-resume: pdev=0x%pK, slot=%s, host=0x%pK", pdev, pci_name(pdev), host);
 
 	pci_set_power_state(pdev, PCI_D0);
 	pci_enable_wake    (pdev, PCI_D0, 0);
@@ -3380,7 +3380,7 @@ static int nsp32_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	ret = nsp32_detect(pdev);
 
-	nsp32_msg(KERN_INFO, "irq: %i mmio: %p+0x%lx slot: %s model: %s",
+	nsp32_msg(KERN_INFO, "irq: %i mmio: %pK+0x%lx slot: %s model: %s",
 		  pdev->irq,
 		  data->MmioAddress, data->MmioLength,
 		  pci_name(pdev),

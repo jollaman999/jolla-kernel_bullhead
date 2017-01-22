@@ -564,7 +564,7 @@ void drm_framebuffer_remove(struct drm_framebuffer *fb)
 				set.fb = NULL;
 				ret = drm_mode_set_config_internal(&set);
 				if (ret)
-					DRM_ERROR("failed to reset crtc %p when fb was deleted\n", crtc);
+					DRM_ERROR("failed to reset crtc %pK when fb was deleted\n", crtc);
 			}
 		}
 

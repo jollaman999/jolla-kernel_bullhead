@@ -816,7 +816,7 @@ static int _sram_proc_show(struct seq_file *m, const char *desc,
 	pslot = pused_head->next;
 
 	while (pslot != NULL) {
-		seq_printf(m, "%p-%p %10i %5i %-10s\n",
+		seq_printf(m, "%pK-%pK %10i %5i %-10s\n",
 			pslot->paddr, pslot->paddr + pslot->size,
 			pslot->size, pslot->pid, "ALLOCATED");
 
@@ -826,7 +826,7 @@ static int _sram_proc_show(struct seq_file *m, const char *desc,
 	pslot = pfree_head->next;
 
 	while (pslot != NULL) {
-		seq_printf(m, "%p-%p %10i %5i %-10s\n",
+		seq_printf(m, "%pK-%pK %10i %5i %-10s\n",
 			pslot->paddr, pslot->paddr + pslot->size,
 			pslot->size, pslot->pid, "FREE");
 

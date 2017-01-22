@@ -36,7 +36,7 @@ static const char *pvr2_buffer_state_decode(enum pvr2_buffer_state);
 #define BUFFER_CHECK(bp) do { \
 	if ((bp)->signature != BUFFER_SIG) { \
 		pvr2_trace(PVR2_TRACE_ERROR_LEGS, \
-		"Buffer %p is bad at %s:%d", \
+		"Buffer %pK is bad at %s:%d", \
 		(bp),__FILE__,__LINE__); \
 		pvr2_buffer_describe(bp,"BadSig"); \
 		BUG(); \
@@ -113,8 +113,8 @@ static const char *pvr2_buffer_state_decode(enum pvr2_buffer_state st)
 static void pvr2_buffer_describe(struct pvr2_buffer *bp,const char *msg)
 {
 	pvr2_trace(PVR2_TRACE_INFO,
-		   "buffer%s%s %p state=%s id=%d status=%d"
-		   " stream=%p purb=%p sig=0x%x",
+		   "buffer%s%s %pK state=%s id=%d status=%d"
+		   " stream=%pK purb=%pK sig=0x%x",
 		   (msg ? " " : ""),
 		   (msg ? msg : ""),
 		   bp,
@@ -169,7 +169,7 @@ static void pvr2_buffer_set_none(struct pvr2_buffer *bp)
 	BUFFER_CHECK(bp);
 	sp = bp->stream;
 	pvr2_trace(PVR2_TRACE_BUF_FLOW,
-		   "/*---TRACE_FLOW---*/ bufferState    %p %6s --> %6s",
+		   "/*---TRACE_FLOW---*/ bufferState    %pK %6s --> %6s",
 		   bp,
 		   pvr2_buffer_state_decode(bp->state),
 		   pvr2_buffer_state_decode(pvr2_buffer_state_none));
@@ -186,7 +186,7 @@ static int pvr2_buffer_set_ready(struct pvr2_buffer *bp)
 	BUFFER_CHECK(bp);
 	sp = bp->stream;
 	pvr2_trace(PVR2_TRACE_BUF_FLOW,
-		   "/*---TRACE_FLOW---*/ bufferState    %p %6s --> %6s",
+		   "/*---TRACE_FLOW---*/ bufferState    %pK %6s --> %6s",
 		   bp,
 		   pvr2_buffer_state_decode(bp->state),
 		   pvr2_buffer_state_decode(pvr2_buffer_state_ready));
@@ -213,7 +213,7 @@ static void pvr2_buffer_set_idle(struct pvr2_buffer *bp)
 	BUFFER_CHECK(bp);
 	sp = bp->stream;
 	pvr2_trace(PVR2_TRACE_BUF_FLOW,
-		   "/*---TRACE_FLOW---*/ bufferState    %p %6s --> %6s",
+		   "/*---TRACE_FLOW---*/ bufferState    %pK %6s --> %6s",
 		   bp,
 		   pvr2_buffer_state_decode(bp->state),
 		   pvr2_buffer_state_decode(pvr2_buffer_state_idle));
@@ -238,7 +238,7 @@ static void pvr2_buffer_set_queued(struct pvr2_buffer *bp)
 	BUFFER_CHECK(bp);
 	sp = bp->stream;
 	pvr2_trace(PVR2_TRACE_BUF_FLOW,
-		   "/*---TRACE_FLOW---*/ bufferState    %p %6s --> %6s",
+		   "/*---TRACE_FLOW---*/ bufferState    %pK %6s --> %6s",
 		   bp,
 		   pvr2_buffer_state_decode(bp->state),
 		   pvr2_buffer_state_decode(pvr2_buffer_state_queued));
@@ -271,7 +271,7 @@ static int pvr2_buffer_init(struct pvr2_buffer *bp,
 	bp->signature = BUFFER_SIG;
 	bp->id = id;
 	pvr2_trace(PVR2_TRACE_BUF_POOL,
-		   "/*---TRACE_FLOW---*/ bufferInit     %p stream=%p",bp,sp);
+		   "/*---TRACE_FLOW---*/ bufferInit     %pK stream=%pK",bp,sp);
 	bp->stream = sp;
 	bp->state = pvr2_buffer_state_none;
 	INIT_LIST_HEAD(&bp->list_overhead);
@@ -294,7 +294,7 @@ static void pvr2_buffer_done(struct pvr2_buffer *bp)
 	bp->stream = NULL;
 	usb_free_urb(bp->purb);
 	pvr2_trace(PVR2_TRACE_BUF_POOL,"/*---TRACE_FLOW---*/"
-		   " bufferDone     %p",bp);
+		   " bufferDone     %pK",bp);
 }
 
 static int pvr2_stream_buffer_count(struct pvr2_stream *sp,unsigned int cnt)
@@ -307,7 +307,7 @@ static int pvr2_stream_buffer_count(struct pvr2_stream *sp,unsigned int cnt)
 
 	pvr2_trace(PVR2_TRACE_BUF_POOL,
 		   "/*---TRACE_FLOW---*/ poolResize    "
-		   " stream=%p cur=%d adj=%+d",
+		   " stream=%pK cur=%d adj=%+d",
 		   sp,
 		   sp->buffer_total_count,
 		   cnt-sp->buffer_total_count);
@@ -375,7 +375,7 @@ static int pvr2_stream_achieve_buffer_count(struct pvr2_stream *sp)
 
 	pvr2_trace(PVR2_TRACE_BUF_POOL,
 		   "/*---TRACE_FLOW---*/"
-		   " poolCheck      stream=%p cur=%d tgt=%d",
+		   " poolCheck      stream=%pK cur=%d tgt=%d",
 		   sp,sp->buffer_total_count,sp->buffer_target_count);
 
 	if (sp->buffer_total_count < sp->buffer_target_count) {
@@ -442,7 +442,7 @@ static void buffer_complete(struct urb *urb)
 	bp->used_count = 0;
 	bp->status = 0;
 	pvr2_trace(PVR2_TRACE_BUF_FLOW,
-		   "/*---TRACE_FLOW---*/ bufferComplete %p stat=%d cnt=%d",
+		   "/*---TRACE_FLOW---*/ bufferComplete %pK stat=%d cnt=%d",
 		   bp,urb->status,urb->actual_length);
 	spin_lock_irqsave(&sp->list_lock,irq_flags);
 	if ((!(urb->status)) ||
@@ -454,7 +454,7 @@ static void buffer_complete(struct urb *urb)
 		bp->used_count = urb->actual_length;
 		if (sp->fail_count) {
 			pvr2_trace(PVR2_TRACE_TOLERANCE,
-				   "stream %p transfer ok"
+				   "stream %pK transfer ok"
 				   " - fail count reset",sp);
 			sp->fail_count = 0;
 		}
@@ -464,7 +464,7 @@ static void buffer_complete(struct urb *urb)
 		(sp->fail_count)++;
 		(sp->buffers_failed)++;
 		pvr2_trace(PVR2_TRACE_TOLERANCE,
-			   "stream %p ignoring error %d"
+			   "stream %pK ignoring error %d"
 			   " - fail count increased to %u",
 			   sp,urb->status,sp->fail_count);
 	} else {
@@ -483,7 +483,7 @@ struct pvr2_stream *pvr2_stream_create(void)
 	struct pvr2_stream *sp;
 	sp = kzalloc(sizeof(*sp),GFP_KERNEL);
 	if (!sp) return sp;
-	pvr2_trace(PVR2_TRACE_INIT,"pvr2_stream_create: sp=%p",sp);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr2_stream_create: sp=%pK",sp);
 	pvr2_stream_init(sp);
 	return sp;
 }
@@ -491,7 +491,7 @@ struct pvr2_stream *pvr2_stream_create(void)
 void pvr2_stream_destroy(struct pvr2_stream *sp)
 {
 	if (!sp) return;
-	pvr2_trace(PVR2_TRACE_INIT,"pvr2_stream_destroy: sp=%p",sp);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr2_stream_destroy: sp=%pK",sp);
 	pvr2_stream_done(sp);
 	kfree(sp);
 }

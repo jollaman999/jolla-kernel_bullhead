@@ -59,7 +59,7 @@ int mantis_dma_exit(struct mantis_pci *mantis)
 {
 	if (mantis->buf_cpu) {
 		dprintk(MANTIS_ERROR, 1,
-			"DMA=0x%lx cpu=0x%p size=%d",
+			"DMA=0x%lx cpu=0x%pK size=%d",
 			(unsigned long) mantis->buf_dma,
 			 mantis->buf_cpu,
 			 MANTIS_BUF_SIZE);
@@ -71,7 +71,7 @@ int mantis_dma_exit(struct mantis_pci *mantis)
 	}
 	if (mantis->risc_cpu) {
 		dprintk(MANTIS_ERROR, 1,
-			"RISC=0x%lx cpu=0x%p size=%lx",
+			"RISC=0x%lx cpu=0x%pK size=%lx",
 			(unsigned long) mantis->risc_dma,
 			mantis->risc_cpu,
 			MANTIS_RISC_SIZE);
@@ -99,7 +99,7 @@ static inline int mantis_alloc_buffers(struct mantis_pci *mantis)
 			goto err;
 		}
 		dprintk(MANTIS_ERROR, 1,
-			"DMA=0x%lx cpu=0x%p size=%d",
+			"DMA=0x%lx cpu=0x%pK size=%d",
 			(unsigned long) mantis->buf_dma,
 			mantis->buf_cpu, MANTIS_BUF_SIZE);
 	}
@@ -117,7 +117,7 @@ static inline int mantis_alloc_buffers(struct mantis_pci *mantis)
 			goto err;
 		}
 		dprintk(MANTIS_ERROR, 1,
-			"RISC=0x%lx cpu=0x%p size=%lx",
+			"RISC=0x%lx cpu=0x%pK size=%lx",
 			(unsigned long) mantis->risc_dma,
 			mantis->risc_cpu, MANTIS_RISC_SIZE);
 	}

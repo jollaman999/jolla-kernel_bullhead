@@ -159,7 +159,7 @@ enum bug_trap_type report_bug(unsigned long bugaddr, struct pt_regs *regs)
 			printk(KERN_WARNING "WARNING: at %s:%u\n",
 			       file, line);
 		else
-			printk(KERN_WARNING "WARNING: at %p "
+			printk(KERN_WARNING "WARNING: at %pK "
 			       "[verbose debug info unavailable]\n",
 			       (void *)bugaddr);
 
@@ -177,7 +177,7 @@ enum bug_trap_type report_bug(unsigned long bugaddr, struct pt_regs *regs)
 		printk(KERN_CRIT "kernel BUG at %s:%u!\n",
 		       file, line);
 	else
-		printk(KERN_CRIT "Kernel BUG at %p "
+		printk(KERN_CRIT "Kernel BUG at %pK "
 		       "[verbose debug info unavailable]\n",
 		       (void *)bugaddr);
 

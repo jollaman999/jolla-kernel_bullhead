@@ -2263,7 +2263,7 @@ void CardClearFromHostDataSlot(card_t *card, const s16 slot)
         }
     }
 
-    unifi_trace(card->ospriv, UDBG4, "CardClearFromHostDataSlot: slot %d recycled %p\n", slot, os_data_ptr);
+    unifi_trace(card->ospriv, UDBG4, "CardClearFromHostDataSlot: slot %d recycled %pK\n", slot, os_data_ptr);
 
 } /* CardClearFromHostDataSlot() */
 
@@ -3343,7 +3343,7 @@ CsrResult CardWriteBulkData(card_t *card, card_signal_t *csptr, unifi_TrafficQue
             card->from_host_data[slots[j]].bd.net_buf_length = bulkdata[i].net_buf_length;
             card->from_host_data[slots[j]].queue = queue;
 
-            unifi_trace(card->ospriv, UDBG4, "CardWriteBulkData sig=0x%x, fh slot %d = %p\n",
+            unifi_trace(card->ospriv, UDBG4, "CardWriteBulkData sig=0x%x, fh slot %d = %pK\n",
                         GET_SIGNAL_ID(packed_sigptr), i, bulkdata[i].os_data_ptr);
 
             /* Sanity-check that the bulk data desc being assigned to the slot

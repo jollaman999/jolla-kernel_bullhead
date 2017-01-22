@@ -67,7 +67,7 @@ flush_tlb_mm(struct mm_struct *mm)
 	int page_id = mm->context.page_id;
 	unsigned long flags;
 
-	D(printk("tlb: flush mm context %d (%p)\n", page_id, mm));
+	D(printk("tlb: flush mm context %d (%pK)\n", page_id, mm));
 
 	if(page_id == NO_CONTEXT)
 		return;
@@ -103,7 +103,7 @@ void flush_tlb_page(struct vm_area_struct *vma, unsigned long addr)
 	int i;
 	unsigned long flags;
 
-	D(printk("tlb: flush page %p in context %d (%p)\n", addr, page_id, mm));
+	D(printk("tlb: flush page %pK in context %d (%pK)\n", addr, page_id, mm));
 
 	if(page_id == NO_CONTEXT)
 		return;
@@ -166,7 +166,7 @@ void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 
 		/* switch context in the MMU */
 
-		D(printk(KERN_DEBUG "switching mmu_context to %d (%p)\n",
+		D(printk(KERN_DEBUG "switching mmu_context to %d (%pK)\n",
 			next->context, next));
 
 		*R_MMU_CONTEXT = IO_FIELD(R_MMU_CONTEXT,

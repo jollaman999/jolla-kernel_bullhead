@@ -216,7 +216,7 @@ void __init or32_early_setup(unsigned int fdt)
 		printk(KERN_INFO "FDT at 0x%08x\n", fdt);
 	} else {
 		early_init_devtree(__dtb_start);
-		printk(KERN_INFO "Compiled-in FDT at %p\n", __dtb_start);
+		printk(KERN_INFO "Compiled-in FDT at %pK\n", __dtb_start);
 	}
 }
 

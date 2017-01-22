@@ -50,7 +50,7 @@ int reserve_pmc_hardware(perf_irq_t new_perf_irq)
 
 	if (pmc_owner_caller) {
 		printk(KERN_WARNING "reserve_pmc_hardware: "
-		       "PMC hardware busy (reserved by caller %p)\n",
+		       "PMC hardware busy (reserved by caller %pK)\n",
 		       pmc_owner_caller);
 		err = -EBUSY;
 		goto out;

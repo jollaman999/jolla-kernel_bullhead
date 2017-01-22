@@ -16,7 +16,7 @@ static void *msgpool_alloc(gfp_t gfp_mask, void *arg)
 	if (!msg) {
 		dout("msgpool_alloc %s failed\n", pool->name);
 	} else {
-		dout("msgpool_alloc %s %p\n", pool->name, msg);
+		dout("msgpool_alloc %s %pK\n", pool->name, msg);
 		msg->pool = pool;
 	}
 	return msg;
@@ -27,7 +27,7 @@ static void msgpool_free(void *element, void *arg)
 	struct ceph_msgpool *pool = arg;
 	struct ceph_msg *msg = element;
 
-	dout("msgpool_release %s %p\n", pool->name, msg);
+	dout("msgpool_release %s %pK\n", pool->name, msg);
 	msg->pool = NULL;
 	ceph_msg_put(msg);
 }
@@ -66,13 +66,13 @@ struct ceph_msg *ceph_msgpool_get(struct ceph_msgpool *pool,
 	}
 
 	msg = mempool_alloc(pool->pool, GFP_NOFS);
-	dout("msgpool_get %s %p\n", pool->name, msg);
+	dout("msgpool_get %s %pK\n", pool->name, msg);
 	return msg;
 }
 
 void ceph_msgpool_put(struct ceph_msgpool *pool, struct ceph_msg *msg)
 {
-	dout("msgpool_put %s %p\n", pool->name, msg);
+	dout("msgpool_put %s %pK\n", pool->name, msg);
 
 	/* reset msg front_len; user may have changed it */
 	msg->front.iov_len = pool->front_len;

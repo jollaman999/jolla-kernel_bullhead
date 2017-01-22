@@ -193,7 +193,7 @@ static int register_device(char *name, unsigned long start, unsigned long length
 	}
 	T("slram: Registered device %s from %luKiB to %luKiB\n", name,
 			(start / 1024), ((start + length) / 1024));
-	T("slram: Mapped from 0x%p to 0x%p\n",
+	T("slram: Mapped from 0x%pK to 0x%pK\n",
 			((slram_priv_t *)(*curmtd)->mtdinfo->priv)->start,
 			((slram_priv_t *)(*curmtd)->mtdinfo->priv)->end);
 	return(0);

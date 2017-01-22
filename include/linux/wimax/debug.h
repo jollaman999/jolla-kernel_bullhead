@@ -175,7 +175,7 @@ void __d_head(char *head, size_t head_size,
 	if (dev == NULL)
 		head[0] = 0;
 	else if ((unsigned long)dev < 4096) {
-		printk(KERN_ERR "E: Corrupt dev %p\n", dev);
+		printk(KERN_ERR "E: Corrupt dev %pK\n", dev);
 		WARN_ON(1);
 	} else
 		snprintf(head, head_size, "%s %s: ",
@@ -461,7 +461,7 @@ void d_submodule_set(struct d_level *d_level, size_t d_level_size,
 	for (itr = d_level, top = itr + d_level_size; itr < top; itr++) {
 		index++;
 		if (itr->name == NULL) {
-			printk(KERN_ERR "%s: itr->name NULL?? (%p, #%d)\n",
+			printk(KERN_ERR "%s: itr->name NULL?? (%pK, #%d)\n",
 			       tag, itr, index);
 			continue;
 		}

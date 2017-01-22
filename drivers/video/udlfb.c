@@ -907,7 +907,7 @@ static int dlfb_ops_open(struct fb_info *info, int user)
 		fb_deferred_io_init(info);
 	}
 
-	pr_notice("open /dev/fb%d user=%d fb_info=%p count=%d\n",
+	pr_notice("open /dev/fb%d user=%d fb_info=%pK count=%d\n",
 	    info->node, user, info, dev->fb_count);
 
 	return 0;
@@ -927,7 +927,7 @@ static void dlfb_free(struct kref *kref)
 
 	kfree(dev->edid);
 
-	pr_warn("freeing dlfb_data %p\n", dev);
+	pr_warn("freeing dlfb_data %pK\n", dev);
 
 	kfree(dev);
 }
@@ -1420,7 +1420,7 @@ static ssize_t edid_show(
 	if (off + count > dev->edid_size)
 		count = dev->edid_size - off;
 
-	pr_info("sysfs edid copy %p to %p, %d bytes\n",
+	pr_info("sysfs edid copy %pK to %pK, %d bytes\n",
 		dev->edid, buf, (int) count);
 
 	memcpy(buf, dev->edid, count);
@@ -1609,7 +1609,7 @@ static int dlfb_usb_probe(struct usb_interface *interface,
 
 	pr_info("%s %s - serial #%s\n",
 		usbdev->manufacturer, usbdev->product, usbdev->serial);
-	pr_info("vid_%04x&pid_%04x&rev_%04x driver's dlfb_data struct at %p\n",
+	pr_info("vid_%04x&pid_%04x&rev_%04x driver's dlfb_data struct at %pK\n",
 		usbdev->descriptor.idVendor, usbdev->descriptor.idProduct,
 		usbdev->descriptor.bcdDevice, dev);
 	pr_info("console enable=%d\n", console);

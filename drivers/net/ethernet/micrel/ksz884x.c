@@ -6989,7 +6989,7 @@ static int pcidev_init(struct pci_dev *pdev, const struct pci_device_id *id)
 	snprintf(banner, sizeof(banner), "%s", version);
 	banner[13] = cnt + '0';		/* Replace x in "Micrel KSZ884x" */
 	dev_info(&hw_priv->pdev->dev, "%s\n", banner);
-	dev_dbg(&hw_priv->pdev->dev, "Mem = %p; IRQ = %d\n", hw->io, pdev->irq);
+	dev_dbg(&hw_priv->pdev->dev, "Mem = %pK; IRQ = %d\n", hw->io, pdev->irq);
 
 	/* Assume device is KSZ8841. */
 	hw->dev_count = 1;

@@ -140,7 +140,7 @@ acpi_ev_queue_notify_request(struct acpi_namespace_node * node,
 	if (!acpi_gbl_global_notify[handler_list_id].handler
 	    && !handler_list_head) {
 		ACPI_DEBUG_PRINT((ACPI_DB_INFO,
-				  "No notify handler for Notify, ignoring (%4.4s, %X) node %p\n",
+				  "No notify handler for Notify, ignoring (%4.4s, %X) node %pK\n",
 				  acpi_ut_get_node_name(node), notify_value,
 				  node));
 
@@ -163,7 +163,7 @@ acpi_ev_queue_notify_request(struct acpi_namespace_node * node,
 	info->notify.global = &acpi_gbl_global_notify[handler_list_id];
 
 	ACPI_DEBUG_PRINT((ACPI_DB_INFO,
-			  "Dispatching Notify on [%4.4s] (%s) Value 0x%2.2X (%s) Node %p\n",
+			  "Dispatching Notify on [%4.4s] (%s) Value 0x%2.2X (%s) Node %pK\n",
 			  acpi_ut_get_node_name(node),
 			  acpi_ut_get_type_name(node->type), notify_value,
 			  acpi_ut_get_notify_name(notify_value), node));

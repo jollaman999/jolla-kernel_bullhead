@@ -205,7 +205,7 @@ int nsm_monitor(const struct nlm_host *host)
 	if (IS_ERR(clnt)) {
 		status = PTR_ERR(clnt);
 		dprintk("lockd: failed to create NSM upcall transport, "
-				"status=%d, net=%p\n", status, host->net);
+				"status=%d, net=%pK\n", status, host->net);
 		return status;
 	}
 

@@ -168,7 +168,7 @@ static int efficeon_free_gatt_table(struct agp_bridge_data *bridge)
 			free_page(page);
 			freed++;
 		}
-		printk(KERN_DEBUG PFX "efficeon_free_gatt_table(%p, %02x, %08x)\n",
+		printk(KERN_DEBUG PFX "efficeon_free_gatt_table(%pK, %02x, %08x)\n",
 			agp_bridge->dev, EFFICEON_ATTPAGE, index);
 		pci_write_config_dword(agp_bridge->dev,
 			EFFICEON_ATTPAGE, index);

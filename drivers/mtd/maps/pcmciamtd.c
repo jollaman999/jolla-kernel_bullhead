@@ -115,7 +115,7 @@ static map_word pcmcia_read8_remap(struct map_info *map, unsigned long ofs)
 		return d;
 
 	d.x[0] = readb(addr);
-	pr_debug("ofs = 0x%08lx (%p) data = 0x%02lx\n", ofs, addr, d.x[0]);
+	pr_debug("ofs = 0x%08lx (%pK) data = 0x%02lx\n", ofs, addr, d.x[0]);
 	return d;
 }
 
@@ -130,7 +130,7 @@ static map_word pcmcia_read16_remap(struct map_info *map, unsigned long ofs)
 		return d;
 
 	d.x[0] = readw(addr);
-	pr_debug("ofs = 0x%08lx (%p) data = 0x%04lx\n", ofs, addr, d.x[0]);
+	pr_debug("ofs = 0x%08lx (%pK) data = 0x%04lx\n", ofs, addr, d.x[0]);
 	return d;
 }
 
@@ -140,7 +140,7 @@ static void pcmcia_copy_from_remap(struct map_info *map, void *to, unsigned long
 	struct pcmciamtd_dev *dev = (struct pcmciamtd_dev *)map->map_priv_1;
 	unsigned long win_size = dev->win_size;
 
-	pr_debug("to = %p from = %lu len = %zd\n", to, from, len);
+	pr_debug("to = %pK from = %lu len = %zd\n", to, from, len);
 	while(len) {
 		int toread = win_size - (from & (win_size-1));
 		caddr_t addr;
@@ -152,7 +152,7 @@ static void pcmcia_copy_from_remap(struct map_info *map, void *to, unsigned long
 		if(!addr)
 			return;
 
-		pr_debug("memcpy from %p to %p len = %d\n", addr, to, toread);
+		pr_debug("memcpy from %pK to %pK len = %d\n", addr, to, toread);
 		memcpy_fromio(to, addr, toread);
 		len -= toread;
 		to += toread;
@@ -168,7 +168,7 @@ static void pcmcia_write8_remap(struct map_info *map, map_word d, unsigned long 
 	if(!addr)
 		return;
 
-	pr_debug("adr = 0x%08lx (%p)  data = 0x%02lx\n", adr, addr, d.x[0]);
+	pr_debug("adr = 0x%08lx (%pK)  data = 0x%02lx\n", adr, addr, d.x[0]);
 	writeb(d.x[0], addr);
 }
 
@@ -179,7 +179,7 @@ static void pcmcia_write16_remap(struct map_info *map, map_word d, unsigned long
 	if(!addr)
 		return;
 
-	pr_debug("adr = 0x%08lx (%p)  data = 0x%04lx\n", adr, addr, d.x[0]);
+	pr_debug("adr = 0x%08lx (%pK)  data = 0x%04lx\n", adr, addr, d.x[0]);
 	writew(d.x[0], addr);
 }
 
@@ -189,7 +189,7 @@ static void pcmcia_copy_to_remap(struct map_info *map, unsigned long to, const v
 	struct pcmciamtd_dev *dev = (struct pcmciamtd_dev *)map->map_priv_1;
 	unsigned long win_size = dev->win_size;
 
-	pr_debug("to = %lu from = %p len = %zd\n", to, from, len);
+	pr_debug("to = %lu from = %pK len = %zd\n", to, from, len);
 	while(len) {
 		int towrite = win_size - (to & (win_size-1));
 		caddr_t addr;
@@ -201,7 +201,7 @@ static void pcmcia_copy_to_remap(struct map_info *map, unsigned long to, const v
 		if(!addr)
 			return;
 
-		pr_debug("memcpy from %p to %p len = %d\n", from, addr, towrite);
+		pr_debug("memcpy from %pK to %pK len = %d\n", from, addr, towrite);
 		memcpy_toio(addr, from, towrite);
 		len -= towrite;
 		to += towrite;
@@ -223,7 +223,7 @@ static map_word pcmcia_read8(struct map_info *map, unsigned long ofs)
 		return d;
 
 	d.x[0] = readb(win_base + ofs);
-	pr_debug("ofs = 0x%08lx (%p) data = 0x%02lx\n",
+	pr_debug("ofs = 0x%08lx (%pK) data = 0x%02lx\n",
 	      ofs, win_base + ofs, d.x[0]);
 	return d;
 }
@@ -238,7 +238,7 @@ static map_word pcmcia_read16(struct map_info *map, unsigned long ofs)
 		return d;
 
 	d.x[0] = readw(win_base + ofs);
-	pr_debug("ofs = 0x%08lx (%p) data = 0x%04lx\n",
+	pr_debug("ofs = 0x%08lx (%pK) data = 0x%04lx\n",
 	      ofs, win_base + ofs, d.x[0]);
 	return d;
 }
@@ -251,7 +251,7 @@ static void pcmcia_copy_from(struct map_info *map, void *to, unsigned long from,
 	if(DEV_REMOVED(map))
 		return;
 
-	pr_debug("to = %p from = %lu len = %zd\n", to, from, len);
+	pr_debug("to = %pK from = %lu len = %zd\n", to, from, len);
 	memcpy_fromio(to, win_base + from, len);
 }
 
@@ -263,7 +263,7 @@ static void pcmcia_write8(struct map_info *map, map_word d, unsigned long adr)
 	if(DEV_REMOVED(map))
 		return;
 
-	pr_debug("adr = 0x%08lx (%p)  data = 0x%02lx\n",
+	pr_debug("adr = 0x%08lx (%pK)  data = 0x%02lx\n",
 	      adr, win_base + adr, d.x[0]);
 	writeb(d.x[0], win_base + adr);
 }
@@ -276,7 +276,7 @@ static void pcmcia_write16(struct map_info *map, map_word d, unsigned long adr)
 	if(DEV_REMOVED(map))
 		return;
 
-	pr_debug("adr = 0x%08lx (%p)  data = 0x%04lx\n",
+	pr_debug("adr = 0x%08lx (%pK)  data = 0x%04lx\n",
 	      adr, win_base + adr, d.x[0]);
 	writew(d.x[0], win_base + adr);
 }
@@ -289,7 +289,7 @@ static void pcmcia_copy_to(struct map_info *map, unsigned long to, const void *f
 	if(DEV_REMOVED(map))
 		return;
 
-	pr_debug("to = %lu from = %p len = %zd\n", to, from, len);
+	pr_debug("to = %lu from = %pK len = %zd\n", to, from, len);
 	memcpy_toio(win_base + to, from, len);
 }
 
@@ -302,7 +302,7 @@ static void pcmciamtd_set_vpp(struct map_info *map, int on)
 	struct pcmcia_device *link = dev->p_dev;
 	unsigned long flags;
 
-	pr_debug("dev = %p on = %d vpp = %d\n\n", dev, on, dev->vpp);
+	pr_debug("dev = %pK on = %d vpp = %d\n\n", dev, on, dev->vpp);
 	spin_lock_irqsave(&pcmcia_vpp_lock, flags);
 	if (on) {
 		if (++pcmcia_vpp_refcnt == 1)   /* first nested 'on' */
@@ -319,7 +319,7 @@ static void pcmciamtd_release(struct pcmcia_device *link)
 {
 	struct pcmciamtd_dev *dev = link->priv;
 
-	pr_debug("link = 0x%p\n", link);
+	pr_debug("link = 0x%pK\n", link);
 
 	if (link->resource[2]->end) {
 		if(dev->win_base) {
@@ -469,7 +469,7 @@ static int pcmciamtd_config(struct pcmcia_device *link)
 	static char *probes[] = { "jedec_probe", "cfi_probe" };
 	int new_name = 0;
 
-	pr_debug("link=0x%p\n", link);
+	pr_debug("link=0x%pK\n", link);
 
 	card_settings(dev, link, &new_name);
 
@@ -539,7 +539,7 @@ static int pcmciamtd_config(struct pcmcia_device *link)
 		pcmciamtd_release(link);
 		return -ENODEV;
 	}
-	pr_debug("mapped window dev = %p @ %pR, base = %p\n",
+	pr_debug("mapped window dev = %pK @ %pR, base = %pK\n",
 	      dev, link->resource[2], dev->win_base);
 
 	dev->offset = 0;
@@ -656,7 +656,7 @@ static void pcmciamtd_detach(struct pcmcia_device *link)
 {
 	struct pcmciamtd_dev *dev = link->priv;
 
-	pr_debug("link=0x%p\n", link);
+	pr_debug("link=0x%pK\n", link);
 
 	if(dev->mtd_info) {
 		mtd_device_unregister(dev->mtd_info);
@@ -676,7 +676,7 @@ static int pcmciamtd_probe(struct pcmcia_device *link)
 	/* Create new memory card device */
 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
 	if (!dev) return -ENOMEM;
-	pr_debug("dev=0x%p\n", dev);
+	pr_debug("dev=0x%pK\n", dev);
 
 	dev->p_dev = link;
 	link->priv = dev;

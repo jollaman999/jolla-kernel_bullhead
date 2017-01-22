@@ -628,10 +628,10 @@ enum dlm_status dlmlock(struct dlm_ctxt *dlm, int mode,
 		if (lock->lksb != lksb || lock->ast != ast ||
 		    lock->bast != bast || lock->astdata != data) {
 			status = DLM_BADARGS;
-			mlog(ML_ERROR, "new args:  lksb=%p, ast=%p, bast=%p, "
-			     "astdata=%p\n", lksb, ast, bast, data);
-			mlog(ML_ERROR, "orig args: lksb=%p, ast=%p, bast=%p, "
-			     "astdata=%p\n", lock->lksb, lock->ast,
+			mlog(ML_ERROR, "new args:  lksb=%pK, ast=%pK, bast=%pK, "
+			     "astdata=%pK\n", lksb, ast, bast, data);
+			mlog(ML_ERROR, "orig args: lksb=%pK, ast=%pK, bast=%pK, "
+			     "astdata=%pK\n", lock->lksb, lock->ast,
 			     lock->bast, lock->astdata);
 			goto error;
 		}
@@ -688,7 +688,7 @@ retry_convert:
 		}
 
 		mlog(0, "type=%d, flags = 0x%x\n", mode, flags);
-		mlog(0, "creating lock: lock=%p res=%p\n", lock, res);
+		mlog(0, "creating lock: lock=%pK res=%pK\n", lock, res);
 
 		dlm_lock_attach_lockres(lock, res);
 		lock->ast = ast;

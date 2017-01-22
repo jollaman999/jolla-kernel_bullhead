@@ -246,7 +246,7 @@ static void dwc2_hprt0_enable(struct dwc2_hsotg *hsotg, u32 hprt0,
 	u32 hcfg;
 	u32 hfir;
 
-	dev_vdbg(hsotg->dev, "%s(%p)\n", __func__, hsotg);
+	dev_vdbg(hsotg->dev, "%s(%pK)\n", __func__, hsotg);
 
 	/* Every time when port enables calculate HFIR.FrInterval */
 	hfir = readl(hsotg->regs + HFIR);
@@ -649,7 +649,7 @@ static void dwc2_deactivate_qh(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 	struct dwc2_qtd *qtd;
 
 	if (dbg_qh(qh))
-		dev_vdbg(hsotg->dev, "  %s(%p,%p,%d)\n", __func__,
+		dev_vdbg(hsotg->dev, "  %s(%pK,%pK,%d)\n", __func__,
 			 hsotg, qh, free_qtd);
 
 	if (list_empty(&qh->qtd_list)) {
@@ -1547,9 +1547,9 @@ static void dwc2_hc_ahberr_intr(struct dwc2_hsotg *hsotg,
 	dev_err(hsotg->dev, "  Max packet size: %d\n",
 		dwc2_hcd_get_mps(&urb->pipe_info));
 	dev_err(hsotg->dev, "  Data buffer length: %d\n", urb->length);
-	dev_err(hsotg->dev, "  Transfer buffer: %p, Transfer DMA: %08lx\n",
+	dev_err(hsotg->dev, "  Transfer buffer: %pK, Transfer DMA: %08lx\n",
 		urb->buf, (unsigned long)urb->dma);
-	dev_err(hsotg->dev, "  Setup buffer: %p, Setup DMA: %08lx\n",
+	dev_err(hsotg->dev, "  Setup buffer: %pK, Setup DMA: %08lx\n",
 		urb->setup_packet, (unsigned long)urb->setup_dma);
 	dev_err(hsotg->dev, "  Interval: %d\n", urb->interval);
 

@@ -802,7 +802,7 @@ static void eth_txdone_irq(void *unused)
 
 			dma_unmap_tx(port, desc);
 #if DEBUG_TX
-			printk(KERN_DEBUG "%s: eth_txdone_irq free %p\n",
+			printk(KERN_DEBUG "%s: eth_txdone_irq free %pK\n",
 			       port->netdev->name, port->tx_buff_tab[n_desc]);
 #endif
 			free_buffer_irq(port->tx_buff_tab[n_desc]);

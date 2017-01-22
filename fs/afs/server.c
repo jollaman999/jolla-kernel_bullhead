@@ -35,7 +35,7 @@ static int afs_install_server(struct afs_server *server)
 	struct rb_node **pp, *p;
 	int ret;
 
-	_enter("%p", server);
+	_enter("%pK", server);
 
 	write_lock(&afs_servers_lock);
 
@@ -44,7 +44,7 @@ static int afs_install_server(struct afs_server *server)
 	p = NULL;
 	while (*pp) {
 		p = *pp;
-		_debug("- consider %p", p);
+		_debug("- consider %pK", p);
 		xserver = rb_entry(p, struct afs_server, master_rb);
 		if (server->addr.s_addr < xserver->addr.s_addr)
 			pp = &(*pp)->rb_left;
@@ -91,7 +91,7 @@ static struct afs_server *afs_alloc_server(struct afs_cell *cell,
 
 		memcpy(&server->addr, addr, sizeof(struct in_addr));
 		server->addr.s_addr = addr->s_addr;
-		_leave(" = %p{%d}", server, atomic_read(&server->usage));
+		_leave(" = %pK{%d}", server, atomic_read(&server->usage));
 	} else {
 		_leave(" = NULL [nomem]");
 	}
@@ -106,7 +106,7 @@ struct afs_server *afs_lookup_server(struct afs_cell *cell,
 {
 	struct afs_server *server, *candidate;
 
-	_enter("%p,%pI4", cell, &addr->s_addr);
+	_enter("%pK,%pI4", cell, &addr->s_addr);
 
 	/* quick scan of the list to see if we already have the server */
 	read_lock(&cell->servers_lock);
@@ -140,7 +140,7 @@ struct afs_server *afs_lookup_server(struct afs_cell *cell,
 	list_add_tail(&server->link, &cell->servers);
 
 	write_unlock(&cell->servers_lock);
-	_leave(" = %p{%d}", server, atomic_read(&server->usage));
+	_leave(" = %pK{%d}", server, atomic_read(&server->usage));
 	return server;
 
 	/* found a matching server quickly */
@@ -154,7 +154,7 @@ no_longer_unused:
 		list_del_init(&server->grave);
 		spin_unlock(&afs_server_graveyard_lock);
 	}
-	_leave(" = %p{%d}", server, atomic_read(&server->usage));
+	_leave(" = %pK{%d}", server, atomic_read(&server->usage));
 	return server;
 
 	/* found a matching server on the second pass */
@@ -192,7 +192,7 @@ struct afs_server *afs_find_server(const struct in_addr *_addr)
 	while (p) {
 		server = rb_entry(p, struct afs_server, master_rb);
 
-		_debug("- consider %p", p);
+		_debug("- consider %pK", p);
 
 		if (addr.s_addr < server->addr.s_addr) {
 			p = p->rb_left;
@@ -208,7 +208,7 @@ struct afs_server *afs_find_server(const struct in_addr *_addr)
 found:
 	read_unlock(&afs_servers_lock);
 	ASSERTIFCMP(server, server->addr.s_addr, ==, addr.s_addr);
-	_leave(" = %p", server);
+	_leave(" = %pK", server);
 	return server;
 }
 
@@ -221,7 +221,7 @@ void afs_put_server(struct afs_server *server)
 	if (!server)
 		return;
 
-	_enter("%p{%d}", server, atomic_read(&server->usage));
+	_enter("%pK{%d}", server, atomic_read(&server->usage));
 
 	_debug("PUT SERVER %d", atomic_read(&server->usage));
 
@@ -250,7 +250,7 @@ void afs_put_server(struct afs_server *server)
  */
 static void afs_destroy_server(struct afs_server *server)
 {
-	_enter("%p", server);
+	_enter("%pK", server);
 
 	ASSERTIF(server->cb_break_head != server->cb_break_tail,
 		 delayed_work_pending(&server->cb_break_work));

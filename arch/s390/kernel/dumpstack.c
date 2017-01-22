@@ -143,7 +143,7 @@ void show_registers(struct pt_regs *regs)
 	char *mode;
 
 	mode = user_mode(regs) ? "User" : "Krnl";
-	printk("%s PSW : %p %p",
+	printk("%s PSW : %pK %pK",
 	       mode, (void *) regs->psw.mask,
 	       (void *) regs->psw.addr);
 	print_symbol(" (%s)\n", regs->psw.addr & PSW_ADDR_INSN);

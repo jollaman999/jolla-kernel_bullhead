@@ -770,7 +770,7 @@ static void dvb_frontend_stop(struct dvb_frontend *fe)
 	/* paranoia check in case a signal arrived */
 	if (fepriv->thread)
 		dev_warn(fe->dvb->device,
-				"dvb_frontend_stop: warning: thread %p won't exit\n",
+				"dvb_frontend_stop: warning: thread %pK won't exit\n",
 				fepriv->thread);
 }
 
@@ -1946,7 +1946,7 @@ static int dvb_frontend_ioctl_properties(struct file *file,
 		tvps = (struct dtv_properties __user *)parg;
 
 		dev_dbg(fe->dvb->device, "%s: properties.num = %d\n", __func__, tvps->num);
-		dev_dbg(fe->dvb->device, "%s: properties.props = %p\n", __func__, tvps->props);
+		dev_dbg(fe->dvb->device, "%s: properties.props = %pK\n", __func__, tvps->props);
 
 		/* Put an arbitrary limit on the number of messages that can
 		 * be sent at once */
@@ -1979,7 +1979,7 @@ static int dvb_frontend_ioctl_properties(struct file *file,
 		tvps = (struct dtv_properties __user *)parg;
 
 		dev_dbg(fe->dvb->device, "%s: properties.num = %d\n", __func__, tvps->num);
-		dev_dbg(fe->dvb->device, "%s: properties.props = %p\n", __func__, tvps->props);
+		dev_dbg(fe->dvb->device, "%s: properties.props = %pK\n", __func__, tvps->props);
 
 		/* Put an arbitrary limit on the number of messages that can
 		 * be sent at once */

@@ -384,7 +384,7 @@ static void ixgbe_dump(struct ixgbe_adapter *adapter)
 	for (n = 0; n < adapter->num_tx_queues; n++) {
 		tx_ring = adapter->tx_ring[n];
 		tx_buffer = &tx_ring->tx_buffer_info[tx_ring->next_to_clean];
-		pr_info(" %5d %5X %5X %016llX %08X %p %016llX\n",
+		pr_info(" %5d %5X %5X %016llX %08X %pK %016llX\n",
 			   n, tx_ring->next_to_use, tx_ring->next_to_clean,
 			   (u64)dma_unmap_addr(tx_buffer, dma),
 			   dma_unmap_len(tx_buffer, len),
@@ -448,7 +448,7 @@ static void ixgbe_dump(struct ixgbe_adapter *adapter)
 			tx_buffer = &tx_ring->tx_buffer_info[i];
 			u0 = (struct my_u0 *)tx_desc;
 			if (dma_unmap_len(tx_buffer, len) > 0) {
-				pr_info("T [0x%03X]    %016llX %016llX %016llX %08X %p %016llX %p",
+				pr_info("T [0x%03X]    %016llX %016llX %016llX %08X %pK %016llX %pK",
 					i,
 					le64_to_cpu(u0->a),
 					le64_to_cpu(u0->b),
@@ -561,13 +561,13 @@ rx_ring_summary:
 			if (staterr & IXGBE_RXD_STAT_DD) {
 				/* Descriptor Done */
 				pr_info("RWB[0x%03X]     %016llX "
-					"%016llX ---------------- %p", i,
+					"%016llX ---------------- %pK", i,
 					le64_to_cpu(u0->a),
 					le64_to_cpu(u0->b),
 					rx_buffer_info->skb);
 			} else {
 				pr_info("R  [0x%03X]     %016llX "
-					"%016llX %016llX %p", i,
+					"%016llX %016llX %pK", i,
 					le64_to_cpu(u0->a),
 					le64_to_cpu(u0->b),
 					(u64)rx_buffer_info->dma,

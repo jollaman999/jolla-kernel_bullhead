@@ -720,7 +720,7 @@ bfad_pci_init(struct pci_dev *pdev, struct bfad_s *bfad)
 	int		rc = -ENODEV;
 
 	if (pci_enable_device(pdev)) {
-		printk(KERN_ERR "pci_enable_device fail %p\n", pdev);
+		printk(KERN_ERR "pci_enable_device fail %pK\n", pdev);
 		goto out;
 	}
 
@@ -734,7 +734,7 @@ bfad_pci_init(struct pci_dev *pdev, struct bfad_s *bfad)
 	    (pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64)) != 0)) {
 		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)) != 0) ||
 		   (pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32)) != 0)) {
-			printk(KERN_ERR "pci_set_dma_mask fail %p\n", pdev);
+			printk(KERN_ERR "pci_set_dma_mask fail %pK\n", pdev);
 			goto out_release_region;
 		}
 	}

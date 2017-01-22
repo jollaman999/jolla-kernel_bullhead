@@ -293,7 +293,7 @@ static u64 prefetch_spill_page;
 static void
 sba_dump_tlb(char *hpa)
 {
-	DBG_INIT("IO TLB at 0x%p\n", (void *)hpa);
+	DBG_INIT("IO TLB at 0x%pK\n", (void *)hpa);
 	DBG_INIT("IOC_IBASE    : %016lx\n", READ_REG(hpa+IOC_IBASE));
 	DBG_INIT("IOC_IMASK    : %016lx\n", READ_REG(hpa+IOC_IMASK));
 	DBG_INIT("IOC_TCNFG    : %016lx\n", READ_REG(hpa+IOC_TCNFG));
@@ -321,12 +321,12 @@ sba_dump_pdir_entry(struct ioc *ioc, char *msg, uint pide)
 	unsigned long *rptr = (unsigned long *) &ioc->res_map[(pide >>3) & -sizeof(unsigned long)];
 	uint rcnt;
 
-	printk(KERN_DEBUG "SBA: %s rp %p bit %d rval 0x%lx\n",
+	printk(KERN_DEBUG "SBA: %s rp %pK bit %d rval 0x%lx\n",
 		 msg, rptr, pide & (BITS_PER_LONG - 1), *rptr);
 
 	rcnt = 0;
 	while (rcnt < BITS_PER_LONG) {
-		printk(KERN_DEBUG "%s %2d %p %016Lx\n",
+		printk(KERN_DEBUG "%s %2d %pK %016Lx\n",
 		       (rcnt == (pide & (BITS_PER_LONG - 1)))
 		       ? "    -->" : "       ",
 		       rcnt, ptr, (unsigned long long) *ptr );
@@ -395,7 +395,7 @@ static void
 sba_dump_sg( struct ioc *ioc, struct scatterlist *startsg, int nents)
 {
 	while (nents-- > 0) {
-		printk(KERN_DEBUG " %d : DMA %08lx/%05x CPU %p\n", nents,
+		printk(KERN_DEBUG " %d : DMA %08lx/%05x CPU %pK\n", nents,
 		       startsg->dma_address, startsg->dma_length,
 		       sba_sg_address(startsg));
 		startsg = sg_next(startsg);
@@ -546,10 +546,10 @@ sba_search_bitmap(struct ioc *ioc, struct device *dev,
 		base_mask = RESMAP_MASK(bits_wanted);
 		mask = base_mask << bitshiftcnt;
 
-		DBG_RES("%s() o %ld %p", __func__, o, res_ptr);
+		DBG_RES("%s() o %ld %pK", __func__, o, res_ptr);
 		for(; res_ptr < res_end ; res_ptr++)
 		{ 
-			DBG_RES("    %p %lx %lx\n", res_ptr, mask, *res_ptr);
+			DBG_RES("    %pK %lx %lx\n", res_ptr, mask, *res_ptr);
 			ASSERT(0 != mask);
 			for (; mask ; mask <<= o, bitshiftcnt += o) {
 				tpide = ptr_to_pide(ioc, res_ptr, bitshiftcnt);
@@ -678,14 +678,14 @@ sba_alloc_range(struct ioc *ioc, struct device *dev, size_t size)
 
 			pide = sba_search_bitmap(ioc, dev, pages_needed, 0);
 			if (unlikely(pide >= (ioc->res_size << 3))) {
-				printk(KERN_WARNING "%s: I/O MMU @ %p is"
+				printk(KERN_WARNING "%s: I/O MMU @ %pK is"
 				       "out of mapping resources, %u %u %lx\n",
 				       __func__, ioc->ioc_hpa, ioc->res_size,
 				       pages_needed, dma_get_seg_boundary(dev));
 				return -1;
 			}
 #else
-			printk(KERN_WARNING "%s: I/O MMU @ %p is"
+			printk(KERN_WARNING "%s: I/O MMU @ %pK is"
 			       "out of mapping resources, %u %u %lx\n",
 			       __func__, ioc->ioc_hpa, ioc->res_size,
 			       pages_needed, dma_get_seg_boundary(dev));
@@ -752,7 +752,7 @@ sba_free_range(struct ioc *ioc, dma_addr_t iova, size_t size)
 			m = RESMAP_MASK(bits_not_wanted) << (pide & (BITS_PER_LONG - 1));
 			bits_not_wanted = 0;
 
-			DBG_RES("%s( ,%x,%x) %x/%lx %x %p %lx\n", __func__, (uint) iova, size,
+			DBG_RES("%s( ,%x,%x) %x/%lx %x %pK %lx\n", __func__, (uint) iova, size,
 			        bits_not_wanted, m, pide, res_ptr, *res_ptr);
 
 			ASSERT(m != 0);
@@ -977,7 +977,7 @@ static dma_addr_t sba_map_page(struct device *dev, struct page *page,
 
 	iovp = (dma_addr_t) pide << iovp_shift;
 
-	DBG_RUN("%s() 0x%p -> 0x%lx\n", __func__, addr, (long) iovp | offset);
+	DBG_RUN("%s() 0x%pK -> 0x%lx\n", __func__, addr, (long) iovp | offset);
 
 	pdir_start = &(ioc->pdir_base[pide]);
 
@@ -985,7 +985,7 @@ static dma_addr_t sba_map_page(struct device *dev, struct page *page,
 		ASSERT(((u8 *)pdir_start)[7] == 0); /* verify availability */
 		sba_io_pdir_entry(pdir_start, (unsigned long) addr);
 
-		DBG_RUN("     pdir 0x%p %lx\n", pdir_start, *pdir_start);
+		DBG_RUN("     pdir 0x%pK %lx\n", pdir_start, *pdir_start);
 
 		addr += iovp_size;
 		size -= iovp_size;
@@ -1239,11 +1239,11 @@ sba_fill_pdir(
 
 #ifdef DEBUG_LARGE_SG_ENTRIES
 		if (dump_run_sg)
-			printk(" %2d : %08lx/%05x %p\n",
+			printk(" %2d : %08lx/%05x %pK\n",
 				nents, startsg->dma_address, cnt,
 				sba_sg_address(startsg));
 #else
-		DBG_RUN_SG(" %d : %08lx/%05x %p\n",
+		DBG_RUN_SG(" %d : %08lx/%05x %pK\n",
 				nents, startsg->dma_address, cnt,
 				sba_sg_address(startsg));
 #endif
@@ -1560,7 +1560,7 @@ static void sba_unmap_sg_attrs(struct device *dev, struct scatterlist *sglist,
 	unsigned long flags;
 #endif
 
-	DBG_RUN_SG("%s() START %d entries,  %p,%x\n",
+	DBG_RUN_SG("%s() START %d entries,  %pK,%x\n",
 		   __func__, nents, sba_sg_address(sglist), sglist->length);
 
 #ifdef ASSERT_PDIR_SANITY
@@ -1616,7 +1616,7 @@ ioc_iova_init(struct ioc *ioc)
 
 	ioc->iov_size = ~ioc->imask + 1;
 
-	DBG_INIT("%s() hpa %p IOV base 0x%lx mask 0x%lx (%dMB)\n",
+	DBG_INIT("%s() hpa %pK IOV base 0x%lx mask 0x%lx (%dMB)\n",
 		__func__, ioc->ioc_hpa, ioc->ibase, ioc->imask,
 		ioc->iov_size >> 20);
 
@@ -1640,7 +1640,7 @@ ioc_iova_init(struct ioc *ioc)
 
 	memset(ioc->pdir_base, 0, ioc->pdir_size);
 
-	DBG_INIT("%s() IOV page size %ldK pdir %p size %x\n", __func__,
+	DBG_INIT("%s() IOV page size %ldK pdir %pK size %x\n", __func__,
 		iovp_size >> 10, ioc->pdir_base, ioc->pdir_size);
 
 	ASSERT(ALIGN((unsigned long) ioc->pdir_base, 4*1024) == (unsigned long) ioc->pdir_base);
@@ -1735,7 +1735,7 @@ ioc_resource_init(struct ioc *ioc)
 							      | prefetch_spill_page);
 #endif
 
-	DBG_INIT("%s() res_map %x %p\n", __func__,
+	DBG_INIT("%s() res_map %x %pK\n", __func__,
 		 ioc->res_size, (void *) ioc->res_map);
 }
 

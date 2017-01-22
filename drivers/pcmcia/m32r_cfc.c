@@ -108,7 +108,7 @@ void pcc_ioread_byte(int sock, unsigned long port, void *buf, size_t size,
 	unsigned char *bp = (unsigned char *)buf;
 	unsigned long flags;
 
-	pr_debug("m32r_cfc: pcc_ioread_byte: sock=%d, port=%#lx, buf=%p, "
+	pr_debug("m32r_cfc: pcc_ioread_byte: sock=%d, port=%#lx, buf=%pK, "
 		 "size=%u, nmemb=%d, flag=%d\n",
 		  sock, port, buf, size, nmemb, flag);
 
@@ -134,7 +134,7 @@ void pcc_ioread_word(int sock, unsigned long port, void *buf, size_t size,
 	unsigned long flags;
 
 	pr_debug("m32r_cfc: pcc_ioread_word: sock=%d, port=%#lx, "
-		 "buf=%p, size=%u, nmemb=%d, flag=%d\n",
+		 "buf=%pK, size=%u, nmemb=%d, flag=%d\n",
 		 sock, port, buf, size, nmemb, flag);
 
 	if (size != 2)
@@ -165,7 +165,7 @@ void pcc_iowrite_byte(int sock, unsigned long port, void *buf, size_t size,
 	unsigned long flags;
 
 	pr_debug("m32r_cfc: pcc_iowrite_byte: sock=%d, port=%#lx, "
-		 "buf=%p, size=%u, nmemb=%d, flag=%d\n",
+		 "buf=%pK, size=%u, nmemb=%d, flag=%d\n",
 		 sock, port, buf, size, nmemb, flag);
 
 	/* write Byte */
@@ -190,7 +190,7 @@ void pcc_iowrite_word(int sock, unsigned long port, void *buf, size_t size,
 	unsigned long flags;
 
 	pr_debug("m32r_cfc: pcc_iowrite_word: sock=%d, port=%#lx, "
-		 "buf=%p, size=%u, nmemb=%d, flag=%d\n",
+		 "buf=%pK, size=%u, nmemb=%d, flag=%d\n",
 		 sock, port, buf, size, nmemb, flag);
 
 	if(size != 2)
@@ -363,7 +363,7 @@ static irqreturn_t pcc_interrupt(int irq, void *dev)
 	u_int events = 0;
 	int handled = 0;
 
-	pr_debug("m32r_cfc: pcc_interrupt: irq=%d, dev=%p\n", irq, dev);
+	pr_debug("m32r_cfc: pcc_interrupt: irq=%d, dev=%pK\n", irq, dev);
 	for (i = 0; i < pcc_sockets; i++) {
 		if (socket[i].cs_irq1 != irq && socket[i].cs_irq2 != irq)
 			continue;

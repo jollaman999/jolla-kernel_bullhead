@@ -359,7 +359,7 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 	case ACPI_TYPE_REGION:
 
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "Load table from Region %p\n", obj_desc));
+				  "Load table from Region %pK\n", obj_desc));
 
 		/* Region must be system_memory (from ACPI spec) */
 
@@ -441,7 +441,7 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 	case ACPI_TYPE_BUFFER:	/* Buffer or resolved region_field */
 
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "Load table from Buffer or Field %p\n",
+				  "Load table from Buffer or Field %pK\n",
 				  obj_desc));
 
 		/* Must have at least an ACPI table header */

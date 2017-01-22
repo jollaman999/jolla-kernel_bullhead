@@ -1506,7 +1506,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 	/* set up first iov for signature check */
 	rdata->iov.iov_base = buf;
 	rdata->iov.iov_len = server->total_read;
-	cifs_dbg(FYI, "0: iov_base=%p iov_len=%zu\n",
+	cifs_dbg(FYI, "0: iov_base=%pK iov_len=%zu\n",
 		 rdata->iov.iov_base, rdata->iov.iov_len);
 
 	/* how much data is in the response? */
@@ -3677,7 +3677,7 @@ validate_ntransact(char *buf, char **ppparm, char **ppdata,
 		cifs_dbg(FYI, "data starts after end of smb\n");
 		return -EINVAL;
 	} else if (data_count + *ppdata > end_of_smb) {
-		cifs_dbg(FYI, "data %p + count %d (%p) past smb end %p start %p\n",
+		cifs_dbg(FYI, "data %pK + count %d (%pK) past smb end %pK start %pK\n",
 			 *ppdata, data_count, (data_count + *ppdata),
 			 end_of_smb, pSMBr);
 		return -EINVAL;
@@ -3740,7 +3740,7 @@ CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon, __u16 fid,
 			goto qsec_out;
 		pSMBr = (struct smb_com_ntransact_rsp *)iov[0].iov_base;
 
-		cifs_dbg(FYI, "smb %p parm %p data %p\n",
+		cifs_dbg(FYI, "smb %pK parm %pK data %pK\n",
 			 pSMBr, parm, *acl_inf);
 
 		if (le32_to_cpu(pSMBr->ParameterCount) != 4) {

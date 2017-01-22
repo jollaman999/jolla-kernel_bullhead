@@ -73,7 +73,7 @@ int ceph_crypto_key_unarmor(struct ceph_crypto_key *key, const char *inkey)
 	kfree(buf);
 	if (ret)
 		return ret;
-	dout("crypto_key_unarmor key %p type %d len %d\n", key,
+	dout("crypto_key_unarmor key %pK type %d len %d\n", key,
 	     key->type, key->len);
 	return 0;
 }

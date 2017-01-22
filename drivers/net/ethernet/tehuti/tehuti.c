@@ -1163,12 +1163,12 @@ static void bdx_recycle_skb(struct bdx_priv *priv, struct rxd_desc *rxdd)
 	int delta;
 
 	ENTER;
-	DBG("priv=%p rxdd=%p\n", priv, rxdd);
+	DBG("priv=%pK rxdd=%pK\n", priv, rxdd);
 	f = &priv->rxf_fifo0;
 	db = priv->rxdb;
-	DBG("db=%p f=%p\n", db, f);
+	DBG("db=%pK f=%pK\n", db, f);
 	dm = bdx_rxdb_addr_elem(db, rxdd->va_lo);
-	DBG("dm=%p\n", dm);
+	DBG("dm=%pK\n", dm);
 	skb = dm->skb;
 	rxfd = (struct rxf_desc *)(f->m.va + f->m.wptr);
 	rxfd->info = CPU_CHIP_SWAP32(0x10003);	/* INFO=1 BC=3 */
@@ -1646,7 +1646,7 @@ static netdev_tx_t bdx_tx_transmit(struct sk_buff *skb,
 	if (skb_shinfo(skb)->gso_size) {
 		txd_mss = skb_shinfo(skb)->gso_size;
 		txd_lgsnd = 1;
-		DBG("skb %p skb len %d gso size = %d\n", skb, skb->len,
+		DBG("skb %pK skb len %d gso size = %d\n", skb, skb->len,
 		    txd_mss);
 	}
 
@@ -1874,7 +1874,7 @@ static void bdx_tx_push_desc_safe(struct bdx_priv *priv, void *data, int size)
 			continue;
 		}
 		avail = min(avail, size);
-		DBG("about to push  %d bytes starting %p size %d\n", avail,
+		DBG("about to push  %d bytes starting %pK size %d\n", avail,
 		    data, size);
 		bdx_tx_push_desc(priv, data, avail);
 		size -= avail;

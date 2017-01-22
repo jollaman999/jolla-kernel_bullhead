@@ -26,7 +26,7 @@ int send_fault_sig(struct pt_regs *regs)
 	siginfo.si_code = current->thread.code;
 	siginfo.si_addr = (void *)current->thread.faddr;
 #ifdef DEBUG
-	printk("send_fault_sig: %p,%d,%d\n", siginfo.si_addr, siginfo.si_signo, siginfo.si_code);
+	printk("send_fault_sig: %pK,%d,%d\n", siginfo.si_addr, siginfo.si_signo, siginfo.si_code);
 #endif
 
 	if (user_mode(regs)) {
@@ -48,7 +48,7 @@ int send_fault_sig(struct pt_regs *regs)
 			printk(KERN_ALERT "Unable to handle kernel NULL pointer dereference");
 		else
 			printk(KERN_ALERT "Unable to handle kernel access");
-		printk(" at virtual address %p\n", siginfo.si_addr);
+		printk(" at virtual address %pK\n", siginfo.si_addr);
 		die_if_kernel("Oops", regs, 0 /*error_code*/);
 		do_exit(SIGKILL);
 	}
@@ -76,7 +76,7 @@ int do_page_fault(struct pt_regs *regs, unsigned long address,
 	unsigned int flags = FAULT_FLAG_ALLOW_RETRY | FAULT_FLAG_KILLABLE;
 
 #ifdef DEBUG
-	printk ("do page fault:\nregs->sr=%#x, regs->pc=%#lx, address=%#lx, %ld, %p\n",
+	printk ("do page fault:\nregs->sr=%#x, regs->pc=%#lx, address=%#lx, %ld, %pK\n",
 		regs->sr, regs->pc, address, error_code,
 		current->mm->pgd);
 #endif

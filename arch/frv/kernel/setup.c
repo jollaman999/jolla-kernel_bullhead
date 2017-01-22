@@ -814,7 +814,7 @@ void __init setup_arch(char **cmdline_p)
 #endif
 
 #ifdef DEBUG
-	printk("KERNEL -> TEXT=0x%p-0x%p DATA=0x%p-0x%p BSS=0x%p-0x%p\n",
+	printk("KERNEL -> TEXT=0x%pK-0x%pK DATA=0x%pK-0x%pK BSS=0x%pK-0x%pK\n",
 	       _stext, _etext, _sdata, _edata, __bss_start, __bss_stop);
 #endif
 

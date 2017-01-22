@@ -324,7 +324,7 @@ terminal_message:
 	msg->msg_flags |= MSG_EOR;
 
 	if (!(flags & MSG_PEEK)) {
-		_net("free terminal skb %p", skb);
+		_net("free terminal skb %pK", skb);
 		if (skb_dequeue(&rx->sk.sk_receive_queue) != skb)
 			BUG();
 		rxrpc_free_skb(skb);

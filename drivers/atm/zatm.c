@@ -635,7 +635,7 @@ static int do_tx(struct sk_buff *skb)
 	unsigned long flags;
 
 	EVENT("do_tx\n",0,0);
-	DPRINTK("sending skb %p\n",skb);
+	DPRINTK("sending skb %pK\n",skb);
 	vcc = ATM_SKB(skb)->vcc;
 	zatm_dev = ZATM_DEV(vcc->dev);
 	zatm_vcc = ZATM_VCC(vcc);

@@ -156,7 +156,7 @@ start_kernel(void)
 		return;
 	}
 	if (INIT_HWRPB->vptb != (unsigned long) VPTB) {
-		srm_printk("Expected vptb at %p, got %p\n",
+		srm_printk("Expected vptb at %pK, got %pK\n",
 			   VPTB, (void *)INIT_HWRPB->vptb);
 		return;
 	}

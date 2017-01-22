@@ -311,7 +311,7 @@ static int s3c2410wdt_probe(struct platform_device *pdev)
 	int started = 0;
 	int ret;
 
-	DBG("%s: probe=%p\n", __func__, pdev);
+	DBG("%s: probe=%pK\n", __func__, pdev);
 
 	dev = &pdev->dev;
 	wdt_dev = &pdev->dev;
@@ -336,7 +336,7 @@ static int s3c2410wdt_probe(struct platform_device *pdev)
 		goto err;
 	}
 
-	DBG("probe: mapped wdt_base=%p\n", wdt_base);
+	DBG("probe: mapped wdt_base=%pK\n", wdt_base);
 
 	wdt_clock = devm_clk_get(dev, "watchdog");
 	if (IS_ERR(wdt_clock)) {

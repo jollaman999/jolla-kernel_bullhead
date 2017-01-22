@@ -223,7 +223,7 @@ static inline int orinoco_lock(struct orinoco_private *priv,
 {
 	priv->hw.ops->lock_irqsave(&priv->lock, flags);
 	if (priv->hw_unavailable) {
-		DEBUG(1, "orinoco_lock() called with hw_unavailable (dev=%p)\n",
+		DEBUG(1, "orinoco_lock() called with hw_unavailable (dev=%pK)\n",
 		       priv->ndev);
 		priv->hw.ops->unlock_irqrestore(&priv->lock, flags);
 		return -EBUSY;

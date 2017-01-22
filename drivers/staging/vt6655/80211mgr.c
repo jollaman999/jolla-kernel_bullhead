@@ -476,7 +476,7 @@ vMgrDecodeAssocResponse(
 	if ((((unsigned char *)pItem) < (pFrame->pBuf + pFrame->len)) &&
 	    (pItem->byElementID == WLAN_EID_EXTSUPP_RATES)) {
 		pFrame->pExtSuppRates = (PWLAN_IE_SUPP_RATES)pItem;
-		DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "pFrame->pExtSuppRates=[%p].\n", pItem);
+		DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "pFrame->pExtSuppRates=[%pK].\n", pItem);
 	} else {
 		pFrame->pExtSuppRates = NULL;
 	}

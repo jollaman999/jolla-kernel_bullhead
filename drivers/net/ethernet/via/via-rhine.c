@@ -1875,7 +1875,7 @@ static int rhine_rx(struct net_device *dev, int limit)
 					    entry, data_size,
 					    desc_status);
 				netdev_warn(dev,
-					    "Oversized Ethernet frame %p vs %p\n",
+					    "Oversized Ethernet frame %pK vs %pK\n",
 					    rp->rx_head_desc,
 					    &rp->rx_ring[entry]);
 				dev->stats.rx_length_errors++;

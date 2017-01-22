@@ -203,7 +203,7 @@ MODULE_PARM_DESC(bus_speed, "Bus Speed in kHz (0 = BIOS default)");
 static void __ismt_desc_dump(struct device *dev, const struct ismt_desc *desc)
 {
 
-	dev_dbg(dev, "Descriptor struct:  %p\n", desc);
+	dev_dbg(dev, "Descriptor struct:  %pK\n", desc);
 	dev_dbg(dev, "\ttgtaddr_rw=0x%02X\n", desc->tgtaddr_rw);
 	dev_dbg(dev, "\twr_len_cmd=0x%02X\n", desc->wr_len_cmd);
 	dev_dbg(dev, "\trd_len=    0x%02X\n", desc->rd_len);
@@ -237,22 +237,22 @@ static void ismt_gen_reg_dump(struct ismt_priv *priv)
 	struct device *dev = &priv->pci_dev->dev;
 
 	dev_dbg(dev, "Dump of the iSMT General Registers\n");
-	dev_dbg(dev, "  GCTRL.... : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  GCTRL.... : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_GR_GCTRL,
 		readl(priv->smba + ISMT_GR_GCTRL));
-	dev_dbg(dev, "  SMTICL... : (0x%p)=0x%016llX\n",
+	dev_dbg(dev, "  SMTICL... : (0x%pK)=0x%016llX\n",
 		priv->smba + ISMT_GR_SMTICL,
 		(long long unsigned int)readq(priv->smba + ISMT_GR_SMTICL));
-	dev_dbg(dev, "  ERRINTMSK : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  ERRINTMSK : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_GR_ERRINTMSK,
 		readl(priv->smba + ISMT_GR_ERRINTMSK));
-	dev_dbg(dev, "  ERRAERMSK : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  ERRAERMSK : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_GR_ERRAERMSK,
 		readl(priv->smba + ISMT_GR_ERRAERMSK));
-	dev_dbg(dev, "  ERRSTS... : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  ERRSTS... : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_GR_ERRSTS,
 		readl(priv->smba + ISMT_GR_ERRSTS));
-	dev_dbg(dev, "  ERRINFO.. : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  ERRINFO.. : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_GR_ERRINFO,
 		readl(priv->smba + ISMT_GR_ERRINFO));
 }
@@ -266,22 +266,22 @@ static void ismt_mstr_reg_dump(struct ismt_priv *priv)
 	struct device *dev = &priv->pci_dev->dev;
 
 	dev_dbg(dev, "Dump of the iSMT Master Registers\n");
-	dev_dbg(dev, "  MDBA..... : (0x%p)=0x%016llX\n",
+	dev_dbg(dev, "  MDBA..... : (0x%pK)=0x%016llX\n",
 		priv->smba + ISMT_MSTR_MDBA,
 		(long long unsigned int)readq(priv->smba + ISMT_MSTR_MDBA));
-	dev_dbg(dev, "  MCTRL.... : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  MCTRL.... : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_MSTR_MCTRL,
 		readl(priv->smba + ISMT_MSTR_MCTRL));
-	dev_dbg(dev, "  MSTS..... : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  MSTS..... : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_MSTR_MSTS,
 		readl(priv->smba + ISMT_MSTR_MSTS));
-	dev_dbg(dev, "  MDS...... : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  MDS...... : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_MSTR_MDS,
 		readl(priv->smba + ISMT_MSTR_MDS));
-	dev_dbg(dev, "  RPOLICY.. : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  RPOLICY.. : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_MSTR_RPOLICY,
 		readl(priv->smba + ISMT_MSTR_RPOLICY));
-	dev_dbg(dev, "  SPGT..... : (0x%p)=0x%X\n",
+	dev_dbg(dev, "  SPGT..... : (0x%pK)=0x%X\n",
 		priv->smba + ISMT_SPGT,
 		readl(priv->smba + ISMT_SPGT));
 }
@@ -517,9 +517,9 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 
 	/* map the data buffer */
 	if (dma_size != 0) {
-		dev_dbg(dev, " dev=%p\n", dev);
-		dev_dbg(dev, " data=%p\n", data);
-		dev_dbg(dev, " dma_buffer=%p\n", priv->dma_buffer);
+		dev_dbg(dev, " dev=%pK\n", dev);
+		dev_dbg(dev, " data=%pK\n", data);
+		dev_dbg(dev, " dma_buffer=%pK\n", priv->dma_buffer);
 		dev_dbg(dev, " dma_size=%d\n", dma_size);
 		dev_dbg(dev, " dma_direction=%d\n", dma_direction);
 
@@ -529,7 +529,7 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 				      dma_direction);
 
 		if (dma_mapping_error(dev, dma_addr)) {
-			dev_err(dev, "Error in mapping dma buffer %p\n",
+			dev_err(dev, "Error in mapping dma buffer %pK\n",
 				priv->dma_buffer);
 			return -EIO;
 		}
@@ -880,7 +880,7 @@ ismt_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)) != 0) ||
 		    (pci_set_consistent_dma_mask(pdev,
 						 DMA_BIT_MASK(32)) != 0)) {
-			dev_err(&pdev->dev, "pci_set_dma_mask fail %p\n",
+			dev_err(&pdev->dev, "pci_set_dma_mask fail %pK\n",
 				pdev);
 			goto fail;
 		}

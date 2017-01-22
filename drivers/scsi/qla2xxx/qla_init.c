@@ -1590,7 +1590,7 @@ qla2x00_alloc_outstanding_cmds(struct qla_hw_data *ha, struct req_que *req)
 		if (!req->outstanding_cmds) {
 			ql_log(ql_log_fatal, NULL, 0x0126,
 			    "Failed to allocate memory for "
-			    "outstanding_cmds for req_que %p.\n", req);
+			    "outstanding_cmds for req_que %pK.\n", req);
 			req->num_outstanding_cmds = 0;
 			return QLA_FUNCTION_FAILED;
 		}
@@ -4290,7 +4290,7 @@ qla2xxx_mctp_dump(scsi_qla_host_t *vha)
 		    "Failed to capture mctp dump\n");
 	} else {
 		ql_log(ql_log_info, vha, 0x5070,
-		    "Mctp dump capture for host (%ld/%p).\n",
+		    "Mctp dump capture for host (%ld/%pK).\n",
 		    vha->host_no, ha->mctp_dump);
 		ha->mctp_dumped = 1;
 	}
@@ -4327,7 +4327,7 @@ qla2x00_quiesce_io(scsi_qla_host_t *vha)
 	struct scsi_qla_host *vp;
 
 	ql_dbg(ql_dbg_dpc, vha, 0x401d,
-	    "Quiescing I/O - ha=%p.\n", ha);
+	    "Quiescing I/O - ha=%pK.\n", ha);
 
 	atomic_set(&ha->loop_down_timer, LOOP_DOWN_TIME);
 	if (atomic_read(&vha->loop_state) != LOOP_DOWN) {
@@ -4362,7 +4362,7 @@ qla2x00_abort_isp_cleanup(scsi_qla_host_t *vha)
 	vha->qla_stats.total_isp_aborts++;
 
 	ql_log(ql_log_info, vha, 0x00af,
-	    "Performing ISP error recovery - ha=%p.\n", ha);
+	    "Performing ISP error recovery - ha=%pK.\n", ha);
 
 	/* For ISP82XX, reset_chip is just disabling interrupts.
 	 * Driver waits for the completion of the commands.

@@ -253,7 +253,7 @@ static int exofs_read_kern(struct osd_dev *od, u8 *cred, struct osd_obj_id *obj,
 out:
 	osd_end_request(or);
 	EXOFS_DBGMSG2("read_kern(0x%llx) offset=0x%llx "
-		      "length=0x%llx dev=%p ret=>%d\n",
+		      "length=0x%llx dev=%pK ret=>%d\n",
 		      _LLU(obj->id), _LLU(offset), _LLU(length), od, ret);
 	return ret;
 }

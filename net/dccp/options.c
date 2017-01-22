@@ -235,7 +235,7 @@ int dccp_parse_options(struct sock *sk, struct dccp_request_sock *dreq,
 				goto out_invalid_option;
 			break;
 		default:
-			DCCP_CRIT("DCCP(%p): option %d(len=%d) not "
+			DCCP_CRIT("DCCP(%pK): option %d(len=%d) not "
 				  "implemented, ignoring", sk, opt, len);
 			break;
 		}
@@ -256,7 +256,7 @@ out_invalid_option:
 	DCCP_INC_STATS_BH(DCCP_MIB_INVALIDOPT);
 	rc = DCCP_RESET_CODE_OPTION_ERROR;
 out_featneg_failed:
-	DCCP_WARN("DCCP(%p): Option %d (len=%d) error=%u\n", sk, opt, len, rc);
+	DCCP_WARN("DCCP(%pK): Option %d (len=%d) error=%u\n", sk, opt, len, rc);
 	DCCP_SKB_CB(skb)->dccpd_reset_code = rc;
 	DCCP_SKB_CB(skb)->dccpd_reset_data[0] = opt;
 	DCCP_SKB_CB(skb)->dccpd_reset_data[1] = len > 0 ? value[0] : 0;

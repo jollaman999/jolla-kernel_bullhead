@@ -2726,7 +2726,7 @@ startup(struct e100_serial * info)
 		info->xmit.buf = (unsigned char *) xmit_page;
 
 #ifdef SERIAL_DEBUG_OPEN
-	printk("starting up ttyS%d (xmit_buf 0x%p)...\n", info->line, info->xmit.buf);
+	printk("starting up ttyS%d (xmit_buf 0x%pK)...\n", info->line, info->xmit.buf);
 #endif
 
 #ifdef CONFIG_SVINTO_SIM
@@ -4460,7 +4460,7 @@ static int __init rs_init(void)
 		INIT_WORK(&info->work, do_softint);
 
 		if (info->enabled) {
-			printk(KERN_INFO "%s%d at %p is a builtin UART with DMA\n",
+			printk(KERN_INFO "%s%d at %pK is a builtin UART with DMA\n",
 			       serial_driver->name, info->line, info->ioport);
 		}
 		tty_port_link_device(&info->port, driver, i);

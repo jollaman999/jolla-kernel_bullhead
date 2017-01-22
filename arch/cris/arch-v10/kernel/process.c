@@ -136,7 +136,7 @@ int copy_thread(unsigned long clone_flags, unsigned long usp,
 	p->thread.ksp = (unsigned long) swstack;
 
 #ifdef DEBUG
-	printk("copy_thread: new regs at 0x%p, as shown below:\n", childregs);
+	printk("copy_thread: new regs at 0x%pK, as shown below:\n", childregs);
 	show_registers(childregs);
 #endif
 

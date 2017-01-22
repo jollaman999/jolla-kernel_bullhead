@@ -1372,13 +1372,13 @@ xpc_notify_sender_uv(struct xpc_channel *ch,
 
 		atomic_dec(&ch->n_to_notify);
 
-		dev_dbg(xpc_chan, "msg_slot->func() called, msg_slot=0x%p "
+		dev_dbg(xpc_chan, "msg_slot->func() called, msg_slot=0x%pK "
 			"msg_slot_number=%d partid=%d channel=%d\n", msg_slot,
 			msg_slot->msg_slot_number, ch->partid, ch->number);
 
 		func(reason, ch->partid, ch->number, msg_slot->key);
 
-		dev_dbg(xpc_chan, "msg_slot->func() returned, msg_slot=0x%p "
+		dev_dbg(xpc_chan, "msg_slot->func() returned, msg_slot=0x%pK "
 			"msg_slot_number=%d partid=%d channel=%d\n", msg_slot,
 			msg_slot->msg_slot_number, ch->partid, ch->number);
 	}

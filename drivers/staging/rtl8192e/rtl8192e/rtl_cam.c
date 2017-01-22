@@ -125,7 +125,7 @@ void setKey(struct net_device *dev, u8 EntryNo, u8 KeyIndex, u16 KeyType,
 	if (EntryNo >= TOTAL_CAM_ENTRY)
 		RT_TRACE(COMP_ERR, "cam entry exceeds in setKey()\n");
 
-	RT_TRACE(COMP_SEC, "====>to setKey(), dev:%p, EntryNo:%d, KeyIndex:%d,"
+	RT_TRACE(COMP_SEC, "====>to setKey(), dev:%pK, EntryNo:%d, KeyIndex:%d,"
 		 "KeyType:%d, MacAddr %pM\n", dev, EntryNo, KeyIndex,
 		 KeyType, MacAddr);
 

@@ -129,7 +129,7 @@ int nubus_proc_attach_device(struct nubus_dev *dev)
 	if (dev->board == NULL) {
 		printk(KERN_ERR
 		       "NULL pointer in nubus_proc_attach_device, shoot the programmer!\n");
-		printk("dev = %p, dev->board = %p\n", dev, dev->board);
+		printk("dev = %pK, dev->board = %pK\n", dev, dev->board);
 		return -1;
 	}
 		

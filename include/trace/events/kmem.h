@@ -34,7 +34,7 @@ DECLARE_EVENT_CLASS(kmem_alloc,
 		__entry->gfp_flags	= gfp_flags;
 	),
 
-	TP_printk("call_site=%lx ptr=%p bytes_req=%zu bytes_alloc=%zu gfp_flags=%s",
+	TP_printk("call_site=%lx ptr=%pK bytes_req=%zu bytes_alloc=%zu gfp_flags=%s",
 		__entry->call_site,
 		__entry->ptr,
 		__entry->bytes_req,
@@ -87,7 +87,7 @@ DECLARE_EVENT_CLASS(kmem_alloc_node,
 		__entry->node		= node;
 	),
 
-	TP_printk("call_site=%lx ptr=%p bytes_req=%zu bytes_alloc=%zu gfp_flags=%s node=%d",
+	TP_printk("call_site=%lx ptr=%pK bytes_req=%zu bytes_alloc=%zu gfp_flags=%s node=%d",
 		__entry->call_site,
 		__entry->ptr,
 		__entry->bytes_req,
@@ -130,7 +130,7 @@ DECLARE_EVENT_CLASS(kmem_free,
 		__entry->ptr		= ptr;
 	),
 
-	TP_printk("call_site=%lx ptr=%p", __entry->call_site, __entry->ptr)
+	TP_printk("call_site=%lx ptr=%pK", __entry->call_site, __entry->ptr)
 );
 
 DEFINE_EVENT(kmem_free, kfree,
@@ -163,7 +163,7 @@ TRACE_EVENT(mm_page_free,
 		__entry->order		= order;
 	),
 
-	TP_printk("page=%p pfn=%lu order=%d",
+	TP_printk("page=%pK pfn=%lu order=%d",
 			__entry->page,
 			page_to_pfn(__entry->page),
 			__entry->order)
@@ -185,7 +185,7 @@ TRACE_EVENT(mm_page_free_batched,
 		__entry->cold		= cold;
 	),
 
-	TP_printk("page=%p pfn=%lu order=0 cold=%d",
+	TP_printk("page=%pK pfn=%lu order=0 cold=%d",
 			__entry->page,
 			page_to_pfn(__entry->page),
 			__entry->cold)
@@ -212,7 +212,7 @@ TRACE_EVENT(mm_page_alloc,
 		__entry->migratetype	= migratetype;
 	),
 
-	TP_printk("page=%p pfn=%lu order=%d migratetype=%d gfp_flags=%s",
+	TP_printk("page=%pK pfn=%lu order=%d migratetype=%d gfp_flags=%s",
 		__entry->page,
 		__entry->page ? page_to_pfn(__entry->page) : 0,
 		__entry->order,
@@ -238,7 +238,7 @@ DECLARE_EVENT_CLASS(mm_page,
 		__entry->migratetype	= migratetype;
 	),
 
-	TP_printk("page=%p pfn=%lu order=%u migratetype=%d percpu_refill=%d",
+	TP_printk("page=%pK pfn=%lu order=%u migratetype=%d percpu_refill=%d",
 		__entry->page,
 		__entry->page ? page_to_pfn(__entry->page) : 0,
 		__entry->order,
@@ -259,7 +259,7 @@ DEFINE_EVENT_PRINT(mm_page, mm_page_pcpu_drain,
 
 	TP_ARGS(page, order, migratetype),
 
-	TP_printk("page=%p pfn=%lu order=%d migratetype=%d",
+	TP_printk("page=%pK pfn=%lu order=%d migratetype=%d",
 		__entry->page, page_to_pfn(__entry->page),
 		__entry->order, __entry->migratetype)
 );
@@ -293,7 +293,7 @@ TRACE_EVENT(mm_page_alloc_extfrag,
 					get_pageblock_migratetype(page));
 	),
 
-	TP_printk("page=%p pfn=%lu alloc_order=%d fallback_order=%d pageblock_order=%d alloc_migratetype=%d fallback_migratetype=%d fragmenting=%d change_ownership=%d",
+	TP_printk("page=%pK pfn=%lu alloc_order=%d fallback_order=%d pageblock_order=%d alloc_migratetype=%d fallback_migratetype=%d fragmenting=%d change_ownership=%d",
 		__entry->page,
 		page_to_pfn(__entry->page),
 		__entry->alloc_order,
@@ -586,7 +586,7 @@ DECLARE_EVENT_CLASS(smmu_map,
 		__entry->len = len;
 		),
 
-	TP_printk("v_addr=%p p_addr=%pa chunk_size=0x%lu len=%zu",
+	TP_printk("v_addr=%pK p_addr=%pa chunk_size=0x%lu len=%zu",
 		(void *)__entry->va,
 		&__entry->pa,
 		__entry->chunk_size,

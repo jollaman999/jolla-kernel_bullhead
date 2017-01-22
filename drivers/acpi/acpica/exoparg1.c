@@ -979,7 +979,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 				default:
 
 					ACPI_ERROR((AE_INFO,
-						    "Unknown Index TargetType 0x%X in reference object %p",
+						    "Unknown Index TargetType 0x%X in reference object %pK",
 						    operand[0]->reference.
 						    target_type, operand[0]));
 					status = AE_AML_OPERAND_TYPE;
@@ -1036,7 +1036,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 
 			default:
 				ACPI_ERROR((AE_INFO,
-					    "Unknown class in reference(%p) - 0x%2.2X",
+					    "Unknown class in reference(%pK) - 0x%2.2X",
 					    operand[0],
 					    operand[0]->reference.class));
 

@@ -559,7 +559,7 @@ static int li_read_ad1843_reg(lithium_t *lith, int reg)
 	}
 	spin_unlock(&lith->lock);
 
-	DBGXV("li_read_ad1843_reg(lith=0x%p, reg=%d) returns 0x%04x\n",
+	DBGXV("li_read_ad1843_reg(lith=0x%pK, reg=%d) returns 0x%04x\n",
 	      lith, reg, val);
 
 	return val;
@@ -598,7 +598,7 @@ static void li_setup_dma(dma_chan_t *chan,
 	unsigned long mode, format;
 	unsigned long size, tmask;
 
-	DBGEV("(chan=0x%p, desc=0x%p, lith=0x%p, buffer_paddr=0x%lx, "
+	DBGEV("(chan=0x%pK, desc=0x%pK, lith=0x%pK, buffer_paddr=0x%lx, "
 	     "bufshift=%d, fragshift=%d, channels=%d, sampsize=%d)\n",
 	     chan, desc, lith, buffer_paddr,
 	     bufshift, fragshift, channels, sampsize);
@@ -661,7 +661,7 @@ static void li_shutdown_dma(dma_chan_t *chan)
 	lithium_t *lith = chan->lith;
 	void * lith1 = lith->page1;
 
-	DBGEV("(chan=0x%p)\n", chan);
+	DBGEV("(chan=0x%pK)\n", chan);
 	
 	chan->ctlval &= ~LI_CCTL_DMA_ENABLE;
 	DBGPV("ctlreg 0x%x = 0x%lx\n", chan->desc->ctlreg, chan->ctlval);
@@ -785,7 +785,7 @@ static void li_read_USTMSC(dma_chan_t *chan, ustmsc_t *ustmsc)
 
 static void li_enable_interrupts(lithium_t *lith, unsigned int mask)
 {
-	DBGEV("(lith=0x%p, mask=0x%x)\n", lith, mask);
+	DBGEV("(lith=0x%pK, mask=0x%x)\n", lith, mask);
 
 	/* clear any already-pending interrupts. */
 
@@ -801,7 +801,7 @@ static void li_disable_interrupts(lithium_t *lith, unsigned int mask)
 {
 	unsigned int keepmask;
 
-	DBGEV("(lith=0x%p, mask=0x%x)\n", lith, mask);
+	DBGEV("(lith=0x%pK, mask=0x%x)\n", lith, mask);
 
 	/* disable the interrupts */
 
@@ -946,7 +946,7 @@ static int ad1843_read_bits(lithium_t *lith, const ad1843_bitfield_t *field)
 	int w = li_read_ad1843_reg(lith, field->reg);
 	int val = w >> field->lo_bit & ((1 << field->nbits) - 1);
 
-	DBGXV("ad1843_read_bits(lith=0x%p, field->{%d %d %d}) returns 0x%x\n",
+	DBGXV("ad1843_read_bits(lith=0x%pK, field->{%d %d %d}) returns 0x%x\n",
 	      lith, field->reg, field->lo_bit, field->nbits, val);
 
 	return val;
@@ -967,7 +967,7 @@ static int ad1843_write_bits(lithium_t *lith,
 	w = (w & ~mask) | newbits;
 	(void) li_write_ad1843_reg(lith, field->reg, w);
 
-	DBGXV("ad1843_write_bits(lith=0x%p, field->{%d %d %d}, val=0x%x) "
+	DBGXV("ad1843_write_bits(lith=0x%pK, field->{%d %d %d}, val=0x%x) "
 	      "returns 0x%x\n",
 	      lith, field->reg, field->lo_bit, field->nbits, newval,
 	      oldval);
@@ -1266,7 +1266,7 @@ static void ad1843_setup_dac(lithium_t *lith,
 {
 	int ad_fmt = 0, ad_mode = 0;
 
-	DBGEV("(lith=0x%p, framerate=%d, fmt=%d, channels=%d)\n",
+	DBGEV("(lith=0x%pK, framerate=%d, fmt=%d, channels=%d)\n",
 	      lith, framerate, fmt, channels);
 
 	switch (fmt) {
@@ -1300,7 +1300,7 @@ static void ad1843_setup_adc(lithium_t *lith, int framerate, int fmt, int channe
 {
 	int da_fmt = 0;
 
-	DBGEV("(lith=0x%p, framerate=%d, fmt=%d, channels=%d)\n",
+	DBGEV("(lith=0x%pK, framerate=%d, fmt=%d, channels=%d)\n",
 	      lith, framerate, fmt, channels);
 
 	switch (fmt) {
@@ -1646,7 +1646,7 @@ static int pcm_setup(vwsnd_dev_t *devc,
 	int sample_size;
 	unsigned int zero_word;
 
-	DBGEV("(devc=0x%p, rport=0x%p, wport=0x%p)\n", devc, rport, wport);
+	DBGEV("(devc=0x%pK, rport=0x%pK, wport=0x%pK)\n", devc, rport, wport);
 
 	ASSERT(aport != NULL);
 	if (aport->swbuf != NULL)
@@ -1857,7 +1857,7 @@ static void pcm_shutdown(vwsnd_dev_t *devc,
 			 vwsnd_port_t *rport,
 			 vwsnd_port_t *wport)
 {
-	DBGEV("(devc=0x%p, rport=0x%p, wport=0x%p)\n", devc, rport, wport);
+	DBGEV("(devc=0x%pK, rport=0x%pK, wport=0x%pK)\n", devc, rport, wport);
 
 	if (rport && rport->swbuf) {
 		DBGPV("shutting down rport\n");
@@ -1946,7 +1946,7 @@ static void pcm_output(vwsnd_dev_t *devc, int erflown, int nb)
 	const int fragsize = wport->hw_fragsize;
 	unsigned long iflags;
 
-	DBGEV("(devc=0x%p, erflown=%d, nb=%d)\n", devc, erflown, nb);
+	DBGEV("(devc=0x%pK, erflown=%d, nb=%d)\n", devc, erflown, nb);
 	spin_lock_irqsave(&wport->lock, iflags);
 	if (erflown)
 		wport->flags |= ERFLOWN;
@@ -2070,7 +2070,7 @@ static void pcm_input(vwsnd_dev_t *devc, int erflown, int nb)
 	const int fragsize = rport->hw_fragsize;
 	unsigned long iflags;
 
-	DBGEV("(devc=0x%p, erflown=%d, nb=%d)\n", devc, erflown, nb);
+	DBGEV("(devc=0x%pK, erflown=%d, nb=%d)\n", devc, erflown, nb);
 
 	spin_lock_irqsave(&rport->lock, iflags);
 	if (erflown)
@@ -2192,7 +2192,7 @@ static void pcm_write_sync(vwsnd_dev_t *devc)
 	unsigned long flags;
 	vwsnd_port_hwstate_t hwstate;
 
-	DBGEV("(devc=0x%p)\n", devc);
+	DBGEV("(devc=0x%pK)\n", devc);
 	add_wait_queue(&wport->queue, &wait);
 	while (1) {
 		set_current_state(TASK_UNINTERRUPTIBLE);
@@ -2239,7 +2239,7 @@ static irqreturn_t vwsnd_audio_intr(int irq, void *dev_id)
 	vwsnd_dev_t *devc = dev_id;
 	unsigned int status;
 
-	DBGEV("(irq=%d, dev_id=0x%p)\n", irq, dev_id);
+	DBGEV("(irq=%d, dev_id=0x%pK)\n", irq, dev_id);
 
 	status = li_get_clear_intr_status(&devc->lith);
 	vwsnd_audio_read_intr(devc, status);
@@ -2257,7 +2257,7 @@ static ssize_t vwsnd_audio_do_read(struct file *file,
 			       &devc->rport : NULL);
 	int ret, nb;
 
-	DBGEV("(file=0x%p, buffer=0x%p, count=%d, ppos=0x%p)\n",
+	DBGEV("(file=0x%pK, buffer=0x%pK, count=%d, ppos=0x%pK)\n",
 	     file, buffer, count, ppos);
 
 	if (!rport)
@@ -2335,7 +2335,7 @@ static ssize_t vwsnd_audio_do_write(struct file *file,
 			       &devc->wport : NULL);
 	int ret, nb;
 
-	DBGEV("(file=0x%p, buffer=0x%p, count=%d, ppos=0x%p)\n",
+	DBGEV("(file=0x%pK, buffer=0x%pK, count=%d, ppos=0x%pK)\n",
 	      file, buffer, count, ppos);
 
 	if (!wport)
@@ -2411,7 +2411,7 @@ static unsigned int vwsnd_audio_poll(struct file *file,
 		&devc->wport : NULL;
 	unsigned int mask = 0;
 
-	DBGEV("(file=0x%p, wait=0x%p)\n", file, wait);
+	DBGEV("(file=0x%pK, wait=0x%pK)\n", file, wait);
 
 	ASSERT(rport || wport);
 	if (rport) {
@@ -2445,7 +2445,7 @@ static int vwsnd_audio_do_ioctl(struct file *file,
 	int ival;
 
 	
-	DBGEV("(file=0x%p, cmd=0x%x, arg=0x%lx)\n",
+	DBGEV("(file=0x%pK, cmd=0x%x, arg=0x%lx)\n",
 	      file, cmd, arg);
 	switch (cmd) {
 	case OSS_GETVERSION:		/* _SIOR ('M', 118, int) */
@@ -2559,7 +2559,7 @@ static int vwsnd_audio_do_ioctl(struct file *file,
 			if (sw_fragcount > MAX_FRAGCOUNT(hw_fragsize))
 				sw_fragcount = MAX_FRAGCOUNT(hw_fragsize);
 			DBGPV("sw_fragshift = %d\n", sw_fragshift);
-			DBGPV("rport = 0x%p, wport = 0x%p\n", rport, wport);
+			DBGPV("rport = 0x%pK, wport = 0x%pK\n", rport, wport);
 			if (rport) {
 				rport->sw_fragshift = sw_fragshift;
 				rport->sw_fragcount = sw_fragcount;
@@ -2904,7 +2904,7 @@ static long vwsnd_audio_ioctl(struct file *file,
 
 static int vwsnd_audio_mmap(struct file *file, struct vm_area_struct *vma)
 {
-	DBGE("(file=0x%p, vma=0x%p)\n", file, vma);
+	DBGE("(file=0x%pK, vma=0x%pK)\n", file, vma);
 	return -ENODEV;
 }
 
@@ -2920,7 +2920,7 @@ static int vwsnd_audio_open(struct inode *inode, struct file *file)
 	int minor = iminor(inode);
 	int sw_samplefmt;
 
-	DBGE("(inode=0x%p, file=0x%p)\n", inode, file);
+	DBGE("(inode=0x%pK, file=0x%pK)\n", inode, file);
 
 	mutex_lock(&vwsnd_mutex);
 	INC_USE_COUNT;
@@ -3015,7 +3015,7 @@ static int vwsnd_audio_release(struct inode *inode, struct file *file)
 	mutex_lock(&vwsnd_mutex);
 	mutex_lock(&devc->io_mutex);
 	{
-		DBGEV("(inode=0x%p, file=0x%p)\n", inode, file);
+		DBGEV("(inode=0x%pK, file=0x%pK)\n", inode, file);
 
 		if (file->f_mode & FMODE_READ)
 			rport = &devc->rport;
@@ -3065,7 +3065,7 @@ static int vwsnd_mixer_open(struct inode *inode, struct file *file)
 {
 	vwsnd_dev_t *devc;
 
-	DBGEV("(inode=0x%p, file=0x%p)\n", inode, file);
+	DBGEV("(inode=0x%pK, file=0x%pK)\n", inode, file);
 
 	INC_USE_COUNT;
 	mutex_lock(&vwsnd_mutex);
@@ -3087,7 +3087,7 @@ static int vwsnd_mixer_open(struct inode *inode, struct file *file)
 
 static int vwsnd_mixer_release(struct inode *inode, struct file *file)
 {
-	DBGEV("(inode=0x%p, file=0x%p)\n", inode, file);
+	DBGEV("(inode=0x%pK, file=0x%pK)\n", inode, file);
 	DEC_USE_COUNT;
 	return 0;
 }
@@ -3098,7 +3098,7 @@ static int mixer_read_ioctl(vwsnd_dev_t *devc, unsigned int nr, void __user *arg
 {
 	int val = -1;
 
-	DBGEV("(devc=0x%p, nr=0x%x, arg=0x%p)\n", devc, nr, arg);
+	DBGEV("(devc=0x%pK, nr=0x%x, arg=0x%pK)\n", devc, nr, arg);
 
 	switch (nr) {
 	case SOUND_MIXER_CAPS:
@@ -3166,7 +3166,7 @@ static int mixer_write_ioctl(vwsnd_dev_t *devc, unsigned int nr, void __user *ar
 	int val;
 	int err;
 
-	DBGEV("(devc=0x%p, nr=0x%x, arg=0x%p)\n", devc, nr, arg);
+	DBGEV("(devc=0x%pK, nr=0x%x, arg=0x%pK)\n", devc, nr, arg);
 
 	err = get_user(val, (int __user *) arg);
 	if (err)
@@ -3221,7 +3221,7 @@ static long vwsnd_mixer_ioctl(struct file *file,
 	const unsigned int nr = (cmd & nrmask) >> _IOC_NRSHIFT;
 	int retval;
 
-	DBGEV("(devc=0x%p, cmd=0x%x, arg=0x%lx)\n", devc, cmd, arg);
+	DBGEV("(devc=0x%pK, cmd=0x%x, arg=0x%lx)\n", devc, cmd, arg);
 
 	mutex_lock(&vwsnd_mutex);
 	mutex_lock(&devc->mix_mutex);
@@ -3257,7 +3257,7 @@ static int __init probe_vwsnd(struct address_info *hw_config)
 	int w;
 	unsigned long later;
 
-	DBGEV("(hw_config=0x%p)\n", hw_config);
+	DBGEV("(hw_config=0x%pK)\n", hw_config);
 
 	/* XXX verify lithium present (to prevent crash on non-vw) */
 
@@ -3309,7 +3309,7 @@ static int __init attach_vwsnd(struct address_info *hw_config)
 	vwsnd_dev_t *devc = NULL;
 	int err = -ENOMEM;
 
-	DBGEV("(hw_config=0x%p)\n", hw_config);
+	DBGEV("(hw_config=0x%pK)\n", hw_config);
 
 	devc = kmalloc(sizeof (vwsnd_dev_t), GFP_KERNEL);
 	if (devc == NULL)
@@ -3350,7 +3350,7 @@ static int __init attach_vwsnd(struct address_info *hw_config)
 		goto fail3;
 	devc->wport.hwbuf = (void *) devc->wport.hwbuf_vaddr;
 	devc->wport.hwbuf_paddr = virt_to_phys(devc->wport.hwbuf);
-	DBGP("wport hwbuf = 0x%p\n", devc->wport.hwbuf);
+	DBGP("wport hwbuf = 0x%pK\n", devc->wport.hwbuf);
 
 	DBGDO(shut_up++);
 	err = ad1843_init(&devc->lith);

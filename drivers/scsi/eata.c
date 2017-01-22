@@ -1766,7 +1766,7 @@ static int eata2x_queuecommand_lck(struct scsi_cmnd *SCpnt,
 	struct mscp *cpp;
 
 	if (SCpnt->host_scribble)
-		panic("%s: qcomm, SCpnt %p already active.\n",
+		panic("%s: qcomm, SCpnt %pK already active.\n",
 		      ha->board_name, SCpnt);
 
 	/* i is the mailbox number, look for the first free mailbox
@@ -1874,7 +1874,7 @@ static int eata2x_eh_abort(struct scsi_cmnd *SCarg)
 		printk("%s: abort, mbox %d is in use.\n", ha->board_name, i);
 
 		if (SCarg != ha->cp[i].SCpnt)
-			panic("%s: abort, mbox %d, SCarg %p, cp SCpnt %p.\n",
+			panic("%s: abort, mbox %d, SCarg %pK, cp SCpnt %pK.\n",
 			      ha->board_name, i, SCarg, ha->cp[i].SCpnt);
 
 		if (inb(shost->io_port + REG_AUX_STATUS) & IRQ_ASSERTED)
@@ -2394,7 +2394,7 @@ static irqreturn_t ihdlr(struct Scsi_Host *shost)
 		panic("%s: ihdlr, mbox %d, SCpnt == NULL.\n", ha->board_name, i);
 
 	if (SCpnt->host_scribble == NULL)
-		panic("%s: ihdlr, mbox %d, SCpnt %p garbled.\n", ha->board_name,
+		panic("%s: ihdlr, mbox %d, SCpnt %pK garbled.\n", ha->board_name,
 		      i, SCpnt);
 
 	if (*(unsigned int *)SCpnt->host_scribble != i)

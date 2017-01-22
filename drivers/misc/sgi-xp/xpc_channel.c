@@ -875,7 +875,7 @@ xpc_initiate_send(short partid, int ch_number, u32 flags, void *payload,
 	struct xpc_partition *part = &xpc_partitions[partid];
 	enum xp_retval ret = xpUnknownReason;
 
-	dev_dbg(xpc_chan, "payload=0x%p, partid=%d, channel=%d\n", payload,
+	dev_dbg(xpc_chan, "payload=0x%pK, partid=%d, channel=%d\n", payload,
 		partid, ch_number);
 
 	DBUG_ON(partid < 0 || partid >= xp_max_npartitions);
@@ -926,7 +926,7 @@ xpc_initiate_send_notify(short partid, int ch_number, u32 flags, void *payload,
 	struct xpc_partition *part = &xpc_partitions[partid];
 	enum xp_retval ret = xpUnknownReason;
 
-	dev_dbg(xpc_chan, "payload=0x%p, partid=%d, channel=%d\n", payload,
+	dev_dbg(xpc_chan, "payload=0x%pK, partid=%d, channel=%d\n", payload,
 		partid, ch_number);
 
 	DBUG_ON(partid < 0 || partid >= xp_max_npartitions);
@@ -963,7 +963,7 @@ xpc_deliver_payload(struct xpc_channel *ch)
 		atomic_inc(&ch->kthreads_active);
 
 		if (ch->func != NULL) {
-			dev_dbg(xpc_chan, "ch->func() called, payload=0x%p "
+			dev_dbg(xpc_chan, "ch->func() called, payload=0x%pK "
 				"partid=%d channel=%d\n", payload, ch->partid,
 				ch->number);
 
@@ -971,7 +971,7 @@ xpc_deliver_payload(struct xpc_channel *ch)
 			ch->func(xpMsgReceived, ch->partid, ch->number, payload,
 				 ch->key);
 
-			dev_dbg(xpc_chan, "ch->func() returned, payload=0x%p "
+			dev_dbg(xpc_chan, "ch->func() returned, payload=0x%pK "
 				"partid=%d channel=%d\n", payload, ch->partid,
 				ch->number);
 		}

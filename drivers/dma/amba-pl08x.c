@@ -1023,7 +1023,7 @@ static int pl08x_fill_llis_for_desc(struct pl08x_driver_data *pl08x,
 			 "lli", "", "csrc", "cdst", "clli", "cctl");
 		for (i = 0; i < num_llis; i++) {
 			dev_vdbg(&pl08x->adev->dev,
-				 "%3d @%p: 0x%08x 0x%08x 0x%08x 0x%08x\n",
+				 "%3d @%pK: 0x%08x 0x%08x 0x%08x 0x%08x\n",
 				 i, &llis_va[i], llis_va[i].src,
 				 llis_va[i].dst, llis_va[i].lli, llis_va[i].cctl
 				);

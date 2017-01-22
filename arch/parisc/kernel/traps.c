@@ -466,7 +466,7 @@ void parisc_terminate(char *msg, struct pt_regs *regs, int code, unsigned long o
 	}
 
 	printk("\n");
-	printk(KERN_CRIT "%s: Code=%d regs=%p (Addr=" RFMT ")\n",
+	printk(KERN_CRIT "%s: Code=%d regs=%pK (Addr=" RFMT ")\n",
 			msg, code, regs, offset);
 	show_regs(regs);
 

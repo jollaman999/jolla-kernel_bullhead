@@ -844,7 +844,7 @@ static int btrfsic_process_superblock_dev_mirror(
 		superblock_tmp->never_written = 0;
 		superblock_tmp->mirror_num = 1 + superblock_mirror_num;
 		if (state->print_mask & BTRFSIC_PRINT_MASK_SUPERBLOCK_WRITE)
-			printk_in_rcu(KERN_INFO "New initial S-block (bdev %p, %s)"
+			printk_in_rcu(KERN_INFO "New initial S-block (bdev %pK, %s)"
 				     " @%llu (%s/%llu/%d)\n",
 				     superblock_bdev,
 				     rcu_str_deref(device->name),
@@ -3049,7 +3049,7 @@ int btrfsic_submit_bh(int rw, struct buffer_head *bh)
 		    BTRFSIC_PRINT_MASK_SUBMIT_BIO_BH)
 			printk(KERN_INFO
 			       "submit_bh(rw=0x%x, blocknr=%lu (bytenr %llu),"
-			       " size=%lu, data=%p, bdev=%p)\n",
+			       " size=%lu, data=%pK, bdev=%pK)\n",
 			       rw, (unsigned long)bh->b_blocknr,
 			       (unsigned long long)dev_bytenr,
 			       (unsigned long)bh->b_size, bh->b_data,
@@ -3061,7 +3061,7 @@ int btrfsic_submit_bh(int rw, struct buffer_head *bh)
 		if (dev_state->state->print_mask &
 		    BTRFSIC_PRINT_MASK_SUBMIT_BIO_BH)
 			printk(KERN_INFO
-			       "submit_bh(rw=0x%x FLUSH, bdev=%p)\n",
+			       "submit_bh(rw=0x%x FLUSH, bdev=%pK)\n",
 			       rw, bh->b_bdev);
 		if (!dev_state->dummy_block_for_bio_bh_flush.is_iodone) {
 			if ((dev_state->state->print_mask &
@@ -3118,7 +3118,7 @@ void btrfsic_submit_bio(int rw, struct bio *bio)
 		    BTRFSIC_PRINT_MASK_SUBMIT_BIO_BH)
 			printk(KERN_INFO
 			       "submit_bio(rw=0x%x, bi_vcnt=%u,"
-			       " bi_sector=%lu (bytenr %llu), bi_bdev=%p)\n",
+			       " bi_sector=%lu (bytenr %llu), bi_bdev=%pK)\n",
 			       rw, bio->bi_vcnt, (unsigned long)bio->bi_sector,
 			       (unsigned long long)dev_bytenr,
 			       bio->bi_bdev);
@@ -3144,7 +3144,7 @@ void btrfsic_submit_bio(int rw, struct bio *bio)
 			     (BTRFSIC_PRINT_MASK_SUBMIT_BIO_BH |
 			      BTRFSIC_PRINT_MASK_VERBOSE)))
 				printk(KERN_INFO
-				       "#%u: page=%p, len=%u, offset=%u\n",
+				       "#%u: page=%pK, len=%u, offset=%u\n",
 				       i, bio->bi_io_vec[i].bv_page,
 				       bio->bi_io_vec[i].bv_len,
 				       bio->bi_io_vec[i].bv_offset);
@@ -3162,7 +3162,7 @@ void btrfsic_submit_bio(int rw, struct bio *bio)
 		if (dev_state->state->print_mask &
 		    BTRFSIC_PRINT_MASK_SUBMIT_BIO_BH)
 			printk(KERN_INFO
-			       "submit_bio(rw=0x%x FLUSH, bdev=%p)\n",
+			       "submit_bio(rw=0x%x FLUSH, bdev=%pK)\n",
 			       rw, bio->bi_bdev);
 		if (!dev_state->dummy_block_for_bio_bh_flush.is_iodone) {
 			if ((dev_state->state->print_mask &

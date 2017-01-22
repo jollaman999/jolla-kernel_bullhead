@@ -125,7 +125,7 @@ nlm_lookup_file(struct svc_rqst *rqstp, struct nlm_file **result,
 	hlist_add_head(&file->f_list, &nlm_files[hash]);
 
 found:
-	dprintk("lockd: found file %p (count %d)\n", file, file->f_count);
+	dprintk("lockd: found file %pK (count %d)\n", file, file->f_count);
 	*result = file;
 	file->f_count++;
 	nfserr = 0;
@@ -291,7 +291,7 @@ nlm_traverse_files(void *data, nlm_host_match_fn_t match,
 void
 nlm_release_file(struct nlm_file *file)
 {
-	dprintk("lockd: nlm_release_file(%p, ct = %d)\n",
+	dprintk("lockd: nlm_release_file(%pK, ct = %d)\n",
 				file, file->f_count);
 
 	/* Lock file table */
@@ -365,7 +365,7 @@ nlmsvc_mark_resources(struct net *net)
 {
 	struct nlm_host hint;
 
-	dprintk("lockd: nlmsvc_mark_resources for net %p\n", net);
+	dprintk("lockd: nlmsvc_mark_resources for net %pK\n", net);
 	hint.net = net;
 	nlm_traverse_files(&hint, nlmsvc_mark_host, NULL);
 }

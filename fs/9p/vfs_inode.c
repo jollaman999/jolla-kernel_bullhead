@@ -366,7 +366,7 @@ struct inode *v9fs_get_inode(struct super_block *sb, umode_t mode, dev_t rdev)
 	struct inode *inode;
 	struct v9fs_session_info *v9ses = sb->s_fs_info;
 
-	p9_debug(P9_DEBUG_VFS, "super block: %p mode: %ho\n", sb, mode);
+	p9_debug(P9_DEBUG_VFS, "super block: %pK mode: %ho\n", sb, mode);
 
 	inode = new_inode(sb);
 	if (!inode) {
@@ -587,7 +587,7 @@ static int v9fs_remove(struct inode *dir, struct dentry *dentry, int flags)
 	struct p9_fid *v9fid, *dfid;
 	struct v9fs_session_info *v9ses;
 
-	p9_debug(P9_DEBUG_VFS, "inode: %p dentry: %p rmdir: %x\n",
+	p9_debug(P9_DEBUG_VFS, "inode: %pK dentry: %pK rmdir: %x\n",
 		 dir, dentry, flags);
 
 	v9ses = v9fs_inode2v9ses(dir);
@@ -788,7 +788,7 @@ struct dentry *v9fs_vfs_lookup(struct inode *dir, struct dentry *dentry,
 	struct inode *inode;
 	char *name;
 
-	p9_debug(P9_DEBUG_VFS, "dir: %p dentry: (%s) %p flags: %x\n",
+	p9_debug(P9_DEBUG_VFS, "dir: %pK dentry: (%s) %pK flags: %x\n",
 		 dir, dentry->d_name.name, dentry, flags);
 
 	if (dentry->d_name.len > NAME_MAX)
@@ -1058,7 +1058,7 @@ v9fs_vfs_getattr(struct vfsmount *mnt, struct dentry *dentry,
 	struct p9_fid *fid;
 	struct p9_wstat *st;
 
-	p9_debug(P9_DEBUG_VFS, "dentry: %p\n", dentry);
+	p9_debug(P9_DEBUG_VFS, "dentry: %pK\n", dentry);
 	err = -EPERM;
 	v9ses = v9fs_dentry2v9ses(dentry);
 	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE) {

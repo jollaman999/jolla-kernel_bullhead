@@ -1055,7 +1055,7 @@ static int i7300_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (mci == NULL)
 		return -ENOMEM;
 
-	edac_dbg(0, "MC: mci = %p\n", mci);
+	edac_dbg(0, "MC: mci = %pK\n", mci);
 
 	mci->pdev = &pdev->dev;	/* record ptr  to the generic device */
 

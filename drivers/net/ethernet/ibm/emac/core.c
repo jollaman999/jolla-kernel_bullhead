@@ -2823,8 +2823,8 @@ static int emac_probe(struct platform_device *ofdev)
 	dev->rx_desc =
 	    dev->mal->bd_virt + mal_rx_bd_offset(dev->mal, dev->mal_rx_chan);
 
-	DBG(dev, "tx_desc %p" NL, dev->tx_desc);
-	DBG(dev, "rx_desc %p" NL, dev->rx_desc);
+	DBG(dev, "tx_desc %pK" NL, dev->tx_desc);
+	DBG(dev, "rx_desc %pK" NL, dev->rx_desc);
 
 	/* Clean rings */
 	memset(dev->tx_desc, 0, NUM_TX_BUFF * sizeof(struct mal_descriptor));

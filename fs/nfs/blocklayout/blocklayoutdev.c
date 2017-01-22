@@ -192,7 +192,7 @@ static struct block_device *translate_devid(struct pnfs_layout_hdr *lo,
 	struct block_mount_id *mid;
 	struct pnfs_block_dev *dev;
 
-	dprintk("%s enter, lo=%p, id=%p\n", __func__, lo, id);
+	dprintk("%s enter, lo=%pK, id=%pK\n", __func__, lo, id);
 	mid = BLK_ID(lo);
 	spin_lock(&mid->bm_lock);
 	list_for_each_entry(dev, &mid->bm_devlist, bm_node) {
@@ -204,7 +204,7 @@ static struct block_device *translate_devid(struct pnfs_layout_hdr *lo,
 	}
  out:
 	spin_unlock(&mid->bm_lock);
-	dprintk("%s returning %p\n", __func__, rv);
+	dprintk("%s returning %pK\n", __func__, rv);
 	return rv;
 }
 

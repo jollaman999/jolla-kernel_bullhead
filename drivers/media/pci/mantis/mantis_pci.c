@@ -104,7 +104,7 @@ int mantis_pci_init(struct mantis_pci *mantis)
 		mantis->pdev->subsystem_device);
 
 	dprintk(MANTIS_ERROR, 0,
-		"irq: %d, latency: %d\n    memory: 0x%lx, mmio: 0x%p\n",
+		"irq: %d, latency: %d\n    memory: 0x%lx, mmio: 0x%pK\n",
 		mantis->pdev->irq,
 		mantis->latency,
 		mantis->mantis_addr,
@@ -152,7 +152,7 @@ void mantis_pci_exit(struct mantis_pci *mantis)
 {
 	struct pci_dev *pdev = mantis->pdev;
 
-	dprintk(MANTIS_NOTICE, 1, " mem: 0x%p", mantis->mmio);
+	dprintk(MANTIS_NOTICE, 1, " mem: 0x%pK", mantis->mmio);
 	free_irq(pdev->irq, mantis);
 	if (mantis->mmio) {
 		iounmap(mantis->mmio);

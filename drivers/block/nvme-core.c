@@ -185,7 +185,7 @@ static void special_completion(struct nvme_dev *dev, void *ctx,
 		return;
 	}
 
-	dev_warn(&dev->pci_dev->dev, "Unknown special completion %p\n", ctx);
+	dev_warn(&dev->pci_dev->dev, "Unknown special completion %pK\n", ctx);
 }
 
 /*

@@ -45,14 +45,14 @@ static atomic_t	rds_iw_allocation = ATOMIC_INIT(0);
 
 static void rds_iw_frag_drop_page(struct rds_page_frag *frag)
 {
-	rdsdebug("frag %p page %p\n", frag, frag->f_page);
+	rdsdebug("frag %pK page %pK\n", frag, frag->f_page);
 	__free_page(frag->f_page);
 	frag->f_page = NULL;
 }
 
 static void rds_iw_frag_free(struct rds_page_frag *frag)
 {
-	rdsdebug("frag %p page %p\n", frag, frag->f_page);
+	rdsdebug("frag %pK page %pK\n", frag, frag->f_page);
 	BUG_ON(frag->f_page);
 	kmem_cache_free(rds_iw_frag_slab, frag);
 }
@@ -71,7 +71,7 @@ static void rds_iw_recv_unmap_page(struct rds_iw_connection *ic,
 {
 	struct rds_page_frag *frag = recv->r_frag;
 
-	rdsdebug("recv %p frag %p page %p\n", recv, frag, frag->f_page);
+	rdsdebug("recv %pK frag %pK page %pK\n", recv, frag, frag->f_page);
 	if (frag->f_mapped)
 		ib_dma_unmap_page(ic->i_cm_id->device,
 			       frag->f_mapped,
@@ -249,7 +249,7 @@ int rds_iw_recv_refill(struct rds_connection *conn, gfp_t kptr_gfp,
 
 		/* XXX when can this fail? */
 		ret = ib_post_recv(ic->i_cm_id->qp, &recv->r_wr, &failed_wr);
-		rdsdebug("recv %p iwinc %p page %p addr %lu ret %d\n", recv,
+		rdsdebug("recv %pK iwinc %pK page %pK addr %lu ret %d\n", recv,
 			 recv->r_iwinc, recv->r_frag->f_page,
 			 (long) recv->r_frag->f_mapped, ret);
 		if (ret) {
@@ -280,7 +280,7 @@ static void rds_iw_inc_purge(struct rds_incoming *inc)
 	struct rds_page_frag *pos;
 
 	iwinc = container_of(inc, struct rds_iw_incoming, ii_inc);
-	rdsdebug("purging iwinc %p inc %p\n", iwinc, inc);
+	rdsdebug("purging iwinc %pK inc %pK\n", iwinc, inc);
 
 	list_for_each_entry_safe(frag, pos, &iwinc->ii_frags, f_item) {
 		list_del_init(&frag->f_item);
@@ -296,7 +296,7 @@ void rds_iw_inc_free(struct rds_incoming *inc)
 	iwinc = container_of(inc, struct rds_iw_incoming, ii_inc);
 
 	rds_iw_inc_purge(inc);
-	rdsdebug("freeing iwinc %p inc %p\n", iwinc, inc);
+	rdsdebug("freeing iwinc %pK inc %pK\n", iwinc, inc);
 	BUG_ON(!list_empty(&iwinc->ii_frags));
 	kmem_cache_free(rds_iw_incoming_slab, iwinc);
 	atomic_dec(&rds_iw_allocation);
@@ -335,8 +335,8 @@ int rds_iw_inc_copy_to_user(struct rds_incoming *inc, struct iovec *first_iov,
 		to_copy = min_t(size_t, to_copy, size - copied);
 		to_copy = min_t(unsigned long, to_copy, len - copied);
 
-		rdsdebug("%lu bytes to user [%p, %zu] + %lu from frag "
-			 "[%p, %lu] + %lu\n",
+		rdsdebug("%lu bytes to user [%pK, %zu] + %lu from frag "
+			 "[%pK, %lu] + %lu\n",
 			 to_copy, iov->iov_base, iov->iov_len, iov_off,
 			 frag->f_page, frag->f_offset, frag_off);
 
@@ -453,7 +453,7 @@ static void rds_iw_send_ack(struct rds_iw_connection *ic, unsigned int adv_credi
 
 	seq = rds_iw_get_ack(ic);
 
-	rdsdebug("send_ack: ic %p ack %llu\n", ic, (unsigned long long) seq);
+	rdsdebug("send_ack: ic %pK ack %llu\n", ic, (unsigned long long) seq);
 	rds_message_populate_header(hdr, 0, 0, 0);
 	hdr->h_ack = cpu_to_be64(seq);
 	hdr->h_credit = adv_credits;
@@ -656,7 +656,7 @@ static void rds_iw_process_recv(struct rds_connection *conn,
 
 	/* XXX shut down the connection if port 0,0 are seen? */
 
-	rdsdebug("ic %p iwinc %p recv %p byte len %u\n", ic, iwinc, recv,
+	rdsdebug("ic %pK iwinc %pK recv %pK byte len %u\n", ic, iwinc, recv,
 		 byte_len);
 
 	if (byte_len < sizeof(struct rds_header)) {
@@ -725,7 +725,7 @@ static void rds_iw_process_recv(struct rds_connection *conn,
 		memcpy(hdr, ihdr, sizeof(*hdr));
 		ic->i_recv_data_rem = be32_to_cpu(hdr->h_len);
 
-		rdsdebug("ic %p iwinc %p rem %u flag 0x%x\n", ic, iwinc,
+		rdsdebug("ic %pK iwinc %pK rem %u flag 0x%x\n", ic, iwinc,
 			 ic->i_recv_data_rem, hdr->h_flags);
 	} else {
 		hdr = &iwinc->ii_inc.i_hdr;
@@ -785,7 +785,7 @@ void rds_iw_recv_cq_comp_handler(struct ib_cq *cq, void *context)
 	struct rds_connection *conn = context;
 	struct rds_iw_connection *ic = conn->c_transport_data;
 
-	rdsdebug("conn %p cq %p\n", conn, cq);
+	rdsdebug("conn %pK cq %pK\n", conn, cq);
 
 	rds_iw_stats_inc(s_iw_rx_cq_call);
 
@@ -867,7 +867,7 @@ int rds_iw_recv(struct rds_connection *conn)
 	struct rds_iw_connection *ic = conn->c_transport_data;
 	int ret = 0;
 
-	rdsdebug("conn %p\n", conn);
+	rdsdebug("conn %pK\n", conn);
 
 	/*
 	 * If we get a temporary posting failure in this context then

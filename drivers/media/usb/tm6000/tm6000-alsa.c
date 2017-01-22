@@ -243,7 +243,7 @@ static int tm6000_fillbuf(struct tm6000_core *core, char *buf, int size)
 		return -EINVAL;
 	}
 
-	dprintk(1, "Copying %d bytes at %p[%d] - buf size=%d x %d\n", size,
+	dprintk(1, "Copying %d bytes at %pK[%d] - buf size=%d x %d\n", size,
 		runtime->dma_area, buf_pos,
 		(unsigned int)runtime->buffer_size, stride);
 

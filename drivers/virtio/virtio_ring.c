@@ -289,7 +289,7 @@ add_head:
 	if (unlikely(vq->num_added == (1 << 16) - 1))
 		virtqueue_kick(_vq);
 
-	pr_debug("Added buffer head %i to %p\n", head, vq);
+	pr_debug("Added buffer head %i to %pK\n", head, vq);
 	END_USE(vq);
 
 	return 0;
@@ -752,14 +752,14 @@ irqreturn_t vring_interrupt(int irq, void *_vq)
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	if (!more_used(vq)) {
-		pr_debug("virtqueue interrupt with no work for %p\n", vq);
+		pr_debug("virtqueue interrupt with no work for %pK\n", vq);
 		return IRQ_NONE;
 	}
 
 	if (unlikely(vq->broken))
 		return IRQ_HANDLED;
 
-	pr_debug("virtqueue callback for %p (%p)\n", vq, vq->vq.callback);
+	pr_debug("virtqueue callback for %pK (%pK)\n", vq, vq->vq.callback);
 	if (vq->vq.callback)
 		vq->vq.callback(&vq->vq);
 

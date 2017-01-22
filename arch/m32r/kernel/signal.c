@@ -223,7 +223,7 @@ static int setup_rt_frame(int sig, struct k_sigaction *ka, siginfo_t *info,
 	set_fs(USER_DS);
 
 #if DEBUG_SIG
-	printk("SIG deliver (%s:%d): sp=%p pc=%p\n",
+	printk("SIG deliver (%s:%d): sp=%pK pc=%pK\n",
 		current->comm, current->pid, frame, regs->pc);
 #endif
 

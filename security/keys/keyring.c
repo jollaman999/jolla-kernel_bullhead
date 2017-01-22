@@ -904,7 +904,7 @@ void __key_link(struct key *keyring, struct key *key,
 	nklist = (struct keyring_list *)(*_prealloc & ~KEY_LINK_FIXQUOTA);
 	*_prealloc = 0;
 
-	kenter("%d,%d,%p", keyring->serial, key->serial, nklist);
+	kenter("%d,%d,%pK", keyring->serial, key->serial, nklist);
 
 	klist = rcu_dereference_locked_keyring(keyring);
 

@@ -886,7 +886,7 @@ ahd_linux_bus_reset(struct scsi_cmnd *cmd)
 	ahd = *(struct ahd_softc **)cmd->device->host->hostdata;
 #ifdef AHD_DEBUG
 	if ((ahd_debug & AHD_SHOW_RECOVERY) != 0)
-		printk("%s: Bus reset called for cmd %p\n",
+		printk("%s: Bus reset called for cmd %pK\n",
 		       ahd_name(ahd), cmd);
 #endif
 	ahd_lock(ahd, &flags);

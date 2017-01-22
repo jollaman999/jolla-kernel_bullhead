@@ -177,7 +177,7 @@ static struct jffs2_tmp_dnode_info *jffs2_lookup_tn(struct rb_root *tn_root, uin
 	struct rb_node *next;
 	struct jffs2_tmp_dnode_info *tn = NULL;
 
-	dbg_readinode("root %p, offset %d\n", tn_root, offset);
+	dbg_readinode("root %pK, offset %d\n", tn_root, offset);
 
 	next = tn_root->rb_node;
 
@@ -359,7 +359,7 @@ static int jffs2_add_tn_to_tree(struct jffs2_sb_info *c,
 	if (this) {
 		while (1) {
 			if (this->fn->ofs + this->fn->size > tn->fn->ofs) {
-				dbg_readinode("Node is overlapped by %p (v %d, 0x%x-0x%x)\n",
+				dbg_readinode("Node is overlapped by %pK (v %d, 0x%x-0x%x)\n",
 					      this, this->version, this->fn->ofs,
 					      this->fn->ofs+this->fn->size);
 				tn->overlapped = 1;
@@ -436,7 +436,7 @@ static void ver_insert(struct rb_root *ver_root, struct jffs2_tmp_dnode_info *tn
 		else
 			link = &parent->rb_right;
 	}
-	dbg_readinode("Link new node at %p (root is %p)\n", link, ver_root);
+	dbg_readinode("Link new node at %pK (root is %pK)\n", link, ver_root);
 	rb_link_node(&tn->rb, parent, link);
 	rb_insert_color(&tn->rb, ver_root);
 }
@@ -457,14 +457,14 @@ static int jffs2_build_inode_fragtree(struct jffs2_sb_info *c,
 	uint32_t high_ver = 0;
 
 	if (rii->mdata_tn) {
-		dbg_readinode("potential mdata is ver %d at %p\n", rii->mdata_tn->version, rii->mdata_tn);
+		dbg_readinode("potential mdata is ver %d at %pK\n", rii->mdata_tn->version, rii->mdata_tn);
 		high_ver = rii->mdata_tn->version;
 		rii->latest_ref = rii->mdata_tn->fn->raw;
 	}
 #ifdef JFFS2_DBG_READINODE_MESSAGES
 	this = tn_last(&rii->tn_root);
 	while (this) {
-		dbg_readinode("tn %p ver %d range 0x%x-0x%x ov %d\n", this, this->version, this->fn->ofs,
+		dbg_readinode("tn %pK ver %d range 0x%x-0x%x ov %d\n", this, this->version, this->fn->ofs,
 			      this->fn->ofs+this->fn->size, this->overlapped);
 		this = tn_prev(this);
 	}
@@ -511,7 +511,7 @@ static int jffs2_build_inode_fragtree(struct jffs2_sb_info *c,
 					high_ver = this->version;
 					rii->latest_ref = this->fn->raw;
 				}
-				dbg_readinode("Add %p (v %d, 0x%x-0x%x, ov %d) to fragtree\n",
+				dbg_readinode("Add %pK (v %d, 0x%x-0x%x, ov %d) to fragtree\n",
 					     this, this->version, this->fn->ofs,
 					     this->fn->ofs+this->fn->size, this->overlapped);
 
@@ -869,7 +869,7 @@ static inline int read_dnode(struct jffs2_sb_info *c, struct jffs2_raw_node_ref 
 	dbg_readinode2("After adding ver %d:\n", je32_to_cpu(rd->version));
 	tn = tn_first(&rii->tn_root);
 	while (tn) {
-		dbg_readinode2("%p: v %d r 0x%x-0x%x ov %d\n",
+		dbg_readinode2("%pK: v %d r 0x%x-0x%x ov %d\n",
 			       tn, tn->version, tn->fn->ofs,
 			       tn->fn->ofs+tn->fn->size, tn->overlapped);
 		tn = tn_next(tn);

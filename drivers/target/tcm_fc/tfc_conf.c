@@ -235,7 +235,7 @@ static void ft_del_acl(struct se_node_acl *se_acl)
 		config_item_name(&se_acl->acl_group.cg_item));
 
 	tpg = container_of(se_tpg, struct ft_tpg, se_tpg);
-	pr_debug("del acl %p se_acl %p tpg %p se_tpg %p\n",
+	pr_debug("del acl %pK se_acl %pK tpg %pK se_tpg %pK\n",
 		    acl, se_acl, tpg, &tpg->se_tpg);
 
 	core_tpg_del_initiator_node_acl(&tpg->se_tpg, se_acl, 1);
@@ -252,11 +252,11 @@ struct ft_node_acl *ft_acl_get(struct ft_tpg *tpg, struct fc_rport_priv *rdata)
 	spin_lock_irq(&se_tpg->acl_node_lock);
 	list_for_each_entry(se_acl, &se_tpg->acl_node_list, acl_list) {
 		acl = container_of(se_acl, struct ft_node_acl, se_node_acl);
-		pr_debug("acl %p port_name %llx\n",
+		pr_debug("acl %pK port_name %llx\n",
 			acl, (unsigned long long)acl->node_auth.port_name);
 		if (acl->node_auth.port_name == rdata->ids.port_name ||
 		    acl->node_auth.node_name == rdata->ids.node_name) {
-			pr_debug("acl %p port_name %llx matched\n", acl,
+			pr_debug("acl %pK port_name %llx matched\n", acl,
 				    (unsigned long long)rdata->ids.port_name);
 			found = acl;
 			/* XXX need to hold onto ACL */
@@ -276,7 +276,7 @@ struct se_node_acl *ft_tpg_alloc_fabric_acl(struct se_portal_group *se_tpg)
 		pr_err("Unable to allocate struct ft_node_acl\n");
 		return NULL;
 	}
-	pr_debug("acl %p\n", acl);
+	pr_debug("acl %pK\n", acl);
 	return &acl->se_node_acl;
 }
 
@@ -286,7 +286,7 @@ static void ft_tpg_release_fabric_acl(struct se_portal_group *se_tpg,
 	struct ft_node_acl *acl = container_of(se_acl,
 				struct ft_node_acl, se_node_acl);
 
-	pr_debug("acl %p\n", acl);
+	pr_debug("acl %pK\n", acl);
 	kfree(acl);
 }
 

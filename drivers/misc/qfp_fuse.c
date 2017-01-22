@@ -258,7 +258,7 @@ static int qfp_fuse_probe(struct platform_device *pdev)
 	if (ret < 0)
 		goto err;
 
-	pr_info("Fuse driver base:%p end:%p\n", qfp_priv->base,
+	pr_info("Fuse driver base:%pK end:%pK\n", qfp_priv->base,
 			qfp_priv->base + qfp_priv->size);
 	return 0;
 

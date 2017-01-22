@@ -210,7 +210,7 @@ acpi_ex_read_data_from_field(struct acpi_walk_state *walk_state,
 	}
 
 	ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
-			  "FieldRead [TO]:   Obj %p, Type %X, Buf %p, ByteLen %X\n",
+			  "FieldRead [TO]:   Obj %pK, Type %X, Buf %pK, ByteLen %X\n",
 			  obj_desc, obj_desc->common.type, buffer,
 			  (u32) length));
 	ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
@@ -417,13 +417,13 @@ acpi_ex_write_data_to_field(union acpi_operand_object *source_desc,
 	}
 
 	ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
-			  "FieldWrite [FROM]: Obj %p (%s:%X), Buf %p, ByteLen %X\n",
+			  "FieldWrite [FROM]: Obj %pK (%s:%X), Buf %pK, ByteLen %X\n",
 			  source_desc,
 			  acpi_ut_get_type_name(source_desc->common.type),
 			  source_desc->common.type, buffer, length));
 
 	ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
-			  "FieldWrite [TO]:   Obj %p (%s:%X), BitLen %X, BitOff %X, ByteOff %X\n",
+			  "FieldWrite [TO]:   Obj %pK (%s:%X), BitLen %X, BitOff %X, ByteOff %X\n",
 			  obj_desc,
 			  acpi_ut_get_type_name(obj_desc->common.type),
 			  obj_desc->common.type,

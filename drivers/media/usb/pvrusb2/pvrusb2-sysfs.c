@@ -92,7 +92,7 @@ static ssize_t show_name(struct device *class_dev,
 	const char *name;
 	cip = container_of(attr, struct pvr2_sysfs_ctl_item, attr_name);
 	name = pvr2_ctrl_get_desc(cip->cptr);
-	pvr2_sysfs_trace("pvr2_sysfs(%p) show_name(cid=%d) is %s",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) show_name(cid=%d) is %s",
 			 cip->chptr, cip->ctl_id, name);
 	if (!name) return -EINVAL;
 	return scnprintf(buf, PAGE_SIZE, "%s\n", name);
@@ -114,7 +114,7 @@ static ssize_t show_type(struct device *class_dev,
 	case pvr2_ctl_bool: name = "boolean"; break;
 	default: name = "?"; break;
 	}
-	pvr2_sysfs_trace("pvr2_sysfs(%p) show_type(cid=%d) is %s",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) show_type(cid=%d) is %s",
 			 cip->chptr, cip->ctl_id, name);
 	if (!name) return -EINVAL;
 	return scnprintf(buf, PAGE_SIZE, "%s\n", name);
@@ -128,7 +128,7 @@ static ssize_t show_min(struct device *class_dev,
 	long val;
 	cip = container_of(attr, struct pvr2_sysfs_ctl_item, attr_min);
 	val = pvr2_ctrl_get_min(cip->cptr);
-	pvr2_sysfs_trace("pvr2_sysfs(%p) show_min(cid=%d) is %ld",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) show_min(cid=%d) is %ld",
 			 cip->chptr, cip->ctl_id, val);
 	return scnprintf(buf, PAGE_SIZE, "%ld\n", val);
 }
@@ -141,7 +141,7 @@ static ssize_t show_max(struct device *class_dev,
 	long val;
 	cip = container_of(attr, struct pvr2_sysfs_ctl_item, attr_max);
 	val = pvr2_ctrl_get_max(cip->cptr);
-	pvr2_sysfs_trace("pvr2_sysfs(%p) show_max(cid=%d) is %ld",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) show_max(cid=%d) is %ld",
 			 cip->chptr, cip->ctl_id, val);
 	return scnprintf(buf, PAGE_SIZE, "%ld\n", val);
 }
@@ -159,7 +159,7 @@ static ssize_t show_def(struct device *class_dev,
 	if (ret < 0) return ret;
 	ret = pvr2_ctrl_value_to_sym(cip->cptr, ~0, val,
 				     buf, PAGE_SIZE - 1, &cnt);
-	pvr2_sysfs_trace("pvr2_sysfs(%p) show_def(cid=%d) is %.*s (%d)",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) show_def(cid=%d) is %.*s (%d)",
 			 cip->chptr, cip->ctl_id, cnt, buf, val);
 	buf[cnt] = '\n';
 	return cnt + 1;
@@ -178,7 +178,7 @@ static ssize_t show_val_norm(struct device *class_dev,
 	if (ret < 0) return ret;
 	ret = pvr2_ctrl_value_to_sym(cip->cptr, ~0, val,
 				     buf, PAGE_SIZE - 1, &cnt);
-	pvr2_sysfs_trace("pvr2_sysfs(%p) show_val_norm(cid=%d) is %.*s (%d)",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) show_val_norm(cid=%d) is %.*s (%d)",
 			 cip->chptr, cip->ctl_id, cnt, buf, val);
 	buf[cnt] = '\n';
 	return cnt+1;
@@ -197,7 +197,7 @@ static ssize_t show_val_custom(struct device *class_dev,
 	if (ret < 0) return ret;
 	ret = pvr2_ctrl_custom_value_to_sym(cip->cptr, ~0, val,
 					    buf, PAGE_SIZE - 1, &cnt);
-	pvr2_sysfs_trace("pvr2_sysfs(%p) show_val_custom(cid=%d) is %.*s (%d)",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) show_val_custom(cid=%d) is %.*s (%d)",
 			 cip->chptr, cip->ctl_id, cnt, buf, val);
 	buf[cnt] = '\n';
 	return cnt+1;
@@ -222,7 +222,7 @@ static ssize_t show_enum(struct device *class_dev,
 		buf[bcnt] = '\n';
 		bcnt++;
 	}
-	pvr2_sysfs_trace("pvr2_sysfs(%p) show_enum(cid=%d)",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) show_enum(cid=%d)",
 			 cip->chptr, cip->ctl_id);
 	return bcnt;
 }
@@ -247,7 +247,7 @@ static ssize_t show_bits(struct device *class_dev,
 		buf[bcnt] = '\n';
 		bcnt++;
 	}
-	pvr2_sysfs_trace("pvr2_sysfs(%p) show_bits(cid=%d)",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) show_bits(cid=%d)",
 			 cip->chptr, cip->ctl_id);
 	return bcnt;
 }
@@ -277,7 +277,7 @@ static ssize_t store_val_norm(struct device *class_dev,
 	struct pvr2_sysfs_ctl_item *cip;
 	int ret;
 	cip = container_of(attr, struct pvr2_sysfs_ctl_item, attr_val);
-	pvr2_sysfs_trace("pvr2_sysfs(%p) store_val_norm(cid=%d) \"%.*s\"",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) store_val_norm(cid=%d) \"%.*s\"",
 			 cip->chptr, cip->ctl_id, (int)count, buf);
 	ret = store_val_any(cip, 0, buf, count);
 	if (!ret) ret = count;
@@ -291,7 +291,7 @@ static ssize_t store_val_custom(struct device *class_dev,
 	struct pvr2_sysfs_ctl_item *cip;
 	int ret;
 	cip = container_of(attr, struct pvr2_sysfs_ctl_item, attr_custom);
-	pvr2_sysfs_trace("pvr2_sysfs(%p) store_val_custom(cid=%d) \"%.*s\"",
+	pvr2_sysfs_trace("pvr2_sysfs(%pK) store_val_custom(cid=%d) \"%.*s\"",
 			 cip->chptr, cip->ctl_id, (int)count, buf);
 	ret = store_val_any(cip, 1, buf, count);
 	if (!ret) ret = count;
@@ -310,7 +310,7 @@ static void pvr2_sysfs_add_control(struct pvr2_sysfs *sfp,int ctl_id)
 
 	cip = kzalloc(sizeof(*cip),GFP_KERNEL);
 	if (!cip) return;
-	pvr2_sysfs_trace("Creating pvr2_sysfs_ctl_item id=%p",cip);
+	pvr2_sysfs_trace("Creating pvr2_sysfs_ctl_item id=%pK",cip);
 
 	cip->cptr = cptr;
 	cip->ctl_id = ctl_id;
@@ -496,7 +496,7 @@ static void pvr2_sysfs_tear_down_controls(struct pvr2_sysfs *sfp)
 		if (cip1->created_ok) {
 			sysfs_remove_group(&sfp->class_dev->kobj,&cip1->grp);
 		}
-		pvr2_sysfs_trace("Destroying pvr2_sysfs_ctl_item id=%p",cip1);
+		pvr2_sysfs_trace("Destroying pvr2_sysfs_ctl_item id=%pK",cip1);
 		kfree(cip1);
 	}
 }
@@ -506,14 +506,14 @@ static void pvr2_sysfs_class_release(struct class *class)
 {
 	struct pvr2_sysfs_class *clp;
 	clp = container_of(class,struct pvr2_sysfs_class,class);
-	pvr2_sysfs_trace("Destroying pvr2_sysfs_class id=%p",clp);
+	pvr2_sysfs_trace("Destroying pvr2_sysfs_class id=%pK",clp);
 	kfree(clp);
 }
 
 
 static void pvr2_sysfs_release(struct device *class_dev)
 {
-	pvr2_sysfs_trace("Releasing class_dev id=%p",class_dev);
+	pvr2_sysfs_trace("Releasing class_dev id=%pK",class_dev);
 	kfree(class_dev);
 }
 
@@ -550,7 +550,7 @@ static void class_dev_destroy(struct pvr2_sysfs *sfp)
 		device_remove_file(sfp->class_dev,
 					 &sfp->attr_unit_number);
 	}
-	pvr2_sysfs_trace("Destroying class_dev id=%p",sfp->class_dev);
+	pvr2_sysfs_trace("Destroying class_dev id=%pK",sfp->class_dev);
 	dev_set_drvdata(sfp->class_dev, NULL);
 	dev = sfp->class_dev->parent;
 	sfp->class_dev->parent = NULL;
@@ -641,7 +641,7 @@ static void class_dev_create(struct pvr2_sysfs *sfp,
 	class_dev = kzalloc(sizeof(*class_dev),GFP_KERNEL);
 	if (!class_dev) return;
 
-	pvr2_sysfs_trace("Creating class_dev id=%p",class_dev);
+	pvr2_sysfs_trace("Creating class_dev id=%pK",class_dev);
 
 	class_dev->class = &class_ptr->class;
 
@@ -761,7 +761,7 @@ static void pvr2_sysfs_internal_check(struct pvr2_channel *chp)
 	struct pvr2_sysfs *sfp;
 	sfp = container_of(chp,struct pvr2_sysfs,channel);
 	if (!sfp->channel.mc_head->disconnect_flag) return;
-	pvr2_trace(PVR2_TRACE_STRUCT,"Destroying pvr2_sysfs id=%p",sfp);
+	pvr2_trace(PVR2_TRACE_STRUCT,"Destroying pvr2_sysfs id=%pK",sfp);
 	class_dev_destroy(sfp);
 	pvr2_channel_done(&sfp->channel);
 	kfree(sfp);
@@ -774,7 +774,7 @@ struct pvr2_sysfs *pvr2_sysfs_create(struct pvr2_context *mp,
 	struct pvr2_sysfs *sfp;
 	sfp = kzalloc(sizeof(*sfp),GFP_KERNEL);
 	if (!sfp) return sfp;
-	pvr2_trace(PVR2_TRACE_STRUCT,"Creating pvr2_sysfs id=%p",sfp);
+	pvr2_trace(PVR2_TRACE_STRUCT,"Creating pvr2_sysfs id=%pK",sfp);
 	pvr2_channel_init(&sfp->channel,mp);
 	sfp->channel.check_func = pvr2_sysfs_internal_check;
 
@@ -789,14 +789,14 @@ struct pvr2_sysfs_class *pvr2_sysfs_class_create(void)
 	struct pvr2_sysfs_class *clp;
 	clp = kzalloc(sizeof(*clp),GFP_KERNEL);
 	if (!clp) return clp;
-	pvr2_sysfs_trace("Creating and registering pvr2_sysfs_class id=%p",
+	pvr2_sysfs_trace("Creating and registering pvr2_sysfs_class id=%pK",
 			 clp);
 	clp->class.name = "pvrusb2";
 	clp->class.class_release = pvr2_sysfs_class_release;
 	clp->class.dev_release = pvr2_sysfs_release;
 	if (class_register(&clp->class)) {
 		pvr2_sysfs_trace(
-			"Registration failed for pvr2_sysfs_class id=%p",clp);
+			"Registration failed for pvr2_sysfs_class id=%pK",clp);
 		kfree(clp);
 		clp = NULL;
 	}
@@ -806,7 +806,7 @@ struct pvr2_sysfs_class *pvr2_sysfs_class_create(void)
 
 void pvr2_sysfs_class_destroy(struct pvr2_sysfs_class *clp)
 {
-	pvr2_sysfs_trace("Unregistering pvr2_sysfs_class id=%p", clp);
+	pvr2_sysfs_trace("Unregistering pvr2_sysfs_class id=%pK", clp);
 	class_unregister(&clp->class);
 }
 

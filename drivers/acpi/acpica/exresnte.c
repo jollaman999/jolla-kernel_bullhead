@@ -95,7 +95,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 	source_desc = acpi_ns_get_attached_object(node);
 	entry_type = acpi_ns_get_type((acpi_handle) node);
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Entry=%p SourceDesc=%p [%s]\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Entry=%pK SourceDesc=%pK [%s]\n",
 			  node, source_desc,
 			  acpi_ut_get_type_name(entry_type)));
 
@@ -124,7 +124,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 	}
 
 	if (!source_desc) {
-		ACPI_ERROR((AE_INFO, "No object attached to node %p", node));
+		ACPI_ERROR((AE_INFO, "No object attached to node %pK", node));
 		return_ACPI_STATUS(AE_AML_NO_OPERAND);
 	}
 
@@ -203,7 +203,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 	case ACPI_TYPE_LOCAL_INDEX_FIELD:
 
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "FieldRead Node=%p SourceDesc=%p Type=%X\n",
+				  "FieldRead Node=%pK SourceDesc=%pK Type=%X\n",
 				  node, source_desc, entry_type));
 
 		status =
@@ -230,7 +230,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 	case ACPI_TYPE_ANY:
 
 		ACPI_ERROR((AE_INFO,
-			    "Untyped entry %p, no attached object!", node));
+			    "Untyped entry %pK, no attached object!", node));
 
 		return_ACPI_STATUS(AE_AML_OPERAND_TYPE);	/* Cannot be AE_TYPE */
 
@@ -263,7 +263,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 		/* Default case is for unknown types */
 
 		ACPI_ERROR((AE_INFO,
-			    "Node %p - Unknown object type 0x%X",
+			    "Node %pK - Unknown object type 0x%X",
 			    node, entry_type));
 
 		return_ACPI_STATUS(AE_AML_OPERAND_TYPE);

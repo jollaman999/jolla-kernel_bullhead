@@ -242,7 +242,7 @@ static int sm501_alloc_mem(struct sm501fb_info *inf, struct sm501_mem *mem,
 	mem->sm_addr = ptr;
 	mem->k_addr  = inf->fbmem + ptr;
 
-	dev_dbg(inf->dev, "%s: result %08lx, %p - %u, %zd\n",
+	dev_dbg(inf->dev, "%s: result %08lx, %pK - %u, %zd\n",
 		__func__, mem->sm_addr, mem->k_addr, why, size);
 
 	return 0;
@@ -639,7 +639,7 @@ static int sm501fb_set_par_crt(struct fb_info *info)
 
 	/* activate new configuration */
 
-	dev_dbg(fbi->dev, "%s(%p)\n", __func__, info);
+	dev_dbg(fbi->dev, "%s(%pK)\n", __func__, info);
 
 	/* enable CRT DAC - note 0 is on!*/
 	sm501_misc_control(fbi->dev->parent, 0, SM501_MISC_DAC_POWER);
@@ -808,7 +808,7 @@ static int sm501fb_set_par_pnl(struct fb_info *info)
 	unsigned long reg;
 	int ret;
 
-	dev_dbg(fbi->dev, "%s(%p)\n", __func__, info);
+	dev_dbg(fbi->dev, "%s(%pK)\n", __func__, info);
 
 	/* activate this new configuration */
 
@@ -968,7 +968,7 @@ static int sm501fb_blank_pnl(int blank_mode, struct fb_info *info)
 	struct sm501fb_par  *par = info->par;
 	struct sm501fb_info *fbi = par->info;
 
-	dev_dbg(fbi->dev, "%s(mode=%d, %p)\n", __func__, blank_mode, info);
+	dev_dbg(fbi->dev, "%s(mode=%d, %pK)\n", __func__, blank_mode, info);
 
 	switch (blank_mode) {
 	case FB_BLANK_POWERDOWN:
@@ -1000,7 +1000,7 @@ static int sm501fb_blank_crt(int blank_mode, struct fb_info *info)
 	struct sm501fb_info *fbi = par->info;
 	unsigned long ctrl;
 
-	dev_dbg(fbi->dev, "%s(mode=%d, %p)\n", __func__, blank_mode, info);
+	dev_dbg(fbi->dev, "%s(mode=%d, %pK)\n", __func__, blank_mode, info);
 
 	ctrl = smc501_readl(fbi->regs + SM501_DC_CRT_CONTROL);
 
@@ -1045,7 +1045,7 @@ static int sm501fb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	unsigned long hwc_addr;
 	unsigned long fg, bg;
 
-	dev_dbg(fbi->dev, "%s(%p,%p)\n", __func__, info, cursor);
+	dev_dbg(fbi->dev, "%s(%pK,%pK)\n", __func__, info, cursor);
 
 	if (par->head == HEAD_CRT)
 		base += SM501_DC_CRT_HWC_BASE;
@@ -2120,8 +2120,8 @@ static int sm501fb_suspend_fb(struct sm501fb_info *info,
 		goto err_nocursor;
 	}
 
-	dev_dbg(info->dev, "suspending screen to %p\n", par->store_fb);
-	dev_dbg(info->dev, "suspending cursor to %p\n", par->store_cursor);
+	dev_dbg(info->dev, "suspending screen to %pK\n", par->store_fb);
+	dev_dbg(info->dev, "suspending cursor to %pK\n", par->store_cursor);
 
 	memcpy_fromio(par->store_fb, par->screen.k_addr, par->screen.size);
 	memcpy_fromio(par->store_cursor, par->cursor.k_addr, par->cursor.size);
@@ -2150,8 +2150,8 @@ static void sm501fb_resume_fb(struct sm501fb_info *info,
 
 	/* restore the data */
 
-	dev_dbg(info->dev, "restoring screen from %p\n", par->store_fb);
-	dev_dbg(info->dev, "restoring cursor from %p\n", par->store_cursor);
+	dev_dbg(info->dev, "restoring screen from %pK\n", par->store_fb);
+	dev_dbg(info->dev, "restoring cursor from %pK\n", par->store_cursor);
 
 	if (par->store_fb)
 		memcpy_toio(par->screen.k_addr, par->store_fb,

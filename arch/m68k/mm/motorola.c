@@ -87,7 +87,7 @@ static pmd_t * __init kernel_ptr_table(void)
 
 		last_pgtable = (pmd_t *)last;
 #ifdef DEBUG
-		printk("kernel_ptr_init: %p\n", last_pgtable);
+		printk("kernel_ptr_init: %pK\n", last_pgtable);
 #endif
 	}
 
@@ -144,7 +144,7 @@ static void __init map_node(int node)
 		if (!pgd_present(*pgd_dir)) {
 			pmd_dir = kernel_ptr_table();
 #ifdef DEBUG
-			printk ("[new pointer %p]", pmd_dir);
+			printk ("[new pointer %pK]", pmd_dir);
 #endif
 			pgd_set(pgd_dir, pmd_dir);
 		} else
@@ -211,7 +211,7 @@ void __init paging_init(void)
 	int i;
 
 #ifdef DEBUG
-	printk ("start of paging_init (%p, %lx)\n", kernel_pg_dir, availmem);
+	printk ("start of paging_init (%pK, %lx)\n", kernel_pg_dir, availmem);
 #endif
 
 	/* Fix the cache mode in the page descriptors for the 680[46]0.  */

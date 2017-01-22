@@ -263,7 +263,7 @@ static int bridge_mmap(struct file *filp, struct vm_area_struct *vma)
 	/* VM_IO | VM_DONTEXPAND | VM_DONTDUMP are set by remap_pfn_range() */
 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 
-	dev_dbg(bridge, "%s: vm filp %p start %lx end %lx page_prot %ulx "
+	dev_dbg(bridge, "%s: vm filp %pK start %lx end %lx page_prot %ulx "
 		"flags %lx\n", __func__, filp,
 		vma->vm_start, vma->vm_end, vma->vm_page_prot,
 		vma->vm_flags);

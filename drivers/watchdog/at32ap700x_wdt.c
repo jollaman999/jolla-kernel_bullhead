@@ -368,7 +368,7 @@ static int __init at32_wdt_probe(struct platform_device *pdev)
 	}
 
 	dev_info(&pdev->dev,
-		"AT32AP700X WDT at 0x%p, timeout %d sec (nowayout=%d)\n",
+		"AT32AP700X WDT at 0x%pK, timeout %d sec (nowayout=%d)\n",
 		wdt->regs, wdt->timeout, nowayout);
 
 	return 0;

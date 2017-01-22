@@ -656,6 +656,6 @@ void p80211skb_free(struct wlandevice *wlandev, struct sk_buff *skb)
 	if (meta && meta->rx)
 		p80211skb_rxmeta_detach(skb);
 	else
-		printk(KERN_ERR "Freeing an skb (%p) w/ no frmmeta.\n", skb);
+		printk(KERN_ERR "Freeing an skb (%pK) w/ no frmmeta.\n", skb);
 	dev_kfree_skb(skb);
 }

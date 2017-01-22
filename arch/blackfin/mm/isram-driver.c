@@ -122,7 +122,7 @@ static bool isram_check_addr(const void *addr, size_t n)
 	    (addr < (void *)(L1_CODE_START + L1_CODE_LENGTH))) {
 		if (unlikely((addr + n) > (void *)(L1_CODE_START + L1_CODE_LENGTH))) {
 			show_stack(NULL, NULL);
-			pr_err("copy involving %p length (%zu) too long\n", addr, n);
+			pr_err("copy involving %pK length (%zu) too long\n", addr, n);
 		}
 		return true;
 	}
@@ -220,7 +220,7 @@ static __init int isram_read_test(char *sdram, void *l1inst)
 		data1 = isram_read(l1inst + i);
 		memcpy(&data2, sdram + i, sizeof(data2));
 		if (data1 != data2) {
-			pr_err("FAIL: isram_read(%p) returned %#llx but wanted %#llx\n",
+			pr_err("FAIL: isram_read(%pK) returned %#llx but wanted %#llx\n",
 				l1inst + i, data1, data2);
 			++ret;
 		}
@@ -248,7 +248,7 @@ static __init int isram_write_test(char *sdram, void *l1inst)
 		isram_write(l1inst + i, data1);
 		data2 = isram_read(l1inst + i);
 		if (data1 != data2) {
-			pr_err("FAIL: isram_write(%p, %#llx) != %#llx\n",
+			pr_err("FAIL: isram_write(%pK, %#llx) != %#llx\n",
 				l1inst + i, data1, data2);
 			++ret;
 		}
@@ -271,7 +271,7 @@ _isram_memcpy_test(char pattern, void *sdram, void *l1inst, const char *smemcpy,
 	fmemcpy(l1inst, sdram, test_len);
 	fmemcpy(sdram + test_len, l1inst, test_len);
 	if (memcmp(sdram, sdram + test_len, test_len)) {
-		pr_err("FAIL: %s(%p <=> %p, %#x) failed (data is %#x)\n",
+		pr_err("FAIL: %s(%pK <=> %pK, %#x) failed (data is %#x)\n",
 			smemcpy, l1inst, sdram, test_len, pattern);
 		return 1;
 	}
@@ -303,7 +303,7 @@ static __init int isram_memcpy_test(char *sdram, void *l1inst)
 			memset(cmp, 0, sizeof(cmp));
 			isram_memcpy(cmp, l1inst + i, j);
 			if (memcmp(cmp, sdram + i, j)) {
-				pr_err("FAIL: %p:", l1inst + 1);
+				pr_err("FAIL: %pK:", l1inst + 1);
 				hex_dump(cmp, j);
 				pr_cont(" SDRAM:");
 				hex_dump(sdram + i, j);
@@ -331,7 +331,7 @@ static __init int isram_memcpy_test(char *sdram, void *l1inst)
 			isram_memcpy(l1inst + i, sdram + i, j);
 			dma_memcpy(cmp, l1inst + i, j);
 			if (memcmp(cmp, sdram + i, j)) {
-				pr_err("FAIL: %p:", l1inst + i);
+				pr_err("FAIL: %pK:", l1inst + i);
 				hex_dump(cmp, j);
 				pr_cont(" SDRAM:");
 				hex_dump(sdram + i, j);
@@ -366,7 +366,7 @@ static __init int isram_test_init(void)
 		pr_warning("SKIP: could not allocate L1 inst\n");
 		return 0;
 	}
-	pr_info("INFO: testing %#x bytes (%p - %p)\n",
+	pr_info("INFO: testing %#x bytes (%pK - %pK)\n",
 	        test_len, l1inst, l1inst + test_len);
 
 	sdram = kmalloc(test_len * 2, GFP_KERNEL);
@@ -378,7 +378,7 @@ static __init int isram_test_init(void)
 
 	/* sanity check initial L1 inst state */
 	ret = 1;
-	pr_info("INFO: running initial dma_memcpy checks %p\n", sdram);
+	pr_info("INFO: running initial dma_memcpy checks %pK\n", sdram);
 	if (_isram_memcpy_test(0xa, sdram, l1inst, dma_memcpy))
 		goto abort;
 	if (_isram_memcpy_test(0x5, sdram, l1inst, dma_memcpy))

@@ -299,7 +299,7 @@ int capi_tdata_req(struct pcbit_chan *chan, struct sk_buff *skb)
 
 	if (skb_headroom(skb) < 10)
 	{
-		printk(KERN_CRIT "No headspace (%u) on headroom %p for capi header\n", skb_headroom(skb), skb);
+		printk(KERN_CRIT "No headspace (%u) on headroom %pK for capi header\n", skb_headroom(skb), skb);
 	}
 	else
 	{

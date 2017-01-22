@@ -136,7 +136,7 @@ acpi_ex_store(union acpi_operand_object *source_desc,
 		/* Destination is not a Reference object */
 
 		ACPI_ERROR((AE_INFO,
-			    "Target is not a Reference or Constant object - %s [%p]",
+			    "Target is not a Reference or Constant object - %s [%pK]",
 			    acpi_ut_get_object_type_name(dest_desc),
 			    dest_desc));
 
@@ -189,7 +189,7 @@ acpi_ex_store(union acpi_operand_object *source_desc,
 		 * displayed and otherwise has no effect -- see ACPI Specification
 		 */
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "**** Write to Debug Object: Object %p %s ****:\n\n",
+				  "**** Write to Debug Object: Object %pK %s ****:\n\n",
 				  source_desc,
 				  acpi_ut_get_object_type_name(source_desc)));
 
@@ -409,7 +409,7 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
 	target_type = acpi_ns_get_type(node);
 	target_desc = acpi_ns_get_attached_object(node);
 
-	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Storing %p (%s) to node %p (%s)\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Storing %pK (%s) to node %pK (%s)\n",
 			  source_desc,
 			  acpi_ut_get_object_type_name(source_desc), node,
 			  acpi_ut_get_type_name(target_type)));
@@ -537,7 +537,7 @@ acpi_ex_store_direct_to_node(union acpi_operand_object *source_desc,
 	ACPI_FUNCTION_TRACE(ex_store_direct_to_node);
 
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-			  "Storing [%s] (%p) directly into node [%s] (%p)"
+			  "Storing [%s] (%pK) directly into node [%s] (%pK)"
 			  " with no implicit conversion\n",
 			  acpi_ut_get_object_type_name(source_desc),
 			  source_desc, acpi_ut_get_type_name(node->type),

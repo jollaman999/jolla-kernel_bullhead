@@ -96,7 +96,7 @@ mk_conf_addr(struct pci_bus *pbus, unsigned int device_fn, int where,
 	u8 bus = pbus->number;
 
 	DBG_CFG(("mk_conf_addr(bus=%d ,device_fn=0x%x, where=0x%x, "
-		 "pci_addr=0x%p, type1=0x%p)\n",
+		 "pci_addr=0x%pK, type1=0x%pK)\n",
 		 bus, device_fn, where, pci_addr, type1));
 	
 	if (!pbus->parent) /* No parent means peer PCI bus. */

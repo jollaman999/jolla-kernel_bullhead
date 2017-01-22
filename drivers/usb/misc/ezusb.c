@@ -100,7 +100,7 @@ static int ezusb_ihex_firmware_download(struct usb_device *dev,
 			if (ret < 0) {
 				dev_err(&dev->dev, "%s - ezusb_writememory "
 					"failed writing internal memory "
-					"(%d %04X %p %d)\n", __func__, ret,
+					"(%d %04X %pK %d)\n", __func__, ret,
 					be32_to_cpu(record->addr), record->data,
 					be16_to_cpu(record->len));
 				goto out;
@@ -120,7 +120,7 @@ static int ezusb_ihex_firmware_download(struct usb_device *dev,
 			if (ret < 0) {
 				dev_err(&dev->dev, "%s - ezusb_writememory "
 					"failed writing external memory "
-					"(%d %04X %p %d)\n", __func__, ret,
+					"(%d %04X %pK %d)\n", __func__, ret,
 					be32_to_cpu(record->addr), record->data,
 					be16_to_cpu(record->len));
 				goto out;

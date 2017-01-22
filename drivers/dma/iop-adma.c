@@ -273,7 +273,7 @@ static void __iop_adma_slot_cleanup(struct iop_adma_chan *iop_chan)
 					if (slot_cnt == 0)
 						break;
 				}
-				pr_debug("\tgrp_start->xor_check_result: %p\n",
+				pr_debug("\tgrp_start->xor_check_result: %pK\n",
 					grp_start->xor_check_result);
 				*grp_start->xor_check_result = zero_sum_result;
 			}
@@ -400,7 +400,7 @@ retry:
 				int i;
 				dev_dbg(iop_chan->device->common.dev,
 					"allocated slot: %d "
-					"(desc %p phys: %#x) slots_per_op %d\n",
+					"(desc %pK phys: %#x) slots_per_op %d\n",
 					iter->idx, iter->hw_desc,
 					iter->async_tx.phys, slots_per_op);
 
@@ -558,7 +558,7 @@ static int iop_adma_alloc_chan_resources(struct dma_chan *chan)
 					slot_node);
 
 	dev_dbg(iop_chan->device->common.dev,
-		"allocated %d descriptor slots last_used: %p\n",
+		"allocated %d descriptor slots last_used: %pK\n",
 		iop_chan->slots_allocated, iop_chan->last_used);
 
 	/* initialize the channel and the chain with a null operation */
@@ -725,7 +725,7 @@ iop_adma_prep_dma_xor_val(struct dma_chan *chan, dma_addr_t *dma_src,
 		iop_desc_init_zero_sum(grp_start, src_cnt, flags);
 		iop_desc_set_zero_sum_byte_count(grp_start, len);
 		grp_start->xor_check_result = result;
-		pr_debug("\t%s: grp_start->xor_check_result: %p\n",
+		pr_debug("\t%s: grp_start->xor_check_result: %pK\n",
 			__func__, grp_start->xor_check_result);
 		sw_desc->unmap_src_cnt = src_cnt;
 		sw_desc->unmap_len = len;
@@ -835,7 +835,7 @@ iop_adma_prep_dma_pq_val(struct dma_chan *chan, dma_addr_t *pq, dma_addr_t *src,
 		iop_desc_init_pq_zero_sum(g, src_cnt+2, flags);
 		iop_desc_set_pq_zero_sum_byte_count(g, len);
 		g->pq_check_result = pqres;
-		pr_debug("\t%s: g->pq_check_result: %p\n",
+		pr_debug("\t%s: g->pq_check_result: %pK\n",
 			__func__, g->pq_check_result);
 		sw_desc->unmap_src_cnt = src_cnt+2;
 		sw_desc->unmap_len = len;
@@ -1463,7 +1463,7 @@ static int iop_adma_probe(struct platform_device *pdev)
 		goto err_free_adev;
 	}
 
-	dev_dbg(&pdev->dev, "%s: allocated descriptor pool virt %p phys %p\n",
+	dev_dbg(&pdev->dev, "%s: allocated descriptor pool virt %pK phys %pK\n",
 		__func__, adev->dma_desc_pool_virt,
 		(void *) adev->dma_desc_pool);
 

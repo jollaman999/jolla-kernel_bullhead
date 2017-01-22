@@ -132,7 +132,7 @@ static void __init prealloc(struct ps3_prealloc *p)
 		return;
 	}
 
-	printk(KERN_INFO "%s: %lu bytes at %p\n", p->name, p->size,
+	printk(KERN_INFO "%s: %lu bytes at %pK\n", p->name, p->size,
 	       p->address);
 }
 #endif

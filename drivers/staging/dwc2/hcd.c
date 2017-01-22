@@ -85,7 +85,7 @@ static void dwc2_dump_channel_info(struct dwc2_hsotg *hsotg,
 	hctsiz = readl(hsotg->regs + HCTSIZ(chan->hc_num));
 	hc_dma = readl(hsotg->regs + HCDMA(chan->hc_num));
 
-	dev_dbg(hsotg->dev, "  Assigned to channel %p:\n", chan);
+	dev_dbg(hsotg->dev, "  Assigned to channel %pK:\n", chan);
 	dev_dbg(hsotg->dev, "    hcchar 0x%08x, hcsplt 0x%08x\n",
 		hcchar, hcsplt);
 	dev_dbg(hsotg->dev, "    hctsiz 0x%08x, hc_dma 0x%08x\n",
@@ -97,24 +97,24 @@ static void dwc2_dump_channel_info(struct dwc2_hsotg *hsotg,
 	dev_dbg(hsotg->dev, "    data_pid_start: %d\n", chan->data_pid_start);
 	dev_dbg(hsotg->dev, "    xfer_started: %d\n", chan->xfer_started);
 	dev_dbg(hsotg->dev, "    halt_status: %d\n", chan->halt_status);
-	dev_dbg(hsotg->dev, "    xfer_buf: %p\n", chan->xfer_buf);
+	dev_dbg(hsotg->dev, "    xfer_buf: %pK\n", chan->xfer_buf);
 	dev_dbg(hsotg->dev, "    xfer_dma: %08lx\n",
 		(unsigned long)chan->xfer_dma);
 	dev_dbg(hsotg->dev, "    xfer_len: %d\n", chan->xfer_len);
-	dev_dbg(hsotg->dev, "    qh: %p\n", chan->qh);
+	dev_dbg(hsotg->dev, "    qh: %pK\n", chan->qh);
 	dev_dbg(hsotg->dev, "  NP inactive sched:\n");
 	list_for_each_entry(qh, &hsotg->non_periodic_sched_inactive,
 			    qh_list_entry)
-		dev_dbg(hsotg->dev, "    %p\n", qh);
+		dev_dbg(hsotg->dev, "    %pK\n", qh);
 	dev_dbg(hsotg->dev, "  NP active sched:\n");
 	list_for_each_entry(qh, &hsotg->non_periodic_sched_active,
 			    qh_list_entry)
-		dev_dbg(hsotg->dev, "    %p\n", qh);
+		dev_dbg(hsotg->dev, "    %pK\n", qh);
 	dev_dbg(hsotg->dev, "  Channels:\n");
 	for (i = 0; i < num_channels; i++) {
 		struct dwc2_host_chan *chan = hsotg->hc_ptr_array[i];
 
-		dev_dbg(hsotg->dev, "    %2d: %p\n", i, chan);
+		dev_dbg(hsotg->dev, "    %2d: %pK\n", i, chan);
 	}
 #endif /* VERBOSE_DEBUG */
 }
@@ -726,7 +726,7 @@ static void dwc2_assign_and_init_hc(struct dwc2_hsotg *hsotg,
 	void *bufptr = NULL;
 
 	if (dbg_qh(qh))
-		dev_vdbg(hsotg->dev, "%s(%p,%p)\n", __func__, hsotg, qh);
+		dev_vdbg(hsotg->dev, "%s(%pK,%pK)\n", __func__, hsotg, qh);
 
 	if (list_empty(&qh->qtd_list)) {
 		dev_dbg(hsotg->dev, "No QTDs in QH list\n");
@@ -1841,7 +1841,7 @@ void dwc2_hcd_dump_state(struct dwc2_hsotg *hsotg)
 		dev_dbg(hsotg->dev, "    multi_count: %d\n", chan->multi_count);
 		dev_dbg(hsotg->dev, "    xfer_started: %d\n",
 			chan->xfer_started);
-		dev_dbg(hsotg->dev, "    xfer_buf: %p\n", chan->xfer_buf);
+		dev_dbg(hsotg->dev, "    xfer_buf: %pK\n", chan->xfer_buf);
 		dev_dbg(hsotg->dev, "    xfer_dma: %08lx\n",
 			(unsigned long)chan->xfer_dma);
 		dev_dbg(hsotg->dev, "    xfer_len: %d\n", chan->xfer_len);
@@ -1858,7 +1858,7 @@ void dwc2_hcd_dump_state(struct dwc2_hsotg *hsotg)
 		dev_dbg(hsotg->dev, "    hub_port: %d\n", chan->hub_port);
 		dev_dbg(hsotg->dev, "    xact_pos: %d\n", chan->xact_pos);
 		dev_dbg(hsotg->dev, "    requests: %d\n", chan->requests);
-		dev_dbg(hsotg->dev, "    qh: %p\n", chan->qh);
+		dev_dbg(hsotg->dev, "    qh: %pK\n", chan->qh);
 
 		if (chan->xfer_started) {
 			u32 hfnum, hcchar, hctsiz, hcint, hcintmsk;
@@ -1883,7 +1883,7 @@ void dwc2_hcd_dump_state(struct dwc2_hsotg *hsotg)
 				break;
 			urb = qtd->urb;
 			dev_dbg(hsotg->dev, "    URB Info:\n");
-			dev_dbg(hsotg->dev, "      qtd: %p, urb: %p\n",
+			dev_dbg(hsotg->dev, "      qtd: %pK, urb: %pK\n",
 				qtd, urb);
 			if (urb) {
 				dev_dbg(hsotg->dev,
@@ -1896,7 +1896,7 @@ void dwc2_hcd_dump_state(struct dwc2_hsotg *hsotg)
 					"      Max packet size: %d\n",
 					dwc2_hcd_get_mps(&urb->pipe_info));
 				dev_dbg(hsotg->dev,
-					"      transfer_buffer: %p\n",
+					"      transfer_buffer: %pK\n",
 					urb->buf);
 				dev_dbg(hsotg->dev,
 					"      transfer_dma: %08lx\n",
@@ -2108,7 +2108,7 @@ void dwc2_host_complete(struct dwc2_hsotg *hsotg, void *context,
 
 	if (dbg_urb(urb))
 		dev_vdbg(hsotg->dev,
-			 "%s: urb %p device %d ep %d-%s status %d actual %d\n",
+			 "%s: urb %pK device %d ep %d-%s status %d actual %d\n",
 			 __func__, urb, usb_pipedevice(urb->pipe),
 			 usb_pipeendpoint(urb->pipe),
 			 usb_pipein(urb->pipe) ? "IN" : "OUT", status,
@@ -2164,7 +2164,7 @@ static void dwc2_hcd_start_func(struct work_struct *work)
 	struct dwc2_hsotg *hsotg = container_of(work, struct dwc2_hsotg,
 						start_work.work);
 
-	dev_dbg(hsotg->dev, "%s() %p\n", __func__, hsotg);
+	dev_dbg(hsotg->dev, "%s() %pK\n", __func__, hsotg);
 	dwc2_host_start(hsotg);
 }
 
@@ -2257,7 +2257,7 @@ static void dwc2_dump_urb_info(struct usb_hcd *hcd, struct urb *urb,
 	char *pipetype;
 	char *speed;
 
-	dev_vdbg(hsotg->dev, "%s, urb %p\n", fn_name, urb);
+	dev_vdbg(hsotg->dev, "%s, urb %pK\n", fn_name, urb);
 	dev_vdbg(hsotg->dev, "  Device address: %d\n",
 		 usb_pipedevice(urb->pipe));
 	dev_vdbg(hsotg->dev, "  Endpoint: %d, %s\n",
@@ -2306,9 +2306,9 @@ static void dwc2_dump_urb_info(struct usb_hcd *hcd, struct urb *urb,
 		 usb_maxpacket(urb->dev, urb->pipe, usb_pipeout(urb->pipe)));
 	dev_vdbg(hsotg->dev, "  Data buffer length: %d\n",
 		 urb->transfer_buffer_length);
-	dev_vdbg(hsotg->dev, "  Transfer buffer: %p, Transfer DMA: %08lx\n",
+	dev_vdbg(hsotg->dev, "  Transfer buffer: %pK, Transfer DMA: %08lx\n",
 		 urb->transfer_buffer, (unsigned long)urb->transfer_dma);
-	dev_vdbg(hsotg->dev, "  Setup buffer: %p, Setup DMA: %08lx\n",
+	dev_vdbg(hsotg->dev, "  Setup buffer: %pK, Setup DMA: %08lx\n",
 		 urb->setup_packet, (unsigned long)urb->setup_dma);
 	dev_vdbg(hsotg->dev, "  Interval: %d\n", urb->interval);
 
@@ -2487,7 +2487,7 @@ static void _dwc2_hcd_endpoint_disable(struct usb_hcd *hcd,
 	struct dwc2_hsotg *hsotg = dwc2_hcd_to_hsotg(hcd);
 
 	dev_dbg(hsotg->dev,
-		"DWC OTG HCD EP DISABLE: bEndpointAddress=0x%02x, ep->hcpriv=%p\n",
+		"DWC OTG HCD EP DISABLE: bEndpointAddress=0x%02x, ep->hcpriv=%pK\n",
 		ep->desc.bEndpointAddress, ep->hcpriv);
 	dwc2_hcd_endpoint_disable(hsotg, ep, 250);
 }
@@ -2628,7 +2628,7 @@ static void dwc2_hcd_free(struct dwc2_hsotg *hsotg)
 		struct dwc2_host_chan *chan = hsotg->hc_ptr_array[i];
 
 		if (chan != NULL) {
-			dev_dbg(hsotg->dev, "HCD Free channel #%i, chan=%p\n",
+			dev_dbg(hsotg->dev, "HCD Free channel #%i, chan=%pK\n",
 				i, chan);
 			hsotg->hc_ptr_array[i] = NULL;
 			kfree(chan);
@@ -2959,7 +2959,7 @@ void dwc2_hcd_remove(struct dwc2_hsotg *hsotg)
 	dev_dbg(hsotg->dev, "DWC OTG HCD REMOVE\n");
 
 	hcd = dwc2_hsotg_to_hcd(hsotg);
-	dev_dbg(hsotg->dev, "hsotg->hcd = %p\n", hcd);
+	dev_dbg(hsotg->dev, "hsotg->hcd = %pK\n", hcd);
 
 	if (!hcd) {
 		dev_dbg(hsotg->dev, "%s: dwc2_hsotg_to_hcd(hsotg) NULL!\n",

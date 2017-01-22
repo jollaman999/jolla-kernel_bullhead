@@ -197,7 +197,7 @@ void i2400m_report_hook_work(struct work_struct *ws)
 		else
 			d_printf(1, dev, "processing queued reports\n");
 		list_for_each_entry_safe(args, args_next, &list, list_node) {
-			d_printf(2, dev, "processing queued report %p\n", args);
+			d_printf(2, dev, "processing queued report %pK\n", args);
 			i2400m_report_hook(i2400m, args->l3l4_hdr, args->size);
 			kfree_skb(args->skb_rx);
 			list_del(&args->list_node);
@@ -223,7 +223,7 @@ void i2400m_report_hook_flush(struct i2400m *i2400m)
 	list_splice_init(&i2400m->rx_reports, &list);
 	spin_unlock_irqrestore(&i2400m->rx_lock, flags);
 	list_for_each_entry_safe(args, args_next, &list, list_node) {
-		d_printf(2, dev, "flushing queued report %p\n", args);
+		d_printf(2, dev, "flushing queued report %pK\n", args);
 		kfree_skb(args->skb_rx);
 		list_del(&args->list_node);
 		kfree(args);
@@ -255,7 +255,7 @@ void i2400m_report_hook_queue(struct i2400m *i2400m, struct sk_buff *skb_rx,
 		spin_lock_irqsave(&i2400m->rx_lock, flags);
 		list_add_tail(&args->list_node, &i2400m->rx_reports);
 		spin_unlock_irqrestore(&i2400m->rx_lock, flags);
-		d_printf(2, dev, "queued report %p\n", args);
+		d_printf(2, dev, "queued report %pK\n", args);
 		rmb();		/* see i2400m->ready's documentation  */
 		if (likely(i2400m->ready))	/* only send if up */
 			queue_work(i2400m->work_queue, &i2400m->rx_report_ws);
@@ -662,19 +662,19 @@ void __i2400m_roq_queue(struct i2400m *i2400m, struct i2400m_roq *roq,
 	struct i2400m_roq_data *roq_data_itr, *roq_data;
 	unsigned nsn_itr;
 
-	d_fnstart(4, dev, "(i2400m %p roq %p skb %p sn %u nsn %u)\n",
+	d_fnstart(4, dev, "(i2400m %pK roq %pK skb %pK sn %u nsn %u)\n",
 		  i2400m, roq, skb, sn, nsn);
 
 	roq_data = (struct i2400m_roq_data *) &skb->cb;
 	BUILD_BUG_ON(sizeof(*roq_data) > sizeof(skb->cb));
 	roq_data->sn = sn;
-	d_printf(3, dev, "ERX: roq %p [ws %u] nsn %d sn %u\n",
+	d_printf(3, dev, "ERX: roq %pK [ws %u] nsn %d sn %u\n",
 		 roq, roq->ws, nsn, roq_data->sn);
 
 	/* Queues will be empty on not-so-bad environments, so try
 	 * that first */
 	if (skb_queue_empty(&roq->queue)) {
-		d_printf(2, dev, "ERX: roq %p - first one\n", roq);
+		d_printf(2, dev, "ERX: roq %pK - first one\n", roq);
 		__skb_queue_head(&roq->queue, skb);
 		goto out;
 	}
@@ -684,7 +684,7 @@ void __i2400m_roq_queue(struct i2400m *i2400m, struct i2400m_roq *roq,
 	nsn_itr = __i2400m_roq_nsn(roq, roq_data_itr->sn);
 	/* NSN bounds assumed correct (checked when it was queued) */
 	if (nsn >= nsn_itr) {
-		d_printf(2, dev, "ERX: roq %p - appended after %p (nsn %d sn %u)\n",
+		d_printf(2, dev, "ERX: roq %pK - appended after %pK (nsn %d sn %u)\n",
 			 roq, skb_itr, nsn_itr, roq_data_itr->sn);
 		__skb_queue_tail(&roq->queue, skb);
 		goto out;
@@ -700,7 +700,7 @@ void __i2400m_roq_queue(struct i2400m *i2400m, struct i2400m_roq *roq,
 		nsn_itr = __i2400m_roq_nsn(roq, roq_data_itr->sn);
 		/* NSN bounds assumed correct (checked when it was queued) */
 		if (nsn_itr > nsn) {
-			d_printf(2, dev, "ERX: roq %p - queued before %p "
+			d_printf(2, dev, "ERX: roq %pK - queued before %pK "
 				 "(nsn %d sn %u)\n", roq, skb_itr, nsn_itr,
 				 roq_data_itr->sn);
 			__skb_queue_before(&roq->queue, skb_itr, skb);
@@ -710,18 +710,18 @@ void __i2400m_roq_queue(struct i2400m *i2400m, struct i2400m_roq *roq,
 	/* If we get here, that is VERY bad -- print info to help
 	 * diagnose and crash it */
 	dev_err(dev, "SW BUG? failed to insert packet\n");
-	dev_err(dev, "ERX: roq %p [ws %u] skb %p nsn %d sn %u\n",
+	dev_err(dev, "ERX: roq %pK [ws %u] skb %pK nsn %d sn %u\n",
 		roq, roq->ws, skb, nsn, roq_data->sn);
 	skb_queue_walk(&roq->queue, skb_itr) {
 		roq_data_itr = (struct i2400m_roq_data *) &skb_itr->cb;
 		nsn_itr = __i2400m_roq_nsn(roq, roq_data_itr->sn);
 		/* NSN bounds assumed correct (checked when it was queued) */
-		dev_err(dev, "ERX: roq %p skb_itr %p nsn %d sn %u\n",
+		dev_err(dev, "ERX: roq %pK skb_itr %pK nsn %d sn %u\n",
 			roq, skb_itr, nsn_itr, roq_data_itr->sn);
 	}
 	BUG();
 out:
-	d_fnend(4, dev, "(i2400m %p roq %p skb %p sn %u nsn %d) = void\n",
+	d_fnend(4, dev, "(i2400m %pK roq %pK skb %pK sn %u nsn %d) = void\n",
 		i2400m, roq, skb, sn, nsn);
 }
 
@@ -758,7 +758,7 @@ unsigned __i2400m_roq_update_ws(struct i2400m *i2400m, struct i2400m_roq *roq,
 		nsn_itr = __i2400m_roq_nsn(roq, roq_data_itr->sn);
 		/* NSN bounds assumed correct (checked when it was queued) */
 		if (nsn_itr < new_nws) {
-			d_printf(2, dev, "ERX: roq %p - release skb %p "
+			d_printf(2, dev, "ERX: roq %pK - release skb %pK "
 				 "(nsn %u/%u new nws %u)\n",
 				 roq, skb_itr, nsn_itr, roq_data_itr->sn,
 				 new_nws);
@@ -789,19 +789,19 @@ void i2400m_roq_reset(struct i2400m *i2400m, struct i2400m_roq *roq)
 	struct sk_buff *skb_itr, *tmp_itr;
 	struct i2400m_roq_data *roq_data_itr;
 
-	d_fnstart(2, dev, "(i2400m %p roq %p)\n", i2400m, roq);
+	d_fnstart(2, dev, "(i2400m %pK roq %pK)\n", i2400m, roq);
 	i2400m_roq_log_add(i2400m, roq, I2400M_RO_TYPE_RESET,
 			     roq->ws, skb_queue_len(&roq->queue),
 			     ~0, ~0, 0);
 	skb_queue_walk_safe(&roq->queue, skb_itr, tmp_itr) {
 		roq_data_itr = (struct i2400m_roq_data *) &skb_itr->cb;
-		d_printf(2, dev, "ERX: roq %p - release skb %p (sn %u)\n",
+		d_printf(2, dev, "ERX: roq %pK - release skb %pK (sn %u)\n",
 			 roq, skb_itr, roq_data_itr->sn);
 		__skb_unlink(skb_itr, &roq->queue);
 		i2400m_net_erx(i2400m, skb_itr, roq_data_itr->cs);
 	}
 	roq->ws = 0;
-	d_fnend(2, dev, "(i2400m %p roq %p) = void\n", i2400m, roq);
+	d_fnend(2, dev, "(i2400m %pK roq %pK) = void\n", i2400m, roq);
 }
 
 
@@ -824,7 +824,7 @@ void i2400m_roq_queue(struct i2400m *i2400m, struct i2400m_roq *roq,
 	struct device *dev = i2400m_dev(i2400m);
 	unsigned nsn, len;
 
-	d_fnstart(2, dev, "(i2400m %p roq %p skb %p lbn %u) = void\n",
+	d_fnstart(2, dev, "(i2400m %pK roq %pK skb %pK lbn %u) = void\n",
 		  i2400m, roq, skb, lbn);
 	len = skb_queue_len(&roq->queue);
 	nsn = __i2400m_roq_nsn(roq, lbn);
@@ -838,7 +838,7 @@ void i2400m_roq_queue(struct i2400m *i2400m, struct i2400m_roq *roq,
 		i2400m_roq_log_add(i2400m, roq, I2400M_RO_TYPE_PACKET,
 				     roq->ws, len, lbn, nsn, ~0);
 	}
-	d_fnend(2, dev, "(i2400m %p roq %p skb %p lbn %u) = void\n",
+	d_fnend(2, dev, "(i2400m %pK roq %pK skb %pK lbn %u) = void\n",
 		i2400m, roq, skb, lbn);
 }
 
@@ -858,13 +858,13 @@ void i2400m_roq_update_ws(struct i2400m *i2400m, struct i2400m_roq *roq,
 	struct device *dev = i2400m_dev(i2400m);
 	unsigned old_ws, nsn, len;
 
-	d_fnstart(2, dev, "(i2400m %p roq %p sn %u)\n", i2400m, roq, sn);
+	d_fnstart(2, dev, "(i2400m %pK roq %pK sn %u)\n", i2400m, roq, sn);
 	old_ws = roq->ws;
 	len = skb_queue_len(&roq->queue);
 	nsn = __i2400m_roq_update_ws(i2400m, roq, sn);
 	i2400m_roq_log_add(i2400m, roq, I2400M_RO_TYPE_WS,
 			     old_ws, len, sn, nsn, roq->ws);
-	d_fnstart(2, dev, "(i2400m %p roq %p sn %u) = void\n", i2400m, roq, sn);
+	d_fnstart(2, dev, "(i2400m %pK roq %pK sn %u) = void\n", i2400m, roq, sn);
 }
 
 
@@ -887,7 +887,7 @@ void i2400m_roq_queue_update_ws(struct i2400m *i2400m, struct i2400m_roq *roq,
 	struct device *dev = i2400m_dev(i2400m);
 	unsigned nsn, old_ws, len;
 
-	d_fnstart(2, dev, "(i2400m %p roq %p skb %p sn %u)\n",
+	d_fnstart(2, dev, "(i2400m %pK roq %pK skb %pK sn %u)\n",
 		  i2400m, roq, skb, sn);
 	len = skb_queue_len(&roq->queue);
 	nsn = __i2400m_roq_nsn(roq, sn);
@@ -912,7 +912,7 @@ void i2400m_roq_queue_update_ws(struct i2400m *i2400m, struct i2400m_roq *roq,
 	i2400m_roq_log_add(i2400m, roq, I2400M_RO_TYPE_PACKET_WS,
 			   old_ws, len, sn, nsn, roq->ws);
 
-	d_fnend(2, dev, "(i2400m %p roq %p skb %p sn %u) = void\n",
+	d_fnend(2, dev, "(i2400m %pK roq %pK skb %pK sn %u) = void\n",
 		i2400m, roq, skb, sn);
 }
 
@@ -993,7 +993,7 @@ void i2400m_rx_edata(struct i2400m *i2400m, struct sk_buff *skb_rx,
 
 	BUILD_BUG_ON(ETH_HLEN > sizeof(*hdr));
 
-	d_fnstart(2, dev, "(i2400m %p skb_rx %p single %u payload %p "
+	d_fnstart(2, dev, "(i2400m %pK skb_rx %pK single %u payload %pK "
 		  "size %zu)\n", i2400m, skb_rx, single_last, payload, size);
 	if (size < sizeof(*hdr)) {
 		dev_err(dev, "ERX: HW BUG? message with short header (%zu "
@@ -1003,7 +1003,7 @@ void i2400m_rx_edata(struct i2400m *i2400m, struct sk_buff *skb_rx,
 
 	if (single_last) {
 		skb = skb_get(skb_rx);
-		d_printf(3, dev, "ERX: skb %p reusing\n", skb);
+		d_printf(3, dev, "ERX: skb %pK reusing\n", skb);
 	} else {
 		skb = skb_clone(skb_rx, GFP_KERNEL);
 		if (skb == NULL) {
@@ -1011,7 +1011,7 @@ void i2400m_rx_edata(struct i2400m *i2400m, struct sk_buff *skb_rx,
 			net_dev->stats.rx_dropped++;
 			goto error_skb_clone;
 		}
-		d_printf(3, dev, "ERX: skb %p cloned from %p\n", skb, skb_rx);
+		d_printf(3, dev, "ERX: skb %pK cloned from %pK\n", skb, skb_rx);
 	}
 	/* now we have to pull and trim so that the skb points to the
 	 * beginning of the IP packet; the netdev part will add the
@@ -1073,7 +1073,7 @@ void i2400m_rx_edata(struct i2400m *i2400m, struct sk_buff *skb_rx,
 		i2400m_net_erx(i2400m, skb, cs);
 error_skb_clone:
 error:
-	d_fnend(2, dev, "(i2400m %p skb_rx %p single %u payload %p "
+	d_fnend(2, dev, "(i2400m %pK skb_rx %pK single %u payload %pK "
 		"size %zu) = void\n", i2400m, skb_rx, single_last, payload, size);
 }
 
@@ -1251,7 +1251,7 @@ int i2400m_rx(struct i2400m *i2400m, struct sk_buff *skb)
 	unsigned num_pls, single_last, skb_len;
 
 	skb_len = skb->len;
-	d_fnstart(4, dev, "(i2400m %p skb %p [size %u])\n",
+	d_fnstart(4, dev, "(i2400m %pK skb %pK [size %u])\n",
 		  i2400m, skb, skb_len);
 	result = -EIO;
 	msg_hdr = (void *) skb->data;
@@ -1301,7 +1301,7 @@ int i2400m_rx(struct i2400m *i2400m, struct sk_buff *skb)
 error_pl_descr_check:
 error_pl_descr_short:
 error_msg_hdr_check:
-	d_fnend(4, dev, "(i2400m %p skb %p [size %u]) = %d\n",
+	d_fnend(4, dev, "(i2400m %pK skb %pK [size %u]) = %d\n",
 		i2400m, skb, skb_len, result);
 	return result;
 }

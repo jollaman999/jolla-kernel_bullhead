@@ -910,14 +910,14 @@ static void arcmsr_drain_donequeue(struct AdapterControlBlock *acb, struct Comma
 				lun = abortcmd->device->lun;				
 				abortcmd->result |= DID_ABORT << 16;
 				arcmsr_ccb_complete(pCCB);
-				printk(KERN_NOTICE "arcmsr%d: pCCB ='0x%p' isr got aborted command \n",
+				printk(KERN_NOTICE "arcmsr%d: pCCB ='0x%pK' isr got aborted command \n",
 				acb->host->host_no, pCCB);
 			}
 			return;
 		}
 		printk(KERN_NOTICE "arcmsr%d: isr get an illegal ccb command \
-				done acb = '0x%p'"
-				"ccb = '0x%p' ccbacb = '0x%p' startdone = 0x%x"
+				done acb = '0x%pK'"
+				"ccb = '0x%pK' ccbacb = '0x%pK' startdone = 0x%x"
 				" ccboutstandingcount = %d \n"
 				, acb->host->host_no
 				, acb
@@ -2332,7 +2332,7 @@ static int arcmsr_polling_hba_ccbdone(struct AdapterControlBlock *acb,
 		poll_ccb_done = (ccb == poll_ccb) ? 1:0;
 		if ((ccb->acb != acb) || (ccb->startdone != ARCMSR_CCB_START)) {
 			if ((ccb->startdone == ARCMSR_CCB_ABORTED) || (ccb == poll_ccb)) {
-				printk(KERN_NOTICE "arcmsr%d: scsi id = %d lun = %d ccb = '0x%p'"
+				printk(KERN_NOTICE "arcmsr%d: scsi id = %d lun = %d ccb = '0x%pK'"
 					" poll command abort successfully \n"
 					, acb->host->host_no
 					, ccb->pcmd->device->id
@@ -2343,7 +2343,7 @@ static int arcmsr_polling_hba_ccbdone(struct AdapterControlBlock *acb,
 				continue;
 			}
 			printk(KERN_NOTICE "arcmsr%d: polling get an illegal ccb"
-				" command done ccb = '0x%p'"
+				" command done ccb = '0x%pK'"
 				"ccboutstandingcount = %d \n"
 				, acb->host->host_no
 				, ccb
@@ -2396,7 +2396,7 @@ static int arcmsr_polling_hbb_ccbdone(struct AdapterControlBlock *acb,
 		poll_ccb_done = (ccb == poll_ccb) ? 1:0;
 		if ((ccb->acb != acb) || (ccb->startdone != ARCMSR_CCB_START)) {
 			if ((ccb->startdone == ARCMSR_CCB_ABORTED) || (ccb == poll_ccb)) {
-				printk(KERN_NOTICE "arcmsr%d: scsi id = %d lun = %d ccb = '0x%p'"
+				printk(KERN_NOTICE "arcmsr%d: scsi id = %d lun = %d ccb = '0x%pK'"
 					" poll command abort successfully \n"
 					,acb->host->host_no
 					,ccb->pcmd->device->id
@@ -2407,7 +2407,7 @@ static int arcmsr_polling_hbb_ccbdone(struct AdapterControlBlock *acb,
 				continue;
 			}
 			printk(KERN_NOTICE "arcmsr%d: polling get an illegal ccb"
-				" command done ccb = '0x%p'"
+				" command done ccb = '0x%pK'"
 				"ccboutstandingcount = %d \n"
 				, acb->host->host_no
 				, ccb
@@ -2453,7 +2453,7 @@ polling_hbc_ccb_retry:
 		/* check ifcommand done with no error*/
 		if ((pCCB->acb != acb) || (pCCB->startdone != ARCMSR_CCB_START)) {
 			if (pCCB->startdone == ARCMSR_CCB_ABORTED) {
-				printk(KERN_NOTICE "arcmsr%d: scsi id = %d lun = %d ccb = '0x%p'"
+				printk(KERN_NOTICE "arcmsr%d: scsi id = %d lun = %d ccb = '0x%pK'"
 					" poll command abort successfully \n"
 					, acb->host->host_no
 					, pCCB->pcmd->device->id
@@ -2464,7 +2464,7 @@ polling_hbc_ccb_retry:
 				continue;
 			}
 			printk(KERN_NOTICE "arcmsr%d: polling get an illegal ccb"
-				" command done ccb = '0x%p'"
+				" command done ccb = '0x%pK'"
 				"ccboutstandingcount = %d \n"
 				, acb->host->host_no
 				, pCCB

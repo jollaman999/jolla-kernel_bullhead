@@ -267,12 +267,12 @@ static int __init spu_map_device(struct spu *spu)
 		goto out_unmap;
 	}
 	pr_debug("spu_new: %s maps:\n", np->full_name);
-	pr_debug("  local store   : 0x%016lx -> 0x%p\n",
+	pr_debug("  local store   : 0x%016lx -> 0x%pK\n",
 		 spu->local_store_phys, spu->local_store);
-	pr_debug("  problem state : 0x%016lx -> 0x%p\n",
+	pr_debug("  problem state : 0x%016lx -> 0x%pK\n",
 		 spu->problem_phys, spu->problem);
-	pr_debug("  priv2         :                       0x%p\n", spu->priv2);
-	pr_debug("  priv1         :                       0x%p\n", spu->priv1);
+	pr_debug("  priv2         :                       0x%pK\n", spu->priv2);
+	pr_debug("  priv1         :                       0x%pK\n", spu->priv1);
 
 	return 0;
 
@@ -351,7 +351,7 @@ static int __init of_create_spu(struct spu *spu, void *data)
 		}
 	}
 
-	pr_debug("Using SPE %s %p %p %p %p %d\n", spu->name,
+	pr_debug("Using SPE %s %pK %pK %pK %pK %d\n", spu->name,
 		spu->local_store, spu->problem, spu->priv1,
 		spu->priv2, spu->number);
 	goto out;

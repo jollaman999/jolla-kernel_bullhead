@@ -581,7 +581,7 @@ static void smc_hardware_send_pkt(unsigned long data)
 
 	buf = skb->data;
 	len = skb->len;
-	DBG(2, "%s: TX PNR 0x%x LENGTH 0x%04x (%d) BUF 0x%p\n",
+	DBG(2, "%s: TX PNR 0x%x LENGTH 0x%04x (%d) BUF 0x%pK\n",
 		dev->name, packet_no, len, len, buf);
 	PRINT_PKT(buf, len);
 
@@ -1870,7 +1870,7 @@ static int smc_probe(struct net_device *dev, void __iomem *ioaddr,
 		if ((val & 0xFF) == 0x33) {
 			printk(KERN_WARNING
 				"%s: Detected possible byte-swapped interface"
-				" at IOADDR %p\n", CARDNAME, ioaddr);
+				" at IOADDR %pK\n", CARDNAME, ioaddr);
 		}
 		retval = -ENODEV;
 		goto err_out;
@@ -1897,7 +1897,7 @@ static int smc_probe(struct net_device *dev, void __iomem *ioaddr,
 	val = SMC_GET_BASE(lp);
 	val = ((val & 0x1F00) >> 3) << SMC_IO_SHIFT;
 	if (((unsigned int)ioaddr & (0x3e0 << SMC_IO_SHIFT)) != val) {
-		printk("%s: IOADDR %p doesn't match configuration (%x).\n",
+		printk("%s: IOADDR %pK doesn't match configuration (%x).\n",
 			CARDNAME, ioaddr, val);
 	}
 
@@ -1912,7 +1912,7 @@ static int smc_probe(struct net_device *dev, void __iomem *ioaddr,
 	version_string = chip_ids[ (revision_register >> 4) & 0xF];
 	if (!version_string || (revision_register & 0xff00) != 0x3300) {
 		/* I don't recognize this chip, so... */
-		printk("%s: IO %p: Unrecognized revision register 0x%04x"
+		printk("%s: IO %pK: Unrecognized revision register 0x%04x"
 			", Contact author.\n", CARDNAME,
 			ioaddr, revision_register);
 
@@ -2030,7 +2030,7 @@ static int smc_probe(struct net_device *dev, void __iomem *ioaddr,
 	retval = register_netdev(dev);
 	if (retval == 0) {
 		/* now, print out the card info, in a short format.. */
-		printk("%s: %s (rev %d) at %p IRQ %d",
+		printk("%s: %s (rev %d) at %pK IRQ %d",
 			dev->name, version_string, revision_register & 0x0f,
 			lp->base, dev->irq);
 

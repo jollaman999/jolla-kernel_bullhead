@@ -107,16 +107,16 @@ static void lapb_t1timer_expiry(unsigned long param)
 				lapb_clear_queues(lapb);
 				lapb->state = LAPB_STATE_0;
 				lapb_disconnect_indication(lapb, LAPB_TIMEDOUT);
-				lapb_dbg(0, "(%p) S1 -> S0\n", lapb->dev);
+				lapb_dbg(0, "(%pK) S1 -> S0\n", lapb->dev);
 				return;
 			} else {
 				lapb->n2count++;
 				if (lapb->mode & LAPB_EXTENDED) {
-					lapb_dbg(1, "(%p) S1 TX SABME(1)\n",
+					lapb_dbg(1, "(%pK) S1 TX SABME(1)\n",
 						 lapb->dev);
 					lapb_send_control(lapb, LAPB_SABME, LAPB_POLLON, LAPB_COMMAND);
 				} else {
-					lapb_dbg(1, "(%p) S1 TX SABM(1)\n",
+					lapb_dbg(1, "(%pK) S1 TX SABM(1)\n",
 						 lapb->dev);
 					lapb_send_control(lapb, LAPB_SABM, LAPB_POLLON, LAPB_COMMAND);
 				}
@@ -131,11 +131,11 @@ static void lapb_t1timer_expiry(unsigned long param)
 				lapb_clear_queues(lapb);
 				lapb->state = LAPB_STATE_0;
 				lapb_disconnect_confirmation(lapb, LAPB_TIMEDOUT);
-				lapb_dbg(0, "(%p) S2 -> S0\n", lapb->dev);
+				lapb_dbg(0, "(%pK) S2 -> S0\n", lapb->dev);
 				return;
 			} else {
 				lapb->n2count++;
-				lapb_dbg(1, "(%p) S2 TX DISC(1)\n", lapb->dev);
+				lapb_dbg(1, "(%pK) S2 TX DISC(1)\n", lapb->dev);
 				lapb_send_control(lapb, LAPB_DISC, LAPB_POLLON, LAPB_COMMAND);
 			}
 			break;
@@ -149,7 +149,7 @@ static void lapb_t1timer_expiry(unsigned long param)
 				lapb->state = LAPB_STATE_0;
 				lapb_stop_t2timer(lapb);
 				lapb_disconnect_indication(lapb, LAPB_TIMEDOUT);
-				lapb_dbg(0, "(%p) S3 -> S0\n", lapb->dev);
+				lapb_dbg(0, "(%pK) S3 -> S0\n", lapb->dev);
 				return;
 			} else {
 				lapb->n2count++;
@@ -165,7 +165,7 @@ static void lapb_t1timer_expiry(unsigned long param)
 				lapb_clear_queues(lapb);
 				lapb->state = LAPB_STATE_0;
 				lapb_disconnect_indication(lapb, LAPB_TIMEDOUT);
-				lapb_dbg(0, "(%p) S4 -> S0\n", lapb->dev);
+				lapb_dbg(0, "(%pK) S4 -> S0\n", lapb->dev);
 				return;
 			} else {
 				lapb->n2count++;

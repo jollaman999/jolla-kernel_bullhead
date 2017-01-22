@@ -373,7 +373,7 @@ setup_frame(struct ksignal *ksig, sigset_t *set, struct pt_regs *regs)
 	wrusp((unsigned long) frame);
 	
 #if DEBUG_SIG
-	printk("SIG deliver (%s:%d): sp=%p pc=%p ra=%p\n",
+	printk("SIG deliver (%s:%d): sp=%pK pc=%pK ra=%pK\n",
 		current->comm, current->pid, frame, regs->pc, regs->r26);
 #endif
 	return 0;
@@ -427,7 +427,7 @@ setup_rt_frame(struct ksignal *ksig, sigset_t *set, struct pt_regs *regs)
 	wrusp((unsigned long) frame);
 
 #if DEBUG_SIG
-	printk("SIG deliver (%s:%d): sp=%p pc=%p ra=%p\n",
+	printk("SIG deliver (%s:%d): sp=%pK pc=%pK ra=%pK\n",
 		current->comm, current->pid, frame, regs->pc, regs->r26);
 #endif
 

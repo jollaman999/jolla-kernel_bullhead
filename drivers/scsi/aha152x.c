@@ -988,7 +988,7 @@ static int aha152x_internal_queue(Scsi_Cmnd *SCpnt, struct completion *complete,
 
 #if defined(AHA152X_DEBUG)
 	if (HOSTDATA(shpnt)->debug & debug_queue) {
-		printk(INFO_LEAD "queue: %p; cmd_len=%d pieces=%d size=%u cmnd=",
+		printk(INFO_LEAD "queue: %pK; cmd_len=%d pieces=%d size=%u cmnd=",
 		       CMDINFO(SCpnt), SCpnt, SCpnt->cmd_len,
 		       scsi_sg_count(SCpnt), scsi_bufflen(SCpnt));
 		__scsi_print_command(SCpnt->cmnd);
@@ -1110,7 +1110,7 @@ static int aha152x_abort(Scsi_Cmnd *SCpnt)
 
 #if defined(AHA152X_DEBUG)
 	if(HOSTDATA(shpnt)->debug & debug_eh) {
-		printk(DEBUG_LEAD "abort(%p)", CMDINFO(SCpnt), SCpnt);
+		printk(DEBUG_LEAD "abort(%pK)", CMDINFO(SCpnt), SCpnt);
 		show_queues(shpnt);
 	}
 #endif
@@ -1162,7 +1162,7 @@ static int aha152x_device_reset(Scsi_Cmnd * SCpnt)
 
 #if defined(AHA152X_DEBUG)
 	if(HOSTDATA(shpnt)->debug & debug_eh) {
-		printk(INFO_LEAD "aha152x_device_reset(%p)", CMDINFO(SCpnt), SCpnt);
+		printk(INFO_LEAD "aha152x_device_reset(%pK)", CMDINFO(SCpnt), SCpnt);
 		show_queues(shpnt);
 	}
 #endif
@@ -1227,12 +1227,12 @@ static void free_hard_reset_SCs(struct Scsi_Host *shpnt, Scsi_Cmnd **SCs)
 		if(SCDATA(ptr)) {
 			next = SCNEXT(ptr);
 		} else {
-			printk(DEBUG_LEAD "queue corrupted at %p\n", CMDINFO(ptr), ptr);
+			printk(DEBUG_LEAD "queue corrupted at %pK\n", CMDINFO(ptr), ptr);
 			next = NULL;
 		}
 
 		if (!ptr->device->soft_reset) {
-			DPRINTK(debug_eh, DEBUG_LEAD "disconnected command %p removed\n", CMDINFO(ptr), ptr);
+			DPRINTK(debug_eh, DEBUG_LEAD "disconnected command %pK removed\n", CMDINFO(ptr), ptr);
 			remove_SC(SCs, ptr);
 			HOSTDATA(shpnt)->commands--;
 			kfree(ptr->host_scribble);
@@ -1411,7 +1411,7 @@ static void done(struct Scsi_Host *shpnt, int error)
 {
 	if (CURRENT_SC) {
 		if(DONE_SC)
-			printk(ERR_LEAD "there's already a completed command %p - will cause abort\n", CMDINFO(CURRENT_SC), DONE_SC);
+			printk(ERR_LEAD "there's already a completed command %pK - will cause abort\n", CMDINFO(CURRENT_SC), DONE_SC);
 
 		DONE_SC = CURRENT_SC;
 		CURRENT_SC = NULL;
@@ -1618,9 +1618,9 @@ static void busfree_run(struct Scsi_Host *shpnt)
 			}
 
 			DO_UNLOCK(flags);
-			DPRINTK(debug_done, DEBUG_LEAD "calling scsi_done(%p)\n", hostno, id, lun, ptr);
+			DPRINTK(debug_done, DEBUG_LEAD "calling scsi_done(%pK)\n", hostno, id, lun, ptr);
                 	ptr->scsi_done(ptr);
-			DPRINTK(debug_done, DEBUG_LEAD "scsi_done(%p) returned\n", hostno, id, lun, ptr);
+			DPRINTK(debug_done, DEBUG_LEAD "scsi_done(%pK) returned\n", hostno, id, lun, ptr);
 			DO_LOCK(flags);
 		}
 
@@ -2916,7 +2916,7 @@ static void disp_enintr(struct Scsi_Host *shpnt)
  */
 static void show_command(Scsi_Cmnd *ptr)
 {
-	scmd_printk(KERN_DEBUG, ptr, "%p: cmnd=(", ptr);
+	scmd_printk(KERN_DEBUG, ptr, "%pK: cmnd=(", ptr);
 
 	__scsi_print_command(ptr->cmnd);
 
@@ -2942,7 +2942,7 @@ static void show_command(Scsi_Cmnd *ptr)
 	if (ptr->SCp.phase & resetted)
 		printk("resetted|");
 	if( SCDATA(ptr) ) {
-		printk("; next=0x%p\n", SCNEXT(ptr));
+		printk("; next=0x%pK\n", SCNEXT(ptr));
 	} else {
 		printk("; next=(host scribble NULL)\n");
 	}
@@ -2983,7 +2983,7 @@ static void get_command(struct seq_file *m, Scsi_Cmnd * ptr)
 {
 	int i;
 
-	SPRINTF("%p: target=%d; lun=%d; cmnd=( ",
+	SPRINTF("%pK: target=%d; lun=%d; cmnd=( ",
 		ptr, ptr->device->id, ptr->device->lun);
 
 	for (i = 0; i < COMMAND_SIZE(ptr->cmnd[0]); i++)
@@ -3009,7 +3009,7 @@ static void get_command(struct seq_file *m, Scsi_Cmnd * ptr)
 		SPRINTF("spiordy|");
 	if (ptr->SCp.phase & syncneg)
 		SPRINTF("syncneg|");
-	SPRINTF("; next=0x%p\n", SCNEXT(ptr));
+	SPRINTF("; next=0x%pK\n", SCNEXT(ptr));
 }
 
 static void get_ports(struct seq_file *m, struct Scsi_Host *shpnt)

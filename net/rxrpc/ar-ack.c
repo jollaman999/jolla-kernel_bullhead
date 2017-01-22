@@ -434,7 +434,7 @@ static int rxrpc_drain_rx_oos_queue(struct rxrpc_call *call)
 		if (ntohl(sp->hdr.seq) != call->rx_first_oos) {
 			skb_queue_head(&call->rx_oos_queue, skb);
 			call->rx_first_oos = ntohl(rxrpc_skb(skb)->hdr.seq);
-			_debug("requeue %p {%u}", skb, call->rx_first_oos);
+			_debug("requeue %pK {%u}", skb, call->rx_first_oos);
 		} else {
 			skb->mark = RXRPC_SKB_MARK_DATA;
 			terminal = ((sp->hdr.flags & RXRPC_LAST_PACKET) &&
@@ -451,7 +451,7 @@ static int rxrpc_drain_rx_oos_queue(struct rxrpc_call *call)
 					ntohl(rxrpc_skb(skb)->hdr.seq);
 			else
 				call->rx_first_oos = 0;
-			_debug("peek %p {%u}", skb, call->rx_first_oos);
+			_debug("peek %pK {%u}", skb, call->rx_first_oos);
 		}
 	}
 
@@ -596,7 +596,7 @@ process_further:
 	if (!skb)
 		return -EAGAIN;
 
-	_net("deferred skb %p", skb);
+	_net("deferred skb %pK", skb);
 
 	sp = rxrpc_skb(skb);
 
@@ -1274,7 +1274,7 @@ maybe_reschedule:
 	/* don't leave aborted connections on the accept queue */
 	if (call->state >= RXRPC_CALL_COMPLETE &&
 	    !list_empty(&call->accept_link)) {
-		_debug("X unlinking once-pending call %p { e=%lx f=%lx c=%x }",
+		_debug("X unlinking once-pending call %pK { e=%lx f=%lx c=%x }",
 		       call, call->events, call->flags,
 		       ntohl(call->conn->cid));
 

@@ -221,7 +221,7 @@ static struct txx9dmac_desc *txx9dmac_desc_get(struct txx9dmac_chan *dc)
 			ret = desc;
 			break;
 		}
-		dev_dbg(chan2dev(&dc->chan), "desc %p not ACKed\n", desc);
+		dev_dbg(chan2dev(&dc->chan), "desc %pK not ACKed\n", desc);
 		i++;
 	}
 	spin_unlock_bh(&dc->lock);
@@ -271,10 +271,10 @@ static void txx9dmac_desc_put(struct txx9dmac_chan *dc,
 		spin_lock_bh(&dc->lock);
 		list_for_each_entry(child, &desc->tx_list, desc_node)
 			dev_vdbg(chan2dev(&dc->chan),
-				 "moving child desc %p to freelist\n",
+				 "moving child desc %pK to freelist\n",
 				 child);
 		list_splice_init(&desc->tx_list, &dc->free_list);
-		dev_vdbg(chan2dev(&dc->chan), "moving desc %p to freelist\n",
+		dev_vdbg(chan2dev(&dc->chan), "moving desc %pK to freelist\n",
 			 desc);
 		list_add(&desc->desc_node, &dc->free_list);
 		spin_unlock_bh(&dc->lock);
@@ -337,7 +337,7 @@ static void txx9dmac_dostart(struct txx9dmac_chan *dc,
 	struct txx9dmac_slave *ds = dc->chan.private;
 	u32 sai, dai;
 
-	dev_vdbg(chan2dev(&dc->chan), "dostart %u %p\n",
+	dev_vdbg(chan2dev(&dc->chan), "dostart %u %pK\n",
 		 first->txd.cookie, first);
 	/* ASSERT:  channel is idle */
 	if (channel_readl(dc, CSR) & TXX9_DMA_CSR_XFACT) {
@@ -408,7 +408,7 @@ txx9dmac_descriptor_complete(struct txx9dmac_chan *dc,
 	struct dma_async_tx_descriptor *txd = &desc->txd;
 	struct txx9dmac_slave *ds = dc->chan.private;
 
-	dev_vdbg(chan2dev(&dc->chan), "descriptor %u %p complete\n",
+	dev_vdbg(chan2dev(&dc->chan), "descriptor %u %pK complete\n",
 		 txd->cookie, desc);
 
 	dma_cookie_complete(txd);
@@ -727,7 +727,7 @@ static dma_cookie_t txx9dmac_tx_submit(struct dma_async_tx_descriptor *tx)
 	spin_lock_bh(&dc->lock);
 	cookie = dma_cookie_assign(tx);
 
-	dev_vdbg(chan2dev(tx->chan), "tx_submit: queued %u %p\n",
+	dev_vdbg(chan2dev(tx->chan), "tx_submit: queued %u %pK\n",
 		 desc->txd.cookie, desc);
 
 	list_add_tail(&desc->desc_node, &dc->queue);
@@ -1099,7 +1099,7 @@ static void txx9dmac_free_chan_resources(struct dma_chan *chan)
 	spin_unlock_bh(&dc->lock);
 
 	list_for_each_entry_safe(desc, _desc, &list, desc_node) {
-		dev_vdbg(chan2dev(chan), "  freeing descriptor %p\n", desc);
+		dev_vdbg(chan2dev(chan), "  freeing descriptor %pK\n", desc);
 		dma_unmap_single(chan2parent(chan), desc->txd.phys,
 				 ddev->descsize, DMA_TO_DEVICE);
 		kfree(desc);

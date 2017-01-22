@@ -1644,7 +1644,7 @@ static int ppc4xx_pciex_read_config(struct pci_bus *bus, unsigned int devfn,
 	}
 
 	pr_debug("pcie-config-read: bus=%3d [%3d..%3d] devfn=0x%04x"
-		 " offset=0x%04x len=%d, addr=0x%p val=0x%08x\n",
+		 " offset=0x%04x len=%d, addr=0x%pK val=0x%08x\n",
 		 bus->number, hose->first_busno, hose->last_busno,
 		 devfn, offset, len, addr + offset, *val);
 
@@ -1684,7 +1684,7 @@ static int ppc4xx_pciex_write_config(struct pci_bus *bus, unsigned int devfn,
 	dcr_write(port->dcrs, DCRO_PEGPL_CFG, gpl_cfg | GPL_DMER_MASK_DISA);
 
 	pr_debug("pcie-config-write: bus=%3d [%3d..%3d] devfn=0x%04x"
-		 " offset=0x%04x len=%d, addr=0x%p val=0x%08x\n",
+		 " offset=0x%04x len=%d, addr=0x%pK val=0x%08x\n",
 		 bus->number, hose->first_busno, hose->last_busno,
 		 devfn, offset, len, addr + offset, val);
 
@@ -1980,7 +1980,7 @@ static void __init ppc4xx_pciex_port_setup_hose(struct ppc4xx_pciex_port *port)
 
 	pr_debug("PCIE %s, bus %d..%d\n", port->node->full_name,
 		 hose->first_busno, hose->last_busno);
-	pr_debug("     config space mapped at: root @0x%p, other @0x%p\n",
+	pr_debug("     config space mapped at: root @0x%pK, other @0x%pK\n",
 		 hose->cfg_addr, hose->cfg_data);
 
 	/* Setup config space */

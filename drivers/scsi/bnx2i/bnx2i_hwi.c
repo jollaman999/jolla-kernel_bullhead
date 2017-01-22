@@ -2384,7 +2384,7 @@ static void bnx2i_process_iscsi_error(struct bnx2i_hba *hba,
 
 		iscsi_conn_printk(KERN_ALERT,
 				  bnx2i_conn->cls_conn->dd_data,
-				  "conn_err - hostno %d conn %p, "
+				  "conn_err - hostno %d conn %pK, "
 				  "iscsi_cid %x cid %x\n",
 				  bnx2i_conn->hba->shost->host_no,
 				  bnx2i_conn, bnx2i_conn->ep->ep_iscsi_cid,

@@ -502,7 +502,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 		acpi_ut_add_reference(obj_desc->field.region_obj);
 
 		ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
-				  "RegionField: BitOff %X, Off %X, Gran %X, Region %p\n",
+				  "RegionField: BitOff %X, Off %X, Gran %X, Region %pK\n",
 				  obj_desc->field.start_field_bit_offset,
 				  obj_desc->field.base_byte_offset,
 				  obj_desc->field.access_byte_width,
@@ -523,7 +523,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 		acpi_ut_add_reference(obj_desc->bank_field.bank_obj);
 
 		ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
-				  "Bank Field: BitOff %X, Off %X, Gran %X, Region %p, BankReg %p\n",
+				  "Bank Field: BitOff %X, Off %X, Gran %X, Region %pK, BankReg %pK\n",
 				  obj_desc->bank_field.start_field_bit_offset,
 				  obj_desc->bank_field.base_byte_offset,
 				  obj_desc->field.access_byte_width,
@@ -590,7 +590,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 					  access_byte_width);
 
 		ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
-				  "IndexField: BitOff %X, Off %X, Value %X, Gran %X, Index %p, Data %p\n",
+				  "IndexField: BitOff %X, Off %X, Value %X, Gran %X, Index %pK, Data %pK\n",
 				  obj_desc->index_field.start_field_bit_offset,
 				  obj_desc->index_field.base_byte_offset,
 				  obj_desc->index_field.value,
@@ -612,7 +612,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 				       acpi_ns_get_type(info->field_node));
 
 	ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
-			  "Set NamedObj %p [%4.4s], ObjDesc %p\n",
+			  "Set NamedObj %pK [%4.4s], ObjDesc %pK\n",
 			  info->field_node,
 			  acpi_ut_get_node_name(info->field_node), obj_desc));
 

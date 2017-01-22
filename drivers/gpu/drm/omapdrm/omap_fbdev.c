@@ -220,7 +220,7 @@ static int omap_fbdev_create(struct drm_fb_helper *helper,
 		goto fail_unlock;
 	}
 
-	DBG("fbi=%p, dev=%p", fbi, dev);
+	DBG("fbi=%pK, dev=%pK", fbi, dev);
 
 	fbdev->fb = fb;
 	helper->fb = fb;
@@ -258,7 +258,7 @@ static int omap_fbdev_create(struct drm_fb_helper *helper,
 	}
 
 
-	DBG("par=%p, %dx%d", fbi->par, fbi->var.xres, fbi->var.yres);
+	DBG("par=%pK, %dx%d", fbi->par, fbi->var.xres, fbi->var.yres);
 	DBG("allocated %dx%d fb", fbdev->fb->width, fbdev->fb->height);
 
 	mutex_unlock(&dev->struct_mutex);
@@ -318,7 +318,7 @@ static void omap_fbdev_flush(struct fb_info *fbi, int x, int y, int w, int h)
 	if (!helper)
 		return;
 
-	VERB("flush fbdev: %d,%d %dx%d, fbi=%p", x, y, w, h, fbi);
+	VERB("flush fbdev: %d,%d %dx%d, fbi=%pK", x, y, w, h, fbi);
 
 	omap_framebuffer_flush(helper->fb, x, y, w, h);
 }

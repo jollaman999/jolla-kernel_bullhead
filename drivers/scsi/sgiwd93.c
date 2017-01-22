@@ -106,7 +106,7 @@ static int dma_setup(struct scsi_cmnd *cmd, int datainp)
 	struct hpc3_scsiregs *hregs =
 		(struct hpc3_scsiregs *) cmd->device->host->base;
 
-	pr_debug("dma_setup: datainp<%d> hcp<%p> ", datainp, hdata->cpu);
+	pr_debug("dma_setup: datainp<%d> hcp<%pK> ", datainp, hdata->cpu);
 
 	hdata->wh.dma_dir = datainp;
 

@@ -515,7 +515,7 @@ static int radeon_ttm_backend_bind(struct ttm_tt *ttm,
 
 	gtt->offset = (unsigned long)(bo_mem->start << PAGE_SHIFT);
 	if (!ttm->num_pages) {
-		WARN(1, "nothing to bind %lu pages for mreg %p back %p!\n",
+		WARN(1, "nothing to bind %lu pages for mreg %pK back %pK!\n",
 		     ttm->num_pages, bo_mem, ttm);
 	}
 	r = radeon_gart_bind(gtt->rdev, gtt->offset,

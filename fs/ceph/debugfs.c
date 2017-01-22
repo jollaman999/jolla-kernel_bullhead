@@ -147,7 +147,7 @@ static int dentry_lru_show(struct seq_file *s, void *ptr)
 	spin_lock(&mdsc->dentry_lru_lock);
 	list_for_each_entry(di, &mdsc->dentry_lru, lru) {
 		struct dentry *dentry = di->dentry;
-		seq_printf(s, "%p %p\t%.*s\n",
+		seq_printf(s, "%pK %pK\t%.*s\n",
 			   di, dentry, dentry->d_name.len, dentry->d_name.name);
 	}
 	spin_unlock(&mdsc->dentry_lru_lock);

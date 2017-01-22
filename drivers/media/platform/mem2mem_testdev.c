@@ -949,7 +949,7 @@ static int m2mtest_open(struct file *file)
 	v4l2_fh_add(&ctx->fh);
 	atomic_inc(&dev->num_inst);
 
-	dprintk(dev, "Created instance %p, m2m_ctx: %p\n", ctx, ctx->m2m_ctx);
+	dprintk(dev, "Created instance %pK, m2m_ctx: %pK\n", ctx, ctx->m2m_ctx);
 
 open_unlock:
 	mutex_unlock(&dev->dev_mutex);
@@ -961,7 +961,7 @@ static int m2mtest_release(struct file *file)
 	struct m2mtest_dev *dev = video_drvdata(file);
 	struct m2mtest_ctx *ctx = file2ctx(file);
 
-	dprintk(dev, "Releasing instance %p\n", ctx);
+	dprintk(dev, "Releasing instance %pK\n", ctx);
 
 	v4l2_fh_del(&ctx->fh);
 	v4l2_fh_exit(&ctx->fh);

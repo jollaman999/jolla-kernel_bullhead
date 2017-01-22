@@ -328,7 +328,7 @@ static void phy_sata_timeout(unsigned long data)
 		goto done;
 
 	dev_dbg(sciphy_to_dev(iphy),
-		 "%s: SCIC SDS Phy 0x%p did not receive signature fis before "
+		 "%s: SCIC SDS Phy 0x%pK did not receive signature fis before "
 		 "timeout.\n",
 		 __func__,
 		 iphy);
@@ -1438,7 +1438,7 @@ int isci_phy_control(struct asd_sas_phy *sas_phy,
 	unsigned long flags;
 
 	dev_dbg(&ihost->pdev->dev,
-		"%s: phy %p; func %d; buf %p; isci phy %p, port %p\n",
+		"%s: phy %pK; func %d; buf %pK; isci phy %pK, port %pK\n",
 		__func__, sas_phy, func, buf, iphy, port);
 
 	switch (func) {
@@ -1478,7 +1478,7 @@ int isci_phy_control(struct asd_sas_phy *sas_phy,
 
 	default:
 		dev_dbg(&ihost->pdev->dev,
-			   "%s: phy %p; func %d NOT IMPLEMENTED!\n",
+			   "%s: phy %pK; func %d NOT IMPLEMENTED!\n",
 			   __func__, sas_phy, func);
 		ret = -ENOSYS;
 		break;

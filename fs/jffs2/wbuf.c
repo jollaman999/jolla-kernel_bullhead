@@ -187,7 +187,7 @@ static struct jffs2_raw_node_ref **jffs2_incore_replace_raw(struct jffs2_sb_info
 	struct jffs2_node_frag *frag;
 	struct jffs2_full_dirent *fd;
 
-	dbg_noderef("incore_replace_raw: node at %p is {%04x,%04x}\n",
+	dbg_noderef("incore_replace_raw: node at %pK is {%04x,%04x}\n",
 		    node, je16_to_cpu(node->u.magic), je16_to_cpu(node->u.nodetype));
 
 	BUG_ON(je16_to_cpu(node->u.magic) != 0x1985 &&
@@ -196,7 +196,7 @@ static struct jffs2_raw_node_ref **jffs2_incore_replace_raw(struct jffs2_sb_info
 	switch (je16_to_cpu(node->u.nodetype)) {
 	case JFFS2_NODETYPE_INODE:
 		if (f->metadata && f->metadata->raw == raw) {
-			dbg_noderef("Will replace ->raw in f->metadata at %p\n", f->metadata);
+			dbg_noderef("Will replace ->raw in f->metadata at %pK\n", f->metadata);
 			return &f->metadata->raw;
 		}
 		frag = jffs2_lookup_node_frag(&f->fragtree, je32_to_cpu(node->i.offset));
@@ -206,13 +206,13 @@ static struct jffs2_raw_node_ref **jffs2_incore_replace_raw(struct jffs2_sb_info
 			frag = frag_next(frag);
 			BUG_ON(!frag);
 		}
-		dbg_noderef("Will replace ->raw in full_dnode at %p\n", frag->node);
+		dbg_noderef("Will replace ->raw in full_dnode at %pK\n", frag->node);
 		return &frag->node->raw;
 
 	case JFFS2_NODETYPE_DIRENT:
 		for (fd = f->dents; fd; fd = fd->next) {
 			if (fd->raw == raw) {
-				dbg_noderef("Will replace ->raw in full_dirent at %p\n", fd);
+				dbg_noderef("Will replace ->raw in full_dirent at %pK\n", fd);
 				return &fd->raw;
 			}
 		}

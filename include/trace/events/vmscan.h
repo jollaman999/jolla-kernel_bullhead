@@ -212,7 +212,7 @@ TRACE_EVENT(mm_shrink_slab_start,
 		__entry->total_scan = total_scan;
 	),
 
-	TP_printk("%pF %p: objects to shrink %ld gfp_flags %s pgs_scanned %ld lru_pgs %ld cache items %ld delta %lld total_scan %ld",
+	TP_printk("%pF %pK: objects to shrink %ld gfp_flags %s pgs_scanned %ld lru_pgs %ld cache items %ld delta %lld total_scan %ld",
 		__entry->shrink,
 		__entry->shr,
 		__entry->nr_objects_to_shrink,
@@ -248,7 +248,7 @@ TRACE_EVENT(mm_shrink_slab_end,
 		__entry->total_scan = new_scan_cnt - unused_scan_cnt;
 	),
 
-	TP_printk("%pF %p: unused scan count %ld new scan count %ld total_scan %ld last shrinker return val %d",
+	TP_printk("%pF %pK: unused scan count %ld new scan count %ld total_scan %ld last shrinker return val %d",
 		__entry->shrink,
 		__entry->shr,
 		__entry->unused_scan,
@@ -338,7 +338,7 @@ TRACE_EVENT(mm_vmscan_writepage,
 		__entry->reclaim_flags = reclaim_flags;
 	),
 
-	TP_printk("page=%p pfn=%lu flags=%s",
+	TP_printk("page=%pK pfn=%lu flags=%s",
 		__entry->page,
 		page_to_pfn(__entry->page),
 		show_reclaim_flags(__entry->reclaim_flags))

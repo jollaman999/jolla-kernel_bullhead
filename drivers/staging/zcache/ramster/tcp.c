@@ -91,7 +91,7 @@
 
 #define sclog(sc, fmt, args...) do {					\
 	typeof(sc) __sc = (sc);						\
-	mlog(ML_SOCKET, "[sc %p refs %d sock %p node %u page %p "	\
+	mlog(ML_SOCKET, "[sc %pK refs %d sock %pK node %u page %pK "	\
 	     "pg_off %zu] " fmt, __sc,					\
 	     atomic_read(&__sc->sc_kref.refcount), __sc->sc_sock,	\
 	    __sc->sc_node->nd_num, __sc->sc_page, __sc->sc_page_off ,	\
@@ -513,12 +513,12 @@ static void r2net_set_nn_state(struct r2net_node *nn,
 	 * an non-null sc from being overwritten with another */
 	BUG_ON(sc && nn->nn_sc && nn->nn_sc != sc);
 	mlog_bug_on_msg(err && valid, "err %d valid %u\n", err, valid);
-	mlog_bug_on_msg(valid && !sc, "valid %u sc %p\n", valid, sc);
+	mlog_bug_on_msg(valid && !sc, "valid %u sc %pK\n", valid, sc);
 
 	if (was_valid && !valid && err == 0)
 		err = -ENOTCONN;
 
-	mlog(ML_CONN, "node %u sc: %p -> %p, valid %u -> %u, err %d -> %d\n",
+	mlog(ML_CONN, "node %u sc: %pK -> %pK, valid %u -> %u, err %d -> %d\n",
 	     r2net_num_from_nn(nn), nn->nn_sc, sc, nn->nn_sc_valid, valid,
 	     nn->nn_persistent_error, err);
 
@@ -825,13 +825,13 @@ int r2net_register_handler(u32 msg_type, u32 key, u32 max_len,
 	}
 
 	if (!msg_type) {
-		mlog(0, "no message type provided: %u, %p\n", msg_type, func);
+		mlog(0, "no message type provided: %u, %pK\n", msg_type, func);
 		ret = -EINVAL;
 		goto out;
 
 	}
 	if (!func) {
-		mlog(0, "no message handler provided: %u, %p\n",
+		mlog(0, "no message handler provided: %u, %pK\n",
 		       msg_type, func);
 		ret = -EINVAL;
 		goto out;
@@ -862,7 +862,7 @@ int r2net_register_handler(u32 msg_type, u32 key, u32 max_len,
 		rb_insert_color(&nmh->nh_node, &r2net_handler_tree);
 		list_add_tail(&nmh->nh_unregister_item, unreg_list);
 
-		mlog(ML_TCP, "registered handler func %p type %u key %08x\n",
+		mlog(ML_TCP, "registered handler func %pK type %u key %08x\n",
 		     func, msg_type, key);
 		/* we've had some trouble with handlers seemingly vanishing. */
 		mlog_bug_on_msg(r2net_handler_tree_lookup(msg_type, key, &p,
@@ -888,7 +888,7 @@ void r2net_unregister_handler_list(struct list_head *list)
 
 	write_lock(&r2net_handler_lock);
 	list_for_each_entry_safe(nmh, n, list, nh_unregister_item) {
-		mlog(ML_TCP, "unregistering handler func %p type %u key %08x\n",
+		mlog(ML_TCP, "unregistering handler func %pK type %u key %08x\n",
 		     nmh->nh_func, nmh->nh_msg_type, nmh->nh_key);
 		rb_erase(&nmh->nh_node, &r2net_handler_tree);
 		list_del_init(&nmh->nh_unregister_item);

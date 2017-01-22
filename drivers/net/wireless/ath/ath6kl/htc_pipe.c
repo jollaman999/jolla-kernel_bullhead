@@ -67,7 +67,7 @@ static void do_send_completion(struct htc_endpoint *ep,
 
 			list_del(&packet->list);
 			ath6kl_dbg(ATH6KL_DBG_HTC,
-				   "%s: calling ep %d send complete callback on packet 0x%p\n",
+				   "%s: calling ep %d send complete callback on packet 0x%pK\n",
 				   __func__, ep->eid, packet);
 			ep->ep_cb.tx_complete(ep->target, packet);
 		} while (!list_empty(queue_to_indicate));
@@ -110,7 +110,7 @@ static void get_htc_packet_credit_based(struct htc_target *target,
 		packet = list_first_entry(&ep->txq, struct htc_packet, list);
 
 		ath6kl_dbg(ATH6KL_DBG_HTC,
-			   "%s: got head packet:0x%p , queue depth: %d\n",
+			   "%s: got head packet:0x%pK , queue depth: %d\n",
 			   __func__, packet, get_queue_depth(&ep->txq));
 
 		transfer_len = packet->act_len + HTC_HDR_LENGTH;
@@ -189,7 +189,7 @@ static void get_htc_packet(struct htc_target *target,
 		list_del(&packet->list);
 
 		ath6kl_dbg(ATH6KL_DBG_HTC,
-			   "%s: got packet:0x%p , new queue depth: %d\n",
+			   "%s: got packet:0x%pK , new queue depth: %d\n",
 			   __func__, packet, get_queue_depth(&ep->txq));
 		packet->info.tx.seqno = ep->seqno;
 		packet->info.tx.flags = 0;
@@ -213,7 +213,7 @@ static int htc_issue_packets(struct htc_target *target,
 	struct htc_packet *packet;
 
 	ath6kl_dbg(ATH6KL_DBG_HTC,
-		   "%s: queue: 0x%p, pkts %d\n", __func__,
+		   "%s: queue: 0x%pK, pkts %d\n", __func__,
 		   pkt_queue, get_queue_depth(pkt_queue));
 
 	while (!list_empty(pkt_queue)) {
@@ -286,7 +286,7 @@ static int htc_issue_packets(struct htc_target *target,
 		while (!list_empty(pkt_queue)) {
 			if (status != -ENOMEM) {
 				ath6kl_dbg(ATH6KL_DBG_HTC,
-					   "%s: failed pkt:0x%p status:%d\n",
+					   "%s: failed pkt:0x%pK status:%d\n",
 					   __func__, packet, status);
 			}
 
@@ -312,7 +312,7 @@ static enum htc_send_queue_result htc_try_send(struct htc_target *target,
 	int tx_resources, overflow, txqueue_depth, i, good_pkts;
 	u8 pipeid;
 
-	ath6kl_dbg(ATH6KL_DBG_HTC, "%s: (queue:0x%p depth:%d)\n",
+	ath6kl_dbg(ATH6KL_DBG_HTC, "%s: (queue:0x%pK depth:%d)\n",
 		   __func__, txq,
 		   (txq == NULL) ? 0 : get_queue_depth(txq));
 
@@ -387,7 +387,7 @@ static enum htc_send_queue_result htc_try_send(struct htc_target *target,
 						 txq, list) {
 
 				ath6kl_dbg(ATH6KL_DBG_HTC,
-					   "%s: Indicat overflowed TX pkts: %p\n",
+					   "%s: Indicat overflowed TX pkts: %pK\n",
 					   __func__, packet);
 				action = ep->ep_cb.tx_full(ep->target, packet);
 				if (action == HTC_SEND_FULL_DROP) {
@@ -1130,7 +1130,7 @@ static void htc_flush_rx_queue(struct htc_target *target,
 		packet->act_len = 0;
 
 		ath6kl_dbg(ATH6KL_DBG_HTC,
-			   "Flushing RX packet:0x%p, length:%d, ep:%d\n",
+			   "Flushing RX packet:0x%pK, length:%d, ep:%d\n",
 			   packet, packet->buf_len,
 			   packet->endpoint);
 
@@ -1558,7 +1558,7 @@ static int ath6kl_htc_pipe_tx(struct htc_target *target,
 	struct list_head queue;
 
 	ath6kl_dbg(ATH6KL_DBG_HTC,
-		   "%s: endPointId: %d, buffer: 0x%p, length: %d\n",
+		   "%s: endPointId: %d, buffer: 0x%pK, length: %d\n",
 		   __func__, packet->endpoint, packet->buf,
 		   packet->act_len);
 

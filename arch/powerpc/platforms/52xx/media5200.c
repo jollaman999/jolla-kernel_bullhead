@@ -115,7 +115,7 @@ void media5200_irq_cascade(unsigned int virq, struct irq_desc *desc)
 static int media5200_irq_map(struct irq_domain *h, unsigned int virq,
 			     irq_hw_number_t hw)
 {
-	pr_debug("%s: h=%p, virq=%i, hwirq=%i\n", __func__, h, virq, (int)hw);
+	pr_debug("%s: h=%pK, virq=%i, hwirq=%i\n", __func__, h, virq, (int)hw);
 	irq_set_chip_data(virq, &media5200_irq);
 	irq_set_chip_and_handler(virq, &media5200_irq_chip, handle_level_irq);
 	irq_set_status_flags(virq, IRQ_LEVEL);
@@ -161,7 +161,7 @@ static void __init media5200_init_irq(void)
 	media5200_irq.regs = of_iomap(fpga_np, 0);
 	if (!media5200_irq.regs)
 		goto out;
-	pr_debug("%s: mapped to %p\n", __func__, media5200_irq.regs);
+	pr_debug("%s: mapped to %pK\n", __func__, media5200_irq.regs);
 
 	cascade_virq = irq_of_parse_and_map(fpga_np, 0);
 	if (!cascade_virq)

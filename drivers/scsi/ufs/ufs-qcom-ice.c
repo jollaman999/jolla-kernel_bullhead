@@ -147,7 +147,7 @@ int ufs_qcom_ice_get_dev(struct ufs_qcom_host *qcom_host)
 	int err = 0;
 
 	if (!qcom_host || !qcom_host->hba || !qcom_host->hba->dev) {
-		pr_err("%s: invalid qcom_host %p or qcom_host->hba or qcom_host->hba->dev\n",
+		pr_err("%s: invalid qcom_host %pK or qcom_host->hba or qcom_host->hba->dev\n",
 			__func__, qcom_host);
 		err = -EINVAL;
 		goto out;
@@ -168,7 +168,7 @@ int ufs_qcom_ice_get_dev(struct ufs_qcom_host *qcom_host)
 	}
 
 	if (!qcom_host->ice.pdev || !qcom_host->ice.vops) {
-		dev_err(ufs_dev, "%s: invalid platform device %p or vops %p\n",
+		dev_err(ufs_dev, "%s: invalid platform device %pK or vops %pK\n",
 			__func__, qcom_host->ice.pdev, qcom_host->ice.vops);
 		qcom_host->ice.pdev = NULL;
 		qcom_host->ice.vops = NULL;

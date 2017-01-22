@@ -58,7 +58,7 @@ static void nfc_llcp_socket_purge(struct nfc_llcp_sock *sock)
 	struct nfc_llcp_local *local = sock->local;
 	struct sk_buff *s, *tmp;
 
-	pr_debug("%p\n", &sock->sk);
+	pr_debug("%pK\n", &sock->sk);
 
 	skb_queue_purge(&sock->tx_queue);
 	skb_queue_purge(&sock->tx_pending_queue);
@@ -343,7 +343,7 @@ struct nfc_llcp_sock *nfc_llcp_sock_from_sn(struct nfc_llcp_local *local,
 	struct sock *sk;
 	struct nfc_llcp_sock *llcp_sock, *tmp_sock;
 
-	pr_debug("sn %zd %p\n", sn_len, sn);
+	pr_debug("sn %zd %pK\n", sn_len, sn);
 
 	if (sn == NULL || sn_len == 0)
 		return NULL;
@@ -355,7 +355,7 @@ struct nfc_llcp_sock *nfc_llcp_sock_from_sn(struct nfc_llcp_local *local,
 	sk_for_each(sk, &local->sockets.head) {
 		tmp_sock = nfc_llcp_sock(sk);
 
-		pr_debug("llcp sock %p\n", tmp_sock);
+		pr_debug("llcp sock %pK\n", tmp_sock);
 
 		if (tmp_sock->sk.sk_type == SOCK_STREAM &&
 		    tmp_sock->sk.sk_state != LLCP_LISTEN)
@@ -380,7 +380,7 @@ struct nfc_llcp_sock *nfc_llcp_sock_from_sn(struct nfc_llcp_local *local,
 
 	read_unlock(&local->sockets.lock);
 
-	pr_debug("Found llcp sock %p\n", llcp_sock);
+	pr_debug("Found llcp sock %pK\n", llcp_sock);
 
 	return llcp_sock;
 }
@@ -943,7 +943,7 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
 	if (sock->ssap < LLCP_LOCAL_NUM_SAP && sock->ssap >= LLCP_WKS_NUM_SAP) {
 		atomic_t *client_count;
 
-		pr_debug("reserved_ssap %d for %p\n", sock->ssap, new_sock);
+		pr_debug("reserved_ssap %d for %pK\n", sock->ssap, new_sock);
 
 		client_count =
 			&local->local_sdp_cnt[sock->ssap - LLCP_WKS_NUM_SAP];
@@ -955,7 +955,7 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
 	nfc_llcp_parse_connection_tlv(new_sock, &skb->data[LLCP_HEADER_SIZE],
 				      skb->len - LLCP_HEADER_SIZE);
 
-	pr_debug("new sock %p sk %p\n", new_sock, &new_sock->sk);
+	pr_debug("new sock %pK sk %pK\n", new_sock, &new_sock->sk);
 
 	nfc_llcp_sock_link(&local->sockets, new_sk);
 
@@ -1039,7 +1039,7 @@ static void nfc_llcp_recv_hdlc(struct nfc_llcp_local *local,
 
 	/* Pass the payload upstream */
 	if (ptype == LLCP_PDU_I) {
-		pr_debug("I frame, queueing on %p\n", &llcp_sock->sk);
+		pr_debug("I frame, queueing on %pK\n", &llcp_sock->sk);
 
 		if (ns == llcp_sock->recv_n)
 			llcp_sock->recv_n = (llcp_sock->recv_n + 1) % 16;
@@ -1293,7 +1293,7 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
 				sap = llcp_sock->ssap;
 			}
 
-			pr_debug("%p %d\n", llcp_sock, sap);
+			pr_debug("%pK %d\n", llcp_sock, sap);
 
 add_snl:
 			sdp = nfc_llcp_build_sdres_tlv(tid, sap);

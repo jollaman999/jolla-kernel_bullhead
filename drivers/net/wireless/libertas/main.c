@@ -463,7 +463,7 @@ static int lbs_thread(void *data)
 		int shouldsleep;
 		u8 resp_idx;
 
-		lbs_deb_thread("1: currenttxskb %p, dnld_sent %d\n",
+		lbs_deb_thread("1: currenttxskb %pK, dnld_sent %d\n",
 				priv->currenttxskb, priv->dnld_sent);
 
 		add_wait_queue(&priv->waitq, &wait);
@@ -506,13 +506,13 @@ static int lbs_thread(void *data)
 		} else
 			spin_unlock_irq(&priv->driver_lock);
 
-		lbs_deb_thread("2: currenttxskb %p, dnld_send %d\n",
+		lbs_deb_thread("2: currenttxskb %pK, dnld_send %d\n",
 			       priv->currenttxskb, priv->dnld_sent);
 
 		set_current_state(TASK_RUNNING);
 		remove_wait_queue(&priv->waitq, &wait);
 
-		lbs_deb_thread("3: currenttxskb %p, dnld_sent %d\n",
+		lbs_deb_thread("3: currenttxskb %pK, dnld_sent %d\n",
 			       priv->currenttxskb, priv->dnld_sent);
 
 		if (kthread_should_stop()) {
@@ -525,7 +525,7 @@ static int lbs_thread(void *data)
 			continue;
 		}
 
-		lbs_deb_thread("4: currenttxskb %p, dnld_sent %d\n",
+		lbs_deb_thread("4: currenttxskb %pK, dnld_sent %d\n",
 		       priv->currenttxskb, priv->dnld_sent);
 
 		/* Process any pending command response */
@@ -586,8 +586,8 @@ static int lbs_thread(void *data)
 		if (priv->psstate == PS_STATE_PRE_SLEEP &&
 		    !priv->dnld_sent && !priv->cur_cmd) {
 			if (priv->connect_status == LBS_CONNECTED) {
-				lbs_deb_thread("pre-sleep, currenttxskb %p, "
-					"dnld_sent %d, cur_cmd %p\n",
+				lbs_deb_thread("pre-sleep, currenttxskb %pK, "
+					"dnld_sent %d, cur_cmd %pK\n",
 					priv->currenttxskb, priv->dnld_sent,
 					priv->cur_cmd);
 
@@ -1032,7 +1032,7 @@ struct lbs_private *lbs_add_card(void *card, struct device *dmdev)
 	priv = NULL;
 
 done:
-	lbs_deb_leave_args(LBS_DEB_MAIN, "priv %p", priv);
+	lbs_deb_leave_args(LBS_DEB_MAIN, "priv %pK", priv);
 	return priv;
 }
 EXPORT_SYMBOL_GPL(lbs_add_card);

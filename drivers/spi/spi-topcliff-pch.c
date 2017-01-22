@@ -1434,7 +1434,7 @@ static int pch_spi_pd_probe(struct platform_device *plat_dev)
 		goto err_pci_iomap;
 	}
 
-	dev_dbg(&plat_dev->dev, "[ch%d] remap_addr=%p\n",
+	dev_dbg(&plat_dev->dev, "[ch%d] remap_addr=%pK\n",
 		plat_dev->id, data->io_remap_addr);
 
 	/* initialize members of SPI master */
@@ -1711,7 +1711,7 @@ static void pch_spi_remove(struct pci_dev *pdev)
 	int i;
 	struct pch_pd_dev_save *pd_dev_save = pci_get_drvdata(pdev);
 
-	dev_dbg(&pdev->dev, "%s ENTRY:pdev=%p\n", __func__, pdev);
+	dev_dbg(&pdev->dev, "%s ENTRY:pdev=%pK\n", __func__, pdev);
 
 	for (i = 0; i < pd_dev_save->num; i++)
 		platform_device_unregister(pd_dev_save->pd_save[i]);

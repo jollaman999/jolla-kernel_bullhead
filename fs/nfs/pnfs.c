@@ -60,7 +60,7 @@ find_pnfs_driver_locked(u32 id)
 			goto out;
 	local = NULL;
 out:
-	dprintk("%s: Searching for id %u, found %p\n", __func__, id, local);
+	dprintk("%s: Searching for id %u, found %pK\n", __func__, id, local);
 	return local;
 }
 
@@ -224,7 +224,7 @@ static void
 pnfs_detach_layout_hdr(struct pnfs_layout_hdr *lo)
 {
 	struct nfs_inode *nfsi = NFS_I(lo->plh_inode);
-	dprintk("%s: freeing layout cache %p\n", __func__, lo);
+	dprintk("%s: freeing layout cache %pK\n", __func__, lo);
 	nfsi->layout = NULL;
 	/* Reset MDS Threshold I/O counters */
 	nfsi->write_io = 0;
@@ -345,7 +345,7 @@ pnfs_put_lseg(struct pnfs_layout_segment *lseg)
 	if (!lseg)
 		return;
 
-	dprintk("%s: lseg %p ref %d valid %d\n", __func__, lseg,
+	dprintk("%s: lseg %pK ref %d valid %d\n", __func__, lseg,
 		atomic_read(&lseg->pls_refcount),
 		test_bit(NFS_LSEG_VALID, &lseg->pls_flags));
 	lo = lseg->pls_layout;
@@ -438,7 +438,7 @@ static int mark_lseg_invalid(struct pnfs_layout_segment *lseg,
 		 * list.  It will now be removed when all
 		 * outstanding io is finished.
 		 */
-		dprintk("%s: lseg %p ref %d\n", __func__, lseg,
+		dprintk("%s: lseg %pK ref %d\n", __func__, lseg,
 			atomic_read(&lseg->pls_refcount));
 		if (pnfs_lseg_dec_and_remove_zero(lseg, tmp_list))
 			rv = 1;
@@ -457,14 +457,14 @@ pnfs_mark_matching_lsegs_invalid(struct pnfs_layout_hdr *lo,
 	struct pnfs_layout_segment *lseg, *next;
 	int invalid = 0, removed = 0;
 
-	dprintk("%s:Begin lo %p\n", __func__, lo);
+	dprintk("%s:Begin lo %pK\n", __func__, lo);
 
 	if (list_empty(&lo->plh_segs))
 		return 0;
 	list_for_each_entry_safe(lseg, next, &lo->plh_segs, pls_list)
 		if (!recall_range ||
 		    should_free_lseg(&lseg->pls_range, recall_range)) {
-			dprintk("%s: freeing lseg %p iomode %d "
+			dprintk("%s: freeing lseg %pK iomode %d "
 				"offset %llu length %llu\n", __func__,
 				lseg, lseg->pls_range.iomode, lseg->pls_range.offset,
 				lseg->pls_range.length);
@@ -1015,9 +1015,9 @@ pnfs_layout_insert_lseg(struct pnfs_layout_hdr *lo,
 		if (cmp_layout(&lseg->pls_range, &lp->pls_range) > 0)
 			continue;
 		list_add_tail(&lseg->pls_list, &lp->pls_list);
-		dprintk("%s: inserted lseg %p "
+		dprintk("%s: inserted lseg %pK "
 			"iomode %d offset %llu length %llu before "
-			"lp %p iomode %d offset %llu length %llu\n",
+			"lp %pK iomode %d offset %llu length %llu\n",
 			__func__, lseg, lseg->pls_range.iomode,
 			lseg->pls_range.offset, lseg->pls_range.length,
 			lp, lp->pls_range.iomode, lp->pls_range.offset,
@@ -1025,7 +1025,7 @@ pnfs_layout_insert_lseg(struct pnfs_layout_hdr *lo,
 		goto out;
 	}
 	list_add_tail(&lseg->pls_list, &lo->plh_segs);
-	dprintk("%s: inserted lseg %p "
+	dprintk("%s: inserted lseg %pK "
 		"iomode %d offset %llu length %llu at tail\n",
 		__func__, lseg, lseg->pls_range.iomode,
 		lseg->pls_range.offset, lseg->pls_range.length);
@@ -1062,7 +1062,7 @@ pnfs_find_alloc_layout(struct inode *ino,
 	struct nfs_inode *nfsi = NFS_I(ino);
 	struct pnfs_layout_hdr *new = NULL;
 
-	dprintk("%s Begin ino=%p layout=%p\n", __func__, ino, nfsi->layout);
+	dprintk("%s Begin ino=%pK layout=%pK\n", __func__, ino, nfsi->layout);
 
 	if (nfsi->layout != NULL)
 		goto out_existing;
@@ -1129,7 +1129,7 @@ pnfs_find_lseg(struct pnfs_layout_hdr *lo,
 			break;
 	}
 
-	dprintk("%s:Return lseg %p ref %d\n",
+	dprintk("%s:Return lseg %pK ref %d\n",
 		__func__, ret, ret ? atomic_read(&ret->pls_refcount) : 0);
 	return ret;
 }
@@ -1843,7 +1843,7 @@ pnfs_set_layoutcommit(struct nfs_write_data *wdata)
 	if (end_pos > nfsi->layout->plh_lwb)
 		nfsi->layout->plh_lwb = end_pos;
 	spin_unlock(&inode->i_lock);
-	dprintk("%s: lseg %p end_pos %llu\n",
+	dprintk("%s: lseg %pK end_pos %llu\n",
 		__func__, hdr->lseg, nfsi->layout->plh_lwb);
 
 	/* if pnfs_layoutcommit_inode() runs between inode locks, the next one

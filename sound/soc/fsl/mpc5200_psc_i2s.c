@@ -43,7 +43,7 @@ static int psc_i2s_hw_params(struct snd_pcm_substream *substream,
 	struct psc_dma *psc_dma = snd_soc_dai_get_drvdata(rtd->cpu_dai);
 	u32 mode;
 
-	dev_dbg(psc_dma->dev, "%s(substream=%p) p_size=%i p_bytes=%i"
+	dev_dbg(psc_dma->dev, "%s(substream=%pK) p_size=%i p_bytes=%i"
 		" periods=%i buffer_size=%i  buffer_bytes=%i\n",
 		__func__, substream, params_period_size(params),
 		params_period_bytes(params), params_periods(params),
@@ -89,7 +89,7 @@ static int psc_i2s_set_sysclk(struct snd_soc_dai *cpu_dai,
 			      int clk_id, unsigned int freq, int dir)
 {
 	struct psc_dma *psc_dma = snd_soc_dai_get_drvdata(cpu_dai);
-	dev_dbg(psc_dma->dev, "psc_i2s_set_sysclk(cpu_dai=%p, dir=%i)\n",
+	dev_dbg(psc_dma->dev, "psc_i2s_set_sysclk(cpu_dai=%pK, dir=%i)\n",
 				cpu_dai, dir);
 	return (dir == SND_SOC_CLOCK_IN) ? 0 : -EINVAL;
 }
@@ -108,7 +108,7 @@ static int psc_i2s_set_sysclk(struct snd_soc_dai *cpu_dai,
 static int psc_i2s_set_fmt(struct snd_soc_dai *cpu_dai, unsigned int format)
 {
 	struct psc_dma *psc_dma = snd_soc_dai_get_drvdata(cpu_dai);
-	dev_dbg(psc_dma->dev, "psc_i2s_set_fmt(cpu_dai=%p, format=%i)\n",
+	dev_dbg(psc_dma->dev, "psc_i2s_set_fmt(cpu_dai=%pK, format=%i)\n",
 				cpu_dai, format);
 	return (format == SND_SOC_DAIFMT_I2S) ? 0 : -EINVAL;
 }

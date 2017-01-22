@@ -570,7 +570,7 @@ static void budget_ci_irq(struct saa7146_dev *dev, u32 * isr)
 {
 	struct budget_ci *budget_ci = (struct budget_ci *) dev->ext_priv;
 
-	dprintk(8, "dev: %p, budget_ci: %p\n", dev, budget_ci);
+	dprintk(8, "dev: %pK, budget_ci: %pK\n", dev, budget_ci);
 
 	if (*isr & MASK_06)
 		tasklet_schedule(&budget_ci->ir.msp430_irq_tasklet);
@@ -1477,7 +1477,7 @@ static int budget_ci_attach(struct saa7146_dev *dev, struct saa7146_pci_extensio
 		goto out1;
 	}
 
-	dprintk(2, "budget_ci: %p\n", budget_ci);
+	dprintk(2, "budget_ci: %pK\n", budget_ci);
 
 	dev->ext_priv = budget_ci;
 

@@ -1324,7 +1324,7 @@ stv0367ter_lock_algo(struct stv0367_state *state)
 
 	tmp  = stv0367_readreg(state, R367TER_SYR_STAT);
 	tmp2 = stv0367_readreg(state, R367TER_STATUS);
-	dprintk("state=%p\n", state);
+	dprintk("state=%pK\n", state);
 	dprintk("LOCK OK! mode=%d SYR_STAT=0x%x R367TER_STATUS=0x%x\n",
 							mode, tmp, tmp2);
 

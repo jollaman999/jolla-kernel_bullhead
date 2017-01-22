@@ -3406,7 +3406,7 @@ static struct pktgen_dev *pktgen_find_dev(struct pktgen_thread *t,
 		}
 
 	if_unlock(t);
-	pr_debug("find_dev(%s) returning %p\n", ifname, pkt_dev);
+	pr_debug("find_dev(%s) returning %pK\n", ifname, pkt_dev);
 	return pkt_dev;
 }
 
@@ -3583,7 +3583,7 @@ static void _rem_dev_from_if_list(struct pktgen_thread *t,
 static int pktgen_remove_device(struct pktgen_thread *t,
 				struct pktgen_dev *pkt_dev)
 {
-	pr_debug("remove_device pkt_dev=%p\n", pkt_dev);
+	pr_debug("remove_device pkt_dev=%pK\n", pkt_dev);
 
 	if (pkt_dev->running) {
 		pr_warning("WARNING: trying to remove a running interface, stopping it now\n");

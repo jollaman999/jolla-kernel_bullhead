@@ -1610,17 +1610,17 @@ void ql_dump_qdev(struct ql_adapter *qdev)
 {
 	int i;
 	DUMP_QDEV_FIELD(qdev, "%lx", flags);
-	DUMP_QDEV_FIELD(qdev, "%p", vlgrp);
-	DUMP_QDEV_FIELD(qdev, "%p", pdev);
-	DUMP_QDEV_FIELD(qdev, "%p", ndev);
+	DUMP_QDEV_FIELD(qdev, "%pK", vlgrp);
+	DUMP_QDEV_FIELD(qdev, "%pK", pdev);
+	DUMP_QDEV_FIELD(qdev, "%pK", ndev);
 	DUMP_QDEV_FIELD(qdev, "%d", chip_rev_id);
-	DUMP_QDEV_FIELD(qdev, "%p", reg_base);
-	DUMP_QDEV_FIELD(qdev, "%p", doorbell_area);
+	DUMP_QDEV_FIELD(qdev, "%pK", reg_base);
+	DUMP_QDEV_FIELD(qdev, "%pK", doorbell_area);
 	DUMP_QDEV_FIELD(qdev, "%d", doorbell_area_size);
 	DUMP_QDEV_FIELD(qdev, "%x", msg_enable);
-	DUMP_QDEV_FIELD(qdev, "%p", rx_ring_shadow_reg_area);
+	DUMP_QDEV_FIELD(qdev, "%pK", rx_ring_shadow_reg_area);
 	DUMP_QDEV_DMA_FIELD(qdev, rx_ring_shadow_reg_dma);
-	DUMP_QDEV_FIELD(qdev, "%p", tx_ring_shadow_reg_area);
+	DUMP_QDEV_FIELD(qdev, "%pK", tx_ring_shadow_reg_area);
 	DUMP_QDEV_DMA_FIELD(qdev, tx_ring_shadow_reg_dma);
 	DUMP_QDEV_FIELD(qdev, "%d", intr_count);
 	if (qdev->msi_x_entry)
@@ -1629,7 +1629,7 @@ void ql_dump_qdev(struct ql_adapter *qdev)
 			DUMP_QDEV_ARRAY(qdev, "%d", msi_x_entry, i, entry);
 		}
 	for (i = 0; i < qdev->intr_count; i++) {
-		DUMP_QDEV_ARRAY(qdev, "%p", intr_context, i, qdev);
+		DUMP_QDEV_ARRAY(qdev, "%pK", intr_context, i, qdev);
 		DUMP_QDEV_ARRAY(qdev, "%d", intr_context, i, intr);
 		DUMP_QDEV_ARRAY(qdev, "%d", intr_context, i, hooked);
 		DUMP_QDEV_ARRAY(qdev, "0x%08x", intr_context, i, intr_en_mask);
@@ -1639,11 +1639,11 @@ void ql_dump_qdev(struct ql_adapter *qdev)
 	DUMP_QDEV_FIELD(qdev, "%d", tx_ring_count);
 	DUMP_QDEV_FIELD(qdev, "%d", rx_ring_count);
 	DUMP_QDEV_FIELD(qdev, "%d", ring_mem_size);
-	DUMP_QDEV_FIELD(qdev, "%p", ring_mem);
+	DUMP_QDEV_FIELD(qdev, "%pK", ring_mem);
 	DUMP_QDEV_FIELD(qdev, "%d", intr_count);
-	DUMP_QDEV_FIELD(qdev, "%p", tx_ring);
+	DUMP_QDEV_FIELD(qdev, "%pK", tx_ring);
 	DUMP_QDEV_FIELD(qdev, "%d", rss_ring_count);
-	DUMP_QDEV_FIELD(qdev, "%p", rx_ring);
+	DUMP_QDEV_FIELD(qdev, "%pK", rx_ring);
 	DUMP_QDEV_FIELD(qdev, "%d", default_rx_queue);
 	DUMP_QDEV_FIELD(qdev, "0x%08x", xg_sem_mask);
 	DUMP_QDEV_FIELD(qdev, "0x%08x", port_link_up);
@@ -1672,21 +1672,21 @@ void ql_dump_tx_ring(struct tx_ring *tx_ring)
 		return;
 	pr_err("===================== Dumping tx_ring %d ===============\n",
 	       tx_ring->wq_id);
-	pr_err("tx_ring->base = %p\n", tx_ring->wq_base);
+	pr_err("tx_ring->base = %pK\n", tx_ring->wq_base);
 	pr_err("tx_ring->base_dma = 0x%llx\n",
 	       (unsigned long long) tx_ring->wq_base_dma);
-	pr_err("tx_ring->cnsmr_idx_sh_reg, addr = 0x%p, value = %d\n",
+	pr_err("tx_ring->cnsmr_idx_sh_reg, addr = 0x%pK, value = %d\n",
 	       tx_ring->cnsmr_idx_sh_reg,
 	       tx_ring->cnsmr_idx_sh_reg
 			? ql_read_sh_reg(tx_ring->cnsmr_idx_sh_reg) : 0);
 	pr_err("tx_ring->size = %d\n", tx_ring->wq_size);
 	pr_err("tx_ring->len = %d\n", tx_ring->wq_len);
-	pr_err("tx_ring->prod_idx_db_reg = %p\n", tx_ring->prod_idx_db_reg);
-	pr_err("tx_ring->valid_db_reg = %p\n", tx_ring->valid_db_reg);
+	pr_err("tx_ring->prod_idx_db_reg = %pK\n", tx_ring->prod_idx_db_reg);
+	pr_err("tx_ring->valid_db_reg = %pK\n", tx_ring->valid_db_reg);
 	pr_err("tx_ring->prod_idx = %d\n", tx_ring->prod_idx);
 	pr_err("tx_ring->cq_id = %d\n", tx_ring->cq_id);
 	pr_err("tx_ring->wq_id = %d\n", tx_ring->wq_id);
-	pr_err("tx_ring->q = %p\n", tx_ring->q);
+	pr_err("tx_ring->q = %pK\n", tx_ring->q);
 	pr_err("tx_ring->tx_count = %d\n", atomic_read(&tx_ring->tx_count));
 }
 
@@ -1758,35 +1758,35 @@ void ql_dump_rx_ring(struct rx_ring *rx_ring)
 	       rx_ring->cq_id, rx_ring->type == DEFAULT_Q ? "DEFAULT" : "",
 	       rx_ring->type == TX_Q ? "OUTBOUND COMPLETIONS" : "",
 	       rx_ring->type == RX_Q ? "INBOUND_COMPLETIONS" : "");
-	pr_err("rx_ring->cqicb = %p\n", &rx_ring->cqicb);
-	pr_err("rx_ring->cq_base = %p\n", rx_ring->cq_base);
+	pr_err("rx_ring->cqicb = %pK\n", &rx_ring->cqicb);
+	pr_err("rx_ring->cq_base = %pK\n", rx_ring->cq_base);
 	pr_err("rx_ring->cq_base_dma = %llx\n",
 	       (unsigned long long) rx_ring->cq_base_dma);
 	pr_err("rx_ring->cq_size = %d\n", rx_ring->cq_size);
 	pr_err("rx_ring->cq_len = %d\n", rx_ring->cq_len);
-	pr_err("rx_ring->prod_idx_sh_reg, addr = 0x%p, value = %d\n",
+	pr_err("rx_ring->prod_idx_sh_reg, addr = 0x%pK, value = %d\n",
 	       rx_ring->prod_idx_sh_reg,
 	       rx_ring->prod_idx_sh_reg
 			? ql_read_sh_reg(rx_ring->prod_idx_sh_reg) : 0);
 	pr_err("rx_ring->prod_idx_sh_reg_dma = %llx\n",
 	       (unsigned long long) rx_ring->prod_idx_sh_reg_dma);
-	pr_err("rx_ring->cnsmr_idx_db_reg = %p\n",
+	pr_err("rx_ring->cnsmr_idx_db_reg = %pK\n",
 	       rx_ring->cnsmr_idx_db_reg);
 	pr_err("rx_ring->cnsmr_idx = %d\n", rx_ring->cnsmr_idx);
-	pr_err("rx_ring->curr_entry = %p\n", rx_ring->curr_entry);
-	pr_err("rx_ring->valid_db_reg = %p\n", rx_ring->valid_db_reg);
+	pr_err("rx_ring->curr_entry = %pK\n", rx_ring->curr_entry);
+	pr_err("rx_ring->valid_db_reg = %pK\n", rx_ring->valid_db_reg);
 
-	pr_err("rx_ring->lbq_base = %p\n", rx_ring->lbq_base);
+	pr_err("rx_ring->lbq_base = %pK\n", rx_ring->lbq_base);
 	pr_err("rx_ring->lbq_base_dma = %llx\n",
 	       (unsigned long long) rx_ring->lbq_base_dma);
-	pr_err("rx_ring->lbq_base_indirect = %p\n",
+	pr_err("rx_ring->lbq_base_indirect = %pK\n",
 	       rx_ring->lbq_base_indirect);
 	pr_err("rx_ring->lbq_base_indirect_dma = %llx\n",
 	       (unsigned long long) rx_ring->lbq_base_indirect_dma);
-	pr_err("rx_ring->lbq = %p\n", rx_ring->lbq);
+	pr_err("rx_ring->lbq = %pK\n", rx_ring->lbq);
 	pr_err("rx_ring->lbq_len = %d\n", rx_ring->lbq_len);
 	pr_err("rx_ring->lbq_size = %d\n", rx_ring->lbq_size);
-	pr_err("rx_ring->lbq_prod_idx_db_reg = %p\n",
+	pr_err("rx_ring->lbq_prod_idx_db_reg = %pK\n",
 	       rx_ring->lbq_prod_idx_db_reg);
 	pr_err("rx_ring->lbq_prod_idx = %d\n", rx_ring->lbq_prod_idx);
 	pr_err("rx_ring->lbq_curr_idx = %d\n", rx_ring->lbq_curr_idx);
@@ -1794,17 +1794,17 @@ void ql_dump_rx_ring(struct rx_ring *rx_ring)
 	pr_err("rx_ring->lbq_free_cnt = %d\n", rx_ring->lbq_free_cnt);
 	pr_err("rx_ring->lbq_buf_size = %d\n", rx_ring->lbq_buf_size);
 
-	pr_err("rx_ring->sbq_base = %p\n", rx_ring->sbq_base);
+	pr_err("rx_ring->sbq_base = %pK\n", rx_ring->sbq_base);
 	pr_err("rx_ring->sbq_base_dma = %llx\n",
 	       (unsigned long long) rx_ring->sbq_base_dma);
-	pr_err("rx_ring->sbq_base_indirect = %p\n",
+	pr_err("rx_ring->sbq_base_indirect = %pK\n",
 	       rx_ring->sbq_base_indirect);
 	pr_err("rx_ring->sbq_base_indirect_dma = %llx\n",
 	       (unsigned long long) rx_ring->sbq_base_indirect_dma);
-	pr_err("rx_ring->sbq = %p\n", rx_ring->sbq);
+	pr_err("rx_ring->sbq = %pK\n", rx_ring->sbq);
 	pr_err("rx_ring->sbq_len = %d\n", rx_ring->sbq_len);
 	pr_err("rx_ring->sbq_size = %d\n", rx_ring->sbq_size);
-	pr_err("rx_ring->sbq_prod_idx_db_reg addr = %p\n",
+	pr_err("rx_ring->sbq_prod_idx_db_reg addr = %pK\n",
 	       rx_ring->sbq_prod_idx_db_reg);
 	pr_err("rx_ring->sbq_prod_idx = %d\n", rx_ring->sbq_prod_idx);
 	pr_err("rx_ring->sbq_curr_idx = %d\n", rx_ring->sbq_curr_idx);
@@ -1814,7 +1814,7 @@ void ql_dump_rx_ring(struct rx_ring *rx_ring)
 	pr_err("rx_ring->cq_id = %d\n", rx_ring->cq_id);
 	pr_err("rx_ring->irq = %d\n", rx_ring->irq);
 	pr_err("rx_ring->cpu = %d\n", rx_ring->cpu);
-	pr_err("rx_ring->qdev = %p\n", rx_ring->qdev);
+	pr_err("rx_ring->qdev = %pK\n", rx_ring->qdev);
 }
 
 void ql_dump_hw_cb(struct ql_adapter *qdev, int size, u32 bit, u16 q_id)

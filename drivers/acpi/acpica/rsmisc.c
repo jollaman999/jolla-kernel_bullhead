@@ -92,7 +92,7 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 		/* Each internal resource struct is expected to be 32-bit aligned */
 
 		ACPI_WARNING((AE_INFO,
-			      "Misaligned resource pointer (get): %p Type 0x%2.2X Length %u",
+			      "Misaligned resource pointer (get): %pK Type 0x%2.2X Length %u",
 			      resource, resource->type, resource->length));
 	}
 

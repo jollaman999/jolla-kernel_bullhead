@@ -911,7 +911,7 @@ found:
 		smmu->page_count * SMMU_PAGE_SIZE - 1;
 	domain->geometry.force_aperture = true;
 
-	dev_dbg(smmu->dev, "smmu_as@%p\n", as);
+	dev_dbg(smmu->dev, "smmu_as@%pK\n", as);
 
 	return 0;
 }
@@ -944,7 +944,7 @@ static void smmu_iommu_domain_destroy(struct iommu_domain *domain)
 	spin_unlock_irqrestore(&as->lock, flags);
 
 	domain->priv = NULL;
-	dev_dbg(smmu->dev, "smmu_as@%p\n", as);
+	dev_dbg(smmu->dev, "smmu_as@%pK\n", as);
 }
 
 static struct iommu_ops smmu_iommu_ops = {

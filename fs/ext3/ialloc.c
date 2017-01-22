@@ -625,7 +625,7 @@ bad_orphan:
 	printk(KERN_NOTICE "ext3_test_bit(bit=%d, block=%llu) = %d\n",
 	       bit, (unsigned long long)bitmap_bh->b_blocknr,
 	       ext3_test_bit(bit, bitmap_bh->b_data));
-	printk(KERN_NOTICE "inode=%p\n", inode);
+	printk(KERN_NOTICE "inode=%pK\n", inode);
 	if (inode) {
 		printk(KERN_NOTICE "is_bad_inode(inode)=%d\n",
 		       is_bad_inode(inode));

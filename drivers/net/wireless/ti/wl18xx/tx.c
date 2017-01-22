@@ -127,7 +127,7 @@ static void wl18xx_tx_complete_packet(struct wl1271 *wl, u8 tx_stat_byte)
 		skb_pull(skb, WL1271_EXTRA_SPACE_TKIP);
 	}
 
-	wl1271_debug(DEBUG_TX, "tx status id %u skb 0x%p success %d",
+	wl1271_debug(DEBUG_TX, "tx status id %u skb 0x%pK success %d",
 		     id, skb, tx_success);
 
 	/* return the packet to the stack */

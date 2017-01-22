@@ -1295,7 +1295,7 @@ static int ocfs2_delete_entry_dx(handle_t *handle, struct inode *dir,
 	index /= sizeof(*dx_entry);
 
 	if (index >= le16_to_cpu(entry_list->de_num_used)) {
-		mlog(ML_ERROR, "Dir %llu: Bad dx_entry ptr idx %d, (%p, %p)\n",
+		mlog(ML_ERROR, "Dir %llu: Bad dx_entry ptr idx %d, (%pK, %pK)\n",
 		     (unsigned long long)OCFS2_I(dir)->ip_blkno, index,
 		     entry_list, dx_entry);
 		return -EIO;

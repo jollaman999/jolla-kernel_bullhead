@@ -2379,7 +2379,7 @@ static int qla4_8xxx_collect_md_data(struct scsi_qla_host *ha)
 	data_collected += ha->fw_dump_tmplt_size;
 
 	num_entry_hdr = tmplt_hdr->num_of_entries;
-	ql4_printk(KERN_INFO, ha, "[%s]: starting data ptr: %p\n",
+	ql4_printk(KERN_INFO, ha, "[%s]: starting data ptr: %pK\n",
 		   __func__, data_ptr);
 	ql4_printk(KERN_INFO, ha,
 		   "[%s]: no of entry headers in Template: 0x%x\n",

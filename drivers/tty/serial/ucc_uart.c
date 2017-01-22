@@ -218,7 +218,7 @@ static inline dma_addr_t cpu2qe_addr(void *addr, struct uart_qe_port *qe_port)
 		return qe_port->bd_dma_addr + (addr - qe_port->bd_virt);
 
 	/* something nasty happened */
-	printk(KERN_ERR "%s: addr=%p\n", __func__, addr);
+	printk(KERN_ERR "%s: addr=%pK\n", __func__, addr);
 	BUG();
 	return 0;
 }

@@ -246,7 +246,7 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm)
 
 	/* Backward compatibility with core_uses_pid:
 	 *
-	 * If core_pattern does not include a %p (as is the default)
+	 * If core_pattern does not include a %pK (as is the default)
 	 * and core_uses_pid is set, then .%pid will be appended to
 	 * the filename. Do not do this for piped commands. */
 	if (!ispipe && !pid_in_pattern && core_uses_pid) {

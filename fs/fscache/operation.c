@@ -169,7 +169,7 @@ static void fscache_report_unexpected_submission(struct fscache_object *object,
 		n = 0;
 		list_for_each_entry(p, &object->pending_ops, pend_link) {
 			ASSERTCMP(p->object, ==, object);
-			kdebug("%p %p", op->processor, op->release);
+			kdebug("%pK %pK", op->processor, op->release);
 			n++;
 		}
 

@@ -114,7 +114,7 @@ static int dwc2_driver_probe(struct platform_device *dev)
 	if (IS_ERR(hsotg->regs))
 		return PTR_ERR(hsotg->regs);
 
-	dev_dbg(&dev->dev, "mapped PA %08lx to VA %p\n",
+	dev_dbg(&dev->dev, "mapped PA %08lx to VA %pK\n",
 		(unsigned long)res->start, hsotg->regs);
 
 	retval = dwc2_hcd_init(hsotg, irq, &params);

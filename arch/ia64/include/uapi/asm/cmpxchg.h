@@ -133,7 +133,7 @@ do {									\
 		void *ip;						\
 		extern int printk(const char *fmt, ...);		\
 		ip = (void *) ia64_getreg(_IA64_REG_IP);		\
-		printk("CMPXCHG_BUGCHECK: stuck at %p on word %p\n", ip, (v));\
+		printk("CMPXCHG_BUGCHECK: stuck at %pK on word %pK\n", ip, (v));\
 		break;							\
 	}								\
 } while (0)

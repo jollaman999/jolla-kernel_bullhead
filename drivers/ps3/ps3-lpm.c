@@ -1014,7 +1014,7 @@ int ps3_lpm_copy_tb_to_user(unsigned long offset, void __user *buf,
 		result = copy_to_user(buf, lpm_priv->tb_cache, tmp);
 
 		if (result) {
-			dev_dbg(sbd_core(), "%s:%u: 0x%llx bytes at 0x%p\n",
+			dev_dbg(sbd_core(), "%s:%u: 0x%llx bytes at 0x%pK\n",
 				__func__, __LINE__, tmp, buf);
 			dev_err(sbd_core(), "%s:%u: copy_to_user failed: %d\n",
 				__func__, __LINE__, result);

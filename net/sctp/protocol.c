@@ -609,8 +609,8 @@ static void sctp_addr_wq_timeout_handler(unsigned long arg)
 	spin_lock_bh(&net->sctp.addr_wq_lock);
 
 	list_for_each_entry_safe(addrw, temp, &net->sctp.addr_waitq, list) {
-		SCTP_DEBUG_PRINTK_IPADDR("sctp_addrwq_timo_handler: the first ent in wq %p is ",
-		    " for cmd %d at entry %p\n", &net->sctp.addr_waitq, &addrw->a, addrw->state,
+		SCTP_DEBUG_PRINTK_IPADDR("sctp_addrwq_timo_handler: the first ent in wq %pK is ",
+		    " for cmd %d at entry %pK\n", &net->sctp.addr_waitq, &addrw->a, addrw->state,
 		    addrw);
 
 #if IS_ENABLED(CONFIG_IPV6)
@@ -713,7 +713,7 @@ void sctp_addr_wq_mgmt(struct net *net, struct sctp_sockaddr_entry *addr, int cm
 	if (addrw) {
 		if (addrw->state != cmd) {
 			SCTP_DEBUG_PRINTK_IPADDR("sctp_addr_wq_mgmt offsets existing entry for %d ",
-			    " in wq %p\n", addrw->state, &addrw->a,
+			    " in wq %pK\n", addrw->state, &addrw->a,
 			    &net->sctp.addr_waitq);
 			list_del(&addrw->list);
 			kfree(addrw);
@@ -731,7 +731,7 @@ void sctp_addr_wq_mgmt(struct net *net, struct sctp_sockaddr_entry *addr, int cm
 	addrw->state = cmd;
 	list_add_tail(&addrw->list, &net->sctp.addr_waitq);
 	SCTP_DEBUG_PRINTK_IPADDR("sctp_addr_wq_mgmt add new entry for cmd:%d ",
-	    " in wq %p\n", addrw->state, &addrw->a, &net->sctp.addr_waitq);
+	    " in wq %pK\n", addrw->state, &addrw->a, &net->sctp.addr_waitq);
 
 	if (!timer_pending(&net->sctp.addr_wq_timer)) {
 		timeo_val = jiffies;
@@ -957,7 +957,7 @@ static inline int sctp_v4_xmit(struct sk_buff *skb,
 {
 	struct inet_sock *inet = inet_sk(skb->sk);
 
-	SCTP_DEBUG_PRINTK("%s: skb:%p, len:%d, src:%pI4, dst:%pI4\n",
+	SCTP_DEBUG_PRINTK("%s: skb:%pK, len:%d, src:%pI4, dst:%pI4\n",
 			  __func__, skb, skb->len,
 			  &transport->fl.u.ip4.saddr,
 			  &transport->fl.u.ip4.daddr);

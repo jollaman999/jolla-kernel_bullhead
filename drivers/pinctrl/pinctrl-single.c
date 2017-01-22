@@ -1456,7 +1456,7 @@ static int pcs_probe(struct platform_device *pdev)
 	if (ret < 0)
 		goto free;
 
-	dev_info(pcs->dev, "%i pins at pa %p size %u\n",
+	dev_info(pcs->dev, "%i pins at pa %pK size %u\n",
 		 pcs->desc.npins, pcs->base, pcs->size);
 
 	return 0;

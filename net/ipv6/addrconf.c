@@ -342,7 +342,7 @@ void in6_dev_finish_destroy(struct inet6_dev *idev)
 #endif
 	dev_put(dev);
 	if (!idev->dead) {
-		pr_warn("Freeing alive inet6 device %p\n", idev);
+		pr_warn("Freeing alive inet6 device %pK\n", idev);
 		return;
 	}
 	snmp6_free_dev(idev);
@@ -787,10 +787,10 @@ void inet6_ifa_finish_destroy(struct inet6_ifaddr *ifp)
 	in6_dev_put(ifp->idev);
 
 	if (del_timer(&ifp->timer))
-		pr_notice("Timer is still running, when freeing ifa=%p\n", ifp);
+		pr_notice("Timer is still running, when freeing ifa=%pK\n", ifp);
 
 	if (ifp->state != INET6_IFADDR_STATE_DEAD) {
-		pr_warn("Freeing alive inet6 address %p\n", ifp);
+		pr_warn("Freeing alive inet6 address %pK\n", ifp);
 		return;
 	}
 	ip6_rt_put(ifp->rt);

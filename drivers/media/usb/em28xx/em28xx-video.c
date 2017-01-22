@@ -146,7 +146,7 @@ static struct em28xx_fmt format[] = {
 static inline void finish_buffer(struct em28xx *dev,
 				 struct em28xx_buffer *buf)
 {
-	em28xx_isocdbg("[%p/%d] wakeup\n", buf, buf->top_field);
+	em28xx_isocdbg("[%pK/%d] wakeup\n", buf, buf->top_field);
 
 	buf->vb.v4l2_buf.sequence = dev->field_count++;
 	buf->vb.v4l2_buf.field = V4L2_FIELD_INTERLACED;

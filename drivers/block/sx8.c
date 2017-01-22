@@ -764,7 +764,7 @@ static inline void carm_push_q (struct carm_host *host, struct request_queue *q)
 	unsigned int idx = host->wait_q_prod % CARM_MAX_WAIT_Q;
 
 	blk_stop_queue(q);
-	VPRINTK("STOPPED QUEUE %p\n", q);
+	VPRINTK("STOPPED QUEUE %pK\n", q);
 
 	host->wait_q[idx] = q;
 	host->wait_q_prod++;
@@ -789,7 +789,7 @@ static inline void carm_round_robin(struct carm_host *host)
 	struct request_queue *q = carm_pop_q(host);
 	if (q) {
 		blk_start_queue(q);
-		VPRINTK("STARTED QUEUE %p\n", q);
+		VPRINTK("STARTED QUEUE %pK\n", q);
 	}
 }
 

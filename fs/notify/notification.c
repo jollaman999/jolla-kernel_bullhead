@@ -87,7 +87,7 @@ void fsnotify_put_event(struct fsnotify_event *event)
 		return;
 
 	if (atomic_dec_and_test(&event->refcnt)) {
-		pr_debug("%s: event=%p\n", __func__, event);
+		pr_debug("%s: event=%pK\n", __func__, event);
 
 		if (event->data_type == FSNOTIFY_EVENT_PATH)
 			path_put(&event->path);
@@ -146,7 +146,7 @@ struct fsnotify_event *fsnotify_add_notify_event(struct fsnotify_group *group, s
 	struct fsnotify_event_holder *holder = NULL;
 	struct list_head *list = &group->notification_list;
 
-	pr_debug("%s: group=%p event=%p priv=%p\n", __func__, group, event, priv);
+	pr_debug("%s: group=%pK event=%pK priv=%pK\n", __func__, group, event, priv);
 
 	/*
 	 * There is one fsnotify_event_holder embedded inside each fsnotify_event.
@@ -241,7 +241,7 @@ struct fsnotify_event *fsnotify_remove_notify_event(struct fsnotify_group *group
 
 	BUG_ON(!mutex_is_locked(&group->notification_mutex));
 
-	pr_debug("%s: group=%p\n", __func__, group);
+	pr_debug("%s: group=%pK\n", __func__, group);
 
 	holder = list_first_entry(&group->notification_list, struct fsnotify_event_holder, event_list);
 
@@ -328,7 +328,7 @@ int fsnotify_replace_event(struct fsnotify_event_holder *old_holder,
 		SPINLOCK_NEW,
 	};
 
-	pr_debug("%s: old_event=%p new_event=%p\n", __func__, old_event, new_event);
+	pr_debug("%s: old_event=%pK new_event=%pK\n", __func__, old_event, new_event);
 
 	/*
 	 * if the new_event's embedded holder is in use someone
@@ -363,7 +363,7 @@ struct fsnotify_event *fsnotify_clone_event(struct fsnotify_event *old_event)
 	if (!event)
 		return NULL;
 
-	pr_debug("%s: old_event=%p new_event=%p\n", __func__, old_event, event);
+	pr_debug("%s: old_event=%pK new_event=%pK\n", __func__, old_event, event);
 
 	memcpy(event, old_event, sizeof(*event));
 	initialize_event(event);
@@ -404,7 +404,7 @@ struct fsnotify_event *fsnotify_create_event(struct inode *to_tell, __u32 mask, 
 	if (!event)
 		return NULL;
 
-	pr_debug("%s: event=%p to_tell=%p mask=%x data=%p data_type=%d\n",
+	pr_debug("%s: event=%pK to_tell=%pK mask=%x data=%pK data_type=%d\n",
 		 __func__, event, to_tell, mask, data, data_type);
 
 	initialize_event(event);

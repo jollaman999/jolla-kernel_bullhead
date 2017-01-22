@@ -79,7 +79,7 @@ acpi_ds_load2_begin_op(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_TRACE(ds_load2_begin_op);
 
 	op = walk_state->op;
-	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Op=%p State=%p\n", op,
+	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Op=%pK State=%pK\n", op,
 			  walk_state));
 
 	if (op) {
@@ -131,7 +131,7 @@ acpi_ds_load2_begin_op(struct acpi_walk_state *walk_state,
 	object_type = walk_state->op_info->object_type;
 
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "State=%p Op=%p Type=%X\n", walk_state, op,
+			  "State=%pK Op=%pK Type=%X\n", walk_state, op,
 			  object_type));
 
 	switch (walk_state->opcode) {
@@ -320,7 +320,7 @@ acpi_ds_load2_begin_op(struct acpi_walk_state *walk_state,
 
 		if (ACPI_SUCCESS(status) && (flags & ACPI_NS_TEMPORARY)) {
 			ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-					  "***New Node [%4.4s] %p is temporary\n",
+					  "***New Node [%4.4s] %pK is temporary\n",
 					  acpi_ut_get_node_name(node), node));
 		}
 		break;
@@ -385,7 +385,7 @@ acpi_status acpi_ds_load2_end_op(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE(ds_load2_end_op);
 
 	op = walk_state->op;
-	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Opcode [%s] Op %p State %p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Opcode [%s] Op %pK State %pK\n",
 			  walk_state->op_info->name, op, walk_state));
 
 	/* Check if opcode had an associated namespace object */
@@ -396,7 +396,7 @@ acpi_status acpi_ds_load2_end_op(struct acpi_walk_state *walk_state)
 
 	if (op->common.aml_opcode == AML_SCOPE_OP) {
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-				  "Ending scope Op=%p State=%p\n", op,
+				  "Ending scope Op=%pK State=%pK\n", op,
 				  walk_state));
 	}
 
@@ -420,7 +420,7 @@ acpi_status acpi_ds_load2_end_op(struct acpi_walk_state *walk_state)
 	if (acpi_ns_opens_scope(object_type) &&
 	    (op->common.aml_opcode != AML_INT_METHODCALL_OP)) {
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-				  "(%s) Popping scope for Op %p\n",
+				  "(%s) Popping scope for Op %pK\n",
 				  acpi_ut_get_type_name(object_type), op));
 
 		status = acpi_ds_scope_stack_pop(walk_state);
@@ -458,7 +458,7 @@ acpi_status acpi_ds_load2_end_op(struct acpi_walk_state *walk_state)
 	 */
 
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "Create-Load [%s] State=%p Op=%p NamedObj=%p\n",
+			  "Create-Load [%s] State=%pK Op=%pK NamedObj=%pK\n",
 			  acpi_ps_get_opcode_name(op->common.aml_opcode),
 			  walk_state, op, node));
 
@@ -642,7 +642,7 @@ acpi_status acpi_ds_load2_end_op(struct acpi_walk_state *walk_state)
 			 * arguments.)
 			 */
 			ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-					  "LOADING-Method: State=%p Op=%p NamedObj=%p\n",
+					  "LOADING-Method: State=%pK Op=%pK NamedObj=%pK\n",
 					  walk_state, op, op->named.node));
 
 			if (!acpi_ns_get_attached_object(op->named.node)) {
@@ -687,7 +687,7 @@ acpi_status acpi_ds_load2_end_op(struct acpi_walk_state *walk_state)
 	case AML_CLASS_METHOD_CALL:
 
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-				  "RESOLVING-MethodCall: State=%p Op=%p NamedObj=%p\n",
+				  "RESOLVING-MethodCall: State=%pK Op=%pK NamedObj=%pK\n",
 				  walk_state, op, node));
 
 		/*

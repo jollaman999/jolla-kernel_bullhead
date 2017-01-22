@@ -244,7 +244,7 @@ int v9fs_dir_release(struct inode *inode, struct file *filp)
 	struct p9_fid *fid;
 
 	fid = filp->private_data;
-	p9_debug(P9_DEBUG_VFS, "inode: %p filp: %p fid: %d\n",
+	p9_debug(P9_DEBUG_VFS, "inode: %pK filp: %pK fid: %d\n",
 		 inode, filp, fid ? fid->fid : -1);
 	if (fid)
 		p9_client_clunk(fid);

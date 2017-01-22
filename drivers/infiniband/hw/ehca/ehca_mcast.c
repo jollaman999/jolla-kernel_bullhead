@@ -87,7 +87,7 @@ int ehca_attach_mcast(struct ib_qp *ibqp, union ib_gid *gid, u16 lid)
 				   lid, subnet_prefix, interface_id);
 	if (h_ret != H_SUCCESS)
 		ehca_err(ibqp->device,
-			 "ehca_qp=%p qp_num=%x hipz_h_attach_mcqp() failed "
+			 "ehca_qp=%pK qp_num=%x hipz_h_attach_mcqp() failed "
 			 "h_ret=%lli", my_qp, ibqp->qp_num, h_ret);
 
 	return ehca2ib_return_code(h_ret);
@@ -124,7 +124,7 @@ int ehca_detach_mcast(struct ib_qp *ibqp, union ib_gid *gid, u16 lid)
 				   lid, subnet_prefix, interface_id);
 	if (h_ret != H_SUCCESS)
 		ehca_err(ibqp->device,
-			 "ehca_qp=%p qp_num=%x hipz_h_detach_mcqp() failed "
+			 "ehca_qp=%pK qp_num=%x hipz_h_detach_mcqp() failed "
 			 "h_ret=%lli", my_qp, ibqp->qp_num, h_ret);
 
 	return ehca2ib_return_code(h_ret);

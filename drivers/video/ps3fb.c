@@ -1104,7 +1104,7 @@ static int ps3fb_probe(struct ps3_system_bus_device *dev)
 		goto err_free_irq;
 	}
 
-	dev_dbg(&dev->core, "video:%p ioif:%lx lpar:%llx size:%lx\n",
+	dev_dbg(&dev->core, "video:%pK ioif:%lx lpar:%llx size:%lx\n",
 		ps3fb_videomemory.address, GPU_IOIF, xdr_lpar,
 		ps3fb_videomemory.size);
 

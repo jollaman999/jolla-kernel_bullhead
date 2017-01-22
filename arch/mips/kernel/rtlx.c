@@ -116,7 +116,7 @@ static void __used dump_rtlx(void)
 static int rtlx_init(struct rtlx_info *rtlxi)
 {
 	if (rtlxi->id != RTLX_ID) {
-		printk(KERN_ERR "no valid RTLX id at 0x%p 0x%lx\n",
+		printk(KERN_ERR "no valid RTLX id at 0x%pK 0x%lx\n",
 			rtlxi, rtlxi->id);
 		return -ENOEXEC;
 	}

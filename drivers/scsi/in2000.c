@@ -714,7 +714,7 @@ static void transfer_pio(uchar * buf, int cnt, int data_in_dir, struct IN2000_ho
 {
 	uchar asr;
 
-	DB(DB_TRANSFER, printk("(%p,%d,%s)", buf, cnt, data_in_dir ? "in" : "out"))
+	DB(DB_TRANSFER, printk("(%pK,%d,%s)", buf, cnt, data_in_dir ? "in" : "out"))
 
 	    write_3393(hostdata, WD_CONTROL, CTRL_IDI | CTRL_EDI | CTRL_POLLED);
 	write_3393_count(hostdata, cnt);
@@ -1045,7 +1045,7 @@ static irqreturn_t in2000_intr(int irqnum, void *dev_id)
 		cmd->SCp.this_residual = read_3393_count(hostdata);
 		cmd->SCp.ptr += (length - cmd->SCp.this_residual);
 
-		DB(DB_TRANSFER, printk("(%p,%d)", cmd->SCp.ptr, cmd->SCp.this_residual))
+		DB(DB_TRANSFER, printk("(%pK,%d)", cmd->SCp.ptr, cmd->SCp.this_residual))
 
 	}
 
@@ -1055,7 +1055,7 @@ static irqreturn_t in2000_intr(int irqnum, void *dev_id)
 		cmd->SCp.this_residual = read_3393_count(hostdata);
 		cmd->SCp.ptr += (length - cmd->SCp.this_residual);
 
-		DB(DB_TRANSFER, printk("(%p,%d)", cmd->SCp.ptr, cmd->SCp.this_residual))
+		DB(DB_TRANSFER, printk("(%pK,%d)", cmd->SCp.ptr, cmd->SCp.this_residual))
 
 	}
 

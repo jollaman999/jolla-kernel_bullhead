@@ -634,7 +634,7 @@ sbc_execute_unmap(struct se_cmd *cmd,
 	/* First UNMAP block descriptor starts at 8 byte offset */
 	ptr = &buf[8];
 	pr_debug("UNMAP: Sub: %s Using dl: %u bd_dl: %u size: %u"
-		" ptr: %p\n", dev->transport->name, dl, bd_dl, size, ptr);
+		" ptr: %pK\n", dev->transport->name, dl, bd_dl, size, ptr);
 
 	while (size >= 16) {
 		lba = get_unaligned_be64(&ptr[0]);

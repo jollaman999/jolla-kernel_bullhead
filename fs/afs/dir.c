@@ -239,7 +239,7 @@ static int afs_dir_iterate_block(unsigned *fpos,
 	size_t nlen;
 	int tmp, ret;
 
-	_enter("%u,%x,%p,,",*fpos,blkoff,block);
+	_enter("%u,%x,%pK,,",*fpos,blkoff,block);
 
 	curr = (*fpos - blkoff) / sizeof(union afs_dirent);
 
@@ -449,7 +449,7 @@ static int afs_do_lookup(struct inode *dir, struct dentry *dentry,
 	unsigned fpos;
 	int ret;
 
-	_enter("{%lu},%p{%s},", dir->i_ino, dentry, dentry->d_name.name);
+	_enter("{%lu},%pK{%s},", dir->i_ino, dentry, dentry->d_name.name);
 
 	as = dir->i_sb->s_fs_info;
 
@@ -490,7 +490,7 @@ static struct inode *afs_try_auto_mntpt(
 	struct afs_vnode *vnode = AFS_FS_I(dir);
 	struct inode *inode;
 
-	_enter("%d, %p{%s}, {%x:%u}, %p",
+	_enter("%d, %pK{%s}, {%x:%u}, %pK",
 	       ret, dentry, devname, vnode->fid.vid, vnode->fid.vnode, key);
 
 	if (ret != -ENOENT ||
@@ -504,7 +504,7 @@ static struct inode *afs_try_auto_mntpt(
 	}
 
 	*fid = AFS_FS_I(inode)->fid;
-	_leave("= %p", inode);
+	_leave("= %pK", inode);
 	return inode;
 
 out:
@@ -526,7 +526,7 @@ static struct dentry *afs_lookup(struct inode *dir, struct dentry *dentry,
 
 	vnode = AFS_FS_I(dir);
 
-	_enter("{%x:%u},%p{%s},",
+	_enter("{%x:%u},%pK{%s},",
 	       vnode->fid.vid, vnode->fid.vnode, dentry, dentry->d_name.name);
 
 	ASSERTCMP(dentry->d_inode, ==, NULL);

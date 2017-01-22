@@ -629,7 +629,7 @@ static void leaf_define_dest_src_infos(int shift_mode, struct tree_balance *tb,
 			       "shift type is unknown (%d)", shift_mode);
 	}
 	RFALSE(!src_bi->bi_bh || !dest_bi->bi_bh,
-	       "vs-10260: mode==%d, source (%p) or dest (%p) buffer is initialized incorrectly",
+	       "vs-10260: mode==%d, source (%pK) or dest (%pK) buffer is initialized incorrectly",
 	       shift_mode, src_bi->bi_bh, dest_bi->bi_bh);
 }
 

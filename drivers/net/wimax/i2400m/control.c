@@ -185,14 +185,14 @@ const struct i2400m_tlv_hdr *i2400m_tlv_buffer_walk(
 	offset = (void *) tlv_pos - (void *) tlv_buf;
 	avail_size = buf_size - offset;
 	if (avail_size < sizeof(*tlv_pos)) {
-		dev_err(dev, "HW BUG? tlv_buf %p [%zu bytes], tlv @%zu: "
+		dev_err(dev, "HW BUG? tlv_buf %pK [%zu bytes], tlv @%zu: "
 			"short header\n", tlv_buf, buf_size, offset);
 		goto error_short_header;
 	}
 	type = le16_to_cpu(tlv_pos->type);
 	length = le16_to_cpu(tlv_pos->length);
 	if (avail_size < sizeof(*tlv_pos) + length) {
-		dev_err(dev, "HW BUG? tlv_buf %p [%zu bytes], "
+		dev_err(dev, "HW BUG? tlv_buf %pK [%zu bytes], "
 			"tlv type 0x%04x @%zu: "
 			"short data (%zu bytes vs %zu needed)\n",
 			tlv_buf, buf_size, type, offset, avail_size,
@@ -315,7 +315,7 @@ void i2400m_report_tlv_system_state(struct i2400m *i2400m,
 	struct wimax_dev *wimax_dev = &i2400m->wimax_dev;
 	enum i2400m_system_state i2400m_state = le32_to_cpu(ss->state);
 
-	d_fnstart(3, dev, "(i2400m %p ss %p [%u])\n", i2400m, ss, i2400m_state);
+	d_fnstart(3, dev, "(i2400m %pK ss %pK [%u])\n", i2400m, ss, i2400m_state);
 
 	if (i2400m->state != i2400m_state) {
 		i2400m->state = i2400m_state;
@@ -364,7 +364,7 @@ void i2400m_report_tlv_system_state(struct i2400m *i2400m,
 		i2400m_reset(i2400m, I2400M_RT_WARM);
 		break;
 	}
-	d_fnend(3, dev, "(i2400m %p ss %p [%u]) = void\n",
+	d_fnend(3, dev, "(i2400m %pK ss %pK [%u]) = void\n",
 		i2400m, ss, i2400m_state);
 }
 
@@ -392,7 +392,7 @@ void i2400m_report_tlv_media_status(struct i2400m *i2400m,
 	struct net_device *net_dev = wimax_dev->net_dev;
 	enum i2400m_media_status status = le32_to_cpu(ms->media_status);
 
-	d_fnstart(3, dev, "(i2400m %p ms %p [%u])\n", i2400m, ms, status);
+	d_fnstart(3, dev, "(i2400m %pK ms %pK [%u])\n", i2400m, ms, status);
 
 	switch (status) {
 	case I2400M_MEDIA_STATUS_LINK_UP:
@@ -413,7 +413,7 @@ void i2400m_report_tlv_media_status(struct i2400m *i2400m,
 		dev_err(dev, "HW BUG? unknown media status %u\n",
 			status);
 	}
-	d_fnend(3, dev, "(i2400m %p ms %p [%u]) = void\n",
+	d_fnend(3, dev, "(i2400m %pK ms %pK [%u]) = void\n",
 		i2400m, ms, status);
 }
 
@@ -485,14 +485,14 @@ void i2400m_report_state_hook(struct i2400m *i2400m,
 	const struct i2400m_tlv_hdr *tlv;
 	size_t tlv_size = le16_to_cpu(l3l4_hdr->length);
 
-	d_fnstart(4, dev, "(i2400m %p, l3l4_hdr %p, size %zu, %s)\n",
+	d_fnstart(4, dev, "(i2400m %pK, l3l4_hdr %pK, size %zu, %s)\n",
 		  i2400m, l3l4_hdr, size, tag);
 	tlv = NULL;
 
 	while ((tlv = i2400m_tlv_buffer_walk(i2400m, &l3l4_hdr->pl,
 					     tlv_size, tlv)))
 		i2400m_report_state_parse_tlv(i2400m, tlv, tag);
-	d_fnend(4, dev, "(i2400m %p, l3l4_hdr %p, size %zu, %s) = void\n",
+	d_fnend(4, dev, "(i2400m %pK, l3l4_hdr %pK, size %zu, %s) = void\n",
 		i2400m, l3l4_hdr, size, tag);
 }
 
@@ -516,7 +516,7 @@ void i2400m_report_hook(struct i2400m *i2400m,
 	struct device *dev = i2400m_dev(i2400m);
 	unsigned msg_type;
 
-	d_fnstart(3, dev, "(i2400m %p l3l4_hdr %p size %zu)\n",
+	d_fnstart(3, dev, "(i2400m %pK l3l4_hdr %pK size %zu)\n",
 		  i2400m, l3l4_hdr, size);
 	/* Chew on the message, we might need some information from
 	 * here */
@@ -542,7 +542,7 @@ void i2400m_report_hook(struct i2400m *i2400m,
 		}
 		break;
 	}
-	d_fnend(3, dev, "(i2400m %p l3l4_hdr %p size %zu) = void\n",
+	d_fnend(3, dev, "(i2400m %pK l3l4_hdr %pK size %zu) = void\n",
 		i2400m, l3l4_hdr, size);
 }
 
@@ -602,7 +602,7 @@ int i2400m_msg_size_check(struct i2400m *i2400m,
 	int result;
 	struct device *dev = i2400m_dev(i2400m);
 	size_t expected_size;
-	d_fnstart(4, dev, "(i2400m %p l3l4_hdr %p msg_size %zu)\n",
+	d_fnstart(4, dev, "(i2400m %pK l3l4_hdr %pK msg_size %zu)\n",
 		  i2400m, l3l4_hdr, msg_size);
 	if (msg_size < sizeof(*l3l4_hdr)) {
 		dev_err(dev, "bad size for message header "
@@ -621,7 +621,7 @@ int i2400m_msg_size_check(struct i2400m *i2400m,
 		result = 0;
 error_hdr_size:
 	d_fnend(4, dev,
-		"(i2400m %p l3l4_hdr %p msg_size %zu) = %d\n",
+		"(i2400m %pK l3l4_hdr %pK msg_size %zu) = %d\n",
 		i2400m, l3l4_hdr, msg_size, result);
 	return result;
 }
@@ -717,7 +717,7 @@ struct sk_buff *i2400m_msg_to_dev(struct i2400m *i2400m,
 	unsigned msg_type;
 	unsigned long flags;
 
-	d_fnstart(3, dev, "(i2400m %p buf %p len %zu)\n",
+	d_fnstart(3, dev, "(i2400m %pK buf %pK len %zu)\n",
 		  i2400m, buf, buf_len);
 
 	rmb();		/* Make sure we see what i2400m_dev_reset_handle() */
@@ -812,7 +812,7 @@ struct sk_buff *i2400m_msg_to_dev(struct i2400m *i2400m,
 	}
 	i2400m_msg_ack_hook(i2400m, ack_l3l4_hdr, ack_len);
 	mutex_unlock(&i2400m->msg_mutex);
-	d_fnend(3, dev, "(i2400m %p buf %p len %zu) = %p\n",
+	d_fnend(3, dev, "(i2400m %pK buf %pK len %zu) = %pK\n",
 		i2400m, buf, buf_len, ack_skb);
 	return ack_skb;
 
@@ -824,7 +824,7 @@ error_wait_for_completion:
 error_tx:
 	mutex_unlock(&i2400m->msg_mutex);
 error_bad_msg:
-	d_fnend(3, dev, "(i2400m %p buf %p len %zu) = %d\n",
+	d_fnend(3, dev, "(i2400m %pK buf %pK len %zu) = %d\n",
 		i2400m, buf, buf_len, result);
 	return ERR_PTR(result);
 }
@@ -1204,7 +1204,7 @@ static int i2400m_set_init_config(struct i2400m *i2400m,
 	const struct i2400m_tlv_hdr *tlv_hdr;
 	void *buf, *itr;
 
-	d_fnstart(3, dev, "(i2400m %p arg %p args %zu)\n", i2400m, arg, args);
+	d_fnstart(3, dev, "(i2400m %pK arg %pK args %zu)\n", i2400m, arg, args);
 	result = 0;
 	if (args == 0)
 		goto none;
@@ -1255,7 +1255,7 @@ error_msg_to_dev:
 	kfree(buf);
 error_alloc:
 none:
-	d_fnend(3, dev, "(i2400m %p arg %p args %zu) = %d\n",
+	d_fnend(3, dev, "(i2400m %pK arg %pK args %zu) = %d\n",
 		i2400m, arg, args, result);
 	return result;
 
@@ -1356,7 +1356,7 @@ int i2400m_dev_initialize(struct i2400m *i2400m)
 	const struct i2400m_tlv_hdr *args[9];
 	unsigned argc = 0;
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	if (i2400m_passive_mode)
 		goto out_passive;
 	/* Disable idle mode? (enabled by default) */
@@ -1412,7 +1412,7 @@ out_passive:
 error:
 	if (result < 0)
 		dev_err(dev, "failed to initialize the device: %d\n", result);
-	d_fnend(3, dev, "(i2400m %p) = %d\n", i2400m, result);
+	d_fnend(3, dev, "(i2400m %pK) = %d\n", i2400m, result);
 	return result;
 }
 
@@ -1431,6 +1431,6 @@ void i2400m_dev_shutdown(struct i2400m *i2400m)
 {
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
-	d_fnend(3, dev, "(i2400m %p) = void\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
+	d_fnend(3, dev, "(i2400m %pK) = void\n", i2400m);
 }

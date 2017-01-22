@@ -804,7 +804,7 @@ static int __init init_pmc551(void)
 		pci_dev_get(PCI_Device);
 
 		printk(KERN_NOTICE "Registered pmc551 memory device.\n");
-		printk(KERN_NOTICE "Mapped %dMiB of memory from 0x%p to 0x%p\n",
+		printk(KERN_NOTICE "Mapped %dMiB of memory from 0x%pK to 0x%pK\n",
 			priv->asize >> 20,
 			priv->start, priv->start + priv->asize);
 		printk(KERN_NOTICE "Total memory is %d%sB\n",
@@ -844,7 +844,7 @@ static void __exit cleanup_pmc551(void)
 
 		if (priv->start) {
 			printk(KERN_DEBUG "pmc551: unmapping %dMiB starting at "
-				"0x%p\n", priv->asize >> 20, priv->start);
+				"0x%pK\n", priv->asize >> 20, priv->start);
 			pci_iounmap(priv->dev, priv->start);
 		}
 		pci_dev_put(priv->dev);

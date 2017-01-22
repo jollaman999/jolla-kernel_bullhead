@@ -95,7 +95,7 @@ static void *___sym_malloc(m_pool_p mp, int size)
 		}
 	}
 #ifdef DEBUG
-	printf("___sym_malloc(%d) = %p\n", size, (void *) a);
+	printf("___sym_malloc(%d) = %pK\n", size, (void *) a);
 #endif
 	return a;
 }
@@ -112,7 +112,7 @@ static void ___sym_mfree(m_pool_p mp, void *ptr, int size)
 	m_link_p h = mp->h;
 
 #ifdef DEBUG
-	printf("___sym_mfree(%p, %d)\n", ptr, size);
+	printf("___sym_mfree(%pK, %d)\n", ptr, size);
 #endif
 
 	if (size > SYM_MEM_CLUSTER_SIZE)
@@ -162,7 +162,7 @@ static void *__sym_calloc2(m_pool_p mp, int size, char *name, int uflags)
 	p = ___sym_malloc(mp, size);
 
 	if (DEBUG_FLAGS & DEBUG_ALLOC) {
-		printf ("new %-10s[%4d] @%p.\n", name, size, p);
+		printf ("new %-10s[%4d] @%pK.\n", name, size, p);
 	}
 
 	if (p)
@@ -179,7 +179,7 @@ static void *__sym_calloc2(m_pool_p mp, int size, char *name, int uflags)
 static void __sym_mfree(m_pool_p mp, void *ptr, int size, char *name)
 {
 	if (DEBUG_FLAGS & DEBUG_ALLOC)
-		printf ("freeing %-10s[%4d] @%p.\n", name, size, ptr);
+		printf ("freeing %-10s[%4d] @%pK.\n", name, size, ptr);
 
 	___sym_mfree(mp, ptr, size);
 }

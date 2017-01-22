@@ -528,7 +528,7 @@ static void scsi_eh_done(struct scsi_cmnd *scmd)
 	struct completion *eh_action;
 
 	SCSI_LOG_ERROR_RECOVERY(3,
-		printk("%s scmd: %p result: %x\n",
+		printk("%s scmd: %pK result: %x\n",
 			__func__, scmd, scmd->result));
 
 	eh_action = scmd->device->host->eh_action;
@@ -823,7 +823,7 @@ retry:
 	scsi_log_completion(scmd, rtn);
 
 	SCSI_LOG_ERROR_RECOVERY(3,
-		printk("%s: scmd: %p, timeleft: %ld\n",
+		printk("%s: scmd: %pK, timeleft: %ld\n",
 			__func__, scmd, timeleft));
 
 	/*
@@ -941,7 +941,7 @@ int scsi_eh_get_sense(struct list_head *work_q,
 		if (rtn != SUCCESS)
 			continue;
 
-		SCSI_LOG_ERROR_RECOVERY(3, printk("sense requested for %p"
+		SCSI_LOG_ERROR_RECOVERY(3, printk("sense requested for %pK"
 						  " result %x\n", scmd,
 						  scmd->result));
 		SCSI_LOG_ERROR_RECOVERY(3, scsi_print_sense("bh", scmd));
@@ -983,7 +983,7 @@ static int scsi_eh_tur(struct scsi_cmnd *scmd)
 retry_tur:
 	rtn = scsi_send_eh_cmnd(scmd, tur_command, 6, SENSE_TIMEOUT, 0);
 
-	SCSI_LOG_ERROR_RECOVERY(3, printk("%s: scmd %p rtn %x\n",
+	SCSI_LOG_ERROR_RECOVERY(3, printk("%s: scmd %pK rtn %x\n",
 		__func__, scmd, rtn));
 
 	switch (rtn) {
@@ -1063,7 +1063,7 @@ static int scsi_eh_abort_cmds(struct list_head *work_q,
 		if (!(scmd->eh_eflags & SCSI_EH_CANCEL_CMD))
 			continue;
 		SCSI_LOG_ERROR_RECOVERY(3, printk("%s: aborting cmd:"
-						  "0x%p\n", current->comm,
+						  "0x%pK\n", current->comm,
 						  scmd));
 		rtn = scsi_try_to_abort_cmd(scmd->device->host->hostt, scmd);
 		if (rtn == SUCCESS || rtn == FAST_IO_FAIL) {
@@ -1075,7 +1075,7 @@ static int scsi_eh_abort_cmds(struct list_head *work_q,
 		} else
 			SCSI_LOG_ERROR_RECOVERY(3, printk("%s: aborting"
 							  " cmd failed:"
-							  "0x%p\n",
+							  "0x%pK\n",
 							  current->comm,
 							  scmd));
 	}
@@ -1137,7 +1137,7 @@ static int scsi_eh_stu(struct Scsi_Host *shost,
 			continue;
 
 		SCSI_LOG_ERROR_RECOVERY(3, printk("%s: Sending START_UNIT to sdev:"
-						  " 0x%p\n", current->comm, sdev));
+						  " 0x%pK\n", current->comm, sdev));
 
 		if (!scsi_eh_try_stu(stu_scmd)) {
 			if (!scsi_device_online(sdev) ||
@@ -1151,7 +1151,7 @@ static int scsi_eh_stu(struct Scsi_Host *shost,
 		} else {
 			SCSI_LOG_ERROR_RECOVERY(3,
 						printk("%s: START_UNIT failed to sdev:"
-						       " 0x%p\n", current->comm, sdev));
+						       " 0x%pK\n", current->comm, sdev));
 		}
 	}
 
@@ -1191,7 +1191,7 @@ static int scsi_eh_bus_device_reset(struct Scsi_Host *shost,
 			continue;
 
 		SCSI_LOG_ERROR_RECOVERY(3, printk("%s: Sending BDR sdev:"
-						  " 0x%p\n", current->comm,
+						  " 0x%pK\n", current->comm,
 						  sdev));
 		rtn = scsi_try_bus_device_reset(bdr_scmd);
 		if (rtn == SUCCESS || rtn == FAST_IO_FAIL) {
@@ -1208,7 +1208,7 @@ static int scsi_eh_bus_device_reset(struct Scsi_Host *shost,
 		} else {
 			SCSI_LOG_ERROR_RECOVERY(3, printk("%s: BDR"
 							  " failed sdev:"
-							  "0x%p\n",
+							  "0x%pK\n",
 							  current->comm,
 							   sdev));
 		}
@@ -1767,7 +1767,7 @@ void scsi_eh_flush_done_q(struct list_head *done_q)
 		    !scsi_noretry_cmd(scmd) &&
 		    (++scmd->retries <= scmd->allowed)) {
 			SCSI_LOG_ERROR_RECOVERY(3, printk("%s: flush"
-							  " retry cmd: %p\n",
+							  " retry cmd: %pK\n",
 							  current->comm,
 							  scmd));
 				scsi_queue_insert(scmd, SCSI_MLQUEUE_EH_RETRY);
@@ -1780,7 +1780,7 @@ void scsi_eh_flush_done_q(struct list_head *done_q)
 			if (!scmd->result)
 				scmd->result |= (DRIVER_TIMEOUT << 24);
 			SCSI_LOG_ERROR_RECOVERY(3, printk("%s: flush finish"
-							" cmd: %p\n",
+							" cmd: %pK\n",
 							current->comm, scmd));
 			scsi_finish_command(scmd);
 		}

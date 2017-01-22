@@ -186,7 +186,7 @@ static int qcom_ice_verify_ice(struct ice_device *ice_dev)
 		return -EIO;
 	}
 
-	dev_info(ice_dev->pdev, "QC ICE %d.%d.%d device found @0x%p\n",
+	dev_info(ice_dev->pdev, "QC ICE %d.%d.%d device found @0x%pK\n",
 					maj_rev, min_rev, step_rev,
 					ice_dev->mmio);
 
@@ -746,7 +746,7 @@ struct platform_device *qcom_ice_get_pdevice(struct device_node *node)
 	struct ice_device *ice_dev = NULL;
 
 	if (!node) {
-		pr_err("%s: invalid node %p", __func__, node);
+		pr_err("%s: invalid node %pK", __func__, node);
 		goto out;
 	}
 
@@ -764,13 +764,13 @@ struct platform_device *qcom_ice_get_pdevice(struct device_node *node)
 
 	list_for_each_entry(ice_dev, &ice_devices, list) {
 		if (ice_dev->pdev->of_node == node) {
-			pr_info("%s: found ice device %p\n", __func__, ice_dev);
+			pr_info("%s: found ice device %pK\n", __func__, ice_dev);
 			break;
 		}
 	}
 
 	ice_pdev = to_platform_device(ice_dev->pdev);
-	pr_info("%s: matching platform device %p\n", __func__, ice_pdev);
+	pr_info("%s: matching platform device %pK\n", __func__, ice_pdev);
 out:
 	return ice_pdev;
 }

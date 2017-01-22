@@ -887,7 +887,7 @@ void disassociate_ctty(int on_exit)
 		tty_kref_put(tty);
 	} else {
 #ifdef TTY_DEBUG_HANGUP
-		printk(KERN_DEBUG "error attempted to write to tty [0x%p]"
+		printk(KERN_DEBUG "error attempted to write to tty [0x%pK]"
 		       " = NULL", tty);
 #endif
 	}

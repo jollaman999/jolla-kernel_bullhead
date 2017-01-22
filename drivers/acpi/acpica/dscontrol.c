@@ -73,7 +73,7 @@ acpi_ds_exec_begin_control_op(struct acpi_walk_state *walk_state,
 
 	ACPI_FUNCTION_NAME(ds_exec_begin_control_op);
 
-	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Op=%p Opcode=%2.2X State=%p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Op=%pK Opcode=%2.2X State=%pK\n",
 			  op, op->common.aml_opcode, walk_state));
 
 	switch (op->common.aml_opcode) {
@@ -174,7 +174,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state * walk_state,
 	switch (op->common.aml_opcode) {
 	case AML_IF_OP:
 
-		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "[IF_OP] Op=%p\n", op));
+		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "[IF_OP] Op=%pK\n", op));
 
 		/*
 		 * Save the result of the predicate in case there is an
@@ -198,7 +198,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state * walk_state,
 
 	case AML_WHILE_OP:
 
-		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "[WHILE_OP] Op=%p\n", op));
+		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "[WHILE_OP] Op=%pK\n", op));
 
 		control_state = walk_state->control_state;
 		if (control_state->common.value) {
@@ -231,7 +231,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state * walk_state,
 		/* Predicate was false, terminate this while loop */
 
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-				  "[WHILE_OP] termination! Op=%p\n", op));
+				  "[WHILE_OP] termination! Op=%pK\n", op));
 
 		/* Pop this control state and free it */
 
@@ -243,7 +243,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state * walk_state,
 	case AML_RETURN_OP:
 
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-				  "[RETURN_OP] Op=%p Arg=%p\n", op,
+				  "[RETURN_OP] Op=%pK Arg=%pK\n", op,
 				  op->common.value.arg));
 
 		/*
@@ -333,7 +333,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state * walk_state,
 		}
 
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-				  "Completed RETURN_OP State=%p, RetVal=%p\n",
+				  "Completed RETURN_OP State=%pK, RetVal=%pK\n",
 				  walk_state, walk_state->return_desc));
 
 		/* End the control method execution right now */
@@ -399,7 +399,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state * walk_state,
 
 	default:
 
-		ACPI_ERROR((AE_INFO, "Unknown control opcode=0x%X Op=%p",
+		ACPI_ERROR((AE_INFO, "Unknown control opcode=0x%X Op=%pK",
 			    op->common.aml_opcode, op));
 
 		status = AE_AML_BAD_OPCODE;

@@ -3380,7 +3380,7 @@ SYSCALL_DEFINE3(init_module, void __user *, umod,
 	if (err)
 		return err;
 
-	pr_debug("init_module: umod=%p, len=%lu, uargs=%p\n",
+	pr_debug("init_module: umod=%pK, len=%lu, uargs=%pK\n",
 	       umod, len, uargs);
 
 	err = copy_module_from_user(umod, len, &info);
@@ -3399,7 +3399,7 @@ SYSCALL_DEFINE3(finit_module, int, fd, const char __user *, uargs, int, flags)
 	if (err)
 		return err;
 
-	pr_debug("finit_module: fd=%d, uargs=%p, flags=%i\n", fd, uargs, flags);
+	pr_debug("finit_module: fd=%d, uargs=%pK, flags=%i\n", fd, uargs, flags);
 
 	if (flags & ~(MODULE_INIT_IGNORE_MODVERSIONS
 		      |MODULE_INIT_IGNORE_VERMAGIC))

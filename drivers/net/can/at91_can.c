@@ -1369,7 +1369,7 @@ static int at91_can_probe(struct platform_device *pdev)
 
 	devm_can_led_init(dev);
 
-	dev_info(&pdev->dev, "device registered (reg_base=%p, irq=%d)\n",
+	dev_info(&pdev->dev, "device registered (reg_base=%pK, irq=%d)\n",
 		 priv->reg_base, dev->irq);
 
 	return 0;

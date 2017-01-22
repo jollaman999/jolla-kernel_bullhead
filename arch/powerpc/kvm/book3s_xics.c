@@ -780,7 +780,7 @@ static noinline int kvmppc_xics_rm_complete(struct kvm_vcpu *vcpu, u32 hcall)
 	struct kvmppc_xics *xics = vcpu->kvm->arch.xics;
 	struct kvmppc_icp *icp = vcpu->arch.icp;
 
-	XICS_DBG("XICS_RM: H_%x completing, act: %x state: %lx tgt: %p\n",
+	XICS_DBG("XICS_RM: H_%x completing, act: %x state: %lx tgt: %pK\n",
 		 hcall, icp->rm_action, icp->rm_dbgstate.raw, icp->rm_dbgtgt);
 
 	if (icp->rm_action & XICS_RM_KICK_VCPU)
@@ -911,7 +911,7 @@ static void xics_debugfs_init(struct kvmppc_xics *xics)
 {
 	char *name;
 
-	name = kasprintf(GFP_KERNEL, "kvm-xics-%p", xics);
+	name = kasprintf(GFP_KERNEL, "kvm-xics-%pK", xics);
 	if (!name) {
 		pr_err("%s: no memory for name\n", __func__);
 		return;

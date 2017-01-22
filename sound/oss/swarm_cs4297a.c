@@ -769,7 +769,7 @@ static int serdma_reg_access(struct cs4297a_state *s, u64 data)
 		*data_p = cpu_to_be64(data);
                 __raw_writeq(1, SS_CSR(R_SER_DMA_DSCR_COUNT_TX));
                 CS_DBGOUT(CS_DESCR, 4,
-                          printk(KERN_INFO "cs4297a: add_tx  %p (%x -> %x)\n",
+                          printk(KERN_INFO "cs4297a: add_tx  %pK (%x -> %x)\n",
                                  data_p, swptr, d->hwptr));
         }
 

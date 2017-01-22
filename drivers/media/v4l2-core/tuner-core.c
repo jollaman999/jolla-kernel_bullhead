@@ -483,7 +483,7 @@ static int tuner_s_type_addr(struct v4l2_subdev *sd,
 	struct tuner *t = to_tuner(sd);
 	struct i2c_client *c = v4l2_get_subdevdata(sd);
 
-	tuner_dbg("Calling set_type_addr for type=%d, addr=0x%02x, mode=0x%02x, config=%p\n",
+	tuner_dbg("Calling set_type_addr for type=%d, addr=0x%02x, mode=0x%02x, config=%pK\n",
 			tun_setup->type,
 			tun_setup->addr,
 			tun_setup->mode_mask,

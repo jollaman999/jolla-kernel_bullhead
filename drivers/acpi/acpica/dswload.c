@@ -130,7 +130,7 @@ acpi_ds_load1_begin_op(struct acpi_walk_state * walk_state,
 	ACPI_FUNCTION_TRACE(ds_load1_begin_op);
 
 	op = walk_state->op;
-	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Op=%p State=%p\n", op,
+	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Op=%pK State=%pK\n", op,
 			  walk_state));
 
 	/* We are only interested in opcodes that have an associated name */
@@ -156,7 +156,7 @@ acpi_ds_load1_begin_op(struct acpi_walk_state * walk_state,
 	object_type = walk_state->op_info->object_type;
 
 	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-			  "State=%p Op=%p [%s]\n", walk_state, op,
+			  "State=%pK Op=%pK [%s]\n", walk_state, op,
 			  acpi_ut_get_type_name(object_type)));
 
 	switch (walk_state->opcode) {
@@ -411,7 +411,7 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE(ds_load1_end_op);
 
 	op = walk_state->op;
-	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Op=%p State=%p\n", op,
+	ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Op=%pK State=%pK\n", op,
 			  walk_state));
 
 	/* We are only interested in opcodes that have an associated name */
@@ -508,7 +508,7 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 			 * arguments.)
 			 */
 			ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-					  "LOADING-Method: State=%p Op=%p NamedObj=%p\n",
+					  "LOADING-Method: State=%pK Op=%pK NamedObj=%pK\n",
 					  walk_state, op, op->named.node));
 
 			if (!acpi_ns_get_attached_object(op->named.node)) {
@@ -543,7 +543,7 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 
 	if (!walk_state->method_node && acpi_ns_opens_scope(object_type)) {
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
-				  "(%s): Popping scope for Op %p\n",
+				  "(%s): Popping scope for Op %pK\n",
 				  acpi_ut_get_type_name(object_type), op));
 
 		status = acpi_ds_scope_stack_pop(walk_state);

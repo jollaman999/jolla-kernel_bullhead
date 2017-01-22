@@ -58,7 +58,7 @@ islpci_eth_cleanup_transmit(islpci_private *priv,
 
 #if VERBOSE > SHOW_ERROR_MESSAGES
 			DEBUG(SHOW_TRACING,
-			      "cleanup skb %p skb->data %p skb->len %u truesize %u\n ",
+			      "cleanup skb %pK skb->data %pK skb->len %u truesize %u\n ",
 			      skb, skb->data, skb->len, skb->truesize);
 #endif
 
@@ -141,7 +141,7 @@ islpci_eth_transmit(struct sk_buff *skb, struct net_device *ndev)
 			}
 
 #if VERBOSE > SHOW_ERROR_MESSAGES
-			DEBUG(SHOW_TRACING, "memmove %p %p %i\n", skb->data,
+			DEBUG(SHOW_TRACING, "memmove %pK %pK %i\n", skb->data,
 			      src, skb->len);
 #endif
 		} else {
@@ -172,7 +172,7 @@ islpci_eth_transmit(struct sk_buff *skb, struct net_device *ndev)
 							  skb->len);
 
 #if VERBOSE > SHOW_ERROR_MESSAGES
-			DEBUG(SHOW_TRACING, "memcpy %p %p %i wds %i\n",
+			DEBUG(SHOW_TRACING, "memcpy %pK %pK %i wds %i\n",
 			      newskb->data, skb->data, skb->len, init_wds);
 #endif
 
@@ -183,7 +183,7 @@ islpci_eth_transmit(struct sk_buff *skb, struct net_device *ndev)
 	}
 	/* display the buffer contents for debugging */
 #if VERBOSE > SHOW_ERROR_MESSAGES
-	DEBUG(SHOW_BUFFER_CONTENTS, "\ntx %p ", skb->data);
+	DEBUG(SHOW_BUFFER_CONTENTS, "\ntx %pK ", skb->data);
 	display_buffer((char *) skb->data, skb->len);
 #endif
 
@@ -332,7 +332,7 @@ islpci_eth_receive(islpci_private *priv)
 
 #if VERBOSE > SHOW_ERROR_MESSAGES
 	DEBUG(SHOW_TRACING,
-	      "frq->addr %x skb->data %p skb->len %u offset %u truesize %u\n ",
+	      "frq->addr %x skb->data %pK skb->len %u offset %u truesize %u\n ",
 	      control_block->rx_data_low[priv->free_data_rx].address, skb->data,
 	      skb->len, offset, skb->truesize);
 #endif
@@ -351,7 +351,7 @@ islpci_eth_receive(islpci_private *priv)
 	}
 #if VERBOSE > SHOW_ERROR_MESSAGES
 	/* display the buffer contents for debugging */
-	DEBUG(SHOW_BUFFER_CONTENTS, "\nrx %p ", skb->data);
+	DEBUG(SHOW_BUFFER_CONTENTS, "\nrx %pK ", skb->data);
 	display_buffer((char *) skb->data, skb->len);
 #endif
 
@@ -364,11 +364,11 @@ islpci_eth_receive(islpci_private *priv)
 		skb_trim(skb, skb->len - 6);
 	}
 #if VERBOSE > SHOW_ERROR_MESSAGES
-	DEBUG(SHOW_TRACING, "Fragment size %i in skb at %p\n", size, skb);
-	DEBUG(SHOW_TRACING, "Skb data at %p, length %i\n", skb->data, skb->len);
+	DEBUG(SHOW_TRACING, "Fragment size %i in skb at %pK\n", size, skb);
+	DEBUG(SHOW_TRACING, "Skb data at %pK, length %i\n", skb->data, skb->len);
 
 	/* display the buffer contents for debugging */
-	DEBUG(SHOW_BUFFER_CONTENTS, "\nrx %p ", skb->data);
+	DEBUG(SHOW_BUFFER_CONTENTS, "\nrx %pK ", skb->data);
 	display_buffer((char *) skb->data, skb->len);
 #endif
 	/* take care of monitor mode and spy monitoring. */
@@ -440,7 +440,7 @@ islpci_eth_receive(islpci_private *priv)
 
 #if VERBOSE > SHOW_ERROR_MESSAGES
 		DEBUG(SHOW_TRACING,
-		      "new alloc skb %p skb->data %p skb->len %u index %u truesize %u\n ",
+		      "new alloc skb %pK skb->data %pK skb->len %u index %u truesize %u\n ",
 		      skb, skb->data, skb->len, index, skb->truesize);
 #endif
 

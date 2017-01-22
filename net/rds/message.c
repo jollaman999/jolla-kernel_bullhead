@@ -46,7 +46,7 @@ static unsigned int	rds_exthdr_size[__RDS_EXTHDR_MAX] = {
 
 void rds_message_addref(struct rds_message *rm)
 {
-	rdsdebug("addref rm %p ref %d\n", rm, atomic_read(&rm->m_refcount));
+	rdsdebug("addref rm %pK ref %d\n", rm, atomic_read(&rm->m_refcount));
 	atomic_inc(&rm->m_refcount);
 }
 EXPORT_SYMBOL_GPL(rds_message_addref);
@@ -62,7 +62,7 @@ static void rds_message_purge(struct rds_message *rm)
 		return;
 
 	for (i = 0; i < rm->data.op_nents; i++) {
-		rdsdebug("putting data page %p\n", (void *)sg_page(&rm->data.op_sg[i]));
+		rdsdebug("putting data page %pK\n", (void *)sg_page(&rm->data.op_sg[i]));
 		/* XXX will have to put_page for page refs */
 		__free_page(sg_page(&rm->data.op_sg[i]));
 	}
@@ -81,8 +81,8 @@ static void rds_message_purge(struct rds_message *rm)
 
 void rds_message_put(struct rds_message *rm)
 {
-	rdsdebug("put rm %p ref %d\n", rm, atomic_read(&rm->m_refcount));
-	WARN(!atomic_read(&rm->m_refcount), "danger refcount zero on %p\n", rm);
+	rdsdebug("put rm %pK ref %d\n", rm, atomic_read(&rm->m_refcount));
+	WARN(!atomic_read(&rm->m_refcount), "danger refcount zero on %pK\n", rm);
 	if (atomic_dec_and_test(&rm->m_refcount)) {
 		BUG_ON(!list_empty(&rm->m_sock_item));
 		BUG_ON(!list_empty(&rm->m_conn_item));
@@ -302,8 +302,8 @@ int rds_message_copy_from_user(struct rds_message *rm, struct iovec *first_iov,
 		to_copy = min(iov->iov_len - iov_off, sg->length - sg_off);
 		to_copy = min_t(size_t, to_copy, total_len);
 
-		rdsdebug("copying %lu bytes from user iov [%p, %zu] + %lu to "
-			 "sg [%p, %u, %u] + %lu\n",
+		rdsdebug("copying %lu bytes from user iov [%pK, %zu] + %lu to "
+			 "sg [%pK, %u, %u] + %lu\n",
 			 to_copy, iov->iov_base, iov->iov_len, iov_off,
 			 (void *)sg_page(sg), sg->offset, sg->length, sg_off);
 
@@ -357,8 +357,8 @@ int rds_message_inc_copy_to_user(struct rds_incoming *inc,
 		to_copy = min_t(size_t, to_copy, size - copied);
 		to_copy = min_t(unsigned long, to_copy, len - copied);
 
-		rdsdebug("copying %lu bytes to user iov [%p, %zu] + %lu to "
-			 "sg [%p, %u, %u] + %lu\n",
+		rdsdebug("copying %lu bytes to user iov [%pK, %zu] + %lu to "
+			 "sg [%pK, %u, %u] + %lu\n",
 			 to_copy, iov->iov_base, iov->iov_len, iov_off,
 			 sg_page(sg), sg->offset, sg->length, vec_off);
 

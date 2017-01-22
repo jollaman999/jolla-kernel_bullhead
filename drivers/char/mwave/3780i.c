@@ -482,7 +482,7 @@ int dsp3780I_ReadDStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 
 
 	PRINTK_5(TRACE_3780I,
-		"3780i::dsp3780I_ReadDStore entry usDspBaseIO %x, pusBuffer %p, uCount %x, ulDSPAddr %lx\n",
+		"3780i::dsp3780I_ReadDStore entry usDspBaseIO %x, pusBuffer %pK, uCount %x, ulDSPAddr %lx\n",
 		usDspBaseIO, pusBuffer, uCount, ulDSPAddr);
 
 
@@ -524,7 +524,7 @@ int dsp3780I_ReadAndClearDStore(unsigned short usDspBaseIO,
 
 
 	PRINTK_5(TRACE_3780I,
-		"3780i::dsp3780I_ReadAndDStore entry usDspBaseIO %x, pusBuffer %p, uCount %x, ulDSPAddr %lx\n",
+		"3780i::dsp3780I_ReadAndDStore entry usDspBaseIO %x, pusBuffer %pK, uCount %x, ulDSPAddr %lx\n",
 		usDspBaseIO, pusBuffer, uCount, ulDSPAddr);
 
 
@@ -565,7 +565,7 @@ int dsp3780I_WriteDStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 
 
 	PRINTK_5(TRACE_3780I,
-		"3780i::dsp3780D_WriteDStore entry usDspBaseIO %x, pusBuffer %p, uCount %x, ulDSPAddr %lx\n",
+		"3780i::dsp3780D_WriteDStore entry usDspBaseIO %x, pusBuffer %pK, uCount %x, ulDSPAddr %lx\n",
 		usDspBaseIO, pusBuffer, uCount, ulDSPAddr);
 
 
@@ -606,7 +606,7 @@ int dsp3780I_ReadIStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 	unsigned short __user *pusBuffer = pvBuffer;
 
 	PRINTK_5(TRACE_3780I,
-		"3780i::dsp3780I_ReadIStore entry usDspBaseIO %x, pusBuffer %p, uCount %x, ulDSPAddr %lx\n",
+		"3780i::dsp3780I_ReadIStore entry usDspBaseIO %x, pusBuffer %pK, uCount %x, ulDSPAddr %lx\n",
 		usDspBaseIO, pusBuffer, uCount, ulDSPAddr);
 
 	/*
@@ -654,7 +654,7 @@ int dsp3780I_WriteIStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 	unsigned short __user *pusBuffer = pvBuffer;
 
 	PRINTK_5(TRACE_3780I,
-		"3780i::dsp3780I_WriteIStore entry usDspBaseIO %x, pusBuffer %p, uCount %x, ulDSPAddr %lx\n",
+		"3780i::dsp3780I_WriteIStore entry usDspBaseIO %x, pusBuffer %pK, uCount %x, ulDSPAddr %lx\n",
 		usDspBaseIO, pusBuffer, uCount, ulDSPAddr);
 
 
@@ -705,7 +705,7 @@ int dsp3780I_GetIPCSource(unsigned short usDspBaseIO,
 
 
 	PRINTK_3(TRACE_3780I,
-		"3780i::dsp3780I_GetIPCSource entry usDspBaseIO %x pusIPCSource %p\n",
+		"3780i::dsp3780I_GetIPCSource entry usDspBaseIO %x pusIPCSource %pK\n",
 		usDspBaseIO, pusIPCSource);
 
 	/*

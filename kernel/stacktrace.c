@@ -22,7 +22,7 @@ int snprint_stack_trace(char *buf, int buf_len, struct stack_trace *trace,
 
 	for (i = 0; i < trace->nr_entries; i++) {
 		unsigned long ip = trace->entries[i];
-		int printed = snprintf(buf, buf_len, "%*c[<%p>] %pS\n",
+		int printed = snprintf(buf, buf_len, "%*c[<%pK>] %pS\n",
 				1 + spaces, ' ',
 				(void *) ip, (void *) ip);
 		buf_len -= printed;

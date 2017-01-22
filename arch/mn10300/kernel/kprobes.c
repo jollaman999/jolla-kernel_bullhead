@@ -633,8 +633,8 @@ int __kprobes longjmp_break_handler(struct kprobe *p, struct pt_regs *regs)
 	if (addr == (u8 *) jprobe_return_bp_addr) {
 		if (jprobe_saved_regs_location != regs) {
 			printk(KERN_ERR"JPROBE:"
-			       " Current regs (%p) does not match saved regs"
-			       " (%p).\n",
+			       " Current regs (%pK) does not match saved regs"
+			       " (%pK).\n",
 			       regs, jprobe_saved_regs_location);
 			BUG();
 		}

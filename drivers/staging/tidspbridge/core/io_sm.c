@@ -693,9 +693,9 @@ int bridge_io_on_loaded(struct io_mgr *hio_mgr)
 		((u8 *) hio_mgr->msg_output_ctrl - hio_mgr->msg_input) /
 		sizeof(struct msg_dspmsg);
 
-	dev_dbg(bridge, "IO MGR shm details: shared_mem %p, input %p, "
-		"output %p, msg_input_ctrl %p, msg_input %p, "
-		"msg_output_ctrl %p, msg_output %p\n",
+	dev_dbg(bridge, "IO MGR shm details: shared_mem %pK, input %pK, "
+		"output %pK, msg_input_ctrl %pK, msg_input %pK, "
+		"msg_output_ctrl %pK, msg_output %pK\n",
 		(u8 *) hio_mgr->shared_mem, hio_mgr->input,
 		hio_mgr->output, (u8 *) hio_mgr->msg_input_ctrl,
 		hio_mgr->msg_input, (u8 *) hio_mgr->msg_output_ctrl,
@@ -2183,7 +2183,7 @@ void dump_dl_modules(struct bridge_dev_context *bridge_context)
 			kfree(module_struct);
 			module_struct = kzalloc(module_size+128, GFP_ATOMIC);
 			module_struct_size = module_size+128;
-			pr_debug("%s: allocated module struct %p %d\n",
+			pr_debug("%s: allocated module struct %pK %d\n",
 				__func__, module_struct, module_struct_size);
 			if (!module_struct)
 				goto func_end;
@@ -2235,7 +2235,7 @@ void dump_dl_modules(struct bridge_dev_context *bridge_context)
 			} else {
 				pr_err("<string error>\n");
 				pr_debug("%s: section name sting address "
-					"is invalid %p\n", __func__, sect_str);
+					"is invalid %pK\n", __func__, sect_str);
 			}
 		}
 	}

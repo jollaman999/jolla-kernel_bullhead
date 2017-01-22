@@ -587,7 +587,7 @@ try_head:
 	tx_msg->size = I2400M_TX_PLD_SIZE;
 out:
 	i2400m->tx_msg = tx_msg;
-	d_printf(2, dev, "new TX message: %p @%zu\n",
+	d_printf(2, dev, "new TX message: %pK @%zu\n",
 		 tx_msg, (void *) tx_msg - i2400m->tx_buf);
 }
 
@@ -663,7 +663,7 @@ void i2400m_tx_close(struct i2400m *i2400m)
 			dev_err(dev,
 				"SW BUG! Possible data leakage from memory the "
 				"device should not read for padding - "
-				"size %lu aligned_size %zu tx_buf %p in "
+				"size %lu aligned_size %zu tx_buf %pK in "
 				"%zu out %zu\n",
 				(unsigned long) tx_msg_moved->size,
 				aligned_size, i2400m->tx_buf, i2400m->tx_in,
@@ -724,7 +724,7 @@ int i2400m_tx(struct i2400m *i2400m, const void *buf, size_t buf_len,
 	unsigned is_singleton = pl_type == I2400M_PT_RESET_WARM
 		|| pl_type == I2400M_PT_RESET_COLD;
 
-	d_fnstart(3, dev, "(i2400m %p skb %p [%zu bytes] pt %u)\n",
+	d_fnstart(3, dev, "(i2400m %pK skb %pK [%zu bytes] pt %u)\n",
 		  i2400m, buf, buf_len, pl_type);
 	padded_len = ALIGN(buf_len, I2400M_PL_ALIGN);
 	d_printf(5, dev, "padded_len %zd buf_len %zd\n", padded_len, buf_len);
@@ -803,7 +803,7 @@ error_tx_new:
 	 * it might free space */
 	if (likely(result != -ESHUTDOWN))
 		i2400m->bus_tx_kick(i2400m);
-	d_fnend(3, dev, "(i2400m %p skb %p [%zu bytes] pt %u) = %d\n",
+	d_fnend(3, dev, "(i2400m %pK skb %pK [%zu bytes] pt %u) = %d\n",
 		i2400m, buf, buf_len, pl_type, result);
 	return result;
 }
@@ -843,7 +843,7 @@ struct i2400m_msg_hdr *i2400m_tx_msg_get(struct i2400m *i2400m,
 	struct i2400m_msg_hdr *tx_msg, *tx_msg_moved;
 	unsigned long flags, pls;
 
-	d_fnstart(3, dev, "(i2400m %p bus_size %p)\n", i2400m, bus_size);
+	d_fnstart(3, dev, "(i2400m %pK bus_size %pK)\n", i2400m, bus_size);
 	spin_lock_irqsave(&i2400m->tx_lock, flags);
 	tx_msg_moved = NULL;
 	if (i2400m->tx_buf == NULL)
@@ -910,7 +910,7 @@ skip:
 		i2400m->tx_size_max = *bus_size;
 out_unlock:
 	spin_unlock_irqrestore(&i2400m->tx_lock, flags);
-	d_fnstart(3, dev, "(i2400m %p bus_size %p [%zu]) = %p\n",
+	d_fnstart(3, dev, "(i2400m %pK bus_size %pK [%zu]) = %pK\n",
 		  i2400m, bus_size, *bus_size, tx_msg_moved);
 	return tx_msg_moved;
 }
@@ -935,7 +935,7 @@ void i2400m_tx_msg_sent(struct i2400m *i2400m)
 	unsigned long flags;
 	struct device *dev = i2400m_dev(i2400m);
 
-	d_fnstart(3, dev, "(i2400m %p)\n", i2400m);
+	d_fnstart(3, dev, "(i2400m %pK)\n", i2400m);
 	spin_lock_irqsave(&i2400m->tx_lock, flags);
 	if (i2400m->tx_buf == NULL)
 		goto out_unlock;
@@ -949,7 +949,7 @@ void i2400m_tx_msg_sent(struct i2400m *i2400m)
 	i2400m->tx_in -= n * I2400M_TX_BUF_SIZE;
 out_unlock:
 	spin_unlock_irqrestore(&i2400m->tx_lock, flags);
-	d_fnend(3, dev, "(i2400m %p) = void\n", i2400m);
+	d_fnend(3, dev, "(i2400m %pK) = void\n", i2400m);
 }
 EXPORT_SYMBOL_GPL(i2400m_tx_msg_sent);
 

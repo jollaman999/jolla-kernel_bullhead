@@ -52,7 +52,7 @@ u16 hpios_locked_mem_alloc(struct consistent_dma_area *p_mem_area, u32 size,
 		GFP_DMA32 | GFP_KERNEL);
 
 	if (p_mem_area->vaddr) {
-		HPI_DEBUG_LOG(DEBUG, "allocated %d bytes, dma 0x%x vma %p\n",
+		HPI_DEBUG_LOG(DEBUG, "allocated %d bytes, dma 0x%x vma %pK\n",
 			size, (unsigned int)p_mem_area->dma_handle,
 			p_mem_area->vaddr);
 		p_mem_area->pdev = &pdev->dev;
@@ -71,7 +71,7 @@ u16 hpios_locked_mem_free(struct consistent_dma_area *p_mem_area)
 	if (p_mem_area->size) {
 		dma_free_coherent(p_mem_area->pdev, p_mem_area->size,
 			p_mem_area->vaddr, p_mem_area->dma_handle);
-		HPI_DEBUG_LOG(DEBUG, "freed %lu bytes, dma 0x%x vma %p\n",
+		HPI_DEBUG_LOG(DEBUG, "freed %lu bytes, dma 0x%x vma %pK\n",
 			(unsigned long)p_mem_area->size,
 			(unsigned int)p_mem_area->dma_handle,
 			p_mem_area->vaddr);

@@ -32,7 +32,7 @@ dma_cookie_t vchan_tx_submit(struct dma_async_tx_descriptor *tx)
 	list_add_tail(&vd->node, &vc->desc_submitted);
 	spin_unlock_irqrestore(&vc->lock, flags);
 
-	dev_dbg(vc->chan.device->dev, "vchan %p: txd %p[%x]: submitted\n",
+	dev_dbg(vc->chan.device->dev, "vchan %pK: txd %pK[%x]: submitted\n",
 		vc, vd, cookie);
 
 	return cookie;
@@ -97,7 +97,7 @@ void vchan_dma_desc_free_list(struct virt_dma_chan *vc, struct list_head *head)
 		struct virt_dma_desc *vd = list_first_entry(head,
 			struct virt_dma_desc, node);
 		list_del(&vd->node);
-		dev_dbg(vc->chan.device->dev, "txd %p: freeing\n", vd);
+		dev_dbg(vc->chan.device->dev, "txd %pK: freeing\n", vd);
 		vc->desc_free(vd);
 	}
 }

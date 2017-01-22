@@ -936,7 +936,7 @@ int mesh_path_send_to_gates(struct mesh_path *mpath)
 			copy = true;
 		} else {
 			mpath_dbg(sdata,
-				  "Not forwarding %p (flags %#x)\n",
+				  "Not forwarding %pK (flags %#x)\n",
 				  gate->mpath, gate->mpath->flags);
 		}
 	}

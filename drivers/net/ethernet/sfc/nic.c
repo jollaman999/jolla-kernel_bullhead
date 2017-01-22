@@ -267,7 +267,7 @@ static int efx_alloc_special_buffer(struct efx_nic *efx,
 
 	netif_dbg(efx, probe, efx->net_dev,
 		  "allocating special buffers %d-%d at %llx+%x "
-		  "(virt %p phys %llx)\n", buffer->index,
+		  "(virt %pK phys %llx)\n", buffer->index,
 		  buffer->index + buffer->entries - 1,
 		  (u64)buffer->dma_addr, len,
 		  buffer->addr, (u64)virt_to_phys(buffer->addr));
@@ -283,7 +283,7 @@ efx_free_special_buffer(struct efx_nic *efx, struct efx_special_buffer *buffer)
 
 	netif_dbg(efx, hw, efx->net_dev,
 		  "deallocating special buffers %d-%d at %llx+%x "
-		  "(virt %p phys %llx)\n", buffer->index,
+		  "(virt %pK phys %llx)\n", buffer->index,
 		  buffer->index + buffer->entries - 1,
 		  (u64)buffer->dma_addr, buffer->len,
 		  buffer->addr, (u64)virt_to_phys(buffer->addr));

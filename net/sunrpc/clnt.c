@@ -298,7 +298,7 @@ static struct rpc_clnt * rpc_new_client(const struct rpc_create_args *args, stru
 	int err;
 
 	/* sanity check the name before trying to print it */
-	dprintk("RPC:       creating %s client for %s (xprt %p)\n",
+	dprintk("RPC:       creating %s client for %s (xprt %pK)\n",
 			program->name, args->servername, xprt);
 
 	err = rpciod_up();
@@ -584,7 +584,7 @@ void rpc_killall_tasks(struct rpc_clnt *clnt)
 
 	if (list_empty(&clnt->cl_tasks))
 		return;
-	dprintk("RPC:       killing all tasks for client %p\n", clnt);
+	dprintk("RPC:       killing all tasks for client %pK\n", clnt);
 	/*
 	 * Spin lock all_tasks to prevent changes...
 	 */
@@ -676,7 +676,7 @@ rpc_free_auth(struct rpc_clnt *clnt)
 void
 rpc_release_client(struct rpc_clnt *clnt)
 {
-	dprintk("RPC:       rpc_release_client(%p)\n", clnt);
+	dprintk("RPC:       rpc_release_client(%pK)\n", clnt);
 
 	if (list_empty(&clnt->cl_tasks))
 		wake_up(&destroy_wait);
@@ -897,7 +897,7 @@ struct rpc_task *rpc_run_bc_task(struct rpc_rqst *req,
 		.callback_ops = tk_ops,
 	};
 
-	dprintk("RPC: rpc_run_bc_task req= %p\n", req);
+	dprintk("RPC: rpc_run_bc_task req= %pK\n", req);
 	/*
 	 * Create an rpc_task to send the data
 	 */
@@ -921,7 +921,7 @@ struct rpc_task *rpc_run_bc_task(struct rpc_rqst *req,
 	rpc_execute(task);
 
 out:
-	dprintk("RPC: rpc_run_bc_task: task= %p\n", task);
+	dprintk("RPC: rpc_run_bc_task: task= %pK\n", task);
 	return task;
 }
 #endif /* CONFIG_SUNRPC_BACKCHANNEL */
@@ -1639,7 +1639,7 @@ call_connect(struct rpc_task *task)
 {
 	struct rpc_xprt *xprt = task->tk_rqstp->rq_xprt;
 
-	dprintk("RPC: %5u call_connect xprt %p %s connected\n",
+	dprintk("RPC: %5u call_connect xprt %pK %s connected\n",
 			task->tk_pid, xprt,
 			(xprt_connected(xprt) ? "is" : "is not"));
 

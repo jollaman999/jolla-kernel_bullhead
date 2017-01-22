@@ -112,7 +112,7 @@ alloc_safe_buffer(struct dmabounce_device_info *device_info, void *ptr,
 	struct device *dev = device_info->dev;
 	unsigned long flags;
 
-	dev_dbg(dev, "%s(ptr=%p, size=%d, dir=%d)\n",
+	dev_dbg(dev, "%s(ptr=%pK, size=%d, dir=%d)\n",
 		__func__, ptr, size, dir);
 
 	if (size <= device_info->small.size) {
@@ -188,7 +188,7 @@ free_safe_buffer(struct dmabounce_device_info *device_info, struct safe_buffer *
 {
 	unsigned long flags;
 
-	dev_dbg(device_info->dev, "%s(buf=%p)\n", __func__, buf);
+	dev_dbg(device_info->dev, "%s(buf=%pK)\n", __func__, buf);
 
 	write_lock_irqsave(&device_info->lock, flags);
 
@@ -253,17 +253,17 @@ static inline dma_addr_t map_single(struct device *dev, void *ptr, size_t size,
 
 	buf = alloc_safe_buffer(device_info, ptr, size, dir);
 	if (buf == NULL) {
-		dev_err(dev, "%s: unable to map unsafe buffer %p!\n",
+		dev_err(dev, "%s: unable to map unsafe buffer %pK!\n",
 		       __func__, ptr);
 		return DMA_ERROR_CODE;
 	}
 
-	dev_dbg(dev, "%s: unsafe buffer %p (dma=%#x) mapped to %p (dma=%#x)\n",
+	dev_dbg(dev, "%s: unsafe buffer %pK (dma=%#x) mapped to %pK (dma=%#x)\n",
 		__func__, buf->ptr, virt_to_dma(dev, buf->ptr),
 		buf->safe, buf->safe_dma_addr);
 
 	if (dir == DMA_TO_DEVICE || dir == DMA_BIDIRECTIONAL) {
-		dev_dbg(dev, "%s: copy unsafe %p to safe %p, size %d\n",
+		dev_dbg(dev, "%s: copy unsafe %pK to safe %pK, size %d\n",
 			__func__, ptr, buf->safe, size);
 		memcpy(buf->safe, ptr, size);
 	}
@@ -277,7 +277,7 @@ static inline void unmap_single(struct device *dev, struct safe_buffer *buf,
 	BUG_ON(buf->size != size);
 	BUG_ON(buf->direction != dir);
 
-	dev_dbg(dev, "%s: unsafe buffer %p (dma=%#x) mapped to %p (dma=%#x)\n",
+	dev_dbg(dev, "%s: unsafe buffer %pK (dma=%#x) mapped to %pK (dma=%#x)\n",
 		__func__, buf->ptr, virt_to_dma(dev, buf->ptr),
 		buf->safe, buf->safe_dma_addr);
 
@@ -286,7 +286,7 @@ static inline void unmap_single(struct device *dev, struct safe_buffer *buf,
 	if (dir == DMA_FROM_DEVICE || dir == DMA_BIDIRECTIONAL) {
 		void *ptr = buf->ptr;
 
-		dev_dbg(dev, "%s: copy back safe %p to unsafe %p size %d\n",
+		dev_dbg(dev, "%s: copy back safe %pK to unsafe %pK size %d\n",
 			__func__, buf->safe, ptr, size);
 		memcpy(ptr, buf->safe, size);
 
@@ -315,7 +315,7 @@ static dma_addr_t dmabounce_map_page(struct device *dev, struct page *page,
 	dma_addr_t dma_addr;
 	int ret;
 
-	dev_dbg(dev, "%s(page=%p,off=%#lx,size=%zx,dir=%x)\n",
+	dev_dbg(dev, "%s(page=%pK,off=%#lx,size=%zx,dir=%x)\n",
 		__func__, page, offset, size, dir);
 
 	dma_addr = pfn_to_dma(dev, page_to_pfn(page)) + offset;
@@ -377,14 +377,14 @@ static int __dmabounce_sync_for_cpu(struct device *dev, dma_addr_t addr,
 
 	BUG_ON(buf->direction != dir);
 
-	dev_dbg(dev, "%s: unsafe buffer %p (dma=%#x off=%#lx) mapped to %p (dma=%#x)\n",
+	dev_dbg(dev, "%s: unsafe buffer %pK (dma=%#x off=%#lx) mapped to %pK (dma=%#x)\n",
 		__func__, buf->ptr, virt_to_dma(dev, buf->ptr), off,
 		buf->safe, buf->safe_dma_addr);
 
 	DO_STATS(dev->archdata.dmabounce->bounce_count++);
 
 	if (dir == DMA_FROM_DEVICE || dir == DMA_BIDIRECTIONAL) {
-		dev_dbg(dev, "%s: copy back safe %p to unsafe %p size %d\n",
+		dev_dbg(dev, "%s: copy back safe %pK to unsafe %pK size %d\n",
 			__func__, buf->safe + off, buf->ptr + off, sz);
 		memcpy(buf->ptr + off, buf->safe + off, sz);
 	}
@@ -417,14 +417,14 @@ static int __dmabounce_sync_for_device(struct device *dev, dma_addr_t addr,
 
 	BUG_ON(buf->direction != dir);
 
-	dev_dbg(dev, "%s: unsafe buffer %p (dma=%#x off=%#lx) mapped to %p (dma=%#x)\n",
+	dev_dbg(dev, "%s: unsafe buffer %pK (dma=%#x off=%#lx) mapped to %pK (dma=%#x)\n",
 		__func__, buf->ptr, virt_to_dma(dev, buf->ptr), off,
 		buf->safe, buf->safe_dma_addr);
 
 	DO_STATS(dev->archdata.dmabounce->bounce_count++);
 
 	if (dir == DMA_TO_DEVICE || dir == DMA_BIDIRECTIONAL) {
-		dev_dbg(dev, "%s: copy out unsafe %p to safe %p, size %d\n",
+		dev_dbg(dev, "%s: copy out unsafe %pK to safe %pK, size %d\n",
 			__func__,buf->ptr + off, buf->safe + off, sz);
 		memcpy(buf->safe + off, buf->ptr + off, sz);
 	}

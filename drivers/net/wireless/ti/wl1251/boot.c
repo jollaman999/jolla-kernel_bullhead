@@ -370,7 +370,7 @@ static int wl1251_boot_upload_firmware(struct wl1251 *wl)
 		/* 10.3 upload the chunk */
 		addr = WL1251_PART_DOWN_MEM_START + chunk_num * CHUNK_SIZE;
 		p = wl->fw + FW_HDR_SIZE + chunk_num * CHUNK_SIZE;
-		wl1251_debug(DEBUG_BOOT, "uploading fw chunk 0x%p to 0x%x",
+		wl1251_debug(DEBUG_BOOT, "uploading fw chunk 0x%pK to 0x%x",
 			     p, addr);
 
 		/* need to copy the chunk for dma */
@@ -389,7 +389,7 @@ static int wl1251_boot_upload_firmware(struct wl1251 *wl)
 	len = fw_data_len % CHUNK_SIZE;
 	memcpy(buf, p, len);
 
-	wl1251_debug(DEBUG_BOOT, "uploading fw last chunk (%zu B) 0x%p to 0x%x",
+	wl1251_debug(DEBUG_BOOT, "uploading fw last chunk (%zu B) 0x%pK to 0x%x",
 		     len, p, addr);
 	wl1251_mem_write(wl, addr, buf, len);
 

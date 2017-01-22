@@ -339,7 +339,7 @@ static void __unflatten_device_tree(void *blob,
 
 	*(__be32 *)(mem + size) = cpu_to_be32(0xdeadbeef);
 
-	pr_debug("  unflattening %p...\n", mem);
+	pr_debug("  unflattening %pK...\n", mem);
 
 	/* Second pass, do actual unflattening */
 	start = 0;

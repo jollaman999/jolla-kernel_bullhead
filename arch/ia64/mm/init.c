@@ -218,7 +218,7 @@ put_kernel_page (struct page *page, unsigned long address, pgprot_t pgprot)
 	pte_t *pte;
 
 	if (!PageReserved(page))
-		printk(KERN_ERR "put_kernel_page: page at 0x%p not in reserved memory\n",
+		printk(KERN_ERR "put_kernel_page: page at 0x%pK not in reserved memory\n",
 		       page_address(page));
 
 	pgd = pgd_offset_k(address);		/* note: this is NOT pgd_offset()! */

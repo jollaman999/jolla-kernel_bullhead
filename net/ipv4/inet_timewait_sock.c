@@ -89,7 +89,7 @@ static void __inet_twsk_kill(struct inet_timewait_sock *tw,
 
 #ifdef SOCK_REFCNT_DEBUG
 	if (atomic_read(&tw->tw_refcnt) != 1) {
-		pr_debug("%s timewait_sock %p refcnt=%d\n",
+		pr_debug("%s timewait_sock %pK refcnt=%d\n",
 			 tw->tw_prot->name, tw, atomic_read(&tw->tw_refcnt));
 	}
 #endif
@@ -104,7 +104,7 @@ static noinline void inet_twsk_free(struct inet_timewait_sock *tw)
 	struct module *owner = tw->tw_prot->owner;
 	twsk_destructor((struct sock *)tw);
 #ifdef SOCK_REFCNT_DEBUG
-	pr_debug("%s timewait_sock %p released\n", tw->tw_prot->name, tw);
+	pr_debug("%s timewait_sock %pK released\n", tw->tw_prot->name, tw);
 #endif
 	release_net(twsk_net(tw));
 	kmem_cache_free(tw->tw_prot->twsk_prot->twsk_slab, tw);

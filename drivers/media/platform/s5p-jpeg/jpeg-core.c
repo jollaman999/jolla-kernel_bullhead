@@ -1355,7 +1355,7 @@ static int s5p_jpeg_probe(struct platform_device *pdev)
 		ret = PTR_ERR(jpeg->clk);
 		return ret;
 	}
-	dev_dbg(&pdev->dev, "clock source %p\n", jpeg->clk);
+	dev_dbg(&pdev->dev, "clock source %pK\n", jpeg->clk);
 	clk_prepare_enable(jpeg->clk);
 
 	/* v4l2 device */

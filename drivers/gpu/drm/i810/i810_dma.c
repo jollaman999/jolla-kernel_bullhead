@@ -403,7 +403,7 @@ static int i810_dma_initialize(struct drm_device *dev,
 		return -ENOMEM;
 	}
 	memset(dev_priv->hw_status_page, 0, PAGE_SIZE);
-	DRM_DEBUG("hw status page @ %p\n", dev_priv->hw_status_page);
+	DRM_DEBUG("hw status page @ %pK\n", dev_priv->hw_status_page);
 
 	I810_WRITE(0x02080, dev_priv->dma_status_page);
 	DRM_DEBUG("Enabled hardware status page\n");

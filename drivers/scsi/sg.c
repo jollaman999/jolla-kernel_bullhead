@@ -1242,7 +1242,7 @@ sg_mmap(struct file *filp, struct vm_area_struct *vma)
 	if ((!filp) || (!vma) || (!(sfp = (Sg_fd *) filp->private_data)))
 		return -ENXIO;
 	req_sz = vma->vm_end - vma->vm_start;
-	SCSI_LOG_TIMEOUT(3, printk("sg_mmap starting, vm_start=%p, len=%d\n",
+	SCSI_LOG_TIMEOUT(3, printk("sg_mmap starting, vm_start=%pK, len=%d\n",
 				   (void *) vma->vm_start, (int) req_sz));
 	if (vma->vm_pgoff)
 		return -EINVAL;	/* want no offset */
@@ -1860,7 +1860,7 @@ sg_remove_scat(Sg_scatter_hold * schp)
 
 			for (k = 0; k < schp->k_use_sg && schp->pages[k]; k++) {
 				SCSI_LOG_TIMEOUT(5, printk(
-				    "sg_remove_scat: k=%d, pg=0x%p\n",
+				    "sg_remove_scat: k=%d, pg=0x%pK\n",
 				    k, schp->pages[k]));
 				__free_pages(schp->pages[k], schp->page_order);
 			}
@@ -2085,7 +2085,7 @@ sg_add_sfp(Sg_device * sdp, int dev)
 	write_lock_irqsave(&sg_index_lock, iflags);
 	list_add_tail(&sfp->sfd_siblings, &sdp->sfds);
 	write_unlock_irqrestore(&sg_index_lock, iflags);
-	SCSI_LOG_TIMEOUT(3, printk("sg_add_sfp: sfp=0x%p\n", sfp));
+	SCSI_LOG_TIMEOUT(3, printk("sg_add_sfp: sfp=0x%pK\n", sfp));
 	if (unlikely(sg_big_buff != def_reserved_size))
 		sg_big_buff = def_reserved_size;
 
@@ -2118,7 +2118,7 @@ static void sg_remove_sfp_usercontext(struct work_struct *work)
 	}
 
 	SCSI_LOG_TIMEOUT(6,
-		printk("sg_remove_sfp: %s, sfp=0x%p\n",
+		printk("sg_remove_sfp: %s, sfp=0x%pK\n",
 			sdp->disk->disk_name,
 			sfp));
 	kfree(sfp);

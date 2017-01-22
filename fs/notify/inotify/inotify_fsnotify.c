@@ -103,7 +103,7 @@ static int inotify_handle_event(struct fsnotify_group *group,
 
 	BUG_ON(vfsmount_mark);
 
-	pr_debug("%s: group=%p event=%p to_tell=%p mask=%x\n", __func__, group,
+	pr_debug("%s: group=%pK event=%pK to_tell=%pK mask=%x\n", __func__, group,
 		 event, event->to_tell, event->mask);
 
 	to_tell = event->to_tell;
@@ -178,7 +178,7 @@ static int idr_callback(int id, void *p, void *data)
 	fsn_mark = p;
 	i_mark = container_of(fsn_mark, struct inotify_inode_mark, fsn_mark);
 
-	WARN(1, "inotify closing but id=%d for fsn_mark=%p in group=%p still in "
+	WARN(1, "inotify closing but id=%d for fsn_mark=%pK in group=%pK still in "
 		"idr.  Probably leaking memory\n", id, p, data);
 
 	/*
@@ -188,7 +188,7 @@ static int idr_callback(int id, void *p, void *data)
 	 * BUG() that was here.
 	 */
 	if (fsn_mark)
-		printk(KERN_WARNING "fsn_mark->group=%p inode=%p wd=%d\n",
+		printk(KERN_WARNING "fsn_mark->group=%pK inode=%pK wd=%d\n",
 			fsn_mark->group, fsn_mark->i.inode, i_mark->wd);
 	return 0;
 }

@@ -1688,7 +1688,7 @@ static int neo_map_mmio(struct fb_info *info, struct pci_dev *dev)
 				   info->fix.mmio_len);
 		return -ENOMEM;
 	} else
-		printk(KERN_INFO "neofb: mapped io at %p\n",
+		printk(KERN_INFO "neofb: mapped io at %pK\n",
 		       par->mmio_vbase);
 	return 0;
 }
@@ -1730,7 +1730,7 @@ static int neo_map_video(struct fb_info *info, struct pci_dev *dev,
 				   info->fix.smem_len);
 		return -ENOMEM;
 	} else
-		printk(KERN_INFO "neofb: mapped framebuffer at %p\n",
+		printk(KERN_INFO "neofb: mapped framebuffer at %pK\n",
 		       info->screen_base);
 
 #ifdef CONFIG_MTRR
@@ -1865,10 +1865,10 @@ static int neo_init_hw(struct fb_info *info)
 #if 0
 	printk(KERN_DEBUG "--- Neo extended register dump ---\n");
 	for (int w = 0; w < 0x85; w++)
-		printk(KERN_DEBUG "CR %p: %p\n", (void *) w,
+		printk(KERN_DEBUG "CR %pK: %pK\n", (void *) w,
 		       (void *) vga_rcrt(NULL, w));
 	for (int w = 0; w < 0xC7; w++)
-		printk(KERN_DEBUG "GR %p: %p\n", (void *) w,
+		printk(KERN_DEBUG "GR %pK: %pK\n", (void *) w,
 		       (void *) vga_rgfx(NULL, w));
 #endif
 	switch (info->fix.accel) {

@@ -290,7 +290,7 @@ static void uml_net_user_timer_expire(unsigned long _conn)
 #ifdef undef
 	struct connection *conn = (struct connection *)_conn;
 
-	dprintk(KERN_INFO "uml_net_user_timer_expire [%p]\n", conn);
+	dprintk(KERN_INFO "uml_net_user_timer_expire [%pK]\n", conn);
 	do_connect(conn);
 #endif
 }

@@ -72,7 +72,7 @@ asmlinkage int sys_rt_sigreturn(struct pt_regs *regs)
 	current_thread_info()->restart_block.fn = do_no_restart_syscall;
 
 	frame = (struct rt_sigframe __user *)regs->sp;
-	pr_debug("SIG return: frame = %p\n", frame);
+	pr_debug("SIG return: frame = %pK\n", frame);
 
 	if (!access_ok(VERIFY_READ, frame, sizeof(*frame)))
 		goto badframe;
@@ -188,7 +188,7 @@ setup_rt_frame(int sig, struct k_sigaction *ka, siginfo_t *info,
 		regs->lr = (unsigned long) &frame->retcode;
 	}
 
-	pr_debug("SIG deliver [%s:%d]: sig=%d sp=0x%lx pc=0x%lx->0x%p lr=0x%lx\n",
+	pr_debug("SIG deliver [%s:%d]: sig=%d sp=0x%lx pc=0x%lx->0x%pK lr=0x%lx\n",
 		 current->comm, current->pid, sig, regs->sp,
 		 regs->pc, ka->sa.sa_handler, regs->lr);
 

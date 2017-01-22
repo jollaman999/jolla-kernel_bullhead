@@ -62,7 +62,7 @@ struct parport_pc_via_data
 static __inline__ void parport_pc_write_data(struct parport *p, unsigned char d)
 {
 #ifdef DEBUG_PARPORT
-	printk (KERN_DEBUG "parport_pc_write_data(%p,0x%02x)\n", p, d);
+	printk (KERN_DEBUG "parport_pc_write_data(%pK,0x%02x)\n", p, d);
 #endif
 	outb(d, DATA(p));
 }
@@ -71,7 +71,7 @@ static __inline__ unsigned char parport_pc_read_data(struct parport *p)
 {
 	unsigned char val = inb (DATA (p));
 #ifdef DEBUG_PARPORT
-	printk (KERN_DEBUG "parport_pc_read_data(%p) = 0x%02x\n",
+	printk (KERN_DEBUG "parport_pc_read_data(%pK) = 0x%02x\n",
 		p, val);
 #endif
 	return val;

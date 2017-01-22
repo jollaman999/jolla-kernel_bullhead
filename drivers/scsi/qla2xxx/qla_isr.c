@@ -1311,7 +1311,7 @@ qla24xx_els_ct_entry(scsi_qla_host_t *vha, struct req_que *req,
 		break;
 	default:
 		ql_dbg(ql_dbg_user, vha, 0x503e,
-		    "Unrecognized SRB: (%p) type=%d.\n", sp, sp->type);
+		    "Unrecognized SRB: (%pK) type=%d.\n", sp, sp->type);
 		return;
 	}
 
@@ -1626,7 +1626,7 @@ qla2x00_handle_sense(srb_t *sp, uint8_t *sense_data, uint32_t par_sense_len,
 
 	if (sense_len) {
 		ql_dbg(ql_dbg_io + ql_dbg_buffer, vha, 0x301c,
-		    "Check condition Sense data, nexus%ld:%d:%d cmd=%p.\n",
+		    "Check condition Sense data, nexus%ld:%d:%d cmd=%pK.\n",
 		    sp->fcport->vha->host_no, cp->device->id, cp->device->lun,
 		    cp);
 		ql_dump_buffer(ql_dbg_io + ql_dbg_buffer, vha, 0x302b,
@@ -1669,7 +1669,7 @@ qla2x00_handle_dif_error(srb_t *sp, struct sts_entry_24xx *sts24)
 	e_ref_tag = le32_to_cpu(*(uint32_t *)(ep + 4));
 
 	ql_dbg(ql_dbg_io, vha, 0x3023,
-	    "iocb(s) %p Returned STATUS.\n", sts24);
+	    "iocb(s) %pK Returned STATUS.\n", sts24);
 
 	ql_dbg(ql_dbg_io, vha, 0x3024,
 	    "DIF ERROR in cmd 0x%x lba 0x%llx act ref"
@@ -1989,7 +1989,7 @@ qla2x00_status_entry(scsi_qla_host_t *vha, struct rsp_que *rsp, void *pkt)
 	cp = GET_CMD_SP(sp);
 	if (cp == NULL) {
 		ql_dbg(ql_dbg_io, vha, 0x3018,
-		    "Command already returned (0x%x/%p).\n",
+		    "Command already returned (0x%x/%pK).\n",
 		    sts->handle, sp);
 
 		return;
@@ -2273,7 +2273,7 @@ qla2x00_status_cont_entry(struct rsp_que *rsp, sts_cont_entry_t *pkt)
 	cp = GET_CMD_SP(sp);
 	if (cp == NULL) {
 		ql_log(ql_log_warn, vha, 0x3025,
-		    "cmd is NULL: already returned to OS (sp=%p).\n", sp);
+		    "cmd is NULL: already returned to OS (sp=%pK).\n", sp);
 
 		rsp->status_srb = NULL;
 		return;
@@ -2911,10 +2911,10 @@ msix_failed:
 		    && (ha->max_rsp_queues > 1 || ha->max_req_queues > 1))
 			ha->mqenable = 1;
 	ql_dbg(ql_dbg_multiq, vha, 0xc005,
-	    "mqiobase=%p, max_rsp_queues=%d, max_req_queues=%d.\n",
+	    "mqiobase=%pK, max_rsp_queues=%d, max_req_queues=%d.\n",
 	    ha->mqiobase, ha->max_rsp_queues, ha->max_req_queues);
 	ql_dbg(ql_dbg_init, vha, 0x0055,
-	    "mqiobase=%p, max_rsp_queues=%d, max_req_queues=%d.\n",
+	    "mqiobase=%pK, max_rsp_queues=%d, max_req_queues=%d.\n",
 	    ha->mqiobase, ha->max_rsp_queues, ha->max_req_queues);
 
 msix_out:

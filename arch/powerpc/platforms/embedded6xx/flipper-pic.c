@@ -155,7 +155,7 @@ struct irq_domain * __init flipper_pic_init(struct device_node *np)
 	}
 	io_base = ioremap(res.start, resource_size(&res));
 
-	pr_info("controller at 0x%08x mapped to 0x%p\n", res.start, io_base);
+	pr_info("controller at 0x%08x mapped to 0x%pK\n", res.start, io_base);
 
 	__flipper_quiesce(io_base);
 

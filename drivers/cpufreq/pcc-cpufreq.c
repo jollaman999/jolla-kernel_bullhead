@@ -175,7 +175,7 @@ static unsigned int pcc_get_freq(unsigned int cpu)
 			/ 100) * 1000);
 
 	pr_debug("get: SUCCESS: (virtual) output_offset for cpu %d is "
-		"0x%p, contains a value of: 0x%x. Speed is: %d MHz\n",
+		"0x%pK, contains a value of: 0x%x. Speed is: %d MHz\n",
 		cpu, (pcch_virt_addr + pcc_cpu_data->output_offset),
 		output_buffer, curr_freq);
 
@@ -209,7 +209,7 @@ static int pcc_cpufreq_target(struct cpufreq_policy *policy,
 	pcc_cpu_data = per_cpu_ptr(pcc_cpu_info, cpu);
 
 	pr_debug("target: CPU %d should go to target freq: %d "
-		"(virtual) input_offset is 0x%p\n",
+		"(virtual) input_offset is 0x%pK\n",
 		cpu, target_freq,
 		(pcch_virt_addr + pcc_cpu_data->input_offset));
 
@@ -457,7 +457,7 @@ static int __init pcc_cpufreq_probe(void)
 	}
 	pcch_hdr = pcch_virt_addr;
 
-	pr_debug("probe: PCCH header (virtual) addr: 0x%p\n", pcch_hdr);
+	pr_debug("probe: PCCH header (virtual) addr: 0x%pK\n", pcch_hdr);
 	pr_debug("probe: PCCH header is at physical address: 0x%llx,"
 		" signature: 0x%x, length: %d bytes, major: %d, minor: %d,"
 		" supported features: 0x%x, command field: 0x%x,"

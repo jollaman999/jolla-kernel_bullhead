@@ -540,7 +540,7 @@ extern void savage_emit_clip_rect_s4(drm_savage_private_t * dev_priv,
 			dev_priv->dma_pages[cur].used;			\
 	if (dma_ptr != expected) {					\
 		DRM_ERROR("DMA allocation and use don't match: "	\
-			  "%p != %p\n", expected, dma_ptr);		\
+			  "%pK != %pK\n", expected, dma_ptr);		\
 		savage_dma_reset(dev_priv);				\
 	}								\
 } while(0)

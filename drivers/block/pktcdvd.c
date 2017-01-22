@@ -987,7 +987,7 @@ static void pkt_end_io_read(struct bio *bio, int err)
 	struct pktcdvd_device *pd = pkt->pd;
 	BUG_ON(!pd);
 
-	VPRINTK("pkt_end_io_read: bio=%p sec0=%llx sec=%llx err=%d\n", bio,
+	VPRINTK("pkt_end_io_read: bio=%pK sec0=%llx sec=%llx err=%d\n", bio,
 		(unsigned long long)pkt->sector, (unsigned long long)bio->bi_sector, err);
 
 	if (err)
@@ -1070,7 +1070,7 @@ static void pkt_gather_data(struct pktcdvd_device *pd, struct packet_data *pkt)
 
 		p = (f * CD_FRAMESIZE) / PAGE_SIZE;
 		offset = (f * CD_FRAMESIZE) % PAGE_SIZE;
-		VPRINTK("pkt_gather_data: Adding frame %d, page:%p offs:%d\n",
+		VPRINTK("pkt_gather_data: Adding frame %d, page:%pK offs:%d\n",
 			f, pkt->pages[p], offset);
 		if (!bio_add_page(bio, pkt->pages[p], CD_FRAMESIZE, offset))
 			BUG();

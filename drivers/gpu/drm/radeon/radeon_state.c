@@ -2285,7 +2285,7 @@ static int radeon_cp_vertex(struct drm_device *dev, void *data, struct drm_file 
 	buf = dma->buflist[vertex->idx];
 
 	if (buf->file_priv != file_priv) {
-		DRM_ERROR("process %d using buffer owned by %p\n",
+		DRM_ERROR("process %d using buffer owned by %pK\n",
 			  DRM_CURRENTPID, buf->file_priv);
 		return -EINVAL;
 	}
@@ -2366,7 +2366,7 @@ static int radeon_cp_indices(struct drm_device *dev, void *data, struct drm_file
 	buf = dma->buflist[elts->idx];
 
 	if (buf->file_priv != file_priv) {
-		DRM_ERROR("process %d using buffer owned by %p\n",
+		DRM_ERROR("process %d using buffer owned by %pK\n",
 			  DRM_CURRENTPID, buf->file_priv);
 		return -EINVAL;
 	}
@@ -2494,7 +2494,7 @@ static int radeon_cp_indirect(struct drm_device *dev, void *data, struct drm_fil
 	buf = dma->buflist[indirect->idx];
 
 	if (buf->file_priv != file_priv) {
-		DRM_ERROR("process %d using buffer owned by %p\n",
+		DRM_ERROR("process %d using buffer owned by %pK\n",
 			  DRM_CURRENTPID, buf->file_priv);
 		return -EINVAL;
 	}
@@ -2568,7 +2568,7 @@ static int radeon_cp_vertex2(struct drm_device *dev, void *data, struct drm_file
 	buf = dma->buflist[vertex->idx];
 
 	if (buf->file_priv != file_priv) {
-		DRM_ERROR("process %d using buffer owned by %p\n",
+		DRM_ERROR("process %d using buffer owned by %pK\n",
 			  DRM_CURRENTPID, buf->file_priv);
 		return -EINVAL;
 	}
@@ -2958,7 +2958,7 @@ static int radeon_cp_cmdbuf(struct drm_device *dev, void *data,
 
 			buf = dma->buflist[idx];
 			if (buf->file_priv != file_priv || buf->pending) {
-				DRM_ERROR("bad buffer %p %p %d\n",
+				DRM_ERROR("bad buffer %pK %pK %d\n",
 					  buf->file_priv, file_priv,
 					  buf->pending);
 				goto err;

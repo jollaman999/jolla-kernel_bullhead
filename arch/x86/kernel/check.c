@@ -130,7 +130,7 @@ void check_for_bios_corruption(void)
 		for (; size; addr++, size -= sizeof(unsigned long)) {
 			if (!*addr)
 				continue;
-			printk(KERN_ERR "Corrupted low memory at %p (%lx phys) = %08lx\n",
+			printk(KERN_ERR "Corrupted low memory at %pK (%lx phys) = %08lx\n",
 			       addr, __pa(addr), *addr);
 			corruption = 1;
 			*addr = 0;

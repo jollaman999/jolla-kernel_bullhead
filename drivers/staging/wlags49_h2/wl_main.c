@@ -975,7 +975,7 @@ int wl_reset(struct net_device *dev)
 	/*------------------------------------------------------------------------*/
 	DBG_FUNC( "wl_reset" );
 	DBG_ENTER( DbgInfo );
-	DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
+	DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
 	DBG_PARAM( DbgInfo, "dev->base_addr", "(%#03lx)", dev->base_addr );
 
 	/*
@@ -1237,7 +1237,7 @@ void wl_set_wep_keys( struct wl_private *lp )
 	/*------------------------------------------------------------------------*/
 	DBG_FUNC( "wl_set_wep_keys" );
 	DBG_ENTER( DbgInfo );
-	DBG_PARAM( DbgInfo, "lp", "%s (0x%p)", lp->dev->name, lp );
+	DBG_PARAM( DbgInfo, "lp", "%s (0x%pK)", lp->dev->name, lp );
 	if ( lp->EnableEncryption ) {
 		/* NOTE: CFG_CNF_ENCRYPTION is set in wl_put_ltv() as it's a static
 				 RID */
@@ -1305,7 +1305,7 @@ int wl_apply(struct wl_private *lp)
 	DBG_FUNC( "wl_apply" );
 	DBG_ENTER( DbgInfo );
 	DBG_ASSERT( lp != NULL);
-	DBG_PARAM( DbgInfo, "lp", "%s (0x%p)", lp->dev->name, lp );
+	DBG_PARAM( DbgInfo, "lp", "%s (0x%pK)", lp->dev->name, lp );
 
 	if ( !( lp->flags & WVLAN2_UIL_BUSY )) {
 		/* The adapter parameters have changed:
@@ -2326,7 +2326,7 @@ void wl_remove( struct net_device *dev )
 	DBG_FUNC( "wl_remove" );
 	DBG_ENTER( DbgInfo );
 
-	DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
+	DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
 
 	wl_lock( lp, &flags );
 
@@ -2398,7 +2398,7 @@ void wl_suspend( struct net_device *dev )
 	DBG_FUNC( "wl_suspend" );
 	DBG_ENTER( DbgInfo );
 
-	DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
+	DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
 
 	/* The adapter is suspended:
 			Stop the adapter
@@ -2454,7 +2454,7 @@ void wl_resume(struct net_device *dev)
 	DBG_FUNC( "wl_resume" );
 	DBG_ENTER( DbgInfo );
 
-	DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
+	DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
 
 	wl_lock( lp, &flags );
 
@@ -2508,7 +2508,7 @@ void wl_release( struct net_device *dev )
 	DBG_FUNC( "wl_release" );
 	DBG_ENTER( DbgInfo );
 
-	DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
+	DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
 	/* If wl_remove() hasn't been called (i.e. when Card Services is shut
 	   down with the card in the slot), then call it */
 	if ( lp->is_registered == TRUE ) {
@@ -3619,7 +3619,7 @@ int scull_read_procmem(struct seq_file *m, void *v)
 //x		u_char                      spy_address[IW_MAX_SPY][ETH_ALEN];
 //x		struct iw_quality           spy_stat[IW_MAX_SPY];
 #endif // WIRELESS_EXT
-		seq_printf(m, "IFB:                  0x%p\n", &lp->hcfCtx );
+		seq_printf(m, "IFB:                  0x%pK\n", &lp->hcfCtx );
 		seq_printf(m, "flags:                %#.8lX\n", lp->flags );  //;?use this format from now on
 		seq_printf(m, "DebugFlag(wl_private) 0x%04X\n", lp->DebugFlag );
 #if DBG

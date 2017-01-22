@@ -144,12 +144,12 @@ enum MHI_STATUS get_nr_enclosed_el(struct mhi_ring *ring, void *rp,
 		return MHI_STATUS_ERROR;
 	}
 	if (MHI_STATUS_SUCCESS != get_element_index(ring, rp, &index_rp)) {
-		mhi_log(MHI_MSG_CRITICAL, "Bad element index rp 0x%p.\n", rp);
+		mhi_log(MHI_MSG_CRITICAL, "Bad element index rp 0x%pK.\n", rp);
 		return MHI_STATUS_ERROR;
 	}
 
 	if (MHI_STATUS_SUCCESS != get_element_index(ring, wp, &index_wp)) {
-		mhi_log(MHI_MSG_CRITICAL, "Bad element index wp 0x%p.\n", wp);
+		mhi_log(MHI_MSG_CRITICAL, "Bad element index wp 0x%pK.\n", wp);
 		return MHI_STATUS_ERROR;
 	}
 	ring_size = ring->len / ring->el_size;

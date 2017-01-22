@@ -165,7 +165,7 @@ struct ehea_cq *ehea_create_cq(struct ehea_adapter *adapter,
 					     0, EHEA_CQ_REGISTER_ORIG,
 					     cq->fw_handle, rpage, 1);
 		if (hret < H_SUCCESS) {
-			pr_err("register_rpage_cq failed ehea_cq=%p hret=%llx counter=%i act_pages=%i\n",
+			pr_err("register_rpage_cq failed ehea_cq=%pK hret=%llx counter=%i act_pages=%i\n",
 			       cq, hret, counter, cq->attr.nr_pages);
 			goto out_kill_hwq;
 		}

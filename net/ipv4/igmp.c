@@ -49,7 +49,7 @@
  *		Christian Daudt :	igmp timer wasn't set for local group
  *					memberships but was being deleted,
  *					which caused a "del_timer() called
- *					from %p with timer not initialized\n"
+ *					from %pK with timer not initialized\n"
  *					message (960131).
  *		Christian Daudt :	removed del_timer from
  *					igmp_timer_expire function (960205).

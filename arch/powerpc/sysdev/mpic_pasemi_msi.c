@@ -76,7 +76,7 @@ static void pasemi_msi_teardown_msi_irqs(struct pci_dev *pdev)
 	struct msi_desc *entry;
 	irq_hw_number_t hwirq;
 
-	pr_debug("pasemi_msi_teardown_msi_irqs, pdev %p\n", pdev);
+	pr_debug("pasemi_msi_teardown_msi_irqs, pdev %pK\n", pdev);
 
 	list_for_each_entry(entry, &pdev->msi_list, list) {
 		if (entry->irq == NO_IRQ)
@@ -99,7 +99,7 @@ static int pasemi_msi_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 	struct msi_msg msg;
 	int hwirq;
 
-	pr_debug("pasemi_msi_setup_msi_irqs, pdev %p nvec %d type %d\n",
+	pr_debug("pasemi_msi_setup_msi_irqs, pdev %pK nvec %d type %d\n",
 		 pdev, nvec, type);
 
 	msg.address_hi = 0;

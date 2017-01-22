@@ -555,7 +555,7 @@ static void sahara_aes_queue_task(unsigned long data)
 
 	/* Request is ready to be dispatched by the device */
 	dev_dbg(dev->device,
-		"dispatch request (nbytes=%d, src=%p, dst=%p)\n",
+		"dispatch request (nbytes=%d, src=%pK, dst=%pK)\n",
 		req->nbytes, req->src, req->dst);
 
 	/* assign new request to device */

@@ -85,7 +85,7 @@ qla4xxx_status_cont_entry(struct scsi_qla_host *ha,
 	cmd = srb->cmd;
 	if (cmd == NULL) {
 		DEBUG2(printk(KERN_INFO "scsi%ld: %s: Cmd already returned "
-			"back to OS srb=%p srb->state:%d\n", ha->host_no,
+			"back to OS srb=%pK srb->state:%d\n", ha->host_no,
 			__func__, srb, srb->state));
 		ha->status_srb = NULL;
 		return;
@@ -124,7 +124,7 @@ static void qla4xxx_status_entry(struct scsi_qla_host *ha,
 	srb = qla4xxx_del_from_active_array(ha, le32_to_cpu(sts_entry->handle));
 	if (!srb) {
 		ql4_printk(KERN_WARNING, ha, "%s invalid status entry: "
-			   "handle=0x%0x, srb=%p\n", __func__,
+			   "handle=0x%0x, srb=%pK\n", __func__,
 			   sts_entry->handle, srb);
 		if (is_qla80XX(ha))
 			set_bit(DPC_RESET_HA_FW_CONTEXT, &ha->dpc_flags);
@@ -136,11 +136,11 @@ static void qla4xxx_status_entry(struct scsi_qla_host *ha,
 	cmd = srb->cmd;
 	if (cmd == NULL) {
 		DEBUG2(printk("scsi%ld: %s: Command already returned back to "
-			      "OS pkt->handle=%d srb=%p srb->state:%d\n",
+			      "OS pkt->handle=%d srb=%pK srb->state:%d\n",
 			      ha->host_no, __func__, sts_entry->handle,
 			      srb, srb->state));
 		ql4_printk(KERN_WARNING, ha, "Command is NULL:"
-		    " already returned to OS (srb=%p)\n", srb);
+		    " already returned to OS (srb=%pK)\n", srb);
 		return;
 	}
 
@@ -526,7 +526,7 @@ void qla4xxx_process_response_queue(struct scsi_qla_host *ha)
 				goto exit_prq_invalid_handle;
 
 			DEBUG2(printk("scsi%ld: %s: FW device queue full, "
-				      "srb %p\n", ha->host_no, __func__, srb));
+				      "srb %pK\n", ha->host_no, __func__, srb));
 
 			/* ETRY normally by sending it back with
 			 * DID_BUS_BUSY */
@@ -570,7 +570,7 @@ void qla4xxx_process_response_queue(struct scsi_qla_host *ha)
 	return;
 
 exit_prq_invalid_handle:
-	DEBUG2(printk("scsi%ld: %s: Invalid handle(srb)=%p type=%x IOCS=%x\n",
+	DEBUG2(printk("scsi%ld: %s: Invalid handle(srb)=%pK type=%x IOCS=%x\n",
 		      ha->host_no, __func__, srb, sts_entry->hdr.entryType,
 		      sts_entry->completionStatus));
 

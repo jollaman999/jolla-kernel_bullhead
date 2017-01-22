@@ -1407,7 +1407,7 @@ mptspi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	if (!ioc_cap) {
 		printk(MYIOC_s_WARN_FMT
-			"Skipping ioc=%p because SCSI Initiator mode is NOT enabled!\n",
+			"Skipping ioc=%pK because SCSI Initiator mode is NOT enabled!\n",
 			ioc->name, ioc);
 		return 0;
 	}
@@ -1509,7 +1509,7 @@ mptspi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 	spin_lock_init(&ioc->scsi_lookup_lock);
 
-	dprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ScsiLookup @ %p\n",
+	dprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ScsiLookup @ %pK\n",
 		 ioc->name, ioc->ScsiLookup));
 
 	ioc->spi_data.Saf_Te = mpt_saf_te;

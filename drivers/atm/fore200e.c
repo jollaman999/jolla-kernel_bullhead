@@ -427,7 +427,7 @@ fore200e_pca_dma_map(struct fore200e* fore200e, void* virt_addr, int size, int d
 {
     u32 dma_addr = pci_map_single((struct pci_dev*)fore200e->bus_dev, virt_addr, size, direction);
 
-    DPRINTK(3, "PCI DVMA mapping: virt_addr = 0x%p, size = %d, direction = %d,  --> dma_addr = 0x%08x\n",
+    DPRINTK(3, "PCI DVMA mapping: virt_addr = 0x%pK, size = %d, direction = %d,  --> dma_addr = 0x%08x\n",
 	    virt_addr, size, direction, dma_addr);
     
     return dma_addr;
@@ -538,7 +538,7 @@ static int fore200e_pca_map(struct fore200e* fore200e)
 	return -EFAULT;
     }
 
-    DPRINTK(1, "device %s mapped to 0x%p\n", fore200e->name, fore200e->virt_base);
+    DPRINTK(1, "device %s mapped to 0x%pK\n", fore200e->name, fore200e->virt_base);
 
     /* gain access to the PCA specific registers  */
     fore200e->regs.pca.hcr = fore200e->virt_base + PCA200E_HCR_OFFSET;
@@ -677,7 +677,7 @@ static u32 fore200e_sba_dma_map(struct fore200e *fore200e, void* virt_addr, int 
 
 	dma_addr = dma_map_single(&op->dev, virt_addr, size, direction);
 
-	DPRINTK(3, "SBUS DVMA mapping: virt_addr = 0x%p, size = %d, direction = %d --> dma_addr = 0x%08x\n",
+	DPRINTK(3, "SBUS DVMA mapping: virt_addr = 0x%pK, size = %d, direction = %d --> dma_addr = 0x%08x\n",
 		virt_addr, size, direction, dma_addr);
     
 	return dma_addr;
@@ -782,7 +782,7 @@ static int __init fore200e_sba_map(struct fore200e *fore200e)
 		return -EFAULT;
 	}
 
-	DPRINTK(1, "device %s mapped to 0x%p\n", fore200e->name, fore200e->virt_base);
+	DPRINTK(1, "device %s mapped to 0x%pK\n", fore200e->name, fore200e->virt_base);
     
 	fore200e->bus->write(0x02, fore200e->regs.sba.isr); /* XXX hardwired interrupt level */
 
@@ -868,7 +868,7 @@ fore200e_tx_irq(struct fore200e* fore200e)
 	    break;
 	}
 
-	DPRINTK(3, "TX COMPLETED: entry = %p [tail = %d], vc_map = %p, skb = %p\n", 
+	DPRINTK(3, "TX COMPLETED: entry = %pK [tail = %d], vc_map = %pK, skb = %pK\n", 
 		entry, txq->tail, entry->vc_map, entry->skb);
 
 	/* free copy of misaligned data */
@@ -1787,7 +1787,7 @@ fore200e_getsockopt(struct atm_vcc* vcc, int level, int optname, void __user *op
 {
     /* struct fore200e* fore200e = FORE200E_DEV(vcc->dev); */
 
-    DPRINTK(2, "getsockopt %d.%d.%d, level = %d, optname = 0x%x, optval = 0x%p, optlen = %d\n",
+    DPRINTK(2, "getsockopt %d.%d.%d, level = %d, optname = 0x%x, optval = 0x%pK, optlen = %d\n",
 	    vcc->itf, vcc->vpi, vcc->vci, level, optname, optval, optlen);
 
     return -EINVAL;
@@ -1799,7 +1799,7 @@ fore200e_setsockopt(struct atm_vcc* vcc, int level, int optname, void __user *op
 {
     /* struct fore200e* fore200e = FORE200E_DEV(vcc->dev); */
     
-    DPRINTK(2, "setsockopt %d.%d.%d, level = %d, optname = 0x%x, optval = 0x%p, optlen = %d\n",
+    DPRINTK(2, "setsockopt %d.%d.%d, level = %d, optname = 0x%x, optval = 0x%pK, optlen = %d\n",
 	    vcc->itf, vcc->vpi, vcc->vci, level, optname, optval, optlen);
     
     return -EINVAL;
@@ -1953,7 +1953,7 @@ fore200e_ioctl(struct atm_dev* dev, unsigned int cmd, void __user * arg)
 {
     struct fore200e* fore200e = FORE200E_DEV(dev);
     
-    DPRINTK(2, "ioctl cmd = 0x%x (%u), arg = 0x%p (%lu)\n", cmd, cmd, arg, (unsigned long)arg);
+    DPRINTK(2, "ioctl cmd = 0x%x (%u), arg = 0x%pK (%lu)\n", cmd, cmd, arg, (unsigned long)arg);
 
     switch (cmd) {
 
@@ -2515,7 +2515,7 @@ static int fore200e_load_and_start_fw(struct fore200e *fore200e)
     fw_header = (struct fw_header *) firmware->data;
     load_addr = fore200e->virt_base + le32_to_cpu(fw_header->load_offset);
 
-    DPRINTK(2, "device %s firmware being loaded at 0x%p (%d words)\n",
+    DPRINTK(2, "device %s firmware being loaded at 0x%pK (%d words)\n",
 	    fore200e->name, load_addr, fw_size);
 
     if (le32_to_cpu(fw_header->magic) != FW_HEADER_MAGIC) {
@@ -2836,8 +2836,8 @@ fore200e_proc_read(struct atm_dev *dev, loff_t* pos, char* page)
 	
 	len += sprintf(page + len,
 		"   interrupt line:\t\t%s\n"
-		"   physical base address:\t0x%p\n"
-		"   virtual base address:\t0x%p\n"
+		"   physical base address:\t0x%pK\n"
+		"   virtual base address:\t0x%pK\n"
 		"   factory address (ESI):\t%pM\n"
 		"   board serial number:\t\t%d\n\n",
 		fore200e_irq_itoa(fore200e->irq),

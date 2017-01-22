@@ -507,7 +507,7 @@ static int gdbstub_single_step(struct pt_regs *regs)
 	if (gdbstub_read_byte(pc, &cur) < 0)
 		return -EFAULT;
 
-	gdbstub_bkpt("Single Step from %p { %02x }\n", pc, cur);
+	gdbstub_bkpt("Single Step from %pK { %02x }\n", pc, cur);
 
 	gdbstub_flush_caches = 1;
 
@@ -696,7 +696,7 @@ static int gdbstub_single_step(struct pt_regs *regs)
 		}
 	}
 
-	gdbstub_bkpt("Step: %02x at %p; %02x at %p\n",
+	gdbstub_bkpt("Step: %02x at %pK; %02x at %pK\n",
 		     step_bp[0].opcode[0], step_bp[0].addr,
 		     step_bp[1].opcode[0], step_bp[1].addr);
 
@@ -1087,7 +1087,7 @@ int gdbstub_set_breakpoint(u8 *addr, int len)
 	len = (len + 1) & ~1;
 #endif
 
-	gdbstub_bkpt("setbkpt(%p,%d)\n", addr, len);
+	gdbstub_bkpt("setbkpt(%pK,%d)\n", addr, len);
 
 	for (bkpt = 255; bkpt >= 0; bkpt--)
 		if (!gdbstub_bkpts[bkpt].addr)
@@ -1116,7 +1116,7 @@ int gdbstub_set_breakpoint(u8 *addr, int len)
 	gdbstub_bkpts[bkpt].addr = addr;
 	gdbstub_bkpts[bkpt].len = len;
 
-	gdbstub_bkpt("Set BKPT[%02x]: %p-%p {%02x%02x%02x%02x%02x%02x%02x}\n",
+	gdbstub_bkpt("Set BKPT[%02x]: %pK-%pK {%02x%02x%02x%02x%02x%02x%02x}\n",
 		     bkpt,
 		     gdbstub_bkpts[bkpt].addr,
 		     gdbstub_bkpts[bkpt].addr + gdbstub_bkpts[bkpt].len - 1,
@@ -1149,7 +1149,7 @@ int gdbstub_clear_breakpoint(u8 *addr, int len)
 	len = (len + 1) & ~1;
 #endif
 
-	gdbstub_bkpt("clearbkpt(%p,%d)\n", addr, len);
+	gdbstub_bkpt("clearbkpt(%pK,%d)\n", addr, len);
 
 	for (bkpt = 255; bkpt >= 0; bkpt--)
 		if (gdbstub_bkpts[bkpt].addr == addr &&
@@ -1704,7 +1704,7 @@ asmlinkage int debugger_intercept(enum exception_code excep,
 		asm("mov mdr,%0" : "=d"(mdr));
 
 		gdbstub_entry(
-			"--> debugger_intercept(%p,%04x) [MDR=%lx PC=%lx]\n",
+			"--> debugger_intercept(%pK,%04x) [MDR=%lx PC=%lx]\n",
 			regs, excep, mdr, regs->pc);
 
 		gdbstub_entry(
@@ -1730,7 +1730,7 @@ asmlinkage int debugger_intercept(enum exception_code excep,
 			"cvf: %08lx   crl: %08lx  crh: %08lx  drq: %08lx\n",
 			regs->mcvf, regs->mcrl, regs->mcrh, regs->mdrq);
 		gdbstub_entry(
-			"threadinfo=%p task=%p)\n",
+			"threadinfo=%pK task=%pK)\n",
 			current_thread_info(), current);
 	} else {
 		notfirst = 1;
@@ -1752,7 +1752,7 @@ asmlinkage void gdbstub_exception(struct pt_regs *regs,
 	unsigned long mdr;
 
 	asm("mov mdr,%0" : "=d"(mdr));
-	gdbstub_entry("--> gdbstub exception({%p},%04x) [MDR=%lx]\n",
+	gdbstub_entry("--> gdbstub exception({%pK},%04x) [MDR=%lx]\n",
 		      regs, excep, mdr);
 
 	while ((unsigned long) regs == 0xffffffff) {}

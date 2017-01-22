@@ -269,7 +269,7 @@ int __kprobes do_page_fault(struct pt_regs *regs, unsigned long address,
 		/* in_atomic() in user mode is really bad,
 		   as is current->mm == NULL. */
 		printk(KERN_EMERG "Page fault in user mode with "
-		       "in_atomic() = %d mm = %p\n", in_atomic(), mm);
+		       "in_atomic() = %d mm = %pK\n", in_atomic(), mm);
 		printk(KERN_EMERG "NIP = %lx  MSR = %lx\n",
 		       regs->nip, regs->msr);
 		die("Weird page fault", regs, SIGSEGV);

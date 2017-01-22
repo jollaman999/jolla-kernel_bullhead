@@ -87,7 +87,7 @@ default_init(struct task_struct *task, void *buf, unsigned int flags, int cpu, v
 	hdr->hdr_overflows    = 0UL;
 	hdr->hdr_count        = 0UL;
 
-	DPRINT(("[%d] buffer=%p buf_size=%lu hdr_size=%lu hdr_version=%u cur_offs=%lu\n",
+	DPRINT(("[%d] buffer=%pK buf_size=%lu hdr_size=%lu hdr_version=%u cur_offs=%lu\n",
 		task_pid_nr(task),
 		buf,
 		hdr->hdr_buf_size,
@@ -110,7 +110,7 @@ default_handler(struct task_struct *task, void *buf, pfm_ovfl_arg_t *arg, struct
 	unsigned char ovfl_notify;
 
 	if (unlikely(buf == NULL || arg == NULL|| regs == NULL || task == NULL)) {
-		DPRINT(("[%d] invalid arguments buf=%p arg=%p\n", task->pid, buf, arg));
+		DPRINT(("[%d] invalid arguments buf=%pK arg=%pK\n", task->pid, buf, arg));
 		return -EINVAL;
 	}
 
@@ -138,7 +138,7 @@ default_handler(struct task_struct *task, void *buf, pfm_ovfl_arg_t *arg, struct
 
 	hdr->hdr_count++;
 
-	DPRINT_ovfl(("[%d] count=%lu cur=%p last=%p free_bytes=%lu ovfl_pmd=%d ovfl_notify=%d npmds=%u\n",
+	DPRINT_ovfl(("[%d] count=%lu cur=%pK last=%pK free_bytes=%lu ovfl_pmd=%d ovfl_notify=%d npmds=%u\n",
 			task->pid,
 			hdr->hdr_count,
 			cur, last,
@@ -245,7 +245,7 @@ default_restart(struct task_struct *task, pfm_ovfl_ctrl_t *ctrl, void *buf, stru
 static int
 default_exit(struct task_struct *task, void *buf, struct pt_regs *regs)
 {
-	DPRINT(("[%d] exit(%p)\n", task_pid_nr(task), buf));
+	DPRINT(("[%d] exit(%pK)\n", task_pid_nr(task), buf));
 	return 0;
 }
 

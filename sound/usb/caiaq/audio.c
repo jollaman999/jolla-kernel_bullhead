@@ -104,7 +104,7 @@ static int stream_start(struct snd_usb_caiaqdev *cdev)
 	int i, ret;
 	struct device *dev = caiaqdev_to_dev(cdev);
 
-	dev_dbg(dev, "%s(%p)\n", __func__, cdev);
+	dev_dbg(dev, "%s(%pK)\n", __func__, cdev);
 
 	if (cdev->streaming)
 		return -EINVAL;
@@ -135,7 +135,7 @@ static void stream_stop(struct snd_usb_caiaqdev *cdev)
 	int i;
 	struct device *dev = caiaqdev_to_dev(cdev);
 
-	dev_dbg(dev, "%s(%p)\n", __func__, cdev);
+	dev_dbg(dev, "%s(%pK)\n", __func__, cdev);
 	if (!cdev->streaming)
 		return;
 
@@ -156,7 +156,7 @@ static int snd_usb_caiaq_substream_open(struct snd_pcm_substream *substream)
 	struct snd_usb_caiaqdev *cdev = snd_pcm_substream_chip(substream);
 	struct device *dev = caiaqdev_to_dev(cdev);
 
-	dev_dbg(dev, "%s(%p)\n", __func__, substream);
+	dev_dbg(dev, "%s(%pK)\n", __func__, substream);
 	substream->runtime->hw = cdev->pcm_info;
 	snd_pcm_limit_hw_rates(substream->runtime);
 
@@ -168,7 +168,7 @@ static int snd_usb_caiaq_substream_close(struct snd_pcm_substream *substream)
 	struct snd_usb_caiaqdev *cdev = snd_pcm_substream_chip(substream);
 	struct device *dev = caiaqdev_to_dev(cdev);
 
-	dev_dbg(dev, "%s(%p)\n", __func__, substream);
+	dev_dbg(dev, "%s(%pK)\n", __func__, substream);
 	if (all_substreams_zero(cdev->sub_playback) &&
 	    all_substreams_zero(cdev->sub_capture)) {
 		/* when the last client has stopped streaming,
@@ -209,7 +209,7 @@ static int snd_usb_caiaq_pcm_prepare(struct snd_pcm_substream *substream)
 	struct snd_pcm_runtime *runtime = substream->runtime;
 	struct device *dev = caiaqdev_to_dev(cdev);
 
-	dev_dbg(dev, "%s(%p)\n", __func__, substream);
+	dev_dbg(dev, "%s(%pK)\n", __func__, substream);
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
 		int out_pos;
@@ -292,7 +292,7 @@ static int snd_usb_caiaq_pcm_trigger(struct snd_pcm_substream *sub, int cmd)
 	struct snd_usb_caiaqdev *cdev = snd_pcm_substream_chip(sub);
 	struct device *dev = caiaqdev_to_dev(cdev);
 
-	dev_dbg(dev, "%s(%p) cmd %d\n", __func__, sub, cmd);
+	dev_dbg(dev, "%s(%pK) cmd %d\n", __func__, sub, cmd);
 
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
@@ -894,7 +894,7 @@ void snd_usb_caiaq_audio_free(struct snd_usb_caiaqdev *cdev)
 {
 	struct device *dev = caiaqdev_to_dev(cdev);
 
-	dev_dbg(dev, "%s(%p)\n", __func__, cdev);
+	dev_dbg(dev, "%s(%pK)\n", __func__, cdev);
 	stream_stop(cdev);
 	free_urbs(cdev->data_urbs_in);
 	free_urbs(cdev->data_urbs_out);

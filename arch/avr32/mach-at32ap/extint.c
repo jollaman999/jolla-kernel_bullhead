@@ -245,7 +245,7 @@ static int __init eic_probe(struct platform_device *pdev)
 	}
 
 	dev_info(&pdev->dev,
-		 "External Interrupt Controller at 0x%p, IRQ %u\n",
+		 "External Interrupt Controller at 0x%pK, IRQ %u\n",
 		 eic->regs, int_irq);
 	dev_info(&pdev->dev,
 		 "Handling %u external IRQs, starting with IRQ %u\n",

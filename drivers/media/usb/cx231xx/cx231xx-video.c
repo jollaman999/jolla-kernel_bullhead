@@ -114,7 +114,7 @@ static inline void buffer_filled(struct cx231xx *dev,
 				 struct cx231xx_buffer *buf)
 {
 	/* Advice that buffer was filled */
-	cx231xx_isocdbg("[%p/%d] wakeup\n", buf, buf->vb.i);
+	cx231xx_isocdbg("[%pK/%d] wakeup\n", buf, buf->vb.i);
 	buf->vb.state = VIDEOBUF_DONE;
 	buf->vb.field_count++;
 	v4l2_get_timestamp(&buf->vb.ts);

@@ -22,7 +22,7 @@ void oz_remember_urb(struct urb *urb)
 	spin_lock_irqsave(&g_urb_mem_lock, irq_state);
 	if (g_nb_urbs < OZ_MAX_URBS) {
 		g_urb_memory[g_nb_urbs++] = urb;
-		oz_trace("%lu: urb up = %d %p\n", jiffies, g_nb_urbs, urb);
+		oz_trace("%lu: urb up = %d %pK\n", jiffies, g_nb_urbs, urb);
 	} else {
 		oz_trace("ERROR urb buffer full\n");
 	}
@@ -42,7 +42,7 @@ int oz_forget_urb(struct urb *urb)
 			if (--g_nb_urbs > i)
 				memcpy(&g_urb_memory[i], &g_urb_memory[i+1],
 					(g_nb_urbs - i) * sizeof(struct urb *));
-			oz_trace("%lu: urb down = %d %p\n",
+			oz_trace("%lu: urb down = %d %pK\n",
 				jiffies, g_nb_urbs, urb);
 		}
 	}

@@ -4218,7 +4218,7 @@ static irqreturn_t niu_interrupt(int irq, void *dev_id)
 	u64 v0, v1, v2;
 
 	if (netif_msg_intr(np))
-		printk(KERN_DEBUG KBUILD_MODNAME ": " "%s() ldg[%p](%d)",
+		printk(KERN_DEBUG KBUILD_MODNAME ": " "%s() ldg[%pK](%d)",
 		       __func__, lp, ldg);
 
 	spin_lock_irqsave(&np->lock, flags);
@@ -4353,7 +4353,7 @@ static int niu_alloc_rx_ring_info(struct niu *np,
 	if (!rp->mbox)
 		return -ENOMEM;
 	if ((unsigned long)rp->mbox & (64UL - 1)) {
-		netdev_err(np->dev, "Coherent alloc gives misaligned RXDMA mailbox %p\n",
+		netdev_err(np->dev, "Coherent alloc gives misaligned RXDMA mailbox %pK\n",
 			   rp->mbox);
 		return -EINVAL;
 	}
@@ -4364,7 +4364,7 @@ static int niu_alloc_rx_ring_info(struct niu *np,
 	if (!rp->rcr)
 		return -ENOMEM;
 	if ((unsigned long)rp->rcr & (64UL - 1)) {
-		netdev_err(np->dev, "Coherent alloc gives misaligned RXDMA RCR table %p\n",
+		netdev_err(np->dev, "Coherent alloc gives misaligned RXDMA RCR table %pK\n",
 			   rp->rcr);
 		return -EINVAL;
 	}
@@ -4377,7 +4377,7 @@ static int niu_alloc_rx_ring_info(struct niu *np,
 	if (!rp->rbr)
 		return -ENOMEM;
 	if ((unsigned long)rp->rbr & (64UL - 1)) {
-		netdev_err(np->dev, "Coherent alloc gives misaligned RXDMA RBR table %p\n",
+		netdev_err(np->dev, "Coherent alloc gives misaligned RXDMA RBR table %pK\n",
 			   rp->rbr);
 		return -EINVAL;
 	}
@@ -4411,7 +4411,7 @@ static int niu_alloc_tx_ring_info(struct niu *np,
 	if (!rp->mbox)
 		return -ENOMEM;
 	if ((unsigned long)rp->mbox & (64UL - 1)) {
-		netdev_err(np->dev, "Coherent alloc gives misaligned TXDMA mailbox %p\n",
+		netdev_err(np->dev, "Coherent alloc gives misaligned TXDMA mailbox %pK\n",
 			   rp->mbox);
 		return -EINVAL;
 	}
@@ -4422,7 +4422,7 @@ static int niu_alloc_tx_ring_info(struct niu *np,
 	if (!rp->descr)
 		return -ENOMEM;
 	if ((unsigned long)rp->descr & (64UL - 1)) {
-		netdev_err(np->dev, "Coherent alloc gives misaligned TXDMA descr table %p\n",
+		netdev_err(np->dev, "Coherent alloc gives misaligned TXDMA descr table %pK\n",
 			   rp->descr);
 		return -EINVAL;
 	}

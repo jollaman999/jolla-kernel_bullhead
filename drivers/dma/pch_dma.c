@@ -470,7 +470,7 @@ static struct pch_dma_desc *pdc_desc_get(struct pch_dma_chan *pd_chan)
 			ret = desc;
 			break;
 		}
-		dev_dbg(chan2dev(&pd_chan->chan), "desc %p not ACKed\n", desc);
+		dev_dbg(chan2dev(&pd_chan->chan), "desc %pK not ACKed\n", desc);
 	}
 	spin_unlock(&pd_chan->lock);
 	dev_dbg(chan2dev(&pd_chan->chan), "scanned %d descriptors\n", i);

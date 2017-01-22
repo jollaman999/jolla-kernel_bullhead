@@ -2451,18 +2451,18 @@ static int esp_eh_abort_handler(struct scsi_cmnd *cmd)
 	 * XXX much for the final driver.
 	 */
 	spin_lock_irqsave(esp->host->host_lock, flags);
-	printk(KERN_ERR PFX "esp%d: Aborting command [%p:%02x]\n",
+	printk(KERN_ERR PFX "esp%d: Aborting command [%pK:%02x]\n",
 	       esp->host->unique_id, cmd, cmd->cmnd[0]);
 	ent = esp->active_cmd;
 	if (ent)
-		printk(KERN_ERR PFX "esp%d: Current command [%p:%02x]\n",
+		printk(KERN_ERR PFX "esp%d: Current command [%pK:%02x]\n",
 		       esp->host->unique_id, ent->cmd, ent->cmd->cmnd[0]);
 	list_for_each_entry(ent, &esp->queued_cmds, list) {
-		printk(KERN_ERR PFX "esp%d: Queued command [%p:%02x]\n",
+		printk(KERN_ERR PFX "esp%d: Queued command [%pK:%02x]\n",
 		       esp->host->unique_id, ent->cmd, ent->cmd->cmnd[0]);
 	}
 	list_for_each_entry(ent, &esp->active_cmds, list) {
-		printk(KERN_ERR PFX "esp%d: Active command [%p:%02x]\n",
+		printk(KERN_ERR PFX "esp%d: Active command [%pK:%02x]\n",
 		       esp->host->unique_id, ent->cmd, ent->cmd->cmnd[0]);
 	}
 	esp_dump_cmd_log(esp);

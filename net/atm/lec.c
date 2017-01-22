@@ -278,7 +278,7 @@ static netdev_tx_t lec_start_xmit(struct sk_buff *skb,
 	dst = lec_h->h_dest;
 	entry = NULL;
 	vcc = lec_arp_resolve(priv, dst, is_rdesc, &entry);
-	pr_debug("%s:vcc:%p vcc_flags:%lx, entry:%p\n",
+	pr_debug("%s:vcc:%pK vcc_flags:%lx, entry:%pK\n",
 		 dev->name, vcc, vcc ? vcc->flags : 0, entry);
 	if (!vcc || !test_bit(ATM_VF_READY, &vcc->flags)) {
 		if (entry && (entry->tx_wait.qlen < LEC_UNRES_QUE_LEN)) {
@@ -1369,12 +1369,12 @@ static void dump_arp_table(struct lec_priv *priv)
 	char buf[256];
 	int i, j, offset;
 
-	pr_info("Dump %p:\n", priv);
+	pr_info("Dump %pK:\n", priv);
 	for (i = 0; i < LEC_ARP_TABLE_SIZE; i++) {
 		hlist_for_each_entry(rulla,
 				     &priv->lec_arp_tables[i], next) {
 			offset = 0;
-			offset += sprintf(buf, "%d: %p\n", i, rulla);
+			offset += sprintf(buf, "%d: %pK\n", i, rulla);
 			offset += sprintf(buf + offset, "Mac: %pM",
 					  rulla->mac_addr);
 			offset += sprintf(buf + offset, " Atm:");
@@ -1607,7 +1607,7 @@ static void lec_arp_expire_vcc(unsigned long data)
 
 	del_timer(&to_remove->timer);
 
-	pr_debug("%p %p: vpi:%d vci:%d\n",
+	pr_debug("%pK %pK: vpi:%d vci:%d\n",
 		 to_remove, priv,
 		 to_remove->vcc ? to_remove->recv_vcc->vpi : 0,
 		 to_remove->vcc ? to_remove->recv_vcc->vci : 0);
@@ -1690,7 +1690,7 @@ static void lec_arp_check_expire(struct work_struct *work)
 	unsigned long now;
 	int i;
 
-	pr_debug("%p\n", priv);
+	pr_debug("%pK\n", priv);
 	now = jiffies;
 restart:
 	spin_lock_irqsave(&priv->lec_arp_lock, flags);
@@ -1783,7 +1783,7 @@ static struct atm_vcc *lec_arp_resolve(struct lec_priv *priv,
 		 */
 		lec_arp_hold(entry);
 		*ret_entry = entry;
-		pr_debug("entry->status %d entry->vcc %p\n", entry->status,
+		pr_debug("entry->status %d entry->vcc %pK\n", entry->status,
 			 entry->vcc);
 		found = NULL;
 	} else {
@@ -2146,7 +2146,7 @@ lec_set_flush_tran_id(struct lec_priv *priv,
 				     &priv->lec_arp_tables[i], next) {
 			if (!memcmp(atm_addr, entry->atm_addr, ATM_ESA_LEN)) {
 				entry->flush_tran_id = tran_id;
-				pr_debug("Set flush transaction id to %lx for %p\n",
+				pr_debug("Set flush transaction id to %lx for %pK\n",
 					 tran_id, entry);
 			}
 		}

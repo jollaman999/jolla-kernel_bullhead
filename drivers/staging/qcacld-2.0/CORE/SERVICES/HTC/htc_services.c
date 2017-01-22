@@ -58,7 +58,7 @@ A_STATUS HTCConnectService(HTC_HANDLE               HTCHandle,
     A_UINT16                            rsp_msg_id, rsp_msg_serv_id, rsp_msg_max_msg_size;
     A_UINT8                             rsp_msg_status, rsp_msg_end_id, rsp_msg_serv_meta_len;
 
-    AR_DEBUG_PRINTF(ATH_DEBUG_TRC, ("+HTCConnectService, target:%p SvcID:0x%X \n",
+    AR_DEBUG_PRINTF(ATH_DEBUG_TRC, ("+HTCConnectService, target:%pK SvcID:0x%X \n",
                                     target, pConnectReq->ServiceID));
 
     do {

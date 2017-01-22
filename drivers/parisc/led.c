@@ -719,7 +719,7 @@ int __init led_init(void)
 			 lcd_info.lcd_width, lcd_info.min_cmd_delay,
 			 __FILE__, sizeof(lcd_info), 
 			 chassis_info.actcnt, chassis_info.maxcnt));
-		DPRINTK((KERN_INFO "%s: cmd=%p, data=%p, reset1=%x, reset2=%x, act_enable=%d\n",
+		DPRINTK((KERN_INFO "%s: cmd=%pK, data=%pK, reset1=%x, reset2=%x, act_enable=%d\n",
 			__FILE__, lcd_info.lcd_cmd_reg_addr, 
 			lcd_info.lcd_data_reg_addr, lcd_info.reset_cmd1,  
 			lcd_info.reset_cmd2, lcd_info.act_enable ));

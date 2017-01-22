@@ -233,7 +233,7 @@ void snd_msnd_dsp_halt(struct snd_msnd *chip, struct file *file)
 		snd_msnd_disable_irq(chip);
 		if (file) {
 			snd_printd(KERN_INFO LOGNAME
-				   ": Stopping read for %p\n", file);
+				   ": Stopping read for %pK\n", file);
 			chip->mode &= ~FMODE_READ;
 		}
 		clear_bit(F_AUDIO_READ_INUSE, &chip->flags);
@@ -246,7 +246,7 @@ void snd_msnd_dsp_halt(struct snd_msnd *chip, struct file *file)
 		snd_msnd_disable_irq(chip);
 		if (file) {
 			snd_printd(KERN_INFO
-				   LOGNAME ": Stopping write for %p\n", file);
+				   LOGNAME ": Stopping write for %pK\n", file);
 			chip->mode &= ~FMODE_WRITE;
 		}
 		clear_bit(F_AUDIO_WRITE_INUSE, &chip->flags);

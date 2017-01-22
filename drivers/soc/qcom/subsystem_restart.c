@@ -577,12 +577,12 @@ static void subsystem_shutdown(struct subsys_device *dev, void *data)
 {
 	const char *name = dev->desc->name;
 
-	pr_info("[%p]: Shutting down %s\n", current, name);
+	pr_info("[%pK]: Shutting down %s\n", current, name);
 	if (dev->desc->shutdown(dev->desc, true) < 0) {
 #ifdef CONFIG_LGE_HANDLE_PANIC
 		lge_set_subsys_crash_reason(name, LGE_ERR_SUB_SD);
 #endif
-		panic("subsys-restart: [%p]: Failed to shutdown %s!",
+		panic("subsys-restart: [%pK]: Failed to shutdown %s!",
 			current, name);
 	}
 	dev->crash_count++;
@@ -596,7 +596,7 @@ static void subsystem_ramdump(struct subsys_device *dev, void *data)
 
 	if (dev->desc->ramdump)
 		if (dev->desc->ramdump(is_ramdump_enabled(dev), dev->desc) < 0)
-			pr_warn("%s[%p]: Ramdump failed.\n", name, current);
+			pr_warn("%s[%pK]: Ramdump failed.\n", name, current);
 	dev->do_ramdump_on_put = false;
 }
 
@@ -611,7 +611,7 @@ static void subsystem_powerup(struct subsys_device *dev, void *data)
 	const char *name = dev->desc->name;
 	int ret;
 
-	pr_info("[%p]: Powering up %s\n", current, name);
+	pr_info("[%pK]: Powering up %s\n", current, name);
 	init_completion(&dev->err_ready);
 
 	if (dev->desc->powerup(dev->desc) < 0) {
@@ -620,7 +620,7 @@ static void subsystem_powerup(struct subsys_device *dev, void *data)
 #ifdef CONFIG_LGE_HANDLE_PANIC
 		lge_set_subsys_crash_reason(name, LGE_ERR_SUB_PWR);
 #endif
-		panic("[%p]: Powerup error: %s!", current, name);
+		panic("[%pK]: Powerup error: %s!", current, name);
 	}
 	enable_all_irqs(dev);
 
@@ -631,7 +631,7 @@ static void subsystem_powerup(struct subsys_device *dev, void *data)
 #ifdef CONFIG_LGE_HANDLE_PANIC
 		lge_set_subsys_crash_reason(name, LGE_ERR_SUB_TOW);
 #endif
-		panic("[%p]: Timed out waiting for error ready: %s!",
+		panic("[%pK]: Timed out waiting for error ready: %s!",
 			current, name);
 	}
 	subsys_set_state(dev, SUBSYS_ONLINE);
@@ -871,7 +871,7 @@ static void subsystem_restart_wq_func(struct work_struct *work)
 	 */
 	mutex_lock(&soc_order_reg_lock);
 
-	pr_debug("[%p]: Starting restart sequence for %s\n", current,
+	pr_debug("[%pK]: Starting restart sequence for %s\n", current,
 			desc->name);
 	notify_each_subsys_device(list, count, SUBSYS_BEFORE_SHUTDOWN, NULL);
 	for_each_subsys_device(list, count, NULL, subsystem_shutdown);
@@ -893,7 +893,7 @@ static void subsystem_restart_wq_func(struct work_struct *work)
 	for_each_subsys_device(list, count, NULL, subsystem_powerup);
 	notify_each_subsys_device(list, count, SUBSYS_AFTER_POWERUP, NULL);
 
-	pr_info("[%p]: Restart sequence for %s completed.\n",
+	pr_info("[%pK]: Restart sequence for %s completed.\n",
 			current, desc->name);
 
 	mutex_unlock(&soc_order_reg_lock);

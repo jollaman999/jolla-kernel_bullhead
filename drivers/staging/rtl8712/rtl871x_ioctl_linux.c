@@ -1967,7 +1967,7 @@ static int r871x_mp_ioctl_hdl(struct net_device *dev,
 		status = phandler->handler(&oid_par);
 		/* todo:check status, BytesNeeded, etc. */
 	} else {
-		netdev_info(dev, "r8712u: %s: err!, subcode=%d, oid=%d, handler=%p\n",
+		netdev_info(dev, "r8712u: %s: err!, subcode=%d, oid=%d, handler=%pK\n",
 			    __func__, poidparam->subcode, phandler->oid,
 			    phandler->handler);
 		ret = -EFAULT;

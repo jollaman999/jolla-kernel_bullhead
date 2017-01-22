@@ -103,7 +103,7 @@ int jfs_mount(struct super_block *sb)
 	}
 	sbi->ipaimap = ipaimap;
 
-	jfs_info("jfs_mount: ipaimap:0x%p", ipaimap);
+	jfs_info("jfs_mount: ipaimap:0x%pK", ipaimap);
 
 	/*
 	 * initialize aggregate inode allocation map
@@ -122,7 +122,7 @@ int jfs_mount(struct super_block *sb)
 		goto errout22;
 	}
 
-	jfs_info("jfs_mount: ipbmap:0x%p", ipbmap);
+	jfs_info("jfs_mount: ipbmap:0x%pK", ipbmap);
 
 	sbi->ipbmap = ipbmap;
 
@@ -154,7 +154,7 @@ int jfs_mount(struct super_block *sb)
 		}
 		sbi->ipaimap2 = ipaimap2;
 
-		jfs_info("jfs_mount: ipaimap2:0x%p", ipaimap2);
+		jfs_info("jfs_mount: ipaimap2:0x%pK", ipaimap2);
 
 		/*
 		 * initialize secondary aggregate inode allocation map
@@ -181,7 +181,7 @@ int jfs_mount(struct super_block *sb)
 		rc = -EIO;
 		goto errout40;
 	}
-	jfs_info("jfs_mount: ipimap:0x%p", ipimap);
+	jfs_info("jfs_mount: ipimap:0x%pK", ipimap);
 
 	/* map further access of per fileset inodes by the fileset inode */
 	sbi->ipimap = ipimap;

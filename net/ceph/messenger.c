@@ -325,7 +325,7 @@ static void con_sock_state_init(struct ceph_connection *con)
 	old_state = atomic_xchg(&con->sock_state, CON_SOCK_STATE_CLOSED);
 	if (WARN_ON(old_state != CON_SOCK_STATE_NEW))
 		printk("%s: unexpected old state %d\n", __func__, old_state);
-	dout("%s con %p sock %d -> %d\n", __func__, con, old_state,
+	dout("%s con %pK sock %d -> %d\n", __func__, con, old_state,
 	     CON_SOCK_STATE_CLOSED);
 }
 
@@ -336,7 +336,7 @@ static void con_sock_state_connecting(struct ceph_connection *con)
 	old_state = atomic_xchg(&con->sock_state, CON_SOCK_STATE_CONNECTING);
 	if (WARN_ON(old_state != CON_SOCK_STATE_CLOSED))
 		printk("%s: unexpected old state %d\n", __func__, old_state);
-	dout("%s con %p sock %d -> %d\n", __func__, con, old_state,
+	dout("%s con %pK sock %d -> %d\n", __func__, con, old_state,
 	     CON_SOCK_STATE_CONNECTING);
 }
 
@@ -347,7 +347,7 @@ static void con_sock_state_connected(struct ceph_connection *con)
 	old_state = atomic_xchg(&con->sock_state, CON_SOCK_STATE_CONNECTED);
 	if (WARN_ON(old_state != CON_SOCK_STATE_CONNECTING))
 		printk("%s: unexpected old state %d\n", __func__, old_state);
-	dout("%s con %p sock %d -> %d\n", __func__, con, old_state,
+	dout("%s con %pK sock %d -> %d\n", __func__, con, old_state,
 	     CON_SOCK_STATE_CONNECTED);
 }
 
@@ -360,7 +360,7 @@ static void con_sock_state_closing(struct ceph_connection *con)
 			old_state != CON_SOCK_STATE_CONNECTED &&
 			old_state != CON_SOCK_STATE_CLOSING))
 		printk("%s: unexpected old state %d\n", __func__, old_state);
-	dout("%s con %p sock %d -> %d\n", __func__, con, old_state,
+	dout("%s con %pK sock %d -> %d\n", __func__, con, old_state,
 	     CON_SOCK_STATE_CLOSING);
 }
 
@@ -374,7 +374,7 @@ static void con_sock_state_closed(struct ceph_connection *con)
 		    old_state != CON_SOCK_STATE_CONNECTING &&
 		    old_state != CON_SOCK_STATE_CLOSED))
 		printk("%s: unexpected old state %d\n", __func__, old_state);
-	dout("%s con %p sock %d -> %d\n", __func__, con, old_state,
+	dout("%s con %pK sock %d -> %d\n", __func__, con, old_state,
 	     CON_SOCK_STATE_CLOSED);
 }
 
@@ -391,7 +391,7 @@ static void ceph_sock_data_ready(struct sock *sk, int count_unused)
 	}
 
 	if (sk->sk_state != TCP_CLOSE_WAIT) {
-		dout("%s on %p state = %lu, queueing work\n", __func__,
+		dout("%s on %pK state = %lu, queueing work\n", __func__,
 		     con, con->state);
 		queue_con(con);
 	}
@@ -411,12 +411,12 @@ static void ceph_sock_write_space(struct sock *sk)
 	 */
 	if (con_flag_test(con, CON_FLAG_WRITE_PENDING)) {
 		if (sk_stream_wspace(sk) >= sk_stream_min_wspace(sk)) {
-			dout("%s %p queueing write work\n", __func__, con);
+			dout("%s %pK queueing write work\n", __func__, con);
 			clear_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
 			queue_con(con);
 		}
 	} else {
-		dout("%s %p nothing to write\n", __func__, con);
+		dout("%s %pK nothing to write\n", __func__, con);
 	}
 }
 
@@ -425,7 +425,7 @@ static void ceph_sock_state_change(struct sock *sk)
 {
 	struct ceph_connection *con = sk->sk_user_data;
 
-	dout("%s %p state = %lu sk_state = %u\n", __func__,
+	dout("%s %pK state = %lu sk_state = %u\n", __func__,
 	     con, con->state, sk->sk_state);
 
 	switch (sk->sk_state) {
@@ -596,7 +596,7 @@ static int con_close_socket(struct ceph_connection *con)
 {
 	int rc = 0;
 
-	dout("con_close_socket on %p sock %p\n", con, con->sock);
+	dout("con_close_socket on %pK sock %pK\n", con, con->sock);
 	if (con->sock) {
 		rc = con->sock->ops->shutdown(con->sock, SHUT_RDWR);
 		sock_release(con->sock);
@@ -641,7 +641,7 @@ static void reset_connection(struct ceph_connection *con)
 {
 	/* reset connection, out_queue, msg_ and connect_seq */
 	/* discard existing out_queue and msg_seq */
-	dout("reset_connection %p\n", con);
+	dout("reset_connection %pK\n", con);
 	ceph_msg_remove_list(&con->out_queue);
 	ceph_msg_remove_list(&con->out_sent);
 
@@ -669,7 +669,7 @@ static void reset_connection(struct ceph_connection *con)
 void ceph_con_close(struct ceph_connection *con)
 {
 	mutex_lock(&con->mutex);
-	dout("con_close %p peer %s\n", con,
+	dout("con_close %pK peer %s\n", con,
 	     ceph_pr_addr(&con->peer_addr.in_addr));
 	con->state = CON_STATE_CLOSED;
 
@@ -694,7 +694,7 @@ void ceph_con_open(struct ceph_connection *con,
 		   struct ceph_entity_addr *addr)
 {
 	mutex_lock(&con->mutex);
-	dout("con_open %p %s\n", con, ceph_pr_addr(&addr->in_addr));
+	dout("con_open %pK %s\n", con, ceph_pr_addr(&addr->in_addr));
 
 	WARN_ON(con->state != CON_STATE_CLOSED);
 	con->state = CON_STATE_PREOPEN;
@@ -724,7 +724,7 @@ void ceph_con_init(struct ceph_connection *con, void *private,
 	const struct ceph_connection_operations *ops,
 	struct ceph_messenger *msgr)
 {
-	dout("con_init %p\n", con);
+	dout("con_init %pK\n", con);
 	memset(con, 0, sizeof(*con));
 	con->private = private;
 	con->ops = ops;
@@ -1184,7 +1184,7 @@ static void prepare_write_message_footer(struct ceph_connection *con)
 
 	m->footer.flags |= CEPH_MSG_FOOTER_COMPLETE;
 
-	dout("prepare_write_message_footer %p\n", con);
+	dout("prepare_write_message_footer %pK\n", con);
 	con->out_kvec_is_msg = true;
 	con->out_kvec[v].iov_base = &m->footer;
 	con->out_kvec[v].iov_len = sizeof(m->footer);
@@ -1235,7 +1235,7 @@ static void prepare_write_message(struct ceph_connection *con)
 	}
 	WARN_ON(m->data_length != le32_to_cpu(m->hdr.data_len));
 
-	dout("prepare_write_message %p seq %lld type %d len %d+%d+%zd\n",
+	dout("prepare_write_message %pK seq %lld type %d len %d+%d+%zd\n",
 	     m, con->out_seq, le16_to_cpu(m->hdr.type),
 	     le32_to_cpu(m->hdr.front_len), le32_to_cpu(m->hdr.middle_len),
 	     m->data_length);
@@ -1285,7 +1285,7 @@ static void prepare_write_message(struct ceph_connection *con)
  */
 static void prepare_write_ack(struct ceph_connection *con)
 {
-	dout("prepare_write_ack %p %llu -> %llu\n", con,
+	dout("prepare_write_ack %pK %llu -> %llu\n", con,
 	     con->in_seq_acked, con->in_seq);
 	con->in_seq_acked = con->in_seq;
 
@@ -1306,7 +1306,7 @@ static void prepare_write_ack(struct ceph_connection *con)
  */
 static void prepare_write_seq(struct ceph_connection *con)
 {
-	dout("prepare_write_seq %p %llu -> %llu\n", con,
+	dout("prepare_write_seq %pK %llu -> %llu\n", con,
 	     con->in_seq_acked, con->in_seq);
 	con->in_seq_acked = con->in_seq;
 
@@ -1324,7 +1324,7 @@ static void prepare_write_seq(struct ceph_connection *con)
  */
 static void prepare_write_keepalive(struct ceph_connection *con)
 {
-	dout("prepare_write_keepalive %p\n", con);
+	dout("prepare_write_keepalive %pK\n", con);
 	con_out_kvec_reset(con);
 	con_out_kvec_add(con, sizeof (tag_keepalive), &tag_keepalive);
 	con_flag_set(con, CON_FLAG_WRITE_PENDING);
@@ -1394,7 +1394,7 @@ static int prepare_write_connect(struct ceph_connection *con)
 		BUG();
 	}
 
-	dout("prepare_write_connect %p cseq=%d gseq=%d proto=%d\n", con,
+	dout("prepare_write_connect %pK cseq=%d gseq=%d proto=%d\n", con,
 	     con->connect_seq, global_seq, proto);
 
 	con->out_connect.features = cpu_to_le64(con->msgr->supported_features);
@@ -1435,7 +1435,7 @@ static int write_partial_kvec(struct ceph_connection *con)
 {
 	int ret;
 
-	dout("write_partial_kvec %p %d left\n", con, con->out_kvec_bytes);
+	dout("write_partial_kvec %pK %d left\n", con, con->out_kvec_bytes);
 	while (con->out_kvec_bytes > 0) {
 		ret = ceph_tcp_sendmsg(con->sock, con->out_kvec_cur,
 				       con->out_kvec_left, con->out_kvec_bytes,
@@ -1463,7 +1463,7 @@ static int write_partial_kvec(struct ceph_connection *con)
 	con->out_kvec_is_msg = false;
 	ret = 1;
 out:
-	dout("write_partial_kvec %p %d left in %d kvecs ret = %d\n", con,
+	dout("write_partial_kvec %pK %d left in %d kvecs ret = %d\n", con,
 	     con->out_kvec_bytes, con->out_kvec_left, ret);
 	return ret;  /* done! */
 }
@@ -1495,7 +1495,7 @@ static int write_partial_message_data(struct ceph_connection *con)
 	bool do_datacrc = !con->msgr->nocrc;
 	u32 crc;
 
-	dout("%s %p msg %p\n", __func__, con, msg);
+	dout("%s %pK msg %pK\n", __func__, con, msg);
 
 	if (list_empty(&msg->data))
 		return -EINVAL;
@@ -1532,7 +1532,7 @@ static int write_partial_message_data(struct ceph_connection *con)
 		need_crc = ceph_msg_data_advance(&msg->cursor, (size_t)ret);
 	}
 
-	dout("%s %p msg %p done\n", __func__, con, msg);
+	dout("%s %pK msg %pK done\n", __func__, con, msg);
 
 	/* prepare and queue up footer, too */
 	if (do_datacrc)
@@ -1570,32 +1570,32 @@ out:
  */
 static void prepare_read_banner(struct ceph_connection *con)
 {
-	dout("prepare_read_banner %p\n", con);
+	dout("prepare_read_banner %pK\n", con);
 	con->in_base_pos = 0;
 }
 
 static void prepare_read_connect(struct ceph_connection *con)
 {
-	dout("prepare_read_connect %p\n", con);
+	dout("prepare_read_connect %pK\n", con);
 	con->in_base_pos = 0;
 }
 
 static void prepare_read_ack(struct ceph_connection *con)
 {
-	dout("prepare_read_ack %p\n", con);
+	dout("prepare_read_ack %pK\n", con);
 	con->in_base_pos = 0;
 }
 
 static void prepare_read_seq(struct ceph_connection *con)
 {
-	dout("prepare_read_seq %p\n", con);
+	dout("prepare_read_seq %pK\n", con);
 	con->in_base_pos = 0;
 	con->in_tag = CEPH_MSGR_TAG_SEQ;
 }
 
 static void prepare_read_tag(struct ceph_connection *con)
 {
-	dout("prepare_read_tag %p\n", con);
+	dout("prepare_read_tag %pK\n", con);
 	con->in_base_pos = 0;
 	con->in_tag = CEPH_MSGR_TAG_READY;
 }
@@ -1605,7 +1605,7 @@ static void prepare_read_tag(struct ceph_connection *con)
  */
 static int prepare_read_message(struct ceph_connection *con)
 {
-	dout("prepare_read_message %p\n", con);
+	dout("prepare_read_message %pK\n", con);
 	BUG_ON(con->in_msg != NULL);
 	con->in_base_pos = 0;
 	con->in_front_crc = con->in_middle_crc = con->in_data_crc = 0;
@@ -1637,7 +1637,7 @@ static int read_partial_banner(struct ceph_connection *con)
 	int end;
 	int ret;
 
-	dout("read_partial_banner %p at %d\n", con, con->in_base_pos);
+	dout("read_partial_banner %pK at %d\n", con, con->in_base_pos);
 
 	/* peer's banner */
 	size = strlen(CEPH_BANNER);
@@ -1668,7 +1668,7 @@ static int read_partial_connect(struct ceph_connection *con)
 	int end;
 	int ret;
 
-	dout("read_partial_connect %p at %d\n", con, con->in_base_pos);
+	dout("read_partial_connect %pK at %d\n", con, con->in_base_pos);
 
 	size = sizeof (con->in_reply);
 	end = size;
@@ -1682,7 +1682,7 @@ static int read_partial_connect(struct ceph_connection *con)
 	if (ret <= 0)
 		goto out;
 
-	dout("read_partial_connect %p tag %d, con_seq = %u, g_seq = %u\n",
+	dout("read_partial_connect %pK tag %d, con_seq = %u, g_seq = %u\n",
 	     con, (int)con->in_reply.tag,
 	     le32_to_cpu(con->in_reply.connect_seq),
 	     le32_to_cpu(con->in_reply.global_seq));
@@ -1916,7 +1916,7 @@ EXPORT_SYMBOL(ceph_parse_ips);
 
 static int process_banner(struct ceph_connection *con)
 {
-	dout("process_banner on %p\n", con);
+	dout("process_banner on %pK\n", con);
 
 	if (verify_hello(con) < 0)
 		return -1;
@@ -1967,7 +1967,7 @@ static int process_connect(struct ceph_connection *con)
 	u64 server_feat = le64_to_cpu(con->in_reply.features);
 	int ret;
 
-	dout("process_connect on %p tag %d\n", con, (int)con->in_tag);
+	dout("process_connect on %pK tag %d\n", con, (int)con->in_tag);
 
 	switch (con->in_reply.tag) {
 	case CEPH_MSGR_TAG_FEATURES:
@@ -1993,7 +1993,7 @@ static int process_connect(struct ceph_connection *con)
 
 	case CEPH_MSGR_TAG_BADAUTHORIZER:
 		con->auth_retry++;
-		dout("process_connect %p got BADAUTHORIZER attempt %d\n", con,
+		dout("process_connect %pK got BADAUTHORIZER attempt %d\n", con,
 		     con->auth_retry);
 		if (con->auth_retry == 2) {
 			con->error_msg = "connect authorization failure";
@@ -2154,7 +2154,7 @@ static void process_ack(struct ceph_connection *con)
 		seq = le64_to_cpu(m->hdr.seq);
 		if (seq > ack)
 			break;
-		dout("got ack for seq %llu type %d at %p\n", seq,
+		dout("got ack for seq %llu type %d at %pK\n", seq,
 		     le16_to_cpu(m->hdr.type), m);
 		m->ack_stamp = jiffies;
 		ceph_msg_remove(m);
@@ -2240,7 +2240,7 @@ static int read_partial_message(struct ceph_connection *con)
 	u64 seq;
 	u32 crc;
 
-	dout("read_partial_message con %p msg %p\n", con, m);
+	dout("read_partial_message con %pK msg %pK\n", con, m);
 
 	/* header */
 	size = sizeof (con->in_hdr);
@@ -2355,25 +2355,25 @@ static int read_partial_message(struct ceph_connection *con)
 	if (ret <= 0)
 		return ret;
 
-	dout("read_partial_message got msg %p %d (%u) + %d (%u) + %d (%u)\n",
+	dout("read_partial_message got msg %pK %d (%u) + %d (%u) + %d (%u)\n",
 	     m, front_len, m->footer.front_crc, middle_len,
 	     m->footer.middle_crc, data_len, m->footer.data_crc);
 
 	/* crc ok? */
 	if (con->in_front_crc != le32_to_cpu(m->footer.front_crc)) {
-		pr_err("read_partial_message %p front crc %u != exp. %u\n",
+		pr_err("read_partial_message %pK front crc %u != exp. %u\n",
 		       m, con->in_front_crc, m->footer.front_crc);
 		return -EBADMSG;
 	}
 	if (con->in_middle_crc != le32_to_cpu(m->footer.middle_crc)) {
-		pr_err("read_partial_message %p middle crc %u != exp %u\n",
+		pr_err("read_partial_message %pK middle crc %u != exp %u\n",
 		       m, con->in_middle_crc, m->footer.middle_crc);
 		return -EBADMSG;
 	}
 	if (do_datacrc &&
 	    (m->footer.flags & CEPH_MSG_FOOTER_NOCRC) == 0 &&
 	    con->in_data_crc != le32_to_cpu(m->footer.data_crc)) {
-		pr_err("read_partial_message %p data crc %u != exp. %u\n", m,
+		pr_err("read_partial_message %pK data crc %u != exp. %u\n", m,
 		       con->in_data_crc, le32_to_cpu(m->footer.data_crc));
 		return -EBADMSG;
 	}
@@ -2403,7 +2403,7 @@ static void process_message(struct ceph_connection *con)
 	con->in_seq++;
 	mutex_unlock(&con->mutex);
 
-	dout("===== %p %llu from %s%lld %d=%s len %d+%d (%u %u %u) =====\n",
+	dout("===== %pK %llu from %s%lld %d=%s len %d+%d (%u %u %u) =====\n",
 	     msg, le64_to_cpu(msg->hdr.seq),
 	     ENTITY_NAME(msg->hdr.src),
 	     le16_to_cpu(msg->hdr.type),
@@ -2425,7 +2425,7 @@ static int try_write(struct ceph_connection *con)
 {
 	int ret = 1;
 
-	dout("try_write start %p state %lu\n", con, con->state);
+	dout("try_write start %pK state %lu\n", con, con->state);
 
 more:
 	dout("try_write out_kvec_bytes %d\n", con->out_kvec_bytes);
@@ -2441,7 +2441,7 @@ more:
 
 		BUG_ON(con->in_msg);
 		con->in_tag = CEPH_MSGR_TAG_READY;
-		dout("try_write initiating connect on %p new state %lu\n",
+		dout("try_write initiating connect on %pK new state %lu\n",
 		     con, con->state);
 		ret = ceph_tcp_connect(con);
 		if (ret < 0) {
@@ -2505,7 +2505,7 @@ do_next:
 	dout("try_write nothing else to write.\n");
 	ret = 0;
 out:
-	dout("try_write done on %p ret %d\n", con, ret);
+	dout("try_write done on %pK ret %d\n", con, ret);
 	return ret;
 }
 
@@ -2519,7 +2519,7 @@ static int try_read(struct ceph_connection *con)
 	int ret = -1;
 
 more:
-	dout("try_read start on %p state %lu\n", con, con->state);
+	dout("try_read start on %pK state %lu\n", con, con->state);
 	if (con->state != CON_STATE_CONNECTING &&
 	    con->state != CON_STATE_NEGOTIATING &&
 	    con->state != CON_STATE_OPEN)
@@ -2643,7 +2643,7 @@ more:
 	}
 
 out:
-	dout("try_read done on %p ret %d\n", con, ret);
+	dout("try_read done on %pK ret %d\n", con, ret);
 	return ret;
 
 bad_tag:
@@ -2662,19 +2662,19 @@ bad_tag:
 static int queue_con_delay(struct ceph_connection *con, unsigned long delay)
 {
 	if (!con->ops->get(con)) {
-		dout("%s %p ref count 0\n", __func__, con);
+		dout("%s %pK ref count 0\n", __func__, con);
 
 		return -ENOENT;
 	}
 
 	if (!queue_delayed_work(ceph_msgr_wq, &con->work, delay)) {
-		dout("%s %p - already queued\n", __func__, con);
+		dout("%s %pK - already queued\n", __func__, con);
 		con->ops->put(con);
 
 		return -EBUSY;
 	}
 
-	dout("%s %p %lu\n", __func__, con, delay);
+	dout("%s %pK %lu\n", __func__, con, delay);
 
 	return 0;
 }
@@ -2702,7 +2702,7 @@ static bool con_sock_closed(struct ceph_connection *con)
 	CASE(OPEN);
 	CASE(STANDBY);
 	default:
-		pr_warning("%s con %p unrecognized state %lu\n",
+		pr_warning("%s con %pK unrecognized state %lu\n",
 			__func__, con, con->state);
 		con->error_msg = "unrecognized con state";
 		BUG();
@@ -2722,7 +2722,7 @@ static bool con_backoff(struct ceph_connection *con)
 
 	ret = queue_con_delay(con, round_jiffies_relative(con->delay));
 	if (ret) {
-		dout("%s: con %p FAILED to back off %lu\n", __func__,
+		dout("%s: con %pK FAILED to back off %lu\n", __func__,
 			con, con->delay);
 		BUG_ON(ret == -ENOENT);
 		con_flag_set(con, CON_FLAG_BACKOFF);
@@ -2762,24 +2762,24 @@ static void con_work(struct work_struct *work)
 		int ret;
 
 		if ((fault = con_sock_closed(con))) {
-			dout("%s: con %p SOCK_CLOSED\n", __func__, con);
+			dout("%s: con %pK SOCK_CLOSED\n", __func__, con);
 			break;
 		}
 		if (con_backoff(con)) {
-			dout("%s: con %p BACKOFF\n", __func__, con);
+			dout("%s: con %pK BACKOFF\n", __func__, con);
 			break;
 		}
 		if (con->state == CON_STATE_STANDBY) {
-			dout("%s: con %p STANDBY\n", __func__, con);
+			dout("%s: con %pK STANDBY\n", __func__, con);
 			break;
 		}
 		if (con->state == CON_STATE_CLOSED) {
-			dout("%s: con %p CLOSED\n", __func__, con);
+			dout("%s: con %pK CLOSED\n", __func__, con);
 			BUG_ON(con->sock);
 			break;
 		}
 		if (con->state == CON_STATE_PREOPEN) {
-			dout("%s: con %p PREOPEN\n", __func__, con);
+			dout("%s: con %pK PREOPEN\n", __func__, con);
 			BUG_ON(con->sock);
 		}
 
@@ -2820,7 +2820,7 @@ static void con_fault(struct ceph_connection *con)
 {
 	pr_warning("%s%lld %s %s\n", ENTITY_NAME(con->peer_name),
 	       ceph_pr_addr(&con->peer_addr.in_addr), con->error_msg);
-	dout("fault %p state %lu to peer %s\n",
+	dout("fault %pK state %lu to peer %s\n",
 	     con, con->state, ceph_pr_addr(&con->peer_addr.in_addr));
 
 	WARN_ON(con->state != CON_STATE_CONNECTING &&
@@ -2850,7 +2850,7 @@ static void con_fault(struct ceph_connection *con)
 	 * the connection in a STANDBY state */
 	if (list_empty(&con->out_queue) &&
 	    !con_flag_test(con, CON_FLAG_KEEPALIVE_PENDING)) {
-		dout("fault %p setting STANDBY clearing WRITE_PENDING\n", con);
+		dout("fault %pK setting STANDBY clearing WRITE_PENDING\n", con);
 		con_flag_clear(con, CON_FLAG_WRITE_PENDING);
 		con->state = CON_STATE_STANDBY;
 	} else {
@@ -2892,7 +2892,7 @@ void ceph_messenger_init(struct ceph_messenger *msgr,
 
 	atomic_set(&msgr->stopping, 0);
 
-	dout("%s %p\n", __func__, msgr);
+	dout("%s %pK\n", __func__, msgr);
 }
 EXPORT_SYMBOL(ceph_messenger_init);
 
@@ -2900,7 +2900,7 @@ static void clear_standby(struct ceph_connection *con)
 {
 	/* come back from STANDBY? */
 	if (con->state == CON_STATE_STANDBY) {
-		dout("clear_standby %p and ++connect_seq\n", con);
+		dout("clear_standby %pK and ++connect_seq\n", con);
 		con->state = CON_STATE_PREOPEN;
 		con->connect_seq++;
 		WARN_ON(con_flag_test(con, CON_FLAG_WRITE_PENDING));
@@ -2921,7 +2921,7 @@ void ceph_con_send(struct ceph_connection *con, struct ceph_msg *msg)
 	mutex_lock(&con->mutex);
 
 	if (con->state == CON_STATE_CLOSED) {
-		dout("con_send %p closed, dropping %p\n", con, msg);
+		dout("con_send %pK closed, dropping %pK\n", con, msg);
 		ceph_msg_put(msg);
 		mutex_unlock(&con->mutex);
 		return;
@@ -2933,7 +2933,7 @@ void ceph_con_send(struct ceph_connection *con, struct ceph_msg *msg)
 
 	BUG_ON(!list_empty(&msg->list_head));
 	list_add_tail(&msg->list_head, &con->out_queue);
-	dout("----- %p to %s%lld %d=%s len %d+%d+%d -----\n", msg,
+	dout("----- %pK to %s%lld %d=%s len %d+%d+%d -----\n", msg,
 	     ENTITY_NAME(con->peer_name), le16_to_cpu(msg->hdr.type),
 	     ceph_msg_type_name(le16_to_cpu(msg->hdr.type)),
 	     le32_to_cpu(msg->hdr.front_len),
@@ -2962,7 +2962,7 @@ void ceph_msg_revoke(struct ceph_msg *msg)
 
 	mutex_lock(&con->mutex);
 	if (!list_empty(&msg->list_head)) {
-		dout("%s %p msg %p - was on queue\n", __func__, con, msg);
+		dout("%s %pK msg %pK - was on queue\n", __func__, con, msg);
 		list_del_init(&msg->list_head);
 		BUG_ON(msg->con == NULL);
 		msg->con->ops->put(msg->con);
@@ -2972,7 +2972,7 @@ void ceph_msg_revoke(struct ceph_msg *msg)
 		ceph_msg_put(msg);
 	}
 	if (con->out_msg == msg) {
-		dout("%s %p msg %p - was sending\n", __func__, con, msg);
+		dout("%s %pK msg %pK - was sending\n", __func__, con, msg);
 		con->out_msg = NULL;
 		if (con->out_kvec_is_msg) {
 			con->out_skip = con->out_kvec_bytes;
@@ -2994,7 +2994,7 @@ void ceph_msg_revoke_incoming(struct ceph_msg *msg)
 
 	BUG_ON(msg == NULL);
 	if (!msg->con) {
-		dout("%s msg %p null con\n", __func__, msg);
+		dout("%s msg %pK null con\n", __func__, msg);
 
 		return;		/* Message not in our possession */
 	}
@@ -3007,7 +3007,7 @@ void ceph_msg_revoke_incoming(struct ceph_msg *msg)
 		unsigned int data_len = le32_to_cpu(con->in_hdr.data_len);
 
 		/* skip rest of message */
-		dout("%s %p msg %p revoked\n", __func__, con, msg);
+		dout("%s %pK msg %pK revoked\n", __func__, con, msg);
 		con->in_base_pos = con->in_base_pos -
 				sizeof(struct ceph_msg_header) -
 				front_len -
@@ -3019,7 +3019,7 @@ void ceph_msg_revoke_incoming(struct ceph_msg *msg)
 		con->in_tag = CEPH_MSGR_TAG_READY;
 		con->in_seq++;
 	} else {
-		dout("%s %p in_msg %p msg %p no-op\n",
+		dout("%s %pK in_msg %pK msg %pK no-op\n",
 		     __func__, con, con->in_msg, msg);
 	}
 	mutex_unlock(&con->mutex);
@@ -3030,7 +3030,7 @@ void ceph_msg_revoke_incoming(struct ceph_msg *msg)
  */
 void ceph_con_keepalive(struct ceph_connection *con)
 {
-	dout("con_keepalive %p\n", con);
+	dout("con_keepalive %pK\n", con);
 	mutex_lock(&con->mutex);
 	clear_standby(con);
 	mutex_unlock(&con->mutex);
@@ -3164,7 +3164,7 @@ struct ceph_msg *ceph_msg_new(int type, int front_len, gfp_t flags,
 	}
 	m->front.iov_len = front_len;
 
-	dout("ceph_msg_new %p front %d\n", m, front_len);
+	dout("ceph_msg_new %pK front %d\n", m, front_len);
 	return m;
 
 out2:
@@ -3194,7 +3194,7 @@ static int ceph_alloc_middle(struct ceph_connection *con, struct ceph_msg *msg)
 	int type = le16_to_cpu(msg->hdr.type);
 	int middle_len = le32_to_cpu(msg->hdr.middle_len);
 
-	dout("alloc_middle %p type %d %s middle_len %d\n", msg, type,
+	dout("alloc_middle %pK type %d %s middle_len %d\n", msg, type,
 	     ceph_msg_type_name(type), middle_len);
 	BUG_ON(!middle_len);
 	BUG_ON(msg->middle);
@@ -3274,7 +3274,7 @@ static int ceph_con_in_msg_alloc(struct ceph_connection *con, int *skip)
  */
 void ceph_msg_kfree(struct ceph_msg *m)
 {
-	dout("msg_kfree %p\n", m);
+	dout("msg_kfree %pK\n", m);
 	if (m->front_is_vmalloc)
 		vfree(m->front.iov_base);
 	else
@@ -3292,7 +3292,7 @@ void ceph_msg_last_put(struct kref *kref)
 	struct list_head *links;
 	struct list_head *next;
 
-	dout("ceph_msg_put last one on %p\n", m);
+	dout("ceph_msg_put last one on %pK\n", m);
 	WARN_ON(!list_empty(&m->list_head));
 
 	/* drop middle, data, if any */
@@ -3320,7 +3320,7 @@ EXPORT_SYMBOL(ceph_msg_last_put);
 
 void ceph_msg_dump(struct ceph_msg *msg)
 {
-	pr_debug("msg_dump %p (front_alloc_len %d length %zd)\n", msg,
+	pr_debug("msg_dump %pK (front_alloc_len %d length %zd)\n", msg,
 		 msg->front_alloc_len, msg->data_length);
 	print_hex_dump(KERN_DEBUG, "header: ",
 		       DUMP_PREFIX_OFFSET, 16, 1,

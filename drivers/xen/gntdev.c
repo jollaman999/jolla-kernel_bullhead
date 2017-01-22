@@ -102,7 +102,7 @@ static void gntdev_print_maps(struct gntdev_priv *priv,
 #ifdef DEBUG
 	struct grant_map *map;
 
-	pr_debug("%s: maps list (priv %p)\n", __func__, priv);
+	pr_debug("%s: maps list (priv %pK)\n", __func__, priv);
 	list_for_each_entry(map, &priv->maps, next)
 		pr_debug("  index %2d, count %2d %s\n",
 		       map->index, map->count,
@@ -373,7 +373,7 @@ static void gntdev_vma_open(struct vm_area_struct *vma)
 {
 	struct grant_map *map = vma->vm_private_data;
 
-	pr_debug("gntdev_vma_open %p\n", vma);
+	pr_debug("gntdev_vma_open %pK\n", vma);
 	atomic_inc(&map->users);
 }
 
@@ -383,7 +383,7 @@ static void gntdev_vma_close(struct vm_area_struct *vma)
 	struct file *file = vma->vm_file;
 	struct gntdev_priv *priv = file->private_data;
 
-	pr_debug("gntdev_vma_close %p\n", vma);
+	pr_debug("gntdev_vma_close %pK\n", vma);
 	if (use_ptemod) {
 		/* It is possible that an mmu notifier could be running
 		 * concurrently, so take priv->lock to ensure that the vma won't
@@ -522,7 +522,7 @@ static int gntdev_open(struct inode *inode, struct file *flip)
 	}
 
 	flip->private_data = priv;
-	pr_debug("priv %p\n", priv);
+	pr_debug("priv %pK\n", priv);
 
 	return 0;
 }
@@ -532,7 +532,7 @@ static int gntdev_release(struct inode *inode, struct file *flip)
 	struct gntdev_priv *priv = flip->private_data;
 	struct grant_map *map;
 
-	pr_debug("priv %p\n", priv);
+	pr_debug("priv %pK\n", priv);
 
 	mutex_lock(&priv->lock);
 	while (!list_empty(&priv->maps)) {
@@ -558,7 +558,7 @@ static long gntdev_ioctl_map_grant_ref(struct gntdev_priv *priv,
 
 	if (copy_from_user(&op, u, sizeof(op)) != 0)
 		return -EFAULT;
-	pr_debug("priv %p, add %d\n", priv, op.count);
+	pr_debug("priv %pK, add %d\n", priv, op.count);
 	if (unlikely(op.count <= 0))
 		return -EINVAL;
 
@@ -599,7 +599,7 @@ static long gntdev_ioctl_unmap_grant_ref(struct gntdev_priv *priv,
 
 	if (copy_from_user(&op, u, sizeof(op)) != 0)
 		return -EFAULT;
-	pr_debug("priv %p, del %d+%d\n", priv, (int)op.index, (int)op.count);
+	pr_debug("priv %pK, del %d+%d\n", priv, (int)op.index, (int)op.count);
 
 	mutex_lock(&priv->lock);
 	map = gntdev_find_map_index(priv, op.index >> PAGE_SHIFT, op.count);
@@ -625,7 +625,7 @@ static long gntdev_ioctl_get_offset_for_vaddr(struct gntdev_priv *priv,
 
 	if (copy_from_user(&op, u, sizeof(op)) != 0)
 		return -EFAULT;
-	pr_debug("priv %p, offset for vaddr %lx\n", priv, (unsigned long)op.vaddr);
+	pr_debug("priv %pK, offset for vaddr %lx\n", priv, (unsigned long)op.vaddr);
 
 	down_read(&current->mm->mmap_sem);
 	vma = find_vma(current->mm, op.vaddr);
@@ -734,7 +734,7 @@ static long gntdev_ioctl(struct file *flip,
 		return gntdev_ioctl_notify(priv, ptr);
 
 	default:
-		pr_debug("priv %p, unknown cmd %x\n", priv, cmd);
+		pr_debug("priv %pK, unknown cmd %x\n", priv, cmd);
 		return -ENOIOCTLCMD;
 	}
 

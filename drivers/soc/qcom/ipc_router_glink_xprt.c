@@ -244,7 +244,7 @@ static int ipc_router_glink_xprt_write(void *data, uint32_t len,
 		IPC_RTR_ERR("%s: Error %d while tx\n", __func__, ret);
 		return ret;
 	}
-	D("%s:%s: TX Complete for %d bytes @ %p\n", __func__,
+	D("%s:%s: TX Complete for %d bytes @ %pK\n", __func__,
 	  glink_xprtp->ipc_rtr_xprt_name, len, temp_pkt);
 	return len;
 }
@@ -325,7 +325,7 @@ static void glink_xprt_read_data(struct work_struct *work)
 	}
 	mutex_unlock(&glink_xprtp->ss_reset_lock);
 
-	D("%s %zu bytes @ %p\n", __func__, rx_work->iovec_size, rx_work->iovec);
+	D("%s %zu bytes @ %pK\n", __func__, rx_work->iovec_size, rx_work->iovec);
 	if (rx_work->iovec_size <= DEFAULT_RX_INTENT_SIZE)
 		glink_queue_rx_intent(glink_xprtp->ch_hndl, (void *)glink_xprtp,
 				      DEFAULT_RX_INTENT_SIZE);
@@ -571,7 +571,7 @@ static void glink_xprt_notify_tx_done(void *handle, const void *priv,
 		(struct ipc_router_glink_xprt *)priv;
 	struct rr_packet *temp_pkt = (struct rr_packet *)ptr;
 
-	D("%s:%s: @ %p\n", __func__, glink_xprtp->ipc_rtr_xprt_name, ptr);
+	D("%s:%s: @ %pK\n", __func__, glink_xprtp->ipc_rtr_xprt_name, ptr);
 	release_pkt(temp_pkt);
 }
 

@@ -2034,7 +2034,7 @@ static int cirrusfb_register(struct fb_info *info)
 	/* set all the vital stuff */
 	cirrusfb_set_fbinfo(info);
 
-	dev_dbg(info->device, "(RAM start set to: 0x%p)\n", info->screen_base);
+	dev_dbg(info->device, "(RAM start set to: 0x%pK)\n", info->screen_base);
 
 	err = fb_find_mode(&info->var, info, mode_option, NULL, 0, NULL, 8);
 	if (!err) {

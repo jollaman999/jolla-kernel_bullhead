@@ -75,7 +75,7 @@ static void pcf_isa_setbyte(void *data, int ctl, int val)
 		val |= I2C_PCF_ENI;
 	}
 
-	pr_debug("%s: Write %p 0x%02X\n", pcf_isa_ops.name, address, val);
+	pr_debug("%s: Write %pK 0x%02X\n", pcf_isa_ops.name, address, val);
 	iowrite8(val, address);
 #ifdef __alpha__
 	/* API UP2000 needs some hardware fudging to make the write stick */
@@ -88,7 +88,7 @@ static int pcf_isa_getbyte(void *data, int ctl)
 	u8 __iomem *address = ctl ? (base_iomem + 1) : base_iomem;
 	int val = ioread8(address);
 
-	pr_debug("%s: Read %p 0x%02X\n", pcf_isa_ops.name, address, val);
+	pr_debug("%s: Read %pK 0x%02X\n", pcf_isa_ops.name, address, val);
 	return (val);
 }
 
@@ -171,7 +171,7 @@ static int pcf_isa_init(void)
 			return -ENODEV;
 		}
 	}
-	pr_debug("%s: registers %#x remapped to %p\n", pcf_isa_ops.name, base,
+	pr_debug("%s: registers %#x remapped to %pK\n", pcf_isa_ops.name, base,
 		 base_iomem);
 
 	if (irq > 0) {

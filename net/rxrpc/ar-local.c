@@ -49,7 +49,7 @@ struct rxrpc_local *rxrpc_alloc_local(struct sockaddr_rxrpc *srx)
 		memcpy(&local->srx, srx, sizeof(*srx));
 	}
 
-	_leave(" = %p", local);
+	_leave(" = %pK", local);
 	return local;
 }
 
@@ -62,7 +62,7 @@ static int rxrpc_create_local(struct rxrpc_local *local)
 	struct sock *sock;
 	int ret, opt;
 
-	_enter("%p{%d}", local, local->srx.transport_type);
+	_enter("%pK{%d}", local, local->srx.transport_type);
 
 	/* create a socket to represent the local endpoint */
 	ret = sock_create_kern(PF_INET, local->srx.transport_type, IPPROTO_UDP,
@@ -196,7 +196,7 @@ struct rxrpc_local *rxrpc_lookup_local(struct sockaddr_rxrpc *srx)
 	     &local->srx.transport.sin.sin_addr,
 	     ntohs(local->srx.transport.sin.sin_port));
 
-	_leave(" = %p [new]", local);
+	_leave(" = %pK [new]", local);
 	return local;
 
 found_local:
@@ -211,7 +211,7 @@ found_local:
 	     &local->srx.transport.sin.sin_addr,
 	     ntohs(local->srx.transport.sin.sin_port));
 
-	_leave(" = %p [reuse]", local);
+	_leave(" = %pK [reuse]", local);
 	return local;
 }
 
@@ -220,7 +220,7 @@ found_local:
  */
 void rxrpc_put_local(struct rxrpc_local *local)
 {
-	_enter("%p{u=%d}", local, atomic_read(&local->usage));
+	_enter("%pK{u=%d}", local, atomic_read(&local->usage));
 
 	ASSERTCMP(atomic_read(&local->usage), >, 0);
 
@@ -243,7 +243,7 @@ static void rxrpc_destroy_local(struct work_struct *work)
 	struct rxrpc_local *local =
 		container_of(work, struct rxrpc_local, destroyer);
 
-	_enter("%p{%d}", local, atomic_read(&local->usage));
+	_enter("%pK{%d}", local, atomic_read(&local->usage));
 
 	down_write(&rxrpc_local_sem);
 

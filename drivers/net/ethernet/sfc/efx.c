@@ -1207,7 +1207,7 @@ static int efx_init_io(struct efx_nic *efx)
 		goto fail4;
 	}
 	netif_dbg(efx, probe, efx->net_dev,
-		  "memory BAR at %llx+%x (virtual %p)\n",
+		  "memory BAR at %llx+%x (virtual %pK)\n",
 		  (unsigned long long)efx->membase_phys,
 		  efx->type->mem_map_size, efx->membase);
 

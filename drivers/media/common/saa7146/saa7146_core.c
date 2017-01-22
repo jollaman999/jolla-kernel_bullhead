@@ -364,7 +364,7 @@ static int saa7146_init_one(struct pci_dev *pci, const struct pci_device_id *ent
 		goto out;
 	}
 
-	DEB_EE("pci:%p\n", pci);
+	DEB_EE("pci:%pK\n", pci);
 
 	err = pci_enable_device(pci);
 	if (err < 0) {
@@ -444,7 +444,7 @@ static int saa7146_init_one(struct pci_dev *pci, const struct pci_device_id *ent
 	/* create a nice device name */
 	sprintf(dev->name, "saa7146 (%d)", saa7146_num);
 
-	pr_info("found saa7146 @ mem %p (revision %d, irq %d) (0x%04x,0x%04x)\n",
+	pr_info("found saa7146 @ mem %pK (revision %d, irq %d) (0x%04x,0x%04x)\n",
 		dev->mem, dev->revision, pci->irq,
 		pci->subsystem_vendor, pci->subsystem_device);
 	dev->ext = ext;
@@ -466,12 +466,12 @@ static int saa7146_init_one(struct pci_dev *pci, const struct pci_device_id *ent
 	err = -ENODEV;
 
 	if (ext->probe && ext->probe(dev)) {
-		DEB_D("ext->probe() failed for %p. skipping device.\n", dev);
+		DEB_D("ext->probe() failed for %pK. skipping device.\n", dev);
 		goto err_free_i2c;
 	}
 
 	if (ext->attach(dev, pci_ext)) {
-		DEB_D("ext->attach() failed for %p. skipping device.\n", dev);
+		DEB_D("ext->attach() failed for %pK. skipping device.\n", dev);
 		goto err_free_i2c;
 	}
 	/* V4L extensions will set the pci drvdata to the v4l2_device in the
@@ -521,7 +521,7 @@ static void saa7146_remove_one(struct pci_dev *pdev)
 		{ NULL, 0 }
 	}, *p;
 
-	DEB_EE("dev:%p\n", dev);
+	DEB_EE("dev:%pK\n", dev);
 
 	dev->ext->detach(dev);
 	/* Zero the PCI drvdata after use. */
@@ -551,7 +551,7 @@ static void saa7146_remove_one(struct pci_dev *pdev)
 
 int saa7146_register_extension(struct saa7146_extension* ext)
 {
-	DEB_EE("ext:%p\n", ext);
+	DEB_EE("ext:%pK\n", ext);
 
 	ext->driver.name = ext->name;
 	ext->driver.id_table = ext->pci_tbl;
@@ -564,7 +564,7 @@ int saa7146_register_extension(struct saa7146_extension* ext)
 
 int saa7146_unregister_extension(struct saa7146_extension* ext)
 {
-	DEB_EE("ext:%p\n", ext);
+	DEB_EE("ext:%pK\n", ext);
 	pr_info("unregister extension '%s'\n", ext->name);
 	pci_unregister_driver(&ext->driver);
 	return 0;

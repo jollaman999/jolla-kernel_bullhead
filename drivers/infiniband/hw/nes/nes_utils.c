@@ -586,7 +586,7 @@ struct nes_cqp_request *nes_get_cqp_request(struct nes_device *nesdev)
 		cqp_request->request_done = 0;
 		cqp_request->callback = 0;
 		init_waitqueue_head(&cqp_request->waitq);
-		nes_debug(NES_DBG_CQP, "Got cqp request %p from the available list \n",
+		nes_debug(NES_DBG_CQP, "Got cqp request %pK from the available list \n",
 				cqp_request);
 	} else
 		printk(KERN_ERR PFX "%s: Could not allocated a CQP request.\n",
@@ -600,7 +600,7 @@ void nes_free_cqp_request(struct nes_device *nesdev,
 {
 	unsigned long flags;
 
-	nes_debug(NES_DBG_CQP, "CQP request %p (opcode 0x%02X) freed.\n",
+	nes_debug(NES_DBG_CQP, "CQP request %pK (opcode 0x%02X) freed.\n",
 		  cqp_request,
 		  le32_to_cpu(cqp_request->cqp_wqe.wqe_words[NES_CQP_WQE_OPCODE_IDX]) & 0x3f);
 
@@ -650,7 +650,7 @@ void nes_post_cqp_request(struct nes_device *nesdev,
 		u64temp = (unsigned long)cqp_request;
 		set_wqe_64bit_value(cqp_wqe->wqe_words, ctx_index, u64temp);
 		nes_debug(NES_DBG_CQP, "CQP request (opcode 0x%02X), line 1 = 0x%08X put on CQPs SQ,"
-			" request = %p, cqp_head = %u, cqp_tail = %u, cqp_size = %u,"
+			" request = %pK, cqp_head = %u, cqp_tail = %u, cqp_size = %u,"
 			" waiting = %d, refcount = %d.\n",
 			opcode & NES_CQP_OPCODE_MASK,
 			le32_to_cpu(cqp_wqe->wqe_words[NES_CQP_WQE_ID_IDX]), cqp_request,
@@ -664,7 +664,7 @@ void nes_post_cqp_request(struct nes_device *nesdev,
 
 		barrier();
 	} else {
-		nes_debug(NES_DBG_CQP, "CQP request %p (opcode 0x%02X), line 1 = 0x%08X"
+		nes_debug(NES_DBG_CQP, "CQP request %pK (opcode 0x%02X), line 1 = 0x%08X"
 				" put on the pending queue.\n",
 				cqp_request,
 				le32_to_cpu(cqp_request->cqp_wqe.wqe_words[NES_CQP_WQE_OPCODE_IDX])&0x3f,
@@ -921,7 +921,7 @@ void nes_dump_mem(unsigned int dump_debug_level, void *addr, int length)
 		nes_debug(dump_debug_level, "Length truncated from %x to %x\n", length, 0x100);
 		length = 0x100;
 	}
-	nes_debug(dump_debug_level, "Address=0x%p, length=0x%x (%d)\n", ptr, length, length);
+	nes_debug(dump_debug_level, "Address=0x%pK, length=0x%x (%d)\n", ptr, length, length);
 
 	memset(ascii_buf, 0, 20);
 	memset(hex_buf, 0, 80);

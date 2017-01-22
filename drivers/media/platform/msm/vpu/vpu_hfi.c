@@ -449,7 +449,7 @@ static void raw_handle_rx_msgs_poll(struct vpu_hfi_device *hdevice)
 	struct vpu_hfi_rxq_info *rxq;
 
 	if (unlikely(!hdevice->handle_msg)) {
-		pr_err("No rx handler callback: %p\n", hdevice);
+		pr_err("No rx handler callback: %pK\n", hdevice);
 		return;
 	}
 
@@ -659,7 +659,7 @@ int vpu_hfi_init(struct vpu_platform_resources *res)
 		rc = -ENODEV;
 		goto error_map_fail1;
 	} else {
-		pr_debug("CSR mapped from 0x%08x to 0x%p\n",
+		pr_debug("CSR mapped from 0x%08x to 0x%pK\n",
 			(u32) res->register_base_phy, hdevice->reg_base);
 	}
 
@@ -672,7 +672,7 @@ int vpu_hfi_init(struct vpu_platform_resources *res)
 		rc = -ENODEV;
 		goto error_map_fail2;
 	} else {
-		pr_debug("MEM mapped from 0x%08x to 0x%p\n",
+		pr_debug("MEM mapped from 0x%08x to 0x%pK\n",
 				(u32) res->mem_base_phy, hdevice->mem_base);
 	}
 
@@ -686,7 +686,7 @@ int vpu_hfi_init(struct vpu_platform_resources *res)
 			rc = -ENODEV;
 			goto error_map_fail3;
 		} else {
-			pr_debug("VBIF mapped from 0x%08x to 0x%p\n",
+			pr_debug("VBIF mapped from 0x%08x to 0x%pK\n",
 				(u32) res->vbif_base_phy, hdevice->vbif_base);
 		}
 	}

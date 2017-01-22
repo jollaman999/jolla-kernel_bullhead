@@ -532,7 +532,7 @@ static void row_dispatch_insert(struct row_data *rd, struct request *rq)
 	rqueue->nr_dispatched++;
 	row_clear_rowq_unserved(rd, rqueue->prio);
 	row_log_rowq(rd, rqueue->prio,
-		" Dispatched request %p nr_disp = %d", rq,
+		" Dispatched request %pK nr_disp = %d", rq,
 		rqueue->nr_dispatched);
 	if (rqueue->prio < ROWQ_REG_PRIO_IDX) {
 		rd->last_served_ioprio_class = IOPRIO_CLASS_RT;

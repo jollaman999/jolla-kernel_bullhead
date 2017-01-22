@@ -564,7 +564,7 @@ mwifiex_scan_channel_list(struct mwifiex_private *priv,
 
 	if (!scan_cfg_out || !chan_tlv_out || !scan_chan_list) {
 		dev_dbg(priv->adapter->dev,
-			"info: Scan: Null detect: %p, %p, %p\n",
+			"info: Scan: Null detect: %pK, %pK, %pK\n",
 		       scan_cfg_out, chan_tlv_out, scan_chan_list);
 		return -1;
 	}

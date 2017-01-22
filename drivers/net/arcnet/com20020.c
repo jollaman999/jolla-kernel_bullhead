@@ -243,7 +243,7 @@ static int com20020_reset(struct net_device *dev, int really_reset)
 	u_int ioaddr = dev->base_addr;
 	u_char inbyte;
 
-	BUGMSG(D_DEBUG, "%s: %d: %s: dev: %p, lp: %p, dev->name: %s\n",
+	BUGMSG(D_DEBUG, "%s: %d: %s: dev: %pK, lp: %pK, dev->name: %s\n",
 		__FILE__,__LINE__,__func__,dev,lp,dev->name);
 	BUGMSG(D_INIT, "Resetting %s (status=%02Xh)\n",
 	       dev->name, ASTATUS());

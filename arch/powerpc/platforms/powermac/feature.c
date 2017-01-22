@@ -2696,7 +2696,7 @@ static void __init probe_one_macio(const char *name, const char *compat, int typ
 	revp = of_get_property(node, "revision-id", NULL);
 	if (revp)
 		macio_chips[i].rev = *revp;
-	printk(KERN_INFO "Found a %s mac-io controller, rev: %d, mapped at 0x%p\n",
+	printk(KERN_INFO "Found a %s mac-io controller, rev: %d, mapped at 0x%pK\n",
 		macio_names[type], macio_chips[i].rev, macio_chips[i].base);
 }
 

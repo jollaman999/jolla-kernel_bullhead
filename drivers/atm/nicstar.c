@@ -404,7 +404,7 @@ static int ns_init_card(int i, struct pci_dev *pcidev)
 		ns_init_card_error(card, error);
 		return error;
 	}
-	PRINTK("nicstar%d: membase at 0x%p.\n", i, card->membase);
+	PRINTK("nicstar%d: membase at 0x%pK.\n", i, card->membase);
 
 	pci_set_master(pcidev);
 
@@ -551,7 +551,7 @@ static int ns_init_card(int i, struct pci_dev *pcidev)
 		ns_tsi_init(card->tsq.base + j);
 	writel(0x00000000, card->membase + TSQH);
 	writel(ALIGN(card->tsq.dma, NS_TSQ_ALIGNMENT), card->membase + TSQB);
-	PRINTK("nicstar%d: TSQ base at 0x%p.\n", i, card->tsq.base);
+	PRINTK("nicstar%d: TSQ base at 0x%pK.\n", i, card->tsq.base);
 
 	/* Initialize RSQ */
 	card->rsq.org = pci_alloc_consistent(card->pcidev,
@@ -570,7 +570,7 @@ static int ns_init_card(int i, struct pci_dev *pcidev)
 		ns_rsqe_init(card->rsq.base + j);
 	writel(0x00000000, card->membase + RSQH);
 	writel(ALIGN(card->rsq.dma, NS_RSQ_ALIGNMENT), card->membase + RSQB);
-	PRINTK("nicstar%d: RSQ base at 0x%p.\n", i, card->rsq.base);
+	PRINTK("nicstar%d: RSQ base at 0x%pK.\n", i, card->rsq.base);
 
 	/* Initialize SCQ0, the only VBR SCQ used */
 	card->scq1 = NULL;
@@ -590,7 +590,7 @@ static int ns_init_card(int i, struct pci_dev *pcidev)
 	ns_write_sram(card, NS_VRSCD1, u32d, 4);	/* These last two won't be used */
 	ns_write_sram(card, NS_VRSCD2, u32d, 4);	/* but are initialized, just in case... */
 	card->scq0->scd = NS_VRSCD0;
-	PRINTK("nicstar%d: VBR-SCQ0 base at 0x%p.\n", i, card->scq0->base);
+	PRINTK("nicstar%d: VBR-SCQ0 base at 0x%pK.\n", i, card->scq0->base);
 
 	/* Initialize TSTs */
 	card->tst_addr = NS_TST0;
@@ -1559,11 +1559,11 @@ static void ns_close(struct atm_vcc *vcc)
 		cfg = readl(card->membase + CFG);
 		printk("STAT = 0x%08X  CFG = 0x%08X  \n", stat, cfg);
 		printk
-		    ("TSQ: base = 0x%p  next = 0x%p  last = 0x%p  TSQT = 0x%08X \n",
+		    ("TSQ: base = 0x%pK  next = 0x%pK  last = 0x%pK  TSQT = 0x%08X \n",
 		     card->tsq.base, card->tsq.next,
 		     card->tsq.last, readl(card->membase + TSQT));
 		printk
-		    ("RSQ: base = 0x%p  next = 0x%p  last = 0x%p  RSQT = 0x%08X \n",
+		    ("RSQ: base = 0x%pK  next = 0x%pK  last = 0x%pK  RSQT = 0x%08X \n",
 		     card->rsq.base, card->rsq.next,
 		     card->rsq.last, readl(card->membase + RSQT));
 		printk("Empty free buffer queue interrupt %s \n",
@@ -1755,9 +1755,9 @@ static int push_scqe(ns_dev * card, vc_map * vc, scq_info * scq, ns_scqe * tbd,
 	*scq->next = *tbd;
 	index = (int)(scq->next - scq->base);
 	scq->skb[index] = skb;
-	XPRINTK("nicstar%d: sending skb at 0x%p (pos %d).\n",
+	XPRINTK("nicstar%d: sending skb at 0x%pK (pos %d).\n",
 		card->index, skb, index);
-	XPRINTK("nicstar%d: TBD written:\n0x%x\n0x%x\n0x%x\n0x%x\n at 0x%p.\n",
+	XPRINTK("nicstar%d: TBD written:\n0x%x\n0x%x\n0x%x\n0x%x\n at 0x%pK.\n",
 		card->index, le32_to_cpu(tbd->word_1), le32_to_cpu(tbd->word_2),
 		le32_to_cpu(tbd->word_3), le32_to_cpu(tbd->word_4),
 		scq->next);
@@ -1811,7 +1811,7 @@ static int push_scqe(ns_dev * card, vc_map * vc, scq_info * scq, ns_scqe * tbd,
 			index = (int)scqi;
 			scq->skb[index] = NULL;
 			XPRINTK
-			    ("nicstar%d: TSR written:\n0x%x\n0x%x\n0x%x\n0x%x\n at 0x%p.\n",
+			    ("nicstar%d: TSR written:\n0x%x\n0x%x\n0x%x\n0x%x\n at 0x%pK.\n",
 			     card->index, le32_to_cpu(tsr.word_1),
 			     le32_to_cpu(tsr.word_2), le32_to_cpu(tsr.word_3),
 			     le32_to_cpu(tsr.word_4), scq->next);
@@ -1915,7 +1915,7 @@ static void drain_scq(ns_dev * card, scq_info * scq, int pos)
 	int i;
 	unsigned long flags;
 
-	XPRINTK("nicstar%d: drain_scq() called, scq at 0x%p, pos %d.\n",
+	XPRINTK("nicstar%d: drain_scq() called, scq at 0x%pK, pos %d.\n",
 		card->index, scq, pos);
 	if (pos >= scq->num_entries) {
 		printk("nicstar%d: Bad index on drain_scq().\n", card->index);
@@ -1928,7 +1928,7 @@ static void drain_scq(ns_dev * card, scq_info * scq, int pos)
 		i = 0;
 	while (i != pos) {
 		skb = scq->skb[i];
-		XPRINTK("nicstar%d: freeing skb at 0x%p (index %d).\n",
+		XPRINTK("nicstar%d: freeing skb at 0x%pK (index %d).\n",
 			card->index, skb, i);
 		if (skb != NULL) {
 			pci_unmap_single(card->pcidev,

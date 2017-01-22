@@ -186,7 +186,7 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
 		 * routine checks before we get here, but we check again just in case.
 		 */
 		ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
-				  "Attempting to init a region %p, with no handler\n",
+				  "Attempting to init a region %pK, with no handler\n",
 				  region_obj));
 		return_ACPI_STATUS(AE_NOT_EXIST);
 	}
@@ -610,7 +610,7 @@ acpi_ev_initialize_region(union acpi_operand_object *region_obj,
 					/* Found correct handler */
 
 					ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
-							  "Found handler %p for region %p in obj %p\n",
+							  "Found handler %pK for region %pK in obj %pK\n",
 							  handler_obj,
 							  region_obj,
 							  obj_desc));
@@ -665,7 +665,7 @@ acpi_ev_initialize_region(union acpi_operand_object *region_obj,
 	/* If we get here, there is no handler for this region */
 
 	ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
-			  "No handler for RegionType %s(%X) (RegionObj %p)\n",
+			  "No handler for RegionType %s(%X) (RegionObj %pK)\n",
 			  acpi_ut_get_region_name(space_id), space_id,
 			  region_obj));
 

@@ -123,7 +123,7 @@ void rds_info_copy(struct rds_info_iterator *iter, void *data,
 
 		this = min(bytes, PAGE_SIZE - iter->offset);
 
-		rdsdebug("page %p addr %p offset %lu this %lu data %p "
+		rdsdebug("page %pK addr %pK offset %lu this %lu data %pK "
 			  "bytes %lu\n", *iter->pages, iter->addr,
 			  iter->offset, this, data, bytes);
 

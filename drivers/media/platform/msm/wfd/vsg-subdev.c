@@ -29,7 +29,7 @@
 static int vsg_release_input_buffer(struct vsg_context *context,
 		struct vsg_buf_info *buf)
 {
-	WFD_MSG_DBG("Releasing frame with ts %lld ms, paddr %p\n",
+	WFD_MSG_DBG("Releasing frame with ts %lld ms, paddr %pK\n",
 			timespec_to_ns(&buf->time),
 			(void *)buf->mdp_buf_info.paddr);
 
@@ -45,7 +45,7 @@ static int vsg_release_input_buffer(struct vsg_context *context,
 static int vsg_encode_frame(struct vsg_context *context,
 		struct vsg_buf_info *buf)
 {
-	WFD_MSG_DBG("Encoding frame with ts %lld ms, paddr %p\n",
+	WFD_MSG_DBG("Encoding frame with ts %lld ms, paddr %pK\n",
 			timespec_to_ns(&buf->time),
 			(void *)buf->mdp_buf_info.paddr);
 
@@ -61,7 +61,7 @@ static void vsg_set_last_buffer(struct vsg_context *context,
 
 	context->last_buffer = buf;
 
-	WFD_MSG_DBG("Setting last buffer to paddr %p\n",
+	WFD_MSG_DBG("Setting last buffer to paddr %pK\n",
 			(void *)buf->mdp_buf_info.paddr);
 }
 
@@ -218,7 +218,7 @@ static void vsg_timer_helper_func(struct work_struct *task)
 			INIT_LIST_HEAD(&info->node);
 
 			list_add_tail(&info->node, &context->free_queue.node);
-			WFD_MSG_DBG("Regenerated frame with paddr %p\n",
+			WFD_MSG_DBG("Regenerated frame with paddr %pK\n",
 				(void *)info->mdp_buf_info.paddr);
 		}
 	}
@@ -430,7 +430,7 @@ static long vsg_queue_buffer(struct v4l2_subdev *sd, void *arg)
 	buf_info->flags = 0;
 	ktime_get_ts(&buf_info->time);
 
-	WFD_MSG_DBG("Queue frame with paddr %p\n",
+	WFD_MSG_DBG("Queue frame with paddr %pK\n",
 			(void *)buf_info->mdp_buf_info.paddr);
 
 	{ /*return pending buffers as we're not going to encode them*/
@@ -526,7 +526,7 @@ static long vsg_return_ip_buffer(struct v4l2_subdev *sd, void *arg)
 	buf_info = (struct vsg_buf_info *)arg;
 	last_buffer = context->last_buffer;
 
-	WFD_MSG_DBG("Return frame with paddr %p\n",
+	WFD_MSG_DBG("Return frame with paddr %pK\n",
 			(void *)buf_info->mdp_buf_info.paddr);
 
 	if (!list_empty(&context->busy_queue.node)) {
@@ -544,14 +544,14 @@ static long vsg_return_ip_buffer(struct v4l2_subdev *sd, void *arg)
 
 	if (!expected_buffer || !known_buffer) {
 		WFD_MSG_ERR("Unexpectedly received buffer from enc with "
-			"paddr %p\n", (void *)buf_info->mdp_buf_info.paddr);
+			"paddr %pK\n", (void *)buf_info->mdp_buf_info.paddr);
 		rc = -EBADHANDLE;
 		goto return_ip_buf_bad_buf;
 	} else if (known_buffer != expected_buffer) {
 		/* Buffers can come back out of order if encoder decides to drop
 		 * a frame */
 		WFD_MSG_DBG(
-				"Got a buffer (%p) out of order. Preferred to get %p\n",
+				"Got a buffer (%pK) out of order. Preferred to get %pK\n",
 				(void *)known_buffer->mdp_buf_info.paddr,
 				(void *)expected_buffer->mdp_buf_info.paddr);
 	}

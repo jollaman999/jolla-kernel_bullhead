@@ -1420,13 +1420,13 @@ static int lpc_eth_drv_probe(struct platform_device *pdev)
 			res->start);
 	netdev_dbg(ndev, "IO address size      :%d\n",
 			res->end - res->start + 1);
-	netdev_dbg(ndev, "IO address (mapped)  :0x%p\n",
+	netdev_dbg(ndev, "IO address (mapped)  :0x%pK\n",
 			pldat->net_base);
 	netdev_dbg(ndev, "IRQ number           :%d\n", ndev->irq);
 	netdev_dbg(ndev, "DMA buffer size      :%d\n", pldat->dma_buff_size);
 	netdev_dbg(ndev, "DMA buffer P address :0x%08x\n",
 			pldat->dma_buff_base_p);
-	netdev_dbg(ndev, "DMA buffer V address :0x%p\n",
+	netdev_dbg(ndev, "DMA buffer V address :0x%pK\n",
 			pldat->dma_buff_base_v);
 
 	/* Get MAC address from current HW setting (POR state is all zeros) */

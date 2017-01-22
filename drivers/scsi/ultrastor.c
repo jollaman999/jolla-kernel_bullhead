@@ -950,7 +950,7 @@ static int ultrastor_abort(struct scsi_cmnd *SCpnt)
 
 #if ULTRASTOR_DEBUG & UD_ABORT
     if (config.mscp[mscp_index].SCint != SCpnt)
-	printk("abort: command mismatch, %p != %p\n",
+	printk("abort: command mismatch, %pK != %pK\n",
 	       config.mscp[mscp_index].SCint, SCpnt);
 #endif
     if (config.mscp[mscp_index].SCint == NULL)

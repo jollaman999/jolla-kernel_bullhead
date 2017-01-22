@@ -54,7 +54,7 @@ enum MHI_STATUS mhi_init_mmio(struct mhi_device_ctxt *mhi_dev_ctxt)
 	mhi_log(MHI_MSG_INFO, "~~~ Initializing MMIO ~~~\n");
 	mhi_dev_ctxt->mmio_addr = mhi_dev_ctxt->dev_props->bar0_base;
 
-	mhi_log(MHI_MSG_INFO, "Bar 0 address is at: 0x%p\n",
+	mhi_log(MHI_MSG_INFO, "Bar 0 address is at: 0x%pK\n",
 			mhi_dev_ctxt->mmio_addr);
 
 	mhi_dev_ctxt->mmio_len = mhi_reg_read(mhi_dev_ctxt->mmio_addr,

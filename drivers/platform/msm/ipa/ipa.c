@@ -224,7 +224,7 @@ static void ipa_wan_msg_free_cb(void *buff, u32 len, u32 type)
 	if (type != WAN_UPSTREAM_ROUTE_ADD &&
 	    type != WAN_UPSTREAM_ROUTE_DEL &&
 	    type != WAN_EMBMS_CONNECT) {
-		IPAERR("Wrong type given. buff %p type %d\n", buff, type);
+		IPAERR("Wrong type given. buff %pK type %d\n", buff, type);
 	}
 	kfree(buff);
 }

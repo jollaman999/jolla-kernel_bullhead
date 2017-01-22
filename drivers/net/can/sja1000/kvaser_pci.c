@@ -267,7 +267,7 @@ static int kvaser_pci_add_chan(struct pci_dev *pdev, int channel,
 
 	init_step = 4;
 
-	dev_info(&pdev->dev, "reg_base=%p conf_addr=%p irq=%d\n",
+	dev_info(&pdev->dev, "reg_base=%pK conf_addr=%pK irq=%d\n",
 		 priv->reg_base, board->conf_addr, dev->irq);
 
 	SET_NETDEV_DEV(dev, &pdev->dev);

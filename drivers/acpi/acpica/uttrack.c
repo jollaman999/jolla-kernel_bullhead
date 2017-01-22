@@ -255,7 +255,7 @@ acpi_ut_free_and_track(void *allocation,
 	}
 
 	acpi_os_free(debug_block);
-	ACPI_DEBUG_PRINT((ACPI_DB_ALLOCATIONS, "%p freed\n", allocation));
+	ACPI_DEBUG_PRINT((ACPI_DB_ALLOCATIONS, "%pK freed\n", allocation));
 	return_VOID;
 }
 
@@ -368,7 +368,7 @@ acpi_ut_track_allocation(struct acpi_debug_mem_block *allocation,
 	element = acpi_ut_find_allocation(allocation);
 	if (element == allocation) {
 		ACPI_ERROR((AE_INFO,
-			    "UtTrackAllocation: Allocation (%p) already present in global list!",
+			    "UtTrackAllocation: Allocation (%pK) already present in global list!",
 			    allocation));
 		goto unlock_and_exit;
 	}
@@ -470,7 +470,7 @@ acpi_ut_remove_allocation(struct acpi_debug_mem_block *allocation,
 		(allocation->next)->previous = allocation->previous;
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_ALLOCATIONS, "Freeing %p, size 0%X\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_ALLOCATIONS, "Freeing %pK, size 0%X\n",
 			  &allocation->user_space, allocation->size));
 
 	/* Mark the segment as deleted */
@@ -580,7 +580,7 @@ void acpi_ut_dump_allocations(u32 component, const char *module)
 
 			if (element->size <
 			    sizeof(struct acpi_common_descriptor)) {
-				acpi_os_printf("%p Length 0x%04X %9.9s-%u "
+				acpi_os_printf("%pK Length 0x%04X %9.9s-%u "
 					       "[Not a Descriptor - too small]\n",
 					       descriptor, element->size,
 					       element->module, element->line);
@@ -590,7 +590,7 @@ void acpi_ut_dump_allocations(u32 component, const char *module)
 				if (ACPI_GET_DESCRIPTOR_TYPE(descriptor) !=
 				    ACPI_DESC_TYPE_CACHED) {
 					acpi_os_printf
-					    ("%p Length 0x%04X %9.9s-%u [%s] ",
+					    ("%pK Length 0x%04X %9.9s-%u [%s] ",
 					     descriptor, element->size,
 					     element->module, element->line,
 					     acpi_ut_get_descriptor_name

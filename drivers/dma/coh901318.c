@@ -1317,8 +1317,8 @@ static void coh901318_list_print(struct coh901318_chan *cohc,
 	int i = 0;
 
 	while (l) {
-		dev_vdbg(COHC_2_DEV(cohc), "i %d, lli %p, ctrl 0x%x, src 0x%x"
-			 ", dst 0x%x, link 0x%x virt_link_addr 0x%p\n",
+		dev_vdbg(COHC_2_DEV(cohc), "i %d, lli %pK, ctrl 0x%x, src 0x%x"
+			 ", dst 0x%x, link 0x%x virt_link_addr 0x%pK\n",
 			 i, l, l->control, l->src_addr, l->dst_addr,
 			 l->link_addr, l->virt_link_addr);
 		i++;

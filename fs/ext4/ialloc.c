@@ -1160,7 +1160,7 @@ bad_orphan:
 	printk(KERN_WARNING "ext4_test_bit(bit=%d, block=%llu) = %d\n",
 	       bit, (unsigned long long)bitmap_bh->b_blocknr,
 	       ext4_test_bit(bit, bitmap_bh->b_data));
-	printk(KERN_WARNING "inode=%p\n", inode);
+	printk(KERN_WARNING "inode=%pK\n", inode);
 	if (inode) {
 		printk(KERN_WARNING "is_bad_inode(inode)=%d\n",
 		       is_bad_inode(inode));

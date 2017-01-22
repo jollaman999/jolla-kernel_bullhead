@@ -248,7 +248,7 @@ EXPORT_SYMBOL(vcc_process_recv_queue);
 
 void atm_dev_signal_change(struct atm_dev *dev, char signal)
 {
-	pr_debug("%s signal=%d dev=%p number=%d dev->signal=%d\n",
+	pr_debug("%s signal=%d dev=%pK number=%d dev->signal=%d\n",
 		__func__, signal, dev, dev->number, dev->signal);
 
 	/* atm driver sending invalid signal */

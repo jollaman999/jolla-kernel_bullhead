@@ -613,7 +613,7 @@ static int rsxx_queue_dma(struct rsxx_cardinfo *card,
 	dma->cb_data      = cb_data;
 
 	dev_dbg(CARD_TO_DEV(card),
-		"Queuing[%c] laddr %x off %d cnt %d page %p pg_off %d\n",
+		"Queuing[%c] laddr %x off %d cnt %d page %pK pg_off %d\n",
 		dir ? 'W' : 'R', dma->laddr, dma->sub_page.off,
 		dma->sub_page.cnt, dma->page, dma->pg_off);
 

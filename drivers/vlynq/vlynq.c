@@ -82,7 +82,7 @@ static void vlynq_dump_regs(struct vlynq_device *dev)
 {
 	int i;
 
-	printk(KERN_DEBUG "VLYNQ local=%p remote=%p\n",
+	printk(KERN_DEBUG "VLYNQ local=%pK remote=%pK\n",
 			dev->local, dev->remote);
 	for (i = 0; i < 32; i++) {
 		printk(KERN_DEBUG "VLYNQ: local %d: %08x\n",
@@ -731,7 +731,7 @@ static int vlynq_probe(struct platform_device *pdev)
 		goto fail_register;
 	platform_set_drvdata(pdev, dev);
 
-	printk(KERN_INFO "%s: regs 0x%p, irq %d, mem 0x%p\n",
+	printk(KERN_INFO "%s: regs 0x%pK, irq %d, mem 0x%pK\n",
 	       dev_name(&dev->dev), (void *)dev->regs_start, dev->irq,
 	       (void *)dev->mem_start);
 

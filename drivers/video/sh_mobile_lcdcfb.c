@@ -2394,7 +2394,7 @@ static int sh_mobile_lcdc_notify(struct notifier_block *nb,
 	if (&ch->lcdc->notifier != nb)
 		return NOTIFY_DONE;
 
-	dev_dbg(info->dev, "%s(): action = %lu, data = %p\n",
+	dev_dbg(info->dev, "%s(): action = %lu, data = %pK\n",
 		__func__, action, event->data);
 
 	switch(action) {

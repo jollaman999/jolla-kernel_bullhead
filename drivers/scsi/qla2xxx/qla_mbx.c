@@ -142,7 +142,7 @@ qla2x00_mailbox_command(scsi_qla_host_t *vha, mbx_cmd_t *mcp)
 	ql_dump_buffer(ql_dbg_mbx + ql_dbg_buffer, vha, 0x1116,
 	    ((uint8_t *)mcp->mb + 0x20), 8);
 	ql_dbg(ql_dbg_mbx + ql_dbg_buffer, vha, 0x1117,
-	    "I/O Address = %p.\n", optr);
+	    "I/O Address = %pK.\n", optr);
 	ql_dump_regs(ql_dbg_mbx + ql_dbg_buffer, vha, 0x100e);
 
 	/* Issue set host interrupt command to send cmd out. */

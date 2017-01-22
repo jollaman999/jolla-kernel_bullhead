@@ -1435,7 +1435,7 @@ csio_ln_mgmt_wr_handler(struct csio_hw *hw, void *wr, uint32_t len)
 	spin_lock_irq(&hw->lock);
 	if (csio_mgmt_req_lookup(mgmtm, io_req) != 0) {
 		csio_err(mgmtm->hw,
-			"Error- Invalid IO handle recv in WR. handle: %p\n",
+			"Error- Invalid IO handle recv in WR. handle: %pK\n",
 			io_req);
 		mgmtm->stats.n_err++;
 		spin_unlock_irq(&hw->lock);
@@ -1626,7 +1626,7 @@ csio_lnode_stop(struct csio_lnode *ln)
 		csio_fcoe_enable_link(ln, 0);
 		ln->flags &= ~CSIO_LNF_LINK_ENABLE;
 	}
-	csio_ln_dbg(ln, "stopping ln :%p\n", ln);
+	csio_ln_dbg(ln, "stopping ln :%pK\n", ln);
 }
 
 /**
@@ -1644,7 +1644,7 @@ csio_lnode_close(struct csio_lnode *ln)
 	if (csio_is_phys_ln(ln))
 		ln->vnp_flowid = CSIO_INVALID_IDX;
 
-	csio_ln_dbg(ln, "closed ln :%p\n", ln);
+	csio_ln_dbg(ln, "closed ln :%pK\n", ln);
 }
 
 /*
@@ -1736,7 +1736,7 @@ csio_ln_mgmt_submit_wr(struct csio_mgmtm *mgmtm, struct csio_ioreq *io_req,
 	/* Get WR to send ELS REQ */
 	ret = csio_wr_get(hw, mgmtm->eq_idx, wr_size, &wrp);
 	if (ret != 0) {
-		csio_err(hw, "Failed to get WR for ec_req %p ret:%d\n",
+		csio_err(hw, "Failed to get WR for ec_req %pK ret:%d\n",
 			io_req, ret);
 		return ret;
 	}

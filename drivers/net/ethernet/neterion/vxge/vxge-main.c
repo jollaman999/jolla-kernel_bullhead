@@ -213,7 +213,7 @@ vxge_rx_alloc(void *dtrh, struct vxge_ring *ring, const int skb_size)
 	}
 
 	vxge_debug_mem(VXGE_TRACE,
-		"%s: %s:%d  Skb : 0x%p", ring->ndev->name,
+		"%s: %s:%d  Skb : 0x%pK", ring->ndev->name,
 		__func__, __LINE__, skb);
 
 	skb_reserve(skb, VXGE_HW_HEADER_ETHERNET_II_802_3_ALIGN);
@@ -376,7 +376,7 @@ vxge_rx_1b_compl(struct __vxge_hw_ring *ringh, void *dtr,
 		prefetch(rx_priv->skb_data);
 
 		vxge_debug_rx(VXGE_TRACE,
-			"%s: %s:%d  skb = 0x%p",
+			"%s: %s:%d  skb = 0x%pK",
 			ring->ndev->name, __func__, __LINE__, skb);
 
 		vxge_hw_ring_rxd_1b_get(ringh, dtr, &dma_sizes);
@@ -459,7 +459,7 @@ vxge_rx_1b_compl(struct __vxge_hw_ring *ringh, void *dtr,
 					PCI_DMA_FROMDEVICE);
 
 				vxge_debug_mem(VXGE_TRACE,
-					"%s: %s:%d  skb_up = %p",
+					"%s: %s:%d  skb_up = %pK",
 					ring->ndev->name, __func__,
 					__LINE__, skb);
 				memcpy(skb_up->data, skb->data, pkt_length);
@@ -561,19 +561,19 @@ vxge_xmit_compl(struct __vxge_hw_fifo *fifo_hw, void *dtr,
 		frag = &skb_shinfo(skb)->frags[0];
 
 		vxge_debug_tx(VXGE_TRACE,
-				"%s: %s:%d fifo_hw = %p dtr = %p "
+				"%s: %s:%d fifo_hw = %pK dtr = %pK "
 				"tcode = 0x%x", fifo->ndev->name, __func__,
 				__LINE__, fifo_hw, dtr, t_code);
 		/* check skb validity */
 		vxge_assert(skb);
 		vxge_debug_tx(VXGE_TRACE,
-			"%s: %s:%d skb = %p itxd_priv = %p frg_cnt = %d",
+			"%s: %s:%d skb = %pK itxd_priv = %pK frg_cnt = %d",
 			fifo->ndev->name, __func__, __LINE__,
 			skb, txd_priv, frg_cnt);
 		if (unlikely(t_code)) {
 			fifo->stats.tx_errors++;
 			vxge_debug_tx(VXGE_ERR,
-				"%s: tx: dtr %p completed due to "
+				"%s: tx: dtr %pK completed due to "
 				"error t_code %01x", fifo->ndev->name,
 				dtr, t_code);
 			vxge_hw_fifo_handle_tcode(fifo_hw, dtr, t_code);
@@ -884,7 +884,7 @@ vxge_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 
 	vxge_debug_tx(VXGE_TRACE,
-		"%s: %s:%d fifo_hw = %p dtr = %p dtr_priv = %p",
+		"%s: %s:%d fifo_hw = %pK dtr = %pK dtr_priv = %pK",
 		dev->name, __func__, __LINE__,
 		fifo_hw, dtr, dtr_priv);
 
@@ -910,7 +910,7 @@ vxge_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	frg_cnt = skb_shinfo(skb)->nr_frags;
 	vxge_debug_tx(VXGE_TRACE,
-			"%s: %s:%d skb = %p txdl_priv = %p "
+			"%s: %s:%d skb = %pK txdl_priv = %pK "
 			"frag_cnt = %d dma_pointer = 0x%llx", dev->name,
 			__func__, __LINE__, skb, txdl_priv,
 			frg_cnt, (unsigned long long)dma_pointer);
@@ -4434,7 +4434,7 @@ vxge_probe(struct pci_dev *pdev, const struct pci_device_id *pre)
 		goto _exit2;
 	}
 	vxge_debug_ll_config(VXGE_TRACE,
-		"pci ioremap bar0: %p:0x%llx",
+		"pci ioremap bar0: %pK:0x%llx",
 		attr.bar0,
 		(unsigned long long)pci_resource_start(pdev, 0));
 

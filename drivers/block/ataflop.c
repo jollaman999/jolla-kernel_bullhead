@@ -1356,7 +1356,7 @@ static int floppy_revalidate(struct gendisk *disk)
 	    test_bit(drive, &fake_change) ||
 	    p->disktype == 0) {
 		if (UD.flags & FTD_MSG)
-			printk(KERN_ERR "floppy: clear format %p!\n", UDT);
+			printk(KERN_ERR "floppy: clear format %pK!\n", UDT);
 		BufferDrive = -1;
 		clear_bit(drive, &fake_change);
 		clear_bit(drive, &changed_floppies);
@@ -1422,7 +1422,7 @@ static void redo_fd_request(void)
 	int drive, type;
 	struct atari_floppy_struct *floppy;
 
-	DPRINT(("redo_fd_request: fd_request=%p dev=%s fd_request->sector=%ld\n",
+	DPRINT(("redo_fd_request: fd_request=%pK dev=%s fd_request->sector=%ld\n",
 		fd_request, fd_request ? fd_request->rq_disk->disk_name : "",
 		fd_request ? blk_rq_pos(fd_request) : 0 ));
 
@@ -1530,7 +1530,7 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
 			type = minor2disktype[type].index;
 			dtp = &atari_disk_type[type];
 			if (UD.flags & FTD_MSG)
-			    printk (KERN_ERR "floppy%d: found dtp %p name %s!\n",
+			    printk (KERN_ERR "floppy%d: found dtp %pK name %s!\n",
 			        drive, dtp, dtp->name);
 		}
 		else {
@@ -1606,7 +1606,7 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
 			    && dtp->spt     == setprm.sect
 			    && dtp->stretch == setprm.stretch ) {
 				if (UD.flags & FTD_MSG)
-				    printk (KERN_INFO "floppy%d: setting %s %p!\n",
+				    printk (KERN_INFO "floppy%d: setting %s %pK!\n",
 				        drive, dtp->name, dtp);
 				UDT = dtp;
 				set_capacity(floppy->disk, UDT->blocks);

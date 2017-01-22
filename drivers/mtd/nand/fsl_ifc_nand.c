@@ -718,7 +718,7 @@ static int fsl_ifc_chip_init_tail(struct mtd_info *mtd)
 							chip->page_shift);
 	dev_dbg(priv->dev, "%s: nand->phys_erase_shift = %d\n", __func__,
 							chip->phys_erase_shift);
-	dev_dbg(priv->dev, "%s: nand->ecclayout = %p\n", __func__,
+	dev_dbg(priv->dev, "%s: nand->ecclayout = %pK\n", __func__,
 							chip->ecclayout);
 	dev_dbg(priv->dev, "%s: nand->ecc.mode = %d\n", __func__,
 							chip->ecc.mode);
@@ -728,7 +728,7 @@ static int fsl_ifc_chip_init_tail(struct mtd_info *mtd)
 							chip->ecc.bytes);
 	dev_dbg(priv->dev, "%s: nand->ecc.total = %d\n", __func__,
 							chip->ecc.total);
-	dev_dbg(priv->dev, "%s: nand->ecc.layout = %p\n", __func__,
+	dev_dbg(priv->dev, "%s: nand->ecc.layout = %pK\n", __func__,
 							chip->ecc.layout);
 	dev_dbg(priv->dev, "%s: mtd->flags = %08x\n", __func__, mtd->flags);
 	dev_dbg(priv->dev, "%s: mtd->size = %lld\n", __func__, mtd->size);

@@ -286,7 +286,7 @@ unsigned int aac_intr_normal(struct aac_dev *dev, u32 index,
 			int isAif, int isFastResponse, struct hw_fib *aif_fib)
 {
 	unsigned long mflags;
-	dprintk((KERN_INFO "aac_intr_normal(%p,%x)\n", dev, index));
+	dprintk((KERN_INFO "aac_intr_normal(%pK,%x)\n", dev, index));
 	if (isAif == 1) {	/* AIF - common */
 		struct hw_fib * hw_fib;
 		struct fib * fib;

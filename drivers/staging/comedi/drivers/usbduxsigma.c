@@ -840,7 +840,7 @@ static int usbduxsub_submit_InURBs(struct usbduxsub *usbduxsub)
 		usbduxsub->urbIn[i]->status = 0;
 		usbduxsub->urbIn[i]->transfer_flags = URB_ISO_ASAP;
 		dev_dbg(&usbduxsub->interface->dev,
-			"comedi%d: submitting in-urb[%d]: %p,%p intv=%d\n",
+			"comedi%d: submitting in-urb[%d]: %pK,%pK intv=%d\n",
 			usbduxsub->comedidev->minor, i,
 			(usbduxsub->urbIn[i]->context),
 			(usbduxsub->urbIn[i]->dev),

@@ -134,11 +134,11 @@ void __init setup_arch(char **cmdline_p)
 	printk(KERN_INFO "H8/300 series support by Yoshinori Sato <ysato@users.sourceforge.jp>\n");
 
 #ifdef DEBUG
-	printk(KERN_DEBUG "KERNEL -> TEXT=0x%p-0x%p DATA=0x%p-0x%p "
-		"BSS=0x%p-0x%p\n", _stext, _etext, _sdata, _edata, __bss_start,
+	printk(KERN_DEBUG "KERNEL -> TEXT=0x%pK-0x%pK DATA=0x%pK-0x%pK "
+		"BSS=0x%pK-0x%pK\n", _stext, _etext, _sdata, _edata, __bss_start,
 		__bss_stop);
-	printk(KERN_DEBUG "KERNEL -> ROMFS=0x%p-0x%06lx MEM=0x%06lx-0x%06lx "
-		"STACK=0x%06lx-0x%p\n", __bss_stop, memory_start, memory_start,
+	printk(KERN_DEBUG "KERNEL -> ROMFS=0x%pK-0x%06lx MEM=0x%06lx-0x%06lx "
+		"STACK=0x%06lx-0x%pK\n", __bss_stop, memory_start, memory_start,
 		memory_end, memory_end, &_ramend);
 #endif
 

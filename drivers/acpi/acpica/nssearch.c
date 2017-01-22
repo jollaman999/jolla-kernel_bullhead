@@ -108,7 +108,7 @@ acpi_ns_search_one_scope(u32 target_name,
 		scope_name = acpi_ns_get_external_pathname(parent_node);
 		if (scope_name) {
 			ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
-					  "Searching %s (%p) For [%4.4s] (%s)\n",
+					  "Searching %s (%pK) For [%4.4s] (%s)\n",
 					  scope_name, parent_node,
 					  ACPI_CAST_PTR(char, &target_name),
 					  acpi_ut_get_type_name(type)));
@@ -141,7 +141,7 @@ acpi_ns_search_one_scope(u32 target_name,
 			/* Found matching entry */
 
 			ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
-					  "Name [%4.4s] (%s) %p found in scope [%4.4s] %p\n",
+					  "Name [%4.4s] (%s) %pK found in scope [%4.4s] %pK\n",
 					  ACPI_CAST_PTR(char, &target_name),
 					  acpi_ut_get_type_name(node->type),
 					  node,
@@ -161,7 +161,7 @@ acpi_ns_search_one_scope(u32 target_name,
 
 	ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
 			  "Name [%4.4s] (%s) not found in search in scope [%4.4s] "
-			  "%p first child %p\n",
+			  "%pK first child %pK\n",
 			  ACPI_CAST_PTR(char, &target_name),
 			  acpi_ut_get_type_name(type),
 			  acpi_ut_get_node_name(parent_node), parent_node,
@@ -300,7 +300,7 @@ acpi_ns_search_and_enter(u32 target_name,
 
 	if (!node || !target_name || !return_node) {
 		ACPI_ERROR((AE_INFO,
-			    "Null parameter: Node %p Name 0x%X ReturnNode %p",
+			    "Null parameter: Node %pK Name 0x%X ReturnNode %pK",
 			    node, target_name, return_node));
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
@@ -365,7 +365,7 @@ acpi_ns_search_and_enter(u32 target_name,
 
 	if (interpreter_mode == ACPI_IMODE_EXECUTE) {
 		ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
-				  "%4.4s Not found in %p [Not adding]\n",
+				  "%4.4s Not found in %pK [Not adding]\n",
 				  ACPI_CAST_PTR(char, &target_name), node));
 
 		return_ACPI_STATUS(AE_NOT_FOUND);

@@ -225,7 +225,7 @@ static void srpt_srq_event(struct ib_event *event, void *ctx)
  */
 static void srpt_qp_event(struct ib_event *event, struct srpt_rdma_ch *ch)
 {
-	pr_debug("QP event %d on cm_id=%p sess_name=%s state=%d\n",
+	pr_debug("QP event %d on cm_id=%pK sess_name=%s state=%d\n",
 		 event->event, ch->cm_id, ch->sess_name, srpt_get_ch_state(ch));
 
 	switch (event->event) {
@@ -1839,7 +1839,7 @@ static void srpt_handle_tsk_mgmt(struct srpt_rdma_ch *ch,
 	cmd = &send_ioctx->cmd;
 
 	pr_debug("recv tsk_mgmt fn %d for task_tag %lld and cmd tag %lld"
-		 " cm_id %p sess %p\n", srp_tsk->tsk_mgmt_func,
+		 " cm_id %pK sess %pK\n", srp_tsk->tsk_mgmt_func,
 		 srp_tsk->task_tag, srp_tsk->tag, ch->cm_id, ch->sess);
 
 	srpt_set_cmd_state(send_ioctx, SRPT_STATE_MGMT);
@@ -2138,7 +2138,7 @@ retry:
 
 	atomic_set(&ch->sq_wr_avail, qp_init->cap.max_send_wr);
 
-	pr_debug("%s: max_cqe= %d max_sge= %d sq_size = %d cm_id= %p\n",
+	pr_debug("%s: max_cqe= %d max_sge= %d sq_size = %d cm_id= %pK\n",
 		 __func__, ch->cq->cqe, qp_init->cap.max_send_sge,
 		 qp_init->cap.max_send_wr, ch->cm_id);
 
@@ -2353,7 +2353,7 @@ static void srpt_release_channel_work(struct work_struct *w)
 	struct se_session *se_sess;
 
 	ch = container_of(w, struct srpt_rdma_ch, release_work);
-	pr_debug("ch = %p; ch->sess = %p; release_done = %p\n", ch, ch->sess,
+	pr_debug("ch = %pK; ch->sess = %pK; release_done = %pK\n", ch, ch->sess,
 		 ch->release_done);
 
 	sdev = ch->sport->sdev;
@@ -2504,7 +2504,7 @@ static int srpt_cm_req_recv(struct ib_cm_id *cm_id,
 
 				/* found an existing channel */
 				pr_debug("Found existing channel %s"
-					 " cm_id= %p state= %d\n",
+					 " cm_id= %pK state= %d\n",
 					 ch->sess_name, ch->cm_id, ch_state);
 
 				__srpt_close_ch(ch);
@@ -2612,7 +2612,7 @@ static int srpt_cm_req_recv(struct ib_cm_id *cm_id,
 	ch->sess->se_node_acl = &nacl->nacl;
 	transport_register_session(&sport->port_tpg_1, &nacl->nacl, ch->sess, ch);
 
-	pr_debug("Establish connection sess=%p name=%s cm_id=%p\n", ch->sess,
+	pr_debug("Establish connection sess=%pK name=%s cm_id=%pK\n", ch->sess,
 		 ch->sess_name, ch->cm_id);
 
 	/* create srp_login_response */
@@ -2688,7 +2688,7 @@ out:
 
 static void srpt_cm_rej_recv(struct ib_cm_id *cm_id)
 {
-	printk(KERN_INFO "Received IB REJ for cm_id %p.\n", cm_id);
+	printk(KERN_INFO "Received IB REJ for cm_id %pK.\n", cm_id);
 	srpt_drain_channel(cm_id);
 }
 
@@ -2723,13 +2723,13 @@ static void srpt_cm_rtu_recv(struct ib_cm_id *cm_id)
 
 static void srpt_cm_timewait_exit(struct ib_cm_id *cm_id)
 {
-	printk(KERN_INFO "Received IB TimeWait exit for cm_id %p.\n", cm_id);
+	printk(KERN_INFO "Received IB TimeWait exit for cm_id %pK.\n", cm_id);
 	srpt_drain_channel(cm_id);
 }
 
 static void srpt_cm_rep_error(struct ib_cm_id *cm_id)
 {
-	printk(KERN_INFO "Received IB REP error for cm_id %p.\n", cm_id);
+	printk(KERN_INFO "Received IB REP error for cm_id %pK.\n", cm_id);
 	srpt_drain_channel(cm_id);
 }
 
@@ -2745,7 +2745,7 @@ static void srpt_cm_dreq_recv(struct ib_cm_id *cm_id)
 	ch = srpt_find_channel(cm_id->context, cm_id);
 	BUG_ON(!ch);
 
-	pr_debug("cm_id= %p ch->state= %d\n", cm_id, srpt_get_ch_state(ch));
+	pr_debug("cm_id= %pK ch->state= %d\n", cm_id, srpt_get_ch_state(ch));
 
 	spin_lock_irqsave(&ch->spinlock, flags);
 	switch (ch->state) {
@@ -2775,7 +2775,7 @@ static void srpt_cm_dreq_recv(struct ib_cm_id *cm_id)
  */
 static void srpt_cm_drep_recv(struct ib_cm_id *cm_id)
 {
-	printk(KERN_INFO "Received InfiniBand DREP message for cm_id %p.\n",
+	printk(KERN_INFO "Received InfiniBand DREP message for cm_id %pK.\n",
 	       cm_id);
 	srpt_drain_channel(cm_id);
 }
@@ -3049,7 +3049,7 @@ static int srpt_queue_response(struct se_cmd *cmd)
 		ioctx->state = SRPT_STATE_MGMT_RSP_SENT;
 		break;
 	default:
-		WARN(true, "ch %p; cmd %d: unexpected command state %d\n",
+		WARN(true, "ch %pK; cmd %d: unexpected command state %d\n",
 			ch, ioctx->ioctx.index, ioctx->state);
 		break;
 	}
@@ -3197,7 +3197,7 @@ static void srpt_add_one(struct ib_device *device)
 	struct ib_srq_init_attr srq_attr;
 	int i;
 
-	pr_debug("device = %p, device->dma_ops = %p\n", device,
+	pr_debug("device = %pK, device->dma_ops = %pK\n", device,
 		 device->dma_ops);
 
 	sdev = kzalloc(sizeof *sdev, GFP_KERNEL);
@@ -3517,7 +3517,7 @@ static void srpt_close_session(struct se_session *se_sess)
 	ch = se_sess->fabric_sess_ptr;
 	WARN_ON(ch->sess != se_sess);
 
-	pr_debug("ch %p state %d\n", ch, srpt_get_ch_state(ch));
+	pr_debug("ch %pK state %d\n", ch, srpt_get_ch_state(ch));
 
 	sdev = ch->sport->sdev;
 	spin_lock_irq(&sdev->spinlock);

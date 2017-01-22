@@ -419,7 +419,7 @@ void __init mpc52xx_init_irq(void)
 		panic(__FILE__	": find_and_map failed on 'mpc5200-bestcomm'. "
 				"Check node !");
 
-	pr_debug("MPC5200 IRQ controller mapped to 0x%p\n", intr);
+	pr_debug("MPC5200 IRQ controller mapped to 0x%pK\n", intr);
 
 	/* Disable all interrupt sources. */
 	out_be32(&sdma->IntPend, 0xffffffff);	/* 1 means clear pending */

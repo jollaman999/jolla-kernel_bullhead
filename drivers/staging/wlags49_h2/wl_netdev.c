@@ -175,7 +175,7 @@ int wl_init( struct net_device *dev )
     DBG_FUNC( "wl_init" );
     DBG_ENTER( DbgInfo );
 
-    DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
+    DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
 
     /* Nothing to do, but grab the spinlock anyway just in case we ever need
        this routine */
@@ -211,8 +211,8 @@ int wl_config( struct net_device *dev, struct ifmap *map )
     DBG_FUNC( "wl_config" );
     DBG_ENTER( DbgInfo );
 
-    DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
-    DBG_PARAM( DbgInfo, "map", "0x%p", map );
+    DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
+    DBG_PARAM( DbgInfo, "map", "0x%pK", map );
 
     /* The only thing we care about here is a port change. Since this not needed,
        ignore the request. */
@@ -253,7 +253,7 @@ struct net_device_stats *wl_stats( struct net_device *dev )
 
     //DBG_FUNC( "wl_stats" );
     //DBG_ENTER( DbgInfo );
-    //DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
+    //DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
 
     pStats = NULL;
 
@@ -415,7 +415,7 @@ int wl_close( struct net_device *dev )
 
     DBG_FUNC("wl_close");
     DBG_ENTER(DbgInfo);
-    DBG_PARAM(DbgInfo, "dev", "%s (0x%p)", dev->name, dev);
+    DBG_PARAM(DbgInfo, "dev", "%s (0x%pK)", dev->name, dev);
 
     /* Mark the adapter as busy */
     netif_stop_queue( dev );
@@ -508,8 +508,8 @@ int wl_ioctl( struct net_device *dev, struct ifreq *rq, int cmd )
 
     DBG_FUNC( "wl_ioctl" );
     DBG_ENTER(DbgInfo);
-    DBG_PARAM(DbgInfo, "dev", "%s (0x%p)", dev->name, dev);
-    DBG_PARAM(DbgInfo, "rq", "0x%p", rq);
+    DBG_PARAM(DbgInfo, "dev", "%s (0x%pK)", dev->name, dev);
+    DBG_PARAM(DbgInfo, "rq", "0x%pK", rq);
     DBG_PARAM(DbgInfo, "cmd", "0x%04x", cmd);
 
     wl_lock( lp, &flags );
@@ -896,7 +896,7 @@ int wl_rx(struct net_device *dev)
     /*------------------------------------------------------------------------*/
 
     DBG_FUNC("wl_rx")
-    DBG_PARAM(DbgInfo, "dev", "%s (0x%p)", dev->name, dev);
+    DBG_PARAM(DbgInfo, "dev", "%s (0x%pK)", dev->name, dev);
 
     if(!( lp->flags & WVLAN2_UIL_BUSY )) {
 
@@ -1051,7 +1051,7 @@ void wl_multicast( struct net_device *dev )
 
     DBG_FUNC( "wl_multicast" );
     DBG_ENTER( DbgInfo );
-    DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
+    DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
 
     if( !wl_adapter_is_open( dev )) {
         DBG_LEAVE( DbgInfo );
@@ -1158,9 +1158,9 @@ void wl_multicast( struct net_device *dev, int num_addrs, void *addrs )
     DBG_FUNC( "wl_multicast");
     DBG_ENTER(DbgInfo);
 
-    DBG_PARAM( DbgInfo, "dev", "%s (0x%p)", dev->name, dev );
+    DBG_PARAM( DbgInfo, "dev", "%s (0x%pK)", dev->name, dev );
     DBG_PARAM( DbgInfo, "num_addrs", "%d", num_addrs );
-    DBG_PARAM( DbgInfo, "addrs", "0x%p", addrs );
+    DBG_PARAM( DbgInfo, "addrs", "0x%pK", addrs );
 
 #error Obsolete set multicast interface!
 
@@ -1883,7 +1883,7 @@ int wl_rx_dma( struct net_device *dev )
     /*------------------------------------------------------------------------*/
 
     DBG_FUNC("wl_rx")
-    DBG_PARAM(DbgInfo, "dev", "%s (0x%p)", dev->name, dev);
+    DBG_PARAM(DbgInfo, "dev", "%s (0x%pK)", dev->name, dev);
 
     if((( lp = dev->priv ) != NULL ) &&
 	!( lp->flags & WVLAN2_UIL_BUSY )) {

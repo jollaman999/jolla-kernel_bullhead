@@ -120,13 +120,13 @@ static inline const char *strtail(const char *s, int n)
  */
 #define CTCM_DBF_DEV(cat, dev, text) \
 	do { \
-		CTCM_DBF_TEXT_(cat, CTC_DBF_INFO, "%s(%p) :-: %s", \
+		CTCM_DBF_TEXT_(cat, CTC_DBF_INFO, "%s(%pK) :-: %s", \
 			CTCM_FUNTAIL, dev, text); \
 	} while (0)
 
 #define MPC_DBF_DEV(cat, dev, text) \
 	do { \
-		CTCM_DBF_TEXT_(MPC_##cat, CTC_DBF_INFO, "%s(%p) :=: %s", \
+		CTCM_DBF_TEXT_(MPC_##cat, CTC_DBF_INFO, "%s(%pK) :=: %s", \
 			CTCM_FUNTAIL, dev, text); \
 	} while (0)
 

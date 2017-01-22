@@ -704,7 +704,7 @@ static void ipa_q6_clnt_svc_arrive(struct work_struct *work)
 		return;
 	}
 
-	IPAWANDBG("Lookup server name, get client-hdl(%p)\n",
+	IPAWANDBG("Lookup server name, get client-hdl(%pK)\n",
 		ipa_q6_clnt);
 	rc = qmi_connect_to_service(ipa_q6_clnt,
 			IPA_Q6_SERVICE_SVC_ID,
@@ -917,7 +917,7 @@ void ipa_qmi_service_exit(void)
 	if (ipa_svc_handle) {
 		ret = qmi_svc_unregister(ipa_svc_handle);
 		if (ret < 0)
-			IPAWANERR("unregister qmi handle %p failed, ret=%d\n",
+			IPAWANERR("unregister qmi handle %pK failed, ret=%d\n",
 			ipa_svc_handle, ret);
 	}
 	if (ipa_svc_workqueue) {
@@ -929,7 +929,7 @@ void ipa_qmi_service_exit(void)
 	if (ipa_svc_handle) {
 		ret = qmi_handle_destroy(ipa_svc_handle);
 		if (ret < 0)
-			IPAWANERR("Error destroying qmi handle %p, ret=%d\n",
+			IPAWANERR("Error destroying qmi handle %pK, ret=%d\n",
 			ipa_svc_handle, ret);
 	}
 

@@ -554,12 +554,12 @@ void scsi_log_send(struct scsi_cmnd *cmd)
 		if (level > 1) {
 			scmd_printk(KERN_INFO, cmd, "Send: ");
 			if (level > 2)
-				printk("0x%p ", cmd);
+				printk("0x%pK ", cmd);
 			printk("\n");
 			scsi_print_command(cmd);
 			if (level > 3) {
-				printk(KERN_INFO "buffer = 0x%p, bufflen = %d,"
-				       " queuecommand 0x%p\n",
+				printk(KERN_INFO "buffer = 0x%pK, bufflen = %d,"
+				       " queuecommand 0x%pK\n",
 					scsi_sglist(cmd), scsi_bufflen(cmd),
 					cmd->device->host->hostt->queuecommand);
 
@@ -591,7 +591,7 @@ void scsi_log_completion(struct scsi_cmnd *cmd, int disposition)
 		    (level > 1)) {
 			scmd_printk(KERN_INFO, cmd, "Done: ");
 			if (level > 2)
-				printk("0x%p ", cmd);
+				printk("0x%pK ", cmd);
 			/*
 			 * Dump truncated values, so we usually fit within
 			 * 80 chars.

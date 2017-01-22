@@ -172,7 +172,7 @@ int rds_page_remainder_alloc(struct scatterlist *scat, unsigned long bytes,
 	local_irq_restore(flags);
 	put_cpu();
 out:
-	rdsdebug("bytes %lu ret %d %p %u %u\n", bytes, ret,
+	rdsdebug("bytes %lu ret %d %pK %u %u\n", bytes, ret,
 		 ret ? NULL : sg_page(scat), ret ? 0 : scat->offset,
 		 ret ? 0 : scat->length);
 	return ret;

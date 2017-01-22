@@ -142,7 +142,7 @@ static struct fsnotify_event *get_one_event(struct fsnotify_group *group,
 
 	event = fsnotify_peek_notify_event(group);
 
-	pr_debug("%s: group=%p event=%p\n", __func__, group, event);
+	pr_debug("%s: group=%pK event=%pK\n", __func__, group, event);
 
 	if (event->name_len)
 		event_size += roundup(event->name_len + 1, event_size);
@@ -173,7 +173,7 @@ static ssize_t copy_event_to_user(struct fsnotify_group *group,
 	size_t event_size = sizeof(struct inotify_event);
 	size_t name_len = 0;
 
-	pr_debug("%s: group=%p event=%p\n", __func__, group, event);
+	pr_debug("%s: group=%pK event=%pK\n", __func__, group, event);
 
 	/* we get the inotify watch descriptor from the event private data */
 	spin_lock(&event->lock);
@@ -247,7 +247,7 @@ static ssize_t inotify_read(struct file *file, char __user *buf,
 		kevent = get_one_event(group, count);
 		mutex_unlock(&group->notification_mutex);
 
-		pr_debug("%s: group=%p kevent=%p\n", __func__, group, kevent);
+		pr_debug("%s: group=%pK kevent=%pK\n", __func__, group, kevent);
 
 		if (kevent) {
 			ret = PTR_ERR(kevent);
@@ -285,7 +285,7 @@ static int inotify_release(struct inode *ignored, struct file *file)
 {
 	struct fsnotify_group *group = file->private_data;
 
-	pr_debug("%s: group=%p\n", __func__, group);
+	pr_debug("%s: group=%pK\n", __func__, group);
 
 	/* free this group, matching get was inotify_init->fsnotify_obtain_group */
 	fsnotify_destroy_group(group);
@@ -306,7 +306,7 @@ static long inotify_ioctl(struct file *file, unsigned int cmd,
 	group = file->private_data;
 	p = (void __user *) arg;
 
-	pr_debug("%s: group=%p cmd=%u\n", __func__, group, cmd);
+	pr_debug("%s: group=%pK cmd=%u\n", __func__, group, cmd);
 
 	switch (cmd) {
 	case FIONREAD:
@@ -443,8 +443,8 @@ static void inotify_remove_from_idr(struct fsnotify_group *group,
 	 * if it wasn't....
 	 */
 	if (wd == -1) {
-		WARN_ONCE(1, "%s: i_mark=%p i_mark->wd=%d i_mark->group=%p"
-			" i_mark->inode=%p\n", __func__, i_mark, i_mark->wd,
+		WARN_ONCE(1, "%s: i_mark=%pK i_mark->wd=%d i_mark->group=%pK"
+			" i_mark->inode=%pK\n", __func__, i_mark, i_mark->wd,
 			i_mark->fsn_mark.group, i_mark->fsn_mark.i.inode);
 		goto out;
 	}
@@ -452,8 +452,8 @@ static void inotify_remove_from_idr(struct fsnotify_group *group,
 	/* Lets look in the idr to see if we find it */
 	found_i_mark = inotify_idr_find_locked(group, wd);
 	if (unlikely(!found_i_mark)) {
-		WARN_ONCE(1, "%s: i_mark=%p i_mark->wd=%d i_mark->group=%p"
-			" i_mark->inode=%p\n", __func__, i_mark, i_mark->wd,
+		WARN_ONCE(1, "%s: i_mark=%pK i_mark->wd=%d i_mark->group=%pK"
+			" i_mark->inode=%pK\n", __func__, i_mark, i_mark->wd,
 			i_mark->fsn_mark.group, i_mark->fsn_mark.i.inode);
 		goto out;
 	}
@@ -464,9 +464,9 @@ static void inotify_remove_from_idr(struct fsnotify_group *group,
 	 * fucked up somewhere.
 	 */
 	if (unlikely(found_i_mark != i_mark)) {
-		WARN_ONCE(1, "%s: i_mark=%p i_mark->wd=%d i_mark->group=%p "
-			"mark->inode=%p found_i_mark=%p found_i_mark->wd=%d "
-			"found_i_mark->group=%p found_i_mark->inode=%p\n",
+		WARN_ONCE(1, "%s: i_mark=%pK i_mark->wd=%d i_mark->group=%pK "
+			"mark->inode=%pK found_i_mark=%pK found_i_mark->wd=%d "
+			"found_i_mark->group=%pK found_i_mark->inode=%pK\n",
 			__func__, i_mark, i_mark->wd, i_mark->fsn_mark.group,
 			i_mark->fsn_mark.i.inode, found_i_mark, found_i_mark->wd,
 			found_i_mark->fsn_mark.group,
@@ -480,8 +480,8 @@ static void inotify_remove_from_idr(struct fsnotify_group *group,
 	 * one ref grabbed by inotify_idr_find
 	 */
 	if (unlikely(atomic_read(&i_mark->fsn_mark.refcnt) < 3)) {
-		printk(KERN_ERR "%s: i_mark=%p i_mark->wd=%d i_mark->group=%p"
-			" i_mark->inode=%p\n", __func__, i_mark, i_mark->wd,
+		printk(KERN_ERR "%s: i_mark=%pK i_mark->wd=%d i_mark->group=%pK"
+			" i_mark->inode=%pK\n", __func__, i_mark, i_mark->wd,
 			i_mark->fsn_mark.group, i_mark->fsn_mark.i.inode);
 		/* we can't really recover with bad ref cnting.. */
 		BUG();

@@ -96,7 +96,7 @@ static struct se_device *fd_alloc_device(struct se_hba *hba, const char *name)
 
 	fd_dev->fd_host = fd_host;
 
-	pr_debug("FILEIO: Allocated fd_dev for %p\n", name);
+	pr_debug("FILEIO: Allocated fd_dev for %pK\n", name);
 
 	return &fd_dev->dev;
 }

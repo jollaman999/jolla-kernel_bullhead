@@ -46,7 +46,7 @@
 #ifdef CONFIG_FB_S3C_DEBUG_REGWRITE
 #undef writel
 #define writel(v, r) do { \
-	pr_debug("%s: %08x => %p\n", __func__, (unsigned int)v, r); \
+	pr_debug("%s: %08x => %pK\n", __func__, (unsigned int)v, r); \
 	__raw_writel(v, r); \
 } while (0)
 #endif /* FB_S3C_DEBUG_REGWRITE */
@@ -706,7 +706,7 @@ static void s3c_fb_update_palette(struct s3c_fb *sfb,
 
 	palreg = sfb->regs + sfb->variant.palette[win->index];
 
-	dev_dbg(sfb->dev, "%s: win %d, reg %d (%p): %08x\n",
+	dev_dbg(sfb->dev, "%s: win %d, reg %d (%pK): %08x\n",
 		__func__, win->index, reg, palreg, value);
 
 	win->palette_buffer[reg] = value;
@@ -1110,7 +1110,7 @@ static int s3c_fb_alloc_memory(struct s3c_fb *sfb, struct s3c_fb_win *win)
 	if (!fbi->screen_base)
 		return -ENOMEM;
 
-	dev_dbg(sfb->dev, "mapped %x to %p\n",
+	dev_dbg(sfb->dev, "mapped %x to %pK\n",
 		(unsigned int)map_dma, fbi->screen_base);
 
 	memset(fbi->screen_base, 0x0, size);
@@ -1182,7 +1182,7 @@ static int s3c_fb_probe_win(struct s3c_fb *sfb, unsigned int win_no,
 	int palette_size;
 	int ret;
 
-	dev_dbg(sfb->dev, "probing window %d, variant %p\n", win_no, variant);
+	dev_dbg(sfb->dev, "probing window %d, variant %pK\n", win_no, variant);
 
 	init_waitqueue_head(&sfb->vsync_info.wait);
 
@@ -1390,7 +1390,7 @@ static int s3c_fb_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	dev_dbg(dev, "allocate new framebuffer %p\n", sfb);
+	dev_dbg(dev, "allocate new framebuffer %pK\n", sfb);
 
 	sfb->dev = dev;
 	sfb->pdata = pd;
@@ -1440,7 +1440,7 @@ static int s3c_fb_probe(struct platform_device *pdev)
 		goto err_lcd_clk;
 	}
 
-	dev_dbg(dev, "got resources (regs %p), probing windows\n", sfb->regs);
+	dev_dbg(dev, "got resources (regs %pK), probing windows\n", sfb->regs);
 
 	platform_set_drvdata(pdev, sfb);
 	pm_runtime_get_sync(sfb->dev);

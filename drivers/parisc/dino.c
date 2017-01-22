@@ -179,7 +179,7 @@ static int dino_cfg_read(struct pci_bus *bus, unsigned int devfn, int where,
 	void __iomem *base_addr = d->hba.base_addr;
 	unsigned long flags;
 
-	DBG("%s: %p, %d, %d, %d\n", __func__, base_addr, devfn, where,
+	DBG("%s: %pK, %d, %d, %d\n", __func__, base_addr, devfn, where,
 									size);
 	spin_lock_irqsave(&d->dinosaur_pen, flags);
 
@@ -214,7 +214,7 @@ static int dino_cfg_write(struct pci_bus *bus, unsigned int devfn, int where,
 	void __iomem *base_addr = d->hba.base_addr;
 	unsigned long flags;
 
-	DBG("%s: %p, %d, %d, %d\n", __func__, base_addr, devfn, where,
+	DBG("%s: %pK, %d, %d, %d\n", __func__, base_addr, devfn, where,
 									size);
 	spin_lock_irqsave(&d->dinosaur_pen, flags);
 
@@ -300,7 +300,7 @@ static void dino_mask_irq(struct irq_data *d)
 	struct dino_device *dino_dev = irq_data_get_irq_chip_data(d);
 	int local_irq = gsc_find_local_irq(d->irq, dino_dev->global_irq, DINO_LOCAL_IRQS);
 
-	DBG(KERN_WARNING "%s(0x%p, %d)\n", __func__, dino_dev, d->irq);
+	DBG(KERN_WARNING "%s(0x%pK, %d)\n", __func__, dino_dev, d->irq);
 
 	/* Clear the matching bit in the IMR register */
 	dino_dev->imr &= ~(DINO_MASK_IRQ(local_irq));
@@ -313,7 +313,7 @@ static void dino_unmask_irq(struct irq_data *d)
 	int local_irq = gsc_find_local_irq(d->irq, dino_dev->global_irq, DINO_LOCAL_IRQS);
 	u32 tmp;
 
-	DBG(KERN_WARNING "%s(0x%p, %d)\n", __func__, dino_dev, d->irq);
+	DBG(KERN_WARNING "%s(0x%pK, %d)\n", __func__, dino_dev, d->irq);
 
 	/*
 	** clear pending IRQ bits
@@ -376,7 +376,7 @@ ilr_again:
 	do {
 		int local_irq = __ffs(mask);
 		int irq = dino_dev->global_irq[local_irq];
-		DBG(KERN_DEBUG "%s(%d, %p) mask 0x%x\n",
+		DBG(KERN_DEBUG "%s(%d, %pK) mask 0x%x\n",
 			__func__, irq, intr_dev, mask);
 		generic_handle_irq(irq);
 		mask &= ~(1 << local_irq);
@@ -393,7 +393,7 @@ ilr_again:
 	if (mask) {
 		if (--ilr_loop > 0)
 			goto ilr_again;
-		printk(KERN_ERR "Dino 0x%p: stuck interrupt %d\n", 
+		printk(KERN_ERR "Dino 0x%pK: stuck interrupt %d\n", 
 		       dino_dev->hba.base_addr, mask);
 		return IRQ_NONE;
 	}
@@ -496,7 +496,7 @@ dino_card_setup(struct pci_bus *bus, void __iomem *base_addr)
 		if (res->start == F_EXTEND(0xf0000000UL | (i * _8MB)))
 			break;
 	}
-	DBG("DINO GSC WRITE i=%d, start=%lx, dino addr = %p\n",
+	DBG("DINO GSC WRITE i=%d, start=%lx, dino addr = %pK\n",
 	    i, res->start, base_addr + DINO_IO_ADDR_EN);
 	__raw_writel(1 << i, base_addr + DINO_IO_ADDR_EN);
 }
@@ -550,7 +550,7 @@ dino_fixup_bus(struct pci_bus *bus)
         struct pci_dev *dev;
         struct dino_device *dino_dev = DINO_DEV(parisc_walk_tree(bus->bridge));
 
-	DBG(KERN_WARNING "%s(0x%p) bus %d platform_data 0x%p\n",
+	DBG(KERN_WARNING "%s(0x%pK) bus %d platform_data 0x%pK\n",
 	    __func__, bus, bus->busn_res.start,
 	    bus->bridge->platform_data);
 
@@ -849,7 +849,7 @@ static int __init dino_common_init(struct parisc_device *dev,
 	res->flags = IORESOURCE_IO; /* do not mark it busy ! */
 	if (request_resource(&ioport_resource, res) < 0) {
 		printk(KERN_ERR "%s: request I/O Port region failed "
-		       "0x%lx/%lx (hpa 0x%p)\n",
+		       "0x%lx/%lx (hpa 0x%pK)\n",
 		       name, (unsigned long)res->start, (unsigned long)res->end,
 		       dino_dev->hba.base_addr);
 		return 1;

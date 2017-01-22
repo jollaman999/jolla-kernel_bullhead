@@ -764,12 +764,12 @@ void dump_bfin_process(struct pt_regs *fp)
 		pr_cont("  CPU=%d\n", current_thread_info()->cpu);
 		if (!((unsigned long)current->mm & 0x3) &&
 			(unsigned long)current->mm >= FIXED_CODE_START) {
-			pr_notice("TEXT = 0x%p-0x%p        DATA = 0x%p-0x%p\n",
+			pr_notice("TEXT = 0x%pK-0x%pK        DATA = 0x%pK-0x%pK\n",
 				(void *)current->mm->start_code,
 				(void *)current->mm->end_code,
 				(void *)current->mm->start_data,
 				(void *)current->mm->end_data);
-			pr_notice(" BSS = 0x%p-0x%p  USER-STACK = 0x%p\n\n",
+			pr_notice(" BSS = 0x%pK-0x%pK  USER-STACK = 0x%pK\n\n",
 				(void *)current->mm->end_data,
 				(void *)current->mm->brk,
 				(void *)current->mm->start_stack);
@@ -786,13 +786,13 @@ void dump_bfin_mem(struct pt_regs *fp)
 
 	erraddr = (void *)fp->pc;
 
-	pr_notice("return address: [0x%p]; contents of:", erraddr);
+	pr_notice("return address: [0x%pK]; contents of:", erraddr);
 
 	for (addr = (unsigned short *)((unsigned long)erraddr & ~0xF) - 0x10;
 	     addr < (unsigned short *)((unsigned long)erraddr & ~0xF) + 0x10;
 	     addr++) {
 		if (!((unsigned long)addr & 0xF))
-			pr_notice("0x%p: ", addr);
+			pr_notice("0x%pK: ", addr);
 
 		if (!get_mem16(&val, addr)) {
 				val = 0;

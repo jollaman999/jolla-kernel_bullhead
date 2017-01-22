@@ -431,7 +431,7 @@ diva_os_register_io_port(void *adapter, int on, unsigned long port,
 void __iomem *divasa_remap_pci_bar(diva_os_xdi_adapter_t *a, int id, unsigned long bar, unsigned long area_length)
 {
 	void __iomem *ret = ioremap(bar, area_length);
-	DBG_TRC(("remap(%08x)->%p", bar, ret));
+	DBG_TRC(("remap(%08x)->%pK", bar, ret));
 	return (ret);
 }
 

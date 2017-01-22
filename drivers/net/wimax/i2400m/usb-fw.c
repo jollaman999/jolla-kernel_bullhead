@@ -189,7 +189,7 @@ ssize_t i2400mu_bus_bm_cmd_send(struct i2400m *i2400m,
 	struct i2400m_bootrom_header *cmd;
 	size_t cmd_size_a = ALIGN(cmd_size, 16);	/* USB restriction */
 
-	d_fnstart(8, dev, "(i2400m %p cmd %p size %zu)\n",
+	d_fnstart(8, dev, "(i2400m %pK cmd %pK size %zu)\n",
 		  i2400m, _cmd, cmd_size);
 	result = -E2BIG;
 	if (cmd_size > I2400M_BM_CMD_BUF_SIZE)
@@ -219,7 +219,7 @@ ssize_t i2400mu_bus_bm_cmd_send(struct i2400m *i2400m,
 error_cmd_size:
 error_cmd_send:
 error_too_big:
-	d_fnend(8, dev, "(i2400m %p cmd %p size %zu) = %zd\n",
+	d_fnend(8, dev, "(i2400m %pK cmd %pK size %zu) = %zd\n",
 		i2400m, _cmd, cmd_size, result);
 	return result;
 }
@@ -287,7 +287,7 @@ ssize_t i2400mu_bus_bm_wait_for_ack(struct i2400m *i2400m,
 	int do_autopm = 1;
 	DECLARE_COMPLETION_ONSTACK(notif_completion);
 
-	d_fnstart(8, dev, "(i2400m %p ack %p size %zu)\n",
+	d_fnstart(8, dev, "(i2400m %pK ack %pK size %zu)\n",
 		  i2400m, ack, ack_size);
 	BUG_ON(_ack == i2400m->bm_ack_buf);
 	result = usb_autopm_get_interface(i2400mu->usb_iface);
@@ -352,7 +352,7 @@ error_dev_gone:
 out:
 	if (do_autopm)
 		usb_autopm_put_interface(i2400mu->usb_iface);
-	d_fnend(8, dev, "(i2400m %p ack %p size %zu) = %ld\n",
+	d_fnend(8, dev, "(i2400m %pK ack %pK size %zu) = %ld\n",
 		i2400m, ack, ack_size, (long) result);
 	return result;
 

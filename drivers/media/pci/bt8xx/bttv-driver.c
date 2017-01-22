@@ -1534,7 +1534,7 @@ bttv_switch_overlay(struct bttv *btv, struct bttv_fh *fh,
 	unsigned long flags;
 	int retval = 0;
 
-	dprintk("switch_overlay: enter [new=%p]\n", new);
+	dprintk("switch_overlay: enter [new=%pK]\n", new);
 	if (new)
 		new->vb.state = VIDEOBUF_DONE;
 	spin_lock_irqsave(&btv->s_lock,flags);
@@ -1544,7 +1544,7 @@ bttv_switch_overlay(struct bttv *btv, struct bttv_fh *fh,
 	bttv_set_dma(btv, 0x03);
 	spin_unlock_irqrestore(&btv->s_lock,flags);
 	if (NULL != old) {
-		dprintk("switch_overlay: old=%p state is %d\n",
+		dprintk("switch_overlay: old=%pK state is %d\n",
 			old, old->vb.state);
 		bttv_dma_free(&fh->cap,btv, old);
 		kfree(old);
@@ -3427,7 +3427,7 @@ static void bttv_risc_disasm(struct bttv *btv,
 {
 	unsigned int i,j,n;
 
-	pr_info("%s: risc disasm: %p [dma=0x%08lx]\n",
+	pr_info("%s: risc disasm: %pK [dma=0x%08lx]\n",
 		btv->c.v4l2_dev.name, risc->cpu, (unsigned long)risc->dma);
 	for (i = 0; i < (risc->size >> 2); i += n) {
 		pr_info("%s:   0x%lx: ",
@@ -3598,7 +3598,7 @@ bttv_irq_next_video(struct bttv *btv, struct bttv_buffer_set *set)
 		}
 	}
 
-	dprintk("%d: next set: top=%p bottom=%p [screen=%p,irq=%d,%d]\n",
+	dprintk("%d: next set: top=%pK bottom=%pK [screen=%pK,irq=%d,%d]\n",
 		btv->c.nr, set->top, set->bottom,
 		btv->screen, set->frame_irq, set->top_irq);
 	return 0;
@@ -3615,7 +3615,7 @@ bttv_irq_wakeup_video(struct bttv *btv, struct bttv_buffer_set *wakeup,
 	if (wakeup->top == wakeup->bottom) {
 		if (NULL != wakeup->top && curr->top != wakeup->top) {
 			if (irq_debug > 1)
-				pr_debug("%d: wakeup: both=%p\n",
+				pr_debug("%d: wakeup: both=%pK\n",
 					 btv->c.nr, wakeup->top);
 			wakeup->top->vb.ts = ts;
 			wakeup->top->vb.field_count = btv->field_count;
@@ -3625,7 +3625,7 @@ bttv_irq_wakeup_video(struct bttv *btv, struct bttv_buffer_set *wakeup,
 	} else {
 		if (NULL != wakeup->top && curr->top != wakeup->top) {
 			if (irq_debug > 1)
-				pr_debug("%d: wakeup: top=%p\n",
+				pr_debug("%d: wakeup: top=%pK\n",
 					 btv->c.nr, wakeup->top);
 			wakeup->top->vb.ts = ts;
 			wakeup->top->vb.field_count = btv->field_count;
@@ -3634,7 +3634,7 @@ bttv_irq_wakeup_video(struct bttv *btv, struct bttv_buffer_set *wakeup,
 		}
 		if (NULL != wakeup->bottom && curr->bottom != wakeup->bottom) {
 			if (irq_debug > 1)
-				pr_debug("%d: wakeup: bottom=%p\n",
+				pr_debug("%d: wakeup: bottom=%pK\n",
 					 btv->c.nr, wakeup->bottom);
 			wakeup->bottom->vb.ts = ts;
 			wakeup->bottom->vb.field_count = btv->field_count;

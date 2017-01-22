@@ -151,7 +151,7 @@ void acpi_table_print_madt_entry(struct acpi_subtable_header *header)
 			struct acpi_madt_local_apic_override *p =
 			    (struct acpi_madt_local_apic_override *)header;
 			printk(KERN_INFO PREFIX
-			       "LAPIC_ADDR_OVR (address[%p])\n",
+			       "LAPIC_ADDR_OVR (address[%pK])\n",
 			       (void *)(unsigned long)p->address);
 		}
 		break;
@@ -161,7 +161,7 @@ void acpi_table_print_madt_entry(struct acpi_subtable_header *header)
 			struct acpi_madt_io_sapic *p =
 			    (struct acpi_madt_io_sapic *)header;
 			printk(KERN_INFO PREFIX
-			       "IOSAPIC (id[0x%x] address[%p] gsi_base[%d])\n",
+			       "IOSAPIC (id[0x%x] address[%pK] gsi_base[%d])\n",
 			       p->id, (void *)(unsigned long)p->address,
 			       p->global_irq_base);
 		}

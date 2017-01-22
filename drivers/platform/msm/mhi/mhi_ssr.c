@@ -109,7 +109,7 @@ int mhi_esoc_register(struct mhi_device_ctxt *mhi_dev_ctxt)
 	np = dev->of_node;
 	mhi_dev_ctxt->esoc_handle = devm_register_esoc_client(dev, "mdm");
 	mhi_log(MHI_MSG_VERBOSE,
-		"Of table of pcie struct device property is dev->of_node %p\n",
+		"Of table of pcie struct device property is dev->of_node %pK\n",
 		np);
 	if (IS_ERR_OR_NULL(mhi_dev_ctxt->esoc_handle)) {
 		mhi_log(MHI_MSG_CRITICAL,

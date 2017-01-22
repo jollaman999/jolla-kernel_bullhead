@@ -1197,7 +1197,7 @@ static int _req_append_segment(struct osd_request *or,
 		return ret;
 
 	io->total_bytes += seg->total_bytes;
-	OSD_DEBUG("padding=%d buff=%p total_bytes=%d\n", padding, seg->buff,
+	OSD_DEBUG("padding=%d buff=%pK total_bytes=%d\n", padding, seg->buff,
 		  seg->total_bytes);
 	return 0;
 }
@@ -1616,7 +1616,7 @@ static int _init_blk_request(struct osd_request *or,
 
 	ret = 0;
 out:
-	OSD_DEBUG("or=%p has_in=%d has_out=%d => %d, %p\n",
+	OSD_DEBUG("or=%pK has_in=%d has_out=%d => %d, %pK\n",
 			or, has_in, has_out, ret, or->request);
 	return ret;
 }

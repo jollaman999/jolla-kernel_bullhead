@@ -339,7 +339,7 @@ static void videobuf_vm_open(struct vm_area_struct *vma)
 {
 	struct videobuf_mapping *map = vma->vm_private_data;
 
-	dprintk(2, "vm_open %p [count=%d,vma=%08lx-%08lx]\n", map,
+	dprintk(2, "vm_open %pK [count=%d,vma=%08lx-%08lx]\n", map,
 		map->count, vma->vm_start, vma->vm_end);
 
 	map->count++;
@@ -352,12 +352,12 @@ static void videobuf_vm_close(struct vm_area_struct *vma)
 	struct videobuf_dma_sg_memory *mem;
 	int i;
 
-	dprintk(2, "vm_close %p [count=%d,vma=%08lx-%08lx]\n", map,
+	dprintk(2, "vm_close %pK [count=%d,vma=%08lx-%08lx]\n", map,
 		map->count, vma->vm_start, vma->vm_end);
 
 	map->count--;
 	if (0 == map->count) {
-		dprintk(1, "munmap %p q=%p\n", map, q);
+		dprintk(1, "munmap %pK q=%pK\n", map, q);
 		videobuf_queue_lock(q);
 		for (i = 0; i < VIDEO_MAX_FRAME; i++) {
 			if (NULL == q->bufs[i])
@@ -433,7 +433,7 @@ static struct videobuf_buffer *__videobuf_alloc_vb(size_t size)
 
 	videobuf_dma_init(&mem->dma);
 
-	dprintk(1, "%s: allocated at %p(%ld+%ld) & %p(%ld)\n",
+	dprintk(1, "%s: allocated at %pK(%ld+%ld) & %pK(%ld)\n",
 		__func__, vb, (long)sizeof(*vb), (long)size - sizeof(*vb),
 		mem, (long)sizeof(*mem));
 
@@ -585,7 +585,7 @@ static int __videobuf_mmap_mapper(struct videobuf_queue *q,
 	vma->vm_flags |= VM_DONTEXPAND | VM_DONTDUMP;
 	vma->vm_flags &= ~VM_IO; /* using shared anonymous pages */
 	vma->vm_private_data = map;
-	dprintk(1, "mmap %p: q=%p %08lx-%08lx pgoff %08lx bufs %d-%d\n",
+	dprintk(1, "mmap %pK: q=%pK %08lx-%08lx pgoff %08lx bufs %d-%d\n",
 		map, q, vma->vm_start, vma->vm_end, vma->vm_pgoff, first, last);
 	retval = 0;
 

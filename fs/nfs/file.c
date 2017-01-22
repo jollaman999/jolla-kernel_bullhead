@@ -454,7 +454,7 @@ static int nfs_write_end(struct file *file, struct address_space *mapping,
 static void nfs_invalidate_page(struct page *page, unsigned int offset,
 				unsigned int length)
 {
-	dfprintk(PAGECACHE, "NFS: invalidate_page(%p, %u, %u)\n",
+	dfprintk(PAGECACHE, "NFS: invalidate_page(%pK, %u, %u)\n",
 		 page, offset, length);
 
 	if (offset != 0 || length < PAGE_CACHE_SIZE)
@@ -475,7 +475,7 @@ static int nfs_release_page(struct page *page, gfp_t gfp)
 {
 	struct address_space *mapping = page->mapping;
 
-	dfprintk(PAGECACHE, "NFS: release_page(%p)\n", page);
+	dfprintk(PAGECACHE, "NFS: release_page(%pK)\n", page);
 
 	/* Only do I/O if gfp is a superset of GFP_KERNEL, and we're not
 	 * doing this memory reclaim for a fs-related allocation.

@@ -306,7 +306,7 @@ int cxio_create_qp(struct cxio_rdev *rdev_p, u32 kernel_domain,
 		wq->udb = (u64)rdev_p->rnic_info.udbell_physbase +
 					(wq->qpid << rdev_p->qpshift);
 	wq->rdev = rdev_p;
-	PDBG("%s qpid 0x%x doorbell 0x%p udb 0x%llx\n", __func__,
+	PDBG("%s qpid 0x%x doorbell 0x%pK udb 0x%llx\n", __func__,
 	     wq->qpid, wq->doorbell, (unsigned long long) wq->udb);
 	return 0;
 err4:
@@ -351,7 +351,7 @@ static void insert_recv_cqe(struct t3_wq *wq, struct t3_cq *cq)
 {
 	struct t3_cqe cqe;
 
-	PDBG("%s wq %p cq %p sw_rptr 0x%x sw_wptr 0x%x\n", __func__,
+	PDBG("%s wq %pK cq %pK sw_rptr 0x%x sw_wptr 0x%x\n", __func__,
 	     wq, cq, cq->sw_rptr, cq->sw_wptr);
 	memset(&cqe, 0, sizeof(cqe));
 	cqe.header = cpu_to_be32(V_CQE_STATUS(TPT_ERR_SWFLUSH) |
@@ -370,7 +370,7 @@ int cxio_flush_rq(struct t3_wq *wq, struct t3_cq *cq, int count)
 	u32 ptr;
 	int flushed = 0;
 
-	PDBG("%s wq %p cq %p\n", __func__, wq, cq);
+	PDBG("%s wq %pK cq %pK\n", __func__, wq, cq);
 
 	/* flush RQ */
 	PDBG("%s rq_rptr %u rq_wptr %u skip count %u\n", __func__,
@@ -388,7 +388,7 @@ static void insert_sq_cqe(struct t3_wq *wq, struct t3_cq *cq,
 {
 	struct t3_cqe cqe;
 
-	PDBG("%s wq %p cq %p sw_rptr 0x%x sw_wptr 0x%x\n", __func__,
+	PDBG("%s wq %pK cq %pK sw_rptr 0x%x sw_wptr 0x%x\n", __func__,
 	     wq, cq, cq->sw_rptr, cq->sw_wptr);
 	memset(&cqe, 0, sizeof(cqe));
 	cqe.header = cpu_to_be32(V_CQE_STATUS(TPT_ERR_SWFLUSH) |
@@ -429,7 +429,7 @@ void cxio_flush_hw_cq(struct t3_cq *cq)
 {
 	struct t3_cqe *cqe, *swcqe;
 
-	PDBG("%s cq %p cqid 0x%x\n", __func__, cq, cq->cqid);
+	PDBG("%s cq %pK cqid 0x%x\n", __func__, cq, cq->cqid);
 	cqe = cxio_next_hw_cqe(cq);
 	while (cqe) {
 		PDBG("%s flushing hwcq rptr 0x%x to swcq wptr 0x%x\n",
@@ -476,7 +476,7 @@ void cxio_count_scqes(struct t3_cq *cq, struct t3_wq *wq, int *count)
 			(*count)++;
 		ptr++;
 	}
-	PDBG("%s cq %p count %d\n", __func__, cq, *count);
+	PDBG("%s cq %pK count %d\n", __func__, cq, *count);
 }
 
 void cxio_count_rcqes(struct t3_cq *cq, struct t3_wq *wq, int *count)
@@ -494,7 +494,7 @@ void cxio_count_rcqes(struct t3_cq *cq, struct t3_wq *wq, int *count)
 			(*count)++;
 		ptr++;
 	}
-	PDBG("%s cq %p count %d\n", __func__, cq, *count);
+	PDBG("%s cq %pK count %d\n", __func__, cq, *count);
 }
 
 static int cxio_hal_init_ctrl_cq(struct cxio_rdev *rdev_p)
@@ -571,7 +571,7 @@ static int cxio_hal_init_ctrl_qp(struct cxio_rdev *rdev_p)
 	wqe->sge_cmd = cpu_to_be64(sge_cmd);
 	wqe->ctx1 = cpu_to_be64(ctx1);
 	wqe->ctx0 = cpu_to_be64(ctx0);
-	PDBG("CtrlQP dma_addr 0x%llx workq %p size %d\n",
+	PDBG("CtrlQP dma_addr 0x%llx workq %pK size %d\n",
 	     (unsigned long long) rdev_p->ctrl_qp.dma_addr,
 	     rdev_p->ctrl_qp.workq, 1 << T3_CTRL_QP_SIZE_LOG2);
 	skb->priority = CPL_PRIORITY_CONTROL;
@@ -605,7 +605,7 @@ static int cxio_hal_ctrl_qp_write_mem(struct cxio_rdev *rdev_p, u32 addr,
 	u64 utx_cmd;
 	addr &= 0x7FFFFFF;
 	nr_wqe = len % 96 ? len / 96 + 1 : len / 96;	/* 96B max per WQE */
-	PDBG("%s wptr 0x%x rptr 0x%x len %d, nr_wqe %d data %p addr 0x%0x\n",
+	PDBG("%s wptr 0x%x rptr 0x%x len %d, nr_wqe %d data %pK addr 0x%0x\n",
 	     __func__, rdev_p->ctrl_qp.wptr, rdev_p->ctrl_qp.rptr, len,
 	     nr_wqe, data, addr);
 	utx_len = 3;		/* in 32B unit */
@@ -839,7 +839,7 @@ int cxio_rdma_init(struct cxio_rdev *rdev_p, struct t3_rdma_init_attr *attr)
 	struct sk_buff *skb = alloc_skb(sizeof(*wqe), GFP_ATOMIC);
 	if (!skb)
 		return -ENOMEM;
-	PDBG("%s rdev_p %p\n", __func__, rdev_p);
+	PDBG("%s rdev_p %pK\n", __func__, rdev_p);
 	wqe = (struct t3_rdma_init_wr *) __skb_put(skb, sizeof(*wqe));
 	wqe->wrh.op_seop_flags = cpu_to_be32(V_FW_RIWR_OP(T3_WR_INIT));
 	wqe->wrh.gen_tid_len = cpu_to_be32(V_FW_RIWR_TID(attr->tid) |
@@ -896,7 +896,7 @@ static int cxio_hal_ev_handler(struct t3cdev *t3cdev_p, struct sk_buff *skb)
 	     CQE_WRID_HI(rsp_msg->cqe), CQE_WRID_LOW(rsp_msg->cqe));
 	rdev_p = (struct cxio_rdev *)t3cdev_p->ulp;
 	if (!rdev_p) {
-		PDBG("%s called by t3cdev %p with null ulp\n", __func__,
+		PDBG("%s called by t3cdev %pK with null ulp\n", __func__,
 		     t3cdev_p);
 		return 0;
 	}
@@ -951,7 +951,7 @@ int cxio_rdev_open(struct cxio_rdev *rdev_p)
 	err = rdev_p->t3cdev_p->ctl(rdev_p->t3cdev_p, GET_EMBEDDED_INFO,
 					 &(rdev_p->fw_info));
 	if (err) {
-		printk(KERN_ERR "%s t3cdev_p(%p)->ctl returned error %d.\n",
+		printk(KERN_ERR "%s t3cdev_p(%pK)->ctl returned error %d.\n",
 		     __func__, rdev_p->t3cdev_p, err);
 		goto err1;
 	}
@@ -967,14 +967,14 @@ int cxio_rdev_open(struct cxio_rdev *rdev_p)
 	err = rdev_p->t3cdev_p->ctl(rdev_p->t3cdev_p, RDMA_GET_PARAMS,
 					 &(rdev_p->rnic_info));
 	if (err) {
-		printk(KERN_ERR "%s t3cdev_p(%p)->ctl returned error %d.\n",
+		printk(KERN_ERR "%s t3cdev_p(%pK)->ctl returned error %d.\n",
 		     __func__, rdev_p->t3cdev_p, err);
 		goto err1;
 	}
 	err = rdev_p->t3cdev_p->ctl(rdev_p->t3cdev_p, GET_PORTS,
 				    &(rdev_p->port_info));
 	if (err) {
-		printk(KERN_ERR "%s t3cdev_p(%p)->ctl returned error %d.\n",
+		printk(KERN_ERR "%s t3cdev_p(%pK)->ctl returned error %d.\n",
 		     __func__, rdev_p->t3cdev_p, err);
 		goto err1;
 	}
@@ -997,7 +997,7 @@ int cxio_rdev_open(struct cxio_rdev *rdev_p)
 	     rdev_p->rnic_info.pbl_base,
 	     rdev_p->rnic_info.pbl_top, rdev_p->rnic_info.rqt_base,
 	     rdev_p->rnic_info.rqt_top);
-	PDBG("udbell_len 0x%0x udbell_physbase 0x%lx kdb_addr %p qpshift %lu "
+	PDBG("udbell_len 0x%0x udbell_physbase 0x%lx kdb_addr %pK qpshift %lu "
 	     "qpnr %d qpmask 0x%x\n",
 	     rdev_p->rnic_info.udbell_len,
 	     rdev_p->rnic_info.udbell_physbase, rdev_p->rnic_info.kdb_addr,
@@ -1324,11 +1324,11 @@ flush_wq:
 
 skip_cqe:
 	if (SW_CQE(*hw_cqe)) {
-		PDBG("%s cq %p cqid 0x%x skip sw cqe sw_rptr 0x%x\n",
+		PDBG("%s cq %pK cqid 0x%x skip sw cqe sw_rptr 0x%x\n",
 		     __func__, cq, cq->cqid, cq->sw_rptr);
 		++cq->sw_rptr;
 	} else {
-		PDBG("%s cq %p cqid 0x%x skip hw cqe rptr 0x%x\n",
+		PDBG("%s cq %pK cqid 0x%x skip hw cqe rptr 0x%x\n",
 		     __func__, cq, cq->cqid, cq->rptr);
 		++cq->rptr;
 

@@ -171,7 +171,7 @@ void gru_flush_tlb_range(struct gru_mm_struct *gms, unsigned long start,
 	num = min(((len + pagesize - 1) >> pageshift), GRUMAXINVAL);
 
 	STAT(flush_tlb);
-	gru_dbg(grudev, "gms %p, start 0x%lx, len 0x%lx, asidmap 0x%lx\n", gms,
+	gru_dbg(grudev, "gms %pK, start 0x%lx, len 0x%lx, asidmap 0x%lx\n", gms,
 		start, len, gms->ms_asidmap[0]);
 
 	spin_lock(&gms->ms_asid_lock);
@@ -228,7 +228,7 @@ static void gru_invalidate_range_start(struct mmu_notifier *mn,
 
 	STAT(mmu_invalidate_range);
 	atomic_inc(&gms->ms_range_active);
-	gru_dbg(grudev, "gms %p, start 0x%lx, end 0x%lx, act %d\n", gms,
+	gru_dbg(grudev, "gms %pK, start 0x%lx, end 0x%lx, act %d\n", gms,
 		start, end, atomic_read(&gms->ms_range_active));
 	gru_flush_tlb_range(gms, start, end - start);
 }
@@ -244,7 +244,7 @@ static void gru_invalidate_range_end(struct mmu_notifier *mn,
 	(void)atomic_dec_and_test(&gms->ms_range_active);
 
 	wake_up_all(&gms->ms_wait_queue);
-	gru_dbg(grudev, "gms %p, start 0x%lx, end 0x%lx\n", gms, start, end);
+	gru_dbg(grudev, "gms %pK, start 0x%lx, end 0x%lx\n", gms, start, end);
 }
 
 static void gru_invalidate_page(struct mmu_notifier *mn, struct mm_struct *mm,
@@ -255,7 +255,7 @@ static void gru_invalidate_page(struct mmu_notifier *mn, struct mm_struct *mm,
 
 	STAT(mmu_invalidate_page);
 	gru_flush_tlb_range(gms, address, PAGE_SIZE);
-	gru_dbg(grudev, "gms %p, address 0x%lx\n", gms, address);
+	gru_dbg(grudev, "gms %pK, address 0x%lx\n", gms, address);
 }
 
 static void gru_release(struct mmu_notifier *mn, struct mm_struct *mm)
@@ -264,7 +264,7 @@ static void gru_release(struct mmu_notifier *mn, struct mm_struct *mm)
 						 ms_notifier);
 
 	gms->ms_released = 1;
-	gru_dbg(grudev, "gms %p\n", gms);
+	gru_dbg(grudev, "gms %pK\n", gms);
 }
 
 
@@ -317,7 +317,7 @@ struct gru_mm_struct *gru_register_mmu_notifier(void)
 				goto error;
 		}
 	}
-	gru_dbg(grudev, "gms %p, refcnt %d\n", gms,
+	gru_dbg(grudev, "gms %pK, refcnt %d\n", gms,
 		atomic_read(&gms->ms_refcnt));
 	return gms;
 error:
@@ -327,7 +327,7 @@ error:
 
 void gru_drop_mmu_notifier(struct gru_mm_struct *gms)
 {
-	gru_dbg(grudev, "gms %p, refcnt %d, released %d\n", gms,
+	gru_dbg(grudev, "gms %pK, refcnt %d, released %d\n", gms,
 		atomic_read(&gms->ms_refcnt), gms->ms_released);
 	if (atomic_dec_return(&gms->ms_refcnt) == 0) {
 		if (!gms->ms_released)

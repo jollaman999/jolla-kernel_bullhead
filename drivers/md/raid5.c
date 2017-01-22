@@ -353,7 +353,7 @@ static void init_stripe(struct stripe_head *sh, sector_t sector, int previous)
 
 		if (dev->toread || dev->read || dev->towrite || dev->written ||
 		    test_bit(R5_LOCKED, &dev->flags)) {
-			printk(KERN_ERR "sector=%llx i=%d %p %p %p %p %d\n",
+			printk(KERN_ERR "sector=%llx i=%d %pK %pK %pK %pK %d\n",
 			       (unsigned long long)sh->sector, i, dev->toread,
 			       dev->read, dev->towrite, dev->written,
 			       test_bit(R5_LOCKED, &dev->flags));
@@ -1524,7 +1524,7 @@ static int grow_stripes(struct r5conf *conf, int num)
 			"raid%d-%s", conf->level, mdname(conf->mddev));
 	else
 		sprintf(conf->cache_name[0],
-			"raid%d-%p", conf->level, conf->mddev);
+			"raid%d-%pK", conf->level, conf->mddev);
 	sprintf(conf->cache_name[1], "%s-alt", conf->cache_name[0]);
 
 	conf->active_name = 0;
@@ -3310,7 +3310,7 @@ static void analyse_stripe(struct stripe_head *sh, struct stripe_head_state *s)
 
 		dev = &sh->dev[i];
 
-		pr_debug("check %d: state 0x%lx read %p write %p written %p\n",
+		pr_debug("check %d: state 0x%lx read %pK write %pK written %pK\n",
 			 i, dev->flags,
 			 dev->toread, dev->towrite, dev->written);
 		/* maybe we can reply to a read

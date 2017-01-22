@@ -688,7 +688,7 @@ static int pxa3xx_gcu_probe(struct platform_device *dev)
 	pxa3xx_gcu_reset(priv);
 	pxa3xx_gcu_init_debug_timer();
 
-	dev_info(&dev->dev, "registered @0x%p, DMA 0x%p (%d bytes), IRQ %d\n",
+	dev_info(&dev->dev, "registered @0x%pK, DMA 0x%pK (%d bytes), IRQ %d\n",
 			(void *) r->start, (void *) priv->shared_phys,
 			SHARED_SIZE, irq);
 	return 0;

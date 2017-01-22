@@ -222,7 +222,7 @@ static void v9fs_kill_super(struct super_block *s)
 {
 	struct v9fs_session_info *v9ses = s->s_fs_info;
 
-	p9_debug(P9_DEBUG_VFS, " %p\n", s);
+	p9_debug(P9_DEBUG_VFS, " %pK\n", s);
 
 	kill_anon_super(s);
 
@@ -302,7 +302,7 @@ static int v9fs_write_inode(struct inode *inode,
 	 * send an fsync request to server irrespective of
 	 * wbc->sync_mode.
 	 */
-	p9_debug(P9_DEBUG_VFS, "%s: inode %p\n", __func__, inode);
+	p9_debug(P9_DEBUG_VFS, "%s: inode %pK\n", __func__, inode);
 	v9inode = V9FS_I(inode);
 	if (!v9inode->writeback_fid)
 		return 0;
@@ -325,7 +325,7 @@ static int v9fs_write_inode_dotl(struct inode *inode,
 	 * send an fsync request to server irrespective of
 	 * wbc->sync_mode.
 	 */
-	p9_debug(P9_DEBUG_VFS, "%s: inode %p\n", __func__, inode);
+	p9_debug(P9_DEBUG_VFS, "%s: inode %pK\n", __func__, inode);
 	v9inode = V9FS_I(inode);
 	if (!v9inode->writeback_fid)
 		return 0;

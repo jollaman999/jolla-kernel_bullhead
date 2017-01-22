@@ -210,7 +210,7 @@ static void initialize(struct lg_cpu *cpu)
 	}
 
 	if (lguest_arch_init_hypercalls(cpu))
-		kill_guest(cpu, "bad guest page %p", cpu->lg->lguest_data);
+		kill_guest(cpu, "bad guest page %pK", cpu->lg->lguest_data);
 
 	/*
 	 * The Guest tells us where we're not to deliver interrupts by putting
@@ -218,7 +218,7 @@ static void initialize(struct lg_cpu *cpu)
 	 */
 	if (get_user(cpu->lg->noirq_start, &cpu->lg->lguest_data->noirq_start)
 	    || get_user(cpu->lg->noirq_end, &cpu->lg->lguest_data->noirq_end))
-		kill_guest(cpu, "bad guest page %p", cpu->lg->lguest_data);
+		kill_guest(cpu, "bad guest page %pK", cpu->lg->lguest_data);
 
 	/*
 	 * We write the current time into the Guest's data page once so it can

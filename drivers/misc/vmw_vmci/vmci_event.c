@@ -149,7 +149,7 @@ int vmci_event_subscribe(u32 event,
 	}
 
 	if (!VMCI_EVENT_VALID(event) || !callback) {
-		pr_devel("%s: Failed to subscribe to event (type=%d) (callback=%p) (data=%p)\n",
+		pr_devel("%s: Failed to subscribe to event (type=%d) (callback=%pK) (data=%pK)\n",
 			 __func__, event, callback, callback_data);
 		return VMCI_ERROR_INVALID_ARGS;
 	}

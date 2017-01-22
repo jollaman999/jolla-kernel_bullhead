@@ -94,7 +94,7 @@ static void ide_detach(struct pcmcia_device *link)
 {
     ide_info_t *info = link->priv;
 
-    dev_dbg(&link->dev, "ide_detach(0x%p)\n", link);
+    dev_dbg(&link->dev, "ide_detach(0x%pK)\n", link);
 
     ide_release(link);
 
@@ -193,7 +193,7 @@ static int ide_config(struct pcmcia_device *link)
     unsigned long io_base, ctl_base;
     struct ide_host *host;
 
-    dev_dbg(&link->dev, "ide_config(0x%p)\n", link);
+    dev_dbg(&link->dev, "ide_config(0x%pK)\n", link);
 
     is_kme = ((link->manf_id == MANFID_KME) &&
 	      ((link->card_id == PRODID_KME_KXLC005_A) ||
@@ -252,7 +252,7 @@ static void ide_release(struct pcmcia_device *link)
     ide_info_t *info = link->priv;
     struct ide_host *host = info->host;
 
-    dev_dbg(&link->dev, "ide_release(0x%p)\n", link);
+    dev_dbg(&link->dev, "ide_release(0x%pK)\n", link);
 
     if (info->ndev) {
 	ide_hwif_t *hwif = host->ports[0];

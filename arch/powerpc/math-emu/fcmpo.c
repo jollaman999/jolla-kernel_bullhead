@@ -16,7 +16,7 @@ fcmpo(u32 *ccr, int crfD, void *frA, void *frB)
 	long cmp;
 
 #ifdef DEBUG
-	printk("%s: %p (%08x) %d %p %p\n", __func__, ccr, *ccr, crfD, frA, frB);
+	printk("%s: %pK (%08x) %d %pK %pK\n", __func__, ccr, *ccr, crfD, frA, frB);
 #endif
 
 	FP_UNPACK_DP(A, frA);

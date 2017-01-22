@@ -3748,7 +3748,7 @@ static void s_vMgrRxProbeResponse(struct vnt_private *pDevice,
 	|| (sFrame.pSSID == NULL)
 	|| (sFrame.pSuppRates == NULL)) {
 
-	DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "Probe resp:Fail addr:[%p]\n",
+	DBG_PRT(MSG_LEVEL_DEBUG, KERN_INFO "Probe resp:Fail addr:[%pK]\n",
 		pRxPacket->p80211Header);
 	DBG_PORT80(0xCC);
 	return;

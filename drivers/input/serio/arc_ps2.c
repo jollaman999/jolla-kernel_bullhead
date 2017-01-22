@@ -175,7 +175,7 @@ static int arc_ps2_create_port(struct platform_device *pdev,
 	port->data_addr = arc_ps2_calc_addr(arc_ps2, index, false);
 	port->status_addr = arc_ps2_calc_addr(arc_ps2, index, true);
 
-	dev_dbg(&pdev->dev, "port%d is allocated (data = 0x%p, status = 0x%p)\n",
+	dev_dbg(&pdev->dev, "port%d is allocated (data = 0x%pK, status = 0x%pK)\n",
 		index, port->data_addr, port->status_addr);
 
 	serio_register_port(port->io);
@@ -212,7 +212,7 @@ static int arc_ps2_probe(struct platform_device *pdev)
 	if (IS_ERR(arc_ps2->addr))
 		return PTR_ERR(arc_ps2->addr);
 
-	dev_info(&pdev->dev, "irq = %d, address = 0x%p, ports = %i\n",
+	dev_info(&pdev->dev, "irq = %d, address = 0x%pK, ports = %i\n",
 		 irq, arc_ps2->addr, ARC_PS2_PORTS);
 
 	id = ioread32(arc_ps2->addr);

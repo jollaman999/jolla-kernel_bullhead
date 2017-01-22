@@ -542,7 +542,7 @@ static struct csio_hw *csio_hw_alloc(struct pci_dev *pdev)
 	hw->regstart = ioremap_nocache(pci_resource_start(pdev, 0),
 				       pci_resource_len(pdev, 0));
 	if (!hw->regstart) {
-		csio_err(hw, "Could not map BAR 0, regstart = %p\n",
+		csio_err(hw, "Could not map BAR 0, regstart = %pK\n",
 			 hw->regstart);
 		goto err_resource_free;
 	}
@@ -554,7 +554,7 @@ static struct csio_hw *csio_hw_alloc(struct pci_dev *pdev)
 
 	csio_dfs_create(hw);
 
-	csio_dbg(hw, "hw:%p\n", hw);
+	csio_dbg(hw, "hw:%pK\n", hw);
 
 	return hw;
 
@@ -728,7 +728,7 @@ csio_lnodes_block_request(struct csio_hw *hw)
 	spin_unlock_irq(&hw->lock);
 
 	for (ii = 0; ii < cur_cnt; ii++) {
-		csio_dbg(hw, "Blocking IOs on lnode: %p\n", lnode_list[ii]);
+		csio_dbg(hw, "Blocking IOs on lnode: %pK\n", lnode_list[ii]);
 		ln = lnode_list[ii];
 		shost = csio_ln_to_shost(ln);
 		scsi_block_requests(shost);
@@ -767,7 +767,7 @@ csio_lnodes_unblock_request(struct csio_hw *hw)
 	spin_unlock_irq(&hw->lock);
 
 	for (ii = 0; ii < cur_cnt; ii++) {
-		csio_dbg(hw, "unblocking IOs on lnode: %p\n", lnode_list[ii]);
+		csio_dbg(hw, "unblocking IOs on lnode: %pK\n", lnode_list[ii]);
 		ln = lnode_list[ii];
 		shost = csio_ln_to_shost(ln);
 		scsi_unblock_requests(shost);
@@ -808,7 +808,7 @@ csio_lnodes_block_by_port(struct csio_hw *hw, uint8_t portid)
 	spin_unlock_irq(&hw->lock);
 
 	for (ii = 0; ii < cur_cnt; ii++) {
-		csio_dbg(hw, "Blocking IOs on lnode: %p\n", lnode_list[ii]);
+		csio_dbg(hw, "Blocking IOs on lnode: %pK\n", lnode_list[ii]);
 		ln = lnode_list[ii];
 		shost = csio_ln_to_shost(ln);
 		scsi_block_requests(shost);
@@ -848,7 +848,7 @@ csio_lnodes_unblock_by_port(struct csio_hw *hw, uint8_t portid)
 	spin_unlock_irq(&hw->lock);
 
 	for (ii = 0; ii < cur_cnt; ii++) {
-		csio_dbg(hw, "unblocking IOs on lnode: %p\n", lnode_list[ii]);
+		csio_dbg(hw, "unblocking IOs on lnode: %pK\n", lnode_list[ii]);
 		ln = lnode_list[ii];
 		shost = csio_ln_to_shost(ln);
 		scsi_unblock_requests(shost);
@@ -885,7 +885,7 @@ csio_lnodes_exit(struct csio_hw *hw, bool npiv)
 
 	/* Delete NPIV lnodes */
 	for (ii = 0; ii < cur_cnt; ii++) {
-		csio_dbg(hw, "Deleting child lnode: %p\n", lnode_list[ii]);
+		csio_dbg(hw, "Deleting child lnode: %pK\n", lnode_list[ii]);
 		ln = lnode_list[ii];
 		fc_vport_terminate(ln->fc_vport);
 	}
@@ -906,7 +906,7 @@ csio_lnodes_exit(struct csio_hw *hw, bool npiv)
 
 	/* Delete physical lnodes */
 	for (ii = 0; ii < cur_cnt; ii++) {
-		csio_dbg(hw, "Deleting parent lnode: %p\n", lnode_list[ii]);
+		csio_dbg(hw, "Deleting parent lnode: %pK\n", lnode_list[ii]);
 		csio_shost_exit(lnode_list[ii]);
 	}
 

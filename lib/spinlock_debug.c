@@ -170,7 +170,7 @@ static void rwlock_bug(rwlock_t *lock, const char *msg)
 	if (!debug_locks_off())
 		return;
 
-	printk(KERN_EMERG "BUG: rwlock %s on CPU#%d, %s/%d, %p\n",
+	printk(KERN_EMERG "BUG: rwlock %s on CPU#%d, %s/%d, %pK\n",
 		msg, raw_smp_processor_id(), current->comm,
 		task_pid_nr(current), lock);
 	dump_stack();
@@ -195,7 +195,7 @@ static void __read_lock_debug(rwlock_t *lock)
 		if (print_once) {
 			print_once = 0;
 			printk(KERN_EMERG "BUG: read-lock lockup on CPU#%d, "
-					"%s/%d, %p\n",
+					"%s/%d, %pK\n",
 				raw_smp_processor_id(), current->comm,
 				current->pid, lock);
 			dump_stack();
@@ -270,7 +270,7 @@ static void __write_lock_debug(rwlock_t *lock)
 		if (print_once) {
 			print_once = 0;
 			printk(KERN_EMERG "BUG: write-lock lockup on CPU#%d, "
-					"%s/%d, %p\n",
+					"%s/%d, %pK\n",
 				raw_smp_processor_id(), current->comm,
 				current->pid, lock);
 			dump_stack();

@@ -2104,7 +2104,7 @@ ahc_print_scb(struct scb *scb)
 
 	struct hardware_scb *hscb = scb->hscb;
 
-	printk("scb:%p control:0x%x scsiid:0x%x lun:%d cdb_len:%d\n",
+	printk("scb:%pK control:0x%x scsiid:0x%x lun:%d cdb_len:%d\n",
 	       (void *)scb,
 	       hscb->control,
 	       hscb->scsiid,
@@ -7959,7 +7959,7 @@ ahc_handle_target_cmd(struct ahc_softc *ahc, struct target_cmd *cmd)
 		 * to this accept tio.
 		 */
 #if 0
-		printk("Received Immediate Command %d:%d:%d - %p\n",
+		printk("Received Immediate Command %d:%d:%d - %pK\n",
 		       initiator, target, lun, ahc->pending_device);
 #endif
 		ahc->pending_device = lstate;

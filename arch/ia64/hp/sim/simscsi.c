@@ -213,7 +213,7 @@ simscsi_queuecommand_lck (struct scsi_cmnd *sc, void (*done)(struct scsi_cmnd *)
 	register long sp asm ("sp");
 
 	if (DBG)
-		printk("simscsi_queuecommand: target=%d,cmnd=%u,sc=%lu,sp=%lx,done=%p\n",
+		printk("simscsi_queuecommand: target=%d,cmnd=%u,sc=%lu,sp=%lx,done=%pK\n",
 		       target_id, sc->cmnd[0], sc->serial_number, sp, done);
 #endif
 

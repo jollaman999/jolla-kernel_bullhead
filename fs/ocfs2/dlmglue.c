@@ -2721,7 +2721,7 @@ static struct ocfs2_lock_res *ocfs2_dlm_next_res(struct ocfs2_lock_res *start,
 	list_for_each_entry(iter, &start->l_debug_list, l_debug_list) {
 		/* discover the head of the list */
 		if (&iter->l_debug_list == &dlm_debug->d_lockres_tracking) {
-			mlog(0, "End of list found, %p\n", ret);
+			mlog(0, "End of list found, %pK\n", ret);
 			break;
 		}
 

@@ -548,7 +548,7 @@ static u32 *iopte_alloc(struct omap_iommu *obj, u32 *iopgd, u32 da)
 		*iopgd = virt_to_phys(iopte) | IOPGD_TABLE;
 		flush_iopgd_range(iopgd, iopgd);
 
-		dev_vdbg(obj->dev, "%s: a new pte:%p\n", __func__, iopte);
+		dev_vdbg(obj->dev, "%s: a new pte:%pK\n", __func__, iopte);
 	} else {
 		/* We raced, free the reduniovant table */
 		iopte_free(iopte);
@@ -558,7 +558,7 @@ pte_ready:
 	iopte = iopte_offset(iopgd, da);
 
 	dev_vdbg(obj->dev,
-		 "%s: da:%08x pgd:%p *pgd:%08x pte:%p *pte:%08x\n",
+		 "%s: da:%08x pgd:%pK *pgd:%08x pte:%pK *pte:%08x\n",
 		 __func__, da, iopgd, *iopgd, iopte, *iopte);
 
 	return iopte;
@@ -607,7 +607,7 @@ static int iopte_alloc_page(struct omap_iommu *obj, u32 da, u32 pa, u32 prot)
 	*iopte = (pa & IOPAGE_MASK) | prot | IOPTE_SMALL;
 	flush_iopte_range(iopte, iopte);
 
-	dev_vdbg(obj->dev, "%s: da:%08x pa:%08x pte:%p *pte:%08x\n",
+	dev_vdbg(obj->dev, "%s: da:%08x pa:%08x pte:%pK *pte:%08x\n",
 		 __func__, da, pa, iopte, *iopte);
 
 	return 0;
@@ -833,15 +833,15 @@ static irqreturn_t iommu_fault_handler(int irq, void *data)
 	iopgd = iopgd_offset(obj, da);
 
 	if (!iopgd_is_table(*iopgd)) {
-		dev_err(obj->dev, "%s: errs:0x%08x da:0x%08x pgd:0x%p "
+		dev_err(obj->dev, "%s: errs:0x%08x da:0x%08x pgd:0x%pK "
 			"*pgd:px%08x\n", obj->name, errs, da, iopgd, *iopgd);
 		return IRQ_NONE;
 	}
 
 	iopte = iopte_offset(iopgd, da);
 
-	dev_err(obj->dev, "%s: errs:0x%08x da:0x%08x pgd:0x%p *pgd:0x%08x "
-		"pte:0x%p *pte:0x%08x\n", obj->name, errs, da, iopgd, *iopgd,
+	dev_err(obj->dev, "%s: errs:0x%08x da:0x%08x pgd:0x%pK *pgd:0x%08x "
+		"pte:0x%pK *pte:0x%08x\n", obj->name, errs, da, iopgd, *iopgd,
 		iopte, *iopte);
 
 	return IRQ_NONE;

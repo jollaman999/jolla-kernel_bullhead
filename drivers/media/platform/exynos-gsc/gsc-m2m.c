@@ -144,7 +144,7 @@ static void gsc_m2m_device_run(void *priv)
 
 	/* Reconfigure hardware if the context has changed. */
 	if (gsc->m2m.ctx != ctx) {
-		pr_debug("gsc->m2m.ctx = 0x%p, current_ctx = 0x%p",
+		pr_debug("gsc->m2m.ctx = 0x%pK, current_ctx = 0x%pK",
 				gsc->m2m.ctx, ctx);
 		ctx->state |= GSC_PARAMS;
 		gsc->m2m.ctx = ctx;
@@ -252,7 +252,7 @@ static void gsc_m2m_buf_queue(struct vb2_buffer *vb)
 {
 	struct gsc_ctx *ctx = vb2_get_drv_priv(vb->vb2_queue);
 
-	pr_debug("ctx: %p, ctx->state: 0x%x", ctx, ctx->state);
+	pr_debug("ctx: %pK, ctx->state: 0x%x", ctx, ctx->state);
 
 	if (ctx->m2m_ctx)
 		v4l2_m2m_buf_queue(ctx->m2m_ctx, vb);
@@ -652,7 +652,7 @@ static int gsc_m2m_open(struct file *file)
 	if (gsc->m2m.refcnt++ == 0)
 		set_bit(ST_M2M_OPEN, &gsc->state);
 
-	pr_debug("gsc m2m driver is opened, ctx(0x%p)", ctx);
+	pr_debug("gsc m2m driver is opened, ctx(0x%pK)", ctx);
 
 	mutex_unlock(&gsc->lock);
 	return 0;

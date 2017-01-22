@@ -303,13 +303,13 @@ void machine_kexec(struct kimage *image)
 
 	kexec_image_info(image);
 
-	pr_devel("%s:%d: control_code_page:        %p\n", __func__, __LINE__,
+	pr_devel("%s:%d: control_code_page:        %pK\n", __func__, __LINE__,
 		image->control_code_page);
 	pr_devel("%s:%d: reboot_code_buffer_phys:  %pa\n", __func__, __LINE__,
 		&reboot_code_buffer_phys);
-	pr_devel("%s:%d: reboot_code_buffer:       %p\n", __func__, __LINE__,
+	pr_devel("%s:%d: reboot_code_buffer:       %pK\n", __func__, __LINE__,
 		reboot_code_buffer);
-	pr_devel("%s:%d: relocate_new_kernel:      %p\n", __func__, __LINE__,
+	pr_devel("%s:%d: relocate_new_kernel:      %pK\n", __func__, __LINE__,
 		relocate_new_kernel);
 	pr_devel("%s:%d: relocate_new_kernel_size: 0x%lx(%lu) bytes\n",
 		__func__, __LINE__, relocate_new_kernel_size,

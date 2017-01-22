@@ -466,7 +466,7 @@ ok_to_read:
 	req = hd_req;
 	insw(HD_DATA, req->buffer, 256);
 #ifdef DEBUG
-	printk("%s: read: sector %ld, remaining = %u, buffer=%p\n",
+	printk("%s: read: sector %ld, remaining = %u, buffer=%pK\n",
 	       req->rq_disk->disk_name, blk_rq_pos(req) + 1,
 	       blk_rq_sectors(req) - 1, req->buffer+512);
 #endif
@@ -621,7 +621,7 @@ repeat:
 	head  = track % disk->head;
 	cyl   = track / disk->head;
 #ifdef DEBUG
-	printk("%s: %sing: CHS=%d/%d/%d, sectors=%d, buffer=%p\n",
+	printk("%s: %sing: CHS=%d/%d/%d, sectors=%d, buffer=%pK\n",
 		req->rq_disk->disk_name,
 		req_data_dir(req) == READ ? "read" : "writ",
 		cyl, head, sec, nsect, req->buffer);

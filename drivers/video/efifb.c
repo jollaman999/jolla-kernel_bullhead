@@ -464,7 +464,7 @@ static int __init efifb_probe(struct platform_device *dev)
 		goto err_release_fb;
 	}
 
-	printk(KERN_INFO "efifb: framebuffer at 0x%lx, mapped to 0x%p, "
+	printk(KERN_INFO "efifb: framebuffer at 0x%lx, mapped to 0x%pK, "
 	       "using %dk, total %dk\n",
 	       efifb_fix.smem_start, info->screen_base,
 	       size_remap/1024, size_total/1024);

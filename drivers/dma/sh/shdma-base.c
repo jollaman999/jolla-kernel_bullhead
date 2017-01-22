@@ -104,7 +104,7 @@ static dma_cookie_t shdma_tx_submit(struct dma_async_tx_descriptor *tx)
 		list_move_tail(&chunk->node, &schan->ld_queue);
 		last = chunk;
 
-		dev_dbg(schan->dev, "submit #%d@%p on %d\n",
+		dev_dbg(schan->dev, "submit #%d@%pK on %d\n",
 			tx->cookie, &last->async_tx, schan->id);
 	}
 
@@ -325,7 +325,7 @@ static dma_async_tx_callback __ld_cleanup(struct shdma_chan *schan, bool all)
 			desc->mark = DESC_WAITING;
 			callback = tx->callback;
 			param = tx->callback_param;
-			dev_dbg(schan->dev, "descriptor #%d@%p on %d callback\n",
+			dev_dbg(schan->dev, "descriptor #%d@%pK on %d callback\n",
 				tx->cookie, tx, schan->id);
 			BUG_ON(desc->chunks != 1);
 			break;
@@ -348,7 +348,7 @@ static dma_async_tx_callback __ld_cleanup(struct shdma_chan *schan, bool all)
 			}
 		}
 
-		dev_dbg(schan->dev, "descriptor %p #%d completed.\n",
+		dev_dbg(schan->dev, "descriptor %pK #%d completed.\n",
 			tx, tx->cookie);
 
 		if (((desc->mark == DESC_COMPLETED ||
@@ -476,7 +476,7 @@ static struct shdma_desc *shdma_add_desc(struct shdma_chan *schan,
 	}
 
 	dev_dbg(schan->dev,
-		"chaining (%u/%u)@%x -> %x with %p, cookie %d\n",
+		"chaining (%u/%u)@%x -> %x with %pK, cookie %d\n",
 		copy_size, *len, *src, *dst, &new->async_tx,
 		new->async_tx.cookie);
 
@@ -540,7 +540,7 @@ static struct dma_async_tx_descriptor *shdma_prep_sg(struct shdma_chan *schan,
 			goto err_get_desc;
 
 		do {
-			dev_dbg(schan->dev, "Add SG #%d@%p[%d], dma %llx\n",
+			dev_dbg(schan->dev, "Add SG #%d@%pK[%d], dma %llx\n",
 				i, sg, len, (unsigned long long)sg_addr);
 
 			if (direction == DMA_DEV_TO_MEM)
@@ -799,7 +799,7 @@ static irqreturn_t chan_irqt(int irq, void *dev)
 	list_for_each_entry(sdesc, &schan->ld_queue, node) {
 		if (sdesc->mark == DESC_SUBMITTED &&
 		    ops->desc_completed(schan, sdesc)) {
-			dev_dbg(schan->dev, "done #%d@%p\n",
+			dev_dbg(schan->dev, "done #%d@%pK\n",
 				sdesc->async_tx.cookie, &sdesc->async_tx);
 			sdesc->mark = DESC_COMPLETED;
 			break;

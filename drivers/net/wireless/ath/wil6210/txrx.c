@@ -118,7 +118,7 @@ static int wil_vring_alloc(struct wil6210_priv *wil, struct vring *vring)
 		_d->dma.status = TX_DMA_STATUS_DU;
 	}
 
-	wil_dbg_misc(wil, "vring[%d] 0x%p:%pad 0x%p\n", vring->size,
+	wil_dbg_misc(wil, "vring[%d] 0x%pK:%pad 0x%pK\n", vring->size,
 		     vring->va, &vring->pa, vring->ctx);
 
 	return 0;
@@ -151,11 +151,11 @@ static void wil_vring_free(struct wil6210_priv *wil, struct vring *vring,
 	if (tx) {
 		int vring_index = vring - wil->vring_tx;
 
-		wil_dbg_misc(wil, "free Tx vring %d [%d] 0x%p:%pad 0x%p\n",
+		wil_dbg_misc(wil, "free Tx vring %d [%d] 0x%pK:%pad 0x%pK\n",
 			     vring_index, vring->size, vring->va,
 			     &vring->pa, vring->ctx);
 	} else {
-		wil_dbg_misc(wil, "free Rx vring [%d] 0x%p:%pad 0x%p\n",
+		wil_dbg_misc(wil, "free Rx vring [%d] 0x%pK:%pad 0x%pK\n",
 			     vring->size, vring->va,
 			     &vring->pa, vring->ctx);
 	}
@@ -965,7 +965,7 @@ static int wil_tx_vring(struct wil6210_priv *wil, struct vring *vring,
 
 	pa = dma_map_single(dev, skb->data, skb_headlen(skb), DMA_TO_DEVICE);
 
-	wil_dbg_txrx(wil, "Tx skb %d bytes 0x%p -> %pad\n", skb_headlen(skb),
+	wil_dbg_txrx(wil, "Tx skb %d bytes 0x%pK -> %pad\n", skb_headlen(skb),
 		     skb->data, &pa);
 	wil_hex_dump_txrx("Tx ", DUMP_PREFIX_OFFSET, 16, 1,
 			  skb->data, skb_headlen(skb), false);

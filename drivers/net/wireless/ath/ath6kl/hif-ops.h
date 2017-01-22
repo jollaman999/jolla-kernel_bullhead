@@ -25,7 +25,7 @@ static inline int hif_read_write_sync(struct ath6kl *ar, u32 addr, u8 *buf,
 				      u32 len, u32 request)
 {
 	ath6kl_dbg(ATH6KL_DBG_HIF,
-		   "hif %s sync addr 0x%x buf 0x%p len %d request 0x%x\n",
+		   "hif %s sync addr 0x%x buf 0x%pK len %d request 0x%x\n",
 		   (request & HIF_WRITE) ? "write" : "read",
 		   addr, buf, len, request);
 
@@ -37,7 +37,7 @@ static inline int hif_write_async(struct ath6kl *ar, u32 address, u8 *buffer,
 				  struct htc_packet *packet)
 {
 	ath6kl_dbg(ATH6KL_DBG_HIF,
-		   "hif write async addr 0x%x buf 0x%p len %d request 0x%x\n",
+		   "hif write async addr 0x%x buf 0x%pK len %d request 0x%x\n",
 		   address, buffer, length, request);
 
 	return ar->hif_ops->write_async(ar, address, buffer, length,

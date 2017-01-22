@@ -808,7 +808,7 @@ static void hss_hdlc_txdone_irq(void *pdev)
 
 		dma_unmap_tx(port, desc);
 #if DEBUG_TX
-		printk(KERN_DEBUG "%s: hss_hdlc_txdone_irq free %p\n",
+		printk(KERN_DEBUG "%s: hss_hdlc_txdone_irq free %pK\n",
 		       dev->name, port->tx_buff_tab[n_desc]);
 #endif
 		free_buffer_irq(port->tx_buff_tab[n_desc]);

@@ -98,7 +98,7 @@ void iop13xx_map_pci_memory(void)
 					}
 				} else
 					iop13xx_atux_mem_size = 0;
-				PRINTK("%s: atu: %d bus_size: %d mem_base: %p\n",
+				PRINTK("%s: atu: %d bus_size: %d mem_base: %pK\n",
 				__func__, atu, iop13xx_atux_mem_size,
 				iop13xx_atux_mem_base);
 				break;
@@ -123,13 +123,13 @@ void iop13xx_map_pci_memory(void)
 					}
 				} else
 					iop13xx_atue_mem_size = 0;
-				PRINTK("%s: atu: %d bus_size: %d mem_base: %p\n",
+				PRINTK("%s: atu: %d bus_size: %d mem_base: %pK\n",
 				__func__, atu, iop13xx_atue_mem_size,
 				iop13xx_atue_mem_base);
 				break;
 			}
 
-			printk("%s: Initialized (%uM @ resource/virtual: %08lx/%p)\n",
+			printk("%s: Initialized (%uM @ resource/virtual: %08lx/%pK)\n",
 			atu ? "ATUE" : "ATUX",
 			(atu ? iop13xx_atue_mem_size : iop13xx_atux_mem_size) /
 			SZ_1M,

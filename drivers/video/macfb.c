@@ -592,7 +592,7 @@ static int __init macfb_init(void)
 	if (!fb_info.screen_base)
 		return -ENODEV;
 
-	pr_info("macfb: framebuffer at 0x%08lx, mapped to 0x%p, size %dk\n",
+	pr_info("macfb: framebuffer at 0x%08lx, mapped to 0x%pK, size %dk\n",
 	        macfb_fix.smem_start, fb_info.screen_base,
 	        macfb_fix.smem_len / 1024);
 	pr_info("macfb: mode is %dx%dx%d, linelength=%d\n",

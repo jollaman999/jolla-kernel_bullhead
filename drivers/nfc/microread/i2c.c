@@ -263,10 +263,10 @@ static int microread_i2c_probe(struct i2c_client *client,
 		dev_get_platdata(&client->dev);
 	int r;
 
-	dev_dbg(&client->dev, "client %p", client);
+	dev_dbg(&client->dev, "client %pK", client);
 
 	if (!pdata) {
-		dev_err(&client->dev, "client %p: missing platform data",
+		dev_err(&client->dev, "client %pK: missing platform data",
 			client);
 		return -EINVAL;
 	}

@@ -900,7 +900,7 @@ ssize_t videobuf_read_one(struct videobuf_queue *q,
 		retval = -ENOMEM;
 		q->read_buf = videobuf_alloc_vb(q);
 
-		dprintk(1, "video alloc=0x%p\n", q->read_buf);
+		dprintk(1, "video alloc=0x%pK\n", q->read_buf);
 		if (NULL == q->read_buf)
 			goto done;
 		q->read_buf->memory = V4L2_MEMORY_USERPTR;

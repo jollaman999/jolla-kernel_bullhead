@@ -2766,7 +2766,7 @@ flash_ok_880:
 			goto unregister;
 			
 #ifdef ED_DBGP		
-	printk("request_irq() shpnt %p hostdata %p\n", shpnt, p);
+	printk("request_irq() shpnt %pK hostdata %pK\n", shpnt, p);
 #endif	        
 		if (request_irq(pdev->irq, atp870u_intr_handle, IRQF_SHARED, "atp870u", shpnt)) {
 				printk(KERN_ERR "Unable to allocate IRQ for Acard controller.\n");
@@ -2903,7 +2903,7 @@ flash_ok_885:
 		k = inb(base_io + 0x29) | 0x01;
 		outb(k, base_io + 0x29);
 #ifdef ED_DBGP
-		//printk("atp885: atp_host[0] 0x%p\n", atp_host[0]);
+		//printk("atp885: atp_host[0] 0x%pK\n", atp_host[0]);
 #endif		
 		shpnt->max_id = 16;
 		shpnt->max_lun = (p->global_map[0] & 0x07) + 1;
@@ -3140,11 +3140,11 @@ static void atp870u_remove (struct pci_dev *pdev)
 	printk(KERN_INFO "free_irq : %d\n",pshost->irq);
 	free_irq(pshost->irq, pshost);
 	release_region(pshost->io_port, pshost->n_io_port);
-	printk(KERN_INFO "atp870u_free_tables : %p\n",pshost);
+	printk(KERN_INFO "atp870u_free_tables : %pK\n",pshost);
 	atp870u_free_tables(pshost);
-	printk(KERN_INFO "scsi_host_put : %p\n",pshost);
+	printk(KERN_INFO "scsi_host_put : %pK\n",pshost);
 	scsi_host_put(pshost);
-	printk(KERN_INFO "pci_set_drvdata : %p\n",pdev);
+	printk(KERN_INFO "pci_set_drvdata : %pK\n",pdev);
 	pci_set_drvdata(pdev, NULL);	
 }
 MODULE_LICENSE("GPL");

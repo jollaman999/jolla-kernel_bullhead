@@ -178,10 +178,10 @@ static noinline void do_no_context(struct pt_regs *regs)
 	address = regs->int_parm_long & __FAIL_ADDR_MASK;
 	if (!user_space_fault(regs->int_parm_long))
 		printk(KERN_ALERT "Unable to handle kernel pointer dereference"
-		       " at virtual kernel address %p\n", (void *)address);
+		       " at virtual kernel address %pK\n", (void *)address);
 	else
 		printk(KERN_ALERT "Unable to handle kernel paging request"
-		       " at virtual user address %p\n", (void *)address);
+		       " at virtual user address %pK\n", (void *)address);
 
 	die(regs, "Oops");
 	do_exit(SIGKILL);

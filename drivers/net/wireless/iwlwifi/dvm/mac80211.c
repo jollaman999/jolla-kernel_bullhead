@@ -1561,9 +1561,9 @@ static void iwlagn_mac_remove_interface(struct ieee80211_hw *hw,
 
 	if (WARN_ON(ctx->vif != vif)) {
 		struct iwl_rxon_context *tmp;
-		IWL_ERR(priv, "ctx->vif = %p, vif = %p\n", ctx->vif, vif);
+		IWL_ERR(priv, "ctx->vif = %pK, vif = %pK\n", ctx->vif, vif);
 		for_each_context(priv, tmp)
-			IWL_ERR(priv, "\tID = %d:\tctx = %p\tctx->vif = %p\n",
+			IWL_ERR(priv, "\tID = %d:\tctx = %pK\tctx->vif = %pK\n",
 				tmp->ctxid, tmp, tmp->vif);
 	}
 	ctx->vif = NULL;

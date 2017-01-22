@@ -109,13 +109,13 @@ acpi_ex_do_debug_object(union acpi_operand_object *source_desc,
 			       acpi_ut_get_object_type_name(source_desc));
 
 		if (!acpi_ut_valid_internal_object(source_desc)) {
-			acpi_os_printf("%p, Invalid Internal Object!\n",
+			acpi_os_printf("%pK, Invalid Internal Object!\n",
 				       source_desc);
 			return_VOID;
 		}
 	} else if (ACPI_GET_DESCRIPTOR_TYPE(source_desc) ==
 		   ACPI_DESC_TYPE_NAMED) {
-		acpi_os_printf("%s: %p\n",
+		acpi_os_printf("%s: %pK\n",
 			       acpi_ut_get_type_name(((struct
 						       acpi_namespace_node *)
 						      source_desc)->type),
@@ -205,10 +205,10 @@ acpi_ex_do_debug_object(union acpi_operand_object *source_desc,
 			    (source_desc->reference.node) !=
 			    ACPI_DESC_TYPE_NAMED) {
 				acpi_os_printf
-				    (" %p - Not a valid namespace node\n",
+				    (" %pK - Not a valid namespace node\n",
 				     source_desc->reference.node);
 			} else {
-				acpi_os_printf("Node %p [%4.4s] ",
+				acpi_os_printf("Node %pK [%4.4s] ",
 					       source_desc->reference.node,
 					       (source_desc->reference.node)->
 					       name.ascii);
@@ -251,7 +251,7 @@ acpi_ex_do_debug_object(union acpi_operand_object *source_desc,
 
 	default:
 
-		acpi_os_printf("%p\n", source_desc);
+		acpi_os_printf("%pK\n", source_desc);
 		break;
 	}
 

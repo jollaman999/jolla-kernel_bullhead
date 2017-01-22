@@ -11,15 +11,15 @@
 
 static inline void print_irq_desc(unsigned int irq, struct irq_desc *desc)
 {
-	printk("irq %d, desc: %p, depth: %d, count: %d, unhandled: %d\n",
+	printk("irq %d, desc: %pK, depth: %d, count: %d, unhandled: %d\n",
 		irq, desc, desc->depth, desc->irq_count, desc->irqs_unhandled);
-	printk("->handle_irq():  %p, ", desc->handle_irq);
+	printk("->handle_irq():  %pK, ", desc->handle_irq);
 	print_symbol("%s\n", (unsigned long)desc->handle_irq);
-	printk("->irq_data.chip(): %p, ", desc->irq_data.chip);
+	printk("->irq_data.chip(): %pK, ", desc->irq_data.chip);
 	print_symbol("%s\n", (unsigned long)desc->irq_data.chip);
-	printk("->action(): %p\n", desc->action);
+	printk("->action(): %pK\n", desc->action);
 	if (desc->action) {
-		printk("->action->handler(): %p, ", desc->action->handler);
+		printk("->action->handler(): %pK, ", desc->action->handler);
 		print_symbol("%s\n", (unsigned long)desc->action->handler);
 	}
 

@@ -236,7 +236,7 @@ void __init tcm_init(void)
 		end   = &__edtcm_data;
 		ram   = &__dtcm_start;
 		memcpy(start, ram, dtcm_code_sz);
-		pr_debug("CPU DTCM: copied data from %p - %p\n",
+		pr_debug("CPU DTCM: copied data from %pK - %pK\n",
 			 start, end);
 		dtcm_present = true;
 	} else if (dtcm_code_sz) {
@@ -268,7 +268,7 @@ no_dtcm:
 		end   = &__eitcm_text;
 		ram   = &__itcm_start;
 		memcpy(start, ram, itcm_code_sz);
-		pr_debug("CPU ITCM: copied code from %p - %p\n",
+		pr_debug("CPU ITCM: copied code from %pK - %pK\n",
 			 start, end);
 		itcm_present = true;
 	} else if (itcm_code_sz) {

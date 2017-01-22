@@ -343,7 +343,7 @@ tioca_dma_d48(struct pci_dev *pdev, u64 paddr)
 	node_upper = ct_addr >> 48;
 
 	if (node_upper > 64) {
-		printk(KERN_ERR "%s:  coretalk addr 0x%p node id out "
+		printk(KERN_ERR "%s:  coretalk addr 0x%pK node id out "
 		       "of range\n", __func__, (void *)ct_addr);
 		return 0;
 	}

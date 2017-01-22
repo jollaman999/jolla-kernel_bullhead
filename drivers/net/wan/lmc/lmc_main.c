@@ -508,7 +508,7 @@ int lmc_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd) /*fold00*/
                     	break;
                     }
 
-                    printk("%s: Starting load of data Len: %d at 0x%p == 0x%p\n", dev->name, xc.len, xc.data, data);
+                    printk("%s: Starting load of data Len: %d at 0x%pK == 0x%pK\n", dev->name, xc.len, xc.data, data);
 
 		    spin_lock_irqsave(&sc->lmc_lock, flags);
                     lmc_gpio_mkinput(sc, 0xff);

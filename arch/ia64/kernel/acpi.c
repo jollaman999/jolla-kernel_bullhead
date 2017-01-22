@@ -407,7 +407,7 @@ static int __init acpi_parse_madt(struct acpi_table_header *table)
 	if (acpi_madt->address)
 		ipi_base_addr = ioremap(acpi_madt->address, 0);
 
-	printk(KERN_INFO PREFIX "Local APIC address %p\n", ipi_base_addr);
+	printk(KERN_INFO PREFIX "Local APIC address %pK\n", ipi_base_addr);
 
 	acpi_madt_oem_check(acpi_madt->header.oem_id,
 			    acpi_madt->header.oem_table_id);

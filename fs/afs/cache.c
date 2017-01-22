@@ -87,7 +87,7 @@ static uint16_t afs_cell_cache_get_key(const void *cookie_netfs_data,
 	const struct afs_cell *cell = cookie_netfs_data;
 	uint16_t klen;
 
-	_enter("%p,%p,%u", cell, buffer, bufmax);
+	_enter("%pK,%pK,%u", cell, buffer, bufmax);
 
 	klen = strlen(cell->name);
 	if (klen > bufmax)
@@ -106,7 +106,7 @@ static uint16_t afs_cell_cache_get_aux(const void *cookie_netfs_data,
 	const struct afs_cell *cell = cookie_netfs_data;
 	uint16_t dlen;
 
-	_enter("%p,%p,%u", cell, buffer, bufmax);
+	_enter("%pK,%pK,%u", cell, buffer, bufmax);
 
 	dlen = cell->vl_naddrs * sizeof(cell->vl_addrs[0]);
 	dlen = min(dlen, bufmax);
@@ -137,7 +137,7 @@ static uint16_t afs_vlocation_cache_get_key(const void *cookie_netfs_data,
 	const struct afs_vlocation *vlocation = cookie_netfs_data;
 	uint16_t klen;
 
-	_enter("{%s},%p,%u", vlocation->vldb.name, buffer, bufmax);
+	_enter("{%s},%pK,%u", vlocation->vldb.name, buffer, bufmax);
 
 	klen = strnlen(vlocation->vldb.name, sizeof(vlocation->vldb.name));
 	if (klen > bufmax)
@@ -158,7 +158,7 @@ static uint16_t afs_vlocation_cache_get_aux(const void *cookie_netfs_data,
 	const struct afs_vlocation *vlocation = cookie_netfs_data;
 	uint16_t dlen;
 
-	_enter("{%s},%p,%u", vlocation->vldb.name, buffer, bufmax);
+	_enter("{%s},%pK,%u", vlocation->vldb.name, buffer, bufmax);
 
 	dlen = sizeof(struct afs_cache_vlocation);
 	dlen -= offsetof(struct afs_cache_vlocation, nservers);
@@ -183,7 +183,7 @@ enum fscache_checkaux afs_vlocation_cache_check_aux(void *cookie_netfs_data,
 	struct afs_vlocation *vlocation = cookie_netfs_data;
 	uint16_t dlen;
 
-	_enter("{%s},%p,%u", vlocation->vldb.name, buffer, buflen);
+	_enter("{%s},%pK,%u", vlocation->vldb.name, buffer, buflen);
 
 	/* check the size of the data is what we're expecting */
 	dlen = sizeof(struct afs_cache_vlocation);
@@ -230,7 +230,7 @@ static uint16_t afs_volume_cache_get_key(const void *cookie_netfs_data,
 	const struct afs_volume *volume = cookie_netfs_data;
 	uint16_t klen;
 
-	_enter("{%u},%p,%u", volume->type, buffer, bufmax);
+	_enter("{%u},%pK,%u", volume->type, buffer, bufmax);
 
 	klen = sizeof(volume->type);
 	if (klen > bufmax)
@@ -253,7 +253,7 @@ static uint16_t afs_vnode_cache_get_key(const void *cookie_netfs_data,
 	const struct afs_vnode *vnode = cookie_netfs_data;
 	uint16_t klen;
 
-	_enter("{%x,%x,%llx},%p,%u",
+	_enter("{%x,%x,%llx},%pK,%u",
 	       vnode->fid.vnode, vnode->fid.unique, vnode->status.data_version,
 	       buffer, bufmax);
 
@@ -291,7 +291,7 @@ static uint16_t afs_vnode_cache_get_aux(const void *cookie_netfs_data,
 	const struct afs_vnode *vnode = cookie_netfs_data;
 	uint16_t dlen;
 
-	_enter("{%x,%x,%Lx},%p,%u",
+	_enter("{%x,%x,%Lx},%pK,%u",
 	       vnode->fid.vnode, vnode->fid.unique, vnode->status.data_version,
 	       buffer, bufmax);
 
@@ -318,7 +318,7 @@ static enum fscache_checkaux afs_vnode_cache_check_aux(void *cookie_netfs_data,
 	struct afs_vnode *vnode = cookie_netfs_data;
 	uint16_t dlen;
 
-	_enter("{%x,%x,%llx},%p,%u",
+	_enter("{%x,%x,%llx},%pK,%u",
 	       vnode->fid.vnode, vnode->fid.unique, vnode->status.data_version,
 	       buffer, buflen);
 

@@ -578,8 +578,8 @@ static int msm_demod_probe(struct platform_device *pdev)
 		DRVERR("ioremap failed");
 		return -ENXIO;
 	}
-	DRVDBG("demod BCSS base = %p\n", BCSSADDR);
-	DRVDBG("top BCSS base = %p\n", drv->top_bcss);
+	DRVDBG("demod BCSS base = %pK\n", BCSSADDR);
+	DRVDBG("top BCSS base = %pK\n", drv->top_bcss);
 
 	drv->gdsc = devm_regulator_get(&pdev->dev, "vdd");
 	if (IS_ERR(drv->gdsc)) {

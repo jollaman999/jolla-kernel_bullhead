@@ -495,7 +495,7 @@ static void mg_read(struct request *req)
 		   MG_CMD_RD, NULL) != MG_ERR_NONE)
 		mg_bad_rw_intr(host);
 
-	MG_DBG("requested %d sects (from %ld), buffer=0x%p\n",
+	MG_DBG("requested %d sects (from %ld), buffer=0x%pK\n",
 	       blk_rq_sectors(req), blk_rq_pos(req), req->buffer);
 
 	do {
@@ -533,7 +533,7 @@ static void mg_write(struct request *req)
 		return;
 	}
 
-	MG_DBG("requested %d sects (from %ld), buffer=0x%p\n",
+	MG_DBG("requested %d sects (from %ld), buffer=0x%pK\n",
 	       rem, blk_rq_pos(req), req->buffer);
 
 	if (mg_wait(host, ATA_DRQ,
@@ -584,7 +584,7 @@ static void mg_read_intr(struct mg_host *host)
 ok_to_read:
 	mg_read_one(host, req);
 
-	MG_DBG("sector %ld, remaining=%ld, buffer=0x%p\n",
+	MG_DBG("sector %ld, remaining=%ld, buffer=0x%pK\n",
 	       blk_rq_pos(req), blk_rq_sectors(req) - 1, req->buffer);
 
 	/* send read confirm */
@@ -623,7 +623,7 @@ ok_to_write:
 	if ((rem = mg_end_request(host, 0, MG_SECTOR_SIZE))) {
 		/* write 1 sector and set handler if remains */
 		mg_write_one(host, req);
-		MG_DBG("sector %ld, remaining=%ld, buffer=0x%p\n",
+		MG_DBG("sector %ld, remaining=%ld, buffer=0x%pK\n",
 		       blk_rq_pos(req), blk_rq_sectors(req), req->buffer);
 		host->mg_do_intr = mg_write_intr;
 		mod_timer(&host->timer, jiffies + 3 * HZ);

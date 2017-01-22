@@ -664,7 +664,7 @@ void mpic_unmask_irq(struct irq_data *d)
 	struct mpic *mpic = mpic_from_irq_data(d);
 	unsigned int src = irqd_to_hwirq(d);
 
-	DBG("%p: %s: enable_irq: %d (src %d)\n", mpic, mpic->name, d->irq, src);
+	DBG("%pK: %s: enable_irq: %d (src %d)\n", mpic, mpic->name, d->irq, src);
 
 	mpic_irq_write(src, MPIC_INFO(IRQ_VECTOR_PRI),
 		       mpic_irq_read(src, MPIC_INFO(IRQ_VECTOR_PRI)) &
@@ -866,7 +866,7 @@ int mpic_set_irq_type(struct irq_data *d, unsigned int flow_type)
 	unsigned int src = irqd_to_hwirq(d);
 	unsigned int vecpri, vold, vnew;
 
-	DBG("mpic: set_irq_type(mpic:@%p,virq:%d,src:0x%x,type:0x%x)\n",
+	DBG("mpic: set_irq_type(mpic:@%pK,virq:%d,src:0x%x,type:0x%x)\n",
 	    mpic, d->irq, src, flow_type);
 
 	if (src >= mpic->num_sources)
@@ -926,7 +926,7 @@ void mpic_set_vector(unsigned int virq, unsigned int vector)
 	unsigned int src = virq_to_hw(virq);
 	unsigned int vecpri;
 
-	DBG("mpic: set_vector(mpic:@%p,virq:%d,src:%d,vector:0x%x)\n",
+	DBG("mpic: set_vector(mpic:@%pK,virq:%d,src:%d,vector:0x%x)\n",
 	    mpic, virq, src, vector);
 
 	if (src >= mpic->num_sources)
@@ -943,7 +943,7 @@ void mpic_set_destination(unsigned int virq, unsigned int cpuid)
 	struct mpic *mpic = mpic_from_irq(virq);
 	unsigned int src = virq_to_hw(virq);
 
-	DBG("mpic: set_destination(mpic:@%p,virq:%d,src:%d,cpuid:0x%x)\n",
+	DBG("mpic: set_destination(mpic:@%pK,virq:%d,src:%d,cpuid:0x%x)\n",
 	    mpic, virq, src, cpuid);
 
 	if (src >= mpic->num_sources)
@@ -1051,7 +1051,7 @@ static int mpic_host_map(struct irq_domain *h, unsigned int virq,
 		chip = &mpic->hc_ht_irq;
 #endif /* CONFIG_MPIC_U3_HT_IRQS */
 
-	DBG("mpic: mapping to irq chip @%p\n", chip);
+	DBG("mpic: mapping to irq chip @%pK\n", chip);
 
 	irq_set_chip_data(virq, mpic);
 	irq_set_chip_and_handler(virq, chip, handle_fasteoi_irq);

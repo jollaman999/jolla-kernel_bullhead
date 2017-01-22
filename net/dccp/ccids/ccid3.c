@@ -66,7 +66,7 @@ static void ccid3_hc_tx_set_state(struct sock *sk,
 	struct ccid3_hc_tx_sock *hc = ccid3_hc_tx_sk(sk);
 	enum ccid3_hc_tx_states oldstate = hc->tx_state;
 
-	ccid3_pr_debug("%s(%p) %-8.8s -> %s\n",
+	ccid3_pr_debug("%s(%pK) %-8.8s -> %s\n",
 		       dccp_role(sk), sk, ccid3_tx_state_name(oldstate),
 		       ccid3_tx_state_name(state));
 	WARN_ON(state == oldstate);
@@ -208,7 +208,7 @@ static void ccid3_hc_tx_no_feedback_timer(unsigned long data)
 		goto restart_timer;
 	}
 
-	ccid3_pr_debug("%s(%p, state=%s) - entry\n", dccp_role(sk), sk,
+	ccid3_pr_debug("%s(%pK, state=%s) - entry\n", dccp_role(sk), sk,
 		       ccid3_tx_state_name(hc->tx_state));
 
 	/* Ignore and do not restart after leaving the established state */
@@ -425,7 +425,7 @@ static void ccid3_hc_tx_packet_recv(struct sock *sk, struct sk_buff *skb)
 	ccid3_hc_tx_update_x(sk, &now);
 
 done_computing_x:
-	ccid3_pr_debug("%s(%p), RTT=%uus (sample=%uus), s=%u, "
+	ccid3_pr_debug("%s(%pK), RTT=%uus (sample=%uus), s=%u, "
 			       "p=%u, X_calc=%u, X_recv=%u, X=%u\n",
 			       dccp_role(sk), sk, hc->tx_rtt, r_sample,
 			       hc->tx_s, hc->tx_p, hc->tx_x_calc,
@@ -454,7 +454,7 @@ done_computing_x:
 	 */
 	t_nfb = max(hc->tx_t_rto, 2 * hc->tx_t_ipi);
 
-	ccid3_pr_debug("%s(%p), Scheduled no feedback timer to "
+	ccid3_pr_debug("%s(%pK), Scheduled no feedback timer to "
 		       "expire in %lu jiffies (%luus)\n",
 		       dccp_role(sk), sk, usecs_to_jiffies(t_nfb), t_nfb);
 
@@ -475,7 +475,7 @@ static int ccid3_hc_tx_parse_options(struct sock *sk, u8 packet_type,
 		if (packet_type == DCCP_PKT_DATA)
 			break;
 		if (unlikely(optlen != 4)) {
-			DCCP_WARN("%s(%p), invalid len %d for %u\n",
+			DCCP_WARN("%s(%pK), invalid len %d for %u\n",
 				  dccp_role(sk), sk, optlen, option);
 			return -EINVAL;
 		}
@@ -486,13 +486,13 @@ static int ccid3_hc_tx_parse_options(struct sock *sk, u8 packet_type,
 			hc->tx_x_recv = opt_val;
 			hc->tx_x_recv <<= 6;
 
-			ccid3_pr_debug("%s(%p), RECEIVE_RATE=%u\n",
+			ccid3_pr_debug("%s(%pK), RECEIVE_RATE=%u\n",
 				       dccp_role(sk), sk, opt_val);
 		} else {
 			/* Update the fixpoint Loss Event Rate fraction */
 			hc->tx_p = tfrc_invert_loss_event_rate(opt_val);
 
-			ccid3_pr_debug("%s(%p), LOSS_EVENT_RATE=%u\n",
+			ccid3_pr_debug("%s(%pK), LOSS_EVENT_RATE=%u\n",
 				       dccp_role(sk), sk, opt_val);
 		}
 	}
@@ -586,7 +586,7 @@ static void ccid3_hc_rx_set_state(struct sock *sk,
 	struct ccid3_hc_rx_sock *hc = ccid3_hc_rx_sk(sk);
 	enum ccid3_hc_rx_states oldstate = hc->rx_state;
 
-	ccid3_pr_debug("%s(%p) %-8.8s -> %s\n",
+	ccid3_pr_debug("%s(%pK) %-8.8s -> %s\n",
 		       dccp_role(sk), sk, ccid3_rx_state_name(oldstate),
 		       ccid3_rx_state_name(state));
 	WARN_ON(state == oldstate);
@@ -702,7 +702,7 @@ static u32 ccid3_first_li(struct sock *sk)
 	fval = scaled_div32(fval, x_recv);
 	p = tfrc_calc_x_reverse_lookup(fval);
 
-	ccid3_pr_debug("%s(%p), receive rate=%u bytes/s, implied "
+	ccid3_pr_debug("%s(%pK), receive rate=%u bytes/s, implied "
 		       "loss rate=%u\n", dccp_role(sk), sk, x_recv, p);
 
 	return p == 0 ? ~0U : scaled_div(1, p);

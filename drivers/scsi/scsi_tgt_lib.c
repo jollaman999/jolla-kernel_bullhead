@@ -182,7 +182,7 @@ static void scsi_tgt_cmd_destroy(struct work_struct *work)
 		container_of(work, struct scsi_tgt_cmd, work);
 	struct scsi_cmnd *cmd = tcmd->rq->special;
 
-	dprintk("cmd %p %d %u\n", cmd, cmd->sc_data_direction,
+	dprintk("cmd %pK %d %u\n", cmd, cmd->sc_data_direction,
 		rq_data_dir(cmd->request));
 	scsi_unmap_user_pages(tcmd);
 	tcmd->rq->bio = NULL;
@@ -328,7 +328,7 @@ static void scsi_tgt_cmd_done(struct scsi_cmnd *cmd)
 {
 	struct scsi_tgt_cmd *tcmd = cmd->request->end_io_data;
 
-	dprintk("cmd %p %u\n", cmd, rq_data_dir(cmd->request));
+	dprintk("cmd %pK %u\n", cmd, rq_data_dir(cmd->request));
 
 	scsi_tgt_uspace_send_status(cmd, tcmd->itn_id, tcmd->tag);
 
@@ -342,7 +342,7 @@ static int scsi_tgt_transfer_response(struct scsi_cmnd *cmd)
 	struct Scsi_Host *shost = scsi_tgt_cmd_to_host(cmd);
 	int err;
 
-	dprintk("cmd %p %u\n", cmd, rq_data_dir(cmd->request));
+	dprintk("cmd %pK %u\n", cmd, rq_data_dir(cmd->request));
 
 	err = shost->hostt->transfer_response(cmd, scsi_tgt_cmd_done);
 	switch (err) {
@@ -416,7 +416,7 @@ static int scsi_tgt_abort_cmd(struct Scsi_Host *shost, struct scsi_cmnd *cmd)
 
 	err = shost->hostt->eh_abort_handler(cmd);
 	if (err)
-		eprintk("fail to abort %p\n", cmd);
+		eprintk("fail to abort %pK\n", cmd);
 
 	tcmd = cmd->request->end_io_data;
 	scsi_tgt_cmd_destroy(&tcmd->work);
@@ -479,7 +479,7 @@ int scsi_tgt_kspace_exec(int host_no, u64 itn_id, int result, u64 tag,
 	}
 	cmd = rq->special;
 
-	dprintk("cmd %p scb %x result %d len %d bufflen %u %u %x\n",
+	dprintk("cmd %pK scb %x result %d len %d bufflen %u %u %x\n",
 		cmd, cmd->cmnd[0], result, len, scsi_bufflen(cmd),
 		rq_data_dir(rq), cmd->cmnd[0]);
 
@@ -508,7 +508,7 @@ int scsi_tgt_kspace_exec(int host_no, u64 itn_id, int result, u64 tag,
 			struct list_head *head;
 			unsigned long flags;
 
-			eprintk("cmd %p ret %d uaddr %lx len %d rw %d\n",
+			eprintk("cmd %pK ret %d uaddr %lx len %d rw %d\n",
 				cmd, err, uaddr, len, rw);
 
 			qdata = shost->uspace_req_q->queuedata;

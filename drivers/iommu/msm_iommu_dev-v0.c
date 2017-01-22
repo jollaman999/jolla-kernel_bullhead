@@ -414,7 +414,7 @@ static int msm_iommu_probe(struct platform_device *pdev)
 
 	msm_iommu_access_ops->iommu_clk_off(drvdata);
 
-	pr_info("device %s mapped at %p, with %d ctx banks\n",
+	pr_info("device %s mapped at %pK, with %d ctx banks\n",
 		drvdata->name, drvdata->base, drvdata->ncb);
 
 	msm_iommu_add_drv(drvdata);

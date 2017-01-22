@@ -156,7 +156,7 @@ static void gelic_card_enable_rxdmac(struct gelic_card *card)
 		       be32_to_cpu(card->rx_chain.head->dmac_cmd_status));
 		printk(KERN_ERR "%s: nextphy=%x\n", __func__,
 		       be32_to_cpu(card->rx_chain.head->next_descr_addr));
-		printk(KERN_ERR "%s: head=%p\n", __func__,
+		printk(KERN_ERR "%s: head=%pK\n", __func__,
 		       card->rx_chain.head);
 	}
 #endif
@@ -796,7 +796,7 @@ static int gelic_descr_prepare_tx(struct gelic_card *card,
 
 	if (!buf) {
 		dev_err(ctodev(card),
-			"dma map 2 failed (%p, %i). Dropping packet\n",
+			"dma map 2 failed (%pK, %i). Dropping packet\n",
 			skb->data, skb->len);
 		return -ENOMEM;
 	}
@@ -991,7 +991,7 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
 		return 0;
 
 	if (status == GELIC_DESCR_DMA_NOT_IN_USE) {
-		dev_dbg(ctodev(card), "dormant descr? %p\n", descr);
+		dev_dbg(ctodev(card), "dormant descr? %pK\n", descr);
 		return 0;
 	}
 
@@ -1206,7 +1206,7 @@ int gelic_net_open(struct net_device *netdev)
 {
 	struct gelic_card *card = netdev_card(netdev);
 
-	dev_dbg(ctodev(card), " -> %s %p\n", __func__, netdev);
+	dev_dbg(ctodev(card), " -> %s %pK\n", __func__, netdev);
 
 	gelic_card_up(card);
 
@@ -1751,7 +1751,7 @@ static int ps3_gelic_driver_probe(struct ps3_system_bus_device *dev)
 	/* head of chain */
 	card->tx_top = card->tx_chain.head;
 	card->rx_top = card->rx_chain.head;
-	dev_dbg(ctodev(card), "descr rx %p, tx %p, size %#lx, num %#x\n",
+	dev_dbg(ctodev(card), "descr rx %pK, tx %pK, size %#lx, num %#x\n",
 		card->rx_top, card->tx_top, sizeof(struct gelic_descr),
 		GELIC_NET_RX_DESCRIPTORS);
 	/* allocate rx skbs */

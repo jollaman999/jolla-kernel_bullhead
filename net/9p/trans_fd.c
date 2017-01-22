@@ -193,7 +193,7 @@ static void p9_conn_cancel(struct p9_conn *m, int err)
 	unsigned long flags;
 	LIST_HEAD(cancel_list);
 
-	p9_debug(P9_DEBUG_ERROR, "mux %p err %d\n", m, err);
+	p9_debug(P9_DEBUG_ERROR, "mux %pK err %d\n", m, err);
 
 	spin_lock_irqsave(&m->client->lock, flags);
 
@@ -219,7 +219,7 @@ static void p9_conn_cancel(struct p9_conn *m, int err)
 	spin_unlock_irqrestore(&m->client->lock, flags);
 
 	list_for_each_entry_safe(req, rtmp, &cancel_list, req_list) {
-		p9_debug(P9_DEBUG_ERROR, "call back req %p\n", req);
+		p9_debug(P9_DEBUG_ERROR, "call back req %pK\n", req);
 		list_del(&req->req_list);
 		p9_client_cb(m->client, req);
 	}
@@ -301,7 +301,7 @@ static void p9_read_work(struct work_struct *work)
 	if (m->err < 0)
 		return;
 
-	p9_debug(P9_DEBUG_TRANS, "start mux %p pos %d\n", m, m->rpos);
+	p9_debug(P9_DEBUG_TRANS, "start mux %pK pos %d\n", m, m->rpos);
 
 	if (!m->rbuf) {
 		m->rbuf = m->tmp_buf;
@@ -310,11 +310,11 @@ static void p9_read_work(struct work_struct *work)
 	}
 
 	clear_bit(Rpending, &m->wsched);
-	p9_debug(P9_DEBUG_TRANS, "read mux %p pos %d size: %d = %d\n",
+	p9_debug(P9_DEBUG_TRANS, "read mux %pK pos %d size: %d = %d\n",
 		 m, m->rpos, m->rsize, m->rsize-m->rpos);
 	err = p9_fd_read(m->client, m->rbuf + m->rpos,
 						m->rsize - m->rpos);
-	p9_debug(P9_DEBUG_TRANS, "mux %p got %d bytes\n", m, err);
+	p9_debug(P9_DEBUG_TRANS, "mux %pK got %d bytes\n", m, err);
 	if (err == -EAGAIN) {
 		goto end_clear;
 	}
@@ -338,7 +338,7 @@ static void p9_read_work(struct work_struct *work)
 
 		tag = le16_to_cpu(*(__le16 *) (m->rbuf+5)); /* read tag */
 		p9_debug(P9_DEBUG_TRANS,
-			 "mux %p pkt: size: %d bytes tag: %d\n", m, n, tag);
+			 "mux %pK pkt: size: %d bytes tag: %d\n", m, n, tag);
 
 		m->req = p9_tag_lookup(m->client, tag);
 		if (!m->req || (m->req->status != REQ_STATUS_SENT &&
@@ -388,7 +388,7 @@ end_clear:
 			n = p9_fd_poll(m->client, NULL);
 
 		if ((n & POLLIN) && !test_and_set_bit(Rworksched, &m->wsched)) {
-			p9_debug(P9_DEBUG_TRANS, "sched read work %p\n", m);
+			p9_debug(P9_DEBUG_TRANS, "sched read work %pK\n", m);
 			schedule_work(&m->rq);
 		}
 	}
@@ -463,7 +463,7 @@ static void p9_write_work(struct work_struct *work)
 		req = list_entry(m->unsent_req_list.next, struct p9_req_t,
 			       req_list);
 		req->status = REQ_STATUS_SENT;
-		p9_debug(P9_DEBUG_TRANS, "move req %p\n", req);
+		p9_debug(P9_DEBUG_TRANS, "move req %pK\n", req);
 		list_move_tail(&req->req_list, &m->req_list);
 
 		m->wbuf = req->tc->sdata;
@@ -472,11 +472,11 @@ static void p9_write_work(struct work_struct *work)
 		spin_unlock(&m->client->lock);
 	}
 
-	p9_debug(P9_DEBUG_TRANS, "mux %p pos %d size %d\n",
+	p9_debug(P9_DEBUG_TRANS, "mux %pK pos %d size %d\n",
 		 m, m->wpos, m->wsize);
 	clear_bit(Wpending, &m->wsched);
 	err = p9_fd_write(m->client, m->wbuf + m->wpos, m->wsize - m->wpos);
-	p9_debug(P9_DEBUG_TRANS, "mux %p sent %d bytes\n", m, err);
+	p9_debug(P9_DEBUG_TRANS, "mux %pK sent %d bytes\n", m, err);
 	if (err == -EAGAIN)
 		goto end_clear;
 
@@ -503,7 +503,7 @@ end_clear:
 
 		if ((n & POLLOUT) &&
 		   !test_and_set_bit(Wworksched, &m->wsched)) {
-			p9_debug(P9_DEBUG_TRANS, "sched write work %p\n", m);
+			p9_debug(P9_DEBUG_TRANS, "sched write work %pK\n", m);
 			schedule_work(&m->wq);
 		}
 	}
@@ -577,7 +577,7 @@ static struct p9_conn *p9_conn_create(struct p9_client *client)
 	int n;
 	struct p9_conn *m;
 
-	p9_debug(P9_DEBUG_TRANS, "client %p msize %d\n", client, client->msize);
+	p9_debug(P9_DEBUG_TRANS, "client %pK msize %d\n", client, client->msize);
 	m = kzalloc(sizeof(struct p9_conn), GFP_KERNEL);
 	if (!m)
 		return ERR_PTR(-ENOMEM);
@@ -594,12 +594,12 @@ static struct p9_conn *p9_conn_create(struct p9_client *client)
 
 	n = p9_fd_poll(client, &m->pt);
 	if (n & POLLIN) {
-		p9_debug(P9_DEBUG_TRANS, "mux %p can read\n", m);
+		p9_debug(P9_DEBUG_TRANS, "mux %pK can read\n", m);
 		set_bit(Rpending, &m->wsched);
 	}
 
 	if (n & POLLOUT) {
-		p9_debug(P9_DEBUG_TRANS, "mux %p can write\n", m);
+		p9_debug(P9_DEBUG_TRANS, "mux %pK can write\n", m);
 		set_bit(Wpending, &m->wsched);
 	}
 
@@ -621,7 +621,7 @@ static void p9_poll_mux(struct p9_conn *m)
 
 	n = p9_fd_poll(m->client, NULL);
 	if (n < 0 || n & (POLLERR | POLLHUP | POLLNVAL)) {
-		p9_debug(P9_DEBUG_TRANS, "error mux %p err %d\n", m, n);
+		p9_debug(P9_DEBUG_TRANS, "error mux %pK err %d\n", m, n);
 		if (n >= 0)
 			n = -ECONNRESET;
 		p9_conn_cancel(m, n);
@@ -629,19 +629,19 @@ static void p9_poll_mux(struct p9_conn *m)
 
 	if (n & POLLIN) {
 		set_bit(Rpending, &m->wsched);
-		p9_debug(P9_DEBUG_TRANS, "mux %p can read\n", m);
+		p9_debug(P9_DEBUG_TRANS, "mux %pK can read\n", m);
 		if (!test_and_set_bit(Rworksched, &m->wsched)) {
-			p9_debug(P9_DEBUG_TRANS, "sched read work %p\n", m);
+			p9_debug(P9_DEBUG_TRANS, "sched read work %pK\n", m);
 			schedule_work(&m->rq);
 		}
 	}
 
 	if (n & POLLOUT) {
 		set_bit(Wpending, &m->wsched);
-		p9_debug(P9_DEBUG_TRANS, "mux %p can write\n", m);
+		p9_debug(P9_DEBUG_TRANS, "mux %pK can write\n", m);
 		if ((m->wsize || !list_empty(&m->unsent_req_list)) &&
 		    !test_and_set_bit(Wworksched, &m->wsched)) {
-			p9_debug(P9_DEBUG_TRANS, "sched write work %p\n", m);
+			p9_debug(P9_DEBUG_TRANS, "sched write work %pK\n", m);
 			schedule_work(&m->wq);
 		}
 	}
@@ -664,7 +664,7 @@ static int p9_fd_request(struct p9_client *client, struct p9_req_t *req)
 	struct p9_trans_fd *ts = client->trans;
 	struct p9_conn *m = ts->conn;
 
-	p9_debug(P9_DEBUG_TRANS, "mux %p task %p tcall %p id %d\n",
+	p9_debug(P9_DEBUG_TRANS, "mux %pK task %pK tcall %pK id %d\n",
 		 m, current, req->tc, req->tc->id);
 	if (m->err < 0)
 		return m->err;
@@ -689,7 +689,7 @@ static int p9_fd_cancel(struct p9_client *client, struct p9_req_t *req)
 {
 	int ret = 1;
 
-	p9_debug(P9_DEBUG_TRANS, "client %p req %p\n", client, req);
+	p9_debug(P9_DEBUG_TRANS, "client %pK req %pK\n", client, req);
 
 	spin_lock(&client->lock);
 
@@ -839,7 +839,7 @@ static int p9_socket_open(struct p9_client *client, struct socket *csocket)
 
 static void p9_conn_destroy(struct p9_conn *m)
 {
-	p9_debug(P9_DEBUG_TRANS, "mux %p prev %p next %p\n",
+	p9_debug(P9_DEBUG_TRANS, "mux %pK prev %pK next %pK\n",
 		 m, m->mux_list.prev, m->mux_list.next);
 
 	p9_mux_poll_stop(m);
@@ -1053,7 +1053,7 @@ static void p9_poll_workfn(struct work_struct *work)
 {
 	unsigned long flags;
 
-	p9_debug(P9_DEBUG_TRANS, "start %p\n", current);
+	p9_debug(P9_DEBUG_TRANS, "start %pK\n", current);
 
 	spin_lock_irqsave(&p9_poll_lock, flags);
 	while (!list_empty(&p9_poll_pending_list)) {

@@ -83,7 +83,7 @@ void rds_connect_complete(struct rds_connection *conn)
 		return;
 	}
 
-	rdsdebug("conn %p for %pI4 to %pI4 complete\n",
+	rdsdebug("conn %pK for %pI4 to %pI4 complete\n",
 	  conn, &conn->c_laddr, &conn->c_faddr);
 
 	conn->c_reconnect_jiffies = 0;
@@ -115,7 +115,7 @@ void rds_queue_reconnect(struct rds_connection *conn)
 {
 	unsigned long rand;
 
-	rdsdebug("conn %p for %pI4 to %pI4 reconnect jiffies %lu\n",
+	rdsdebug("conn %pK for %pI4 to %pI4 reconnect jiffies %lu\n",
 	  conn, &conn->c_laddr, &conn->c_faddr,
 	  conn->c_reconnect_jiffies);
 
@@ -127,7 +127,7 @@ void rds_queue_reconnect(struct rds_connection *conn)
 	}
 
 	get_random_bytes(&rand, sizeof(rand));
-	rdsdebug("%lu delay %lu ceil conn %p for %pI4 -> %pI4\n",
+	rdsdebug("%lu delay %lu ceil conn %pK for %pI4 -> %pI4\n",
 		 rand % conn->c_reconnect_jiffies, conn->c_reconnect_jiffies,
 		 conn, &conn->c_laddr, &conn->c_faddr);
 	queue_delayed_work(rds_wq, &conn->c_conn_w,
@@ -145,7 +145,7 @@ void rds_connect_worker(struct work_struct *work)
 	clear_bit(RDS_RECONNECT_PENDING, &conn->c_flags);
 	if (rds_conn_transition(conn, RDS_CONN_DOWN, RDS_CONN_CONNECTING)) {
 		ret = conn->c_trans->conn_connect(conn);
-		rdsdebug("conn %p for %pI4 to %pI4 dispatched, ret %d\n",
+		rdsdebug("conn %pK for %pI4 to %pI4 dispatched, ret %d\n",
 			conn, &conn->c_laddr, &conn->c_faddr, ret);
 
 		if (ret) {
@@ -164,7 +164,7 @@ void rds_send_worker(struct work_struct *work)
 
 	if (rds_conn_state(conn) == RDS_CONN_UP) {
 		ret = rds_send_xmit(conn);
-		rdsdebug("conn %p ret %d\n", conn, ret);
+		rdsdebug("conn %pK ret %d\n", conn, ret);
 		switch (ret) {
 		case -EAGAIN:
 			rds_stats_inc(s_send_immediate_retry);
@@ -186,7 +186,7 @@ void rds_recv_worker(struct work_struct *work)
 
 	if (rds_conn_state(conn) == RDS_CONN_UP) {
 		ret = conn->c_trans->recv(conn);
-		rdsdebug("conn %p ret %d\n", conn, ret);
+		rdsdebug("conn %pK ret %d\n", conn, ret);
 		switch (ret) {
 		case -EAGAIN:
 			rds_stats_inc(s_recv_immediate_retry);

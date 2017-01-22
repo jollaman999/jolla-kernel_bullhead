@@ -444,10 +444,10 @@ void tmio_mmc_do_data_irq(struct tmio_mmc_host *host)
 	if (data->flags & MMC_DATA_READ) {
 		if (host->chan_rx && !host->force_pio)
 			tmio_mmc_check_bounce_buffer(host);
-		dev_dbg(&host->pdev->dev, "Complete Rx request %p\n",
+		dev_dbg(&host->pdev->dev, "Complete Rx request %pK\n",
 			host->mrq);
 	} else {
-		dev_dbg(&host->pdev->dev, "Complete Tx request %p\n",
+		dev_dbg(&host->pdev->dev, "Complete Tx request %pK\n",
 			host->mrq);
 	}
 

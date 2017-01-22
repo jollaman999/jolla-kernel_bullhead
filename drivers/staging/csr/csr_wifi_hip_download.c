@@ -395,7 +395,7 @@ CsrResult unifi_dl_patch(card_t *card, void *dlpriv, u32 boot_ctrl)
     xbv1_t *fwinfo;
     CsrResult r;
 
-    unifi_info(card->ospriv, "unifi_dl_patch %p %08x\n", dlpriv, boot_ctrl);
+    unifi_info(card->ospriv, "unifi_dl_patch %pK %08x\n", dlpriv, boot_ctrl);
 
     fwinfo = kmalloc(sizeof(xbv1_t), GFP_KERNEL);
     if (fwinfo == NULL)

@@ -509,7 +509,7 @@ static void ecard_dump_irq_state(void)
 			printk("irq %spending\n",
 			       ec->ops->irqpending(ec) ? "" : "not ");
 		else
-			printk("irqaddr %p, mask = %02X, status = %02X\n",
+			printk("irqaddr %pK, mask = %02X, status = %02X\n",
 			       ec->irqaddr, ec->irqmask, readb(ec->irqaddr));
 	}
 }

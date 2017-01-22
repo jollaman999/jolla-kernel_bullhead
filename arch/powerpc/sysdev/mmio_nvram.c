@@ -143,7 +143,7 @@ int __init mmio_nvram_init(void)
 		goto out;
 	}
 
-	printk(KERN_INFO "mmio NVRAM, %luk at 0x%lx mapped to %p\n",
+	printk(KERN_INFO "mmio NVRAM, %luk at 0x%lx mapped to %pK\n",
 	       mmio_nvram_len >> 10, nvram_addr, mmio_nvram_start);
 
 	ppc_md.nvram_read_val	= mmio_nvram_read_val;

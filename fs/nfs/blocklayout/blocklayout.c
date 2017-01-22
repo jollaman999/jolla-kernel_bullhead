@@ -52,7 +52,7 @@ MODULE_DESCRIPTION("The NFSv4.1 pNFS Block layout driver");
 
 static void print_page(struct page *page)
 {
-	dprintk("PRINTPAGE page %p\n", page);
+	dprintk("PRINTPAGE page %pK\n", page);
 	dprintk("	PagePrivate %d\n", PagePrivate(page));
 	dprintk("	PageUptodate %d\n", PageUptodate(page));
 	dprintk("	PageError %d\n", PageError(page));
@@ -473,7 +473,7 @@ static void mark_bad_read(void)
 static void
 map_block(struct buffer_head *bh, sector_t isect, struct pnfs_block_extent *be)
 {
-	dprintk("%s enter be=%p\n", __func__, be);
+	dprintk("%s enter be=%pK\n", __func__, be);
 
 	set_buffer_mapped(bh);
 	bh->b_bdev = be->be_mdev;
@@ -596,7 +596,7 @@ init_page_for_write(struct page *page, struct pnfs_block_extent *cow_read)
 	int ret = 0;
 	sector_t isect;
 
-	dprintk("%s enter, %p\n", __func__, page);
+	dprintk("%s enter, %pK\n", __func__, page);
 	BUG_ON(PageUptodate(page));
 	if (!cow_read) {
 		zero_user_segment(page, 0, PAGE_SIZE);

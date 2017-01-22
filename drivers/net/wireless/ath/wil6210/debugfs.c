@@ -54,7 +54,7 @@ static void wil_print_vring(struct seq_file *s, struct wil6210_priv *wil,
 
 	seq_printf(s, "VRING %s = {\n", name);
 	seq_printf(s, "  pa     = %pad\n", &vring->pa);
-	seq_printf(s, "  va     = 0x%p\n", vring->va);
+	seq_printf(s, "  va     = 0x%pK\n", vring->va);
 	seq_printf(s, "  size   = %d\n", vring->size);
 	seq_printf(s, "  swtail = %d\n", vring->swtail);
 	seq_printf(s, "  swhead = %d\n", vring->swhead);
@@ -838,7 +838,7 @@ static int wil_txdesc_debugfs_show(struct seq_file *s, void *data)
 			   u[0], u[1], u[2], u[3]);
 		seq_printf(s, "  DMA = 0x%08x 0x%08x 0x%08x 0x%08x\n",
 			   u[4], u[5], u[6], u[7]);
-		seq_printf(s, "  SKB = 0x%p\n", skb);
+		seq_printf(s, "  SKB = 0x%pK\n", skb);
 
 		if (skb) {
 			skb_get(skb);

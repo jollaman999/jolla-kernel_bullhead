@@ -1499,7 +1499,7 @@ static int ngd_slim_probe(struct platform_device *pdev)
 						&dev->dsp.nb);
 	if (IS_ERR_OR_NULL(dev->dsp.ssr))
 		dev_err(dev->dev,
-			"subsys_notif_register_notifier failed %p",
+			"subsys_notif_register_notifier failed %pK",
 			dev->dsp.ssr);
 	if (slim_mdm) {
 		dev->ext_mdm.nb.notifier_call = mdm_ssr_notify_cb;
@@ -1507,7 +1507,7 @@ static int ngd_slim_probe(struct platform_device *pdev)
 							&dev->ext_mdm.nb);
 		if (IS_ERR_OR_NULL(dev->ext_mdm.ssr))
 			dev_err(dev->dev,
-				"subsys_notif_register_notifier failed %p",
+				"subsys_notif_register_notifier failed %pK",
 				dev->ext_mdm.ssr);
 	}
 

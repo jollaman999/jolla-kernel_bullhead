@@ -128,7 +128,7 @@ static int rxrpc_abort_connection(struct rxrpc_connection *conn,
  */
 static void rxrpc_call_is_secure(struct rxrpc_call *call)
 {
-	_enter("%p", call);
+	_enter("%pK", call);
 	if (call) {
 		read_lock(&call->state_lock);
 		if (call->state < RXRPC_CALL_COMPLETE &&

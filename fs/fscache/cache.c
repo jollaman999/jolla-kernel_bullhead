@@ -120,7 +120,7 @@ struct fscache_cache *fscache_select_cache_for_object(
 			cache = NULL;
 
 		spin_unlock(&cookie->lock);
-		_leave(" = %p [parent]", cache);
+		_leave(" = %pK [parent]", cache);
 		return cache;
 	}
 
@@ -156,14 +156,14 @@ struct fscache_cache *fscache_select_cache_for_object(
 	if (test_bit(FSCACHE_IOERROR, &tag->cache->flags))
 		return NULL;
 
-	_leave(" = %p [specific]", tag->cache);
+	_leave(" = %pK [specific]", tag->cache);
 	return tag->cache;
 
 no_preference:
 	/* netfs has no preference - just select first cache */
 	cache = list_entry(fscache_cache_list.next,
 			   struct fscache_cache, link);
-	_leave(" = %p [first]", cache);
+	_leave(" = %pK [first]", cache);
 	return cache;
 }
 
@@ -337,7 +337,7 @@ static void fscache_withdraw_all_objects(struct fscache_cache *cache,
 				    struct fscache_object, cache_link);
 		list_move_tail(&object->cache_link, dying_objects);
 
-		_debug("withdraw %p", object->cookie);
+		_debug("withdraw %pK", object->cookie);
 
 		spin_lock(&object->lock);
 		spin_unlock(&cache->object_list_lock);

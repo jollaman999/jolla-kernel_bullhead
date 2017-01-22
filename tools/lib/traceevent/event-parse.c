@@ -986,7 +986,7 @@ static enum event_type __read_token(char **tok)
 		} else if (strcmp(*tok, "VIF_PR_FMT") == 0) {
 			free(*tok);
 			*tok = NULL;
-			return force_token("\" vif:%p(%d)\" ", tok);
+			return force_token("\" vif:%pK(%d)\" ", tok);
 		}
 	}
 
@@ -4193,7 +4193,7 @@ static void pretty_print(struct trace_seq *s, void *data, int size, struct event
 					/* make %l into %ll */
 					if (ls == 1 && (p = strchr(format, 'l')))
 						memmove(p+1, p, strlen(p)+1);
-					else if (strcmp(format, "%p") == 0)
+					else if (strcmp(format, "%pK") == 0)
 						strcpy(format, "0x%llx");
 					ls = 2;
 				}

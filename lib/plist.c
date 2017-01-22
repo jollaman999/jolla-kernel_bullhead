@@ -35,9 +35,9 @@ static void plist_check_prev_next(struct list_head *t, struct list_head *p,
 				  struct list_head *n)
 {
 	WARN(n->prev != p || p->next != n,
-			"top: %p, n: %p, p: %p\n"
-			"prev: %p, n: %p, p: %p\n"
-			"next: %p, n: %p, p: %p\n",
+			"top: %pK, n: %pK, p: %pK\n"
+			"prev: %pK, n: %pK, p: %pK\n"
+			"next: %pK, n: %pK, p: %pK\n",
 			 t, t->next, t->prev,
 			p, p->next, p->prev,
 			n, n->next, n->prev);

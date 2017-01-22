@@ -404,7 +404,7 @@ void limTspecDelete(tpAniSirGlobal pMac, tpLimTspecInfo pInfo)
         return;
         //pierre
     limLog(pMac, ADMIT_CONTROL_LOGLEVEL, FL("tspec entry = %d"), pInfo->idx);
-    limLog(pMac, ADMIT_CONTROL_LOGLEVEL, FL("delete tspec %p"), pInfo);
+    limLog(pMac, ADMIT_CONTROL_LOGLEVEL, FL("delete tspec %pK"), pInfo);
     pInfo->inuse = 0;
 
     return;

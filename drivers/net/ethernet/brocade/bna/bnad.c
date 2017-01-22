@@ -3212,7 +3212,7 @@ bnad_init(struct bnad *bnad,
 		pci_set_drvdata(pdev, NULL);
 		return -ENOMEM;
 	}
-	pr_info("bar0 mapped to %p, len %llu\n", bnad->bar0,
+	pr_info("bar0 mapped to %pK, len %llu\n", bnad->bar0,
 	       (unsigned long long) bnad->mmio_len);
 
 	spin_lock_irqsave(&bnad->bna_lock, flags);
@@ -3340,7 +3340,7 @@ bnad_pci_probe(struct pci_dev *pdev,
 	struct bfa_pcidev pcidev_info;
 	unsigned long flags;
 
-	pr_info("bnad_pci_probe : (0x%p, 0x%p) PCI Func : (%d)\n",
+	pr_info("bnad_pci_probe : (0x%pK, 0x%pK) PCI Func : (%d)\n",
 	       pdev, pcidev_id, PCI_FUNC(pdev->devfn));
 
 	mutex_lock(&bnad_fwimg_mutex);

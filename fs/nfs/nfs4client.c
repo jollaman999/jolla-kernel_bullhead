@@ -191,7 +191,7 @@ struct nfs_client *nfs4_init_client(struct nfs_client *clp,
 
 	if (clp->cl_cons_state == NFS_CS_READY) {
 		/* the client is initialised already */
-		dprintk("<-- nfs4_init_client() = 0 [already %p]\n", clp);
+		dprintk("<-- nfs4_init_client() = 0 [already %pK]\n", clp);
 		return clp;
 	}
 
@@ -359,7 +359,7 @@ int nfs40_walk_client_list(struct nfs_client *new,
 
 			prev = NULL;
 			*result = pos;
-			dprintk("NFS: <-- %s using nfs_client = %p ({%d})\n",
+			dprintk("NFS: <-- %s using nfs_client = %pK ({%d})\n",
 				__func__, pos, atomic_read(&pos->cl_count));
 		default:
 			goto out;
@@ -488,7 +488,7 @@ int nfs41_walk_client_list(struct nfs_client *new,
 		atomic_inc(&pos->cl_count);
 		*result = pos;
 		status = 0;
-		dprintk("NFS: <-- %s using nfs_client = %p ({%d})\n",
+		dprintk("NFS: <-- %s using nfs_client = %pK ({%d})\n",
 			__func__, pos, atomic_read(&pos->cl_count));
 		break;
 	}
@@ -645,7 +645,7 @@ static int nfs4_set_client(struct nfs_server *server,
 	set_bit(NFS_CS_CHECK_LEASE_TIME, &clp->cl_res_state);
 
 	server->nfs_client = clp;
-	dprintk("<-- nfs4_set_client() = 0 [new %p]\n", clp);
+	dprintk("<-- nfs4_set_client() = 0 [new %pK]\n", clp);
 	return 0;
 error:
 	dprintk("<-- nfs4_set_client() = xerror %d\n", error);
@@ -686,7 +686,7 @@ struct nfs_client *nfs4_set_ds_client(struct nfs_client* mds_clp,
 	clp = nfs_get_client(&cl_init, &ds_timeout, mds_clp->cl_ipaddr,
 			     mds_clp->cl_rpcclient->cl_auth->au_flavor);
 
-	dprintk("<-- %s %p\n", __func__, clp);
+	dprintk("<-- %s %pK\n", __func__, clp);
 	return clp;
 }
 EXPORT_SYMBOL_GPL(nfs4_set_ds_client);
@@ -854,7 +854,7 @@ struct nfs_server *nfs4_create_server(struct nfs_mount_info *mount_info,
 	if (error < 0)
 		goto error;
 
-	dprintk("<-- nfs4_create_server() = %p\n", server);
+	dprintk("<-- nfs4_create_server() = %pK\n", server);
 	return server;
 
 error:
@@ -907,7 +907,7 @@ struct nfs_server *nfs4_create_referral_server(struct nfs_clone_mount *data,
 	if (error < 0)
 		goto error;
 
-	dprintk("<-- nfs_create_referral_server() = %p\n", server);
+	dprintk("<-- nfs_create_referral_server() = %pK\n", server);
 	return server;
 
 error:

@@ -337,7 +337,7 @@ static inline int key_in_buffer(struct treepath *chk_path,	/* Path which should 
 
 	RFALSE(!key || chk_path->path_length < FIRST_PATH_ELEMENT_OFFSET
 	       || chk_path->path_length > MAX_HEIGHT,
-	       "PAP-5050: pointer to the key(%p) is NULL or invalid path length(%d)",
+	       "PAP-5050: pointer to the key(%pK) is NULL or invalid path length(%d)",
 	       key, chk_path->path_length);
 	RFALSE(!PATH_PLAST_BUFFER(chk_path)->b_bdev,
 	       "PAP-5060: device must not be NODEV");

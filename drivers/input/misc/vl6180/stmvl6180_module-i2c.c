@@ -183,13 +183,13 @@ int stmvl6180_power_up_i2c(void *i2c_object, unsigned int *preset_flag)
 #ifndef STM_TEST
 	ret = regulator_set_voltage(data->vana,	VL6180_VDD_MIN, VL6180_VDD_MAX);
 	if (ret < 0) {
-		vl6180_errmsg("set_vol(%p) fail %d\n", data->vana , ret);
+		vl6180_errmsg("set_vol(%pK) fail %d\n", data->vana , ret);
 		return ret;
 	}
 	ret = regulator_enable(data->vana);
 	msleep(3);
 	if (ret < 0) {
-		vl6180_errmsg("reg enable(%p) failed.rc=%d\n", data->vana, ret);
+		vl6180_errmsg("reg enable(%pK) failed.rc=%d\n", data->vana, ret);
 		return ret;
 	}
 	data->power_up = 1;
@@ -212,7 +212,7 @@ int stmvl6180_power_down_i2c(void *i2c_object)
 	msleep(3);
 	ret = regulator_disable(data->vana);
 	if (ret < 0) {
-		vl6180_errmsg("reg disable(%p) failed.rc=%d\n", data->vana, ret);
+		vl6180_errmsg("reg disable(%pK) failed.rc=%d\n", data->vana, ret);
 	}
 	data->power_up = 0;
 #endif

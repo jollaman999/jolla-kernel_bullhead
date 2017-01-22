@@ -116,7 +116,7 @@ static void ath9k_tx_cabq(struct ieee80211_hw *hw, struct sk_buff *skb)
 	memset(&txctl, 0, sizeof(struct ath_tx_control));
 	txctl.txq = sc->beacon.cabq;
 
-	ath_dbg(common, XMIT, "transmitting CABQ packet, skb: %p\n", skb);
+	ath_dbg(common, XMIT, "transmitting CABQ packet, skb: %pK\n", skb);
 
 	if (ath_tx_start(hw, skb, &txctl) != 0) {
 		ath_dbg(common, XMIT, "CABQ TX failed\n");

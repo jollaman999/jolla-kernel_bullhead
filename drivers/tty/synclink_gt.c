@@ -3711,7 +3711,7 @@ static int init_one(struct pci_dev *dev,
 			      const struct pci_device_id *ent)
 {
 	if (pci_enable_device(dev)) {
-		printk("error enabling pci device %p\n", dev);
+		printk("error enabling pci device %pK\n", dev);
 		return -EIO;
 	}
 	pci_set_master(dev);

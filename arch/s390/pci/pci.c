@@ -488,7 +488,7 @@ static int zpci_setup_msi(struct pci_dev *pdev, int msi_vecs)
 
 	/* wire up IRQ shortcut pointer */
 	bucket->imap[zdev->aisb] = zdev->irq_map;
-	pr_debug("%s: imap[%u] linked to %p\n", __func__, zdev->aisb, zdev->irq_map);
+	pr_debug("%s: imap[%u] linked to %pK\n", __func__, zdev->aisb, zdev->irq_map);
 
 	/* TODO: irq number 0 wont be found if we return less than requested MSIs.
 	 * ignore it for now and fix in common code.
@@ -546,7 +546,7 @@ int arch_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 
 void arch_teardown_msi_irqs(struct pci_dev *pdev)
 {
-	pr_info("%s: on pdev: %p\n", __func__, pdev);
+	pr_info("%s: on pdev: %pK\n", __func__, pdev);
 	zpci_teardown_msi(pdev);
 }
 
@@ -668,7 +668,7 @@ void zpci_free_irq(unsigned int irq)
 int request_irq(unsigned int irq, irq_handler_t handler,
 		unsigned long irqflags, const char *devname, void *dev_id)
 {
-	pr_debug("%s: irq: %d  handler: %p  flags: %lx  dev: %s\n",
+	pr_debug("%s: irq: %d  handler: %pK  flags: %lx  dev: %s\n",
 		__func__, irq, handler, irqflags, devname);
 
 	return zpci_request_irq(irq, handler, dev_id);

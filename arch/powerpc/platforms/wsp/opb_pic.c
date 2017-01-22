@@ -313,7 +313,7 @@ void __init opb_pic_init(void)
 			continue;
 		}
 
-		printk("OPB%d init with %d IRQs at %p\n", opb->index,
+		printk("OPB%d init with %d IRQs at %pK\n", opb->index,
 				OPB_NR_IRQS, opb->regs);
 	}
 }

@@ -229,7 +229,7 @@ islpci_interrupt(int irq, void *config)
 
 #if VERBOSE > SHOW_ERROR_MESSAGES
 		DEBUG(SHOW_FUNCTION_CALLS,
-		      "IRQ: Identification register 0x%p 0x%x\n", device, reg);
+		      "IRQ: Identification register 0x%pK 0x%x\n", device, reg);
 #endif
 
 		/* check for each bit in the register separately */
@@ -861,7 +861,7 @@ islpci_setup(struct pci_dev *pdev)
 	ndev->mem_end = ndev->mem_start + ISL38XX_PCI_MEM_SIZE;
 
 #if VERBOSE > SHOW_ERROR_MESSAGES
-	DEBUG(SHOW_TRACING, "PCI Memory remapped to 0x%p\n", priv->device_base);
+	DEBUG(SHOW_TRACING, "PCI Memory remapped to 0x%pK\n", priv->device_base);
 #endif
 
 	init_waitqueue_head(&priv->reset_done);

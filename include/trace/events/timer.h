@@ -22,7 +22,7 @@ DECLARE_EVENT_CLASS(timer_class,
 		__entry->timer	= timer;
 	),
 
-	TP_printk("timer=%p", __entry->timer)
+	TP_printk("timer=%pK", __entry->timer)
 );
 
 /**
@@ -64,7 +64,7 @@ TRACE_EVENT(timer_start,
 		__entry->deferrable     = deferrable;
 	),
 
-	TP_printk("timer=%p function=%pf expires=%lu [timeout=%ld] defer=%c",
+	TP_printk("timer=%pK function=%pf expires=%lu [timeout=%ld] defer=%c",
 		  __entry->timer, __entry->function, __entry->expires,
 		  (long)__entry->expires - __entry->now, __entry->deferrable)
 );
@@ -93,7 +93,7 @@ TRACE_EVENT(timer_expire_entry,
 		__entry->function	= timer->function;
 	),
 
-	TP_printk("timer=%p function=%pf now=%lu", __entry->timer, __entry->function,__entry->now)
+	TP_printk("timer=%pK function=%pf now=%lu", __entry->timer, __entry->function,__entry->now)
 );
 
 /**
@@ -149,7 +149,7 @@ TRACE_EVENT(hrtimer_init,
 		__entry->mode		= mode;
 	),
 
-	TP_printk("hrtimer=%p clockid=%s mode=%s", __entry->hrtimer,
+	TP_printk("hrtimer=%pK clockid=%s mode=%s", __entry->hrtimer,
 		  __entry->clockid == CLOCK_REALTIME ?
 			"CLOCK_REALTIME" : "CLOCK_MONOTONIC",
 		  __entry->mode == HRTIMER_MODE_ABS ?
@@ -180,7 +180,7 @@ TRACE_EVENT(hrtimer_start,
 		__entry->softexpires	= hrtimer_get_softexpires(hrtimer).tv64;
 	),
 
-	TP_printk("hrtimer=%p function=%pf expires=%llu softexpires=%llu",
+	TP_printk("hrtimer=%pK function=%pf expires=%llu softexpires=%llu",
 		  __entry->hrtimer, __entry->function,
 		  (unsigned long long)ktime_to_ns((ktime_t) {
 				  .tv64 = __entry->expires }),
@@ -214,7 +214,7 @@ TRACE_EVENT(hrtimer_expire_entry,
 		__entry->function	= hrtimer->function;
 	),
 
-	TP_printk("hrtimer=%p function=%pf now=%llu", __entry->hrtimer, __entry->function,
+	TP_printk("hrtimer=%pK function=%pf now=%llu", __entry->hrtimer, __entry->function,
 		  (unsigned long long)ktime_to_ns((ktime_t) { .tv64 = __entry->now }))
  );
 
@@ -232,7 +232,7 @@ DECLARE_EVENT_CLASS(hrtimer_class,
 		__entry->hrtimer	= hrtimer;
 	),
 
-	TP_printk("hrtimer=%p", __entry->hrtimer)
+	TP_printk("hrtimer=%pK", __entry->hrtimer)
 );
 
 /**

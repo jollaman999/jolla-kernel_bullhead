@@ -705,7 +705,7 @@ static void reuse_unused_kprobe(struct kprobe *ap)
 	op = container_of(ap, struct optimized_kprobe, kp);
 	if (unlikely(list_empty(&op->list)))
 		printk(KERN_WARNING "Warning: found a stray unused "
-			"aggrprobe@%p\n", ap->addr);
+			"aggrprobe@%pK\n", ap->addr);
 	/* Enable the probe again */
 	ap->flags &= ~KPROBE_FLAG_DISABLED;
 	/* Optimize it again (remove from op->list) */
@@ -963,7 +963,7 @@ static void __kprobes arm_kprobe_ftrace(struct kprobe *p)
 
 	ret = ftrace_set_filter_ip(&kprobe_ftrace_ops,
 				   (unsigned long)p->addr, 0, 0);
-	WARN(ret < 0, "Failed to arm kprobe-ftrace at %p (%d)\n", p->addr, ret);
+	WARN(ret < 0, "Failed to arm kprobe-ftrace at %pK (%d)\n", p->addr, ret);
 	kprobe_ftrace_enabled++;
 	if (kprobe_ftrace_enabled == 1) {
 		ret = register_ftrace_function(&kprobe_ftrace_ops);
@@ -983,7 +983,7 @@ static void __kprobes disarm_kprobe_ftrace(struct kprobe *p)
 	}
 	ret = ftrace_set_filter_ip(&kprobe_ftrace_ops,
 			   (unsigned long)p->addr, 1, 0);
-	WARN(ret < 0, "Failed to disarm kprobe-ftrace at %p (%d)\n", p->addr, ret);
+	WARN(ret < 0, "Failed to disarm kprobe-ftrace at %pK (%d)\n", p->addr, ret);
 }
 #else	/* !CONFIG_KPROBES_ON_FTRACE */
 #define prepare_kprobe(p)	arch_prepare_kprobe(p)
@@ -2032,7 +2032,7 @@ EXPORT_SYMBOL_GPL(enable_kprobe);
 void __kprobes dump_kprobe(struct kprobe *kp)
 {
 	printk(KERN_WARNING "Dumping kprobe:\n");
-	printk(KERN_WARNING "Name: %s\nAddress: %p\nOffset: %x\n",
+	printk(KERN_WARNING "Name: %s\nAddress: %pK\nOffset: %x\n",
 	       kp->symbol_name, kp->addr, kp->offset);
 }
 
@@ -2168,11 +2168,11 @@ static void __kprobes report_probe(struct seq_file *pi, struct kprobe *p,
 		kprobe_type = "k";
 
 	if (sym)
-		seq_printf(pi, "%p  %s  %s+0x%x  %s ",
+		seq_printf(pi, "%pK  %s  %s+0x%x  %s ",
 			p->addr, kprobe_type, sym, offset,
 			(modname ? modname : " "));
 	else
-		seq_printf(pi, "%p  %s  %p ",
+		seq_printf(pi, "%pK  %s  %pK ",
 			p->addr, kprobe_type, p->addr);
 
 	if (!pp)

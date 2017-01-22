@@ -76,7 +76,7 @@ static void gru_vma_close(struct vm_area_struct *vma)
 
 	vdata = vma->vm_private_data;
 	vma->vm_private_data = NULL;
-	gru_dbg(grudev, "vma %p, file %p, vdata %p\n", vma, vma->vm_file,
+	gru_dbg(grudev, "vma %pK, file %pK, vdata %pK\n", vma, vma->vm_file,
 				vdata);
 	list_for_each_safe(entry, next, &vdata->vd_head) {
 		gts =
@@ -117,7 +117,7 @@ static int gru_file_mmap(struct file *file, struct vm_area_struct *vma)
 	if (!vma->vm_private_data)
 		return -ENOMEM;
 
-	gru_dbg(grudev, "file %p, vaddr 0x%lx, vma %p, vdata %p\n",
+	gru_dbg(grudev, "file %pK, vaddr 0x%lx, vma %pK, vdata %pK\n",
 		file, vma->vm_start, vma, vma->vm_private_data);
 	return 0;
 }
@@ -193,7 +193,7 @@ static long gru_file_unlocked_ioctl(struct file *file, unsigned int req,
 {
 	int err = -EBADRQC;
 
-	gru_dbg(grudev, "file %p, req 0x%x, 0x%lx\n", file, req, arg);
+	gru_dbg(grudev, "file %pK, req 0x%x, 0x%lx\n", file, req, arg);
 
 	switch (req) {
 	case GRU_CREATE_CONTEXT:
@@ -251,7 +251,7 @@ static void gru_init_chiplet(struct gru_state *gru, unsigned long paddr,
 	gru_tgh_flush_init(gru);
 	if (gru->gs_gid >= gru_max_gids)
 		gru_max_gids = gru->gs_gid + 1;
-	gru_dbg(grudev, "bid %d, gid %d, vaddr %p (0x%lx)\n",
+	gru_dbg(grudev, "bid %d, gid %d, vaddr %pK (0x%lx)\n",
 		blade_id, gru->gs_gid, gru->gs_gru_base_vaddr,
 		gru->gs_gru_base_paddr);
 }

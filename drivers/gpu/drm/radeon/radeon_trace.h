@@ -24,7 +24,7 @@ TRACE_EVENT(radeon_bo_create,
 			   __entry->bo = bo;
 			   __entry->pages = bo->tbo.num_pages;
 			   ),
-	    TP_printk("bo=%p, pages=%u", __entry->bo, __entry->pages)
+	    TP_printk("bo=%pK, pages=%u", __entry->bo, __entry->pages)
 );
 
 DECLARE_EVENT_CLASS(radeon_fence_request,

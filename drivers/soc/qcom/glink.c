@@ -1755,7 +1755,7 @@ void *glink_open(const struct glink_open_config *cfg)
 		return ERR_PTR(ret);
 	}
 
-	GLINK_INFO_CH(ctx, "%s: Created channel, sent OPEN command. ctx %p\n",
+	GLINK_INFO_CH(ctx, "%s: Created channel, sent OPEN command. ctx %pK\n",
 			__func__, ctx);
 
 	return ctx;
@@ -1819,7 +1819,7 @@ int glink_close(void *handle)
 	if (!ctx)
 		return -EINVAL;
 
-	GLINK_INFO_CH(ctx, "%s: Closing channel, ctx: %p\n", __func__, ctx);
+	GLINK_INFO_CH(ctx, "%s: Closing channel, ctx: %pK\n", __func__, ctx);
 	if (ctx->local_open_state == GLINK_CHANNEL_CLOSED)
 		return 0;
 
@@ -1938,7 +1938,7 @@ static int glink_tx_common(void *handle, void *pkt_priv,
 		mutex_unlock(&ctx->transport_ptr->tx_ready_mutex_lhb2);
 	}
 
-	GLINK_INFO_PERF_CH(ctx, "%s: R[%u]:%zu data[%p], size[%zu]. TID %u\n",
+	GLINK_INFO_PERF_CH(ctx, "%s: R[%u]:%zu data[%pK], size[%zu]. TID %u\n",
 			__func__, riid, intent_size,
 			data ? data : iovec, size, current->pid);
 	tx_info = kzalloc(sizeof(struct glink_core_tx_pkt),
@@ -2057,18 +2057,18 @@ int glink_rx_done(void *handle, const void *ptr, bool reuse)
 
 	if (IS_ERR_OR_NULL(liid_ptr)) {
 		/* invalid pointer */
-		GLINK_ERR_CH(ctx, "%s: Invalid pointer %p\n", __func__, ptr);
+		GLINK_ERR_CH(ctx, "%s: Invalid pointer %pK\n", __func__, ptr);
 		return -EINVAL;
 	}
 
-	GLINK_INFO_PERF_CH(ctx, "%s: L[%u]: data[%p]. TID %u\n",
+	GLINK_INFO_PERF_CH(ctx, "%s: L[%u]: data[%pK]. TID %u\n",
 			__func__, liid_ptr->id, ptr, current->pid);
 	id = liid_ptr->id;
 	if (reuse) {
 		ret = ctx->transport_ptr->ops->reuse_rx_intent(
 					ctx->transport_ptr->ops, liid_ptr);
 		if (ret) {
-			GLINK_ERR_CH(ctx, "%s: Intent reuse err %d for %p\n",
+			GLINK_ERR_CH(ctx, "%s: Intent reuse err %d for %pK\n",
 					__func__, ret, ptr);
 			ret = -ENOBUFS;
 			reuse = false;
@@ -3516,7 +3516,7 @@ void glink_core_rx_put_pkt_ctx(struct glink_transport_if *if_ptr,
 		return;
 	}
 
-	GLINK_PERF_CH(ctx, "%s: L[%u]: data[%p] size[%zu]\n",
+	GLINK_PERF_CH(ctx, "%s: L[%u]: data[%pK] size[%zu]\n",
 		__func__, intent_ptr->id,
 		intent_ptr->data ? intent_ptr->data : intent_ptr->iovec,
 		intent_ptr->write_offset);

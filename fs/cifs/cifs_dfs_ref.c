@@ -331,7 +331,7 @@ static struct vfsmount *cifs_dfs_do_automount(struct dentry *mntpt)
 		}
 		mnt = cifs_dfs_do_refmount(cifs_sb,
 				full_path, referrals + i);
-		cifs_dbg(FYI, "%s: cifs_dfs_do_refmount:%s , mnt:%p\n",
+		cifs_dbg(FYI, "%s: cifs_dfs_do_refmount:%s , mnt:%pK\n",
 			 __func__, referrals[i].node_name, mnt);
 		if (!IS_ERR(mnt))
 			goto success;

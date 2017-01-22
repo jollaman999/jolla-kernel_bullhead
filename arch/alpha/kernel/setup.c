@@ -292,7 +292,7 @@ move_initrd(unsigned long mem_limit)
 	memmove(start, (void *)initrd_start, size);
 	initrd_start = (unsigned long)start;
 	initrd_end = initrd_start + size;
-	printk("initrd moved to %p\n", start);
+	printk("initrd moved to %pK\n", start);
 	return start;
 }
 #endif
@@ -440,13 +440,13 @@ setup_memory(void *kernel_end)
 	initrd_start = INITRD_START;
 	if (initrd_start) {
 		initrd_end = initrd_start+INITRD_SIZE;
-		printk("Initial ramdisk at: 0x%p (%lu bytes)\n",
+		printk("Initial ramdisk at: 0x%pK (%lu bytes)\n",
 		       (void *) initrd_start, INITRD_SIZE);
 
 		if ((void *)initrd_end > phys_to_virt(PFN_PHYS(max_low_pfn))) {
 			if (!move_initrd(PFN_PHYS(max_low_pfn)))
 				printk("initrd extends beyond end of memory "
-				       "(0x%08lx > 0x%p)\ndisabling initrd\n",
+				       "(0x%08lx > 0x%pK)\ndisabling initrd\n",
 				       initrd_end,
 				       phys_to_virt(PFN_PHYS(max_low_pfn)));
 		} else {

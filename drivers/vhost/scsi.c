@@ -665,7 +665,7 @@ static void vhost_scsi_complete_cmd_work(struct vhost_work *work)
 		llnode = llist_next(llnode);
 		se_cmd = &tv_cmd->tvc_se_cmd;
 
-		pr_debug("%s tv_cmd %p resid %u status %#02x\n", __func__,
+		pr_debug("%s tv_cmd %pK resid %u status %#02x\n", __func__,
 			tv_cmd, se_cmd->residual_count, se_cmd->scsi_status);
 
 		memset(&v_rsp, 0, sizeof(v_rsp));
@@ -795,7 +795,7 @@ static int vhost_scsi_map_iov_to_sgl(struct tcm_vhost_cmd *tv_cmd,
 	sg = kmalloc(sizeof(tv_cmd->tvc_sgl[0]) * sgl_count, GFP_ATOMIC);
 	if (!sg)
 		return -ENOMEM;
-	pr_debug("%s sg %p sgl_count %u is_err %d\n", __func__,
+	pr_debug("%s sg %pK sgl_count %u is_err %d\n", __func__,
 	       sg, sgl_count, !sg);
 	sg_init_table(sg, sgl_count);
 
@@ -970,7 +970,7 @@ static void vhost_scsi_handle_vq(struct vhost_scsi *vs,
 				" bytes\n", vq->iov[0].iov_len);
 			break;
 		}
-		pr_debug("Calling __copy_from_user: vq->iov[0].iov_base: %p,"
+		pr_debug("Calling __copy_from_user: vq->iov[0].iov_base: %pK,"
 			" len: %zu\n", vq->iov[0].iov_base, sizeof(v_req));
 		ret = __copy_from_user(&v_req, vq->iov[0].iov_base,
 				sizeof(v_req));
@@ -1000,7 +1000,7 @@ static void vhost_scsi_handle_vq(struct vhost_scsi *vs,
 					PTR_ERR(tv_cmd));
 			goto err_cmd;
 		}
-		pr_debug("Allocated tv_cmd: %p exp_data_len: %d, data_direction"
+		pr_debug("Allocated tv_cmd: %pK exp_data_len: %d, data_direction"
 			": %d\n", tv_cmd, exp_data_len, data_direction);
 
 		tv_cmd->tvc_vhost = vs;

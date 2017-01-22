@@ -386,7 +386,7 @@ int ipa_get_wdi_stats(struct IpaHwStatsWDIInfoData_t *stats)
 	ipa_ctx->uc_wdi_ctx.wdi_uc_stats_mmio->rx_ch_stats.y
 
 	if (!stats || !ipa_ctx->uc_wdi_ctx.wdi_uc_stats_mmio) {
-		IPAERR("bad parms stats=%p wdi_stats=%p\n",
+		IPAERR("bad parms stats=%pK wdi_stats=%pK\n",
 			stats,
 			ipa_ctx->uc_wdi_ctx.wdi_uc_stats_mmio);
 		return -EINVAL;
@@ -479,7 +479,7 @@ int ipa_connect_wdi_pipe(struct ipa_wdi_in_params *in,
 	struct ipa_ep_cfg_ctrl ep_cfg_ctrl;
 
 	if (in == NULL || out == NULL || in->sys.client >= IPA_CLIENT_MAX) {
-		IPAERR("bad parm. in=%p out=%p\n", in, out);
+		IPAERR("bad parm. in=%pK out=%pK\n", in, out);
 		if (in)
 			IPAERR("client = %d\n", in->sys.client);
 		return -EINVAL;
@@ -1088,7 +1088,7 @@ int ipa_uc_reg_rdyCB(
 	int result = 0;
 
 	if (inout == NULL) {
-		IPAERR("bad parm. inout=%p ", inout);
+		IPAERR("bad parm. inout=%pK ", inout);
 		return -EINVAL;
 	}
 
@@ -1133,7 +1133,7 @@ int ipa_uc_wdi_get_dbpa(
 	struct ipa_wdi_db_params *param)
 {
 	if (param == NULL || param->client >= IPA_CLIENT_MAX) {
-		IPAERR("bad parm. param=%p ", param);
+		IPAERR("bad parm. param=%pK ", param);
 		if (param)
 			IPAERR("client = %d\n", param->client);
 		return -EINVAL;

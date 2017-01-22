@@ -919,9 +919,9 @@ static int msm_nand_validate_mtd_params(struct mtd_info *mtd, bool read,
 	int err = 0;
 
 	pr_debug("========================================================\n");
-	pr_debug("offset 0x%llx mode %d\ndatbuf 0x%p datlen 0x%x\n",
+	pr_debug("offset 0x%llx mode %d\ndatbuf 0x%pK datlen 0x%x\n",
 			offset, ops->mode, ops->datbuf, ops->len);
-	pr_debug("oobbuf 0x%p ooblen 0x%x\n", ops->oobbuf, ops->ooblen);
+	pr_debug("oobbuf 0x%pK ooblen 0x%x\n", ops->oobbuf, ops->ooblen);
 
 	if (ops->mode == MTD_OPS_PLACE_OOB) {
 		pr_err("MTD_OPS_PLACE_OOB is not supported\n");
@@ -991,7 +991,7 @@ static int msm_nand_validate_mtd_params(struct mtd_info *mtd, bool read,
 			msm_nand_dma_map(chip->dev, ops->datbuf, ops->len,
 				      (read ? DMA_FROM_DEVICE : DMA_TO_DEVICE));
 		if (dma_mapping_error(chip->dev, args->data_dma_addr)) {
-			pr_err("dma mapping failed for 0x%p\n", ops->datbuf);
+			pr_err("dma mapping failed for 0x%pK\n", ops->datbuf);
 			err = -EIO;
 			goto out;
 		}
@@ -1003,7 +1003,7 @@ static int msm_nand_validate_mtd_params(struct mtd_info *mtd, bool read,
 			msm_nand_dma_map(chip->dev, ops->oobbuf, ops->ooblen,
 				(read ? DMA_BIDIRECTIONAL : DMA_TO_DEVICE));
 		if (dma_mapping_error(chip->dev, args->oob_dma_addr)) {
-			pr_err("dma mapping failed for 0x%p\n", ops->oobbuf);
+			pr_err("dma mapping failed for 0x%pK\n", ops->oobbuf);
 			err = -EIO;
 			goto dma_map_oobbuf_failed;
 		}
@@ -2989,7 +2989,7 @@ static int msm_nand_probe(struct platform_device *pdev)
 
 	pr_info("NANDc phys addr 0x%lx, BAM phys addr 0x%lx, BAM IRQ %d\n",
 			info->nand_phys, info->bam_phys, info->bam_irq);
-	pr_info("Allocated DMA buffer at virt_addr 0x%p, phys_addr 0x%x\n",
+	pr_info("Allocated DMA buffer at virt_addr 0x%pK, phys_addr 0x%x\n",
 		info->nand_chip.dma_virt_addr, info->nand_chip.dma_phys_addr);
 	goto out;
 free_bam:

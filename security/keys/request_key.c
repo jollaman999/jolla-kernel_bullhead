@@ -227,7 +227,7 @@ static int construct_key(struct key *key, const void *callout_info,
 	struct key *authkey;
 	int ret;
 
-	kenter("%d,%p,%zu,%p", key->serial, callout_info, callout_len, aux);
+	kenter("%d,%pK,%zu,%pK", key->serial, callout_info, callout_len, aux);
 
 	cons = kmalloc(sizeof(*cons), GFP_KERNEL);
 	if (!cons)
@@ -274,7 +274,7 @@ static void construct_get_dest_keyring(struct key **_dest_keyring)
 	const struct cred *cred = current_cred();
 	struct key *dest_keyring = *_dest_keyring, *authkey;
 
-	kenter("%p", dest_keyring);
+	kenter("%pK", dest_keyring);
 
 	/* find the appropriate keyring */
 	if (dest_keyring) {
@@ -534,7 +534,7 @@ struct key *request_key_and_link(struct key_type *type,
 	key_ref_t key_ref;
 	int ret;
 
-	kenter("%s,%s,%p,%zu,%p,%p,%lx",
+	kenter("%s,%s,%pK,%zu,%pK,%pK,%lx",
 	       type->name, description, callout_info, callout_len, aux,
 	       dest_keyring, flags);
 
@@ -568,7 +568,7 @@ struct key *request_key_and_link(struct key_type *type,
 	}
 
 error:
-	kleave(" = %p", key);
+	kleave(" = %pK", key);
 	return key;
 }
 

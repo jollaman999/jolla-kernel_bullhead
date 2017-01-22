@@ -290,7 +290,7 @@ mptsas_add_fw_event(MPT_ADAPTER *ioc, struct fw_event_work *fw_event,
 	spin_lock_irqsave(&ioc->fw_event_lock, flags);
 	list_add_tail(&fw_event->list, &ioc->fw_event_list);
 	INIT_DELAYED_WORK(&fw_event->work, mptsas_firmware_event_work);
-	devtprintk(ioc, printk(MYIOC_s_DEBUG_FMT "%s: add (fw_event=0x%p)"
+	devtprintk(ioc, printk(MYIOC_s_DEBUG_FMT "%s: add (fw_event=0x%pK)"
 		"on cpuid %d\n", ioc->name, __func__,
 		fw_event, smp_processor_id()));
 	queue_delayed_work_on(smp_processor_id(), ioc->fw_event_q,
@@ -306,7 +306,7 @@ mptsas_requeue_fw_event(MPT_ADAPTER *ioc, struct fw_event_work *fw_event,
 	unsigned long flags;
 	spin_lock_irqsave(&ioc->fw_event_lock, flags);
 	devtprintk(ioc, printk(MYIOC_s_DEBUG_FMT "%s: reschedule task "
-	    "(fw_event=0x%p)on cpuid %d\n", ioc->name, __func__,
+	    "(fw_event=0x%pK)on cpuid %d\n", ioc->name, __func__,
 		fw_event, smp_processor_id()));
 	fw_event->retries++;
 	queue_delayed_work_on(smp_processor_id(), ioc->fw_event_q,
@@ -321,7 +321,7 @@ mptsas_free_fw_event(MPT_ADAPTER *ioc, struct fw_event_work *fw_event)
 	unsigned long flags;
 
 	spin_lock_irqsave(&ioc->fw_event_lock, flags);
-	devtprintk(ioc, printk(MYIOC_s_DEBUG_FMT "%s: kfree (fw_event=0x%p)\n",
+	devtprintk(ioc, printk(MYIOC_s_DEBUG_FMT "%s: kfree (fw_event=0x%pK)\n",
 	    ioc->name, __func__, fw_event));
 	list_del(&fw_event->list);
 	kfree(fw_event);
@@ -460,7 +460,7 @@ mptsas_port_delete(MPT_ADAPTER *ioc, struct mptsas_portinfo_details * port_detai
 	port_info = port_details->port_info;
 	phy_info = port_info->phy_info;
 
-	dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "%s: [%p]: num_phys=%02d "
+	dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "%s: [%pK]: num_phys=%02d "
 	    "bitmask=0x%016llX\n", ioc->name, __func__, port_details,
 	    port_details->num_phys, (unsigned long long)
 	    port_details->phy_bitmask));
@@ -489,14 +489,14 @@ mptsas_set_rphy(MPT_ADAPTER *ioc, struct mptsas_phyinfo *phy_info, struct sas_rp
 {
 	if (phy_info->port_details) {
 		phy_info->port_details->rphy = rphy;
-		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "sas_rphy_add: rphy=%p\n",
+		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "sas_rphy_add: rphy=%pK\n",
 		    ioc->name, rphy));
 	}
 
 	if (rphy) {
 		dsaswideprintk(ioc, dev_printk(KERN_DEBUG,
 		    &rphy->dev, MYIOC_s_FMT "add:", ioc->name));
-		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "rphy=%p release=%p\n",
+		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "rphy=%pK release=%pK\n",
 		    ioc->name, rphy, rphy->dev.release));
 	}
 }
@@ -519,7 +519,7 @@ mptsas_set_port(MPT_ADAPTER *ioc, struct mptsas_phyinfo *phy_info, struct sas_po
 	if (port) {
 		dsaswideprintk(ioc, dev_printk(KERN_DEBUG,
 		    &port->dev, MYIOC_s_FMT "add:", ioc->name));
-		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "port=%p release=%p\n",
+		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "port=%pK release=%pK\n",
 		    ioc->name, port, port->dev.release));
 	}
 }
@@ -851,7 +851,7 @@ mptsas_setup_wide_ports(MPT_ADAPTER *ioc, struct mptsas_portinfo *port_info)
 		 * phy be removed by firmware events.
 		 */
 		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		    "%s: [%p]: deleting phy = %d\n",
+		    "%s: [%pK]: deleting phy = %d\n",
 		    ioc->name, __func__, port_details, i));
 		port_details->num_phys--;
 		port_details->phy_bitmask &= ~ (1 << phy_info->phy_id);
@@ -859,7 +859,7 @@ mptsas_setup_wide_ports(MPT_ADAPTER *ioc, struct mptsas_portinfo *port_info)
 		if (phy_info->phy) {
 			devtprintk(ioc, dev_printk(KERN_DEBUG,
 				&phy_info->phy->dev, MYIOC_s_FMT
-				"delete phy %d, phy-obj (0x%p)\n", ioc->name,
+				"delete phy %d, phy-obj (0x%pK)\n", ioc->name,
 				phy_info->phy_id, phy_info->phy));
 			sas_port_delete_phy(port_details->port, phy_info->phy);
 		}
@@ -943,11 +943,11 @@ mptsas_setup_wide_ports(MPT_ADAPTER *ioc, struct mptsas_portinfo *port_info)
 		if (!port_details)
 			continue;
 		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-		    "%s: [%p]: phy_id=%02d num_phys=%02d "
+		    "%s: [%pK]: phy_id=%02d num_phys=%02d "
 		    "bitmask=0x%016llX\n", ioc->name, __func__,
 		    port_details, i, port_details->num_phys,
 		    (unsigned long long)port_details->phy_bitmask));
-		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "\t\tport = %p rphy=%p\n",
+		dsaswideprintk(ioc, printk(MYIOC_s_DEBUG_FMT "\t\tport = %pK rphy=%pK\n",
 		    ioc->name, port_details->port, port_details->rphy));
 	}
 	dsaswideprintk(ioc, printk("\n"));
@@ -1056,7 +1056,7 @@ mptsas_target_reset(MPT_ADAPTER *ioc, u8 channel, u8 id)
 		goto out_fail;
 	}
 
-	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "TaskMgmt request (mf=%p)\n",
+	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "TaskMgmt request (mf=%pK)\n",
 		ioc->name, mf));
 
 	/* Format the Request
@@ -1203,7 +1203,7 @@ mptsas_taskmgmt_complete(MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf, MPT_FRAME_HDR *mr)
 	SCSITaskMgmtReply_t *pScsiTmReply;
 
 	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "TaskMgmt completed: "
-	    "(mf = %p, mr = %p)\n", ioc->name, mf, mr));
+	    "(mf = %pK, mr = %pK)\n", ioc->name, mf, mr));
 
 	pScsiTmReply = (SCSITaskMgmtReply_t *)mr;
 	if (pScsiTmReply) {
@@ -1561,7 +1561,7 @@ mptsas_del_end_device(MPT_ADAPTER *ioc, struct mptsas_phyinfo *phy_info)
 		    sas_address)
 			continue;
 		dev_printk(KERN_DEBUG, &phy_info_parent->phy->dev,
-		    MYIOC_s_FMT "delete phy %d, phy-obj (0x%p)\n",
+		    MYIOC_s_FMT "delete phy %d, phy-obj (0x%pK)\n",
 		    ioc->name, phy_info_parent->phy_id,
 		    phy_info_parent->phy);
 		sas_port_delete_phy(port, phy_info_parent->phy);
@@ -1648,7 +1648,7 @@ mptsas_firmware_event_work(struct work_struct *work)
 		return;
 	}
 
-	devtprintk(ioc, printk(MYIOC_s_DEBUG_FMT "%s: fw_event=(0x%p), "
+	devtprintk(ioc, printk(MYIOC_s_DEBUG_FMT "%s: fw_event=(0x%pK), "
 	    "event = (0x%02x)\n", ioc->name, __func__, fw_event,
 	    (fw_event->event & 0xFF)));
 
@@ -1938,14 +1938,14 @@ static enum blk_eh_timer_return mptsas_eh_timed_out(struct scsi_cmnd *sc)
 
 	hd = shost_priv(sc->device->host);
 	if (hd == NULL) {
-		printk(KERN_ERR MYNAM ": %s: Can't locate host! (sc=%p)\n",
+		printk(KERN_ERR MYNAM ": %s: Can't locate host! (sc=%pK)\n",
 		    __func__, sc);
 		goto done;
 	}
 
 	ioc = hd->ioc;
 	if (ioc->bus_type != SAS) {
-		printk(KERN_ERR MYNAM ": %s: Wrong bus type (sc=%p)\n",
+		printk(KERN_ERR MYNAM ": %s: Wrong bus type (sc=%pK)\n",
 		    __func__, sc);
 		goto done;
 	}
@@ -1955,7 +1955,7 @@ static enum blk_eh_timer_return mptsas_eh_timed_out(struct scsi_cmnd *sc)
 	*/
 	if (ioc->ioc_reset_in_progress) {
 		dtmprintk(ioc, printk(MYIOC_s_WARN_FMT ": %s: ioc is in reset,"
-		    "SML need to reset the timer (sc=%p)\n",
+		    "SML need to reset the timer (sc=%pK)\n",
 		    ioc->name, __func__, sc));
 		rc = BLK_EH_RESET_TIMER;
 	}
@@ -1963,7 +1963,7 @@ static enum blk_eh_timer_return mptsas_eh_timed_out(struct scsi_cmnd *sc)
 	if (vdevice && vdevice->vtarget && (vdevice->vtarget->inDMD
 		|| vdevice->vtarget->deleted)) {
 		dtmprintk(ioc, printk(MYIOC_s_WARN_FMT ": %s: target removed "
-		    "or in device removal delay (sc=%p)\n",
+		    "or in device removal delay (sc=%pK)\n",
 		    ioc->name, __func__, sc));
 		rc = BLK_EH_RESET_TIMER;
 		goto done;
@@ -3191,7 +3191,7 @@ static int mptsas_probe_one_phy(struct device *dev,
 		sas_port_add_phy(port, phy_info->phy);
 		phy_info->sas_port_add_phy = 0;
 		devtprintk(ioc, dev_printk(KERN_DEBUG, &phy_info->phy->dev,
-		    MYIOC_s_FMT "add phy %d, phy-obj (0x%p)\n", ioc->name,
+		    MYIOC_s_FMT "add phy %d, phy-obj (0x%pK)\n", ioc->name,
 		     phy_info->phy_id, phy_info->phy));
 	}
 	if (!mptsas_get_rphy(phy_info) && port && !port->rphy) {
@@ -3570,7 +3570,7 @@ static void mptsas_expander_delete(MPT_ADAPTER *ioc,
 			port_details = phy_info->port_details;
 		}
 		dev_printk(KERN_DEBUG, &phy_info->phy->dev,
-		    MYIOC_s_FMT "delete phy %d, phy-obj (0x%p)\n", ioc->name,
+		    MYIOC_s_FMT "delete phy %d, phy-obj (0x%pK)\n", ioc->name,
 		    phy_info->phy_id, phy_info->phy);
 		sas_port_delete_phy(port, phy_info->phy);
 	}
@@ -4786,7 +4786,7 @@ mptsas_issue_tm(MPT_ADAPTER *ioc, u8 type, u8 channel, u8 id, u64 lun,
 		goto out;
 	}
 
-	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "TaskMgmt request: mr = %p, "
+	dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "TaskMgmt request: mr = %pK, "
 	    "task_type = 0x%02X,\n\t timeout = %ld, fw_channel = %d, "
 	    "fw_id = %d, lun = %lld,\n\t task_context = 0x%x\n", ioc->name, mf,
 	     type, timeout, channel, id, (unsigned long long)lun,
@@ -4816,7 +4816,7 @@ mptsas_issue_tm(MPT_ADAPTER *ioc, u8 type, u8 channel, u8 id, u64 lun,
 	if (!(ioc->taskmgmt_cmds.status & MPT_MGMT_STATUS_COMMAND_GOOD)) {
 		retval = -1; /* return failure */
 		dtmprintk(ioc, printk(MYIOC_s_ERR_FMT
-		    "TaskMgmt request: TIMED OUT!(mr=%p)\n", ioc->name, mf));
+		    "TaskMgmt request: TIMED OUT!(mr=%pK)\n", ioc->name, mf));
 		mpt_free_msg_frame(ioc, mf);
 		if (ioc->taskmgmt_cmds.status & MPT_MGMT_STATUS_DID_IOCRESET)
 			goto out;
@@ -5188,7 +5188,7 @@ mptsas_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	if (!ioc_cap) {
 		printk(MYIOC_s_WARN_FMT
-			"Skipping ioc=%p because SCSI Initiator mode "
+			"Skipping ioc=%pK because SCSI Initiator mode "
 			"is NOT enabled!\n", ioc->name, ioc);
 		return 0;
 	}
@@ -5286,7 +5286,7 @@ mptsas_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 	spin_lock_init(&ioc->scsi_lookup_lock);
 
-	dprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ScsiLookup @ %p\n",
+	dprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ScsiLookup @ %pK\n",
 		 ioc->name, ioc->ScsiLookup));
 
 	ioc->sas_data.ptClear = mpt_pt_clear;

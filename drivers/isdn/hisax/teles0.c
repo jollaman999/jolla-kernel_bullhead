@@ -335,7 +335,7 @@ int setup_teles0(struct IsdnCard *card)
 	}
 	cs->hw.teles0.membase = ioremap(cs->hw.teles0.phymem, TELES_IOMEM_SIZE);
 	printk(KERN_INFO
-	       "HiSax: %s config irq:%d mem:%p cfg:0x%X\n",
+	       "HiSax: %s config irq:%d mem:%pK cfg:0x%X\n",
 	       CardType[cs->typ], cs->irq,
 	       cs->hw.teles0.membase, cs->hw.teles0.cfg_reg);
 	if (reset_teles0(cs)) {

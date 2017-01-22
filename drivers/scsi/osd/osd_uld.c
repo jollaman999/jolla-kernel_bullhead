@@ -142,7 +142,7 @@ static int osd_uld_open(struct inode *inode, struct file *file)
 	get_device(&oud->class_dev);
 	/* cache osd_uld_device on file handle */
 	file->private_data = oud;
-	OSD_DEBUG("osd_uld_open %p\n", oud);
+	OSD_DEBUG("osd_uld_open %pK\n", oud);
 	return 0;
 }
 
@@ -150,7 +150,7 @@ static int osd_uld_release(struct inode *inode, struct file *file)
 {
 	struct osd_uld_device *oud = file->private_data;
 
-	OSD_DEBUG("osd_uld_release %p\n", file->private_data);
+	OSD_DEBUG("osd_uld_release %pK\n", file->private_data);
 	file->private_data = NULL;
 	put_device(&oud->class_dev);
 	return 0;
@@ -199,7 +199,7 @@ static long osd_uld_ioctl(struct file *file, unsigned int cmd,
 	if (do_test)
 		ret = do_test(&oud->od, cmd, arg);
 	else {
-		OSD_ERR("Unknown ioctl %d: osd_uld_device=%p\n", cmd, oud);
+		OSD_ERR("Unknown ioctl %d: osd_uld_device=%pK\n", cmd, oud);
 		ret = -ENOIOCTLCMD;
 	}
 	return ret;
@@ -375,7 +375,7 @@ static int __detect_osd(struct osd_uld_device *oud)
 	/* sending a test_unit_ready as first command seems to be needed
 	 * by some targets
 	 */
-	OSD_DEBUG("start scsi_test_unit_ready %p %p %p\n",
+	OSD_DEBUG("start scsi_test_unit_ready %pK %pK %pK\n",
 			oud, scsi_device, scsi_device->request_queue);
 	error = scsi_test_unit_ready(scsi_device, 10*HZ, 5, NULL);
 	if (error)
@@ -521,7 +521,7 @@ static int osd_remove(struct device *dev)
 	struct osd_uld_device *oud = dev_get_drvdata(dev);
 
 	if (!oud || (oud->od.scsi_device != scsi_device)) {
-		OSD_ERR("Half cooked osd-device %p,%p || %p!=%p",
+		OSD_ERR("Half cooked osd-device %pK,%pK || %pK!=%pK",
 			dev, oud, oud ? oud->od.scsi_device : NULL,
 			scsi_device);
 	}

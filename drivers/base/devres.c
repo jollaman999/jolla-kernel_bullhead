@@ -50,7 +50,7 @@ static void devres_log(struct device *dev, struct devres_node *node,
 		       const char *op)
 {
 	if (unlikely(log_devres))
-		dev_err(dev, "DEVRES %3s %p %s (%lu bytes)\n",
+		dev_err(dev, "DEVRES %3s %pK %s (%lu bytes)\n",
 			op, node, node->name, (unsigned long)node->size);
 }
 #else /* CONFIG_DEBUG_DEVRES */

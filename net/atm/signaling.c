@@ -131,7 +131,7 @@ static int sigd_send(struct atm_vcc *vcc, struct sk_buff *skb)
 		}
 		sk->sk_ack_backlog++;
 		skb_queue_tail(&sk->sk_receive_queue, skb);
-		pr_debug("waking sk_sleep(sk) 0x%p\n", sk_sleep(sk));
+		pr_debug("waking sk_sleep(sk) 0x%pK\n", sk_sleep(sk));
 		sk->sk_state_change(sk);
 as_indicate_complete:
 		release_sock(sk);
@@ -168,7 +168,7 @@ void sigd_enq2(struct atm_vcc *vcc, enum atmsvc_msg_type type,
 	struct atmsvc_msg *msg;
 	static unsigned int session = 0;
 
-	pr_debug("%d (0x%p)\n", (int)type, vcc);
+	pr_debug("%d (0x%pK)\n", (int)type, vcc);
 	while (!(skb = alloc_skb(sizeof(struct atmsvc_msg), GFP_KERNEL)))
 		schedule();
 	msg = (struct atmsvc_msg *)skb_put(skb, sizeof(struct atmsvc_msg));

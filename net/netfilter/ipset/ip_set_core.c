@@ -242,14 +242,14 @@ ip_set_alloc(size_t size)
 		members = kzalloc(size, GFP_KERNEL | __GFP_NOWARN);
 
 	if (members) {
-		pr_debug("%p: allocated with kmalloc\n", members);
+		pr_debug("%pK: allocated with kmalloc\n", members);
 		return members;
 	}
 
 	members = vzalloc(size);
 	if (!members)
 		return NULL;
-	pr_debug("%p: allocated with vmalloc\n", members);
+	pr_debug("%pK: allocated with vmalloc\n", members);
 
 	return members;
 }
@@ -258,7 +258,7 @@ EXPORT_SYMBOL_GPL(ip_set_alloc);
 void
 ip_set_free(void *members)
 {
-	pr_debug("%p: free with %s\n", members,
+	pr_debug("%pK: free with %s\n", members,
 		 is_vmalloc_addr(members) ? "vfree" : "kfree");
 	if (is_vmalloc_addr(members))
 		vfree(members);

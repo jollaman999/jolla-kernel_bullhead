@@ -818,7 +818,7 @@ static int _rmnet_vnd_update_flow_map(uint8_t action,
 				itm->tc_flow_valid[i] = 1;
 				itm->tc_flow_id[i] = tc_flow;
 				rc = RMNET_VND_UPDATE_FLOW_OK;
-				LOGD("{%p}->tc_flow_id[%d]=%08X",
+				LOGD("{%pK}->tc_flow_id[%d]=%08X",
 				     itm, i, tc_flow);
 				break;
 			}
@@ -834,7 +834,7 @@ static int _rmnet_vnd_update_flow_map(uint8_t action,
 					itm->tc_flow_valid[i] = 0;
 					itm->tc_flow_id[i] = 0;
 					j++;
-					LOGD("{%p}->tc_flow_id[%d]=0", itm, i);
+					LOGD("{%pK}->tc_flow_id[%d]=0", itm, i);
 				}
 			} else {
 				j++;
@@ -923,7 +923,7 @@ int rmnet_vnd_add_tc_flow(uint32_t id, uint32_t map_flow, uint32_t tc_flow)
 	list_add(&(itm->list), &(dev_conf->flow_head));
 	write_unlock_irqrestore(&dev_conf->flow_map_lock, flags);
 
-	LOGD("Created flow mapping [%s][0x%08X][0x%08X]@%p",
+	LOGD("Created flow mapping [%s][0x%08X][0x%08X]@%pK",
 	     dev->name, itm->map_flow_id, itm->tc_flow_id[0], itm);
 
 	return RMNET_CONFIG_OK;
@@ -979,7 +979,7 @@ int rmnet_vnd_del_tc_flow(uint32_t id, uint32_t map_flow, uint32_t tc_flow)
 
 	if (r ==  RMNET_VND_UPDATE_FLOW_NO_VALID_LEFT) {
 		if (itm)
-			LOGD("Removed flow mapping [%s][0x%08X]@%p",
+			LOGD("Removed flow mapping [%s][0x%08X]@%pK",
 			     dev->name, itm->map_flow_id, itm);
 		kfree(itm);
 	}

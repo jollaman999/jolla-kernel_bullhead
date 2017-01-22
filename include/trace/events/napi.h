@@ -26,7 +26,7 @@ TRACE_EVENT(napi_poll,
 		__assign_str(dev_name, napi->dev ? napi->dev->name : NO_DEV);
 	),
 
-	TP_printk("napi poll on napi struct %p for device %s",
+	TP_printk("napi poll on napi struct %pK for device %s",
 		__entry->napi, __get_str(dev_name))
 );
 

@@ -61,7 +61,7 @@
 static int fib_map_alloc(struct aac_dev *dev)
 {
 	dprintk((KERN_INFO
-	  "allocate hardware fibs pci_alloc_consistent(%p, %d * (%d + %d), %p)\n",
+	  "allocate hardware fibs pci_alloc_consistent(%pK, %d * (%d + %d), %pK)\n",
 	  dev->pdev, dev->max_fib_size, dev->scsi_host_ptr->can_queue,
 	  AAC_NUM_MGT_FIB, &dev->hw_fib_pa));
 	dev->hw_fib_va = pci_alloc_consistent(dev->pdev,
@@ -224,7 +224,7 @@ void aac_fib_free(struct fib *fibptr)
 	if (unlikely(fibptr->flags & FIB_CONTEXT_FLAG_TIMED_OUT))
 		aac_config.fib_timeouts++;
 	if (fibptr->hw_fib_va->header.XferState != 0) {
-		printk(KERN_WARNING "aac_fib_free, XferState != 0, fibptr = 0x%p, XferState = 0x%x\n",
+		printk(KERN_WARNING "aac_fib_free, XferState != 0, fibptr = 0x%pK, XferState = 0x%x\n",
 			 (void*)fibptr,
 			 le32_to_cpu(fibptr->hw_fib_va->header.XferState));
 	}
@@ -494,9 +494,9 @@ int aac_fib_send(u16 command, struct fib *fibptr, unsigned long size,
 	dprintk((KERN_DEBUG "  Command =               %d.\n", le32_to_cpu(hw_fib->header.Command)));
 	dprintk((KERN_DEBUG "  SubCommand =            %d.\n", le32_to_cpu(((struct aac_query_mount *)fib_data(fibptr))->command)));
 	dprintk((KERN_DEBUG "  XferState  =            %x.\n", le32_to_cpu(hw_fib->header.XferState)));
-	dprintk((KERN_DEBUG "  hw_fib va being sent=%p\n",fibptr->hw_fib_va));
+	dprintk((KERN_DEBUG "  hw_fib va being sent=%pK\n",fibptr->hw_fib_va));
 	dprintk((KERN_DEBUG "  hw_fib pa being sent=%lx\n",(ulong)fibptr->hw_fib_pa));
-	dprintk((KERN_DEBUG "  fib being sent=%p\n",fibptr));
+	dprintk((KERN_DEBUG "  fib being sent=%pK\n",fibptr));
 
 	if (!dev->queues)
 		return -EBUSY;

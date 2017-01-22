@@ -385,7 +385,7 @@ int ath_descdma_setup(struct ath_softc *sc, struct ath_descdma *dd,
 		return -ENOMEM;
 
 	ds = (u8 *) dd->dd_desc;
-	ath_dbg(common, CONFIG, "%s DMA map: %p (%u) -> %llx (%u)\n",
+	ath_dbg(common, CONFIG, "%s DMA map: %pK (%u) -> %llx (%u)\n",
 		name, ds, (u32) dd->dd_desc_len,
 		ito64(dd->dd_desc_paddr), /*XXX*/(u32) dd->dd_desc_len);
 

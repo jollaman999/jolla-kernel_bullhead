@@ -1631,8 +1631,8 @@ int mvs_abort_task(struct sas_task *task)
 		if (SAS_SATA_DEV == dev->dev_type) {
 			struct mvs_slot_info *slot = task->lldd_task;
 			u32 slot_idx = (u32)(slot - mvi->slot_info);
-			mv_dprintk("mvs_abort_task() mvi=%p task=%p "
-				   "slot=%p slot_idx=x%x\n",
+			mv_dprintk("mvs_abort_task() mvi=%pK task=%pK "
+				   "slot=%pK slot_idx=x%x\n",
 				   mvi, task, slot, slot_idx);
 			task->task_state_flags |= SAS_TASK_STATE_ABORTED;
 			mvs_slot_task_free(mvi, task, slot, slot_idx);
@@ -1952,7 +1952,7 @@ void mvs_do_release_task(struct mvs_info *mvi,
 		if (dev && task->dev != dev)
 			continue;
 
-		mv_printk("Release slot [%x] tag[%x], task [%p]:\n",
+		mv_printk("Release slot [%x] tag[%x], task [%pK]:\n",
 			slot_idx, slot->slot_tag, task);
 		MVS_CHIP_DISP->command_active(mvi, slot_idx);
 

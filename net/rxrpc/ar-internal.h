@@ -730,7 +730,7 @@ do {						\
  */
 static inline void __rxrpc_new_skb(struct sk_buff *skb, const char *fn)
 {
-	//_net("new skb %p %s [%d]", skb, fn, atomic_read(&rxrpc_n_skbs));
+	//_net("new skb %pK %s [%d]", skb, fn, atomic_read(&rxrpc_n_skbs));
 	//atomic_inc(&rxrpc_n_skbs);
 }
 
@@ -738,7 +738,7 @@ static inline void __rxrpc_new_skb(struct sk_buff *skb, const char *fn)
 
 static inline void __rxrpc_kill_skb(struct sk_buff *skb, const char *fn)
 {
-	//_net("kill skb %p %s [%d]", skb, fn, atomic_read(&rxrpc_n_skbs));
+	//_net("kill skb %pK %s [%d]", skb, fn, atomic_read(&rxrpc_n_skbs));
 	//atomic_dec(&rxrpc_n_skbs);
 }
 
@@ -748,7 +748,7 @@ static inline void __rxrpc_free_skb(struct sk_buff *skb, const char *fn)
 {
 	if (skb) {
 		CHECK_SLAB_OKAY(&skb->users);
-		//_net("free skb %p %s [%d]",
+		//_net("free skb %pK %s [%d]",
 		//     skb, fn, atomic_read(&rxrpc_n_skbs));
 		//atomic_dec(&rxrpc_n_skbs);
 		kfree_skb(skb);

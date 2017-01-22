@@ -108,7 +108,7 @@ struct sk_buff *wimax_gnl_re_state_change_alloc(
 	void *data;
 	struct sk_buff *report_skb;
 
-	d_fnstart(3, dev, "(wimax_dev %p new_state %u old_state %u)\n",
+	d_fnstart(3, dev, "(wimax_dev %pK new_state %u old_state %u)\n",
 		  wimax_dev, new_state, old_state);
 	result = -ENOMEM;
 	report_skb = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
@@ -140,14 +140,14 @@ struct sk_buff *wimax_gnl_re_state_change_alloc(
 		dev_err(dev, "RE_STCH: Error adding IFINDEX attribute\n");
 		goto error_put;
 	}
-	d_fnend(3, dev, "(wimax_dev %p new_state %u old_state %u) = %p\n",
+	d_fnend(3, dev, "(wimax_dev %pK new_state %u old_state %u) = %pK\n",
 		wimax_dev, new_state, old_state, report_skb);
 	return report_skb;
 
 error_put:
 	nlmsg_free(report_skb);
 error_new:
-	d_fnend(3, dev, "(wimax_dev %p new_state %u old_state %u) = %d\n",
+	d_fnend(3, dev, "(wimax_dev %pK new_state %u old_state %u) = %d\n",
 		wimax_dev, new_state, old_state, result);
 	return ERR_PTR(result);
 }
@@ -170,7 +170,7 @@ int wimax_gnl_re_state_change_send(
 {
 	int result = 0;
 	struct device *dev = wimax_dev_to_dev(wimax_dev);
-	d_fnstart(3, dev, "(wimax_dev %p report_skb %p)\n",
+	d_fnstart(3, dev, "(wimax_dev %pK report_skb %pK)\n",
 		  wimax_dev, report_skb);
 	if (report_skb == NULL) {
 		result = -ENOMEM;
@@ -179,7 +179,7 @@ int wimax_gnl_re_state_change_send(
 	genlmsg_end(report_skb, header);
 	genlmsg_multicast(report_skb, 0, wimax_gnl_mcg.id, GFP_KERNEL);
 out:
-	d_fnend(3, dev, "(wimax_dev %p report_skb %p) = %d\n",
+	d_fnend(3, dev, "(wimax_dev %pK report_skb %pK) = %d\n",
 		wimax_dev, report_skb, result);
 	return result;
 }
@@ -207,7 +207,7 @@ void __wimax_state_change(struct wimax_dev *wimax_dev, enum wimax_st new_state)
 	struct sk_buff *stch_skb;
 	void *header;
 
-	d_fnstart(3, dev, "(wimax_dev %p new_state %u [old %u])\n",
+	d_fnstart(3, dev, "(wimax_dev %pK new_state %u [old %u])\n",
 		  wimax_dev, new_state, old_state);
 
 	if (WARN_ON(new_state >= __WIMAX_ST_INVALID)) {
@@ -280,7 +280,7 @@ void __wimax_state_change(struct wimax_dev *wimax_dev, enum wimax_st new_state)
 		break;
 	case __WIMAX_ST_INVALID:
 	default:
-		dev_err(dev, "SW BUG: wimax_dev %p is in unknown state %u\n",
+		dev_err(dev, "SW BUG: wimax_dev %pK is in unknown state %u\n",
 			wimax_dev, wimax_dev->state);
 		WARN_ON(1);
 		goto out;
@@ -289,7 +289,7 @@ void __wimax_state_change(struct wimax_dev *wimax_dev, enum wimax_st new_state)
 	/* Execute the actions of entry to the new state */
 	switch (new_state) {
 	case __WIMAX_ST_NULL:
-		dev_err(dev, "SW BUG: wimax_dev %p entering NULL state "
+		dev_err(dev, "SW BUG: wimax_dev %pK entering NULL state "
 			"from %u\n", wimax_dev, wimax_dev->state);
 		WARN_ON(1);		/* Nobody can enter this state */
 		break;
@@ -319,7 +319,7 @@ void __wimax_state_change(struct wimax_dev *wimax_dev, enum wimax_st new_state)
 	if (!IS_ERR(stch_skb))
 		wimax_gnl_re_state_change_send(wimax_dev, stch_skb, header);
 out:
-	d_fnend(3, dev, "(wimax_dev %p new_state %u [old %u]) = void\n",
+	d_fnend(3, dev, "(wimax_dev %pK new_state %u [old %u]) = void\n",
 		wimax_dev, new_state, old_state);
 }
 
@@ -460,7 +460,7 @@ int wimax_dev_add(struct wimax_dev *wimax_dev, struct net_device *net_dev)
 	struct device *dev = net_dev->dev.parent;
 	char addr_str[32];
 
-	d_fnstart(3, dev, "(wimax_dev %p net_dev %p)\n", wimax_dev, net_dev);
+	d_fnstart(3, dev, "(wimax_dev %pK net_dev %pK)\n", wimax_dev, net_dev);
 
 	/* Do the RFKILL setup before locking, as RFKILL will call
 	 * into our functions. */
@@ -486,7 +486,7 @@ int wimax_dev_add(struct wimax_dev *wimax_dev, struct net_device *net_dev)
 			    net_dev->dev_addr, net_dev->addr_len);
 	dev_err(dev, "WiMAX interface %s (%s) ready\n",
 		net_dev->name, addr_str);
-	d_fnend(3, dev, "(wimax_dev %p net_dev %p) = 0\n", wimax_dev, net_dev);
+	d_fnend(3, dev, "(wimax_dev %pK net_dev %pK) = 0\n", wimax_dev, net_dev);
 	return 0;
 
 error_debugfs_add:
@@ -494,7 +494,7 @@ error_debugfs_add:
 	mutex_unlock(&wimax_dev->mutex);
 	wimax_rfkill_rm(wimax_dev);
 error_rfkill_add:
-	d_fnend(3, dev, "(wimax_dev %p net_dev %p) = %d\n",
+	d_fnend(3, dev, "(wimax_dev %pK net_dev %pK) = %d\n",
 		wimax_dev, net_dev, result);
 	return result;
 }
@@ -522,7 +522,7 @@ EXPORT_SYMBOL_GPL(wimax_dev_add);
  */
 void wimax_dev_rm(struct wimax_dev *wimax_dev)
 {
-	d_fnstart(3, NULL, "(wimax_dev %p)\n", wimax_dev);
+	d_fnstart(3, NULL, "(wimax_dev %pK)\n", wimax_dev);
 
 	mutex_lock(&wimax_dev->mutex);
 	__wimax_state_change(wimax_dev, __WIMAX_ST_QUIESCING);
@@ -531,7 +531,7 @@ void wimax_dev_rm(struct wimax_dev *wimax_dev)
 	__wimax_state_change(wimax_dev, WIMAX_ST_DOWN);
 	mutex_unlock(&wimax_dev->mutex);
 	wimax_rfkill_rm(wimax_dev);
-	d_fnend(3, NULL, "(wimax_dev %p) = void\n", wimax_dev);
+	d_fnend(3, NULL, "(wimax_dev %pK) = void\n", wimax_dev);
 }
 EXPORT_SYMBOL_GPL(wimax_dev_rm);
 

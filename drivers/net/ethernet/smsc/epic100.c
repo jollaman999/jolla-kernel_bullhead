@@ -738,7 +738,7 @@ static int epic_open(struct net_device *dev)
 	     TxUnderrun);
 
 	if (debug > 1) {
-		printk(KERN_DEBUG "%s: epic_open() ioaddr %p IRQ %d "
+		printk(KERN_DEBUG "%s: epic_open() ioaddr %pK IRQ %d "
 		       "status %4.4x %s-duplex.\n",
 		       dev->name, ioaddr, irq, er32(GENCTL),
 		       ep->mii.full_duplex ? "full" : "half");

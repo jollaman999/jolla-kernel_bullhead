@@ -911,7 +911,7 @@ int nes_init_mgt_qp(struct nes_device *nesdev, struct net_device *netdev, struct
 		mgtvnic->nesvnic = nesvnic;
 		mgtvnic->mgt.qp_id = nesdev->mac_index + NES_MGT_QP_OFFSET + i;
 		memset(mgt_vbase, 0, mgt_mem_size);
-		nes_debug(NES_DBG_INIT, "Allocated mgt QP structures at %p (phys = %016lX), size = %u.\n",
+		nes_debug(NES_DBG_INIT, "Allocated mgt QP structures at %pK (phys = %016lX), size = %u.\n",
 			  mgt_vbase, (unsigned long)mgt_pbase, mgt_mem_size);
 
 		vmem = (void *)(((unsigned long)mgt_vbase + (256 - 1)) &

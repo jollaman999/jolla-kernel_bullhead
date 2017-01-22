@@ -308,7 +308,7 @@ static int cc770_probe_chip(struct net_device *dev)
 	 * is no chip in this address space
 	 */
 	if (cc770_read_reg(priv, cpu_interface) & CPUIF_RST) {
-		netdev_info(dev, "probing @0x%p failed (reset)\n",
+		netdev_info(dev, "probing @0x%pK failed (reset)\n",
 			    priv->reg_base);
 		return -ENODEV;
 	}
@@ -320,7 +320,7 @@ static int cc770_probe_chip(struct net_device *dev)
 	if ((cc770_read_reg(priv, msgobj[1].data[1]) != 0x25) ||
 	    (cc770_read_reg(priv, msgobj[2].data[3]) != 0x52) ||
 	    (cc770_read_reg(priv, msgobj[10].data[6]) != 0xc3)) {
-		netdev_info(dev, "probing @0x%p failed (pattern)\n",
+		netdev_info(dev, "probing @0x%pK failed (pattern)\n",
 			    priv->reg_base);
 		return -ENODEV;
 	}

@@ -107,7 +107,7 @@ alloc_transaction:
 		}
 	}
 
-	jbd_debug(3, "New handle %p going live.\n", handle);
+	jbd_debug(3, "New handle %pK going live.\n", handle);
 
 repeat:
 
@@ -174,7 +174,7 @@ repeat_locked:
 		 */
 		DEFINE_WAIT(wait);
 
-		jbd_debug(2, "Handle %p starting new commit...\n", handle);
+		jbd_debug(2, "Handle %pK starting new commit...\n", handle);
 		spin_unlock(&transaction->t_handle_lock);
 		prepare_to_wait(&journal->j_wait_transaction_locked, &wait,
 				TASK_UNINTERRUPTIBLE);
@@ -211,7 +211,7 @@ repeat_locked:
 	 * journal_extend().
 	 */
 	if (__log_space_left(journal) < jbd_space_needed(journal)) {
-		jbd_debug(2, "Handle %p waiting for checkpoint...\n", handle);
+		jbd_debug(2, "Handle %pK waiting for checkpoint...\n", handle);
 		spin_unlock(&transaction->t_handle_lock);
 		__log_wait_for_space(journal);
 		goto repeat_locked;
@@ -224,7 +224,7 @@ repeat_locked:
 	transaction->t_outstanding_credits += nblocks;
 	transaction->t_updates++;
 	transaction->t_handle_count++;
-	jbd_debug(4, "Handle %p given %d credits (total %d, free %d)\n",
+	jbd_debug(4, "Handle %pK given %d credits (total %d, free %d)\n",
 		  handle, nblocks, transaction->t_outstanding_credits,
 		  __log_space_left(journal));
 	spin_unlock(&transaction->t_handle_lock);
@@ -334,7 +334,7 @@ int journal_extend(handle_t *handle, int nblocks)
 
 	/* Don't extend a locked-down transaction! */
 	if (handle->h_transaction->t_state != T_RUNNING) {
-		jbd_debug(3, "denied handle %p %d blocks: "
+		jbd_debug(3, "denied handle %pK %d blocks: "
 			  "transaction not running\n", handle, nblocks);
 		goto error_out;
 	}
@@ -343,13 +343,13 @@ int journal_extend(handle_t *handle, int nblocks)
 	wanted = transaction->t_outstanding_credits + nblocks;
 
 	if (wanted > journal->j_max_transaction_buffers) {
-		jbd_debug(3, "denied handle %p %d blocks: "
+		jbd_debug(3, "denied handle %pK %d blocks: "
 			  "transaction too large\n", handle, nblocks);
 		goto unlock;
 	}
 
 	if (wanted > __log_space_left(journal)) {
-		jbd_debug(3, "denied handle %p %d blocks: "
+		jbd_debug(3, "denied handle %pK %d blocks: "
 			  "insufficient log space\n", handle, nblocks);
 		goto unlock;
 	}
@@ -358,7 +358,7 @@ int journal_extend(handle_t *handle, int nblocks)
 	transaction->t_outstanding_credits += nblocks;
 	result = 0;
 
-	jbd_debug(3, "extended handle %p by %d\n", handle, nblocks);
+	jbd_debug(3, "extended handle %pK by %d\n", handle, nblocks);
 unlock:
 	spin_unlock(&transaction->t_handle_lock);
 error_out:
@@ -410,7 +410,7 @@ int journal_restart(handle_t *handle, int nblocks)
 		wake_up(&journal->j_wait_updates);
 	spin_unlock(&transaction->t_handle_lock);
 
-	jbd_debug(2, "restarting handle %p\n", handle);
+	jbd_debug(2, "restarting handle %pK\n", handle);
 	__log_start_commit(journal, transaction->t_tid);
 	spin_unlock(&journal->j_state_lock);
 
@@ -532,7 +532,7 @@ do_get_write_access(handle_t *handle, struct journal_head *jh,
 	transaction = handle->h_transaction;
 	journal = transaction->t_journal;
 
-	jbd_debug(5, "journal_head %p, force_copy %d\n", jh, force_copy);
+	jbd_debug(5, "journal_head %pK, force_copy %d\n", jh, force_copy);
 
 	JBUFFER_TRACE(jh, "entry");
 repeat:
@@ -788,7 +788,7 @@ int journal_get_create_access(handle_t *handle, struct buffer_head *bh)
 	struct journal_head *jh = journal_add_journal_head(bh);
 	int err;
 
-	jbd_debug(5, "journal_head %p\n", jh);
+	jbd_debug(5, "journal_head %pK\n", jh);
 	err = -EROFS;
 	if (is_handle_aborted(handle))
 		goto out;
@@ -961,7 +961,7 @@ int journal_dirty_data(handle_t *handle, struct buffer_head *bh)
 	 * The buffer could *already* be dirty.  Writeout can start
 	 * at any time.
 	 */
-	jbd_debug(4, "jh: %p, tid:%d\n", jh, handle->h_transaction->t_tid);
+	jbd_debug(4, "jh: %pK, tid:%d\n", jh, handle->h_transaction->t_tid);
 
 	/*
 	 * What if the buffer is already part of a running transaction?
@@ -1140,7 +1140,7 @@ int journal_dirty_metadata(handle_t *handle, struct buffer_head *bh)
 	journal_t *journal = transaction->t_journal;
 	struct journal_head *jh = bh2jh(bh);
 
-	jbd_debug(5, "journal_head %p\n", jh);
+	jbd_debug(5, "journal_head %pK\n", jh);
 	JBUFFER_TRACE(jh, "entry");
 	if (is_handle_aborted(handle))
 		goto out;
@@ -1381,7 +1381,7 @@ int journal_stop(handle_t *handle)
 		return err;
 	}
 
-	jbd_debug(4, "Handle %p going down\n", handle);
+	jbd_debug(4, "Handle %pK going down\n", handle);
 
 	/*
 	 * Implement synchronous transaction batching.  If the handle
@@ -1460,7 +1460,7 @@ int journal_stop(handle_t *handle)
 
 		spin_unlock(&transaction->t_handle_lock);
 		jbd_debug(2, "transaction too old, requesting commit for "
-					"handle %p\n", handle);
+					"handle %pK\n", handle);
 		/* This is non-blocking */
 		__log_start_commit(journal, transaction->t_tid);
 		spin_unlock(&journal->j_state_lock);

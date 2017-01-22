@@ -136,7 +136,7 @@ int omap_irq_enable_vblank(struct drm_device *dev, int crtc_id)
 	struct drm_crtc *crtc = priv->crtcs[crtc_id];
 	unsigned long flags;
 
-	DBG("dev=%p, crtc=%d", dev, crtc_id);
+	DBG("dev=%pK, crtc=%d", dev, crtc_id);
 
 	dispc_runtime_get();
 	spin_lock_irqsave(&list_lock, flags);
@@ -163,7 +163,7 @@ void omap_irq_disable_vblank(struct drm_device *dev, int crtc_id)
 	struct drm_crtc *crtc = priv->crtcs[crtc_id];
 	unsigned long flags;
 
-	DBG("dev=%p, crtc=%d", dev, crtc_id);
+	DBG("dev=%pK, crtc=%d", dev, crtc_id);
 
 	dispc_runtime_get();
 	spin_lock_irqsave(&list_lock, flags);
@@ -210,7 +210,7 @@ irqreturn_t omap_irq_handler(DRM_IRQ_ARGS)
 
 void omap_irq_preinstall(struct drm_device *dev)
 {
-	DBG("dev=%p", dev);
+	DBG("dev=%pK", dev);
 	dispc_runtime_get();
 	dispc_clear_irqstatus(0xffffffff);
 	dispc_runtime_put();
@@ -221,7 +221,7 @@ int omap_irq_postinstall(struct drm_device *dev)
 	struct omap_drm_private *priv = dev->dev_private;
 	struct omap_drm_irq *error_handler = &priv->error_handler;
 
-	DBG("dev=%p", dev);
+	DBG("dev=%pK", dev);
 
 	INIT_LIST_HEAD(&priv->irq_list);
 
@@ -240,7 +240,7 @@ int omap_irq_postinstall(struct drm_device *dev)
 
 void omap_irq_uninstall(struct drm_device *dev)
 {
-	DBG("dev=%p", dev);
+	DBG("dev=%pK", dev);
 	// TODO prolly need to call drm_irq_uninstall() somewhere too
 }
 

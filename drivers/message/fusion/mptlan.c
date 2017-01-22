@@ -173,7 +173,7 @@ lan_reply (MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf, MPT_FRAME_HDR *reply)
 	dioprintk((KERN_INFO MYNAM ": %s/%s: Got reply.\n",
 		  IOC_AND_NETDEV_NAMES_s_s(dev)));
 
-//	dioprintk((KERN_INFO MYNAM "@lan_reply: mf = %p, reply = %p\n",
+//	dioprintk((KERN_INFO MYNAM "@lan_reply: mf = %pK, reply = %pK\n",
 //			mf, reply));
 
 	if (mf == NULL) {
@@ -589,7 +589,7 @@ mpt_lan_send_turbo(struct net_device *dev, u32 tmsg)
 	dev->stats.tx_packets++;
 	dev->stats.tx_bytes += sent->len;
 
-	dioprintk((KERN_INFO MYNAM ": %s/%s: @%s, skb %p sent.\n",
+	dioprintk((KERN_INFO MYNAM ": %s/%s: @%s, skb %pK sent.\n",
 			IOC_AND_NETDEV_NAMES_s_s(dev),
 			__func__, sent));
 
@@ -655,7 +655,7 @@ mpt_lan_send_reply(struct net_device *dev, LANSendReply_t *pSendRep)
 		sent = priv->SendCtl[ctx].skb;
 		dev->stats.tx_bytes += sent->len;
 
-		dioprintk((KERN_INFO MYNAM ": %s/%s: @%s, skb %p sent.\n",
+		dioprintk((KERN_INFO MYNAM ": %s/%s: @%s, skb %pK sent.\n",
 				IOC_AND_NETDEV_NAMES_s_s(dev),
 				__func__, sent));
 
@@ -695,7 +695,7 @@ mpt_lan_sdu_send (struct sk_buff *skb, struct net_device *dev)
 	int ctx;
 	u16 cur_naa = 0x1000;
 
-	dioprintk((KERN_INFO MYNAM ": %s called, skb_addr = %p\n",
+	dioprintk((KERN_INFO MYNAM ": %s called, skb_addr = %pK\n",
 			__func__, skb));
 
 	spin_lock_irqsave(&priv->txfidx_lock, flags);
@@ -756,7 +756,7 @@ mpt_lan_sdu_send (struct sk_buff *skb, struct net_device *dev)
 	pTrans->Flags         = 0;
 	pTrans->TransactionContext[0] = cpu_to_le32(ctx);
 
-//	dioprintk((KERN_INFO MYNAM ": %s/%s: BC = %08x, skb = %p, buff = %p\n",
+//	dioprintk((KERN_INFO MYNAM ": %s/%s: BC = %08x, skb = %pK, buff = %pK\n",
 //			IOC_AND_NETDEV_NAMES_s_s(dev),
 //			ctx, skb, skb->data));
 
@@ -934,7 +934,7 @@ mpt_lan_receive_post_free(struct net_device *dev,
 
 //		dlprintk((KERN_INFO MYNAM ": %s: dev_name = %s\n",
 //				IOC_AND_NETDEV_NAMES_s_s(dev)));
-//		dlprintk((KERN_INFO MYNAM "@rpr[2], priv = %p, buckets_out addr = %p",
+//		dlprintk((KERN_INFO MYNAM "@rpr[2], priv = %pK, buckets_out addr = %pK",
 //				priv, &(priv->buckets_out)));
 //		dlprintk((KERN_INFO MYNAM "@rpr[2] TC + 3\n"));
 

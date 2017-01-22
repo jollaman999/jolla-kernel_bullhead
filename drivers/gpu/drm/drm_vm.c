@@ -151,7 +151,7 @@ static int drm_do_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		vmf->page = page;
 
 		DRM_DEBUG
-		    ("baddr = 0x%llx page = 0x%p, offset = 0x%llx, count=%d\n",
+		    ("baddr = 0x%llx page = 0x%pK, offset = 0x%llx, count=%d\n",
 		     (unsigned long long)baddr,
 		     agpmem->memory->pages[offset],
 		     (unsigned long long)offset,

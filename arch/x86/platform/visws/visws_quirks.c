@@ -195,7 +195,7 @@ static void __init visws_find_smp_config(void)
 	unsigned short ncpus = readw(phys_to_virt(CO_CPU_NUM_PHYS));
 
 	if (ncpus > CO_CPU_MAX) {
-		printk(KERN_WARNING "find_visws_smp: got cpu count of %d at %p\n",
+		printk(KERN_WARNING "find_visws_smp: got cpu count of %d at %pK\n",
 			ncpus, mp);
 
 		ncpus = CO_CPU_MAX;

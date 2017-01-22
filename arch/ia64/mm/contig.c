@@ -348,7 +348,7 @@ paging_init (void)
 			find_min_pfn_with_active_regions();
 		free_area_init_nodes(max_zone_pfns);
 
-		printk("Virtual mem_map starts at 0x%p\n", mem_map);
+		printk("Virtual mem_map starts at 0x%pK\n", mem_map);
 	}
 #else /* !CONFIG_VIRTUAL_MEM_MAP */
 	memblock_add_node(0, PFN_PHYS(max_low_pfn), 0);

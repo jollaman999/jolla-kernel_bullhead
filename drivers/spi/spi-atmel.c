@@ -534,7 +534,7 @@ static void atmel_spi_next_xfer_pio(struct spi_master *master,
 		spi_writel(as, TDR, 0);
 
 	dev_dbg(master->dev.parent,
-		"  start pio xfer %p: len %u tx %p rx %p bitpw %d\n",
+		"  start pio xfer %pK: len %u tx %pK rx %pK bitpw %d\n",
 		xfer, xfer->len, xfer->tx_buf, xfer->rx_buf,
 		xfer->bits_per_word);
 
@@ -618,7 +618,7 @@ static int atmel_spi_next_xfer_dma_submit(struct spi_master *master,
 		goto err_dma;
 
 	dev_dbg(master->dev.parent,
-		"  start dma xfer %p: len %u tx %p/%08x rx %p/%08x\n",
+		"  start dma xfer %pK: len %u tx %pK/%08x rx %pK/%08x\n",
 		xfer, xfer->len, xfer->tx_buf, xfer->tx_dma,
 		xfer->rx_buf, xfer->rx_dma);
 
@@ -721,7 +721,7 @@ static void atmel_spi_pdc_next_xfer(struct spi_master *master,
 		spi_writel(as, TCR, len);
 
 		dev_dbg(&msg->spi->dev,
-			"  start xfer %p: len %u tx %p/%08x rx %p/%08x\n",
+			"  start xfer %pK: len %u tx %pK/%08x rx %pK/%08x\n",
 			xfer, xfer->len, xfer->tx_buf, xfer->tx_dma,
 			xfer->rx_buf, xfer->rx_dma);
 	} else {
@@ -760,7 +760,7 @@ static void atmel_spi_pdc_next_xfer(struct spi_master *master,
 		spi_writel(as, TNCR, len);
 
 		dev_dbg(&msg->spi->dev,
-			"  next xfer %p: len %u tx %p/%08x rx %p/%08x\n",
+			"  next xfer %pK: len %u tx %pK/%08x rx %pK/%08x\n",
 			xfer, xfer->len, xfer->tx_buf, xfer->tx_dma,
 			xfer->rx_buf, xfer->rx_dma);
 		ieval = SPI_BIT(ENDRX) | SPI_BIT(OVRES);
@@ -837,7 +837,7 @@ static void atmel_spi_next_message(struct spi_master *master)
 	msg = list_entry(as->queue.next, struct spi_message, queue);
 	spi = msg->spi;
 
-	dev_dbg(master->dev.parent, "start message %p for %s\n",
+	dev_dbg(master->dev.parent, "start message %pK for %s\n",
 			msg, dev_name(&spi->dev));
 
 	/* select chip if it's not still active */
@@ -1376,7 +1376,7 @@ static int atmel_spi_transfer(struct spi_device *spi, struct spi_message *msg)
 
 	as = spi_master_get_devdata(spi->master);
 
-	dev_dbg(controller, "new message %p submitted for %s\n",
+	dev_dbg(controller, "new message %pK submitted for %s\n",
 			msg, dev_name(&spi->dev));
 
 	if (unlikely(list_empty(&msg->transfers)))
@@ -1428,7 +1428,7 @@ static int atmel_spi_transfer(struct spi_device *spi, struct spi_message *msg)
 #ifdef VERBOSE
 	list_for_each_entry(xfer, &msg->transfers, transfer_list) {
 		dev_dbg(controller,
-			"  xfer %p: len %u tx %p/%08x rx %p/%08x\n",
+			"  xfer %pK: len %u tx %pK/%08x rx %pK/%08x\n",
 			xfer, xfer->len,
 			xfer->tx_buf, xfer->tx_dma,
 			xfer->rx_buf, xfer->rx_dma);

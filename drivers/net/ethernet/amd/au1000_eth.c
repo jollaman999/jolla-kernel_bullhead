@@ -841,7 +841,7 @@ static int au1000_open(struct net_device *dev)
 	int retval;
 	struct au1000_private *aup = netdev_priv(dev);
 
-	netif_dbg(aup, drv, dev, "open: dev=%p\n", dev);
+	netif_dbg(aup, drv, dev, "open: dev=%pK\n", dev);
 
 	retval = request_irq(dev->irq, au1000_interrupt, 0,
 					dev->name, dev);
@@ -875,7 +875,7 @@ static int au1000_close(struct net_device *dev)
 	unsigned long flags;
 	struct au1000_private *const aup = netdev_priv(dev);
 
-	netif_dbg(aup, drv, dev, "close: dev=%p\n", dev);
+	netif_dbg(aup, drv, dev, "close: dev=%pK\n", dev);
 
 	if (aup->phy_dev)
 		phy_stop(aup->phy_dev);
@@ -906,7 +906,7 @@ static netdev_tx_t au1000_tx(struct sk_buff *skb, struct net_device *dev)
 	struct db_dest *pDB;
 	int i;
 
-	netif_dbg(aup, tx_queued, dev, "tx: aup %x len=%d, data=%p, head %d\n",
+	netif_dbg(aup, tx_queued, dev, "tx: aup %x len=%d, data=%pK, head %d\n",
 				(unsigned)aup, skb->len,
 				skb->data, aup->tx_head);
 
@@ -953,7 +953,7 @@ static netdev_tx_t au1000_tx(struct sk_buff *skb, struct net_device *dev)
  */
 static void au1000_tx_timeout(struct net_device *dev)
 {
-	netdev_err(dev, "au1000_tx_timeout: dev=%p\n", dev);
+	netdev_err(dev, "au1000_tx_timeout: dev=%pK\n", dev);
 	au1000_reset_mac(dev);
 	au1000_init(dev);
 	dev->trans_start = jiffies; /* prevent tx timeout */

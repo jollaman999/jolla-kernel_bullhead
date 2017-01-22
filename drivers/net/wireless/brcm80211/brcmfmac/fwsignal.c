@@ -648,7 +648,7 @@ static void brcmf_fws_init_mac_descriptor(struct brcmf_fws_mac_descriptor *desc,
 					  u8 *addr, u8 ifidx)
 {
 	brcmf_dbg(TRACE,
-		  "enter: desc %p ea=%pM, ifidx=%u\n", desc, addr, ifidx);
+		  "enter: desc %pK ea=%pM, ifidx=%u\n", desc, addr, ifidx);
 	desc->occupied = 1;
 	desc->state = BRCMF_FWS_STATE_OPEN;
 	desc->requested_credit = 0;
@@ -719,7 +719,7 @@ brcmf_fws_find_mac_desc(struct brcmf_fws_info *fws, struct brcmf_if *ifp,
 		entry = &fws->desc.other;
 
 done:
-	brcmf_dbg(TRACE, "exit: entry=%p\n", entry);
+	brcmf_dbg(TRACE, "exit: entry=%pK\n", entry);
 	return entry;
 }
 
@@ -1074,7 +1074,7 @@ static int brcmf_fws_enq(struct brcmf_fws_info *fws,
 
 	entry = brcmf_skbcb(p)->mac;
 	if (entry == NULL) {
-		brcmf_err("no mac descriptor found for skb %p\n", p);
+		brcmf_err("no mac descriptor found for skb %pK\n", p);
 		return -ENOENT;
 	}
 
@@ -1192,7 +1192,7 @@ static struct sk_buff *brcmf_fws_deq(struct brcmf_fws_info *fws, int fifo)
 	}
 	p = NULL;
 done:
-	brcmf_dbg(TRACE, "exit: fifo %d skb %p\n", fifo, p);
+	brcmf_dbg(TRACE, "exit: fifo %d skb %pK\n", fifo, p);
 	return p;
 }
 
@@ -1908,7 +1908,7 @@ static void brcmf_fws_dequeue_worker(struct work_struct *worker)
 
 	fws = container_of(worker, struct brcmf_fws_info, fws_dequeue_work);
 
-	brcmf_dbg(TRACE, "enter: fws=%p\n", fws);
+	brcmf_dbg(TRACE, "enter: fws=%pK\n", fws);
 	brcmf_fws_lock(fws->drvr, flags);
 	for (fifo = NL80211_NUM_ACS; fifo >= 0; fifo--) {
 		brcmf_dbg(TRACE, "fifo %d credit %d\n", fifo,

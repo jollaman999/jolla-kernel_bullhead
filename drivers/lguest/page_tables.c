@@ -1065,7 +1065,7 @@ void page_table_guest_data_init(struct lg_cpu *cpu)
 		 * addresses (used by the Switcher).
 		 */
 	    || put_user(top, &cpu->lg->lguest_data->reserve_mem)) {
-		kill_guest(cpu, "bad guest page %p", cpu->lg->lguest_data);
+		kill_guest(cpu, "bad guest page %pK", cpu->lg->lguest_data);
 		return;
 	}
 

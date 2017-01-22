@@ -111,7 +111,7 @@ unwind_table_init(struct unwind_table *table, const char *name,
 	for (; start <= end; start++) {
 		if (start < end && 
 		    start->region_end > (start+1)->region_start) {
-			printk("WARNING: Out of order unwind entry! %p and %p\n", start, start+1);
+			printk("WARNING: Out of order unwind entry! %pK and %pK\n", start, start+1);
 		}
 
 		start->region_start += base_addr;

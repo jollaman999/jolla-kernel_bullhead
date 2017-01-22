@@ -941,7 +941,7 @@ struct sock *llc_sk_alloc(struct net *net, int family, gfp_t priority, struct pr
 	sock_init_data(NULL, sk);
 #ifdef LLC_REFCNT_DEBUG
 	atomic_inc(&llc_sock_nr);
-	printk(KERN_DEBUG "LLC socket %p created in %s, now we have %d alive\n", sk,
+	printk(KERN_DEBUG "LLC socket %pK created in %s, now we have %d alive\n", sk,
 		__func__, atomic_read(&llc_sock_nr));
 #endif
 out:
@@ -971,13 +971,13 @@ void llc_sk_free(struct sock *sk)
 	skb_queue_purge(&llc->pdu_unack_q);
 #ifdef LLC_REFCNT_DEBUG
 	if (atomic_read(&sk->sk_refcnt) != 1) {
-		printk(KERN_DEBUG "Destruction of LLC sock %p delayed in %s, cnt=%d\n",
+		printk(KERN_DEBUG "Destruction of LLC sock %pK delayed in %s, cnt=%d\n",
 			sk, __func__, atomic_read(&sk->sk_refcnt));
 		printk(KERN_DEBUG "%d LLC sockets are still alive\n",
 			atomic_read(&llc_sock_nr));
 	} else {
 		atomic_dec(&llc_sock_nr);
-		printk(KERN_DEBUG "LLC socket %p released in %s, %d are still alive\n", sk,
+		printk(KERN_DEBUG "LLC socket %pK released in %s, %d are still alive\n", sk,
 			__func__, atomic_read(&llc_sock_nr));
 	}
 #endif

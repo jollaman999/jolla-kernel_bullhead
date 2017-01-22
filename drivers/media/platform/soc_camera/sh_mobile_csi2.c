@@ -217,7 +217,7 @@ static int sh_csi2_client_connect(struct sh_csi2 *priv)
 		if (&pdata->clients[i].pdev->dev == icd->pdev)
 			break;
 
-	dev_dbg(dev, "%s(%p): found #%d\n", __func__, dev, i);
+	dev_dbg(dev, "%s(%pK): found #%d\n", __func__, dev, i);
 
 	if (i == pdata->num_clients)
 		return -ENODEV;
@@ -338,7 +338,7 @@ static int sh_csi2_probe(struct platform_device *pdev)
 	snprintf(priv->subdev.name, V4L2_SUBDEV_NAME_SIZE, "%s.mipi-csi",
 		 dev_name(pdata->v4l2_dev->dev));
 	ret = v4l2_device_register_subdev(pdata->v4l2_dev, &priv->subdev);
-	dev_dbg(&pdev->dev, "%s(%p): ret(register_subdev) = %d\n", __func__, priv, ret);
+	dev_dbg(&pdev->dev, "%s(%pK): ret(register_subdev) = %d\n", __func__, priv, ret);
 	if (ret < 0)
 		goto esdreg;
 

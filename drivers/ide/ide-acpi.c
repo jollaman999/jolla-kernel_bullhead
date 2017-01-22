@@ -151,7 +151,7 @@ static int ide_get_dev_handle(struct device *dev, acpi_handle *handle,
 		goto err;
 	}
 
-	DEBPRINT("for dev=0x%x.%x, addr=0x%llx, *handle=0x%p\n",
+	DEBPRINT("for dev=0x%x.%x, addr=0x%llx, *handle=0x%pK\n",
 		 devnum, func, (unsigned long long)addr, *handle);
 	ret = 0;
 err:
@@ -192,7 +192,7 @@ static acpi_handle ide_acpi_hwif_get_handle(ide_hwif_t *hwif)
 	 * + _their_ children == drive objects */
 	/* channel is hwif->channel */
 	chan_handle = acpi_get_child(dev_handle, hwif->channel);
-	DEBPRINT("chan adr=%d: handle=0x%p\n",
+	DEBPRINT("chan adr=%d: handle=0x%pK\n",
 		 hwif->channel, chan_handle);
 
 	return chan_handle;
@@ -248,7 +248,7 @@ static int do_drive_get_GTF(ide_drive_t *drive,
 
 	if (!output.length || !output.pointer) {
 		DEBPRINT("Run _GTF: "
-		       "length or ptr is NULL (0x%llx, 0x%p)\n",
+		       "length or ptr is NULL (0x%llx, 0x%pK)\n",
 		       (unsigned long long)output.length,
 		       output.pointer);
 		goto out;
@@ -267,7 +267,7 @@ static int do_drive_get_GTF(ide_drive_t *drive,
 	if (!out_obj->buffer.length || !out_obj->buffer.pointer ||
 	    out_obj->buffer.length % REGS_PER_GTF) {
 		printk(KERN_ERR
-		       "%s: unexpected GTF length (%d) or addr (0x%p)\n",
+		       "%s: unexpected GTF length (%d) or addr (0x%pK)\n",
 		       __func__, out_obj->buffer.length,
 		       out_obj->buffer.pointer);
 		err = -ENOENT;
@@ -398,7 +398,7 @@ void ide_acpi_get_timing(ide_hwif_t *hwif)
 	status = acpi_evaluate_object(hwif->acpidata->obj_handle, "_GTM",
 				      NULL, &output);
 
-	DEBPRINT("_GTM status: %d, outptr: 0x%p, outlen: 0x%llx\n",
+	DEBPRINT("_GTM status: %d, outptr: 0x%pK, outlen: 0x%llx\n",
 		 status, output.pointer,
 		 (unsigned long long)output.length);
 
@@ -408,7 +408,7 @@ void ide_acpi_get_timing(ide_hwif_t *hwif)
 	}
 
 	if (!output.length || !output.pointer) {
-		DEBPRINT("Run _GTM: length or ptr is NULL (0x%llx, 0x%p)\n",
+		DEBPRINT("Run _GTM: length or ptr is NULL (0x%llx, 0x%pK)\n",
 		       (unsigned long long)output.length,
 		       output.pointer);
 		kfree(output.pointer);
@@ -428,7 +428,7 @@ void ide_acpi_get_timing(ide_hwif_t *hwif)
 	    out_obj->buffer.length != sizeof(struct GTM_buffer)) {
 		printk(KERN_ERR
 			"%s: unexpected _GTM length (0x%x)[should be 0x%zx] or "
-			"addr (0x%p)\n",
+			"addr (0x%pK)\n",
 			__func__, out_obj->buffer.length,
 			sizeof(struct GTM_buffer), out_obj->buffer.pointer);
 		kfree(output.pointer);
@@ -438,7 +438,7 @@ void ide_acpi_get_timing(ide_hwif_t *hwif)
 	memcpy(&hwif->acpidata->gtm, out_obj->buffer.pointer,
 	       sizeof(struct GTM_buffer));
 
-	DEBPRINT("_GTM info: ptr: 0x%p, len: 0x%x, exp.len: 0x%Zx\n",
+	DEBPRINT("_GTM info: ptr: 0x%pK, len: 0x%x, exp.len: 0x%Zx\n",
 		 out_obj->buffer.pointer, out_obj->buffer.length,
 		 sizeof(struct GTM_buffer));
 
@@ -579,7 +579,7 @@ void ide_acpi_port_init_devices(ide_hwif_t *hwif)
 		dev_handle = acpi_get_child(hwif->acpidata->obj_handle,
 					    drive->dn & 1);
 
-		DEBPRINT("drive %s handle 0x%p\n", drive->name, dev_handle);
+		DEBPRINT("drive %s handle 0x%pK\n", drive->name, dev_handle);
 
 		drive->acpidata->obj_handle = dev_handle;
 	}

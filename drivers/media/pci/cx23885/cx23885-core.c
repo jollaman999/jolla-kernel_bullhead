@@ -440,7 +440,7 @@ void cx23885_wakeup(struct cx23885_tsport *port,
 			break;
 
 		v4l2_get_timestamp(&buf->vb.ts);
-		dprintk(2, "[%p/%d] wakeup reg=%d buf=%d\n", buf, buf->vb.i,
+		dprintk(2, "[%pK/%d] wakeup reg=%d buf=%d\n", buf, buf->vb.i,
 			count, buf->count);
 		buf->vb.state = VIDEOBUF_DONE;
 		list_del(&buf->vb.queue);
@@ -595,7 +595,7 @@ static void cx23885_risc_disasm(struct cx23885_tsport *port,
 	struct cx23885_dev *dev = port->dev;
 	unsigned int i, j, n;
 
-	printk(KERN_INFO "%s: risc disasm: %p [dma=0x%08lx]\n",
+	printk(KERN_INFO "%s: risc disasm: %pK [dma=0x%08lx]\n",
 	       dev->name, risc->cpu, (unsigned long)risc->dma);
 	for (i = 0; i < (risc->size >> 2); i += n) {
 		printk(KERN_INFO "%s:   %04d: ", dev->name, i);
@@ -1521,7 +1521,7 @@ int cx23885_restart_queue(struct cx23885_tsport *port,
 				buf->vb.state = VIDEOBUF_ACTIVE;
 				buf->count    = q->count++;
 				mod_timer(&q->timeout, jiffies+BUFFER_TIMEOUT);
-				dprintk(5, "[%p/%d] restart_queue - f/active\n",
+				dprintk(5, "[%pK/%d] restart_queue - f/active\n",
 					buf, buf->vb.i);
 
 			} else if (prev->vb.width  == buf->vb.width  &&
@@ -1533,7 +1533,7 @@ int cx23885_restart_queue(struct cx23885_tsport *port,
 				prev->risc.jmp[1] = cpu_to_le32(buf->risc.dma);
 				/* 64 bit bits 63-32 */
 				prev->risc.jmp[2] = cpu_to_le32(0);
-				dprintk(5, "[%p/%d] restart_queue - m/active\n",
+				dprintk(5, "[%pK/%d] restart_queue - m/active\n",
 					buf, buf->vb.i);
 			} else {
 				return 0;
@@ -1544,7 +1544,7 @@ int cx23885_restart_queue(struct cx23885_tsport *port,
 	}
 
 	buf = list_entry(q->active.next, struct cx23885_buffer, vb.queue);
-	dprintk(2, "restart_queue [%p/%d]: restart dma\n",
+	dprintk(2, "restart_queue [%pK/%d]: restart dma\n",
 		buf, buf->vb.i);
 	cx23885_start_dma(port, q, buf);
 	list_for_each_entry(buf, &q->active, vb.queue)
@@ -1562,7 +1562,7 @@ int cx23885_buf_prepare(struct videobuf_queue *q, struct cx23885_tsport *port,
 	int size = port->ts_packet_size * port->ts_packet_count;
 	int rc;
 
-	dprintk(1, "%s: %p\n", __func__, buf);
+	dprintk(1, "%s: %pK\n", __func__, buf);
 	if (0 != buf->vb.baddr  &&  buf->vb.bsize < size)
 		return -EINVAL;
 
@@ -1605,7 +1605,7 @@ void cx23885_buf_queue(struct cx23885_tsport *port, struct cx23885_buffer *buf)
 		buf->vb.state = VIDEOBUF_ACTIVE;
 		buf->count    = cx88q->count++;
 		mod_timer(&cx88q->timeout, jiffies + BUFFER_TIMEOUT);
-		dprintk(1, "[%p/%d] %s - first active\n",
+		dprintk(1, "[%pK/%d] %s - first active\n",
 			buf, buf->vb.i, __func__);
 	} else {
 		dprintk(1, "queue is not empty - append to active\n");
@@ -1616,7 +1616,7 @@ void cx23885_buf_queue(struct cx23885_tsport *port, struct cx23885_buffer *buf)
 		buf->count    = cx88q->count++;
 		prev->risc.jmp[1] = cpu_to_le32(buf->risc.dma);
 		prev->risc.jmp[2] = cpu_to_le32(0); /* 64 bit bits 63-32 */
-		dprintk(1, "[%p/%d] %s - append to active\n",
+		dprintk(1, "[%pK/%d] %s - append to active\n",
 			 buf, buf->vb.i, __func__);
 	}
 }
@@ -1638,7 +1638,7 @@ static void do_cancel_buffers(struct cx23885_tsport *port, char *reason,
 		list_del(&buf->vb.queue);
 		buf->vb.state = VIDEOBUF_ERROR;
 		wake_up(&buf->vb.done);
-		dprintk(1, "[%p/%d] %s - dma=0x%08lx\n",
+		dprintk(1, "[%pK/%d] %s - dma=0x%08lx\n",
 			buf, buf->vb.i, reason, (unsigned long)buf->risc.dma);
 	}
 	if (restart) {

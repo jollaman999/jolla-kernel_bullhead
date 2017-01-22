@@ -113,10 +113,10 @@ static struct sk_buff* ieee80211_ADDBA(struct ieee80211_device* ieee, u8* Dst, P
 	u16 tmp = 0;
 	u16 len = ieee->tx_headroom + 9;
 	//category(1) + action field(1) + Dialog Token(1) + BA Parameter Set(2) +  BA Timeout Value(2) +  BA Start SeqCtrl(2)(or StatusCode(2))
-	IEEE80211_DEBUG(IEEE80211_DL_TRACE | IEEE80211_DL_BA, "========>%s(), frame(%d) sentd to:%pM, ieee->dev:%p\n", __FUNCTION__, type, Dst, ieee->dev);
+	IEEE80211_DEBUG(IEEE80211_DL_TRACE | IEEE80211_DL_BA, "========>%s(), frame(%d) sentd to:%pM, ieee->dev:%pK\n", __FUNCTION__, type, Dst, ieee->dev);
 	if (pBA == NULL||ieee == NULL)
 	{
-		IEEE80211_DEBUG(IEEE80211_DL_ERR, "pBA(%p) is NULL or ieee(%p) is NULL\n", pBA, ieee);
+		IEEE80211_DEBUG(IEEE80211_DL_ERR, "pBA(%pK) is NULL or ieee(%pK) is NULL\n", pBA, ieee);
 		return NULL;
 	}
 	skb = dev_alloc_skb(len + sizeof( struct ieee80211_hdr_3addr)); //need to add something others? FIXME

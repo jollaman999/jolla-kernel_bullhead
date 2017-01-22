@@ -654,7 +654,7 @@ int se_dev_set_max_unmap_lba_count(
 	u32 max_unmap_lba_count)
 {
 	dev->dev_attrib.max_unmap_lba_count = max_unmap_lba_count;
-	pr_debug("dev[%p]: Set max_unmap_lba_count: %u\n",
+	pr_debug("dev[%pK]: Set max_unmap_lba_count: %u\n",
 			dev, dev->dev_attrib.max_unmap_lba_count);
 	return 0;
 }
@@ -665,7 +665,7 @@ int se_dev_set_max_unmap_block_desc_count(
 {
 	dev->dev_attrib.max_unmap_block_desc_count =
 		max_unmap_block_desc_count;
-	pr_debug("dev[%p]: Set max_unmap_block_desc_count: %u\n",
+	pr_debug("dev[%pK]: Set max_unmap_block_desc_count: %u\n",
 			dev, dev->dev_attrib.max_unmap_block_desc_count);
 	return 0;
 }
@@ -675,7 +675,7 @@ int se_dev_set_unmap_granularity(
 	u32 unmap_granularity)
 {
 	dev->dev_attrib.unmap_granularity = unmap_granularity;
-	pr_debug("dev[%p]: Set unmap_granularity: %u\n",
+	pr_debug("dev[%pK]: Set unmap_granularity: %u\n",
 			dev, dev->dev_attrib.unmap_granularity);
 	return 0;
 }
@@ -685,7 +685,7 @@ int se_dev_set_unmap_granularity_alignment(
 	u32 unmap_granularity_alignment)
 {
 	dev->dev_attrib.unmap_granularity_alignment = unmap_granularity_alignment;
-	pr_debug("dev[%p]: Set unmap_granularity_alignment: %u\n",
+	pr_debug("dev[%pK]: Set unmap_granularity_alignment: %u\n",
 			dev, dev->dev_attrib.unmap_granularity_alignment);
 	return 0;
 }
@@ -695,7 +695,7 @@ int se_dev_set_max_write_same_len(
 	u32 max_write_same_len)
 {
 	dev->dev_attrib.max_write_same_len = max_write_same_len;
-	pr_debug("dev[%p]: Set max_write_same_len: %u\n",
+	pr_debug("dev[%pK]: Set max_write_same_len: %u\n",
 			dev, dev->dev_attrib.max_write_same_len);
 	return 0;
 }
@@ -706,7 +706,7 @@ static void dev_set_t10_wwn_model_alias(struct se_device *dev)
 
 	configname = config_item_name(&dev->dev_group.cg_item);
 	if (strlen(configname) >= 16) {
-		pr_warn("dev[%p]: Backstore name '%s' is too long for "
+		pr_warn("dev[%pK]: Backstore name '%s' is too long for "
 			"INQUIRY_MODEL, truncating to 16 bytes\n", dev,
 			configname);
 	}
@@ -716,7 +716,7 @@ static void dev_set_t10_wwn_model_alias(struct se_device *dev)
 int se_dev_set_emulate_model_alias(struct se_device *dev, int flag)
 {
 	if (dev->export_count) {
-		pr_err("dev[%p]: Unable to change model alias"
+		pr_err("dev[%pK]: Unable to change model alias"
 			" while export_count is %d\n",
 			dev, dev->export_count);
 			return -EINVAL;
@@ -766,7 +766,7 @@ int se_dev_set_emulate_fua_write(struct se_device *dev, int flag)
 		return -EINVAL;
 	}
 	dev->dev_attrib.emulate_fua_write = flag;
-	pr_debug("dev[%p]: SE Device Forced Unit Access WRITEs: %d\n",
+	pr_debug("dev[%pK]: SE Device Forced Unit Access WRITEs: %d\n",
 			dev, dev->dev_attrib.emulate_fua_write);
 	return 0;
 }
@@ -804,7 +804,7 @@ int se_dev_set_emulate_write_cache(struct se_device *dev, int flag)
 	}
 
 	dev->dev_attrib.emulate_write_cache = flag;
-	pr_debug("dev[%p]: SE Device WRITE_CACHE_EMULATION flag: %d\n",
+	pr_debug("dev[%pK]: SE Device WRITE_CACHE_EMULATION flag: %d\n",
 			dev, dev->dev_attrib.emulate_write_cache);
 	return 0;
 }
@@ -817,13 +817,13 @@ int se_dev_set_emulate_ua_intlck_ctrl(struct se_device *dev, int flag)
 	}
 
 	if (dev->export_count) {
-		pr_err("dev[%p]: Unable to change SE Device"
+		pr_err("dev[%pK]: Unable to change SE Device"
 			" UA_INTRLCK_CTRL while export_count is %d\n",
 			dev, dev->export_count);
 		return -EINVAL;
 	}
 	dev->dev_attrib.emulate_ua_intlck_ctrl = flag;
-	pr_debug("dev[%p]: SE Device UA_INTRLCK_CTRL flag: %d\n",
+	pr_debug("dev[%pK]: SE Device UA_INTRLCK_CTRL flag: %d\n",
 		dev, dev->dev_attrib.emulate_ua_intlck_ctrl);
 
 	return 0;
@@ -837,13 +837,13 @@ int se_dev_set_emulate_tas(struct se_device *dev, int flag)
 	}
 
 	if (dev->export_count) {
-		pr_err("dev[%p]: Unable to change SE Device TAS while"
+		pr_err("dev[%pK]: Unable to change SE Device TAS while"
 			" export_count is %d\n",
 			dev, dev->export_count);
 		return -EINVAL;
 	}
 	dev->dev_attrib.emulate_tas = flag;
-	pr_debug("dev[%p]: SE Device TASK_ABORTED status bit: %s\n",
+	pr_debug("dev[%pK]: SE Device TASK_ABORTED status bit: %s\n",
 		dev, (dev->dev_attrib.emulate_tas) ? "Enabled" : "Disabled");
 
 	return 0;
@@ -865,7 +865,7 @@ int se_dev_set_emulate_tpu(struct se_device *dev, int flag)
 	}
 
 	dev->dev_attrib.emulate_tpu = flag;
-	pr_debug("dev[%p]: SE Device Thin Provisioning UNMAP bit: %d\n",
+	pr_debug("dev[%pK]: SE Device Thin Provisioning UNMAP bit: %d\n",
 				dev, flag);
 	return 0;
 }
@@ -886,7 +886,7 @@ int se_dev_set_emulate_tpws(struct se_device *dev, int flag)
 	}
 
 	dev->dev_attrib.emulate_tpws = flag;
-	pr_debug("dev[%p]: SE Device Thin Provisioning WRITE_SAME: %d\n",
+	pr_debug("dev[%pK]: SE Device Thin Provisioning WRITE_SAME: %d\n",
 				dev, flag);
 	return 0;
 }
@@ -898,7 +898,7 @@ int se_dev_set_enforce_pr_isids(struct se_device *dev, int flag)
 		return -EINVAL;
 	}
 	dev->dev_attrib.enforce_pr_isids = flag;
-	pr_debug("dev[%p]: SE Device enforce_pr_isids bit: %s\n", dev,
+	pr_debug("dev[%pK]: SE Device enforce_pr_isids bit: %s\n", dev,
 		(dev->dev_attrib.enforce_pr_isids) ? "Enabled" : "Disabled");
 	return 0;
 }
@@ -910,7 +910,7 @@ int se_dev_set_is_nonrot(struct se_device *dev, int flag)
 		return -EINVAL;
 	}
 	dev->dev_attrib.is_nonrot = flag;
-	pr_debug("dev[%p]: SE Device is_nonrot bit: %d\n",
+	pr_debug("dev[%pK]: SE Device is_nonrot bit: %d\n",
 	       dev, flag);
 	return 0;
 }
@@ -918,12 +918,12 @@ int se_dev_set_is_nonrot(struct se_device *dev, int flag)
 int se_dev_set_emulate_rest_reord(struct se_device *dev, int flag)
 {
 	if (flag != 0) {
-		printk(KERN_ERR "dev[%p]: SE Device emulatation of restricted"
+		printk(KERN_ERR "dev[%pK]: SE Device emulatation of restricted"
 			" reordering not implemented\n", dev);
 		return -ENOSYS;
 	}
 	dev->dev_attrib.emulate_rest_reord = flag;
-	pr_debug("dev[%p]: SE Device emulate_rest_reord: %d\n", dev, flag);
+	pr_debug("dev[%pK]: SE Device emulate_rest_reord: %d\n", dev, flag);
 	return 0;
 }
 
@@ -933,20 +933,20 @@ int se_dev_set_emulate_rest_reord(struct se_device *dev, int flag)
 int se_dev_set_queue_depth(struct se_device *dev, u32 queue_depth)
 {
 	if (dev->export_count) {
-		pr_err("dev[%p]: Unable to change SE Device TCQ while"
+		pr_err("dev[%pK]: Unable to change SE Device TCQ while"
 			" export_count is %d\n",
 			dev, dev->export_count);
 		return -EINVAL;
 	}
 	if (!queue_depth) {
-		pr_err("dev[%p]: Illegal ZERO value for queue"
+		pr_err("dev[%pK]: Illegal ZERO value for queue"
 			"_depth\n", dev);
 		return -EINVAL;
 	}
 
 	if (dev->transport->transport_type == TRANSPORT_PLUGIN_PHBA_PDEV) {
 		if (queue_depth > dev->dev_attrib.hw_queue_depth) {
-			pr_err("dev[%p]: Passed queue_depth: %u"
+			pr_err("dev[%pK]: Passed queue_depth: %u"
 				" exceeds TCM/SE_Device TCQ: %u\n",
 				dev, queue_depth,
 				dev->dev_attrib.hw_queue_depth);
@@ -955,7 +955,7 @@ int se_dev_set_queue_depth(struct se_device *dev, u32 queue_depth)
 	} else {
 		if (queue_depth > dev->dev_attrib.queue_depth) {
 			if (queue_depth > dev->dev_attrib.hw_queue_depth) {
-				pr_err("dev[%p]: Passed queue_depth:"
+				pr_err("dev[%pK]: Passed queue_depth:"
 					" %u exceeds TCM/SE_Device MAX"
 					" TCQ: %u\n", dev, queue_depth,
 					dev->dev_attrib.hw_queue_depth);
@@ -965,7 +965,7 @@ int se_dev_set_queue_depth(struct se_device *dev, u32 queue_depth)
 	}
 
 	dev->dev_attrib.queue_depth = dev->queue_depth = queue_depth;
-	pr_debug("dev[%p]: SE Device TCQ Depth changed to: %u\n",
+	pr_debug("dev[%pK]: SE Device TCQ Depth changed to: %u\n",
 			dev, queue_depth);
 	return 0;
 }
@@ -975,25 +975,25 @@ int se_dev_set_fabric_max_sectors(struct se_device *dev, u32 fabric_max_sectors)
 	int block_size = dev->dev_attrib.block_size;
 
 	if (dev->export_count) {
-		pr_err("dev[%p]: Unable to change SE Device"
+		pr_err("dev[%pK]: Unable to change SE Device"
 			" fabric_max_sectors while export_count is %d\n",
 			dev, dev->export_count);
 		return -EINVAL;
 	}
 	if (!fabric_max_sectors) {
-		pr_err("dev[%p]: Illegal ZERO value for"
+		pr_err("dev[%pK]: Illegal ZERO value for"
 			" fabric_max_sectors\n", dev);
 		return -EINVAL;
 	}
 	if (fabric_max_sectors < DA_STATUS_MAX_SECTORS_MIN) {
-		pr_err("dev[%p]: Passed fabric_max_sectors: %u less than"
+		pr_err("dev[%pK]: Passed fabric_max_sectors: %u less than"
 			" DA_STATUS_MAX_SECTORS_MIN: %u\n", dev, fabric_max_sectors,
 				DA_STATUS_MAX_SECTORS_MIN);
 		return -EINVAL;
 	}
 	if (dev->transport->transport_type == TRANSPORT_PLUGIN_PHBA_PDEV) {
 		if (fabric_max_sectors > dev->dev_attrib.hw_max_sectors) {
-			pr_err("dev[%p]: Passed fabric_max_sectors: %u"
+			pr_err("dev[%pK]: Passed fabric_max_sectors: %u"
 				" greater than TCM/SE_Device max_sectors:"
 				" %u\n", dev, fabric_max_sectors,
 				dev->dev_attrib.hw_max_sectors);
@@ -1001,7 +1001,7 @@ int se_dev_set_fabric_max_sectors(struct se_device *dev, u32 fabric_max_sectors)
 		}
 	} else {
 		if (fabric_max_sectors > DA_STATUS_MAX_SECTORS_MAX) {
-			pr_err("dev[%p]: Passed fabric_max_sectors: %u"
+			pr_err("dev[%pK]: Passed fabric_max_sectors: %u"
 				" greater than DA_STATUS_MAX_SECTORS_MAX:"
 				" %u\n", dev, fabric_max_sectors,
 				DA_STATUS_MAX_SECTORS_MAX);
@@ -1019,7 +1019,7 @@ int se_dev_set_fabric_max_sectors(struct se_device *dev, u32 fabric_max_sectors)
 						      block_size);
 
 	dev->dev_attrib.fabric_max_sectors = fabric_max_sectors;
-	pr_debug("dev[%p]: SE Device max_sectors changed to %u\n",
+	pr_debug("dev[%pK]: SE Device max_sectors changed to %u\n",
 			dev, fabric_max_sectors);
 	return 0;
 }
@@ -1027,25 +1027,25 @@ int se_dev_set_fabric_max_sectors(struct se_device *dev, u32 fabric_max_sectors)
 int se_dev_set_optimal_sectors(struct se_device *dev, u32 optimal_sectors)
 {
 	if (dev->export_count) {
-		pr_err("dev[%p]: Unable to change SE Device"
+		pr_err("dev[%pK]: Unable to change SE Device"
 			" optimal_sectors while export_count is %d\n",
 			dev, dev->export_count);
 		return -EINVAL;
 	}
 	if (dev->transport->transport_type == TRANSPORT_PLUGIN_PHBA_PDEV) {
-		pr_err("dev[%p]: Passed optimal_sectors cannot be"
+		pr_err("dev[%pK]: Passed optimal_sectors cannot be"
 				" changed for TCM/pSCSI\n", dev);
 		return -EINVAL;
 	}
 	if (optimal_sectors > dev->dev_attrib.hw_max_sectors) {
-		pr_err("dev[%p]: Passed optimal_sectors %u cannot be"
+		pr_err("dev[%pK]: Passed optimal_sectors %u cannot be"
 			" greater than hw_max_sectors: %u\n", dev,
 			optimal_sectors, dev->dev_attrib.hw_max_sectors);
 		return -EINVAL;
 	}
 
 	dev->dev_attrib.optimal_sectors = optimal_sectors;
-	pr_debug("dev[%p]: SE Device optimal_sectors changed to %u\n",
+	pr_debug("dev[%pK]: SE Device optimal_sectors changed to %u\n",
 			dev, optimal_sectors);
 	return 0;
 }
@@ -1053,7 +1053,7 @@ int se_dev_set_optimal_sectors(struct se_device *dev, u32 optimal_sectors)
 int se_dev_set_block_size(struct se_device *dev, u32 block_size)
 {
 	if (dev->export_count) {
-		pr_err("dev[%p]: Unable to change SE Device block_size"
+		pr_err("dev[%pK]: Unable to change SE Device block_size"
 			" while export_count is %d\n",
 			dev, dev->export_count);
 		return -EINVAL;
@@ -1063,21 +1063,21 @@ int se_dev_set_block_size(struct se_device *dev, u32 block_size)
 	    (block_size != 1024) &&
 	    (block_size != 2048) &&
 	    (block_size != 4096)) {
-		pr_err("dev[%p]: Illegal value for block_device: %u"
+		pr_err("dev[%pK]: Illegal value for block_device: %u"
 			" for SE device, must be 512, 1024, 2048 or 4096\n",
 			dev, block_size);
 		return -EINVAL;
 	}
 
 	if (dev->transport->transport_type == TRANSPORT_PLUGIN_PHBA_PDEV) {
-		pr_err("dev[%p]: Not allowed to change block_size for"
+		pr_err("dev[%pK]: Not allowed to change block_size for"
 			" Physical Device, use for Linux/SCSI to change"
 			" block_size for underlying hardware\n", dev);
 		return -EINVAL;
 	}
 
 	dev->dev_attrib.block_size = block_size;
-	pr_debug("dev[%p]: SE Device block_size changed to %u\n",
+	pr_debug("dev[%pK]: SE Device block_size changed to %u\n",
 			dev, block_size);
 
 	if (dev->dev_attrib.max_bytes_per_io)

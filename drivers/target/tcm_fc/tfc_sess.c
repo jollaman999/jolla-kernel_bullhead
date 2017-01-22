@@ -182,7 +182,7 @@ static struct ft_sess *ft_sess_get(struct fc_lport *lport, u32 port_id)
 		if (sess->port_id == port_id) {
 			kref_get(&sess->kref);
 			rcu_read_unlock();
-			pr_debug("port_id %x found %p\n", port_id, sess);
+			pr_debug("port_id %x found %pK\n", port_id, sess);
 			return sess;
 		}
 	}
@@ -223,7 +223,7 @@ static struct ft_sess *ft_sess_create(struct ft_tport *tport, u32 port_id,
 	hlist_add_head_rcu(&sess->hash, head);
 	tport->sess_count++;
 
-	pr_debug("port_id %x sess %p\n", port_id, sess);
+	pr_debug("port_id %x sess %pK\n", port_id, sess);
 
 	transport_register_session(&tport->tpg->se_tpg, &acl->se_node_acl,
 				   sess->se_sess, sess);

@@ -269,7 +269,7 @@ static void nfs_fscache_inode_now_uncached(void *cookie_netfs_data)
 	pagevec_init(&pvec, 0);
 	first = 0;
 
-	dprintk("NFS: nfs_inode_now_uncached: nfs_inode 0x%p\n", nfsi);
+	dprintk("NFS: nfs_inode_now_uncached: nfs_inode 0x%pK\n", nfsi);
 
 	for (;;) {
 		/* grab a bunch of pages to unmark */

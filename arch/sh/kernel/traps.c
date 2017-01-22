@@ -28,7 +28,7 @@ void die(const char *str, struct pt_regs *regs, long err)
 	print_modules();
 	show_regs(regs);
 
-	printk("Process: %s (pid: %d, stack limit = %p)\n", current->comm,
+	printk("Process: %s (pid: %d, stack limit = %pK)\n", current->comm,
 			task_pid_nr(current), task_stack_page(current) + 1);
 
 	if (!user_mode(regs) || in_interrupt())

@@ -84,7 +84,7 @@ uint32_t udf_get_pblock_virt15(struct super_block *sb, uint32_t block,
 
 	bh = sb_bread(sb, loc);
 	if (!bh) {
-		udf_debug("get_pblock(UDF_VIRTUAL_MAP:%p,%d,%d) VAT: %d[%d]\n",
+		udf_debug("get_pblock(UDF_VIRTUAL_MAP:%pK,%d,%d) VAT: %d[%d]\n",
 			  sb, block, partition, loc, index);
 		return 0xFFFFFFFF;
 	}

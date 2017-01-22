@@ -156,7 +156,7 @@ bool session_remove_bulk_buf(struct session *session, void *virt_addr)
 	struct bulk_buffer_descriptor *tmp;
 	struct list_head *pos, *q;
 
-	MCDRV_DBG_VERBOSE(mc_kapi, "Virtual Address = 0x%p",
+	MCDRV_DBG_VERBOSE(mc_kapi, "Virtual Address = 0x%pK",
 			  virt_addr);
 
 	/* Search and remove bulk buffer descriptor */
@@ -194,7 +194,7 @@ uint32_t session_find_bulk_buf(struct session *session, void *virt_addr)
 	struct bulk_buffer_descriptor *tmp;
 	struct list_head *pos, *q;
 
-	MCDRV_DBG_VERBOSE(mc_kapi, "Virtual Address = 0x%p",
+	MCDRV_DBG_VERBOSE(mc_kapi, "Virtual Address = 0x%pK",
 			  virt_addr);
 
 	/* Search and return buffer descriptor handle */

@@ -67,7 +67,7 @@ void rds_ib_ring_init(struct rds_ib_work_ring *ring, u32 nr)
 {
 	memset(ring, 0, sizeof(*ring));
 	ring->w_nr = nr;
-	rdsdebug("ring %p nr %u\n", ring, ring->w_nr);
+	rdsdebug("ring %pK nr %u\n", ring, ring->w_nr);
 }
 
 static inline u32 __rds_ib_ring_used(struct rds_ib_work_ring *ring)
@@ -100,7 +100,7 @@ u32 rds_ib_ring_alloc(struct rds_ib_work_ring *ring, u32 val, u32 *pos)
 
 	avail = ring->w_nr - __rds_ib_ring_used(ring);
 
-	rdsdebug("ring %p val %u next %u free %u\n", ring, val,
+	rdsdebug("ring %pK val %u next %u free %u\n", ring, val,
 		 ring->w_alloc_ptr, avail);
 
 	if (val && avail) {
@@ -162,7 +162,7 @@ u32 rds_ib_ring_completed(struct rds_ib_work_ring *ring, u32 wr_id, u32 oldest)
 	else
 		ret = ring->w_nr - oldest + (unsigned long long)wr_id + 1;
 
-	rdsdebug("ring %p ret %u wr_id %u oldest %u\n", ring, ret,
+	rdsdebug("ring %pK ret %u wr_id %u oldest %u\n", ring, ret,
 		 wr_id, oldest);
 	return ret;
 }

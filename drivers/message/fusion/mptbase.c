@@ -534,7 +534,7 @@ mpt_reply(MPT_ADAPTER *ioc, u32 pa)
 	cb_idx = mr->u.frame.hwhdr.msgctxu.fld.cb_idx;
 	mf = MPT_INDEX_2_MFPTR(ioc, req_idx);
 
-	dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Got non-TURBO reply=%p req_idx=%x cb_idx=%x Function=%x\n",
+	dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Got non-TURBO reply=%pK req_idx=%x cb_idx=%x Function=%x\n",
 			ioc->name, mr, req_idx, cb_idx, mr->u.hdr.Function));
 	DBG_DUMP_REPLY_FRAME(ioc, (u32 *)mr);
 
@@ -944,7 +944,7 @@ mpt_get_msg_frame(u8 cb_idx, MPT_ADAPTER *ioc)
 		    ioc->mfcnt, ioc->req_depth);
 #endif
 
-	dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT "mpt_get_msg_frame(%d,%d), got mf=%p\n",
+	dmfprintk(ioc, printk(MYIOC_s_DEBUG_FMT "mpt_get_msg_frame(%d,%d), got mf=%pK\n",
 	    ioc->name, cb_idx, ioc->id, mf));
 	return mf;
 }
@@ -1336,7 +1336,7 @@ mpt_host_page_alloc(MPT_ADAPTER *ioc, pIOCInit_t ioc_init)
 			    &ioc->HostPageBuffer_dma)) != NULL) {
 
 				dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-				    "host_page_buffer @ %p, dma @ %x, sz=%d bytes\n",
+				    "host_page_buffer @ %pK, dma @ %x, sz=%d bytes\n",
 				    ioc->name, ioc->HostPageBuffer,
 				    (u32)ioc->HostPageBuffer_dma,
 				    host_page_buffer_sz));
@@ -1737,7 +1737,7 @@ mpt_mapresources(MPT_ADAPTER *ioc)
 		goto out_pci_release_region;
 	}
 	ioc->memmap = mem;
-	dinitprintk(ioc, printk(MYIOC_s_INFO_FMT "mem = %p, mem_phys = %llx\n",
+	dinitprintk(ioc, printk(MYIOC_s_INFO_FMT "mem = %pK, mem_phys = %llx\n",
 	    ioc->name, mem, (unsigned long long)mem_phys));
 
 	ioc->mem_phys = mem_phys;
@@ -1884,7 +1884,7 @@ mpt_attach(struct pci_dev *pdev, const struct pci_device_id *id)
 		return -ENOMEM;
 	}
 
-	dinitprintk(ioc, printk(MYIOC_s_INFO_FMT "facts @ %p, pfacts[0] @ %p\n",
+	dinitprintk(ioc, printk(MYIOC_s_INFO_FMT "facts @ %pK, pfacts[0] @ %pK\n",
 	    ioc->name, &ioc->facts, &ioc->pfacts[0]));
 
 	mpt_get_product_name(pdev->vendor, pdev->device, pdev->revision,
@@ -2128,7 +2128,7 @@ mpt_suspend(struct pci_dev *pdev, pm_message_t state)
 	MPT_ADAPTER *ioc = pci_get_drvdata(pdev);
 
 	device_state = pci_choose_state(pdev, state);
-	printk(MYIOC_s_INFO_FMT "pci-suspend: pdev=0x%p, slot=%s, Entering "
+	printk(MYIOC_s_INFO_FMT "pci-suspend: pdev=0x%pK, slot=%s, Entering "
 	    "operating state [D%d]\n", ioc->name, pdev, pci_name(pdev),
 	    device_state);
 
@@ -2169,7 +2169,7 @@ mpt_resume(struct pci_dev *pdev)
 	int recovery_state;
 	int err;
 
-	printk(MYIOC_s_INFO_FMT "pci-resume: pdev=0x%p, slot=%s, Previous "
+	printk(MYIOC_s_INFO_FMT "pci-resume: pdev=0x%pK, slot=%s, Previous "
 	    "operating state [D%d]\n", ioc->name, pdev, pci_name(pdev),
 	    device_state);
 
@@ -2475,7 +2475,7 @@ mpt_do_ioc_recovery(MPT_ADAPTER *ioc, u32 reason, int sleepFlag)
 						 * mpt_diag_reset)
 						 */
 						ddlprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-						    "mpt_upload:  alt_%s has cached_fw=%p \n",
+						    "mpt_upload:  alt_%s has cached_fw=%pK \n",
 						    ioc->name, ioc->alt_ioc->name, ioc->alt_ioc->cached_fw));
 						ioc->cached_fw = NULL;
 					}
@@ -2717,7 +2717,7 @@ mpt_adapter_disable(MPT_ADAPTER *ioc)
 
 	if (ioc->alloc != NULL) {
 		sz = ioc->alloc_sz;
-		dexitprintk(ioc, printk(MYIOC_s_INFO_FMT "free  @ %p, sz=%d bytes\n",
+		dexitprintk(ioc, printk(MYIOC_s_INFO_FMT "free  @ %pK, sz=%d bytes\n",
 		    ioc->name, ioc->alloc, ioc->alloc_sz));
 		pci_free_consistent(ioc->pcidev, sz,
 				ioc->alloc, ioc->alloc_dma);
@@ -2777,7 +2777,7 @@ mpt_adapter_disable(MPT_ADAPTER *ioc)
 			    ioc->name, __func__, ret);
 		}
 		dexitprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-			"HostPageBuffer free  @ %p, sz=%d bytes\n",
+			"HostPageBuffer free  @ %pK, sz=%d bytes\n",
 			ioc->name, ioc->HostPageBuffer,
 			ioc->HostPageBuffer_sz));
 		pci_free_consistent(ioc->pcidev, ioc->HostPageBuffer_sz,
@@ -3385,7 +3385,7 @@ SendIocInit(MPT_ADAPTER *ioc, int sleepFlag)
 	ioc->facts.MaxDevices = ioc_init.MaxDevices;
 	ioc->facts.MaxBuses = ioc_init.MaxBuses;
 
-	dhsprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Sending IOCInit (req @ %p)\n",
+	dhsprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Sending IOCInit (req @ %pK)\n",
 			ioc->name, &ioc_init));
 
 	r = mpt_handshake_req_reply_wait(ioc, sizeof(IOCInit_t), (u32*)&ioc_init,
@@ -3399,7 +3399,7 @@ SendIocInit(MPT_ADAPTER *ioc, int sleepFlag)
 	 * since we don't even look at its contents.
 	 */
 
-	dhsprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Sending PortEnable (req @ %p)\n",
+	dhsprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Sending PortEnable (req @ %pK)\n",
 			ioc->name, &ioc_init));
 
 	if ((r = SendPortEnable(ioc, 0, sleepFlag)) != 0) {
@@ -3470,7 +3470,7 @@ SendPortEnable(MPT_ADAPTER *ioc, int portnum, int sleepFlag)
 /*	port_enable.MsgFlags = 0;		*/
 /*	port_enable.MsgContext = 0;		*/
 
-	dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Sending Port(%d)Enable (req @ %p)\n",
+	dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Sending Port(%d)Enable (req @ %pK)\n",
 			ioc->name, portnum, &port_enable));
 
 	/* RAID FW may take a long time to enable
@@ -3518,7 +3518,7 @@ mpt_alloc_fw_memory(MPT_ADAPTER *ioc, int size)
 		    ioc->name);
 		rc = -1;
 	} else {
-		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "FW Image  @ %p[%p], sz=%d[%x] bytes\n",
+		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "FW Image  @ %pK[%pK], sz=%d[%x] bytes\n",
 		    ioc->name, ioc->cached_fw, (void *)(ulong)ioc->cached_fw_dma, size, size));
 		ioc->alloc_total += size;
 		rc = 0;
@@ -3543,7 +3543,7 @@ mpt_free_fw_memory(MPT_ADAPTER *ioc)
 		return;
 
 	sz = ioc->facts.FWImageSize;
-	dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "free_fw_memory: FW Image  @ %p[%p], sz=%d[%x] bytes\n",
+	dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "free_fw_memory: FW Image  @ %pK[%pK], sz=%d[%x] bytes\n",
 		 ioc->name, ioc->cached_fw, (void *)(ulong)ioc->cached_fw_dma, sz, sz));
 	pci_free_consistent(ioc->pcidev, sz, ioc->cached_fw, ioc->cached_fw_dma);
 	ioc->alloc_total -= sz;
@@ -3583,7 +3583,7 @@ mpt_do_upload(MPT_ADAPTER *ioc, int sleepFlag)
 	if (mpt_alloc_fw_memory(ioc, ioc->facts.FWImageSize) != 0)
 		return -ENOMEM;
 
-	dinitprintk(ioc, printk(MYIOC_s_INFO_FMT ": FW Image  @ %p[%p], sz=%d[%x] bytes\n",
+	dinitprintk(ioc, printk(MYIOC_s_INFO_FMT ": FW Image  @ %pK[%pK], sz=%d[%x] bytes\n",
 	    ioc->name, ioc->cached_fw, (void *)(ulong)ioc->cached_fw_dma, sz, sz));
 
 	prequest = (sleepFlag == NO_SLEEP) ? kzalloc(ioc->req_sz, GFP_ATOMIC) :
@@ -3614,7 +3614,7 @@ mpt_do_upload(MPT_ADAPTER *ioc, int sleepFlag)
 	request_size = offsetof(FWUpload_t, SGL) + sizeof(FWUploadTCSGE_t) +
 	    ioc->SGE_size;
 	dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Sending FW Upload "
-	    " (req @ %p) fw_size=%d mf_request_size=%d\n", ioc->name, prequest,
+	    " (req @ %pK) fw_size=%d mf_request_size=%d\n", ioc->name, prequest,
 	    ioc->facts.FWImageSize, request_size));
 	DBG_DUMP_FW_REQUEST_FRAME(ioc, (u32 *)prequest);
 
@@ -3678,7 +3678,7 @@ mpt_downloadboot(MPT_ADAPTER *ioc, MpiFwHeader_t *pFwHeader, int sleepFlag)
 	u32			 load_addr;
 	u32 			 ioc_state=0;
 
-	ddlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "downloadboot: fw size 0x%x (%d), FW Ptr %p\n",
+	ddlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "downloadboot: fw size 0x%x (%d), FW Ptr %pK\n",
 				ioc->name, pFwHeader->ImageSize, pFwHeader->ImageSize, pFwHeader));
 
 	CHIPREG_WRITE32(&ioc->chip->WriteSequence, 0xFF);
@@ -3745,7 +3745,7 @@ mpt_downloadboot(MPT_ADAPTER *ioc, MpiFwHeader_t *pFwHeader, int sleepFlag)
 	ddlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "LoadStart addr written 0x%x \n",
 		ioc->name, pFwHeader->LoadStartAddress));
 
-	ddlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Write FW Image: 0x%x bytes @ %p\n",
+	ddlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Write FW Image: 0x%x bytes @ %pK\n",
 				ioc->name, fwSize*4, ptrFw));
 	while (fwSize--) {
 		CHIPREG_PIO_WRITE32(&ioc->pio_chip->DiagRwData, *ptrFw++);
@@ -3760,7 +3760,7 @@ mpt_downloadboot(MPT_ADAPTER *ioc, MpiFwHeader_t *pFwHeader, int sleepFlag)
 		fwSize = (pExtImage->ImageSize + 3) >> 2;
 		ptrFw = (u32 *)pExtImage;
 
-		ddlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Write Ext Image: 0x%x (%d) bytes @ %p load_addr=%x\n",
+		ddlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Write Ext Image: 0x%x (%d) bytes @ %pK load_addr=%x\n",
 						ioc->name, fwSize*4, fwSize*4, ptrFw, load_addr));
 		CHIPREG_PIO_WRITE32(&ioc->pio_chip->DiagRwAddress, load_addr);
 
@@ -3972,8 +3972,8 @@ mpt_diag_reset(MPT_ADAPTER *ioc, int ignore, int sleepFlag)
 		if (!ignore)
 			return 0;
 
-		drsprintk(ioc, printk(MYIOC_s_WARN_FMT "%s: Doorbell=%p; 1078 reset "
-			"address=%p\n",  ioc->name, __func__,
+		drsprintk(ioc, printk(MYIOC_s_WARN_FMT "%s: Doorbell=%pK; 1078 reset "
+			"address=%pK\n",  ioc->name, __func__,
 			&ioc->chip->Doorbell, &ioc->chip->Reset_1078));
 		CHIPREG_WRITE32(&ioc->chip->Reset_1078, 0x07);
 		if (sleepFlag == CAN_SLEEP)
@@ -4328,14 +4328,14 @@ initChainBuffers(MPT_ADAPTER *ioc)
 			return -1;
 
 		ioc->ReqToChain = (int *) mem;
-		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ReqToChain alloc  @ %p, sz=%d bytes\n",
+		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ReqToChain alloc  @ %pK, sz=%d bytes\n",
 			 	ioc->name, mem, sz));
 		mem = kmalloc(sz, GFP_ATOMIC);
 		if (mem == NULL)
 			return -1;
 
 		ioc->RequestNB = (int *) mem;
-		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "RequestNB alloc  @ %p, sz=%d bytes\n",
+		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "RequestNB alloc  @ %pK, sz=%d bytes\n",
 			 	ioc->name, mem, sz));
 	}
 	for (ii = 0; ii < ioc->req_depth; ii++) {
@@ -4402,7 +4402,7 @@ initChainBuffers(MPT_ADAPTER *ioc)
 			return -1;
 
 		ioc->ChainToChain = (int *) mem;
-		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ChainToChain alloc @ %p, sz=%d bytes\n",
+		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ChainToChain alloc @ %pK, sz=%d bytes\n",
 			 	ioc->name, mem, sz));
 	} else {
 		mem = (u8 *) ioc->ChainToChain;
@@ -4494,7 +4494,7 @@ PrimeIocFifos(MPT_ADAPTER *ioc)
 			goto out_fail;
 		}
 
-		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Total alloc @ %p[%p], sz=%d[%x] bytes\n",
+		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Total alloc @ %pK[%pK], sz=%d[%x] bytes\n",
 			 	ioc->name, mem, (void *)(ulong)alloc_dma, total_size, total_size));
 
 		memset(mem, 0, total_size);
@@ -4505,7 +4505,7 @@ PrimeIocFifos(MPT_ADAPTER *ioc)
 		ioc->reply_frames = (MPT_FRAME_HDR *) mem;
 		ioc->reply_frames_low_dma = (u32) (alloc_dma & 0xFFFFFFFF);
 
-		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ReplyBuffers @ %p[%p]\n",
+		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ReplyBuffers @ %pK[%pK]\n",
 	 		ioc->name, ioc->reply_frames, (void *)(ulong)alloc_dma));
 
 		alloc_dma += reply_sz;
@@ -4516,7 +4516,7 @@ PrimeIocFifos(MPT_ADAPTER *ioc)
 		ioc->req_frames = (MPT_FRAME_HDR *) mem;
 		ioc->req_frames_dma = alloc_dma;
 
-		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "RequestBuffers @ %p[%p]\n",
+		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "RequestBuffers @ %pK[%pK]\n",
 			 	ioc->name, mem, (void *)(ulong)alloc_dma));
 
 		ioc->req_frames_low_dma = (u32) (alloc_dma & 0xFFFFFFFF);
@@ -4542,7 +4542,7 @@ PrimeIocFifos(MPT_ADAPTER *ioc)
 		ioc->ChainBuffer = mem;
 		ioc->ChainBufferDMA = alloc_dma;
 
-		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ChainBuffers @ %p(%p)\n",
+		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ChainBuffers @ %pK(%pK)\n",
 			ioc->name, ioc->ChainBuffer, (void *)(ulong)ioc->ChainBufferDMA));
 
 		/* Initialize the free chain Q.
@@ -4587,7 +4587,7 @@ PrimeIocFifos(MPT_ADAPTER *ioc)
 
 		ioc->sense_buf_low_dma = (u32) (ioc->sense_buf_pool_dma & 0xFFFFFFFF);
 		ioc->alloc_total += sz;
-		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "SenseBuffers @ %p[%p]\n",
+		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "SenseBuffers @ %pK[%pK]\n",
  			ioc->name, ioc->sense_buf_pool, (void *)(ulong)ioc->sense_buf_pool_dma));
 
 	}
@@ -4595,7 +4595,7 @@ PrimeIocFifos(MPT_ADAPTER *ioc)
 	/* Post Reply frames to FIFO
 	 */
 	alloc_dma = ioc->alloc_dma;
-	dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ReplyBuffers @ %p[%p]\n",
+	dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ReplyBuffers @ %pK[%pK]\n",
 	 	ioc->name, ioc->reply_frames, (void *)(ulong)alloc_dma));
 
 	for (i = 0; i < ioc->reply_depth; i++) {
@@ -4725,7 +4725,7 @@ mpt_handshake_req_reply_wait(MPT_ADAPTER *ioc, int reqBytes, u32 *req,
 				failcnt++;
 		}
 
-		dhsprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Handshake request frame (@%p) header\n", ioc->name, req));
+		dhsprintk(ioc, printk(MYIOC_s_DEBUG_FMT "Handshake request frame (@%pK) header\n", ioc->name, req));
 		DBG_DUMP_REQUEST_FRAME_HDR(ioc, (u32 *)req);
 
 		dhsprintk(ioc, printk(MYIOC_s_DEBUG_FMT "HandShake request post done, WaitCnt=%d%s\n",
@@ -5383,7 +5383,7 @@ mpt_GetScsiPortSettings(MPT_ADAPTER *ioc, int portnum)
 
 		ioc->spi_data.nvram = (int *) mem;
 
-		dprintk(ioc, printk(MYIOC_s_DEBUG_FMT "SCSI device NVRAM settings @ %p, sz=%d\n",
+		dprintk(ioc, printk(MYIOC_s_DEBUG_FMT "SCSI device NVRAM settings @ %pK, sz=%d\n",
 			ioc->name, ioc->spi_data.nvram, sz));
 	}
 
@@ -6289,7 +6289,7 @@ SendEventNotification(MPT_ADAPTER *ioc, u8 EvSwitch, int sleepFlag)
 	evn.MsgContext = cpu_to_le32(mpt_base_index << 16);
 
 	devtverboseprintk(ioc, printk(MYIOC_s_DEBUG_FMT
-	    "Sending EventNotification (%d) request %p\n",
+	    "Sending EventNotification (%d) request %pK\n",
 	    ioc->name, EvSwitch, &evn));
 
 	return mpt_handshake_req_reply_wait(ioc, sizeof(EventNotification_t),
@@ -6755,7 +6755,7 @@ static int mpt_iocinfo_proc_show(struct seq_file *m, void *v)
 	seq_printf(m, "  MaxChainDepth = 0x%02x frames\n", ioc->facts.MaxChainDepth);
 	seq_printf(m, "  MinBlockSize = 0x%02x bytes\n", 4*ioc->facts.BlockSize);
 
-	seq_printf(m, "  RequestFrames @ 0x%p (Dma @ 0x%p)\n",
+	seq_printf(m, "  RequestFrames @ 0x%pK (Dma @ 0x%pK)\n",
 					(void *)ioc->req_frames, (void *)(ulong)ioc->req_frames_dma);
 	/*
 	 *  Rounding UP to nearest 4-kB boundary here...
@@ -6768,7 +6768,7 @@ static int mpt_iocinfo_proc_show(struct seq_file *m, void *v)
 					4*ioc->facts.RequestFrameSize,
 					ioc->facts.GlobalCredits);
 
-	seq_printf(m, "  Frames   @ 0x%p (Dma @ 0x%p)\n",
+	seq_printf(m, "  Frames   @ 0x%pK (Dma @ 0x%pK)\n",
 					(void *)ioc->alloc, (void *)(ulong)ioc->alloc_dma);
 	sz = (ioc->reply_sz * ioc->reply_depth) + 128;
 	seq_printf(m, "    {CurRepSz=%d} x {CurRepDepth=%d} = %d bytes ^= 0x%x\n",

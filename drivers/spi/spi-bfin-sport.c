@@ -399,7 +399,7 @@ bfin_sport_spi_pump_transfers(unsigned long data)
 	if (transfer->tx_buf != NULL) {
 		drv_data->tx = (void *)transfer->tx_buf;
 		drv_data->tx_end = drv_data->tx + transfer->len;
-		dev_dbg(drv_data->dev, "tx_buf is %p, tx_end is %p\n",
+		dev_dbg(drv_data->dev, "tx_buf is %pK, tx_end is %pK\n",
 			transfer->tx_buf, drv_data->tx_end);
 	} else
 		drv_data->tx = NULL;
@@ -408,7 +408,7 @@ bfin_sport_spi_pump_transfers(unsigned long data)
 		full_duplex = transfer->tx_buf != NULL;
 		drv_data->rx = transfer->rx_buf;
 		drv_data->rx_end = drv_data->rx + transfer->len;
-		dev_dbg(drv_data->dev, "rx_buf is %p, rx_end is %p\n",
+		dev_dbg(drv_data->dev, "rx_buf is %pK, rx_end is %pK\n",
 			transfer->rx_buf, drv_data->rx_end);
 	} else
 		drv_data->rx = NULL;
@@ -841,7 +841,7 @@ static int bfin_sport_spi_probe(struct platform_device *pdev)
 		goto out_error_master;
 	}
 
-	dev_info(dev, "%s, regs_base@%p\n", DRV_DESC, drv_data->regs);
+	dev_info(dev, "%s, regs_base@%pK\n", DRV_DESC, drv_data->regs);
 	return 0;
 
  out_error_master:

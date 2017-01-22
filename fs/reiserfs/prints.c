@@ -142,7 +142,7 @@ static void sprintf_buffer_head(char *buf, struct buffer_head *bh)
 	char b[BDEVNAME_SIZE];
 
 	sprintf(buf,
-		"dev %s, size %zd, blocknr %llu, count %d, state 0x%lx, page %p, (%s, %s, %s)",
+		"dev %s, size %zd, blocknr %llu, count %d, state 0x%lx, page %pK, (%s, %s, %s)",
 		bdevname(bh->b_bdev, b), bh->b_size,
 		(unsigned long long)bh->b_blocknr, atomic_read(&(bh->b_count)),
 		bh->b_state, bh->b_page,
@@ -319,7 +319,7 @@ void reiserfs_debug(struct super_block *s, int level, const char *fmt, ...)
     reiserfs_panic(
 	p_sb, "reiser-29: reiserfs_new_blocknrs: "
 	"one of search_start or rn(%d) is equal to MAX_B_NUM,"
-	"which means that we are optimizing location based on the bogus location of a temp buffer (%p).",
+	"which means that we are optimizing location based on the bogus location of a temp buffer (%pK).",
 	rn, bh
     );
 
@@ -686,7 +686,7 @@ void store_print_tb(struct tree_balance *tb)
 	h = 0;
 	for (i = 0; i < ARRAY_SIZE(tb->FEB); i++)
 		sprintf(print_tb_buf + strlen(print_tb_buf),
-			"%p (%llu %d)%s", tb->FEB[i],
+			"%pK (%llu %d)%s", tb->FEB[i],
 			tb->FEB[i] ? (unsigned long long)tb->FEB[i]->
 			b_blocknr : 0ULL,
 			tb->FEB[i] ? atomic_read(&(tb->FEB[i]->b_count)) : 0,

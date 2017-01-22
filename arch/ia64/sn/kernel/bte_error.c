@@ -46,12 +46,12 @@ int shub1_bte_error_handler(unsigned long _nodepda)
 	ii_icmr_u_t icmr;
 	ii_ieclr_u_t ieclr;
 
-	BTE_PRINTK(("shub1_bte_error_handler(%p) - %d\n", err_nodepda,
+	BTE_PRINTK(("shub1_bte_error_handler(%pK) - %d\n", err_nodepda,
 		    smp_processor_id()));
 
 	if ((err_nodepda->bte_if[0].bh_error == BTE_SUCCESS) &&
 	    (err_nodepda->bte_if[1].bh_error == BTE_SUCCESS)) {
-		BTE_PRINTK(("eh:%p:%d Nothing to do.\n", err_nodepda,
+		BTE_PRINTK(("eh:%pK:%d Nothing to do.\n", err_nodepda,
 			    smp_processor_id()));
 		return 1;
 	}
@@ -79,7 +79,7 @@ int shub1_bte_error_handler(unsigned long _nodepda)
 		 * hubiio_crb_error_handler
 		 */
 		mod_timer(recovery_timer, jiffies + (HZ * 5));
-		BTE_PRINTK(("eh:%p:%d Marked Giving up\n", err_nodepda,
+		BTE_PRINTK(("eh:%pK:%d Marked Giving up\n", err_nodepda,
 			    smp_processor_id()));
 		return 1;
 	}
@@ -96,7 +96,7 @@ int shub1_bte_error_handler(unsigned long _nodepda)
 			    REMOTE_HUB_L(nasid, IIO_ICRB_D(i));
 			if (icrbd.d_bteop) {
 				mod_timer(recovery_timer, jiffies + (HZ * 5));
-				BTE_PRINTK(("eh:%p:%d Valid %d, Giving up\n",
+				BTE_PRINTK(("eh:%pK:%d Valid %d, Giving up\n",
 					    err_nodepda, smp_processor_id(),
 					    i));
 				return 1;
@@ -104,7 +104,7 @@ int shub1_bte_error_handler(unsigned long _nodepda)
 		}
 	}
 
-	BTE_PRINTK(("eh:%p:%d Cleaning up\n", err_nodepda, smp_processor_id()));
+	BTE_PRINTK(("eh:%pK:%d Cleaning up\n", err_nodepda, smp_processor_id()));
 	/* Re-enable both bte interfaces */
 	imem.ii_imem_regval = REMOTE_HUB_L(nasid, IIO_IMEM);
 	imem.ii_imem_fld_s.i_b0_esd = imem.ii_imem_fld_s.i_b1_esd = 1;
@@ -155,7 +155,7 @@ int shub2_bte_error_handler(unsigned long _nodepda)
 		if (!(status & IBLS_BUSY))
 			continue;
 		mod_timer(recovery_timer, jiffies + (HZ * 5));
-		BTE_PRINTK(("eh:%p:%d Marked Giving up\n", err_nodepda,
+		BTE_PRINTK(("eh:%pK:%d Marked Giving up\n", err_nodepda,
 			    smp_processor_id()));
 		return 1;
 	}
@@ -179,7 +179,7 @@ void bte_error_handler(unsigned long _nodepda)
 	volatile u64 *notify;
 	bte_result_t bh_error;
 
-	BTE_PRINTK(("bte_error_handler(%p) - %d\n", err_nodepda,
+	BTE_PRINTK(("bte_error_handler(%pK) - %d\n", err_nodepda,
 		    smp_processor_id()));
 
 	spin_lock_irqsave(recovery_lock, irq_flags);
@@ -193,7 +193,7 @@ void bte_error_handler(unsigned long _nodepda)
 			continue;
 		}
 		spin_lock(&err_nodepda->bte_if[i].spinlock);
-		BTE_PRINTK(("eh:%p:%d locked %d\n", err_nodepda,
+		BTE_PRINTK(("eh:%pK:%d locked %d\n", err_nodepda,
 			    smp_processor_id(), i));
 		err_nodepda->bte_if[i].cleanup_active = 1;
 	}
@@ -224,7 +224,7 @@ void bte_error_handler(unsigned long _nodepda)
 		}
 
 		err_nodepda->bte_if[i].cleanup_active = 0;
-		BTE_PRINTK(("eh:%p:%d Unlocked %d\n", err_nodepda,
+		BTE_PRINTK(("eh:%pK:%d Unlocked %d\n", err_nodepda,
 			    smp_processor_id(), i));
 		spin_unlock(&err_nodepda->bte_if[i].spinlock);
 	}

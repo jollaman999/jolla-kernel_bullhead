@@ -253,7 +253,7 @@ static void __kprobes kprobe_reenter_check(struct kprobe_ctlblk *kcb,
 		 * is a BUG. The code path resides in the .kprobes.text
 		 * section and is executed with interrupts disabled.
 		 */
-		printk(KERN_EMERG "Invalid kprobe detected at %p.\n", p->addr);
+		printk(KERN_EMERG "Invalid kprobe detected at %pK.\n", p->addr);
 		dump_kprobe(p);
 		BUG();
 	}

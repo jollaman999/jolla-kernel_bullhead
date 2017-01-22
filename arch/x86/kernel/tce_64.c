@@ -138,7 +138,7 @@ int __init build_tce_table(struct pci_dev *dev, void __iomem *bbar)
 	int ret;
 
 	if (pci_iommu(dev->bus)) {
-		printk(KERN_ERR "Calgary: dev %p has sysdata->iommu %p\n",
+		printk(KERN_ERR "Calgary: dev %pK has sysdata->iommu %pK\n",
 		       dev, pci_iommu(dev->bus));
 		BUG();
 	}

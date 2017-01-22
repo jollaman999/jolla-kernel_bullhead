@@ -197,7 +197,7 @@ static int vbi_buffer_prepare(struct videobuf_queue *q,
 
 	buf->vb.state = VIDEOBUF_PREPARED;
 	buf->vb.field = field;
-	dprintk("buf prepare %p: top=%p bottom=%p field=%s\n",
+	dprintk("buf prepare %pK: top=%pK bottom=%pK field=%s\n",
 		vb, &buf->top, &buf->bottom,
 		v4l2_field_names[buf->vb.field]);
 	return 0;
@@ -214,7 +214,7 @@ vbi_buffer_queue(struct videobuf_queue *q, struct videobuf_buffer *vb)
 	struct bttv *btv = fh->btv;
 	struct bttv_buffer *buf = container_of(vb,struct bttv_buffer,vb);
 
-	dprintk("queue %p\n",vb);
+	dprintk("queue %pK\n",vb);
 	buf->vb.state = VIDEOBUF_QUEUED;
 	list_add_tail(&buf->vb.queue,&btv->vcapture);
 	if (NULL == btv->cvbi) {
@@ -229,7 +229,7 @@ static void vbi_buffer_release(struct videobuf_queue *q, struct videobuf_buffer 
 	struct bttv *btv = fh->btv;
 	struct bttv_buffer *buf = container_of(vb,struct bttv_buffer,vb);
 
-	dprintk("free %p\n",vb);
+	dprintk("free %pK\n",vb);
 	bttv_dma_free(q,fh->btv,buf);
 }
 

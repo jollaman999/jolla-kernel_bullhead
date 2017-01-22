@@ -353,7 +353,7 @@ static unsigned long *cell_iommu_alloc_ptab(struct cbe_iommu *iommu,
 	/* number of 4K pages needed for a page table */
 	n_pte_pages = (pages_per_segment * sizeof(unsigned long)) >> 12;
 
-	pr_debug("%s: iommu[%d]: stab at %p, ptab at %p, n_pte_pages: %lu\n",
+	pr_debug("%s: iommu[%d]: stab at %pK, ptab at %pK, n_pte_pages: %lu\n",
 			__func__, iommu->nid, iommu->stab, ptab,
 			n_pte_pages);
 
@@ -987,7 +987,7 @@ static void insert_16M_pte(unsigned long addr, unsigned long *ptab,
 	offset = (addr >> 24) - (segment << IO_PAGENO_BITS(24));
 	ptab = ptab + (segment * (1 << 12) / sizeof(unsigned long));
 
-	pr_debug("iommu: addr %lx ptab %p segment %lx offset %lx\n",
+	pr_debug("iommu: addr %lx ptab %pK segment %lx offset %lx\n",
 		  addr, ptab, segment, offset);
 
 	ptab[offset] = base_pte | (__pa(addr) & CBE_IOPTE_RPN_Mask);
@@ -1175,7 +1175,7 @@ static u64 cell_dma_get_required_mask(struct device *dev)
 	if (dma_ops->get_required_mask)
 		return dma_ops->get_required_mask(dev);
 
-	WARN_ONCE(1, "no get_required_mask in %p ops", dma_ops);
+	WARN_ONCE(1, "no get_required_mask in %pK ops", dma_ops);
 
 	return DMA_BIT_MASK(64);
 }

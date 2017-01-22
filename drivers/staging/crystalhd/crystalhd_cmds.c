@@ -476,14 +476,14 @@ static enum BC_STATUS bc_cproc_check_inbuffs(bool pin, void *ubuff, uint32_t ub_
 					uint32_t uv_off, bool en_422)
 {
 	if (!ubuff || !ub_sz) {
-		BCMLOG_ERR("%s->Invalid Arg %p %x\n",
+		BCMLOG_ERR("%s->Invalid Arg %pK %x\n",
 			((pin) ? "TX" : "RX"), ubuff, ub_sz);
 		return BC_STS_INV_ARG;
 	}
 
 	/* Check for alignment */
 	if (((uintptr_t)ubuff) & 0x03) {
-		BCMLOG_ERR("%s-->Un-aligned address not implemented yet.. %p\n",
+		BCMLOG_ERR("%s-->Un-aligned address not implemented yet.. %pK\n",
 				((pin) ? "TX" : "RX"), ubuff);
 		return BC_STS_NOT_IMPL;
 	}

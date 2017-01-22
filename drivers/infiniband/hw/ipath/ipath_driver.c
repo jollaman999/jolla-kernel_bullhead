@@ -555,7 +555,7 @@ static int ipath_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		((void __iomem *)dd->ipath_kregbase + len);
 	dd->ipath_physaddr = addr;	/* used for io_remap, etc. */
 	/* for user mmap */
-	ipath_cdbg(VERBOSE, "mapped io addr %llx to kregbase %p\n",
+	ipath_cdbg(VERBOSE, "mapped io addr %llx to kregbase %pK\n",
 		   addr, dd->ipath_kregbase);
 
 	if (dd->ipath_f_bus(dd, pdev))
@@ -704,7 +704,7 @@ static void cleanup_device(struct ipath_devdata *dd)
 				   (unsigned long long)
 				   ipath_stats.sps_pageunlocks);
 
-		ipath_cdbg(VERBOSE, "Free shadow page tid array at %p\n",
+		ipath_cdbg(VERBOSE, "Free shadow page tid array at %pK\n",
 			   dd->ipath_pageshadow);
 		tmpp = dd->ipath_pageshadow;
 		dd->ipath_pageshadow = NULL;
@@ -736,7 +736,7 @@ static void ipath_remove_one(struct pci_dev *pdev)
 {
 	struct ipath_devdata *dd = pci_get_drvdata(pdev);
 
-	ipath_cdbg(VERBOSE, "removing, pdev=%p, dd=%p\n", pdev, dd);
+	ipath_cdbg(VERBOSE, "removing, pdev=%pK, dd=%pK\n", pdev, dd);
 
 	/*
 	 * disable the IB link early, to be sure no new packets arrive, which
@@ -754,7 +754,7 @@ static void ipath_remove_one(struct pci_dev *pdev)
 	ipathfs_remove_device(dd);
 	ipath_device_remove_group(&pdev->dev, dd);
 
-	ipath_cdbg(VERBOSE, "Releasing pci memory regions, dd %p, "
+	ipath_cdbg(VERBOSE, "Releasing pci memory regions, dd %pK, "
 		   "unit %u\n", dd, (u32) dd->ipath_unit);
 
 	cleanup_device(dd);
@@ -782,7 +782,7 @@ static void ipath_remove_one(struct pci_dev *pdev)
 		/* clean up chip-specific stuff */
 		dd->ipath_f_cleanup(dd);
 
-	ipath_cdbg(VERBOSE, "Unmapping kregbase %p\n", dd->ipath_kregbase);
+	ipath_cdbg(VERBOSE, "Unmapping kregbase %pK\n", dd->ipath_kregbase);
 	iounmap((volatile void __iomem *) dd->ipath_kregbase);
 	pci_release_regions(pdev);
 	ipath_cdbg(VERBOSE, "calling pci_disable_device\n");
@@ -1647,7 +1647,7 @@ u32 __iomem *ipath_getpiobuf(struct ipath_devdata *dd, u32 plen, u32 *pbufnum)
 			dd->ipath_upd_pio_shadow = 0;
 		if (dd->ipath_consec_nopiobuf)
 			dd->ipath_consec_nopiobuf = 0;
-		ipath_cdbg(VERBOSE, "Return piobuf%u %uk @ %p\n",
+		ipath_cdbg(VERBOSE, "Return piobuf%u %uk @ %pK\n",
 			   pnum, (pnum < dd->ipath_piobcnt2k) ? 2 : 4, buf);
 		if (pbufnum)
 			*pbufnum = pnum;
@@ -1805,7 +1805,7 @@ int ipath_create_rcvhdrq(struct ipath_devdata *dd,
 
 		pd->port_rcvhdrq_size = amt;
 
-		ipath_cdbg(VERBOSE, "%d pages at %p (phys %lx) size=%lu "
+		ipath_cdbg(VERBOSE, "%d pages at %pK (phys %lx) size=%lu "
 			   "for port %u rcvhdr Q\n",
 			   amt >> PAGE_SHIFT, pd->port_rcvhdrq,
 			   (unsigned long) pd->port_rcvhdrq_phys,
@@ -1813,8 +1813,8 @@ int ipath_create_rcvhdrq(struct ipath_devdata *dd,
 			   pd->port_port);
 	}
 	else
-		ipath_cdbg(VERBOSE, "reuse port %d rcvhdrq @%p %llx phys; "
-			   "hdrtailaddr@%p %llx physical\n",
+		ipath_cdbg(VERBOSE, "reuse port %d rcvhdrq @%pK %llx phys; "
+			   "hdrtailaddr@%pK %llx physical\n",
 			   pd->port_port, pd->port_rcvhdrq,
 			   (unsigned long long) pd->port_rcvhdrq_phys,
 			   pd->port_rcvhdrtail_kvaddr, (unsigned long long)
@@ -2432,7 +2432,7 @@ void ipath_free_pddata(struct ipath_devdata *dd, struct ipath_portdata *pd)
 		return;
 
 	if (pd->port_rcvhdrq) {
-		ipath_cdbg(VERBOSE, "free closed port %d rcvhdrq @ %p "
+		ipath_cdbg(VERBOSE, "free closed port %d rcvhdrq @ %pK "
 			   "(size=%lu)\n", pd->port_port, pd->port_rcvhdrq,
 			   (unsigned long) pd->port_rcvhdrq_size);
 		dma_free_coherent(&dd->pcidev->dev, pd->port_rcvhdrq_size,
@@ -2452,7 +2452,7 @@ void ipath_free_pddata(struct ipath_devdata *dd, struct ipath_portdata *pd)
 			void *base = pd->port_rcvegrbuf[e];
 			size_t size = pd->port_rcvegrbuf_size;
 
-			ipath_cdbg(VERBOSE, "egrbuf free(%p, %lu), "
+			ipath_cdbg(VERBOSE, "egrbuf free(%pK, %lu), "
 				   "chunk %u/%u\n", base,
 				   (unsigned long) size,
 				   e, pd->port_rcvegrbuf_chunks);
@@ -2470,7 +2470,7 @@ void ipath_free_pddata(struct ipath_devdata *dd, struct ipath_portdata *pd)
 
 		dd->ipath_port0_skbinfo = NULL;
 		ipath_cdbg(VERBOSE, "free closed port %d "
-			   "ipath_port0_skbinfo @ %p\n", pd->port_port,
+			   "ipath_port0_skbinfo @ %pK\n", pd->port_port,
 			   skbinfo);
 		for (e = 0; e < dd->ipath_p0_rcvegrcnt; e++)
 			if (skbinfo[e].skb) {

@@ -331,7 +331,7 @@ void show_registers(struct pt_regs *regs)
 
 	__show_regs(regs);
 	print_modules();
-	printk("Process %s (pid: %d, threadinfo=%p, task=%p, tls=%0*lx)\n",
+	printk("Process %s (pid: %d, threadinfo=%pK, task=%pK, tls=%0*lx)\n",
 	       current->comm, current->pid, current_thread_info(), current,
 	      field, current_thread_info()->tp_value);
 	if (cpu_has_userlocal) {

@@ -139,7 +139,7 @@ int qxl_mmap(struct file *filp, struct vm_area_struct *vma)
 		 "filp->private_data->minor->dev->dev_private == NULL\n");
 		return -EINVAL;
 	}
-	QXL_INFO(qdev, "%s: filp->private_data = 0x%p, vma->vm_pgoff = %lx\n",
+	QXL_INFO(qdev, "%s: filp->private_data = 0x%pK, vma->vm_pgoff = %lx\n",
 		 __func__, filp->private_data, vma->vm_pgoff);
 
 	r = ttm_bo_mmap(filp, vma, &qdev->mman.bdev);
@@ -269,7 +269,7 @@ static int qxl_ttm_backend_bind(struct ttm_tt *ttm,
 
 	gtt->offset = (unsigned long)(bo_mem->start << PAGE_SHIFT);
 	if (!ttm->num_pages) {
-		WARN(1, "nothing to bind %lu pages for mreg %p back %p!\n",
+		WARN(1, "nothing to bind %lu pages for mreg %pK back %pK!\n",
 		     ttm->num_pages, bo_mem, ttm);
 	}
 	/* Not implemented */

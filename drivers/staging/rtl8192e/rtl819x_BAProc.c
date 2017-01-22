@@ -83,7 +83,7 @@ static struct sk_buff *rtllib_ADDBA(struct rtllib_device *ieee, u8 *Dst,
 	u16 len = ieee->tx_headroom + 9;
 
 	RTLLIB_DEBUG(RTLLIB_DL_TRACE | RTLLIB_DL_BA, "========>%s(), frame(%d)"
-		     " sentd to: %pM, ieee->dev:%p\n", __func__,
+		     " sentd to: %pM, ieee->dev:%pK\n", __func__,
 		     type, Dst, ieee->dev);
 	if (pBA == NULL) {
 		RTLLIB_DEBUG(RTLLIB_DL_ERR, "pBA is NULL\n");

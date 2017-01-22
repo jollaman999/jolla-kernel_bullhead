@@ -99,7 +99,7 @@ int __init of_early_console(void *version)
 
 void __init early_init_devtree(void *params)
 {
-	pr_debug(" -> early_init_devtree(%p)\n", params);
+	pr_debug(" -> early_init_devtree(%pK)\n", params);
 
 	/* Setup flat device-tree pointer */
 	initial_boot_params = params;

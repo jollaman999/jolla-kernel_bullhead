@@ -745,7 +745,7 @@ static struct pci_resource *get_resource(struct pci_resource **head, u32 size)
 		return NULL;
 
 	for (node = *head; node; node = node->next) {
-		dbg("%s: req_size =%x node=%p, base=%x, length=%x\n",
+		dbg("%s: req_size =%x node=%pK, base=%x, length=%x\n",
 		    __func__, size, node, node->base, node->length);
 		if (node->length < size)
 			continue;
@@ -830,12 +830,12 @@ int cpqhp_resource_sort_and_combine(struct pci_resource **head)
 	struct pci_resource *node2;
 	int out_of_order = 1;
 
-	dbg("%s: head = %p, *head = %p\n", __func__, head, *head);
+	dbg("%s: head = %pK, *head = %pK\n", __func__, head, *head);
 
 	if (!(*head))
 		return 1;
 
-	dbg("*head->next = %p\n",(*head)->next);
+	dbg("*head->next = %pK\n",(*head)->next);
 
 	if (!(*head)->next)
 		return 0;	/* only one item on the list, already sorted! */
@@ -1823,7 +1823,7 @@ static void interrupt_event_handler(struct controller *ctrl)
 				if (!p_slot)
 					return;
 
-				dbg("hp_slot %d, func %p, p_slot %p\n",
+				dbg("hp_slot %d, func %pK, p_slot %pK\n",
 				    hp_slot, func, p_slot);
 
 				if (ctrl->event_queue[loop].event_type == INT_BUTTON_PRESS) {
@@ -1892,7 +1892,7 @@ static void interrupt_event_handler(struct controller *ctrl)
 					p_slot->task_event.function = pushbutton_helper_thread;
 					p_slot->task_event.data = (u32) p_slot;
 
-					dbg("add_timer p_slot = %p\n", p_slot);
+					dbg("add_timer p_slot = %pK\n", p_slot);
 					add_timer(&p_slot->task_event);
 				}
 				/***********POWER FAULT */
@@ -1938,7 +1938,7 @@ void cpqhp_pushbutton_thread(unsigned long slot)
 		p_slot->state = POWEROFF_STATE;
 		/* power Down board */
 		func = cpqhp_slot_find(p_slot->bus, p_slot->device, 0);
-		dbg("In power_down_board, func = %p, ctrl = %p\n", func, ctrl);
+		dbg("In power_down_board, func = %pK, ctrl = %pK\n", func, ctrl);
 		if (!func) {
 			dbg("Error! func NULL in %s\n", __func__);
 			return ;
@@ -1960,7 +1960,7 @@ void cpqhp_pushbutton_thread(unsigned long slot)
 		/* slot is off */
 
 		func = cpqhp_slot_find(p_slot->bus, p_slot->device, 0);
-		dbg("In add_board, func = %p, ctrl = %p\n", func, ctrl);
+		dbg("In add_board, func = %pK, ctrl = %pK\n", func, ctrl);
 		if (!func) {
 			dbg("Error! func NULL in %s\n", __func__);
 			return ;
@@ -2460,13 +2460,13 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 			return -ENOMEM;
 		dbg("Setup the IO, memory, and prefetchable windows\n");
 		dbg("io_node\n");
-		dbg("(base, len, next) (%x, %x, %p)\n", io_node->base,
+		dbg("(base, len, next) (%x, %x, %pK)\n", io_node->base,
 					io_node->length, io_node->next);
 		dbg("mem_node\n");
-		dbg("(base, len, next) (%x, %x, %p)\n", mem_node->base,
+		dbg("(base, len, next) (%x, %x, %pK)\n", mem_node->base,
 					mem_node->length, mem_node->next);
 		dbg("p_mem_node\n");
-		dbg("(base, len, next) (%x, %x, %p)\n", p_mem_node->base,
+		dbg("(base, len, next) (%x, %x, %pK)\n", p_mem_node->base,
 					p_mem_node->length, p_mem_node->next);
 
 		/* set up the IRQ info */
@@ -2829,9 +2829,9 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 
 					dbg("CND:      length = 0x%x\n", base);
 					io_node = get_io_resource(&(resources->io_head), base);
-					dbg("Got io_node start = %8.8x, length = %8.8x next (%p)\n",
+					dbg("Got io_node start = %8.8x, length = %8.8x next (%pK)\n",
 					    io_node->base, io_node->length, io_node->next);
-					dbg("func (%p) io_head (%p)\n", func, func->io_head);
+					dbg("func (%pK) io_head (%pK)\n", func, func->io_head);
 
 					/* allocate the resource to the board */
 					if (io_node) {

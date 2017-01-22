@@ -27,7 +27,7 @@ static int die_counter;
 
 void printk_address(unsigned long address, int reliable)
 {
-	pr_cont(" [<%p>] %s%pB\n",
+	pr_cont(" [<%pK>] %s%pB\n",
 		(void *)address, reliable ? "" : "? ", (void *)address);
 }
 

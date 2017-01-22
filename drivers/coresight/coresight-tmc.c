@@ -1523,7 +1523,7 @@ static void tmc_etr_sg_compute_read(struct tmc_drvdata *drvdata, loff_t *ppos,
 	}
 
 	dev_dbg_ratelimited(drvdata->dev,
-	"%s: read at %p, phys %pa len %zu blk %d, rel blk %d RWP blk %d\n",
+	"%s: read at %pK, phys %pa len %zu blk %d, rel blk %d RWP blk %d\n",
 	 __func__, *bufpp, &phys_pte, *len, blk_num, blk_num_rel,
 	drvdata->sg_blk_num);
 }

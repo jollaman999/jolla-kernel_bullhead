@@ -110,7 +110,7 @@ void radeon_semaphore_free(struct radeon_device *rdev,
 		return;
 	}
 	if ((*semaphore)->waiters > 0) {
-		dev_err(rdev->dev, "semaphore %p has more waiters than signalers,"
+		dev_err(rdev->dev, "semaphore %pK has more waiters than signalers,"
 			" hardware lockup imminent!\n", *semaphore);
 	}
 	radeon_sa_bo_free(rdev, &(*semaphore)->sa_bo, fence);

@@ -2227,7 +2227,7 @@ static void do_retry(struct work_struct *ws)
 				(req->rq_state & RQ_LOCAL_ABORTED) != 0);
 
 		if (!expected)
-			dev_err(DEV, "req=%p completion_ref=%d rq_state=%x\n",
+			dev_err(DEV, "req=%pK completion_ref=%d rq_state=%x\n",
 				req, atomic_read(&req->completion_ref),
 				req->rq_state);
 

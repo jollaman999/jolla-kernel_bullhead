@@ -72,7 +72,7 @@ static void print_pagetable_entries(pgd_t *pgdir, unsigned long address)
 	pte_t *pte;
 
 	pgd = pgdir + __pgd_offset(address);
-	printk(KERN_DEBUG "pgd entry %p: %016Lx\n",
+	printk(KERN_DEBUG "pgd entry %pK: %016Lx\n",
 	       pgd, (long long) pgd_val(*pgd));
 
 	if (!pgd_present(*pgd)) {
@@ -80,7 +80,7 @@ static void print_pagetable_entries(pgd_t *pgdir, unsigned long address)
 		return;
 	}
 	pmd = pmd_offset(pgd, address);
-	printk(KERN_DEBUG "pmd entry %p: %016Lx\n",
+	printk(KERN_DEBUG "pmd entry %pK: %016Lx\n",
 	       pmd, (long long)pmd_val(*pmd));
 
 	if (!pmd_present(*pmd)) {
@@ -88,7 +88,7 @@ static void print_pagetable_entries(pgd_t *pgdir, unsigned long address)
 		return;
 	}
 	pte = pte_offset(pmd, address);
-	printk(KERN_DEBUG "pte entry %p: %016Lx\n",
+	printk(KERN_DEBUG "pte entry %pK: %016Lx\n",
 	       pte, (long long) pte_val(*pte));
 
 	if (!pte_present(*pte))
@@ -135,7 +135,7 @@ asmlinkage void do_page_fault(struct pt_regs *regs, unsigned long fault_code,
 #endif
 
 #if 0
-	printk(KERN_DEBUG "--- do_page_fault(%p,%s:%04lx,%08lx)\n",
+	printk(KERN_DEBUG "--- do_page_fault(%pK,%s:%04lx,%08lx)\n",
 	       regs,
 	       fault_code & 0x10000 ? "ins" : "data",
 	       fault_code & 0xffff, address);

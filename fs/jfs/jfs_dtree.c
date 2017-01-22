@@ -1375,7 +1375,7 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 		return rc;
 	}
 
-	jfs_info("dtSplitPage: ip:0x%p smp:0x%p rmp:0x%p", ip, smp, rmp);
+	jfs_info("dtSplitPage: ip:0x%pK smp:0x%pK rmp:0x%pK", ip, smp, rmp);
 
 	BT_MARK_DIRTY(rmp, ip);
 	/*
@@ -1483,7 +1483,7 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 		 * acquire a transaction lock on the next page
 		 */
 		tlck = txLock(tid, ip, mp, tlckDTREE | tlckRELINK);
-		jfs_info("dtSplitPage: tlck = 0x%p, ip = 0x%p, mp=0x%p",
+		jfs_info("dtSplitPage: tlck = 0x%pK, ip = 0x%pK, mp=0x%pK",
 			tlck, ip, mp);
 		dtlck = (struct dt_lock *) & tlck->lock;
 
@@ -1724,7 +1724,7 @@ static int dtExtendPage(tid_t tid,
 	 */
 	sp->header.self = *pxd;
 
-	jfs_info("dtExtendPage: ip:0x%p smp:0x%p sp:0x%p", ip, smp, sp);
+	jfs_info("dtExtendPage: ip:0x%pK smp:0x%pK sp:0x%pK", ip, smp, sp);
 
 	BT_MARK_DIRTY(smp, ip);
 	/*
@@ -2769,7 +2769,7 @@ static int dtRelink(tid_t tid, struct inode *ip, dtpage_t * p)
 		 * action: update prev pointer;
 		 */
 		tlck = txLock(tid, ip, mp, tlckDTREE | tlckRELINK);
-		jfs_info("dtRelink nextbn: tlck = 0x%p, ip = 0x%p, mp=0x%p",
+		jfs_info("dtRelink nextbn: tlck = 0x%pK, ip = 0x%pK, mp=0x%pK",
 			tlck, ip, mp);
 		dtlck = (struct dt_lock *) & tlck->lock;
 
@@ -2798,7 +2798,7 @@ static int dtRelink(tid_t tid, struct inode *ip, dtpage_t * p)
 		 * action: update next pointer;
 		 */
 		tlck = txLock(tid, ip, mp, tlckDTREE | tlckRELINK);
-		jfs_info("dtRelink prevbn: tlck = 0x%p, ip = 0x%p, mp=0x%p",
+		jfs_info("dtRelink prevbn: tlck = 0x%pK, ip = 0x%pK, mp=0x%pK",
 			tlck, ip, mp);
 		dtlck = (struct dt_lock *) & tlck->lock;
 

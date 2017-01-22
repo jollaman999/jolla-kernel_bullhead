@@ -113,7 +113,7 @@ void dma_free_coherent(struct device *dev, size_t size,
 	void *addr = phys_to_cached(uncached_to_phys(cpu_addr));
 	struct page *page;
 
-	pr_debug("dma_free_coherent addr %p (phys %08lx) size %u\n",
+	pr_debug("dma_free_coherent addr %pK (phys %08lx) size %u\n",
 		 cpu_addr, (unsigned long)handle, (unsigned)size);
 	BUG_ON(!virt_addr_valid(addr));
 	page = virt_to_page(addr);

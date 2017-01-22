@@ -16,7 +16,7 @@ fadds(void *frD, void *frA, void *frB)
 	FP_DECL_EX;
 
 #ifdef DEBUG
-	printk("%s: %p %p %p\n", __func__, frD, frA, frB);
+	printk("%s: %pK %pK %pK\n", __func__, frD, frA, frB);
 #endif
 
 	FP_UNPACK_DP(A, frA);

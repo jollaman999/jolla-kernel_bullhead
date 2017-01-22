@@ -104,7 +104,7 @@ static void audit_mappings(struct kvm_vcpu *vcpu, u64 *sptep, int level)
 
 	if (sp->unsync) {
 		if (level != PT_PAGE_TABLE_LEVEL) {
-			audit_printk(vcpu->kvm, "unsync sp: %p "
+			audit_printk(vcpu->kvm, "unsync sp: %pK "
 				     "level = %d\n", sp, level);
 			return;
 		}
@@ -167,7 +167,7 @@ static void audit_spte_after_sync(struct kvm_vcpu *vcpu, u64 *sptep, int level)
 	struct kvm_mmu_page *sp = page_header(__pa(sptep));
 
 	if (vcpu->kvm->arch.audit_point == AUDIT_POST_SYNC && sp->unsync)
-		audit_printk(vcpu->kvm, "meet unsync sp(%p) after sync "
+		audit_printk(vcpu->kvm, "meet unsync sp(%pK) after sync "
 			     "root.\n", sp);
 }
 

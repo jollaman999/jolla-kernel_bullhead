@@ -1563,7 +1563,7 @@ setup_instance(hfc4s8s_hw *hw)
 	}
 #ifdef HISAX_HFC4S8S_PCIMEM
 	printk(KERN_INFO
-	       "HFC-4S/8S: found PCI card at membase 0x%p, irq %d\n",
+	       "HFC-4S/8S: found PCI card at membase 0x%pK, irq %d\n",
 	       hw->hw_membase, hw->irq);
 #else
 	printk(KERN_INFO

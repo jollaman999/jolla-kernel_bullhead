@@ -150,7 +150,7 @@ static int bcm63xx_txrx_bufs(struct spi_device *spi, struct spi_transfer *first,
 	/* Disable the CMD_DONE interrupt */
 	bcm_spi_writeb(bs, 0, SPI_INT_MASK);
 
-	dev_dbg(&spi->dev, "txrx: tx %p, rx %p, len %d\n",
+	dev_dbg(&spi->dev, "txrx: tx %pK, rx %pK, len %d\n",
 		t->tx_buf, t->rx_buf, t->len);
 
 	if (num_transfers > 1 && t->tx_buf && t->len <= BCM63XX_SPI_MAX_PREPEND)

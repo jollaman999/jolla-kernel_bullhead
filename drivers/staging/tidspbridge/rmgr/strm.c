@@ -167,7 +167,7 @@ int strm_close(struct strm_res_object *strmres,
 
 	idr_remove(pr_ctxt->stream_id, strmres->id);
 func_end:
-	dev_dbg(bridge, "%s: stream_obj: %p, status 0x%x\n", __func__,
+	dev_dbg(bridge, "%s: stream_obj: %pK, status 0x%x\n", __func__,
 		stream_obj, status);
 	return status;
 }
@@ -331,7 +331,7 @@ int strm_idle(struct strm_object *stream_obj, bool flush_data)
 						      flush_data);
 	}
 
-	dev_dbg(bridge, "%s: stream_obj: %p flush_data: 0x%x status: 0x%x\n",
+	dev_dbg(bridge, "%s: stream_obj: %pK flush_data: 0x%x status: 0x%x\n",
 		__func__, stream_obj, flush_data, status);
 	return status;
 }
@@ -370,7 +370,7 @@ int strm_issue(struct strm_object *stream_obj, u8 *pbuf, u32 ul_bytes,
 			status = -ENOSR;
 	}
 
-	dev_dbg(bridge, "%s: stream_obj: %p pbuf: %p ul_bytes: 0x%x dw_arg:"
+	dev_dbg(bridge, "%s: stream_obj: %pK pbuf: %pK ul_bytes: 0x%x dw_arg:"
 		" 0x%x status: 0x%x\n", __func__, stream_obj, pbuf,
 		ul_bytes, dw_arg, status);
 	return status;
@@ -512,8 +512,8 @@ func_cont:
 		(void)delete_strm(strm_obj);
 	}
 
-	dev_dbg(bridge, "%s: hnode: %p dir: 0x%x index: 0x%x pattr: %p "
-		"strmres: %p status: 0x%x\n", __func__,
+	dev_dbg(bridge, "%s: hnode: %pK dir: 0x%x index: 0x%x pattr: %pK "
+		"strmres: %pK status: 0x%x\n", __func__,
 		hnode, dir, index, pattr, strmres, status);
 	return status;
 }
@@ -586,8 +586,8 @@ int strm_reclaim(struct strm_object *stream_obj, u8 **buf_ptr,
 		*buf_ptr = chnl_ioc_obj.buf;
 	}
 func_end:
-	dev_dbg(bridge, "%s: stream_obj: %p buf_ptr: %p nbytes: %p "
-		"pdw_arg: %p status 0x%x\n", __func__, stream_obj,
+	dev_dbg(bridge, "%s: stream_obj: %pK buf_ptr: %pK nbytes: %pK "
+		"pdw_arg: %pK status 0x%x\n", __func__, stream_obj,
 		buf_ptr, nbytes, pdw_arg, status);
 	return status;
 }

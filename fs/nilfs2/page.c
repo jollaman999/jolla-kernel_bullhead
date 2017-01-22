@@ -180,8 +180,8 @@ void nilfs_page_bug(struct page *page)
 	m = page->mapping;
 	ino = m ? m->host->i_ino : 0;
 
-	printk(KERN_CRIT "NILFS_PAGE_BUG(%p): cnt=%d index#=%llu flags=0x%lx "
-	       "mapping=%p ino=%lu\n",
+	printk(KERN_CRIT "NILFS_PAGE_BUG(%pK): cnt=%d index#=%llu flags=0x%lx "
+	       "mapping=%pK ino=%lu\n",
 	       page, atomic_read(&page->_count),
 	       (unsigned long long)page->index, page->flags, m, ino);
 
@@ -192,7 +192,7 @@ void nilfs_page_bug(struct page *page)
 		bh = head = page_buffers(page);
 		do {
 			printk(KERN_CRIT
-			       " BH[%d] %p: cnt=%d block#=%llu state=0x%lx\n",
+			       " BH[%d] %pK: cnt=%d block#=%llu state=0x%lx\n",
 			       i++, bh, atomic_read(&bh->b_count),
 			       (unsigned long long)bh->b_blocknr, bh->b_state);
 			bh = bh->b_this_page;

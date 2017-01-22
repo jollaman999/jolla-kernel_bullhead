@@ -213,8 +213,8 @@ static void megasas_teardown_frame_pool_fusion(
 	struct megasas_cmd_fusion *cmd;
 
 	if (!fusion->sg_dma_pool || !fusion->sense_dma_pool) {
-		printk(KERN_ERR "megasas: dma pool is null. SG Pool %p, "
-		       "sense pool : %p\n", fusion->sg_dma_pool,
+		printk(KERN_ERR "megasas: dma pool is null. SG Pool %pK, "
+		       "sense pool : %pK\n", fusion->sg_dma_pool,
 		       fusion->sense_dma_pool);
 		return;
 	}

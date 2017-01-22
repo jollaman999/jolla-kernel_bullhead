@@ -123,7 +123,7 @@ static struct config_group *target_core_register_fabric(
 	struct target_fabric_configfs *tf;
 	int ret;
 
-	pr_debug("Target_Core_ConfigFS: REGISTER -> group: %p name:"
+	pr_debug("Target_Core_ConfigFS: REGISTER -> group: %pK name:"
 			" %s\n", group, name);
 	/*
 	 * Below are some hardcoded request_module() calls to automatically
@@ -175,7 +175,7 @@ static struct config_group *target_core_register_fabric(
 	 * On a successful target_core_get_fabric() look, the returned
 	 * struct target_fabric_configfs *tf will contain a usage reference.
 	 */
-	pr_debug("Target_Core_ConfigFS: REGISTER tfc_wwn_cit -> %p\n",
+	pr_debug("Target_Core_ConfigFS: REGISTER tfc_wwn_cit -> %pK\n",
 			&TF_CIT_TMPL(tf)->tfc_wwn_cit);
 
 	tf->tf_group.default_groups = tf->tf_default_groups;
@@ -323,7 +323,7 @@ struct target_fabric_configfs *target_fabric_configfs_init(
 
 	pr_debug("<<<<<<<<<<<<<<<<<<<<<< BEGIN FABRIC API >>>>>>>>"
 			">>>>>>>>>>>>>>\n");
-	pr_debug("Initialized struct target_fabric_configfs: %p for"
+	pr_debug("Initialized struct target_fabric_configfs: %pK for"
 			" %s\n", tf, tf->tf_name);
 	return tf;
 }

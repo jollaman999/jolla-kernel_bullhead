@@ -295,7 +295,7 @@ A_STATUS HIFRegBasedGetTargetInfo(HIF_DEVICE *device, struct bmi_target_info *ta
         msleep(100);
     }
 
-    AR_DEBUG_PRINTF(ATH_DEBUG_BMI, ("BMI Get Target Info: Enter (device: 0x%p)\n", device));
+    AR_DEBUG_PRINTF(ATH_DEBUG_BMI, ("BMI Get Target Info: Enter (device: 0x%pK)\n", device));
     cid = BMI_GET_TARGET_INFO;
 
     status = bmiBufferSend(device, (A_UCHAR *)&cid, sizeof(cid));

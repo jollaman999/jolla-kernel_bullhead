@@ -648,7 +648,7 @@ int nilfs_empty_dir(struct inode *inode)
 			if (de->rec_len == 0) {
 				nilfs_error(inode->i_sb, __func__,
 					    "zero-length directory entry "
-					    "(kaddr=%p, de=%p)\n", kaddr, de);
+					    "(kaddr=%pK, de=%pK)\n", kaddr, de);
 				goto not_empty;
 			}
 			if (de->inode != 0) {

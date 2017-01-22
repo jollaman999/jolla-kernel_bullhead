@@ -77,7 +77,7 @@ int btcx_riscmem_alloc(struct pci_dev *pci,
 		risc->size = size;
 		if (debug) {
 			memcnt++;
-			printk("btcx: riscmem alloc [%d] dma=%lx cpu=%p size=%d\n",
+			printk("btcx: riscmem alloc [%d] dma=%lx cpu=%pK size=%d\n",
 			       memcnt, (unsigned long)dma, cpu, size);
 		}
 	}

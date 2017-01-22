@@ -1296,7 +1296,7 @@ static struct urb *keyspan_setup_urb(struct usb_serial *serial, int endpoint,
 		return NULL;
 	}
 
-	dev_dbg(&serial->interface->dev, "%s - using urb %p for %s endpoint %x\n",
+	dev_dbg(&serial->interface->dev, "%s - using urb %pK for %s endpoint %x\n",
 	    __func__, urb, ep_type_name, endpoint);
 	return urb;
 }

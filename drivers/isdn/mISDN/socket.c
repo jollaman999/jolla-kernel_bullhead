@@ -74,7 +74,7 @@ mISDN_send(struct mISDNchannel *ch, struct sk_buff *skb)
 
 	msk = container_of(ch, struct mISDN_sock, ch);
 	if (*debug & DEBUG_SOCKET)
-		printk(KERN_DEBUG "%s len %d %p\n", __func__, skb->len, skb);
+		printk(KERN_DEBUG "%s len %d %pK\n", __func__, skb->len, skb);
 	if (msk->sk.sk_state == MISDN_CLOSED)
 		return -EUNATCH;
 	__net_timestamp(skb);
@@ -91,7 +91,7 @@ mISDN_ctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 
 	msk = container_of(ch, struct mISDN_sock, ch);
 	if (*debug & DEBUG_SOCKET)
-		printk(KERN_DEBUG "%s(%p, %x, %p)\n", __func__, ch, cmd, arg);
+		printk(KERN_DEBUG "%s(%pK, %x, %pK)\n", __func__, ch, cmd, arg);
 	switch (cmd) {
 	case CLOSE_CHANNEL:
 		msk->sk.sk_state = MISDN_CLOSED;
@@ -250,7 +250,7 @@ data_sock_release(struct socket *sock)
 	struct sock *sk = sock->sk;
 
 	if (*debug & DEBUG_SOCKET)
-		printk(KERN_DEBUG "%s(%p) sk=%p\n", __func__, sock, sk);
+		printk(KERN_DEBUG "%s(%pK) sk=%pK\n", __func__, sock, sk);
 	if (!sk)
 		return 0;
 	switch (sk->sk_protocol) {
@@ -419,7 +419,7 @@ static int data_sock_setsockopt(struct socket *sock, int level, int optname,
 	int err = 0, opt = 0;
 
 	if (*debug & DEBUG_SOCKET)
-		printk(KERN_DEBUG "%s(%p, %d, %x, %p, %d)\n", __func__, sock,
+		printk(KERN_DEBUG "%s(%pK, %d, %x, %pK, %d)\n", __func__, sock,
 		       level, optname, optval, len);
 
 	lock_sock(sk);
@@ -482,7 +482,7 @@ data_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
 	int err = 0;
 
 	if (*debug & DEBUG_SOCKET)
-		printk(KERN_DEBUG "%s(%p) sk=%p\n", __func__, sock, sk);
+		printk(KERN_DEBUG "%s(%pK) sk=%pK\n", __func__, sock, sk);
 	if (addr_len != sizeof(struct sockaddr_mISDN))
 		return -EINVAL;
 	if (!maddr || maddr->family != AF_ISDN)
@@ -632,7 +632,7 @@ base_sock_release(struct socket *sock)
 {
 	struct sock *sk = sock->sk;
 
-	printk(KERN_DEBUG "%s(%p) sk=%p\n", __func__, sock, sk);
+	printk(KERN_DEBUG "%s(%pK) sk=%pK\n", __func__, sock, sk);
 	if (!sk)
 		return 0;
 

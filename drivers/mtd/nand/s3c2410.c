@@ -450,7 +450,7 @@ static int s3c2410_nand_correct_data(struct mtd_info *mtd, u_char *dat,
 	unsigned int diff0, diff1, diff2;
 	unsigned int bit, byte;
 
-	pr_debug("%s(%p,%p,%p,%p)\n", __func__, mtd, dat, read_ecc, calc_ecc);
+	pr_debug("%s(%pK,%pK,%pK,%pK)\n", __func__, mtd, dat, read_ecc, calc_ecc);
 
 	diff0 = read_ecc[0] ^ calc_ecc[0];
 	diff1 = read_ecc[1] ^ calc_ecc[1];
@@ -713,7 +713,7 @@ static int s3c24xx_nand_remove(struct platform_device *pdev)
 		int mtdno;
 
 		for (mtdno = 0; mtdno < info->mtd_count; mtdno++, ptr++) {
-			pr_debug("releasing mtd %d (%p)\n", mtdno, ptr);
+			pr_debug("releasing mtd %d (%pK)\n", mtdno, ptr);
 			nand_release(&ptr->mtd);
 		}
 	}
@@ -876,7 +876,7 @@ static void s3c2410_nand_update_chip(struct s3c2410_nand_info *info,
 {
 	struct nand_chip *chip = &nmtd->chip;
 
-	dev_dbg(info->device, "chip %p => page shift %d\n",
+	dev_dbg(info->device, "chip %pK => page shift %d\n",
 		chip, chip->page_shift);
 
 	if (chip->ecc.mode != NAND_ECC_HW)
@@ -917,7 +917,7 @@ static int s3c24xx_nand_probe(struct platform_device *pdev)
 
 	cpu_type = platform_get_device_id(pdev)->driver_data;
 
-	pr_debug("s3c2410_nand_probe(%p)\n", pdev);
+	pr_debug("s3c2410_nand_probe(%pK)\n", pdev);
 
 	info = devm_kzalloc(&pdev->dev, sizeof(*info), GFP_KERNEL);
 	if (info == NULL) {
@@ -958,7 +958,7 @@ static int s3c24xx_nand_probe(struct platform_device *pdev)
 		goto exit_error;
 	}
 
-	dev_dbg(&pdev->dev, "mapped registers at %p\n", info->regs);
+	dev_dbg(&pdev->dev, "mapped registers at %pK\n", info->regs);
 
 	/* initialise the hardware */
 
@@ -986,7 +986,7 @@ static int s3c24xx_nand_probe(struct platform_device *pdev)
 	nmtd = info->mtds;
 
 	for (setno = 0; setno < nr_sets; setno++, nmtd++) {
-		pr_debug("initialising set %d (%p, info %p)\n",
+		pr_debug("initialising set %d (%pK, info %pK)\n",
 			 setno, nmtd, info);
 
 		s3c2410_nand_init_chip(info, nmtd, sets);

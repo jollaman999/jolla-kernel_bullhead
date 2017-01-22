@@ -229,7 +229,7 @@ static void cpmac_dump_regs(struct net_device *dev)
 		if (i % 16 == 0) {
 			if (i)
 				pr_cont("\n");
-			printk(KERN_DEBUG "%s: reg[%p]:", dev->name,
+			printk(KERN_DEBUG "%s: reg[%pK]:", dev->name,
 			       priv->regs + i);
 		}
 		printk(" %08x", cpmac_read(priv->regs, i));
@@ -240,7 +240,7 @@ static void cpmac_dump_regs(struct net_device *dev)
 static void cpmac_dump_desc(struct net_device *dev, struct cpmac_desc *desc)
 {
 	int i;
-	printk(KERN_DEBUG "%s: desc[%p]:", dev->name, desc);
+	printk(KERN_DEBUG "%s: desc[%pK]:", dev->name, desc);
 	for (i = 0; i < sizeof(*desc) / 4; i++)
 		printk(" %08x", ((u32 *)desc)[i]);
 	printk("\n");
@@ -259,12 +259,12 @@ static void cpmac_dump_all_desc(struct net_device *dev)
 static void cpmac_dump_skb(struct net_device *dev, struct sk_buff *skb)
 {
 	int i;
-	printk(KERN_DEBUG "%s: skb 0x%p, len=%d\n", dev->name, skb, skb->len);
+	printk(KERN_DEBUG "%s: skb 0x%pK, len=%d\n", dev->name, skb, skb->len);
 	for (i = 0; i < skb->len; i++) {
 		if (i % 16 == 0) {
 			if (i)
 				pr_cont("\n");
-			printk(KERN_DEBUG "%s: data[%p]:", dev->name,
+			printk(KERN_DEBUG "%s: data[%pK]:", dev->name,
 			       skb->data + i);
 		}
 		printk(" %02x", ((u8 *)skb->data)[i]);
@@ -453,7 +453,7 @@ static int cpmac_poll(struct napi_struct *napi, int budget)
 			if (unlikely(restart)) {
 				if (netif_msg_rx_err(priv))
 					printk(KERN_ERR "%s: poll found a"
-						" duplicate EOQ: %p and %p\n",
+						" duplicate EOQ: %pK and %pK\n",
 						priv->dev->name, restart, desc);
 				goto fatal_error;
 			}
@@ -505,7 +505,7 @@ static int cpmac_poll(struct napi_struct *napi, int budget)
 			if (netif_msg_drv(priv))
 				printk(KERN_ERR "%s: cpmac_poll is trying to "
 					"restart rx from a descriptor that's "
-					"not free: %p\n",
+					"not free: %pK\n",
 					priv->dev->name, restart);
 			goto fatal_error;
 		}
@@ -589,7 +589,7 @@ static int cpmac_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	desc->datalen = len;
 	desc->buflen = len;
 	if (unlikely(netif_msg_tx_queued(priv)))
-		printk(KERN_DEBUG "%s: sending 0x%p, len=%d\n", dev->name, skb,
+		printk(KERN_DEBUG "%s: sending 0x%pK, len=%d\n", dev->name, skb,
 		       skb->len);
 	if (unlikely(netif_msg_hw(priv)))
 		cpmac_dump_desc(dev, desc);
@@ -616,7 +616,7 @@ static void cpmac_end_xmit(struct net_device *dev, int queue)
 				 DMA_TO_DEVICE);
 
 		if (unlikely(netif_msg_tx_done(priv)))
-			printk(KERN_DEBUG "%s: sent 0x%p, len=%d\n", dev->name,
+			printk(KERN_DEBUG "%s: sent 0x%pK, len=%d\n", dev->name,
 			       desc->skb, desc->skb->len);
 
 		dev_kfree_skb_irq(desc->skb);
@@ -1192,7 +1192,7 @@ static int cpmac_probe(struct platform_device *pdev)
 
 	if (netif_msg_probe(priv)) {
 		printk(KERN_INFO
-		       "cpmac: device %s (regs: %p, irq: %d, phy: %s, "
+		       "cpmac: device %s (regs: %pK, irq: %d, phy: %s, "
 		       "mac: %pM)\n", dev->name, (void *)mem->start, dev->irq,
 		       priv->phy_name, dev->dev_addr);
 	}

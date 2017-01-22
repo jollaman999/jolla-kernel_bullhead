@@ -324,7 +324,7 @@ static void __init initialize_cache_info(void)
 				lsize = *lsizep;
 			if (sizep == 0 || lsizep == 0)
 				DBG("Argh, can't find dcache properties ! "
-				    "sizep: %p, lsizep: %p\n", sizep, lsizep);
+				    "sizep: %pK, lsizep: %pK\n", sizep, lsizep);
 
 			ppc64_caches.dsize = size;
 			ppc64_caches.dline_size = lsize;
@@ -346,7 +346,7 @@ static void __init initialize_cache_info(void)
 				lsize = *lsizep;
 			if (sizep == 0 || lsizep == 0)
 				DBG("Argh, can't find icache properties ! "
-				    "sizep: %p, lsizep: %p\n", sizep, lsizep);
+				    "sizep: %pK, lsizep: %pK\n", sizep, lsizep);
 
 			ppc64_caches.isize = size;
 			ppc64_caches.iline_size = lsize;
@@ -451,7 +451,7 @@ void __init setup_system(void)
 		       ppc64_caches.iline_size);
 #ifdef CONFIG_PPC_STD_MMU_64
 	if (htab_address)
-		printk("htab_address                  = 0x%p\n", htab_address);
+		printk("htab_address                  = 0x%pK\n", htab_address);
 	printk("htab_hash_mask                = 0x%lx\n", htab_hash_mask);
 #endif /* CONFIG_PPC_STD_MMU_64 */
 	if (PHYSICAL_START > 0)

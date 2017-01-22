@@ -471,7 +471,7 @@ int siu_init_port(int port, struct siu_port **port_info, struct snd_card *card)
 	if (!*port_info)
 		return -ENOMEM;
 
-	dev_dbg(dev, "%s: port #%d@%p\n", __func__, port, *port_info);
+	dev_dbg(dev, "%s: port #%d@%pK\n", __func__, port, *port_info);
 
 	(*port_info)->playback.volume = DFLT_VOLUME_LEVEL;
 	(*port_info)->capture.volume = DFLT_VOLUME_LEVEL;
@@ -486,14 +486,14 @@ int siu_init_port(int port, struct siu_port **port_info, struct snd_card *card)
 	ret = snd_ctl_add(card, kctrl);
 	if (ret < 0)
 		dev_err(dev,
-			"failed to add playback controls %p port=%d err=%d\n",
+			"failed to add playback controls %pK port=%d err=%d\n",
 			kctrl, port, ret);
 
 	kctrl = snd_ctl_new1(&capture_controls, *port_info);
 	ret = snd_ctl_add(card, kctrl);
 	if (ret < 0)
 		dev_err(dev,
-			"failed to add capture controls %p port=%d err=%d\n",
+			"failed to add capture controls %pK port=%d err=%d\n",
 			kctrl, port, ret);
 
 	return 0;
@@ -512,7 +512,7 @@ static int siu_dai_startup(struct snd_pcm_substream *substream,
 	struct siu_port	*port_info = siu_port_info(substream);
 	int ret;
 
-	dev_dbg(substream->pcm->card->dev, "%s: port=%d@%p\n", __func__,
+	dev_dbg(substream->pcm->card->dev, "%s: port=%d@%pK\n", __func__,
 		info->port_id, port_info);
 
 	snd_soc_set_runtime_hwparams(substream, &siu_dai_pcm_hw);
@@ -532,7 +532,7 @@ static void siu_dai_shutdown(struct snd_pcm_substream *substream,
 	struct siu_info *info = snd_soc_dai_get_drvdata(dai);
 	struct siu_port	*port_info = siu_port_info(substream);
 
-	dev_dbg(substream->pcm->card->dev, "%s: port=%d@%p\n", __func__,
+	dev_dbg(substream->pcm->card->dev, "%s: port=%d@%pK\n", __func__,
 		info->port_id, port_info);
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)

@@ -496,7 +496,7 @@ static int i82975x_probe1(struct pci_dev *pdev, int dev_idx)
 	mch_window = ioremap_nocache(mchbar, 0x1000);
 
 #ifdef i82975x_DEBUG_IOMEM
-	i82975x_printk(KERN_INFO, "MCHBAR real = %0x, remapped = %p\n",
+	i82975x_printk(KERN_INFO, "MCHBAR real = %0x, remapped = %pK\n",
 					mchbar, mch_window);
 
 	c0drb[0] = readb(mch_window + I82975X_DRB_CH0R0);

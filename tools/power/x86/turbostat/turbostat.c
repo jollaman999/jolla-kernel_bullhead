@@ -312,7 +312,7 @@ void print_header(void)
 int dump_counters(struct thread_data *t, struct core_data *c,
 	struct pkg_data *p)
 {
-	fprintf(stderr, "t %p, c %p, p %p\n", t, c, p);
+	fprintf(stderr, "t %pK, c %pK, p %pK\n", t, c, p);
 
 	if (t) {
 		fprintf(stderr, "CPU: %d flags 0x%x\n", t->cpu_id, t->flags);

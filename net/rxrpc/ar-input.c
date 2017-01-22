@@ -110,7 +110,7 @@ int rxrpc_queue_rcv_skb(struct rxrpc_call *call, struct sk_buff *skb,
 			 * control pulling packets from the queue */
 			skb_len = skb->len;
 
-			_net("post skb %p", skb);
+			_net("post skb %pK", skb);
 			__skb_queue_tail(&sk->sk_receive_queue, skb);
 			spin_unlock_bh(&sk->sk_receive_queue.lock);
 
@@ -259,7 +259,7 @@ out:
 	return ret;
 
 discard_and_ack:
-	_debug("discard and ACK packet %p", skb);
+	_debug("discard and ACK packet %pK", skb);
 	__rxrpc_propose_ACK(call, ack, sp->hdr.serial, true);
 discard:
 	spin_unlock(&call->lock);
@@ -270,7 +270,7 @@ discard:
 enqueue_and_ack:
 	__rxrpc_propose_ACK(call, ack, sp->hdr.serial, true);
 enqueue_packet:
-	_net("defer skb %p", skb);
+	_net("defer skb %pK", skb);
 	spin_unlock(&call->lock);
 	skb_queue_tail(&call->rx_queue, skb);
 	atomic_inc(&call->ackr_not_idle);
@@ -322,7 +322,7 @@ void rxrpc_fast_process_packet(struct rxrpc_call *call, struct sk_buff *skb)
 	__be32 _abort_code;
 	u32 serial, hi_serial, seq, abort_code;
 
-	_enter("%p,%p", call, skb);
+	_enter("%pK,%pK", call, skb);
 
 	ASSERT(!irqs_disabled());
 
@@ -534,7 +534,7 @@ static void rxrpc_post_packet_to_call(struct rxrpc_connection *conn,
 	struct rb_node *p;
 	__be32 call_id;
 
-	_enter("%p,%p", conn, skb);
+	_enter("%pK,%pK", conn, skb);
 
 	read_lock_bh(&conn->lock);
 
@@ -657,7 +657,7 @@ done:
 static void rxrpc_post_packet_to_conn(struct rxrpc_connection *conn,
 				      struct sk_buff *skb)
 {
-	_enter("%p,%p", conn, skb);
+	_enter("%pK,%pK", conn, skb);
 
 	atomic_inc(&conn->usage);
 	skb_queue_tail(&conn->rx_queue, skb);
@@ -678,7 +678,7 @@ void rxrpc_data_ready(struct sock *sk, int count)
 	struct sk_buff *skb;
 	int ret;
 
-	_enter("%p, %d", sk, count);
+	_enter("%pK, %d", sk, count);
 
 	ASSERT(!irqs_disabled());
 
@@ -705,7 +705,7 @@ void rxrpc_data_ready(struct sock *sk, int count)
 
 	rxrpc_new_skb(skb);
 
-	_net("recv skb %p", skb);
+	_net("recv skb %pK", skb);
 
 	/* we'll probably need to checksum it (didn't call sock_recvmsg) */
 	if (skb_checksum_complete(skb)) {
@@ -763,7 +763,7 @@ void rxrpc_data_ready(struct sock *sk, int count)
 	if (!conn)
 		goto cant_route_call;
 
-	_debug("CONN %p {%d}", conn, conn->debug_id);
+	_debug("CONN %pK {%d}", conn, conn->debug_id);
 
 	if (sp->hdr.callNumber == 0)
 		rxrpc_post_packet_to_conn(conn, skb);

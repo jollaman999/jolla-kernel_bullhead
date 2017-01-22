@@ -262,7 +262,7 @@ static void pwc_isoc_handler(struct urb *urb)
 
 	if (urb->status == -ENOENT || urb->status == -ECONNRESET ||
 	    urb->status == -ESHUTDOWN) {
-		PWC_DEBUG_OPEN("URB (%p) unlinked %ssynchronuously.\n", urb, urb->status == -ENOENT ? "" : "a");
+		PWC_DEBUG_OPEN("URB (%pK) unlinked %ssynchronuously.\n", urb, urb->status == -ENOENT ? "" : "a");
 		return;
 	}
 
@@ -416,7 +416,7 @@ retry:
 			return -ENOMEM;
 		}
 		pdev->urbs[i] = urb;
-		PWC_DEBUG_MEMORY("Allocated URB at 0x%p\n", urb);
+		PWC_DEBUG_MEMORY("Allocated URB at 0x%pK\n", urb);
 
 		urb->interval = 1; // devik
 		urb->dev = udev;
@@ -455,7 +455,7 @@ retry:
 			pwc_isoc_cleanup(pdev);
 			return ret;
 		}
-		PWC_DEBUG_MEMORY("URB 0x%p submitted.\n", pdev->urbs[i]);
+		PWC_DEBUG_MEMORY("URB 0x%pK submitted.\n", pdev->urbs[i]);
 	}
 
 	/* All is done... */
@@ -470,7 +470,7 @@ static void pwc_iso_stop(struct pwc_device *pdev)
 	/* Unlinking ISOC buffers one by one */
 	for (i = 0; i < MAX_ISO_BUFS; i++) {
 		if (pdev->urbs[i]) {
-			PWC_DEBUG_MEMORY("Unlinking URB %p\n", pdev->urbs[i]);
+			PWC_DEBUG_MEMORY("Unlinking URB %pK\n", pdev->urbs[i]);
 			usb_kill_urb(pdev->urbs[i]);
 		}
 	}

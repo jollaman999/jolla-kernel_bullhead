@@ -853,7 +853,7 @@ avm_bctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	int ret = -EINVAL;
 	u_long flags;
 
-	pr_debug("%s: %s cmd:%x %p\n", fc->name, __func__, cmd, arg);
+	pr_debug("%s: %s cmd:%x %pK\n", fc->name, __func__, cmd, arg);
 	switch (cmd) {
 	case CLOSE_CHANNEL:
 		test_and_clear_bit(FLG_OPEN, &bch->Flags);
@@ -933,7 +933,7 @@ avm_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	struct channel_req	*rq;
 	int			err = 0;
 
-	pr_debug("%s: %s cmd:%x %p\n", fc->name, __func__, cmd, arg);
+	pr_debug("%s: %s cmd:%x %pK\n", fc->name, __func__, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
 		rq = arg;
@@ -947,7 +947,7 @@ avm_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 			pr_info("%s: cannot get module\n", fc->name);
 		break;
 	case CLOSE_CHANNEL:
-		pr_debug("%s: dev(%d) close from %p\n", fc->name, dch->dev.id,
+		pr_debug("%s: dev(%d) close from %pK\n", fc->name, dch->dev.id,
 			 __builtin_return_address(0));
 		module_put(THIS_MODULE);
 		break;

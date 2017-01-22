@@ -48,7 +48,7 @@ int s3c2410_dma_set_opfn(enum dma_ch channel, s3c2410_dma_opfn_t rtn)
 	if (chan == NULL)
 		return -EINVAL;
 
-	pr_debug("%s: chan=%p, op rtn=%p\n", __func__, chan, rtn);
+	pr_debug("%s: chan=%pK, op rtn=%pK\n", __func__, chan, rtn);
 
 	chan->op_fn = rtn;
 
@@ -63,7 +63,7 @@ int s3c2410_dma_set_buffdone_fn(enum dma_ch channel, s3c2410_dma_cbfn_t rtn)
 	if (chan == NULL)
 		return -EINVAL;
 
-	pr_debug("%s: chan=%p, callback rtn=%p\n", __func__, chan, rtn);
+	pr_debug("%s: chan=%pK, callback rtn=%pK\n", __func__, chan, rtn);
 
 	chan->callback_fn = rtn;
 

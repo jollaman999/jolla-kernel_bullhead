@@ -63,7 +63,7 @@ static int iser_prepare_read_cmd(struct iscsi_task *task,
 
 	if (edtl > iser_task->data[ISER_DIR_IN].data_len) {
 		iser_err("Total data length: %ld, less than EDTL: "
-			 "%d, in READ cmd BHS itt: %d, conn: 0x%p\n",
+			 "%d, in READ cmd BHS itt: %d, conn: 0x%pK\n",
 			 iser_task->data[ISER_DIR_IN].data_len, edtl,
 			 task->itt, iser_task->iser_conn);
 		return -EINVAL;
@@ -113,7 +113,7 @@ iser_prepare_write_cmd(struct iscsi_task *task,
 
 	if (edtl > iser_task->data[ISER_DIR_OUT].data_len) {
 		iser_err("Total data length: %ld, less than EDTL: %d, "
-			 "in WRITE cmd BHS itt: %d, conn: 0x%p\n",
+			 "in WRITE cmd BHS itt: %d, conn: 0x%pK\n",
 			 iser_task->data[ISER_DIR_OUT].data_len,
 			 edtl, task->itt, task->conn);
 		return -EINVAL;
@@ -166,7 +166,7 @@ static void iser_create_send_desc(struct iser_conn	*ib_conn,
 
 	if (tx_desc->tx_sg[0].lkey != device->mr->lkey) {
 		tx_desc->tx_sg[0].lkey = device->mr->lkey;
-		iser_dbg("sdesc %p lkey mismatch, fixing\n", tx_desc);
+		iser_dbg("sdesc %pK lkey mismatch, fixing\n", tx_desc);
 	}
 }
 
@@ -311,7 +311,7 @@ int iser_send_command(struct iscsi_conn *conn,
 		return 0;
 
 send_command_error:
-	iser_err("conn %p failed task->itt %d err %d\n",conn, task->itt, err);
+	iser_err("conn %pK failed task->itt %d err %d\n",conn, task->itt, err);
 	return err;
 }
 
@@ -377,7 +377,7 @@ int iser_send_data_out(struct iscsi_conn *conn,
 
 send_data_out_error:
 	kmem_cache_free(ig.desc_cache, tx_desc);
-	iser_err("conn %p failed err %d\n",conn, err);
+	iser_err("conn %pK failed err %d\n",conn, err);
 	return err;
 }
 
@@ -438,7 +438,7 @@ int iser_send_control(struct iscsi_conn *conn,
 		return 0;
 
 send_control_error:
-	iser_err("conn %p failed err %d\n",conn, err);
+	iser_err("conn %pK failed err %d\n",conn, err);
 	return err;
 }
 

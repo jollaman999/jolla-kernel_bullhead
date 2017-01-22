@@ -1356,8 +1356,8 @@ static void bond_netpoll_cleanup(struct net_device *bond_dev)
 static void bond_set_dev_addr(struct net_device *bond_dev,
 			      struct net_device *slave_dev)
 {
-	pr_debug("bond_dev=%p\n", bond_dev);
-	pr_debug("slave_dev=%p\n", slave_dev);
+	pr_debug("bond_dev=%pK\n", bond_dev);
+	pr_debug("slave_dev=%pK\n", slave_dev);
 	pr_debug("slave_dev->addr_len=%d\n", slave_dev->addr_len);
 	memcpy(bond_dev->dev_addr, slave_dev->dev_addr, slave_dev->addr_len);
 	bond_dev->addr_assign_type = NET_ADDR_SET;
@@ -3666,7 +3666,7 @@ static int bond_do_ioctl(struct net_device *bond_dev, struct ifreq *ifr, int cmd
 
 	slave_dev = dev_get_by_name(net, ifr->ifr_slave);
 
-	pr_debug("slave_dev=%p:\n", slave_dev);
+	pr_debug("slave_dev=%pK:\n", slave_dev);
 
 	if (!slave_dev)
 		res = -ENODEV;
@@ -3823,7 +3823,7 @@ static int bond_change_mtu(struct net_device *bond_dev, int new_mtu)
 	int res = 0;
 	int i;
 
-	pr_debug("bond=%p, name=%s, new_mtu=%d\n", bond,
+	pr_debug("bond=%pK, name=%s, new_mtu=%d\n", bond,
 		 (bond_dev ? bond_dev->name : "None"), new_mtu);
 
 	/* Can't hold bond->lock with bh disabled here since
@@ -3842,7 +3842,7 @@ static int bond_change_mtu(struct net_device *bond_dev, int new_mtu)
 	 */
 
 	bond_for_each_slave(bond, slave, i) {
-		pr_debug("s %p s->p %p c_m %p\n",
+		pr_debug("s %pK s->p %pK c_m %pK\n",
 			 slave,
 			 slave->prev,
 			 slave->dev->netdev_ops->ndo_change_mtu);
@@ -3902,7 +3902,7 @@ static int bond_set_mac_address(struct net_device *bond_dev, void *addr)
 		return bond_alb_set_mac_address(bond_dev, addr);
 
 
-	pr_debug("bond=%p, name=%s\n",
+	pr_debug("bond=%pK, name=%s\n",
 		 bond, bond_dev ? bond_dev->name : "None");
 
 	/*
@@ -3932,7 +3932,7 @@ static int bond_set_mac_address(struct net_device *bond_dev, void *addr)
 
 	bond_for_each_slave(bond, slave, i) {
 		const struct net_device_ops *slave_ops = slave->dev->netdev_ops;
-		pr_debug("slave %p %s\n", slave, slave->dev->name);
+		pr_debug("slave %pK %s\n", slave, slave->dev->name);
 
 		if (slave_ops->ndo_set_mac_address == NULL) {
 			res = -EOPNOTSUPP;

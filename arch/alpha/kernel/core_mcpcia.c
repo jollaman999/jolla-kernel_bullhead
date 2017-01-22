@@ -174,7 +174,7 @@ mk_conf_addr(struct pci_bus *pbus, unsigned int devfn, int where,
 	unsigned long addr;
 
 	DBG_CFG(("mk_conf_addr(bus=%d,devfn=0x%x,hose=%d,where=0x%x,"
-		 " pci_addr=0x%p, type1=0x%p)\n",
+		 " pci_addr=0x%pK, type1=0x%pK)\n",
 		 bus, devfn, hose->index, where, pci_addr, type1));
 
 	/* Type 1 configuration cycle for *ALL* busses.  */

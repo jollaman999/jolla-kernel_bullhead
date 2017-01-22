@@ -323,7 +323,7 @@ static void sh_mmcif_start_dma_rx(struct sh_mmcif_host *host)
 		sh_mmcif_bitclr(host, MMCIF_CE_BUF_ACC, BUF_ACC_DMAREN | BUF_ACC_DMAWEN);
 	}
 
-	dev_dbg(&host->pd->dev, "%s(): desc %p, cookie %d, sg[%d]\n", __func__,
+	dev_dbg(&host->pd->dev, "%s(): desc %pK, cookie %d, sg[%d]\n", __func__,
 		desc, cookie, data->sg_len);
 }
 
@@ -372,7 +372,7 @@ static void sh_mmcif_start_dma_tx(struct sh_mmcif_host *host)
 		sh_mmcif_bitclr(host, MMCIF_CE_BUF_ACC, BUF_ACC_DMAREN | BUF_ACC_DMAWEN);
 	}
 
-	dev_dbg(&host->pd->dev, "%s(): desc %p, cookie %d\n", __func__,
+	dev_dbg(&host->pd->dev, "%s(): desc %pK, cookie %d\n", __func__,
 		desc, cookie);
 }
 
@@ -398,7 +398,7 @@ static void sh_mmcif_request_dma(struct sh_mmcif_host *host,
 
 	host->chan_tx = dma_request_channel(mask, shdma_chan_filter,
 					    (void *)pdata->slave_id_tx);
-	dev_dbg(&host->pd->dev, "%s: TX: got channel %p\n", __func__,
+	dev_dbg(&host->pd->dev, "%s: TX: got channel %pK\n", __func__,
 		host->chan_tx);
 
 	if (!host->chan_tx)
@@ -414,7 +414,7 @@ static void sh_mmcif_request_dma(struct sh_mmcif_host *host,
 
 	host->chan_rx = dma_request_channel(mask, shdma_chan_filter,
 					    (void *)pdata->slave_id_rx);
-	dev_dbg(&host->pd->dev, "%s: RX: got channel %p\n", __func__,
+	dev_dbg(&host->pd->dev, "%s: RX: got channel %pK\n", __func__,
 		host->chan_rx);
 
 	if (!host->chan_rx)

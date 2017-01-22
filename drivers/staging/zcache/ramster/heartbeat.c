@@ -396,7 +396,7 @@ int r2hb_register_callback(const char *region_uuid,
 	up_write(&r2hb_callback_sem);
 	ret = 0;
 out:
-	mlog(ML_CLUSTER, "returning %d on behalf of %p for funcs %p\n",
+	mlog(ML_CLUSTER, "returning %d on behalf of %pK for funcs %pK\n",
 	     ret, __builtin_return_address(0), hc);
 	return ret;
 }
@@ -407,7 +407,7 @@ void r2hb_unregister_callback(const char *region_uuid,
 {
 	BUG_ON(hc->hc_magic != R2HB_CB_MAGIC);
 
-	mlog(ML_CLUSTER, "on behalf of %p for funcs %p\n",
+	mlog(ML_CLUSTER, "on behalf of %pK for funcs %pK\n",
 	     __builtin_return_address(0), hc);
 
 	/* XXX Can this happen _with_ a region reference? */

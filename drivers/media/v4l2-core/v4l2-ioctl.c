@@ -286,7 +286,7 @@ static void v4l_print_format(const void *arg, bool write_only)
 		/* Note: we can't print the clip list here since the clips
 		 * pointer is a userspace pointer, not a kernelspace
 		 * pointer. */
-		pr_cont(", wxh=%dx%d, x,y=%d,%d, field=%s, chromakey=0x%08x, clipcount=%u, clips=%p, bitmap=%p, global_alpha=0x%02x\n",
+		pr_cont(", wxh=%dx%d, x,y=%d,%d, field=%s, chromakey=0x%08x, clipcount=%u, clips=%pK, bitmap=%pK, global_alpha=0x%02x\n",
 			win->w.width, win->w.height, win->w.left, win->w.top,
 			prt_names(win->field, v4l2_field_names),
 			win->chromakey, win->clipcount, win->clips,
@@ -323,7 +323,7 @@ static void v4l_print_framebuffer(const void *arg, bool write_only)
 {
 	const struct v4l2_framebuffer *p = arg;
 
-	pr_cont("capability=0x%x, flags=0x%x, base=0x%p, width=%u, "
+	pr_cont("capability=0x%x, flags=0x%x, base=0x%pK, width=%u, "
 		"height=%u, pixelformat=%c%c%c%c, "
 		"bytesperline=%u, sizeimage=%u, colorspace=%d\n",
 			p->capability, p->flags, p->base,

@@ -774,16 +774,16 @@ static int intelfb_pci_register(struct pci_dev *pdev,
 	if (mtrr)
 		set_mtrr(dinfo);
 
-	DBG_MSG("fb: 0x%x(+ 0x%x)/0x%x (0x%p)\n",
+	DBG_MSG("fb: 0x%x(+ 0x%x)/0x%x (0x%pK)\n",
 		dinfo->fb.physical, dinfo->fb.offset, dinfo->fb.size,
 		dinfo->fb.virtual);
-	DBG_MSG("MMIO: 0x%x/0x%x (0x%p)\n",
+	DBG_MSG("MMIO: 0x%x/0x%x (0x%pK)\n",
 		dinfo->mmio_base_phys, INTEL_REG_SIZE,
 		dinfo->mmio_base);
-	DBG_MSG("ring buffer: 0x%x/0x%x (0x%p)\n",
+	DBG_MSG("ring buffer: 0x%x/0x%x (0x%pK)\n",
 		dinfo->ring.physical, dinfo->ring.size,
 		dinfo->ring.virtual);
-	DBG_MSG("HW cursor: 0x%x/0x%x (0x%p) (offset 0x%x) (phys 0x%x)\n",
+	DBG_MSG("HW cursor: 0x%x/0x%x (0x%pK) (offset 0x%x) (phys 0x%x)\n",
 		dinfo->cursor.physical, dinfo->cursor.size,
 		dinfo->cursor.virtual, dinfo->cursor.offset,
 		dinfo->cursor.physical);

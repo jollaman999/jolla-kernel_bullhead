@@ -297,7 +297,7 @@ void iounmap(volatile void __iomem *addr)
 	p = find_vm_area((void __force *)addr);
 
 	if (!p) {
-		printk(KERN_ERR "iounmap: bad address %p\n", addr);
+		printk(KERN_ERR "iounmap: bad address %pK\n", addr);
 		dump_stack();
 		return;
 	}
@@ -401,7 +401,7 @@ void __init early_ioremap_init(void)
 #undef __FIXADDR_TOP
 	if (pmd != early_ioremap_pmd(fix_to_virt(FIX_BTMAP_END))) {
 		WARN_ON(1);
-		printk(KERN_WARNING "pmd %p != %p\n",
+		printk(KERN_WARNING "pmd %pK != %pK\n",
 		       pmd, early_ioremap_pmd(fix_to_virt(FIX_BTMAP_END)));
 		printk(KERN_WARNING "fix_to_virt(FIX_BTMAP_BEGIN): %08lx\n",
 			fix_to_virt(FIX_BTMAP_BEGIN));
@@ -598,21 +598,21 @@ void __init early_iounmap(void __iomem *addr, unsigned long size)
 	}
 
 	if (slot < 0) {
-		printk(KERN_INFO "early_iounmap(%p, %08lx) not found slot\n",
+		printk(KERN_INFO "early_iounmap(%pK, %08lx) not found slot\n",
 			 addr, size);
 		WARN_ON(1);
 		return;
 	}
 
 	if (prev_size[slot] != size) {
-		printk(KERN_INFO "early_iounmap(%p, %08lx) [%d] size not consistent %08lx\n",
+		printk(KERN_INFO "early_iounmap(%pK, %08lx) [%d] size not consistent %08lx\n",
 			 addr, size, slot, prev_size[slot]);
 		WARN_ON(1);
 		return;
 	}
 
 	if (early_ioremap_debug) {
-		printk(KERN_INFO "early_iounmap(%p, %08lx) [%d]\n", addr,
+		printk(KERN_INFO "early_iounmap(%pK, %08lx) [%d]\n", addr,
 		       size, slot);
 		dump_stack();
 	}

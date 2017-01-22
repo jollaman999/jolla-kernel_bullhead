@@ -160,7 +160,7 @@ xfs_error_report(
 {
 	if (level <= xfs_error_level) {
 		xfs_alert_tag(mp, XFS_PTAG_ERROR_REPORT,
-		"Internal error %s at line %d of file %s.  Caller 0x%p\n",
+		"Internal error %s at line %d of file %s.  Caller 0x%pK\n",
 			    tag, linenum, filename, ra);
 
 		xfs_stack_trace();

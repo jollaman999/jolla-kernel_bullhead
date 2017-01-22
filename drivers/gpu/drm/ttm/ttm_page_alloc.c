@@ -590,7 +590,7 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool,
 			++pool->nrefills;
 			pool->npages += alloc_size;
 		} else {
-			pr_err("Failed to fill pool (%p)\n", pool);
+			pr_err("Failed to fill pool (%pK)\n", pool);
 			/* If we have any pages left put them to the pool. */
 			list_for_each_entry(p, &pool->list, lru) {
 				++cpages;

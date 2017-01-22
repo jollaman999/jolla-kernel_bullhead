@@ -103,7 +103,7 @@ int cx8800_restart_vbi_queue(struct cx8800_dev    *dev,
 		return 0;
 
 	buf = list_entry(q->active.next, struct cx88_buffer, vb.queue);
-	dprintk(2,"restart_queue [%p/%d]: restart dma\n",
+	dprintk(2,"restart_queue [%pK/%d]: restart dma\n",
 		buf, buf->vb.i);
 	cx8800_start_vbi_dma(dev, q, buf);
 	list_for_each_entry(buf, &q->active, vb.queue)
@@ -131,7 +131,7 @@ void cx8800_vbi_timeout(unsigned long data)
 		list_del(&buf->vb.queue);
 		buf->vb.state = VIDEOBUF_ERROR;
 		wake_up(&buf->vb.done);
-		printk("%s/0: [%p/%d] timeout - dma=0x%08lx\n", dev->core->name,
+		printk("%s/0: [%pK/%d] timeout - dma=0x%08lx\n", dev->core->name,
 		       buf, buf->vb.i, (unsigned long)buf->risc.dma);
 	}
 	cx8800_restart_vbi_queue(dev,q);
@@ -209,7 +209,7 @@ vbi_queue(struct videobuf_queue *vq, struct videobuf_buffer *vb)
 		buf->vb.state = VIDEOBUF_ACTIVE;
 		buf->count    = q->count++;
 		mod_timer(&q->timeout, jiffies+BUFFER_TIMEOUT);
-		dprintk(2,"[%p/%d] vbi_queue - first active\n",
+		dprintk(2,"[%pK/%d] vbi_queue - first active\n",
 			buf, buf->vb.i);
 
 	} else {
@@ -218,7 +218,7 @@ vbi_queue(struct videobuf_queue *vq, struct videobuf_buffer *vb)
 		buf->vb.state = VIDEOBUF_ACTIVE;
 		buf->count    = q->count++;
 		prev->risc.jmp[1] = cpu_to_le32(buf->risc.dma);
-		dprintk(2,"[%p/%d] buffer_queue - append to active\n",
+		dprintk(2,"[%pK/%d] buffer_queue - append to active\n",
 			buf, buf->vb.i);
 	}
 }

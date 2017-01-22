@@ -391,7 +391,7 @@ int radeon_fence_wait(struct radeon_fence *fence, bool intr)
 	int r;
 
 	if (fence == NULL) {
-		WARN(1, "Querying an invalid fence : %p !\n", fence);
+		WARN(1, "Querying an invalid fence : %pK !\n", fence);
 		return -EINVAL;
 	}
 
@@ -801,7 +801,7 @@ int radeon_fence_driver_start_ring(struct radeon_device *rdev, int ring)
 	}
 	radeon_fence_write(rdev, atomic64_read(&rdev->fence_drv[ring].last_seq), ring);
 	rdev->fence_drv[ring].initialized = true;
-	dev_info(rdev->dev, "fence driver on ring %d use gpu addr 0x%016llx and cpu addr 0x%p\n",
+	dev_info(rdev->dev, "fence driver on ring %d use gpu addr 0x%016llx and cpu addr 0x%pK\n",
 		 ring, rdev->fence_drv[ring].gpu_addr, rdev->fence_drv[ring].cpu_addr);
 	return 0;
 }

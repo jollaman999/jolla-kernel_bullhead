@@ -774,7 +774,7 @@ void __init paging_init(void)
 		sizeof(struct page));
 	vmem_map = (struct page *) VMALLOC_END;
 	efi_memmap_walk(create_mem_map_page_table, NULL);
-	printk("Virtual mem_map starts at 0x%p\n", vmem_map);
+	printk("Virtual mem_map starts at 0x%pK\n", vmem_map);
 #endif
 
 	for_each_online_node(node) {

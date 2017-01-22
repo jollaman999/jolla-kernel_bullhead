@@ -394,7 +394,7 @@ static struct macio_dev * macio_add_one_device(struct macio_chip *chip,
 #endif /* CONFIG_PCI */
 
 #ifdef DEBUG
-	printk("preparing mdev @%p, ofdev @%p, dev @%p, kobj @%p\n",
+	printk("preparing mdev @%pK, ofdev @%pK, dev @%pK, kobj @%pK\n",
 	       dev, &dev->ofdev, &dev->ofdev.dev, &dev->ofdev.dev.kobj);
 #endif
 

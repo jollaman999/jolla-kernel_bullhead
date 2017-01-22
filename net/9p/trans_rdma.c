@@ -303,7 +303,7 @@ handle_recv(struct p9_client *client, struct p9_trans_rdma *rdma,
 	return;
 
  err_out:
-	p9_debug(P9_DEBUG_ERROR, "req %p err %d status %d\n", req, err, status);
+	p9_debug(P9_DEBUG_ERROR, "req %pK err %d status %d\n", req, err, status);
 	rdma->state = P9_RDMA_FLUSHING;
 	client->status = Disconnected;
 }
@@ -319,7 +319,7 @@ handle_send(struct p9_client *client, struct p9_trans_rdma *rdma,
 
 static void qp_event_handler(struct ib_event *event, void *context)
 {
-	p9_debug(P9_DEBUG_ERROR, "QP event %d context %p\n",
+	p9_debug(P9_DEBUG_ERROR, "QP event %d context %pK\n",
 		 event->event, context);
 }
 
@@ -356,7 +356,7 @@ static void cq_comp_handler(struct ib_cq *cq, void *cq_context)
 
 static void cq_event_handler(struct ib_event *e, void *v)
 {
-	p9_debug(P9_DEBUG_ERROR, "CQ event %d context %p\n", e->event, v);
+	p9_debug(P9_DEBUG_ERROR, "CQ event %d context %pK\n", e->event, v);
 }
 
 static void rdma_destroy_trans(struct p9_trans_rdma *rdma)

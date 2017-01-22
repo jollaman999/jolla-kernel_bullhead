@@ -412,7 +412,7 @@ static int __init pio_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, pio);
 
-	printk(KERN_DEBUG "%s: base 0x%p, irq %d chains %d..%d\n",
+	printk(KERN_DEBUG "%s: base 0x%pK, irq %d chains %d..%d\n",
 	       pio->name, pio->regs, irq, gpio_irq_base, gpio_irq_base + 31);
 
 	return 0;

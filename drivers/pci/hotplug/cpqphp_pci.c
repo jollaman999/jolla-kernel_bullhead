@@ -76,7 +76,7 @@ static void __iomem *detect_HRT_floating_pointer(void __iomem *begin, void __iom
 	if (!status)
 		fp = NULL;
 
-	dbg("Discovered Hotplug Resource Table at %p\n", fp);
+	dbg("Discovered Hotplug Resource Table at %pK\n", fp);
 	return fp;
 }
 
@@ -1179,7 +1179,7 @@ int cpqhp_find_available_resources(struct controller *ctrl, void __iomem *rom_st
 	struct pci_resource *bus_node;
 
 	rom_resource_table = detect_HRT_floating_pointer(rom_start, rom_start+0xffff);
-	dbg("rom_resource_table = %p\n", rom_resource_table);
+	dbg("rom_resource_table = %pK\n", rom_resource_table);
 
 	if (rom_resource_table == NULL)
 		return -ENODEV;
@@ -1270,7 +1270,7 @@ int cpqhp_find_available_resources(struct controller *ctrl, void __iomem *rom_st
 			func = cpqhp_slot_find(primary_bus, dev_func >> 3, 0);
 
 			while (func && (func->function != (dev_func & 0x07))) {
-				dbg("func = %p (bus, dev, fun) = (%d, %d, %d)\n", func, primary_bus, dev_func >> 3, index);
+				dbg("func = %pK (bus, dev, fun) = (%d, %d, %d)\n", func, primary_bus, dev_func >> 3, index);
 				func = cpqhp_slot_find(primary_bus, dev_func >> 3, index++);
 			}
 

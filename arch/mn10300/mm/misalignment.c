@@ -404,7 +404,7 @@ bus_error:
 	/* error reading opcodes */
 fetch_error:
 	printk(KERN_CRIT
-	       "MISALIGN: %p: fault whilst reading instruction data\n",
+	       "MISALIGN: %pK: fault whilst reading instruction data\n",
 	       pc);
 	goto failed;
 
@@ -464,7 +464,7 @@ found_opcode:
 		if (__get_user(byte, pc) != 0)
 			goto fetch_error;
 		disp |= byte << loop;
-		kdebug("{%p} disp[%02x]=%02x", pc, loop, byte);
+		kdebug("{%pK} disp[%02x]=%02x", pc, loop, byte);
 	}
 
 	kdebug("disp=%lx", disp);
@@ -501,7 +501,7 @@ found_opcode:
 				      &store))
 			goto bad_reg_mode;
 
-		kdebug("mov%u (%p),DARn", datasz, address);
+		kdebug("mov%u (%pK),DARn", datasz, address);
 		if (copy_from_user(&data, (void *) address, datasz) != 0)
 			goto transfer_failed;
 		if (pop->params[0] & 0x1000000) {
@@ -524,7 +524,7 @@ found_opcode:
 
 		data = *store;
 
-		kdebug("mov%u %lx,(%p)", datasz, data, address);
+		kdebug("mov%u %lx,(%pK)", datasz, data, address);
 		if (copy_to_user((void *) address, &data, datasz) != 0)
 			goto transfer_failed;
 		if (pop->params[1] & 0x1000000)
@@ -834,7 +834,7 @@ static int __init test_misalignment(void)
 	void *p = testbuf, *q;
 	u32 tmp, tmp2, x;
 
-	printk(KERN_NOTICE "==>test_misalignment() [testbuf=%p]\n", p);
+	printk(KERN_NOTICE "==>test_misalignment() [testbuf=%pK]\n", p);
 	p++;
 
 	printk(KERN_NOTICE "___ MOV (Am),Dn ___\n");

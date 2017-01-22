@@ -159,7 +159,7 @@ csio_process_scsi_cmpl(struct csio_hw *hw, void *wr, uint32_t len,
 					((struct fw_scsi_abrt_cls_wr *)
 					    scsiwr)->sub_opcode_to_chk_all_io);
 
-			csio_dbg(hw, "%s cmpl recvd ioreq:%p status:%d\n",
+			csio_dbg(hw, "%s cmpl recvd ioreq:%pK status:%d\n",
 				    subop ? "Close" : "Abort",
 				    ioreq, ioreq->wr_status);
 

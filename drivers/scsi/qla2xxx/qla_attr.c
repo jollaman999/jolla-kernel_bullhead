@@ -1895,7 +1895,7 @@ qla24xx_vport_create(struct fc_vport *fc_vport, bool disable)
 	if (ha->flags.cpu_affinity_enabled) {
 		req = ha->req_q_map[1];
 		ql_dbg(ql_dbg_multiq, vha, 0xc000,
-		    "Request queue %p attached with "
+		    "Request queue %pK attached with "
 		    "VP[%d], cpu affinity =%d\n",
 		    req, vha->vp_idx, ha->flags.cpu_affinity_enabled);
 		goto vport_queue;

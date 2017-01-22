@@ -112,7 +112,7 @@ void rds_tcp_listen_data_ready(struct sock *sk, int bytes)
 {
 	void (*ready)(struct sock *sk, int bytes);
 
-	rdsdebug("listen data ready sk %p\n", sk);
+	rdsdebug("listen data ready sk %pK\n", sk);
 
 	read_lock(&sk->sk_callback_lock);
 	ready = sk->sk_user_data;

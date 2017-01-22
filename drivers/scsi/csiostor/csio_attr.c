@@ -685,7 +685,7 @@ csio_dev_loss_tmo_callbk(struct fc_rport *rport)
 	if (csio_is_hw_removing(hw) || csio_is_rnode_ready(rn))
 		goto out;
 
-	csio_ln_dbg(ln, "devloss timeout on rnode:%p portid:x%x flowid:x%x\n",
+	csio_ln_dbg(ln, "devloss timeout on rnode:%pK portid:x%x flowid:x%x\n",
 		    rn, rn->nport_id, csio_rn_flowid(rn));
 
 	CSIO_INC_STATS(ln, n_dev_loss_tmo);

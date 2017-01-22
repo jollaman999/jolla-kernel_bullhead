@@ -231,8 +231,8 @@ acpi_remove_address_space_handler(acpi_handle device,
 			/* Matched space_id, first dereference this in the Regions */
 
 			ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
-					  "Removing address handler %p(%p) for region %s "
-					  "on Device %p(%p)\n",
+					  "Removing address handler %pK(%pK) for region %s "
+					  "on Device %pK(%pK)\n",
 					  handler_obj, handler,
 					  acpi_ut_get_region_name(space_id),
 					  node, obj_desc));
@@ -279,7 +279,7 @@ acpi_remove_address_space_handler(acpi_handle device,
 	/* The handler does not exist */
 
 	ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
-			  "Unable to remove address handler %p for %s(%X), DevNode %p, obj %p\n",
+			  "Unable to remove address handler %pK for %s(%X), DevNode %pK, obj %pK\n",
 			  handler, acpi_ut_get_region_name(space_id), space_id,
 			  node, obj_desc));
 

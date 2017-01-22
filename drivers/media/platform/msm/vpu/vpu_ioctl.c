@@ -354,7 +354,7 @@ static int __vpu_attach_client(struct vpu_client *client,
 		return -EINVAL;
 	core = client->core;
 
-	pr_debug("Attach client %p to session %d\n", client, session->id);
+	pr_debug("Attach client %pK to session %d\n", client, session->id);
 
 	if (client->session == session) {
 		return 0; /* client already attached to this session */

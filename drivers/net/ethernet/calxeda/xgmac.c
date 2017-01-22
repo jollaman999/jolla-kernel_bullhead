@@ -742,8 +742,8 @@ static int xgmac_dma_desc_rings_init(struct net_device *dev)
 	if (!priv->dma_tx)
 		goto err_dma_tx;
 
-	netdev_dbg(priv->dev, "DMA desc rings: virt addr (Rx %p, "
-	    "Tx %p)\n\tDMA phy addr (Rx 0x%08x, Tx 0x%08x)\n",
+	netdev_dbg(priv->dev, "DMA desc rings: virt addr (Rx %pK, "
+	    "Tx %pK)\n\tDMA phy addr (Rx 0x%08x, Tx 0x%08x)\n",
 	    priv->dma_rx, priv->dma_tx,
 	    (unsigned int)priv->dma_rx_phy, (unsigned int)priv->dma_tx_phy);
 

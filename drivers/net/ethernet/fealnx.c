@@ -664,7 +664,7 @@ static int fealnx_init_one(struct pci_dev *pdev,
 	if (err)
 		goto err_out_free_tx;
 
-	printk(KERN_INFO "%s: %s at %p, %pM, IRQ %d.\n",
+	printk(KERN_INFO "%s: %s at %pK, %pM, IRQ %d.\n",
 	       dev->name, skel_netdrv_tbl[chip_id].chip_name, ioaddr,
 	       dev->dev_addr, irq);
 
@@ -1209,12 +1209,12 @@ static void fealnx_tx_timeout(struct net_device *dev)
 	       dev->name, ioread32(ioaddr + ISR));
 
 	{
-		printk(KERN_DEBUG "  Rx ring %p: ", np->rx_ring);
+		printk(KERN_DEBUG "  Rx ring %pK: ", np->rx_ring);
 		for (i = 0; i < RX_RING_SIZE; i++)
 			printk(KERN_CONT " %8.8x",
 			       (unsigned int) np->rx_ring[i].status);
 		printk(KERN_CONT "\n");
-		printk(KERN_DEBUG "  Tx ring %p: ", np->tx_ring);
+		printk(KERN_DEBUG "  Tx ring %pK: ", np->tx_ring);
 		for (i = 0; i < TX_RING_SIZE; i++)
 			printk(KERN_CONT " %4.4x", np->tx_ring[i].status);
 		printk(KERN_CONT "\n");

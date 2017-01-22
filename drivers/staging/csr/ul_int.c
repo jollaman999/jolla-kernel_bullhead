@@ -352,7 +352,7 @@ _align_bulk_data_buffers(unifi_priv_t *priv, u8 *signal,
                 return CSR_RESULT_SUCCESS;
             }
             unifi_trace(priv, UDBG5,
-                        "Align f-h buffer (0x%p) by %d bytes (skb->data: 0x%p)\n",
+                        "Align f-h buffer (0x%pK) by %d bytes (skb->data: 0x%pK)\n",
                         bulkdata->d[i].os_data_ptr, align_offset, skb->data);
 
 

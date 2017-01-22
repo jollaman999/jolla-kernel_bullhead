@@ -95,7 +95,7 @@ static struct urb *bfusb_get_completed(struct bfusb_data *data)
 	struct sk_buff *skb;
 	struct urb *urb = NULL;
 
-	BT_DBG("bfusb %p", data);
+	BT_DBG("bfusb %pK", data);
 
 	skb = skb_dequeue(&data->completed_q);
 	if (skb) {
@@ -111,7 +111,7 @@ static void bfusb_unlink_urbs(struct bfusb_data *data)
 	struct sk_buff *skb;
 	struct urb *urb;
 
-	BT_DBG("bfusb %p", data);
+	BT_DBG("bfusb %pK", data);
 
 	while ((skb = skb_dequeue(&data->pending_q))) {
 		urb = ((struct bfusb_data_scb *) skb->cb)->urb;
@@ -129,7 +129,7 @@ static int bfusb_send_bulk(struct bfusb_data *data, struct sk_buff *skb)
 	struct urb *urb = bfusb_get_completed(data);
 	int err, pipe;
 
-	BT_DBG("bfusb %p skb %p len %d", data, skb, skb->len);
+	BT_DBG("bfusb %pK skb %pK len %d", data, skb, skb->len);
 
 	if (!urb && !(urb = usb_alloc_urb(0, GFP_ATOMIC)))
 		return -ENOMEM;
@@ -145,7 +145,7 @@ static int bfusb_send_bulk(struct bfusb_data *data, struct sk_buff *skb)
 
 	err = usb_submit_urb(urb, GFP_ATOMIC);
 	if (err) {
-		BT_ERR("%s bulk tx submit failed urb %p err %d", 
+		BT_ERR("%s bulk tx submit failed urb %pK err %d", 
 					data->hdev->name, urb, err);
 		skb_unlink(skb, &data->pending_q);
 		usb_free_urb(urb);
@@ -159,7 +159,7 @@ static void bfusb_tx_wakeup(struct bfusb_data *data)
 {
 	struct sk_buff *skb;
 
-	BT_DBG("bfusb %p", data);
+	BT_DBG("bfusb %pK", data);
 
 	if (test_and_set_bit(BFUSB_TX_PROCESS, &data->state)) {
 		set_bit(BFUSB_TX_WAKEUP, &data->state);
@@ -187,7 +187,7 @@ static void bfusb_tx_complete(struct urb *urb)
 	struct sk_buff *skb = (struct sk_buff *) urb->context;
 	struct bfusb_data *data = (struct bfusb_data *) skb->dev;
 
-	BT_DBG("bfusb %p urb %p skb %p len %d", data, urb, skb, skb->len);
+	BT_DBG("bfusb %pK urb %pK skb %pK len %d", data, urb, skb, skb->len);
 
 	atomic_dec(&data->pending_tx);
 
@@ -216,7 +216,7 @@ static int bfusb_rx_submit(struct bfusb_data *data, struct urb *urb)
 	struct sk_buff *skb;
 	int err, pipe, size = HCI_MAX_FRAME_SIZE + 32;
 
-	BT_DBG("bfusb %p urb %p", data, urb);
+	BT_DBG("bfusb %pK urb %pK", data, urb);
 
 	if (!urb && !(urb = usb_alloc_urb(0, GFP_ATOMIC)))
 		return -ENOMEM;
@@ -241,7 +241,7 @@ static int bfusb_rx_submit(struct bfusb_data *data, struct urb *urb)
 
 	err = usb_submit_urb(urb, GFP_ATOMIC);
 	if (err) {
-		BT_ERR("%s bulk rx submit failed urb %p err %d",
+		BT_ERR("%s bulk rx submit failed urb %pK err %d",
 					data->hdev->name, urb, err);
 		skb_unlink(skb, &data->pending_q);
 		kfree_skb(skb);
@@ -253,7 +253,7 @@ static int bfusb_rx_submit(struct bfusb_data *data, struct urb *urb)
 
 static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned char *buf, int len)
 {
-	BT_DBG("bfusb %p hdr 0x%02x data %p len %d", data, hdr, buf, len);
+	BT_DBG("bfusb %pK hdr 0x%02x data %pK len %d", data, hdr, buf, len);
 
 	if (hdr & 0x10) {
 		BT_ERR("%s error in block", data->hdev->name);
@@ -348,7 +348,7 @@ static void bfusb_rx_complete(struct urb *urb)
 	int count = urb->actual_length;
 	int err, hdr, len;
 
-	BT_DBG("bfusb %p urb %p skb %p len %d", data, urb, skb, skb->len);
+	BT_DBG("bfusb %pK urb %pK skb %pK len %d", data, urb, skb, skb->len);
 
 	read_lock(&data->lock);
 
@@ -401,7 +401,7 @@ resubmit:
 
 	err = usb_submit_urb(urb, GFP_ATOMIC);
 	if (err) {
-		BT_ERR("%s bulk resubmit failed urb %p err %d",
+		BT_ERR("%s bulk resubmit failed urb %pK err %d",
 					data->hdev->name, urb, err);
 	}
 
@@ -415,7 +415,7 @@ static int bfusb_open(struct hci_dev *hdev)
 	unsigned long flags;
 	int i, err;
 
-	BT_DBG("hdev %p bfusb %p", hdev, data);
+	BT_DBG("hdev %pK bfusb %pK", hdev, data);
 
 	if (test_and_set_bit(HCI_RUNNING, &hdev->flags))
 		return 0;
@@ -439,7 +439,7 @@ static int bfusb_flush(struct hci_dev *hdev)
 {
 	struct bfusb_data *data = hci_get_drvdata(hdev);
 
-	BT_DBG("hdev %p bfusb %p", hdev, data);
+	BT_DBG("hdev %pK bfusb %pK", hdev, data);
 
 	skb_queue_purge(&data->transmit_q);
 
@@ -451,7 +451,7 @@ static int bfusb_close(struct hci_dev *hdev)
 	struct bfusb_data *data = hci_get_drvdata(hdev);
 	unsigned long flags;
 
-	BT_DBG("hdev %p bfusb %p", hdev, data);
+	BT_DBG("hdev %pK bfusb %pK", hdev, data);
 
 	if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags))
 		return 0;
@@ -473,7 +473,7 @@ static int bfusb_send_frame(struct sk_buff *skb)
 	unsigned char buf[3];
 	int sent = 0, size, count;
 
-	BT_DBG("hdev %p skb %p type %d len %d", hdev, skb, bt_cb(skb)->pkt_type, skb->len);
+	BT_DBG("hdev %pK skb %pK type %d len %d", hdev, skb, bt_cb(skb)->pkt_type, skb->len);
 
 	if (!hdev) {
 		BT_ERR("Frame for unknown HCI device (hdev=NULL)");
@@ -555,7 +555,7 @@ static int bfusb_load_firmware(struct bfusb_data *data,
 	unsigned char *buf;
 	int err, pipe, len, size, sent = 0;
 
-	BT_DBG("bfusb %p udev %p", data, data->udev);
+	BT_DBG("bfusb %pK udev %pK", data, data->udev);
 
 	BT_INFO("BlueFRITZ! USB loading firmware");
 
@@ -638,7 +638,7 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
 	struct hci_dev *hdev;
 	struct bfusb_data *data;
 
-	BT_DBG("intf %p id %p", intf, id);
+	BT_DBG("intf %pK id %pK", intf, id);
 
 	/* Check number of endpoints */
 	if (intf->cur_altsetting->desc.bNumEndpoints < 2)
@@ -677,7 +677,7 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
 		goto done;
 	}
 
-	BT_DBG("firmware data %p size %zu", firmware->data, firmware->size);
+	BT_DBG("firmware data %pK size %zu", firmware->data, firmware->size);
 
 	if (bfusb_load_firmware(data, firmware->data, firmware->size) < 0) {
 		BT_ERR("Firmware loading failed");
@@ -727,7 +727,7 @@ static void bfusb_disconnect(struct usb_interface *intf)
 	struct bfusb_data *data = usb_get_intfdata(intf);
 	struct hci_dev *hdev = data->hdev;
 
-	BT_DBG("intf %p", intf);
+	BT_DBG("intf %pK", intf);
 
 	if (!hdev)
 		return;

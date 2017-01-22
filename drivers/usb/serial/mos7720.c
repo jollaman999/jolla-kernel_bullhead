@@ -1057,7 +1057,7 @@ static int mos7720_open(struct tty_struct *tty, struct usb_serial_port *port)
 	port_number = port->number - port->serial->minor;
 	read_mos_reg(serial, port_number, LSR, &data);
 
-	dev_dbg(&port->dev, "SS::%p LSR:%x\n", mos7720_port, data);
+	dev_dbg(&port->dev, "SS::%pK LSR:%x\n", mos7720_port, data);
 
 	write_mos_reg(serial, dummy, SP1_REG, 0x02);
 	write_mos_reg(serial, dummy, SP2_REG, 0x02);

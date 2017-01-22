@@ -183,7 +183,7 @@ static void set_addr(struct mtd_info *mtd, int column, int page_addr, int oob)
 		elbc_fcm_ctrl->index += priv->page_size ? 2048 : 512;
 
 	dev_vdbg(priv->dev, "set_addr: bank=%d, "
-			    "elbc_fcm_ctrl->addr=0x%p (0x%p), "
+			    "elbc_fcm_ctrl->addr=0x%pK (0x%pK), "
 	                    "index %x, pes %d ps %d\n",
 		 buf_num, elbc_fcm_ctrl->addr, priv->vbase,
 		 elbc_fcm_ctrl->index,
@@ -650,7 +650,7 @@ static int fsl_elbc_chip_init_tail(struct mtd_info *mtd)
 	        chip->page_shift);
 	dev_dbg(priv->dev, "fsl_elbc_init: nand->phys_erase_shift = %d\n",
 	        chip->phys_erase_shift);
-	dev_dbg(priv->dev, "fsl_elbc_init: nand->ecclayout = %p\n",
+	dev_dbg(priv->dev, "fsl_elbc_init: nand->ecclayout = %pK\n",
 	        chip->ecclayout);
 	dev_dbg(priv->dev, "fsl_elbc_init: nand->ecc.mode = %d\n",
 	        chip->ecc.mode);
@@ -660,7 +660,7 @@ static int fsl_elbc_chip_init_tail(struct mtd_info *mtd)
 	        chip->ecc.bytes);
 	dev_dbg(priv->dev, "fsl_elbc_init: nand->ecc.total = %d\n",
 	        chip->ecc.total);
-	dev_dbg(priv->dev, "fsl_elbc_init: nand->ecc.layout = %p\n",
+	dev_dbg(priv->dev, "fsl_elbc_init: nand->ecc.layout = %pK\n",
 	        chip->ecc.layout);
 	dev_dbg(priv->dev, "fsl_elbc_init: mtd->flags = %08x\n", mtd->flags);
 	dev_dbg(priv->dev, "fsl_elbc_init: mtd->size = %lld\n", mtd->size);

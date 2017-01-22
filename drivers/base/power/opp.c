@@ -306,7 +306,7 @@ struct opp *dev_pm_opp_find_freq_ceil(struct device *dev, unsigned long *freq)
 	struct opp *temp_opp, *opp = ERR_PTR(-ERANGE);
 
 	if (!dev || !freq) {
-		dev_err(dev, "%s: Invalid argument freq=%p\n", __func__, freq);
+		dev_err(dev, "%s: Invalid argument freq=%pK\n", __func__, freq);
 		return ERR_PTR(-EINVAL);
 	}
 
@@ -353,7 +353,7 @@ struct opp *dev_pm_opp_find_freq_floor(struct device *dev, unsigned long *freq)
 	struct opp *temp_opp, *opp = ERR_PTR(-ERANGE);
 
 	if (!dev || !freq) {
-		dev_err(dev, "%s: Invalid argument freq=%p\n", __func__, freq);
+		dev_err(dev, "%s: Invalid argument freq=%pK\n", __func__, freq);
 		return ERR_PTR(-EINVAL);
 	}
 

@@ -677,7 +677,7 @@ static int find_psb_table(struct powernow_k8_data *data)
 		if (memcmp(psb, PSB_ID_STRING, PSB_ID_STRING_LEN) != 0)
 			continue;
 
-		pr_debug("found PSB header at 0x%p\n", psb);
+		pr_debug("found PSB header at 0x%pK\n", psb);
 
 		pr_debug("table vers: 0x%x\n", psb->tableversion);
 		if (psb->tableversion != PSB_VERSION_1_4) {

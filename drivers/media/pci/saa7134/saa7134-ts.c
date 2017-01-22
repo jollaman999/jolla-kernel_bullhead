@@ -45,18 +45,18 @@ static int buffer_activate(struct saa7134_dev *dev,
 			   struct saa7134_buf *next)
 {
 
-	dprintk("buffer_activate [%p]",buf);
+	dprintk("buffer_activate [%pK]",buf);
 	buf->vb.state = VIDEOBUF_ACTIVE;
 	buf->top_seen = 0;
 
 	if (NULL == next)
 		next = buf;
 	if (V4L2_FIELD_TOP == buf->vb.field) {
-		dprintk("- [top]     buf=%p next=%p\n",buf,next);
+		dprintk("- [top]     buf=%pK next=%pK\n",buf,next);
 		saa_writel(SAA7134_RS_BA1(5),saa7134_buffer_base(buf));
 		saa_writel(SAA7134_RS_BA2(5),saa7134_buffer_base(next));
 	} else {
-		dprintk("- [bottom]  buf=%p next=%p\n",buf,next);
+		dprintk("- [bottom]  buf=%pK next=%pK\n",buf,next);
 		saa_writel(SAA7134_RS_BA1(5),saa7134_buffer_base(next));
 		saa_writel(SAA7134_RS_BA2(5),saa7134_buffer_base(buf));
 	}
@@ -80,7 +80,7 @@ static int buffer_prepare(struct videobuf_queue *q, struct videobuf_buffer *vb,
 	unsigned int lines, llength, size;
 	int err;
 
-	dprintk("buffer_prepare [%p,%s]\n",buf,v4l2_field_names[field]);
+	dprintk("buffer_prepare [%pK,%s]\n",buf,v4l2_field_names[field]);
 
 	llength = TS_PACKET_SIZE;
 	lines = dev->ts.nr_packets;

@@ -881,7 +881,7 @@ int vmw_surface_reference_ioctl(struct drm_device *dev, void *data,
 		ret = copy_to_user(user_sizes, srf->sizes,
 				   srf->num_sizes * sizeof(*srf->sizes));
 	if (unlikely(ret != 0)) {
-		DRM_ERROR("copy_to_user failed %p %u\n",
+		DRM_ERROR("copy_to_user failed %pK %u\n",
 			  user_sizes, srf->num_sizes);
 		ret = -EFAULT;
 	}

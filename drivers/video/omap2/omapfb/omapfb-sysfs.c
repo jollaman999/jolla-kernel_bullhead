@@ -519,7 +519,7 @@ static ssize_t show_virt(struct device *dev,
 	struct fb_info *fbi = dev_get_drvdata(dev);
 	struct omapfb_info *ofbi = FB2OFB(fbi);
 
-	return snprintf(buf, PAGE_SIZE, "%p\n", ofbi->region->vaddr);
+	return snprintf(buf, PAGE_SIZE, "%pK\n", ofbi->region->vaddr);
 }
 
 static ssize_t show_upd_mode(struct device *dev,

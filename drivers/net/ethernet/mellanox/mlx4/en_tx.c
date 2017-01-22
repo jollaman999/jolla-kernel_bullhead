@@ -72,7 +72,7 @@ int mlx4_en_create_tx_ring(struct mlx4_en_priv *priv,
 	if (!ring->tx_info)
 		return -ENOMEM;
 
-	en_dbg(DRV, priv, "Allocated tx_info ring at addr:%p size:%d\n",
+	en_dbg(DRV, priv, "Allocated tx_info ring at addr:%pK size:%d\n",
 		 ring->tx_info, tmp);
 
 	ring->bounce_buf = kmalloc(MAX_DESC_SIZE, GFP_KERNEL);
@@ -97,7 +97,7 @@ int mlx4_en_create_tx_ring(struct mlx4_en_priv *priv,
 
 	ring->buf = ring->wqres.buf.direct.buf;
 
-	en_dbg(DRV, priv, "Allocated TX ring (addr:%p) - buf:%p size:%d "
+	en_dbg(DRV, priv, "Allocated TX ring (addr:%pK) - buf:%pK size:%d "
 	       "buf_size:%d dma:%llx\n", ring, ring->buf, ring->size,
 	       ring->buf_size, (unsigned long long) ring->wqres.buf.direct.map);
 

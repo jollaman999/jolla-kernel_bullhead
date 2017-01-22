@@ -91,7 +91,7 @@ nlmsvc_insert_block_locked(struct nlm_block *block, unsigned long when)
 	struct nlm_block *b;
 	struct list_head *pos;
 
-	dprintk("lockd: nlmsvc_insert_block(%p, %ld)\n", block, when);
+	dprintk("lockd: nlmsvc_insert_block(%pK, %ld)\n", block, when);
 	if (list_empty(&block->b_list)) {
 		kref_get(&block->b_count);
 	} else {
@@ -146,13 +146,13 @@ nlmsvc_lookup_block(struct nlm_file *file, struct nlm_lock *lock)
 	struct nlm_block	*block;
 	struct file_lock	*fl;
 
-	dprintk("lockd: nlmsvc_lookup_block f=%p pd=%d %Ld-%Ld ty=%d\n",
+	dprintk("lockd: nlmsvc_lookup_block f=%pK pd=%d %Ld-%Ld ty=%d\n",
 				file, lock->fl.fl_pid,
 				(long long)lock->fl.fl_start,
 				(long long)lock->fl.fl_end, lock->fl.fl_type);
 	list_for_each_entry(block, &nlm_blocked, b_list) {
 		fl = &block->b_call->a_args.lock.fl;
-		dprintk("lockd: check f=%p pd=%d %Ld-%Ld ty=%d cookie=%s\n",
+		dprintk("lockd: check f=%pK pd=%d %Ld-%Ld ty=%d cookie=%s\n",
 				block->b_file, fl->fl_pid,
 				(long long)fl->fl_start,
 				(long long)fl->fl_end, fl->fl_type,
@@ -191,7 +191,7 @@ nlmsvc_find_block(struct nlm_cookie *cookie)
 	return NULL;
 
 found:
-	dprintk("nlmsvc_find_block(%s): block=%p\n", nlmdbg_cookie2a(cookie), block);
+	dprintk("nlmsvc_find_block(%s): block=%pK\n", nlmdbg_cookie2a(cookie), block);
 	kref_get(&block->b_count);
 	return block;
 }
@@ -239,7 +239,7 @@ nlmsvc_create_block(struct svc_rqst *rqstp, struct nlm_host *host,
 	call->a_args.lock.fl.fl_lmops = &nlmsvc_lock_operations;
 	nlmclnt_next_cookie(&call->a_args.cookie);
 
-	dprintk("lockd: created block %p...\n", block);
+	dprintk("lockd: created block %pK...\n", block);
 
 	/* Create and initialize the block */
 	block->b_daemon = rqstp->rq_server;
@@ -273,7 +273,7 @@ failed:
 static int nlmsvc_unlink_block(struct nlm_block *block)
 {
 	int status;
-	dprintk("lockd: unlinking block %p...\n", block);
+	dprintk("lockd: unlinking block %pK...\n", block);
 
 	/* Remove block from list */
 	status = posix_unblock_lock(block->b_file->f_file, &block->b_call->a_args.lock.fl);
@@ -286,7 +286,7 @@ static void nlmsvc_free_block(struct kref *kref)
 	struct nlm_block *block = container_of(kref, struct nlm_block, b_count);
 	struct nlm_file		*file = block->b_file;
 
-	dprintk("lockd: freeing block %p...\n", block);
+	dprintk("lockd: freeing block %pK...\n", block);
 
 	/* Remove block from file's list of blocks */
 	list_del_init(&block->b_flist);
@@ -386,7 +386,7 @@ nlmsvc_defer_lock_rqst(struct svc_rqst *rqstp, struct nlm_block *block)
 		if (block->b_deferred_req != NULL)
 			status = nlm_drop_reply;
 	}
-	dprintk("lockd: nlmsvc_defer_lock_rqst block %p flags %d status %d\n",
+	dprintk("lockd: nlmsvc_defer_lock_rqst block %pK flags %d status %d\n",
 		block, block->b_flags, ntohl(status));
 
 	return status;
@@ -429,7 +429,7 @@ nlmsvc_lock(struct svc_rqst *rqstp, struct nlm_file *file,
 		lock->fl.fl_flags &= ~FL_SLEEP;
 
 	if (block->b_flags & B_QUEUED) {
-		dprintk("lockd: nlmsvc_lock deferred block %p flags %d\n",
+		dprintk("lockd: nlmsvc_lock deferred block %pK flags %d\n",
 							block, block->b_flags);
 		if (block->b_granted) {
 			nlmsvc_unlink_block(block);
@@ -535,7 +535,7 @@ nlmsvc_testlock(struct svc_rqst *rqstp, struct nlm_file *file,
 		block->b_fl = conf;
 	}
 	if (block->b_flags & B_QUEUED) {
-		dprintk("lockd: nlmsvc_testlock deferred block %p flags %d fl %p\n",
+		dprintk("lockd: nlmsvc_testlock deferred block %pK flags %d fl %pK\n",
 			block, block->b_flags, block->b_fl);
 		if (block->b_flags & B_TIMED_OUT) {
 			nlmsvc_unlink_block(block);
@@ -690,7 +690,7 @@ static int nlmsvc_grant_deferred(struct file_lock *fl, struct file_lock *conf,
 	spin_lock(&nlm_blocked_lock);
 	list_for_each_entry(block, &nlm_blocked, b_list) {
 		if (nlm_compare_locks(&block->b_call->a_args.lock.fl, fl)) {
-			dprintk("lockd: nlmsvc_notify_blocked block %p flags %d\n",
+			dprintk("lockd: nlmsvc_notify_blocked block %pK flags %d\n",
 							block, block->b_flags);
 			if (block->b_flags & B_QUEUED) {
 				if (block->b_flags & B_TIMED_OUT) {
@@ -725,7 +725,7 @@ nlmsvc_notify_blocked(struct file_lock *fl)
 {
 	struct nlm_block	*block;
 
-	dprintk("lockd: VFS unblock notification for block %p\n", fl);
+	dprintk("lockd: VFS unblock notification for block %pK\n", fl);
 	spin_lock(&nlm_blocked_lock);
 	list_for_each_entry(block, &nlm_blocked, b_list) {
 		if (nlm_compare_locks(&block->b_call->a_args.lock.fl, fl)) {
@@ -769,7 +769,7 @@ nlmsvc_grant_blocked(struct nlm_block *block)
 	int			error;
 	loff_t			fl_start, fl_end;
 
-	dprintk("lockd: grant blocked lock %p\n", block);
+	dprintk("lockd: grant blocked lock %pK\n", block);
 
 	kref_get(&block->b_count);
 
@@ -929,7 +929,7 @@ retry_deferred_block(struct nlm_block *block)
 	if (!(block->b_flags & B_GOT_CALLBACK))
 		block->b_flags |= B_TIMED_OUT;
 	nlmsvc_insert_block(block, NLM_TIMEOUT);
-	dprintk("revisit block %p flags %d\n",	block, block->b_flags);
+	dprintk("revisit block %pK flags %d\n",	block, block->b_flags);
 	if (block->b_deferred_req) {
 		block->b_deferred_req->revisit(block->b_deferred_req, 0);
 		block->b_deferred_req = NULL;
@@ -959,10 +959,10 @@ nlmsvc_retry_blocked(void)
 		}
 		spin_unlock(&nlm_blocked_lock);
 
-		dprintk("nlmsvc_retry_blocked(%p, when=%ld)\n",
+		dprintk("nlmsvc_retry_blocked(%pK, when=%ld)\n",
 			block, block->b_when);
 		if (block->b_flags & B_QUEUED) {
-			dprintk("nlmsvc_retry_blocked delete block (%p, granted=%d, flags=%d)\n",
+			dprintk("nlmsvc_retry_blocked delete block (%pK, granted=%d, flags=%d)\n",
 				block, block->b_granted, block->b_flags);
 			retry_deferred_block(block);
 		} else

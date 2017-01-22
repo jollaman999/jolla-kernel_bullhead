@@ -595,7 +595,7 @@ void iounmap(volatile void __iomem *addr_in)
 	p = find_vm_area((void *)addr);
 
 	if (!p) {
-		pr_err("iounmap: bad address %p\n", addr);
+		pr_err("iounmap: bad address %pK\n", addr);
 		dump_stack();
 		return;
 	}

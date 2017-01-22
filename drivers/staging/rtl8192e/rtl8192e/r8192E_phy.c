@@ -1008,7 +1008,7 @@ void rtl8192_SwChnl_WorkItem(struct net_device *dev)
 
 	RT_TRACE(COMP_TRACE, "==> SwChnlCallback819xUsbWorkItem()\n");
 
-	RT_TRACE(COMP_TRACE, "=====>--%s(), set chan:%d, priv:%p\n", __func__,
+	RT_TRACE(COMP_TRACE, "=====>--%s(), set chan:%d, priv:%pK\n", __func__,
 		 priv->chan, priv);
 
 	rtl8192_phy_FinishSwChnlNow(dev , priv->chan);

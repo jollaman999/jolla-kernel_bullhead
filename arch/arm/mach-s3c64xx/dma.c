@@ -62,7 +62,7 @@ static void dbg_showchan(struct s3c2410_dma_chan *chan)
 
 static void show_lli(struct pl080s_lli *lli)
 {
-	pr_debug("LLI[%p] %08x->%08x, NL %08x C %08x,%08x\n",
+	pr_debug("LLI[%pK] %08x->%08x, NL %08x C %08x,%08x\n",
 		 lli, lli->src_addr, lli->dst_addr, lli->next_lli,
 		 lli->control0, lli->control1);
 }
@@ -72,7 +72,7 @@ static void dbg_showbuffs(struct s3c2410_dma_chan *chan)
 	struct s3c64xx_dma_buff *ptr;
 	struct s3c64xx_dma_buff *end;
 
-	pr_debug("DMA%d: buffs next %p, curr %p, end %p\n",
+	pr_debug("DMA%d: buffs next %pK, curr %pK, end %pK\n",
 		 chan->number, chan->next, chan->curr, chan->end);
 
 	ptr = chan->next;
@@ -183,7 +183,7 @@ static void s3c64xx_lli_to_regs(struct s3c2410_dma_chan *chan,
 {
 	void __iomem *regs = chan->regs;
 
-	pr_debug("%s: LLI %p => regs\n", __func__, lli);
+	pr_debug("%s: LLI %pK => regs\n", __func__, lli);
 	show_lli(lli);
 
 	writel(lli->src_addr, regs + PL080_CH_SRC_ADDR);
@@ -285,7 +285,7 @@ static int s3c64xx_dma_flush(struct s3c2410_dma_chan *chan)
 
 	for (buff = chan->curr; buff != NULL; buff = next) {
 		next = buff->next;
-		pr_debug("%s: buff %p (next %p)\n", __func__, buff, buff->next);
+		pr_debug("%s: buff %pK (next %pK)\n", __func__, buff, buff->next);
 
 		s3c64xx_dma_bufffdone(chan, buff, S3C2410_RES_ABORT);
 		s3c64xx_dma_freebuff(buff);
@@ -357,7 +357,7 @@ int s3c2410_dma_enqueue(enum dma_ch channel, void *id,
 		goto err_buff;
 	}
 
-	pr_debug("%s: buff %p, dp %08x lli (%p, %08x) %d\n",
+	pr_debug("%s: buff %pK, dp %08x lli (%pK, %08x) %d\n",
 		 __func__, buff, data, lli, (u32)buff->lli_dma, size);
 
 	buff->lli = lli;
@@ -422,7 +422,7 @@ int s3c2410_dma_devconfig(enum dma_ch channel,
 	u32 peripheral;
 	u32 config = 0;
 
-	pr_debug("%s: channel %d, source %d, dev %08lx, chan %p\n",
+	pr_debug("%s: channel %d, source %d, dev %08lx, chan %pK\n",
 		 __func__, channel, source, devaddr, chan);
 
 	WARN_ON(!chan);
@@ -493,7 +493,7 @@ int s3c2410_dma_request(enum dma_ch channel,
 	struct s3c2410_dma_chan *chan;
 	unsigned long flags;
 
-	pr_debug("dma%d: s3c2410_request_dma: client=%s, dev=%p\n",
+	pr_debug("dma%d: s3c2410_request_dma: client=%s, dev=%pK\n",
 		 channel, client->name, dev);
 
 	local_irq_save(flags);
@@ -515,7 +515,7 @@ int s3c2410_dma_request(enum dma_ch channel,
 
 	/* need to setup */
 
-	pr_debug("%s: channel initialised, %p\n", __func__, chan);
+	pr_debug("%s: channel initialised, %pK\n", __func__, chan);
 
 	return chan->number | DMACH_LOW_LEVEL;
 }
@@ -544,7 +544,7 @@ int s3c2410_dma_free(enum dma_ch channel, struct s3c2410_dma_client *client)
 	local_irq_save(flags);
 
 	if (chan->client != client) {
-		printk(KERN_WARNING "dma%d: possible free from different client (channel %p, passed %p)\n",
+		printk(KERN_WARNING "dma%d: possible free from different client (channel %pK, passed %pK)\n",
 		       channel, chan->client, client);
 	}
 
@@ -692,7 +692,7 @@ static int s3c64xx_dma_init1(int chno, enum dma_ch chbase,
 	regptr = regs + PL080_Cx_BASE(0);
 
 	for (ch = 0; ch < 8; ch++, chptr++) {
-		pr_debug("%s: registering DMA %d (%p)\n",
+		pr_debug("%s: registering DMA %d (%pK)\n",
 			 __func__, chno + ch, regptr);
 
 		chptr->bit = 1 << ch;
@@ -705,7 +705,7 @@ static int s3c64xx_dma_init1(int chno, enum dma_ch chbase,
 	/* for the moment, permanently enable the controller */
 	writel(PL080_CONFIG_ENABLE, regs + PL080_CONFIG);
 
-	printk(KERN_INFO "PL080: IRQ %d, at %p, channels %d..%d\n",
+	printk(KERN_INFO "PL080: IRQ %d, at %pK, channels %d..%d\n",
 	       irq, regs, chno, chno+8);
 
 	return 0;

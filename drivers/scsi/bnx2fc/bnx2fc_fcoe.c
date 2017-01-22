@@ -2352,7 +2352,7 @@ static void bnx2fc_ulp_exit(struct cnic_dev *dev)
 	mutex_lock(&bnx2fc_dev_lock);
 	hba = bnx2fc_find_hba_for_cnic(dev);
 	if (!hba) {
-		printk(KERN_ERR PFX "bnx2fc_ulp_exit: hba not found, dev 0%p\n",
+		printk(KERN_ERR PFX "bnx2fc_ulp_exit: hba not found, dev 0%pK\n",
 		       dev);
 		mutex_unlock(&bnx2fc_dev_lock);
 		return;
@@ -2609,7 +2609,7 @@ static void __exit bnx2fc_mod_exit(void)
 	/* Unregister with cnic */
 	list_for_each_entry_safe(hba, next, &to_be_deleted, list) {
 		list_del_init(&hba->list);
-		printk(KERN_ERR PFX "MOD_EXIT:destroy hba = 0x%p\n",
+		printk(KERN_ERR PFX "MOD_EXIT:destroy hba = 0x%pK\n",
 		       hba);
 		bnx2fc_ulp_stop(hba);
 		/* unregister cnic device */

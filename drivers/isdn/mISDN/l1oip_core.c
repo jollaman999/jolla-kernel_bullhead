@@ -998,7 +998,7 @@ static int
 open_dchannel(struct l1oip *hc, struct dchannel *dch, struct channel_req *rq)
 {
 	if (debug & DEBUG_HW_OPEN)
-		printk(KERN_DEBUG "%s: dev(%d) open from %p\n", __func__,
+		printk(KERN_DEBUG "%s: dev(%d) open from %pK\n", __func__,
 		       dch->dev.id, __builtin_return_address(0));
 	if (rq->protocol == ISDN_P_NONE)
 		return -EINVAL;
@@ -1057,7 +1057,7 @@ l1oip_dctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 	int			err = 0;
 
 	if (dch->debug & DEBUG_HW)
-		printk(KERN_DEBUG "%s: cmd:%x %p\n",
+		printk(KERN_DEBUG "%s: cmd:%x %pK\n",
 		       __func__, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
@@ -1085,7 +1085,7 @@ l1oip_dctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 		break;
 	case CLOSE_CHANNEL:
 		if (debug & DEBUG_HW_OPEN)
-			printk(KERN_DEBUG "%s: dev(%d) close from %p\n",
+			printk(KERN_DEBUG "%s: dev(%d) close from %pK\n",
 			       __func__, dch->dev.id,
 			       __builtin_return_address(0));
 		module_put(THIS_MODULE);
@@ -1220,7 +1220,7 @@ l1oip_bctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 	int		err = -EINVAL;
 
 	if (bch->debug & DEBUG_HW)
-		printk(KERN_DEBUG "%s: cmd:%x %p\n",
+		printk(KERN_DEBUG "%s: cmd:%x %pK\n",
 		       __func__, cmd, arg);
 	switch (cmd) {
 	case CLOSE_CHANNEL:

@@ -293,7 +293,7 @@ static void dump_packet(unsigned char *data, unsigned long length, char *s)
 
 	static unsigned int count;
 
-	pr_info("dump_packet(data %p, length 0x%lx s %s count 0x%x)\n",
+	pr_info("dump_packet(data %pK, length 0x%lx s %s count 0x%x)\n",
 	       data, length, s, count++);
 
 	pr_info("\n");
@@ -468,7 +468,7 @@ static bool tile_net_provide_needed_buffer(struct tile_net_cpu *info,
 	if (hash_default) {
 		HV_PTE pte = *virt_to_pte(current->mm, (unsigned long)va);
 		if (hv_pte_get_mode(pte) != HV_PTE_MODE_CACHE_HASH_L3)
-			panic("Non-HFH ingress buffer! VA=%p Mode=%d PTE=%llx",
+			panic("Non-HFH ingress buffer! VA=%pK Mode=%d PTE=%llx",
 			      va, hv_pte_get_mode(pte), hv_pte_val(pte));
 	}
 #endif
@@ -862,7 +862,7 @@ static bool tile_net_poll_aux(struct tile_net_cpu *info, int index)
 		/* Paranoia. */
 		if (skb->data != buf)
 			panic("Corrupt linux buffer from LIPP! "
-			      "VA=%p, skb=%p, skb->data=%p\n",
+			      "VA=%pK, skb=%pK, skb->data=%pK\n",
 			      va, skb, skb->data);
 
 		/* Encode the actual packet length. */
@@ -1125,7 +1125,7 @@ static void tile_net_register(void *dev_ptr)
 			   NETIO_IPP_INPUT_REGISTER_OFF);
 	PDEBUG("hv_dev_pread(NETIO_IPP_INPUT_REGISTER_OFF) returned %d\n",
 	       ret);
-	PDEBUG("queuep %p\n", queuep);
+	PDEBUG("queuep %pK\n", queuep);
 	if (ret <= 0) {
 		/* ISSUE: Shouldn't this be a fatal error? */
 		pr_err("hv_dev_pread NETIO_IPP_INPUT_REGISTER_OFF failure\n");
@@ -1973,7 +1973,7 @@ static int tile_net_tx(struct sk_buff *skb, struct net_device *dev)
 	if (hash_default) {
 		HV_PTE pte = *virt_to_pte(current->mm, (unsigned long)data);
 		if (hv_pte_get_mode(pte) != HV_PTE_MODE_CACHE_HASH_L3)
-			panic("Non-HFH egress buffer! VA=%p Mode=%d PTE=%llx",
+			panic("Non-HFH egress buffer! VA=%pK Mode=%d PTE=%llx",
 			      data, hv_pte_get_mode(pte), hv_pte_val(pte));
 	}
 #endif
@@ -2229,7 +2229,7 @@ static int tile_net_get_mac(struct net_device *dev)
 
 	/* Get the hypervisor handle for this device. */
 	priv->hv_devhdl = hv_dev_open((HV_VirtAddr)hv_dev_name, 0);
-	PDEBUG("hv_dev_open(%s) returned %d %p\n",
+	PDEBUG("hv_dev_open(%s) returned %d %pK\n",
 	       hv_dev_name, priv->hv_devhdl, &priv->hv_devhdl);
 	if (priv->hv_devhdl < 0) {
 		if (priv->hv_devhdl == HV_ENODEV)

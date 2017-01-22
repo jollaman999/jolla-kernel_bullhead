@@ -97,7 +97,7 @@ static int send_hcill_cmd(u8 cmd, struct hci_uart *hu)
 	struct ll_struct *ll = hu->priv;
 	struct hcill_cmd *hcill_packet;
 
-	BT_DBG("hu %p cmd 0x%x", hu, cmd);
+	BT_DBG("hu %pK cmd 0x%x", hu, cmd);
 
 	/* allocate packet */
 	skb = bt_skb_alloc(1, GFP_ATOMIC);
@@ -123,7 +123,7 @@ static int ll_open(struct hci_uart *hu)
 {
 	struct ll_struct *ll;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	ll = kzalloc(sizeof(*ll), GFP_KERNEL);
 	if (!ll)
@@ -145,7 +145,7 @@ static int ll_flush(struct hci_uart *hu)
 {
 	struct ll_struct *ll = hu->priv;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	skb_queue_purge(&ll->tx_wait_q);
 	skb_queue_purge(&ll->txq);
@@ -158,7 +158,7 @@ static int ll_close(struct hci_uart *hu)
 {
 	struct ll_struct *ll = hu->priv;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	skb_queue_purge(&ll->tx_wait_q);
 	skb_queue_purge(&ll->txq);
@@ -197,7 +197,7 @@ static void ll_device_want_to_wakeup(struct hci_uart *hu)
 	unsigned long flags;
 	struct ll_struct *ll = hu->priv;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	/* lock hcill state */
 	spin_lock_irqsave(&ll->hcill_lock, flags);
@@ -247,7 +247,7 @@ static void ll_device_want_to_sleep(struct hci_uart *hu)
 	unsigned long flags;
 	struct ll_struct *ll = hu->priv;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	/* lock hcill state */
 	spin_lock_irqsave(&ll->hcill_lock, flags);
@@ -280,7 +280,7 @@ static void ll_device_woke_up(struct hci_uart *hu)
 	unsigned long flags;
 	struct ll_struct *ll = hu->priv;
 
-	BT_DBG("hu %p", hu);
+	BT_DBG("hu %pK", hu);
 
 	/* lock hcill state */
 	spin_lock_irqsave(&ll->hcill_lock, flags);
@@ -305,7 +305,7 @@ static int ll_enqueue(struct hci_uart *hu, struct sk_buff *skb)
 	unsigned long flags = 0;
 	struct ll_struct *ll = hu->priv;
 
-	BT_DBG("hu %p skb %p", hu, skb);
+	BT_DBG("hu %pK skb %pK", hu, skb);
 
 	/* Prepend skb with frame type */
 	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
@@ -380,7 +380,7 @@ static int ll_recv(struct hci_uart *hu, void *data, int count)
 	struct hci_sco_hdr   *sh;
 	int len, type, dlen;
 
-	BT_DBG("hu %p count %d rx_state %ld rx_count %ld", hu, count, ll->rx_state, ll->rx_count);
+	BT_DBG("hu %pK count %d rx_state %ld rx_count %ld", hu, count, ll->rx_state, ll->rx_count);
 
 	ptr = data;
 	while (count) {

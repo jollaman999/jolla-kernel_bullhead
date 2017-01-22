@@ -144,8 +144,8 @@ static void setup_desc(struct dmasg *desc, void *buf, int fragcount,
 	/* make circular */
 	desc[fragcount-1].next_desc_addr = desc;
 
-	pr_debug("setup desc: desc0=%p, next0=%p, desc1=%p,"
-		"next1=%p\nx_count=%x,y_count=%x,addr=0x%lx,cfs=0x%x\n",
+	pr_debug("setup desc: desc0=%pK, next0=%pK, desc1=%pK,"
+		"next1=%pK\nx_count=%x,y_count=%x,addr=0x%lx,cfs=0x%x\n",
 		desc, desc[0].next_desc_addr,
 		desc+1, desc[1].next_desc_addr,
 		desc[0].x_count, desc[0].y_count,
@@ -394,7 +394,7 @@ int sport_config_rx_dma(struct sport_device *sport, void *buf,
 	unsigned int cfg;
 	dma_addr_t addr;
 
-	pr_debug("%s buf:%p, frag:%d, fragsize:0x%lx\n", __func__, \
+	pr_debug("%s buf:%pK, frag:%d, fragsize:0x%lx\n", __func__, \
 			buf, fragcount, fragsize);
 
 	x_count = fragsize / sport->wdsize;
@@ -459,7 +459,7 @@ int sport_config_tx_dma(struct sport_device *sport, void *buf, \
 	unsigned int cfg;
 	dma_addr_t addr;
 
-	pr_debug("%s buf:%p, fragcount:%d, fragsize:0x%lx\n",
+	pr_debug("%s buf:%pK, fragcount:%d, fragsize:0x%lx\n",
 			__func__, buf, fragcount, fragsize);
 
 	x_count = fragsize/sport->wdsize;
@@ -674,9 +674,9 @@ int  sport_dump_stat(struct sport_device *sport, char *buf, size_t len)
 	len -= ret;
 
 	ret += snprintf(buf, len,
-			"curr_rx_desc:0x%p, curr_tx_desc:0x%p\n"
-			"dma_rx_desc:0x%p, dma_tx_desc:0x%p\n"
-			"dummy_rx_desc:0x%p, dummy_tx_desc:0x%p\n",
+			"curr_rx_desc:0x%pK, curr_tx_desc:0x%pK\n"
+			"dma_rx_desc:0x%pK, dma_tx_desc:0x%pK\n"
+			"dummy_rx_desc:0x%pK, dummy_tx_desc:0x%pK\n",
 			sport->curr_rx_desc, sport->curr_tx_desc,
 			sport->dma_rx_desc, sport->dma_tx_desc,
 			sport->dummy_rx_desc, sport->dummy_tx_desc);
@@ -905,7 +905,7 @@ struct sport_device *sport_init(struct platform_device *pdev,
 		goto __init_err3;
 	}
 
-	dev_info(dev, "dma rx:%d tx:%d, err irq:%d, regs:%p\n",
+	dev_info(dev, "dma rx:%d tx:%d, err irq:%d, regs:%pK\n",
 			sport->dma_rx_chan, sport->dma_tx_chan,
 			sport->err_irq, sport->regs);
 
@@ -1015,7 +1015,7 @@ int sport_send_and_recv(struct sport_device *sport, u8 *out_data, \
 	unsigned long flags;
 	unsigned long wait = 0;
 
-	pr_debug("%s enter, out_data:%p, in_data:%p len:%d\n", \
+	pr_debug("%s enter, out_data:%pK, in_data:%pK len:%d\n", \
 			__func__, out_data, in_data, len);
 	pr_debug("tcr1:0x%04x, tcr2:0x%04x, tclkdiv:0x%04x, tfsdiv:0x%04x\n"
 			"mcmc1:0x%04x, mcmc2:0x%04x\n",

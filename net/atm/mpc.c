@@ -1162,7 +1162,7 @@ static void MPOA_res_reply_rcvd(struct k_message *msg, struct mpoa_client *mpc)
 
 	dprintk("(%s) ip %pI4\n",
 		mpc->dev->name, &dst_ip);
-	ddprintk("(%s) entry = %p",
+	ddprintk("(%s) entry = %pK",
 		 mpc->dev->name, entry);
 	if (entry == NULL) {
 		pr_info("(%s) ARGH, received res. reply for an entry that doesn't exist.\n",
@@ -1181,7 +1181,7 @@ static void MPOA_res_reply_rcvd(struct k_message *msg, struct mpoa_client *mpc)
 	do_gettimeofday(&(entry->tv));
 	do_gettimeofday(&(entry->reply_wait)); /* Used in refreshing func from now on */
 	entry->refresh_time = 0;
-	ddprintk_cont("entry->shortcut = %p\n", entry->shortcut);
+	ddprintk_cont("entry->shortcut = %pK\n", entry->shortcut);
 
 	if (entry->entry_state == INGRESS_RESOLVING &&
 	    entry->shortcut != NULL) {
@@ -1314,7 +1314,7 @@ static void MPOA_cache_impos_rcvd(struct k_message *msg,
 	eg_cache_entry *entry = mpc->eg_ops->get_by_cache_id(msg->content.eg_info.cache_id, mpc);
 
 	holding_time = msg->content.eg_info.holding_time;
-	dprintk("(%s) entry = %p, holding_time = %u\n",
+	dprintk("(%s) entry = %pK, holding_time = %u\n",
 		mpc->dev->name, entry, holding_time);
 	if (entry == NULL && holding_time) {
 		entry = mpc->eg_ops->add_entry(msg, mpc);
@@ -1514,9 +1514,9 @@ static void __exit atm_mpoa_cleanup(void)
 		ddprintk("caches cleared\n");
 		kfree(mpc->mps_macs);
 		memset(mpc, 0, sizeof(struct mpoa_client));
-		ddprintk("about to kfree %p\n", mpc);
+		ddprintk("about to kfree %pK\n", mpc);
 		kfree(mpc);
-		ddprintk("next mpc is at %p\n", tmp);
+		ddprintk("next mpc is at %pK\n", tmp);
 		mpc = tmp;
 	}
 
@@ -1524,7 +1524,7 @@ static void __exit atm_mpoa_cleanup(void)
 	qos_head = NULL;
 	while (qos != NULL) {
 		nextqos = qos->next;
-		dprintk("freeing qos entry %p\n", qos);
+		dprintk("freeing qos entry %pK\n", qos);
 		kfree(qos);
 		qos = nextqos;
 	}

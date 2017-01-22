@@ -427,7 +427,7 @@ open_dchannel(struct hfcsusb *hw, struct mISDNchannel *ch,
 	int err = 0;
 
 	if (debug & DEBUG_HW_OPEN)
-		printk(KERN_DEBUG "%s: %s: dev(%d) open addr(%i) from %p\n",
+		printk(KERN_DEBUG "%s: %s: dev(%d) open addr(%i) from %pK\n",
 		       hw->name, __func__, hw->dch.dev.id, rq->adr.channel,
 		       __builtin_return_address(0));
 	if (rq->protocol == ISDN_P_NONE)
@@ -536,7 +536,7 @@ hfc_dctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 	int			err = 0;
 
 	if (dch->debug & DEBUG_HW)
-		printk(KERN_DEBUG "%s: %s: cmd:%x %p\n",
+		printk(KERN_DEBUG "%s: %s: cmd:%x %pK\n",
 		       hw->name, __func__, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
@@ -553,7 +553,7 @@ hfc_dctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 		hw->open--;
 		if (debug & DEBUG_HW_OPEN)
 			printk(KERN_DEBUG
-			       "%s: %s: dev(%d) close from %p (open %d)\n",
+			       "%s: %s: dev(%d) close from %pK (open %d)\n",
 			       hw->name, __func__, hw->dch.dev.id,
 			       __builtin_return_address(0), hw->open);
 		if (!hw->open) {
@@ -822,7 +822,7 @@ hfcsusb_rx_frame(struct usb_fifo *fifo, __u8 *data, unsigned int len,
 
 	if (debug & DBG_HFC_CALL_TRACE)
 		printk(KERN_DEBUG "%s: %s: fifo(%i) len(%i) "
-		       "dch(%p) bch(%p) ech(%p)\n",
+		       "dch(%pK) bch(%pK) ech(%pK)\n",
 		       hw->name, __func__, fifon, len,
 		       fifo->dch, fifo->bch, fifo->ech);
 
@@ -1801,7 +1801,7 @@ hfc_bctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 	int		ret = -EINVAL;
 
 	if (bch->debug & DEBUG_HW)
-		printk(KERN_DEBUG "%s: cmd:%x %p\n", __func__, cmd, arg);
+		printk(KERN_DEBUG "%s: cmd:%x %pK\n", __func__, cmd, arg);
 
 	switch (cmd) {
 	case HW_TESTRX_RAW:

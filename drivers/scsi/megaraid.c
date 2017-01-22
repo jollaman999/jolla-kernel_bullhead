@@ -1460,7 +1460,7 @@ mega_cmd_done(adapter_t *adapter, u8 completed[], int nstatus, int status)
 			if( !(scb->state & SCB_ISSUED) || scb->cmd == NULL ) {
 				printk(KERN_CRIT
 					"megaraid: invalid command ");
-				printk("Id %d, scb->state:%x, scsi cmd:%p\n",
+				printk("Id %d, scb->state:%x, scsi cmd:%pK\n",
 					cmdid, scb->state, scb->cmd);
 
 				continue;

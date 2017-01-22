@@ -732,7 +732,7 @@ enum BC_STATUS crystalhd_map_dio(struct crystalhd_adp *adp, void *ubuff,
 				     (void *)(uaddr + count - dio->fb_size),
 				     dio->fb_size);
 		if (res) {
-			BCMLOG_ERR("failed %d to copy %u fill bytes from %p\n",
+			BCMLOG_ERR("failed %d to copy %u fill bytes from %pK\n",
 				   res, dio->fb_size,
 				   (void *)(uaddr + count-dio->fb_size));
 			crystalhd_unmap_dio(adp, dio);
@@ -882,7 +882,7 @@ int crystalhd_create_dio_pool(struct crystalhd_adp *adp, uint32_t max_pages)
 	asz =  (sizeof(*dio->pages) * max_pages) +
 	       (sizeof(*dio->sg) * max_pages) + sizeof(*dio);
 
-	BCMLOG(BCMLOG_DBG, "Initializing Dio pool %d %d %x %p\n",
+	BCMLOG(BCMLOG_DBG, "Initializing Dio pool %d %d %x %pK\n",
 	       BC_LINK_SG_POOL_SZ, max_pages, asz, adp->fill_byte_pool);
 
 	for (i = 0; i < BC_LINK_SG_POOL_SZ; i++) {

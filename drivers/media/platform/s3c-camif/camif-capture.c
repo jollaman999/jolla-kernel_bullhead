@@ -564,7 +564,7 @@ static int s3c_camif_open(struct file *file)
 	struct camif_dev *camif = vp->camif;
 	int ret;
 
-	pr_debug("[vp%d] state: %#x,  owner: %p, pid: %d\n", vp->id,
+	pr_debug("[vp%d] state: %#x,  owner: %pK, pid: %d\n", vp->id,
 		 vp->state, vp->owner, task_pid_nr(current));
 
 	if (mutex_lock_interruptible(&camif->lock))
@@ -596,7 +596,7 @@ static int s3c_camif_close(struct file *file)
 	struct camif_dev *camif = vp->camif;
 	int ret;
 
-	pr_debug("[vp%d] state: %#x, owner: %p, pid: %d\n", vp->id,
+	pr_debug("[vp%d] state: %#x, owner: %pK, pid: %d\n", vp->id,
 		 vp->state, vp->owner, task_pid_nr(current));
 
 	mutex_lock(&camif->lock);
@@ -922,7 +922,7 @@ static int s3c_camif_reqbufs(struct file *file, void *priv,
 	struct camif_vp *vp = video_drvdata(file);
 	int ret;
 
-	pr_debug("[vp%d] rb count: %d, owner: %p, priv: %p\n",
+	pr_debug("[vp%d] rb count: %d, owner: %pK, priv: %pK\n",
 		 vp->id, rb->count, vp->owner, priv);
 
 	if (vp->owner && vp->owner != priv)

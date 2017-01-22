@@ -2576,7 +2576,7 @@ t_hash_show(struct seq_file *m, struct ftrace_iterator *iter)
 	seq_printf(m, "%ps:%ps", (void *)rec->ip, (void *)rec->ops->func);
 
 	if (rec->data)
-		seq_printf(m, ":%p", rec->data);
+		seq_printf(m, ":%pK", rec->data);
 	seq_putc(m, '\n');
 
 	return 0;

@@ -111,7 +111,7 @@ int pcmcia_register_socket(struct pcmcia_socket *socket)
 	if (!socket || !socket->ops || !socket->dev.parent || !socket->resource_ops)
 		return -EINVAL;
 
-	dev_dbg(&socket->dev, "pcmcia_register_socket(0x%p)\n", socket->ops);
+	dev_dbg(&socket->dev, "pcmcia_register_socket(0x%pK)\n", socket->ops);
 
 	/* try to obtain a socket number [yes, it gets ugly if we
 	 * register more than 2^sizeof(unsigned int) pcmcia
@@ -211,7 +211,7 @@ void pcmcia_unregister_socket(struct pcmcia_socket *socket)
 	if (!socket)
 		return;
 
-	dev_dbg(&socket->dev, "pcmcia_unregister_socket(0x%p)\n", socket->ops);
+	dev_dbg(&socket->dev, "pcmcia_unregister_socket(0x%pK)\n", socket->ops);
 
 	if (socket->thread)
 		kthread_stop(socket->thread);

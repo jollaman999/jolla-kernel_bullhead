@@ -135,7 +135,7 @@ void acpi_ns_delete_node(struct acpi_namespace_node *node)
 	(void)acpi_os_release_object(acpi_gbl_namespace_cache, node);
 
 	ACPI_MEM_TRACKING(acpi_gbl_ns_node_list->total_freed++);
-	ACPI_DEBUG_PRINT((ACPI_DB_ALLOCATIONS, "Node %p, Remaining %X\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_ALLOCATIONS, "Node %pK, Remaining %X\n",
 			  node, acpi_gbl_current_node_count));
 }
 
@@ -263,7 +263,7 @@ void acpi_ns_install_node(struct acpi_walk_state *walk_state, struct acpi_namesp
 	node->type = (u8) type;
 
 	ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
-			  "%4.4s (%s) [Node %p Owner %X] added to %4.4s (%s) [Node %p]\n",
+			  "%4.4s (%s) [Node %pK Owner %X] added to %4.4s (%s) [Node %pK]\n",
 			  acpi_ut_get_node_name(node),
 			  acpi_ut_get_type_name(node->type), node, owner_id,
 			  acpi_ut_get_node_name(parent_node),
@@ -305,7 +305,7 @@ void acpi_ns_delete_children(struct acpi_namespace_node *parent_node)
 		/* Grandchildren should have all been deleted already */
 
 		if (next_node->child) {
-			ACPI_ERROR((AE_INFO, "Found a grandchild! P=%p C=%p",
+			ACPI_ERROR((AE_INFO, "Found a grandchild! P=%pK C=%pK",
 				    parent_node, next_node));
 		}
 

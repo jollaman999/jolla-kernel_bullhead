@@ -568,7 +568,7 @@ static inline int on_list(struct list_head *obj, struct list_head *head)
 
 	list_for_each(this, head) {
 		if (this == obj) {
-			jffs2_dbg(1, "%p is on list at %p\n", obj, head);
+			jffs2_dbg(1, "%pK is on list at %pK\n", obj, head);
 			return 1;
 
 		}

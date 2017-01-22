@@ -756,7 +756,7 @@ dbusy_timer_handler(struct isac_hw *isac)
 static int
 open_dchannel(struct isac_hw *isac, struct channel_req *rq)
 {
-	pr_debug("%s: %s dev(%d) open from %p\n", isac->name, __func__,
+	pr_debug("%s: %s dev(%d) open from %pK\n", isac->name, __func__,
 		 isac->dch.dev.id, __builtin_return_address(1));
 	if (rq->protocol != ISDN_P_TE_S0)
 		return -EINVAL;
@@ -1402,7 +1402,7 @@ hscx_bctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	int ret = -EINVAL;
 	u_long flags;
 
-	pr_debug("%s: %s cmd:%x %p\n", hx->ip->name, __func__, cmd, arg);
+	pr_debug("%s: %s cmd:%x %pK\n", hx->ip->name, __func__, cmd, arg);
 	switch (cmd) {
 	case CLOSE_CHANNEL:
 		test_and_clear_bit(FLG_OPEN, &bch->Flags);
@@ -1543,7 +1543,7 @@ ipac_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	struct channel_req *rq;
 	int err = 0;
 
-	pr_debug("%s: DCTRL: %x %p\n", ipac->name, cmd, arg);
+	pr_debug("%s: DCTRL: %x %pK\n", ipac->name, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
 		rq = arg;
@@ -1557,7 +1557,7 @@ ipac_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 			pr_info("%s: cannot get module\n", ipac->name);
 		break;
 	case CLOSE_CHANNEL:
-		pr_debug("%s: dev(%d) close from %p\n", ipac->name,
+		pr_debug("%s: dev(%d) close from %pK\n", ipac->name,
 			 dch->dev.id, __builtin_return_address(0));
 		module_put(ipac->owner);
 		break;

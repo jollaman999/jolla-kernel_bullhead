@@ -39,7 +39,7 @@ DECLARE_EVENT_CLASS(rmnet_handler_template,
 		__assign_str(name, skb->dev->name);
 	),
 
-	TP_printk("dev=%s skbaddr=%p len=%u",
+	TP_printk("dev=%s skbaddr=%pK len=%u",
 		__get_str(name), __entry->skbaddr, __entry->len)
 )
 
@@ -128,7 +128,7 @@ DECLARE_EVENT_CLASS(rmnet_aggregation_template,
 		__entry->num = num_agg_pakcets;
 	),
 
-	TP_printk("dev=%s skbaddr=%p len=%u agg_count: %d",
+	TP_printk("dev=%s skbaddr=%pK len=%u agg_count: %d",
 		__get_str(name), __entry->skbaddr, __entry->len, __entry->num)
 )
 

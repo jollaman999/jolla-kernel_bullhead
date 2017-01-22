@@ -998,7 +998,7 @@ int hash_page(unsigned long ea, unsigned long access, unsigned long trap)
 		rc = 1;
 		goto bail;
 	}
-	DBG_LOW(" mm=%p, mm->pgdir=%p, vsid=%016lx\n", mm, mm->pgd, vsid);
+	DBG_LOW(" mm=%pK, mm->pgdir=%pK, vsid=%016lx\n", mm, mm->pgd, vsid);
 
 	/* Bad address. */
 	if (!vsid) {
@@ -1159,7 +1159,7 @@ void hash_preload(struct mm_struct *mm, unsigned long ea,
 		return;
 #endif
 
-	DBG_LOW("hash_preload(mm=%p, mm->pgdir=%p, ea=%016lx, access=%lx,"
+	DBG_LOW("hash_preload(mm=%pK, mm->pgdir=%pK, ea=%016lx, access=%lx,"
 		" trap=%lx\n", mm, mm->pgd, ea, access, trap);
 
 	/* Get Linux PTE if available */

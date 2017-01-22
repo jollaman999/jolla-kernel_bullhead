@@ -36,7 +36,7 @@ static ssize_t w1_f3a_read_state(
 {
 	struct w1_slave *sl = kobj_to_w1_slave(kobj);
 	dev_dbg(&sl->dev,
-		"Reading %s kobj: %p, off: %0#10x, count: %zu, buff addr: %p",
+		"Reading %s kobj: %pK, off: %0#10x, count: %zu, buff addr: %pK",
 		bin_attr->attr.name, kobj, (unsigned int)off, count, buf);
 
 	if (off != 0)

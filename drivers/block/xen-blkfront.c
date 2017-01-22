@@ -528,8 +528,8 @@ static void do_blkif_request(struct request_queue *rq)
 			continue;
 		}
 
-		pr_debug("do_blk_req %p: cmd %p, sec %lx, "
-			 "(%u/%u) buffer:%p [%s]\n",
+		pr_debug("do_blk_req %pK: cmd %pK, sec %lx, "
+			 "(%u/%u) buffer:%pK [%s]\n",
 			 req, req->cmd, (unsigned long)blk_rq_pos(req),
 			 blk_rq_cur_sectors(req), blk_rq_sectors(req),
 			 req->buffer, rq_data_dir(req) ? "write" : "read");

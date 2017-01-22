@@ -554,7 +554,7 @@ qla2xxx_dump_post_process(scsi_qla_host_t *vha, int rval)
 		ha->fw_dumped = 0;
 	} else {
 		ql_log(ql_log_info, vha, 0xd001,
-		    "Firmware dump saved to temp buffer (%ld/%p).\n",
+		    "Firmware dump saved to temp buffer (%ld/%pK).\n",
 		    vha->host_no, ha->fw_dump);
 		ha->fw_dumped = 1;
 		qla2x00_post_uevent_work(vha, QLA_UEVENT_CODE_FW_DUMP);
@@ -592,7 +592,7 @@ qla2300_fw_dump(scsi_qla_host_t *vha, int hardware_locked)
 
 	if (ha->fw_dumped) {
 		ql_log(ql_log_warn, vha, 0xd003,
-		    "Firmware has been previously dumped (%p) "
+		    "Firmware has been previously dumped (%pK) "
 		    "-- ignoring request.\n",
 		    ha->fw_dump);
 		goto qla2300_fw_dump_failed;
@@ -756,7 +756,7 @@ qla2100_fw_dump(scsi_qla_host_t *vha, int hardware_locked)
 
 	if (ha->fw_dumped) {
 		ql_log(ql_log_warn, vha, 0xd005,
-		    "Firmware has been previously dumped (%p) "
+		    "Firmware has been previously dumped (%pK) "
 		    "-- ignoring request.\n",
 		    ha->fw_dump);
 		goto qla2100_fw_dump_failed;
@@ -956,7 +956,7 @@ qla24xx_fw_dump(scsi_qla_host_t *vha, int hardware_locked)
 
 	if (ha->fw_dumped) {
 		ql_log(ql_log_warn, vha, 0xd007,
-		    "Firmware has been previously dumped (%p) "
+		    "Firmware has been previously dumped (%pK) "
 		    "-- ignoring request.\n",
 		    ha->fw_dump);
 		goto qla24xx_fw_dump_failed;
@@ -1205,7 +1205,7 @@ qla25xx_fw_dump(scsi_qla_host_t *vha, int hardware_locked)
 
 	if (ha->fw_dumped) {
 		ql_log(ql_log_warn, vha, 0xd009,
-		    "Firmware has been previously dumped (%p) "
+		    "Firmware has been previously dumped (%pK) "
 		    "-- ignoring request.\n",
 		    ha->fw_dump);
 		goto qla25xx_fw_dump_failed;
@@ -1522,7 +1522,7 @@ qla81xx_fw_dump(scsi_qla_host_t *vha, int hardware_locked)
 
 	if (ha->fw_dumped) {
 		ql_log(ql_log_warn, vha, 0xd00b,
-		    "Firmware has been previously dumped (%p) "
+		    "Firmware has been previously dumped (%pK) "
 		    "-- ignoring request.\n",
 		    ha->fw_dump);
 		goto qla81xx_fw_dump_failed;
@@ -1841,7 +1841,7 @@ qla83xx_fw_dump(scsi_qla_host_t *vha, int hardware_locked)
 
 	if (ha->fw_dumped) {
 		ql_log(ql_log_warn, vha, 0xd00d,
-		    "Firmware has been previously dumped (%p) -- ignoring "
+		    "Firmware has been previously dumped (%pK) -- ignoring "
 		    "request...\n", ha->fw_dump);
 		goto qla83xx_fw_dump_failed;
 	}

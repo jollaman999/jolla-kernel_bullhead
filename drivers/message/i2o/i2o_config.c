@@ -713,7 +713,7 @@ static int i2o_cfg_passthru32(struct file *file, unsigned cmnd,
 				    ((void __user *)(u64) sg[j].addr_bus,
 				     sg_list[j].virt, sg_size)) {
 					printk(KERN_WARNING
-					       "%s: Could not copy %p TO user %x\n",
+					       "%s: Could not copy %pK TO user %x\n",
 					       c->name, sg_list[j].virt,
 					       sg[j].addr_bus);
 					rcode = -EFAULT;
@@ -953,7 +953,7 @@ static int i2o_cfg_passthru(unsigned long arg)
 				    ((void __user *)sg[j].addr_bus, sg_list[j].virt,
 				     sg_size)) {
 					printk(KERN_WARNING
-					       "%s: Could not copy %p TO user %x\n",
+					       "%s: Could not copy %pK TO user %x\n",
 					       c->name, sg_list[j].virt,
 					       sg[j].addr_bus);
 					rcode = -EFAULT;

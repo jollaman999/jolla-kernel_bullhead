@@ -156,7 +156,7 @@ int get_user_pages_fast(unsigned long start, int nr_pages, int write,
 	do {
 		pgd_t pgd = *pgdp;
 
-		pr_devel("  %016lx: normal pgd %p\n", addr,
+		pr_devel("  %016lx: normal pgd %pK\n", addr,
 			 (void *)pgd_val(pgd));
 		next = pgd_addr_end(addr, end);
 		if (pgd_none(pgd))

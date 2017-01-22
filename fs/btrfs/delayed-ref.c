@@ -361,7 +361,7 @@ int btrfs_check_delayed_seq(struct btrfs_fs_info *fs_info,
 		elem = list_first_entry(&fs_info->tree_mod_seq_list,
 					struct seq_list, list);
 		if (seq >= elem->seq) {
-			pr_debug("holding back delayed_ref %#x.%x, lowest is %#x.%x (%p)\n",
+			pr_debug("holding back delayed_ref %#x.%x, lowest is %#x.%x (%pK)\n",
 				 (u32)(seq >> 32), (u32)seq,
 				 (u32)(elem->seq >> 32), (u32)elem->seq,
 				 delayed_refs);

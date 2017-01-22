@@ -1075,7 +1075,7 @@ static int temac_of_probe(struct platform_device *op)
 		if (lp->sdma_regs) {
 			lp->dma_in = temac_dma_in32;
 			lp->dma_out = temac_dma_out32;
-			dev_dbg(&op->dev, "MEM base: %p\n", lp->sdma_regs);
+			dev_dbg(&op->dev, "MEM base: %pK\n", lp->sdma_regs);
 		} else {
 			dev_err(&op->dev, "unable to map DMA registers\n");
 			of_node_put(np);
@@ -1110,7 +1110,7 @@ static int temac_of_probe(struct platform_device *op)
 
 	lp->phy_node = of_parse_phandle(op->dev.of_node, "phy-handle", 0);
 	if (lp->phy_node)
-		dev_dbg(lp->dev, "using PHY node %s (%p)\n", np->full_name, np);
+		dev_dbg(lp->dev, "using PHY node %s (%pK)\n", np->full_name, np);
 
 	/* Add the device attributes */
 	rc = sysfs_create_group(&lp->dev->kobj, &temac_attr_group);

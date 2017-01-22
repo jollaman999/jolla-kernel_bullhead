@@ -60,7 +60,7 @@ TRACE_EVENT(undef_instr,
 		__entry->prog_cnt	= prog_cnt;
 	),
 
-	TP_printk("pc:%p", __entry->prog_cnt)
+	TP_printk("pc:%pK", __entry->prog_cnt)
 );
 
 TRACE_EVENT(unhandled_abort,

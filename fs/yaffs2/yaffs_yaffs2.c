@@ -576,7 +576,7 @@ static int yaffs2_wr_checkpt_objs(struct yaffs_dev *dev)
 					cp.struct_type = sizeof(cp);
 
 					yaffs_trace(YAFFS_TRACE_CHECKPOINT,
-						"Checkpoint write object %d parent %d type %d chunk %d obj addr %p",
+						"Checkpoint write object %d parent %d type %d chunk %d obj addr %pK",
 						cp.obj_id, cp.parent_id,
 						cp.variant_type, cp.hdr_chunk, obj);
 

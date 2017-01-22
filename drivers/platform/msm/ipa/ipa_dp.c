@@ -967,7 +967,7 @@ int ipa_setup_sys_pipe(struct ipa_sys_connect_params *sys_in, u32 *clnt_hdl)
 				result = -EFAULT;
 				goto fail_and_disable_clocks;
 			}
-			IPADBG("client %d (ep: %d) overlay ok sys=%p\n",
+			IPADBG("client %d (ep: %d) overlay ok sys=%pK\n",
 					sys_in->client, ipa_ep_idx, ep->sys);
 			ep->client_notify = sys_in->notify;
 			ep->priv = sys_in->priv;
@@ -1153,7 +1153,7 @@ int ipa_setup_sys_pipe(struct ipa_sys_connect_params *sys_in, u32 *clnt_hdl)
 	if (!ep->keep_ipa_awake)
 		ipa_dec_client_disable_clks();
 
-	IPADBG("client %d (ep: %d) connected sys=%p\n", sys_in->client,
+	IPADBG("client %d (ep: %d) connected sys=%pK\n", sys_in->client,
 			ipa_ep_idx, ep->sys);
 
 	return 0;
@@ -1260,7 +1260,7 @@ static void ipa_tx_comp_usr_notify_release(void *user1, int user2)
 	struct sk_buff *skb = (struct sk_buff *)user1;
 	int ep_idx = user2;
 
-	IPADBG("skb=%p ep=%d\n", skb, ep_idx);
+	IPADBG("skb=%pK ep=%d\n", skb, ep_idx);
 
 	IPA_STATS_INC_CNT(ipa_ctx->stats.tx_pkts_compl);
 
@@ -1440,7 +1440,7 @@ begin:
 		rx_pkt = kmem_cache_zalloc(ipa_ctx->rx_pkt_wrapper_cache,
 					   flag);
 		if (!rx_pkt) {
-			pr_err_ratelimited("%s fail alloc rx wrapper sys=%p\n",
+			pr_err_ratelimited("%s fail alloc rx wrapper sys=%pK\n",
 					__func__, sys);
 			goto fail_kmem_cache_alloc;
 		}
@@ -1451,7 +1451,7 @@ begin:
 
 		rx_pkt->data.skb = sys->get_skb(sys->rx_buff_sz, flag);
 		if (rx_pkt->data.skb == NULL) {
-			pr_err_ratelimited("%s fail alloc skb sys=%p\n",
+			pr_err_ratelimited("%s fail alloc skb sys=%pK\n",
 					__func__, sys);
 			goto fail_skb_alloc;
 		}
@@ -1461,7 +1461,7 @@ begin:
 						     DMA_FROM_DEVICE);
 		if (rx_pkt->data.dma_addr == 0 ||
 				rx_pkt->data.dma_addr == ~0) {
-			pr_err_ratelimited("%s dma map fail %p for %p sys=%p\n",
+			pr_err_ratelimited("%s dma map fail %pK for %pK sys=%pK\n",
 			       __func__, (void *)rx_pkt->data.dma_addr,
 			       ptr, sys);
 			goto fail_dma_mapping;
@@ -1488,7 +1488,7 @@ fail_kmem_cache_alloc:
 			IPA_STATS_INC_CNT(ipa_ctx->stats.lan_repl_rx_empty);
 		else
 			WARN_ON(1);
-		pr_err_ratelimited("%s sys=%p repl ring empty\n",
+		pr_err_ratelimited("%s sys=%pK repl ring empty\n",
 				__func__, sys);
 		goto begin;
 	}
@@ -1614,7 +1614,7 @@ static void ipa_alloc_wlan_rx_common_cache(u32 size)
 				IPA_WLAN_RX_BUFF_SZ, DMA_FROM_DEVICE);
 		if (rx_pkt->data.dma_addr == 0 ||
 				rx_pkt->data.dma_addr == ~0) {
-			IPAERR("dma_map_single failure %p for %p\n",
+			IPAERR("dma_map_single failure %pK for %pK\n",
 			       (void *)rx_pkt->data.dma_addr, ptr);
 			goto fail_dma_mapping;
 		}
@@ -1685,7 +1685,7 @@ static void ipa_replenish_rx_cache(struct ipa_sys_context *sys)
 						     DMA_FROM_DEVICE);
 		if (rx_pkt->data.dma_addr == 0 ||
 				rx_pkt->data.dma_addr == ~0) {
-			IPAERR("dma_map_single failure %p for %p\n",
+			IPAERR("dma_map_single failure %pK for %pK\n",
 			       (void *)rx_pkt->data.dma_addr, ptr);
 			goto fail_dma_mapping;
 		}
@@ -2278,7 +2278,7 @@ static int ipa_rx_pyld_hdlr(struct sk_buff *rx_skb, struct ipa_sys_context *sys)
 	ep = &ipa_ctx->ep[src_pipe];
 	if (unlikely(src_pipe >= IPA_NUM_PIPES ||
 		!ep->valid || !ep->client_notify)) {
-		IPAERR("drop pipe=%d ep_valid=%d client_notify=%p\n",
+		IPAERR("drop pipe=%d ep_valid=%d client_notify=%pK\n",
 		  src_pipe, ep->valid, ep->client_notify);
 		dev_kfree_skb_any(rx_skb);
 		return 0;
@@ -2327,7 +2327,7 @@ void ipa_lan_rx_cb(void *priv, enum ipa_dp_evt_type evt, unsigned long data)
 	if (unlikely(src_pipe >= IPA_NUM_PIPES ||
 		!ep->valid ||
 		!ep->client_notify)) {
-		IPAERR("drop pipe=%d ep_valid=%d client_notify=%p\n",
+		IPAERR("drop pipe=%d ep_valid=%d client_notify=%pK\n",
 		  src_pipe, ep->valid, ep->client_notify);
 		dev_kfree_skb_any(rx_skb);
 		return;
@@ -2452,12 +2452,12 @@ void ipa_sps_irq_rx_no_aggr_notify(struct sps_event_notify *notify)
 	case SPS_EVENT_EOT:
 		rx_pkt = notify->data.transfer.user;
 		rx_pkt->len = notify->data.transfer.iovec.size;
-		IPADBG("event %d notified sys=%p len=%u\n", notify->event_id,
+		IPADBG("event %d notified sys=%pK len=%u\n", notify->event_id,
 				notify->user, rx_pkt->len);
 		queue_work(rx_pkt->sys->wq, &rx_pkt->work);
 		break;
 	default:
-		IPAERR("recieved unexpected event id %d sys=%p\n",
+		IPAERR("recieved unexpected event id %d sys=%pK\n",
 				notify->event_id, notify->user);
 	}
 }
@@ -2682,7 +2682,7 @@ static void ipa_tx_client_rx_notify_release(void *user1, int user2)
 	struct ipa_tx_data_desc *dd = (struct ipa_tx_data_desc *)user1;
 	int ep_idx = user2;
 
-	IPADBG("Received data desc anchor:%p\n", dd);
+	IPADBG("Received data desc anchor:%pK\n", dd);
 
 	atomic_inc(&ipa_ctx->ep[ep_idx].avail_fifo_desc);
 	ipa_ctx->ep[ep_idx].wstats.rx_pkts_status_rcvd++;
@@ -2690,7 +2690,7 @@ static void ipa_tx_client_rx_notify_release(void *user1, int user2)
   /* wlan host driver waits till tx complete before unload */
 	IPADBG("ep=%d fifo_desc_free_count=%d\n",
 		ep_idx, atomic_read(&ipa_ctx->ep[ep_idx].avail_fifo_desc));
-	IPADBG("calling client notify callback with priv:%p\n",
+	IPADBG("calling client notify callback with priv:%pK\n",
 		ipa_ctx->ep[ep_idx].priv);
 
 	if (ipa_ctx->ep[ep_idx].client_notify) {
@@ -2749,7 +2749,7 @@ int ipa_tx_dp_mul(enum ipa_client_type src,
 	u32 num_desc, cnt;
 	int ep_idx;
 
-	IPADBG("Received data desc anchor:%p\n", data_desc);
+	IPADBG("Received data desc anchor:%pK\n", data_desc);
 
 	spin_lock_bh(&ipa_ctx->wc_memb.ipa_tx_mul_spinlock);
 
@@ -2791,12 +2791,12 @@ int ipa_tx_dp_mul(enum ipa_client_type src,
 		desc.type = IPA_DATA_DESC_SKB;
 		desc.user1 = data_desc;
 		desc.user2 = ep_idx;
-		IPADBG("priv:%p pyld_buf:0x%p pyld_len:%d\n",
+		IPADBG("priv:%pK pyld_buf:0x%pK pyld_len:%d\n",
 			entry->priv, desc.pyld, desc.len);
 
 		/* In case of last descriptor populate callback */
 		if (cnt == num_desc) {
-			IPADBG("data desc:%p\n", data_desc);
+			IPADBG("data desc:%pK\n", data_desc);
 			desc.callback = ipa_tx_client_rx_notify_release;
 		} else {
 			desc.callback = ipa_tx_client_rx_pkt_status;
@@ -2902,7 +2902,7 @@ int ipa_sys_setup(struct ipa_sys_connect_params *sys_in,
 				result = -EFAULT;
 				goto fail_and_disable_clocks;
 			}
-			IPAERR("client %d (ep: %d) overlay ok sys=%p\n",
+			IPAERR("client %d (ep: %d) overlay ok sys=%pK\n",
 					sys_in->client, ipa_ep_idx, ep->sys);
 			ep->client_notify = sys_in->notify;
 			ep->priv = sys_in->priv;
@@ -2952,7 +2952,7 @@ int ipa_sys_setup(struct ipa_sys_connect_params *sys_in,
 		ipa_dec_client_disable_clks();
 
 	ipa_ctx->skip_ep_cfg_shadow[ipa_ep_idx] = ep->skip_ep_cfg;
-	IPADBG("client %d (ep: %d) connected sys=%p\n", sys_in->client,
+	IPADBG("client %d (ep: %d) connected sys=%pK\n", sys_in->client,
 			ipa_ep_idx, ep->sys);
 
 	return 0;

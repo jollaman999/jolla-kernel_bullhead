@@ -150,7 +150,7 @@ static void rds_iw_remove_one(struct ib_device *device)
 		ib_dereg_mr(rds_iwdev->mr);
 
 	while (ib_dealloc_pd(rds_iwdev->pd)) {
-		rdsdebug("Failed to dealloc pd %p\n", rds_iwdev->pd);
+		rdsdebug("Failed to dealloc pd %pK\n", rds_iwdev->pd);
 		msleep(1);
 	}
 

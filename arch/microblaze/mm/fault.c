@@ -113,7 +113,7 @@ void do_page_fault(struct pt_regs *regs, unsigned long address,
 
 		/* in_atomic() in user mode is really bad,
 		   as is current->mm == NULL. */
-		pr_emerg("Page fault in user mode with in_atomic(), mm = %p\n",
+		pr_emerg("Page fault in user mode with in_atomic(), mm = %pK\n",
 									mm);
 		pr_emerg("r15 = %lx  MSR = %lx\n",
 		       regs->r15, regs->msr);

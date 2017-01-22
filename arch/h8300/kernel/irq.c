@@ -136,8 +136,8 @@ static void __init setup_vector(void)
 	ramvec_p = ramvec;
 	for (i = 0; i < NR_IRQS; i++) {
 		if ((i % 8) == 0)
-			printk(KERN_DEBUG "\n%p: ",ramvec_p);
-		printk(KERN_DEBUG "%p ",*ramvec_p);
+			printk(KERN_DEBUG "\n%pK: ",ramvec_p);
+		printk(KERN_DEBUG "%pK ",*ramvec_p);
 		ramvec_p++;
 	}
 	printk(KERN_DEBUG "\n");

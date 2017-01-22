@@ -87,7 +87,7 @@ static void fill_kobj_path(struct kobject *kobj, char *path, int length)
 		*(path + --length) = '/';
 	}
 
-	pr_debug("kobject: '%s' (%p): %s: path = '%s'\n", kobject_name(kobj),
+	pr_debug("kobject: '%s' (%pK): %s: path = '%s'\n", kobject_name(kobj),
 		 kobj, __func__, path);
 }
 
@@ -162,7 +162,7 @@ static int kobject_add_internal(struct kobject *kobj)
 		return -ENOENT;
 
 	if (!kobj->name || !kobj->name[0]) {
-		WARN(1, "kobject: (%p): attempted to be registered with empty "
+		WARN(1, "kobject: (%pK): attempted to be registered with empty "
 			 "name!\n", kobj);
 		return -EINVAL;
 	}
@@ -177,7 +177,7 @@ static int kobject_add_internal(struct kobject *kobj)
 		kobj->parent = parent;
 	}
 
-	pr_debug("kobject: '%s' (%p): %s: parent: '%s', set: '%s'\n",
+	pr_debug("kobject: '%s' (%pK): %s: parent: '%s', set: '%s'\n",
 		 kobject_name(kobj), kobj, __func__,
 		 parent ? kobject_name(parent) : "<NULL>",
 		 kobj->kset ? kobject_name(&kobj->kset->kobj) : "<NULL>");
@@ -279,7 +279,7 @@ void kobject_init(struct kobject *kobj, struct kobj_type *ktype)
 	}
 	if (kobj->state_initialized) {
 		/* do not error out as sometimes we can recover */
-		printk(KERN_ERR "kobject (%p): tried to init an initialized "
+		printk(KERN_ERR "kobject (%pK): tried to init an initialized "
 		       "object, something is seriously wrong.\n", kobj);
 		dump_stack();
 	}
@@ -289,7 +289,7 @@ void kobject_init(struct kobject *kobj, struct kobj_type *ktype)
 	return;
 
 error:
-	printk(KERN_ERR "kobject (%p): %s\n", kobj, err_str);
+	printk(KERN_ERR "kobject (%pK): %s\n", kobj, err_str);
 	dump_stack();
 }
 EXPORT_SYMBOL(kobject_init);
@@ -343,7 +343,7 @@ int kobject_add(struct kobject *kobj, struct kobject *parent,
 		return -EINVAL;
 
 	if (!kobj->state_initialized) {
-		printk(KERN_ERR "kobject '%s' (%p): tried to add an "
+		printk(KERN_ERR "kobject '%s' (%pK): tried to add an "
 		       "uninitialized object, something is seriously wrong.\n",
 		       kobject_name(kobj), kobj);
 		dump_stack();
@@ -545,30 +545,30 @@ static void kobject_cleanup(struct kobject *kobj)
 	struct kobj_type *t = get_ktype(kobj);
 	const char *name = kobj->name;
 
-	pr_debug("kobject: '%s' (%p): %s\n",
+	pr_debug("kobject: '%s' (%pK): %s\n",
 		 kobject_name(kobj), kobj, __func__);
 
 	if (t && !t->release)
-		pr_debug("kobject: '%s' (%p): does not have a release() "
+		pr_debug("kobject: '%s' (%pK): does not have a release() "
 			 "function, it is broken and must be fixed.\n",
 			 kobject_name(kobj), kobj);
 
 	/* send "remove" if the caller did not do it but sent "add" */
 	if (kobj->state_add_uevent_sent && !kobj->state_remove_uevent_sent) {
-		pr_debug("kobject: '%s' (%p): auto cleanup 'remove' event\n",
+		pr_debug("kobject: '%s' (%pK): auto cleanup 'remove' event\n",
 			 kobject_name(kobj), kobj);
 		kobject_uevent(kobj, KOBJ_REMOVE);
 	}
 
 	/* remove from sysfs if the caller did not do it */
 	if (kobj->state_in_sysfs) {
-		pr_debug("kobject: '%s' (%p): auto cleanup kobject_del\n",
+		pr_debug("kobject: '%s' (%pK): auto cleanup kobject_del\n",
 			 kobject_name(kobj), kobj);
 		kobject_del(kobj);
 	}
 
 	if (t && t->release) {
-		pr_debug("kobject: '%s' (%p): calling ktype release\n",
+		pr_debug("kobject: '%s' (%pK): calling ktype release\n",
 			 kobject_name(kobj), kobj);
 		t->release(kobj);
 	}
@@ -595,7 +595,7 @@ void kobject_put(struct kobject *kobj)
 {
 	if (kobj) {
 		if (!kobj->state_initialized)
-			WARN(1, KERN_WARNING "kobject: '%s' (%p): is not "
+			WARN(1, KERN_WARNING "kobject: '%s' (%pK): is not "
 			       "initialized, yet kobject_put() is being "
 			       "called.\n", kobject_name(kobj), kobj);
 		kref_put(&kobj->kref, kobject_release);
@@ -604,7 +604,7 @@ void kobject_put(struct kobject *kobj)
 
 static void dynamic_kobj_release(struct kobject *kobj)
 {
-	pr_debug("kobject: (%p): %s\n", kobj, __func__);
+	pr_debug("kobject: (%pK): %s\n", kobj, __func__);
 	kfree(kobj);
 }
 
@@ -770,7 +770,7 @@ struct kobject *kset_find_obj(struct kset *kset, const char *name)
 static void kset_release(struct kobject *kobj)
 {
 	struct kset *kset = container_of(kobj, struct kset, kobj);
-	pr_debug("kobject: '%s' (%p): %s\n",
+	pr_debug("kobject: '%s' (%pK): %s\n",
 		 kobject_name(kobj), kobj, __func__);
 	kfree(kset);
 }

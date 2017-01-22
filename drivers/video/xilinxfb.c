@@ -325,11 +325,11 @@ static int xilinxfb_assign(struct device *dev,
 
 	if (drvdata->flags & PLB_ACCESS_FLAG) {
 		/* Put a banner in the log (for DEBUG) */
-		dev_dbg(dev, "regs: phys=%lx, virt=%p\n", physaddr,
+		dev_dbg(dev, "regs: phys=%lx, virt=%pK\n", physaddr,
 					drvdata->regs);
 	}
 	/* Put a banner in the log (for DEBUG) */
-	dev_dbg(dev, "fb: phys=%llx, virt=%p, size=%x\n",
+	dev_dbg(dev, "fb: phys=%llx, virt=%pK, size=%x\n",
 		(unsigned long long)drvdata->fb_phys, drvdata->fb_virt, fbsize);
 
 	return 0;	/* success */

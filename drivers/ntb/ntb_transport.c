@@ -404,7 +404,7 @@ static ssize_t debugfs_read(struct file *filp, char __user *ubuf, size_t count,
 	out_offset += snprintf(buf + out_offset, out_count - out_offset,
 			       "rx_err_ver - \t%llu\n", qp->rx_err_ver);
 	out_offset += snprintf(buf + out_offset, out_count - out_offset,
-			       "rx_buff - \t%p\n", qp->rx_buff);
+			       "rx_buff - \t%pK\n", qp->rx_buff);
 	out_offset += snprintf(buf + out_offset, out_count - out_offset,
 			       "rx_index - \t%u\n", qp->rx_index);
 	out_offset += snprintf(buf + out_offset, out_count - out_offset,
@@ -417,7 +417,7 @@ static ssize_t debugfs_read(struct file *filp, char __user *ubuf, size_t count,
 	out_offset += snprintf(buf + out_offset, out_count - out_offset,
 			       "tx_ring_full - \t%llu\n", qp->tx_ring_full);
 	out_offset += snprintf(buf + out_offset, out_count - out_offset,
-			       "tx_mw - \t%p\n", qp->tx_mw);
+			       "tx_mw - \t%pK\n", qp->tx_mw);
 	out_offset += snprintf(buf + out_offset, out_count - out_offset,
 			       "tx_index - \t%u\n", qp->tx_index);
 	out_offset += snprintf(buf + out_offset, out_count - out_offset,
@@ -1090,7 +1090,7 @@ static int ntb_process_tx(struct ntb_transport_qp *qp,
 
 	offset = qp->tx_mw + qp->tx_max_frame * qp->tx_index;
 
-	dev_dbg(&ntb_query_pdev(qp->ndev)->dev, "%lld - offset %p, tx %u, entry len %d flags %x buff %p\n",
+	dev_dbg(&ntb_query_pdev(qp->ndev)->dev, "%lld - offset %pK, tx %u, entry len %d flags %x buff %pK\n",
 		qp->tx_pkts, offset, qp->tx_index, entry->len, entry->flags,
 		entry->buf);
 	if (qp->tx_index == qp->remote_rx_info->entry) {

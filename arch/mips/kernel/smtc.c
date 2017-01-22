@@ -1034,7 +1034,7 @@ void ipi_decode(struct smtc_ipi *pipi)
 			ipi_call_interrupt();
 			break;
 		default:
-			printk("Impossible SMTC IPI Argument %p\n", arg_copy);
+			printk("Impossible SMTC IPI Argument %pK\n", arg_copy);
 			break;
 		}
 		break;

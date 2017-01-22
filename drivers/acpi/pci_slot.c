@@ -153,7 +153,7 @@ register_slot(acpi_handle handle, u32 lvl, void *context, void **rv)
 
 	get_device(&pci_bus->dev);
 
-	dbg("pci_slot: %p, pci_bus: %x, device: %d, name: %s\n",
+	dbg("pci_slot: %pK, pci_bus: %x, device: %d, name: %s\n",
 		pci_slot, pci_bus->number, device, name);
 
 	return AE_OK;

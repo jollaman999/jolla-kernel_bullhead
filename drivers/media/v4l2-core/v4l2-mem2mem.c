@@ -208,7 +208,7 @@ static void v4l2_m2m_try_schedule(struct v4l2_m2m_ctx *m2m_ctx)
 	unsigned long flags_job, flags_out, flags_cap;
 
 	m2m_dev = m2m_ctx->m2m_dev;
-	dprintk("Trying to schedule a job for m2m_ctx: %p\n", m2m_ctx);
+	dprintk("Trying to schedule a job for m2m_ctx: %pK\n", m2m_ctx);
 
 	if (!m2m_ctx->out_q_ctx.q.streaming
 	    || !m2m_ctx->cap_q_ctx.q.streaming) {
@@ -661,13 +661,13 @@ void v4l2_m2m_ctx_release(struct v4l2_m2m_ctx *m2m_ctx)
 	if (m2m_ctx->job_flags & TRANS_RUNNING) {
 		spin_unlock_irqrestore(&m2m_dev->job_spinlock, flags);
 		m2m_dev->m2m_ops->job_abort(m2m_ctx->priv);
-		dprintk("m2m_ctx %p running, will wait to complete", m2m_ctx);
+		dprintk("m2m_ctx %pK running, will wait to complete", m2m_ctx);
 		wait_event(m2m_ctx->finished, !(m2m_ctx->job_flags & TRANS_RUNNING));
 	} else if (m2m_ctx->job_flags & TRANS_QUEUED) {
 		list_del(&m2m_ctx->queue);
 		m2m_ctx->job_flags &= ~(TRANS_QUEUED | TRANS_RUNNING);
 		spin_unlock_irqrestore(&m2m_dev->job_spinlock, flags);
-		dprintk("m2m_ctx: %p had been on queue and was removed\n",
+		dprintk("m2m_ctx: %pK had been on queue and was removed\n",
 			m2m_ctx);
 	} else {
 		/* Do nothing, was not on queue/running */

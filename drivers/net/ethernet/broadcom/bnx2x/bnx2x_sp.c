@@ -453,7 +453,7 @@ static int bnx2x_get_n_elements(struct bnx2x *bp, struct bnx2x_vlan_mac_obj *o,
 		if (counter < n) {
 			memcpy(next, &pos->u, size);
 			counter++;
-			DP(BNX2X_MSG_SP, "copied element number %d to address %p element was:\n",
+			DP(BNX2X_MSG_SP, "copied element number %d to address %pK element was:\n",
 			   counter, next);
 			next += stride + size;
 
@@ -4621,7 +4621,7 @@ static inline int bnx2x_q_init(struct bnx2x *bp,
 	for (cos = 0; cos < o->max_cos; cos++) {
 		DP(BNX2X_MSG_SP, "setting context validation. cid %d, cos %d\n",
 				 o->cids[cos], cos);
-		DP(BNX2X_MSG_SP, "context pointer %p\n", init->cxts[cos]);
+		DP(BNX2X_MSG_SP, "context pointer %pK\n", init->cxts[cos]);
 		bnx2x_set_ctx_validation(bp, init->cxts[cos], o->cids[cos]);
 	}
 

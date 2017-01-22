@@ -201,7 +201,7 @@ static int atmel_pcm_trigger(struct snd_pcm_substream *substream,
 	int ret = 0;
 
 	pr_debug("atmel-pcm:buffer_size = %ld,"
-		"dma_area = %p, dma_bytes = %zu\n",
+		"dma_area = %pK, dma_bytes = %zu\n",
 		rtd->buffer_size, rtd->dma_area, rtd->dma_bytes);
 
 	switch (cmd) {

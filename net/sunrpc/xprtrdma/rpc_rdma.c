@@ -310,7 +310,7 @@ rpcrdma_inline_pullup(struct rpc_rqst *rqst, int pad)
 	if (pad < 0 || rqst->rq_slen - curlen < RPCRDMA_INLINE_PAD_THRESH)
 		pad = 0;	/* don't pad this request */
 
-	dprintk("RPC:       %s: pad %d destp 0x%p len %d hdrlen %d\n",
+	dprintk("RPC:       %s: pad %d destp 0x%pK len %d hdrlen %d\n",
 		__func__, pad, destp, rqst->rq_slen, curlen);
 
 	copy_len = rqst->rq_snd_buf.page_len;
@@ -322,7 +322,7 @@ rpcrdma_inline_pullup(struct rpc_rqst *rqst, int pad)
 				rqst->rq_snd_buf.tail[0].iov_base, curlen);
 			r_xprt->rx_stats.pullup_copy_count += curlen;
 		}
-		dprintk("RPC:       %s: tail destp 0x%p len %d\n",
+		dprintk("RPC:       %s: tail destp 0x%pK len %d\n",
 			__func__, destp + copy_len, curlen);
 		rqst->rq_svec[0].iov_len += curlen;
 	}
@@ -336,7 +336,7 @@ rpcrdma_inline_pullup(struct rpc_rqst *rqst, int pad)
 		curlen = PAGE_SIZE - page_base;
 		if (curlen > copy_len)
 			curlen = copy_len;
-		dprintk("RPC:       %s: page %d destp 0x%p len %d curlen %d\n",
+		dprintk("RPC:       %s: page %d destp 0x%pK len %d curlen %d\n",
 			__func__, i, destp, copy_len, curlen);
 		srcp = kmap_atomic(ppages[i]);
 		memcpy(destp, srcp+page_base, curlen);
@@ -516,7 +516,7 @@ rpcrdma_marshal_req(struct rpc_rqst *rqst)
 		return -1;
 
 	dprintk("RPC:       %s: %s: hdrlen %zd rpclen %zd padlen %zd"
-		" headerp 0x%p base 0x%p lkey 0x%x\n",
+		" headerp 0x%pK base 0x%pK lkey 0x%x\n",
 		__func__, transfertypes[wtype], hdrlen, rpclen, padlen,
 		headerp, base, req->rl_iov.lkey);
 
@@ -614,7 +614,7 @@ rpcrdma_inline_fixup(struct rpc_rqst *rqst, char *srcp, int copy_len, int pad)
 		rqst->rq_rcv_buf.head[0].iov_len = curlen;
 	}
 
-	dprintk("RPC:       %s: srcp 0x%p len %d hdrlen %d\n",
+	dprintk("RPC:       %s: srcp 0x%pK len %d hdrlen %d\n",
 		__func__, srcp, copy_len, curlen);
 
 	/* Shift pointer for first receive segment only */
@@ -637,7 +637,7 @@ rpcrdma_inline_fixup(struct rpc_rqst *rqst, char *srcp, int copy_len, int pad)
 			if (curlen > copy_len)
 				curlen = copy_len;
 			dprintk("RPC:       %s: page %d"
-				" srcp 0x%p len %d curlen %d\n",
+				" srcp 0x%pK len %d curlen %d\n",
 				__func__, i, srcp, copy_len, curlen);
 			destp = kmap_atomic(ppages[i]);
 			memcpy(destp + page_base, srcp, curlen);
@@ -659,7 +659,7 @@ rpcrdma_inline_fixup(struct rpc_rqst *rqst, char *srcp, int copy_len, int pad)
 			curlen = rqst->rq_rcv_buf.tail[0].iov_len;
 		if (rqst->rq_rcv_buf.tail[0].iov_base != srcp)
 			memmove(rqst->rq_rcv_buf.tail[0].iov_base, srcp, curlen);
-		dprintk("RPC:       %s: tail srcp 0x%p len %d curlen %d\n",
+		dprintk("RPC:       %s: tail srcp 0x%pK len %d curlen %d\n",
 			__func__, srcp, copy_len, curlen);
 		rqst->rq_rcv_buf.tail[0].iov_len = curlen;
 		copy_len -= curlen; ++i;
@@ -757,7 +757,7 @@ rpcrdma_reply_handler(struct rpcrdma_rep *rep)
 	rqst = xprt_lookup_rqst(xprt, headerp->rm_xid);
 	if (rqst == NULL) {
 		spin_unlock(&xprt->transport_lock);
-		dprintk("RPC:       %s: reply 0x%p failed "
+		dprintk("RPC:       %s: reply 0x%pK failed "
 			"to match any request xid 0x%08x len %d\n",
 			__func__, rep, headerp->rm_xid, rep->rr_len);
 repost:
@@ -773,14 +773,14 @@ repost:
 	req = rpcr_to_rdmar(rqst);
 	if (req->rl_reply) {
 		spin_unlock(&xprt->transport_lock);
-		dprintk("RPC:       %s: duplicate reply 0x%p to RPC "
-			"request 0x%p: xid 0x%08x\n", __func__, rep, req,
+		dprintk("RPC:       %s: duplicate reply 0x%pK to RPC "
+			"request 0x%pK: xid 0x%08x\n", __func__, rep, req,
 			headerp->rm_xid);
 		goto repost;
 	}
 
-	dprintk("RPC:       %s: reply 0x%p completes request 0x%p\n"
-		"                   RPC request 0x%p xid 0x%08x\n",
+	dprintk("RPC:       %s: reply 0x%pK completes request 0x%pK\n"
+		"                   RPC request 0x%pK xid 0x%08x\n",
 			__func__, rep, req, rqst, headerp->rm_xid);
 
 	/* from here on, the reply is no longer an orphan */
@@ -880,7 +880,7 @@ badheader:
 		break;
 	}
 
-	dprintk("RPC:       %s: xprt_complete_rqst(0x%p, 0x%p, %d)\n",
+	dprintk("RPC:       %s: xprt_complete_rqst(0x%pK, 0x%pK, %d)\n",
 			__func__, xprt, rqst, status);
 	xprt_complete_rqst(rqst->rq_task, status);
 	spin_unlock(&xprt->transport_lock);

@@ -30,7 +30,7 @@ struct ceph_buffer *ceph_buffer_new(size_t len, gfp_t gfp)
 	kref_init(&b->kref);
 	b->alloc_len = len;
 	b->vec.iov_len = len;
-	dout("buffer_new %p\n", b);
+	dout("buffer_new %pK\n", b);
 	return b;
 }
 EXPORT_SYMBOL(ceph_buffer_new);
@@ -39,7 +39,7 @@ void ceph_buffer_release(struct kref *kref)
 {
 	struct ceph_buffer *b = container_of(kref, struct ceph_buffer, kref);
 
-	dout("buffer_release %p\n", b);
+	dout("buffer_release %pK\n", b);
 	if (b->vec.iov_base) {
 		if (b->is_vmalloc)
 			vfree(b->vec.iov_base);

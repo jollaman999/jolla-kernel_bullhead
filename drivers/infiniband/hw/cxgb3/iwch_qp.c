@@ -508,7 +508,7 @@ int iwch_post_receive(struct ib_qp *ibqp, struct ib_recv_wr *wr,
 			       Q_GENBIT(qhp->wq.wptr, qhp->wq.size_log2),
 			       0, sizeof(struct t3_receive_wr) >> 3, T3_SOPEOP);
 		PDBG("%s cookie 0x%llx idx 0x%x rq_wptr 0x%x rw_rptr 0x%x "
-		     "wqe %p \n", __func__, (unsigned long long) wr->wr_id,
+		     "wqe %pK \n", __func__, (unsigned long long) wr->wr_id,
 		     idx, qhp->wq.rq_wptr, qhp->wq.rq_rptr, wqe);
 		++(qhp->wq.rq_wptr);
 		++(qhp->wq.wptr);
@@ -559,7 +559,7 @@ int iwch_bind_mw(struct ib_qp *qp,
 		return -ENOMEM;
 	}
 	idx = Q_PTR2IDX(qhp->wq.wptr, qhp->wq.size_log2);
-	PDBG("%s: idx 0x%0x, mw 0x%p, mw_bind 0x%p\n", __func__, idx,
+	PDBG("%s: idx 0x%0x, mw 0x%pK, mw_bind 0x%pK\n", __func__, idx,
 	     mw, mw_bind);
 	wqe = (union t3_wr *) (qhp->wq.queue + idx);
 
@@ -810,7 +810,7 @@ static void __flush_qp(struct iwch_qp *qhp, struct iwch_cq *rchp,
 	int flushed;
 
 
-	PDBG("%s qhp %p rchp %p schp %p\n", __func__, qhp, rchp, schp);
+	PDBG("%s qhp %pK rchp %pK schp %pK\n", __func__, qhp, rchp, schp);
 	/* take a ref on the qhp since we must release the lock */
 	atomic_inc(&qhp->refcnt);
 	spin_unlock(&qhp->lock);
@@ -887,7 +887,7 @@ u16 iwch_rqes_posted(struct iwch_qp *qhp)
 		count++;
 		wqe++;
 	}
-	PDBG("%s qhp %p count %u\n", __func__, qhp, count);
+	PDBG("%s qhp %pK count %u\n", __func__, qhp, count);
 	return count;
 }
 
@@ -957,7 +957,7 @@ int iwch_modify_qp(struct iwch_dev *rhp, struct iwch_qp *qhp,
 	int free = 0;
 	struct iwch_ep *ep = NULL;
 
-	PDBG("%s qhp %p qpid 0x%x ep %p state %d -> %d\n", __func__,
+	PDBG("%s qhp %pK qpid 0x%x ep %pK state %d -> %d\n", __func__,
 	     qhp, qhp->wq.qpid, qhp->ep, qhp->attr.state,
 	     (mask & IWCH_QP_ATTR_NEXT_STATE) ? attrs->next_state : -1);
 
@@ -1122,7 +1122,7 @@ int iwch_modify_qp(struct iwch_dev *rhp, struct iwch_qp *qhp,
 	}
 	goto out;
 err:
-	PDBG("%s disassociating ep %p qpid 0x%x\n", __func__, qhp->ep,
+	PDBG("%s disassociating ep %pK qpid 0x%x\n", __func__, qhp->ep,
 	     qhp->wq.qpid);
 
 	/* disassociate the LLP connection */

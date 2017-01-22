@@ -1597,7 +1597,7 @@ snd_rme9652_proc_read(struct snd_info_entry *entry, struct snd_info_buffer *buff
 	status = rme9652_read(rme9652, RME9652_status_register);
 
 	snd_iprintf(buffer, "%s (Card #%d)\n", rme9652->card_name, rme9652->card->number + 1);
-	snd_iprintf(buffer, "Buffers: capture %p playback %p\n",
+	snd_iprintf(buffer, "Buffers: capture %pK playback %pK\n",
 		    rme9652->capture_buffer, rme9652->playback_buffer);
 	snd_iprintf(buffer, "IRQ: %d Registers bus: 0x%lx VM: 0x%lx\n",
 		    rme9652->irq, rme9652->port, (unsigned long)rme9652->iobase);

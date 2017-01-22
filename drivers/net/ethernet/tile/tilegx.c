@@ -347,7 +347,7 @@ static struct sk_buff *mpipe_buf_to_skb(void *va)
 		 * that corrupt buffers means generic memory
 		 * corruption, with unpredictable system effects.
 		 */
-		panic("Corrupt linux buffer! va=%p, skb=%p, skb->data=%p",
+		panic("Corrupt linux buffer! va=%pK, skb=%pK, skb->data=%pK",
 		      va, skb, skb->data);
 	}
 

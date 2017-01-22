@@ -30,12 +30,12 @@ static noinline bool dump_tree_aux(struct rb_node *node, struct rb_node *parent,
 		bad = dump_tree_aux(node->rb_left, node, depth + 2, '/');
 
 	vnode = rb_entry(node, struct afs_vnode, cb_promise);
-	_debug("%c %*.*s%c%p {%d}",
+	_debug("%c %*.*s%c%pK {%d}",
 	       rb_is_red(node) ? 'R' : 'B',
 	       depth, depth, "", lr,
 	       vnode, vnode->cb_expires_at);
 	if (rb_parent(node) != parent) {
-		printk("BAD: %p != %p\n", rb_parent(node), parent);
+		printk("BAD: %pK != %pK\n", rb_parent(node), parent);
 		bad = true;
 	}
 
@@ -63,7 +63,7 @@ static void afs_install_vnode(struct afs_vnode *vnode,
 	struct afs_vnode *xvnode;
 	struct rb_node *parent, **p;
 
-	_enter("%p,%p", vnode, server);
+	_enter("%pK,%pK", vnode, server);
 
 	if (old_server) {
 		spin_lock(&old_server->fs_lock);
@@ -117,7 +117,7 @@ static void afs_vnode_note_promise(struct afs_vnode *vnode,
 	struct afs_vnode *xvnode;
 	struct rb_node *parent, **p;
 
-	_enter("%p,%p", vnode, server);
+	_enter("%pK,%pK", vnode, server);
 
 	ASSERT(server != NULL);
 
@@ -142,7 +142,7 @@ static void afs_vnode_note_promise(struct afs_vnode *vnode,
 		afs_install_vnode(vnode, server);
 
 	vnode->cb_expires_at = vnode->cb_expires;
-	_debug("PROMISE on %p {%lu}",
+	_debug("PROMISE on %pK {%lu}",
 	       vnode, (unsigned long) vnode->cb_expires_at);
 
 	/* abuse an RB-tree to hold the expiration order (we may have multiple
@@ -175,7 +175,7 @@ static void afs_vnode_deleted_remotely(struct afs_vnode *vnode)
 {
 	struct afs_server *server;
 
-	_enter("{%p}", vnode->server);
+	_enter("{%pK}", vnode->server);
 
 	set_bit(AFS_VNODE_DELETED, &vnode->flags);
 
@@ -215,7 +215,7 @@ void afs_vnode_finalise_status_update(struct afs_vnode *vnode,
 {
 	struct afs_server *oldserver = NULL;
 
-	_enter("%p,%p", vnode, server);
+	_enter("%pK,%pK", vnode, server);
 
 	spin_lock(&vnode->lock);
 	clear_bit(AFS_VNODE_CB_BROKEN, &vnode->flags);
@@ -354,7 +354,7 @@ get_anyway:
 		if (IS_ERR(server))
 			goto no_server;
 
-		_debug("USING SERVER: %p{%08x}",
+		_debug("USING SERVER: %pK{%08x}",
 		       server, ntohl(server->addr.s_addr));
 
 		ret = afs_fs_fetch_file_status(server, key, vnode, NULL,

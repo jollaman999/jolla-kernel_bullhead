@@ -254,7 +254,7 @@ static int mv_chan_xor_slot_count(size_t len, int src_cnt)
 static void mv_xor_free_slots(struct mv_xor_chan *mv_chan,
 			      struct mv_xor_desc_slot *slot)
 {
-	dev_dbg(mv_chan_to_devp(mv_chan), "%s %d slot %p\n",
+	dev_dbg(mv_chan_to_devp(mv_chan), "%s %d slot %pK\n",
 		__func__, __LINE__, slot);
 
 	slot->slots_per_op = 0;
@@ -269,7 +269,7 @@ static void mv_xor_free_slots(struct mv_xor_chan *mv_chan,
 static void mv_xor_start_new_chain(struct mv_xor_chan *mv_chan,
 				   struct mv_xor_desc_slot *sw_desc)
 {
-	dev_dbg(mv_chan_to_devp(mv_chan), "%s %d: sw_desc %p\n",
+	dev_dbg(mv_chan_to_devp(mv_chan), "%s %d: sw_desc %pK\n",
 		__func__, __LINE__, sw_desc);
 	if (sw_desc->type != mv_chan->current_type)
 		mv_set_mode(mv_chan, sw_desc->type);
@@ -371,7 +371,7 @@ static int
 mv_xor_clean_slot(struct mv_xor_desc_slot *desc,
 	struct mv_xor_chan *mv_chan)
 {
-	dev_dbg(mv_chan_to_devp(mv_chan), "%s %d: desc %p flags %d\n",
+	dev_dbg(mv_chan_to_devp(mv_chan), "%s %d: desc %pK flags %d\n",
 		__func__, __LINE__, desc, desc->async_tx.flags);
 	list_del(&desc->chain_node);
 	/* the client is allowed to attach dependent operations
@@ -570,7 +570,7 @@ mv_xor_tx_submit(struct dma_async_tx_descriptor *tx)
 	int new_hw_chain = 1;
 
 	dev_dbg(mv_chan_to_devp(mv_chan),
-		"%s sw_desc %p: async_tx %p\n",
+		"%s sw_desc %pK: async_tx %pK\n",
 		__func__, sw_desc, &sw_desc->async_tx);
 
 	grp_start = sw_desc->group_head;
@@ -662,7 +662,7 @@ static int mv_xor_alloc_chan_resources(struct dma_chan *chan)
 					slot_node);
 
 	dev_dbg(mv_chan_to_devp(mv_chan),
-		"allocated %d descriptor slots last_used: %p\n",
+		"allocated %d descriptor slots last_used: %pK\n",
 		mv_chan->slots_allocated, mv_chan->last_used);
 
 	return mv_chan->slots_allocated ? : -ENOMEM;
@@ -701,7 +701,7 @@ mv_xor_prep_dma_memcpy(struct dma_chan *chan, dma_addr_t dest, dma_addr_t src,
 	spin_unlock_bh(&mv_chan->lock);
 
 	dev_dbg(mv_chan_to_devp(mv_chan),
-		"%s sw_desc %p async_tx %p\n",
+		"%s sw_desc %pK async_tx %pK\n",
 		__func__, sw_desc, sw_desc ? &sw_desc->async_tx : 0);
 
 	return sw_desc ? &sw_desc->async_tx : NULL;
@@ -739,7 +739,7 @@ mv_xor_prep_dma_memset(struct dma_chan *chan, dma_addr_t dest, int value,
 	}
 	spin_unlock_bh(&mv_chan->lock);
 	dev_dbg(mv_chan_to_devp(mv_chan),
-		"%s sw_desc %p async_tx %p \n",
+		"%s sw_desc %pK async_tx %pK \n",
 		__func__, sw_desc, &sw_desc->async_tx);
 	return sw_desc ? &sw_desc->async_tx : NULL;
 }
@@ -779,7 +779,7 @@ mv_xor_prep_dma_xor(struct dma_chan *chan, dma_addr_t dest, dma_addr_t *src,
 	}
 	spin_unlock_bh(&mv_chan->lock);
 	dev_dbg(mv_chan_to_devp(mv_chan),
-		"%s sw_desc %p async_tx %p \n",
+		"%s sw_desc %pK async_tx %pK \n",
 		__func__, sw_desc, &sw_desc->async_tx);
 	return sw_desc ? &sw_desc->async_tx : NULL;
 }

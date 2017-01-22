@@ -4601,7 +4601,7 @@ void mem_cgroup_print_bad_page(struct page *page)
 
 	pc = lookup_page_cgroup_used(page);
 	if (pc) {
-		pr_alert("pc:%p pc->flags:%lx pc->mem_cgroup:%p\n",
+		pr_alert("pc:%pK pc->flags:%lx pc->mem_cgroup:%pK\n",
 			 pc, pc->flags, pc->mem_cgroup);
 	}
 }

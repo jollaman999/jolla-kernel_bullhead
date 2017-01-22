@@ -117,7 +117,7 @@ static int v9fs_vfs_readpages(struct file *filp, struct address_space *mapping,
 	struct inode *inode;
 
 	inode = mapping->host;
-	p9_debug(P9_DEBUG_VFS, "inode: %p file: %p\n", inode, filp);
+	p9_debug(P9_DEBUG_VFS, "inode: %pK file: %pK\n", inode, filp);
 
 	ret = v9fs_readpages_from_fscache(inode, mapping, pages, &nr_pages);
 	if (ret == 0)

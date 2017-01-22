@@ -53,7 +53,7 @@ static int macio_do_gpio_write(PMF_STD_ARGS, u8 value, u8 mask)
 	raw_spin_lock_irqsave(&feature_lock, flags);
 	tmp = readb(addr);
 	tmp = (tmp & ~mask) | (value & mask);
-	DBG("Do write 0x%02x to GPIO %s (%p)\n",
+	DBG("Do write 0x%02x to GPIO %s (%pK)\n",
 	    tmp, func->node->full_name, addr);
 	writeb(tmp, addr);
 	raw_spin_unlock_irqrestore(&feature_lock, flags);

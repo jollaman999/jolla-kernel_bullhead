@@ -833,7 +833,7 @@ qlafx00_iospace_config(struct qla_hw_data *ha)
 	ha->max_req_queues = ha->max_rsp_queues = 1;
 
 	ql_log_pci(ql_log_info, ha->pdev, 0x012c,
-	    "Bars 0x%x, iobase0 0x%p, iobase2 0x%p\n",
+	    "Bars 0x%x, iobase0 0x%pK, iobase2 0x%pK\n",
 	    ha->bars, ha->cregbase, ha->iobase);
 
 	return 0;
@@ -858,12 +858,12 @@ qlafx00_save_queue_ptrs(struct scsi_qla_host *vha)
 	rsp->dma_fx00 = rsp->dma;
 
 	ql_dbg(ql_dbg_init, vha, 0x012d,
-	    "req: %p, ring_fx00: %p, length_fx00: 0x%x,"
+	    "req: %pK, ring_fx00: %pK, length_fx00: 0x%x,"
 	    "req->dma_fx00: 0x%llx\n", req, req->ring_fx00,
 	    req->length_fx00, (u64)req->dma_fx00);
 
 	ql_dbg(ql_dbg_init, vha, 0x012e,
-	    "rsp: %p, ring_fx00: %p, length_fx00: 0x%x,"
+	    "rsp: %pK, ring_fx00: %pK, length_fx00: 0x%x,"
 	    "rsp->dma_fx00: 0x%llx\n", rsp, rsp->ring_fx00,
 	    rsp->length_fx00, (u64)rsp->dma_fx00);
 }
@@ -886,7 +886,7 @@ qlafx00_config_queues(struct scsi_qla_host *vha)
 	}
 
 	ql_dbg(ql_dbg_init, vha, 0x0130,
-	    "req: %p req_ring pointer %p req len 0x%x "
+	    "req: %pK req_ring pointer %pK req len 0x%x "
 	    "req off 0x%x\n, req->dma: 0x%llx",
 	    req, req->ring, req->length,
 	    ha->req_que_off, (u64)req->dma);
@@ -901,7 +901,7 @@ qlafx00_config_queues(struct scsi_qla_host *vha)
 	}
 
 	ql_dbg(ql_dbg_init, vha, 0x0132,
-	    "rsp: %p rsp_ring pointer %p rsp len 0x%x "
+	    "rsp: %pK rsp_ring pointer %pK rsp len 0x%x "
 	    "rsp off 0x%x, rsp->dma: 0x%llx\n",
 	    rsp, rsp->ring, rsp->length,
 	    ha->rsp_que_off, (u64)rsp->dma);
@@ -1201,7 +1201,7 @@ qlafx00_find_all_targets(scsi_qla_host_t *vha,
 				fcport->old_tgt_id = fcport->tgt_id;
 				fcport->tgt_id = new_fcport->tgt_id;
 				ql_log(ql_log_info, vha, 0x208d,
-				   "TGT-ID: New fcport Added: %p\n", fcport);
+				   "TGT-ID: New fcport Added: %pK\n", fcport);
 				qla2x00_update_fcport(vha, fcport);
 			} else {
 				ql_log(ql_log_info, vha, 0x208e,
@@ -1361,7 +1361,7 @@ qlafx00_abort_isp_cleanup(scsi_qla_host_t *vha)
 	vha->qla_stats.total_isp_aborts++;
 
 	ql_log(ql_log_info, vha, 0x013f,
-	    "Performing ISP error recovery - ha = %p.\n", ha);
+	    "Performing ISP error recovery - ha = %pK.\n", ha);
 
 	ha->isp_ops->reset_chip(vha);
 
@@ -1394,7 +1394,7 @@ qlafx00_abort_isp_cleanup(scsi_qla_host_t *vha)
 	QLAFX00_CLR_INTR_REG(ha, QLAFX00_HST_INT_STS_BITS);
 
 	ql_log(ql_log_info, vha, 0x0140,
-	    "%s Done done - ha=%p.\n", __func__, ha);
+	    "%s Done done - ha=%pK.\n", __func__, ha);
 }
 
 /**
@@ -1620,7 +1620,7 @@ qlafx00_get_fcport(struct scsi_qla_host *vha, int tgt_id)
 	list_for_each_entry(fcport, &vha->vp_fcports, list) {
 		if (fcport->tgt_id == tgt_id) {
 			ql_dbg(ql_dbg_async, vha, 0x5072,
-			    "Matching fcport(%p) found with TGT-ID: 0x%x "
+			    "Matching fcport(%pK) found with TGT-ID: 0x%x "
 			    "and Remote TGT_ID: 0x%x\n",
 			    fcport, fcport->tgt_id, tgt_id);
 			break;
@@ -2158,7 +2158,7 @@ qlafx00_handle_sense(srb_t *sp, uint8_t *sense_data, uint32_t par_sense_len,
 
 	if (sense_len) {
 		ql_dbg(ql_dbg_io + ql_dbg_buffer, vha, 0x3039,
-		    "Check condition Sense data, nexus%ld:%d:%d cmd=%p.\n",
+		    "Check condition Sense data, nexus%ld:%d:%d cmd=%pK.\n",
 		    sp->fcport->vha->host_no, cp->device->id, cp->device->lun,
 		    cp);
 		ql_dump_buffer(ql_dbg_io + ql_dbg_buffer, vha, 0x3049,
@@ -2333,7 +2333,7 @@ qlafx00_status_entry(scsi_qla_host_t *vha, struct rsp_que *rsp, void *pkt)
 	cp = GET_CMD_SP(sp);
 	if (cp == NULL) {
 		ql_dbg(ql_dbg_io, vha, 0x3048,
-		    "Command already returned (0x%x/%p).\n",
+		    "Command already returned (0x%x/%pK).\n",
 		    handle, sp);
 
 		return;
@@ -2557,19 +2557,19 @@ qlafx00_status_cont_entry(struct rsp_que *rsp, sts_cont_entry_t *pkt)
 
 	if (!sp) {
 		ql_dbg(ql_dbg_io, vha, 0x3037,
-		    "no SP, sp = %p\n", sp);
+		    "no SP, sp = %pK\n", sp);
 		return;
 	}
 
 	if (!GET_FW_SENSE_LEN(sp)) {
 		ql_dbg(ql_dbg_io, vha, 0x304b,
-		    "no fw sense data, sp = %p\n", sp);
+		    "no fw sense data, sp = %pK\n", sp);
 		return;
 	}
 	cp = GET_CMD_SP(sp);
 	if (cp == NULL) {
 		ql_log(ql_log_warn, vha, 0x303b,
-		    "cmd is NULL: already returned to OS (sp=%p).\n", sp);
+		    "cmd is NULL: already returned to OS (sp=%pK).\n", sp);
 
 		rsp->status_srb = NULL;
 		return;
@@ -2577,12 +2577,12 @@ qlafx00_status_cont_entry(struct rsp_que *rsp, sts_cont_entry_t *pkt)
 
 	if (!GET_CMD_SENSE_LEN(sp)) {
 		ql_dbg(ql_dbg_io, vha, 0x304c,
-		    "no sense data, sp = %p\n", sp);
+		    "no sense data, sp = %pK\n", sp);
 	} else {
 		sense_len = GET_CMD_SENSE_LEN(sp);
 		sense_ptr = GET_CMD_SENSE_PTR(sp);
 		ql_dbg(ql_dbg_io, vha, 0x304f,
-		    "sp=%p sense_len=0x%x sense_ptr=%p.\n",
+		    "sp=%pK sense_len=0x%x sense_ptr=%pK.\n",
 		    sp, sense_len, sense_ptr);
 
 		if (sense_len > sizeof(pkt->data))

@@ -3704,7 +3704,7 @@ static bool snd_soc_dapm_widget_in_card_paths(struct snd_soc_card *card,
 	list_for_each_entry(p, &card->paths, list) {
 		if ((p->source == w) || (p->sink == w)) {
 			dev_dbg(card->dev,
-			    "... Path %s(id:%d dapm:%p) - %s(id:%d dapm:%p)\n",
+			    "... Path %s(id:%d dapm:%pK) - %s(id:%d dapm:%pK)\n",
 			    p->source->name, p->source->id, p->source->dapm,
 			    p->sink->name, p->sink->id, p->sink->dapm);
 
@@ -3745,7 +3745,7 @@ void snd_soc_dapm_auto_nc_codec_pins(struct snd_soc_codec *codec)
 	struct snd_soc_dapm_context *dapm = &codec->dapm;
 	struct snd_soc_dapm_widget *w;
 
-	dev_dbg(codec->dev, "ASoC: Auto NC: DAPMs: card:%p codec:%p\n",
+	dev_dbg(codec->dev, "ASoC: Auto NC: DAPMs: card:%pK codec:%pK\n",
 		&card->dapm, &codec->dapm);
 
 	list_for_each_entry(w, &card->widgets, list) {

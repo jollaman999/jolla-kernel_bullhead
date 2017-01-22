@@ -295,7 +295,7 @@ static int xps2_of_probe(struct platform_device *ofdev)
 	 * we have the PS2 in a good state */
 	out_be32(drvdata->base_address + XPS2_SRST_OFFSET, XPS2_SRST_RESET);
 
-	dev_info(dev, "Xilinx PS2 at 0x%08llX mapped to 0x%p, irq=%d\n",
+	dev_info(dev, "Xilinx PS2 at 0x%08llX mapped to 0x%pK, irq=%d\n",
 		 (unsigned long long)phys_addr, drvdata->base_address,
 		 drvdata->irq);
 

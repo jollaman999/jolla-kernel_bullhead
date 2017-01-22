@@ -1799,7 +1799,7 @@ static int zoran_s_fmt_vid_overlay(struct file *file, void *__fh,
 	struct zoran *zr = fh->zr;
 	int res;
 
-	dprintk(3, "x=%d, y=%d, w=%d, h=%d, cnt=%d, map=0x%p\n",
+	dprintk(3, "x=%d, y=%d, w=%d, h=%d, cnt=%d, map=0x%pK\n",
 			fmt->fmt.win.w.left, fmt->fmt.win.w.top,
 			fmt->fmt.win.w.width,
 			fmt->fmt.win.w.height,

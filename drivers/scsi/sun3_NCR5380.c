@@ -73,10 +73,10 @@
 
 #if (NDEBUG & NDEBUG_LISTS)
 #define LIST(x,y) \
-  { printk("LINE:%d   Adding %p to %p\n", __LINE__, (void*)(x), (void*)(y)); \
+  { printk("LINE:%d   Adding %pK to %pK\n", __LINE__, (void*)(x), (void*)(y)); \
     if ((x)==(y)) udelay(5); }
 #define REMOVE(w,x,y,z) \
-  { printk("LINE:%d   Removing: %p->%p  %p->%p \n", __LINE__, \
+  { printk("LINE:%d   Removing: %pK->%pK  %pK->%pK \n", __LINE__, \
 	   (void*)(w), (void*)(x), (void*)(y), (void*)(z)); \
     if ((x)==(y)) udelay(5); }
 #else
@@ -1014,7 +1014,7 @@ static void NCR5380_main (struct work_struct *bl)
 
 #if (NDEBUG & NDEBUG_LISTS)
 		if (prev != tmp)
-		    printk("MAIN tmp=%p   target=%d   busy=%d lun=%d\n",
+		    printk("MAIN tmp=%pK   target=%d   busy=%d lun=%d\n",
 			   tmp, tmp->target, hostdata->busy[tmp->target],
 			   tmp->lun);
 #endif
@@ -1854,7 +1854,7 @@ static int NCR5380_transfer_dma( struct Scsi_Host *instance,
     }
     hostdata->dma_len = c;
 
-    DMA_PRINTK("scsi%d: initializing DMA for %s, %d bytes %s %p\n",
+    DMA_PRINTK("scsi%d: initializing DMA for %s, %d bytes %s %pK\n",
 	       HOSTNO, (p & SR_IO) ? "reading" : "writing",
 	       c, (p & SR_IO) ? "to" : "from", *data);
 

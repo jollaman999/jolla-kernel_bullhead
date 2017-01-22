@@ -121,7 +121,7 @@ void c2_set_qp_state(struct c2_qp *qp, int c2_state)
 {
 	int new_state = to_ib_state(c2_state);
 
-	pr_debug("%s: qp[%p] state modify %s --> %s\n",
+	pr_debug("%s: qp[%pK] state modify %s --> %s\n",
 	       __func__,
 		qp,
 		to_ib_state_str(qp->state),
@@ -141,7 +141,7 @@ int c2_qp_modify(struct c2_dev *c2dev, struct c2_qp *qp,
 	u8 next_state;
 	int err;
 
-	pr_debug("%s:%d qp=%p, %s --> %s\n",
+	pr_debug("%s:%d qp=%pK, %s --> %s\n",
 		__func__, __LINE__,
 		qp,
 		to_ib_state_str(qp->state),
@@ -173,7 +173,7 @@ int c2_qp_modify(struct c2_dev *c2dev, struct c2_qp *qp,
 			spin_lock_irqsave(&qp->lock, flags);
 			if (qp->cm_id && qp->state == IB_QPS_RTS) {
 				pr_debug("Generating CLOSE event for QP-->ERR, "
-					"qp=%p, cm_id=%p\n",qp,qp->cm_id);
+					"qp=%pK, cm_id=%pK\n",qp,qp->cm_id);
 				/* Generate an CLOSE event */
 				vq_req->cm_id = qp->cm_id;
 				vq_req->event = IW_CM_EVENT_CLOSE;
@@ -243,7 +243,7 @@ int c2_qp_modify(struct c2_dev *c2dev, struct c2_qp *qp,
       bail0:
 	vq_req_free(c2dev, vq_req);
 
-	pr_debug("%s:%d qp=%p, cur_state=%s\n",
+	pr_debug("%s:%d qp=%pK, cur_state=%s\n",
 		__func__, __LINE__,
 		qp,
 		to_ib_state_str(qp->state));
@@ -331,7 +331,7 @@ static int destroy_qp(struct c2_dev *c2dev, struct c2_qp *qp)
 	spin_lock_irqsave(&qp->lock, flags);
 	if (qp->cm_id && qp->state == IB_QPS_RTS) {
 		pr_debug("destroy_qp: generating CLOSE event for QP-->ERR, "
-			"qp=%p, cm_id=%p\n",qp,qp->cm_id);
+			"qp=%pK, cm_id=%pK\n",qp,qp->cm_id);
 		/* Generate an CLOSE event */
 		vq_req->qp = qp;
 		vq_req->cm_id = qp->cm_id;

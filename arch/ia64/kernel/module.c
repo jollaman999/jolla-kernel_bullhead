@@ -732,7 +732,7 @@ do_reloc (struct module *mod, uint8_t r_type, Elf64_Sym *sym, uint64_t addend,
 		      case R_IA64_LDXMOV:
 			if (gp_addressable(mod, val)) {
 				/* turn "ld8" into "mov": */
-				DEBUGP("%s: patching ld8 at %p to mov\n", __func__, location);
+				DEBUGP("%s: patching ld8 at %pK to mov\n", __func__, location);
 				ia64_patch((u64) location, 0x1fff80fe000UL, 0x10000000000UL);
 			}
 			return 0;
@@ -766,7 +766,7 @@ do_reloc (struct module *mod, uint8_t r_type, Elf64_Sym *sym, uint64_t addend,
 	if (!ok)
 		return -ENOEXEC;
 
-	DEBUGP("%s: [%p]<-%016lx = %s(%lx)\n", __func__, location, val,
+	DEBUGP("%s: [%pK]<-%016lx = %s(%lx)\n", __func__, location, val,
 	       reloc_name[r_type] ? reloc_name[r_type] : "?", sym->st_value + addend);
 
 	switch (format) {
@@ -899,13 +899,13 @@ register_unwind_table (struct module *mod)
 	if (num_core > 0) {
 		mod->arch.core_unw_table = unw_add_unwind_table(mod->name, 0, mod->arch.gp,
 								core, core + num_core);
-		DEBUGP("%s:  core: handle=%p [%p-%p)\n", __func__,
+		DEBUGP("%s:  core: handle=%pK [%pK-%pK)\n", __func__,
 		       mod->arch.core_unw_table, core, core + num_core);
 	}
 	if (num_init > 0) {
 		mod->arch.init_unw_table = unw_add_unwind_table(mod->name, 0, mod->arch.gp,
 								init, init + num_init);
-		DEBUGP("%s:  init: handle=%p [%p-%p)\n", __func__,
+		DEBUGP("%s:  init: handle=%pK [%pK-%pK)\n", __func__,
 		       mod->arch.init_unw_table, init, init + num_init);
 	}
 }
@@ -913,7 +913,7 @@ register_unwind_table (struct module *mod)
 int
 module_finalize (const Elf_Ehdr *hdr, const Elf_Shdr *sechdrs, struct module *mod)
 {
-	DEBUGP("%s: init: entry=%p\n", __func__, mod->init);
+	DEBUGP("%s: init: entry=%pK\n", __func__, mod->init);
 	if (mod->arch.unwind)
 		register_unwind_table(mod);
 #ifdef CONFIG_PARAVIRT

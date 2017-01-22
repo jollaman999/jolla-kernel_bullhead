@@ -222,7 +222,7 @@ static void *smem_phys_to_virt(phys_addr_t base, unsigned offset)
 		if (base >= phys_addr && base + offset < phys_addr + size) {
 			if (OVERFLOW_ADD_UNSIGNED(uintptr_t,
 				(uintptr_t)smem_ram_base, offset)) {
-				SMEM_INFO("%s: overflow %p %x\n", __func__,
+				SMEM_INFO("%s: overflow %pK %x\n", __func__,
 					smem_ram_base, offset);
 				return NULL;
 			}
@@ -241,7 +241,7 @@ static void *smem_phys_to_virt(phys_addr_t base, unsigned offset)
 
 		if (OVERFLOW_ADD_UNSIGNED(uintptr_t,
 				(uintptr_t)smem_areas[i].virt_addr, offset)) {
-			SMEM_INFO("%s: overflow %p %x\n", __func__,
+			SMEM_INFO("%s: overflow %pK %x\n", __func__,
 				smem_areas[i].virt_addr, offset);
 			return NULL;
 		}
@@ -397,7 +397,7 @@ static void *__smem_get_entry_secure(unsigned id,
 		remote_spin_lock_irqsave(&remote_spinlock, lflags);
 	if (hdr->identifier != SMEM_PART_HDR_IDENTIFIER) {
 		LOG_ERR(
-			"%s: SMEM corruption detected.  Partition %d to %d at %p\n",
+			"%s: SMEM corruption detected.  Partition %d to %d at %pK\n",
 								__func__,
 								partition_num,
 								to_proc,
@@ -415,7 +415,7 @@ static void *__smem_get_entry_secure(unsigned id,
 						alloc_hdr->size - a_hdr_size) {
 			if (alloc_hdr->canary != SMEM_ALLOCATION_CANARY) {
 				LOG_ERR(
-					"%s: SMEM corruption detected.  Partition %d to %d at %p\n",
+					"%s: SMEM corruption detected.  Partition %d to %d at %pK\n",
 								__func__,
 								partition_num,
 								to_proc,
@@ -441,7 +441,7 @@ static void *__smem_get_entry_secure(unsigned id,
 						alloc_hdr->size) {
 			if (alloc_hdr->canary != SMEM_ALLOCATION_CANARY) {
 				LOG_ERR(
-					"%s: SMEM corruption detected.  Partition %d to %d at %p\n",
+					"%s: SMEM corruption detected.  Partition %d to %d at %pK\n",
 								__func__,
 								partition_num,
 								to_proc,
@@ -607,7 +607,7 @@ static void *alloc_item_secure(unsigned id, unsigned size_in, unsigned to_proc,
 
 	if (hdr->identifier != SMEM_PART_HDR_IDENTIFIER) {
 		LOG_ERR(
-			"%s: SMEM corruption detected.  Partition %d to %d at %p\n",
+			"%s: SMEM corruption detected.  Partition %d to %d at %pK\n",
 								__func__,
 								partition_num,
 								to_proc,
@@ -1041,7 +1041,7 @@ static __init int modem_restart_late_init(void)
 	for (i = 0; i < ARRAY_SIZE(restart_notifiers); i++) {
 		nb = &restart_notifiers[i];
 		handle = subsys_notif_register_notifier(nb->name, &nb->nb);
-		SMEM_DBG("%s: registering notif for '%s', handle=%p\n",
+		SMEM_DBG("%s: registering notif for '%s', handle=%pK\n",
 				__func__, nb->name, handle);
 	}
 
@@ -1381,7 +1381,7 @@ smem_targ_info_done:
 		smem_areas_tmp[smem_idx].virt_addr = ioremap_nocache(
 			(unsigned long)(smem_areas_tmp[smem_idx].phys_addr),
 			smem_areas_tmp[smem_idx].size);
-		SMEM_DBG("%s: %s = %pa %pa -> %p", __func__, temp_string,
+		SMEM_DBG("%s: %s = %pa %pa -> %pK", __func__, temp_string,
 				&aux_mem_base, &aux_mem_size,
 				smem_areas_tmp[smem_idx].virt_addr);
 
@@ -1398,7 +1398,7 @@ smem_targ_info_done:
 				(uintptr_t)smem_areas_tmp[smem_idx].virt_addr,
 				smem_areas_tmp[smem_idx].size)) {
 			LOG_ERR(
-				"%s: invalid virtual address block %i: %p:%pa\n",
+				"%s: invalid virtual address block %i: %pK:%pa\n",
 					__func__, smem_idx,
 					smem_areas_tmp[smem_idx].virt_addr,
 					&smem_areas_tmp[smem_idx].size);

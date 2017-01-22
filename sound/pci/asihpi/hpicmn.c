@@ -234,7 +234,7 @@ static unsigned int control_cache_alloc_check(struct hpi_control_cache *pC)
 			byte_count += info->size_in32bit_words * 4;
 
 			HPI_DEBUG_LOG(VERBOSE,
-				"cached %d, pinfo %p index %d type %d size %d\n",
+				"cached %d, pinfo %pK index %d type %d size %d\n",
 				cached, pC->p_info[info->control_index],
 				info->control_index, info->control_type,
 				info->size_in32bit_words);

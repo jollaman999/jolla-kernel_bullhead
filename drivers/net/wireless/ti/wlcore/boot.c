@@ -225,7 +225,7 @@ static int wl1271_boot_upload_firmware_chunk(struct wl1271 *wl, void *buf,
 		addr = dest + chunk_num * CHUNK_SIZE;
 		p = buf + chunk_num * CHUNK_SIZE;
 		memcpy(chunk, p, CHUNK_SIZE);
-		wl1271_debug(DEBUG_BOOT, "uploading fw chunk 0x%p to 0x%x",
+		wl1271_debug(DEBUG_BOOT, "uploading fw chunk 0x%pK to 0x%x",
 			     p, addr);
 		ret = wlcore_write(wl, addr, chunk, CHUNK_SIZE, false);
 		if (ret < 0)
@@ -238,7 +238,7 @@ static int wl1271_boot_upload_firmware_chunk(struct wl1271 *wl, void *buf,
 	addr = dest + chunk_num * CHUNK_SIZE;
 	p = buf + chunk_num * CHUNK_SIZE;
 	memcpy(chunk, p, fw_data_len % CHUNK_SIZE);
-	wl1271_debug(DEBUG_BOOT, "uploading fw last chunk (%zd B) 0x%p to 0x%x",
+	wl1271_debug(DEBUG_BOOT, "uploading fw last chunk (%zd B) 0x%pK to 0x%x",
 		     fw_data_len % CHUNK_SIZE, p, addr);
 	ret = wlcore_write(wl, addr, chunk, fw_data_len % CHUNK_SIZE, false);
 

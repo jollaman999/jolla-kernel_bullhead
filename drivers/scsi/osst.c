@@ -4518,9 +4518,9 @@ static int __os_scsi_tape_open(struct inode * inode, struct file * filp)
 		     b_size += STp->buffer->sg[i++].length);
 		STp->buffer->aux = (os_aux_t *) (page_address(sg_page(&STp->buffer->sg[i])) + OS_DATA_SIZE - b_size);
 #if DEBUG
-		printk(OSST_DEB_MSG "%s:D: b_data points to %p in segment 0 at %p\n", name,
+		printk(OSST_DEB_MSG "%s:D: b_data points to %pK in segment 0 at %pK\n", name,
 			STp->buffer->b_data, page_address(STp->buffer->sg[0].page));
-		printk(OSST_DEB_MSG "%s:D: AUX points to %p in segment %d at %p\n", name,
+		printk(OSST_DEB_MSG "%s:D: AUX points to %pK in segment %d at %pK\n", name,
 			 STp->buffer->aux, i, page_address(STp->buffer->sg[i].page));
 #endif
 	} else {
@@ -5386,10 +5386,10 @@ static int enlarge_buffer(struct osst_buffer *STbuffer, int need_dma)
 #if DEBUG
 	if (debugging) {
 		printk(OSST_DEB_MSG
-			   "osst :D: Expanded tape buffer (%d bytes, %d->%d segments, dma: %d, at: %p).\n",
+			   "osst :D: Expanded tape buffer (%d bytes, %d->%d segments, dma: %d, at: %pK).\n",
 			   got, STbuffer->orig_sg_segs, STbuffer->sg_segs, need_dma, STbuffer->b_data);
 		printk(OSST_DEB_MSG
-			   "osst :D: segment sizes: first %d at %p, last %d bytes at %p.\n",
+			   "osst :D: segment sizes: first %d at %pK, last %d bytes at %pK.\n",
 			   STbuffer->sg[0].length, page_address(STbuffer->sg[0].page),
 			   STbuffer->sg[segs-1].length, page_address(STbuffer->sg[segs-1].page));
 	}
@@ -5415,7 +5415,7 @@ static void normalize_buffer(struct osst_buffer *STbuffer)
 	}
 #if DEBUG
 	if (debugging && STbuffer->orig_sg_segs < STbuffer->sg_segs)
-		printk(OSST_DEB_MSG "osst :D: Buffer at %p normalized to %d bytes (segs %d).\n",
+		printk(OSST_DEB_MSG "osst :D: Buffer at %pK normalized to %d bytes (segs %d).\n",
 			     STbuffer->b_data, STbuffer->buffer_size, STbuffer->sg_segs);
 #endif
 	STbuffer->sg_segs = STbuffer->orig_sg_segs = 0;

@@ -158,7 +158,7 @@ static u16 bnx2x_free_tx_pkt(struct bnx2x *bp, struct bnx2x_fp_txdata *txdata,
 	/* prefetch skb end pointer to speedup dev_kfree_skb() */
 	prefetch(&skb->end);
 
-	DP(NETIF_MSG_TX_DONE, "fp[%d]: pkt_idx %d  buff @(%p)->skb %p\n",
+	DP(NETIF_MSG_TX_DONE, "fp[%d]: pkt_idx %d  buff @(%pK)->skb %pK\n",
 	   txdata->txq_index, idx, tx_buf, skb);
 
 	tx_start_bd = &txdata->tx_desc_ring[bd_idx].start_bd;
@@ -3601,7 +3601,7 @@ netdev_tx_t bnx2x_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	/* enable this debug print to view the tranmission details
 	DP(NETIF_MSG_TX_QUEUED,
-	   "transmitting packet cid %d fp index %d txdata_index %d tx_data ptr %p fp pointer %p\n",
+	   "transmitting packet cid %d fp index %d txdata_index %d tx_data ptr %pK fp pointer %pK\n",
 	   txdata->cid, fp_index, txdata_index, txdata, fp); */
 
 	if (unlikely(bnx2x_tx_avail(bp, txdata) <
@@ -3697,7 +3697,7 @@ netdev_tx_t bnx2x_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	tx_buf->flags = 0;
 
 	DP(NETIF_MSG_TX_QUEUED,
-	   "sending pkt %u @%p  next_idx %u  bd %u @%p\n",
+	   "sending pkt %u @%pK  next_idx %u  bd %u @%pK\n",
 	   pkt_prod, tx_buf, txdata->tx_pkt_prod, bd_prod, tx_start_bd);
 
 	if (vlan_tx_tag_present(skb)) {
@@ -3808,7 +3808,7 @@ netdev_tx_t bnx2x_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	pkt_size = tx_start_bd->nbytes;
 
 	DP(NETIF_MSG_TX_QUEUED,
-	   "first bd @%p  addr (%x:%x)  nbytes %d  flags %x  vlan %x\n",
+	   "first bd @%pK  addr (%x:%x)  nbytes %d  flags %x  vlan %x\n",
 	   tx_start_bd, tx_start_bd->addr_hi, tx_start_bd->addr_lo,
 	   le16_to_cpu(tx_start_bd->nbytes),
 	   tx_start_bd->bd_flags.as_bitfield,
@@ -3880,12 +3880,12 @@ netdev_tx_t bnx2x_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		nbd++;
 
 		DP(NETIF_MSG_TX_QUEUED,
-		   "frag %d  bd @%p  addr (%x:%x)  nbytes %d\n",
+		   "frag %d  bd @%pK  addr (%x:%x)  nbytes %d\n",
 		   i, tx_data_bd, tx_data_bd->addr_hi, tx_data_bd->addr_lo,
 		   le16_to_cpu(tx_data_bd->nbytes));
 	}
 
-	DP(NETIF_MSG_TX_QUEUED, "last bd @%p\n", tx_data_bd);
+	DP(NETIF_MSG_TX_QUEUED, "last bd @%pK\n", tx_data_bd);
 
 	/* update with actual num BDs */
 	first_bd->nbd = cpu_to_le16(nbd);
@@ -3910,14 +3910,14 @@ netdev_tx_t bnx2x_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	if (pbd_e1x)
 		DP(NETIF_MSG_TX_QUEUED,
-		   "PBD (E1X) @%p  ip_data %x  ip_hlen %u  ip_id %u  lso_mss %u  tcp_flags %x  xsum %x  seq %u  hlen %u\n",
+		   "PBD (E1X) @%pK  ip_data %x  ip_hlen %u  ip_id %u  lso_mss %u  tcp_flags %x  xsum %x  seq %u  hlen %u\n",
 		   pbd_e1x, pbd_e1x->global_data, pbd_e1x->ip_hlen_w,
 		   pbd_e1x->ip_id, pbd_e1x->lso_mss, pbd_e1x->tcp_flags,
 		   pbd_e1x->tcp_pseudo_csum, pbd_e1x->tcp_send_seq,
 		    le16_to_cpu(pbd_e1x->total_hlen_w));
 	if (pbd_e2)
 		DP(NETIF_MSG_TX_QUEUED,
-		   "PBD (E2) @%p  dst %x %x %x src %x %x %x parsing_data %x\n",
+		   "PBD (E2) @%pK  dst %x %x %x src %x %x %x parsing_data %x\n",
 		   pbd_e2,
 		   pbd_e2->data.mac_addr.dst_hi,
 		   pbd_e2->data.mac_addr.dst_mid,

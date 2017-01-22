@@ -464,7 +464,7 @@ nouveau_object_debug(void)
 		nv_fatal(NULL, "* AIIIII! object(s) still exist!!!\n");
 		nv_fatal(NULL, "*******************************************\n");
 		list_for_each_entry(object, &_objlist, list) {
-			nv_fatal(object, "%p/%p/%d/%d\n",
+			nv_fatal(object, "%pK/%pK/%d/%d\n",
 				 object->parent, object->engine,
 				 atomic_read(&object->refcount),
 				 atomic_read(&object->usecount));

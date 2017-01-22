@@ -774,7 +774,7 @@ void signal_fault(struct pt_regs *regs, void __user *frame, char *where)
 
 	if (show_unhandled_signals && printk_ratelimit()) {
 		printk("%s"
-		       "%s[%d] bad frame in %s frame:%p ip:%lx sp:%lx orax:%lx",
+		       "%s[%d] bad frame in %s frame:%pK ip:%lx sp:%lx orax:%lx",
 		       task_pid_nr(current) > 1 ? KERN_INFO : KERN_EMERG,
 		       me->comm, me->pid, where, frame,
 		       regs->ip, regs->sp, regs->orig_ax);

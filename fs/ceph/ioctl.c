@@ -248,11 +248,11 @@ static long ceph_ioctl_lazyio(struct file *file)
 		fi->fmode |= CEPH_FILE_MODE_LAZY;
 		ci->i_nr_by_mode[fi->fmode]++;
 		spin_unlock(&ci->i_ceph_lock);
-		dout("ioctl_layzio: file %p marked lazy\n", file);
+		dout("ioctl_layzio: file %pK marked lazy\n", file);
 
 		ceph_check_caps(ci, 0, NULL);
 	} else {
-		dout("ioctl_layzio: file %p already lazy\n", file);
+		dout("ioctl_layzio: file %pK already lazy\n", file);
 	}
 	return 0;
 }
@@ -267,7 +267,7 @@ static long ceph_ioctl_syncio(struct file *file)
 
 long ceph_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
-	dout("ioctl file %p cmd %u arg %lu\n", file, cmd, arg);
+	dout("ioctl file %pK cmd %u arg %lu\n", file, cmd, arg);
 	switch (cmd) {
 	case CEPH_IOC_GET_LAYOUT:
 		return ceph_ioctl_get_layout(file, (void __user *)arg);

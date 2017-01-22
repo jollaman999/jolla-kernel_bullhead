@@ -705,7 +705,7 @@ static struct hptiop_request *get_req(struct hptiop_hba *hba)
 {
 	struct hptiop_request *ret;
 
-	dprintk("get_req : req=%p\n", hba->req_list);
+	dprintk("get_req : req=%pK\n", hba->req_list);
 
 	ret = hba->req_list;
 	if (ret)
@@ -716,7 +716,7 @@ static struct hptiop_request *get_req(struct hptiop_hba *hba)
 
 static void free_req(struct hptiop_hba *hba, struct hptiop_request *req)
 {
-	dprintk("free_req(%d, %p)\n", req->index, req);
+	dprintk("free_req(%d, %pK)\n", req->index, req);
 	req->next = hba->req_list;
 	hba->req_list = req;
 }
@@ -726,7 +726,7 @@ static void hptiop_finish_scsi_req(struct hptiop_hba *hba, u32 tag,
 {
 	struct scsi_cmnd *scp;
 
-	dprintk("hptiop_finish_scsi_req: req=%p, type=%d, "
+	dprintk("hptiop_finish_scsi_req: req=%pK, type=%d, "
 			"result=%d, context=0x%x tag=%d\n",
 			req, req->header.type, req->header.result,
 			req->header.context, tag);
@@ -779,7 +779,7 @@ static void hptiop_finish_scsi_req(struct hptiop_hba *hba, u32 tag,
 		scsi_bufflen(scp) - le32_to_cpu(req->dataxfer_length));
 
 skip_resid:
-	dprintk("scsi_done(%p)\n", scp);
+	dprintk("scsi_done(%pK)\n", scp);
 	scp->scsi_done(scp);
 	free_req(hba, &hba->reqs[tag]);
 }
@@ -810,7 +810,7 @@ void hptiop_iop_request_callback_itl(struct hptiop_hba *hba, u32 tag)
 
 	req = (struct hpt_iop_request_header __iomem *)
 			((unsigned long)hba->u.itl.iop + tag);
-	dprintk("hptiop_iop_request_callback_itl: req=%p, type=%d, "
+	dprintk("hptiop_iop_request_callback_itl: req=%pK, type=%d, "
 			"result=%d, context=0x%x tag=%d\n",
 			req, readl(&req->type), readl(&req->result),
 			readl(&req->context), tag);
@@ -1024,8 +1024,8 @@ static int hptiop_queuecommand_lck(struct scsi_cmnd *scp,
 
 	_req->scp = scp;
 
-	dprintk("hptiop_queuecmd(scp=%p) %d/%d/%d/%d cdb=(%08x-%08x-%08x-%08x) "
-			"req_index=%d, req=%p\n",
+	dprintk("hptiop_queuecmd(scp=%pK) %d/%d/%d/%d cdb=(%08x-%08x-%08x-%08x) "
+			"req_index=%d, req=%pK\n",
 			scp,
 			host->host_no, scp->device->channel,
 			scp->device->id, scp->device->lun,
@@ -1068,7 +1068,7 @@ static int hptiop_queuecommand_lck(struct scsi_cmnd *scp,
 	return 0;
 
 cmd_done:
-	dprintk("scsi_done(scp=%p)\n", scp);
+	dprintk("scsi_done(scp=%pK)\n", scp);
 	scp->scsi_done(scp);
 	return 0;
 }
@@ -1110,7 +1110,7 @@ static int hptiop_reset(struct scsi_cmnd *scp)
 	struct Scsi_Host * host = scp->device->host;
 	struct hptiop_hba * hba = (struct hptiop_hba *)host->hostdata;
 
-	printk(KERN_WARNING "hptiop_reset(%d/%d/%d) scp=%p\n",
+	printk(KERN_WARNING "hptiop_reset(%d/%d/%d) scp=%pK\n",
 			scp->device->host->host_no, scp->device->channel,
 			scp->device->id, scp);
 
@@ -1293,7 +1293,7 @@ static int hptiop_probe(struct pci_dev *pcidev, const struct pci_device_id *id)
 	void *start_virt;
 	u32 offset, i, req_size;
 
-	dprintk("hptiop_probe(%p)\n", pcidev);
+	dprintk("hptiop_probe(%pK)\n", pcidev);
 
 	if (pci_enable_device(pcidev)) {
 		printk(KERN_ERR "hptiop: fail to enable pci device\n");
@@ -1508,7 +1508,7 @@ static void hptiop_shutdown(struct pci_dev *pcidev)
 	struct Scsi_Host *host = pci_get_drvdata(pcidev);
 	struct hptiop_hba *hba = (struct hptiop_hba *)host->hostdata;
 
-	dprintk("hptiop_shutdown(%p)\n", hba);
+	dprintk("hptiop_shutdown(%pK)\n", hba);
 
 	/* stop the iop */
 	if (iop_send_sync_msg(hba, IOPMU_INBOUND_MSG0_SHUTDOWN, 60000))

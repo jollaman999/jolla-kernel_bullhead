@@ -148,7 +148,7 @@ unifi_net_dma_align(void *ospriv, bulk_data_desc_t *bulk_data_slot)
     buf_address = (unsigned long)(bulk_data_slot->os_data_ptr) & (CSR_WIFI_ALIGN_BYTES - 1);
 
     unifi_trace(priv, UDBG5,
-                "unifi_net_dma_align: Allign buffer (0x%p) by %d bytes\n",
+                "unifi_net_dma_align: Allign buffer (0x%pK) by %d bytes\n",
                 bulk_data_slot->os_data_ptr, buf_address);
 
     offset = CSR_WIFI_ALIGN_BYTES - buf_address;

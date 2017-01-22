@@ -1077,7 +1077,7 @@ static int cop1Emulate(struct pt_regs *xcp, struct mips_fpu_struct *ctx,
 				value = (value & ~FPU_CSR_RM) |
 					mips_rm[modeindex(value)];
 #ifdef CSRTRACE
-				printk("%p gpr[%d]<-csr=%08x\n",
+				printk("%pK gpr[%d]<-csr=%08x\n",
 					(void *) (xcp->cp0_epc),
 					MIPSInst_RT(ir), value);
 #endif
@@ -1104,7 +1104,7 @@ static int cop1Emulate(struct pt_regs *xcp, struct mips_fpu_struct *ctx,
 			 */
 			if (MIPSInst_RD(ir) == FPCREG_CSR) {
 #ifdef CSRTRACE
-				printk("%p gpr[%d]->csr=%08x\n",
+				printk("%pK gpr[%d]->csr=%08x\n",
 					(void *) (xcp->cp0_epc),
 					MIPSInst_RT(ir), value);
 #endif

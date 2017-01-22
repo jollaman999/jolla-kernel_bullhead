@@ -142,7 +142,7 @@ nlm4_encode_testres(__be32 *p, struct nlm_res *resp)
 {
 	s64		start, len;
 
-	dprintk("xdr: before encode_testres (p %p resp %p)\n", p, resp);
+	dprintk("xdr: before encode_testres (p %pK resp %pK)\n", p, resp);
 	if (!(p = nlm4_encode_cookie(p, &resp->cookie)))
 		return NULL;
 	*p++ = resp->status;
@@ -170,7 +170,7 @@ nlm4_encode_testres(__be32 *p, struct nlm_res *resp)
 			(long long)fl->fl_start,  (long long)fl->fl_end);
 	}
 
-	dprintk("xdr: after encode_testres (p %p resp %p)\n", p, resp);
+	dprintk("xdr: after encode_testres (p %pK resp %pK)\n", p, resp);
 	return p;
 }
 

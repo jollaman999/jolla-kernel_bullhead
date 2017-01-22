@@ -453,7 +453,7 @@ static void lx_trigger_start(struct lx6464es *chip, struct lx_stream *lx_stream)
 				     lower_32_bits(buf), upper_32_bits(buf),
 				     &buffer_index);
 
-		snd_printdd(LXP "starting: buffer index %x on %p (%d bytes)\n",
+		snd_printdd(LXP "starting: buffer index %x on %pK (%d bytes)\n",
 			    buffer_index, (void *)buf, period_bytes);
 		buf += period_bytes;
 	}
@@ -1117,7 +1117,7 @@ static int snd_lx6464es_probe(struct pci_dev *pci,
 		chip->mac_address[0], chip->mac_address[1], chip->mac_address[2],
 		chip->mac_address[3], chip->mac_address[4], chip->mac_address[5]);
 
-	sprintf(card->longname, "%s at 0x%lx, 0x%p, irq %i",
+	sprintf(card->longname, "%s at 0x%lx, 0x%pK, irq %i",
 		card->shortname, chip->port_plx,
 		chip->port_dsp_bar, chip->irq);
 

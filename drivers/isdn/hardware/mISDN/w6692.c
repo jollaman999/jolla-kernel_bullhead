@@ -1050,7 +1050,7 @@ w6692_bctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	int ret = -EINVAL;
 	u_long flags;
 
-	pr_debug("%s: %s cmd:%x %p\n", card->name, __func__, cmd, arg);
+	pr_debug("%s: %s cmd:%x %pK\n", card->name, __func__, cmd, arg);
 	switch (cmd) {
 	case CLOSE_CHANNEL:
 		test_and_clear_bit(FLG_OPEN, &bch->Flags);
@@ -1178,7 +1178,7 @@ w6692_l1callback(struct dchannel *dch, u32 cmd)
 static int
 open_dchannel(struct w6692_hw *card, struct channel_req *rq)
 {
-	pr_debug("%s: %s dev(%d) open from %p\n", card->name, __func__,
+	pr_debug("%s: %s dev(%d) open from %pK\n", card->name, __func__,
 		 card->dch.dev.id, __builtin_return_address(1));
 	if (rq->protocol != ISDN_P_TE_S0)
 		return -EINVAL;
@@ -1202,7 +1202,7 @@ w6692_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	struct channel_req *rq;
 	int err = 0;
 
-	pr_debug("%s: DCTRL: %x %p\n", card->name, cmd, arg);
+	pr_debug("%s: DCTRL: %x %pK\n", card->name, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
 		rq = arg;
@@ -1216,7 +1216,7 @@ w6692_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 			pr_info("%s: cannot get module\n", card->name);
 		break;
 	case CLOSE_CHANNEL:
-		pr_debug("%s: dev(%d) close from %p\n", card->name,
+		pr_debug("%s: dev(%d) close from %pK\n", card->name,
 			 dch->dev.id, __builtin_return_address(0));
 		module_put(THIS_MODULE);
 		break;

@@ -1113,7 +1113,7 @@ int r300_do_cp_cmdbuf(struct drm_device *dev,
 
 			buf = dma->buflist[idx];
 			if (buf->file_priv != file_priv || buf->pending) {
-				DRM_ERROR("bad buffer %p %p %d\n",
+				DRM_ERROR("bad buffer %pK %pK %d\n",
 					  buf->file_priv, file_priv,
 					  buf->pending);
 				ret = -EINVAL;

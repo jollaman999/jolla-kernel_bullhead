@@ -368,7 +368,7 @@ static void snd_cs4231_mce_up(struct snd_cs4231 *chip)
 	chip->mce_bit |= CS4231_MCE;
 	timeout = __cs4231_readb(chip, CS4231U(chip, REGSEL));
 	if (timeout == 0x80)
-		snd_printdd("mce_up [%p]: serious init problem - "
+		snd_printdd("mce_up [%pK]: serious init problem - "
 			    "codec still busy\n",
 			    chip->port);
 	if (!(timeout & CS4231_MCE))
@@ -386,7 +386,7 @@ static void snd_cs4231_mce_down(struct snd_cs4231 *chip)
 	spin_lock_irqsave(&chip->lock, flags);
 #ifdef CONFIG_SND_DEBUG
 	if (__cs4231_readb(chip, CS4231U(chip, REGSEL)) & CS4231_INIT)
-		snd_printdd("mce_down [%p] - auto calibration time out (0)\n",
+		snd_printdd("mce_down [%pK] - auto calibration time out (0)\n",
 			    CS4231U(chip, REGSEL));
 #endif
 	chip->mce_bit &= ~CS4231_MCE;
@@ -394,7 +394,7 @@ static void snd_cs4231_mce_down(struct snd_cs4231 *chip)
 	__cs4231_writeb(chip, chip->mce_bit | (reg & 0x1f),
 			CS4231U(chip, REGSEL));
 	if (reg == 0x80)
-		snd_printdd("mce_down [%p]: serious init problem "
+		snd_printdd("mce_down [%pK]: serious init problem "
 			    "- codec still busy\n", chip->port);
 	if ((reg & CS4231_MCE) == 0) {
 		spin_unlock_irqrestore(&chip->lock, flags);
@@ -1041,7 +1041,7 @@ static int snd_cs4231_probe(struct snd_cs4231 *chip)
 				break;	/* this is valid value */
 		}
 	}
-	snd_printdd("cs4231: port = %p, id = 0x%x\n", chip->port, id);
+	snd_printdd("cs4231: port = %pK, id = 0x%x\n", chip->port, id);
 	if (id != 0x0a)
 		return -ENODEV;	/* no valid device found */
 

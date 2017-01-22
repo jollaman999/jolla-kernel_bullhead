@@ -411,7 +411,7 @@ static int access_mem(unw_addr_space_t __maybe_unused as,
 	if (addr < start || addr + sizeof(unw_word_t) >= end) {
 		ret = access_dso_mem(ui, addr, valp);
 		if (ret) {
-			pr_debug("unwind: access_mem %p not inside range %p-%p\n",
+			pr_debug("unwind: access_mem %pK not inside range %pK-%pK\n",
 				(void *)addr, (void *)start, (void *)end);
 			*valp = 0;
 			return ret;
@@ -421,7 +421,7 @@ static int access_mem(unw_addr_space_t __maybe_unused as,
 
 	offset = addr - start;
 	*valp  = *(unw_word_t *)&stack->data[offset];
-	pr_debug("unwind: access_mem addr %p, val %lx, offset %d\n",
+	pr_debug("unwind: access_mem addr %pK, val %lx, offset %d\n",
 		 (void *)addr, (unsigned long)*valp, offset);
 	return 0;
 }

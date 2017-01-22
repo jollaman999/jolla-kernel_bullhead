@@ -126,14 +126,14 @@ static unsigned yaffs_gc_control_callback(struct yaffs_dev *dev)
 
 static void yaffs_gross_lock(struct yaffs_dev *dev)
 {
-	yaffs_trace(YAFFS_TRACE_LOCK, "yaffs locking %p", current);
+	yaffs_trace(YAFFS_TRACE_LOCK, "yaffs locking %pK", current);
 	mutex_lock(&(yaffs_dev_to_lc(dev)->gross_lock));
-	yaffs_trace(YAFFS_TRACE_LOCK, "yaffs locked %p", current);
+	yaffs_trace(YAFFS_TRACE_LOCK, "yaffs locked %pK", current);
 }
 
 static void yaffs_gross_unlock(struct yaffs_dev *dev)
 {
-	yaffs_trace(YAFFS_TRACE_LOCK, "yaffs unlocking %p", current);
+	yaffs_trace(YAFFS_TRACE_LOCK, "yaffs unlocking %pK", current);
 	mutex_unlock(&(yaffs_dev_to_lc(dev)->gross_lock));
 }
 
@@ -1164,7 +1164,7 @@ static void yaffs_touch_super(struct yaffs_dev *dev)
 {
 	struct super_block *sb = yaffs_dev_to_lc(dev)->super;
 
-	yaffs_trace(YAFFS_TRACE_OS, "yaffs_touch_super() sb = %p", sb);
+	yaffs_trace(YAFFS_TRACE_OS, "yaffs_touch_super() sb = %pK", sb);
 	if (sb)
 		yaffs_mark_sb_dirty(sb);
 }
@@ -1485,7 +1485,7 @@ static int yaffs_write_end(struct file *filp, struct address_space *mapping,
 	addr = kva + offset_into_page;
 
 	yaffs_trace(YAFFS_TRACE_OS,
-		"yaffs_write_end addr %p pos %x n_bytes %d",
+		"yaffs_write_end addr %pK pos %x n_bytes %d",
 		addr, (unsigned)pos, copied);
 
 	ret = yaffs_file_write(filp, addr, copied, &pos);
@@ -1679,7 +1679,7 @@ static int yaffs_bg_thread_fn(void *data)
 	struct timer_list timer;
 
 	yaffs_trace(YAFFS_TRACE_BACKGROUND,
-		"yaffs_background starting for dev %p", (void *)dev);
+		"yaffs_background starting for dev %pK", (void *)dev);
 
 	set_freezable();
 	while (context->bg_running) {
@@ -2146,13 +2146,13 @@ static struct super_block *yaffs_internal_read_super(int yaffs_version,
 		return NULL;
 	}
 
-	yaffs_trace(YAFFS_TRACE_OS, " erase %p", mtd->_erase);
-	yaffs_trace(YAFFS_TRACE_OS, " read %p", mtd->_read);
-	yaffs_trace(YAFFS_TRACE_OS, " write %p", mtd->_write);
-	yaffs_trace(YAFFS_TRACE_OS, " readoob %p", mtd->_read_oob);
-	yaffs_trace(YAFFS_TRACE_OS, " writeoob %p", mtd->_write_oob);
-	yaffs_trace(YAFFS_TRACE_OS, " block_isbad %p", mtd->_block_isbad);
-	yaffs_trace(YAFFS_TRACE_OS, " block_markbad %p", mtd->_block_markbad);
+	yaffs_trace(YAFFS_TRACE_OS, " erase %pK", mtd->_erase);
+	yaffs_trace(YAFFS_TRACE_OS, " read %pK", mtd->_read);
+	yaffs_trace(YAFFS_TRACE_OS, " write %pK", mtd->_write);
+	yaffs_trace(YAFFS_TRACE_OS, " readoob %pK", mtd->_read_oob);
+	yaffs_trace(YAFFS_TRACE_OS, " writeoob %pK", mtd->_write_oob);
+	yaffs_trace(YAFFS_TRACE_OS, " block_isbad %pK", mtd->_block_isbad);
+	yaffs_trace(YAFFS_TRACE_OS, " block_markbad %pK", mtd->_block_markbad);
 	yaffs_trace(YAFFS_TRACE_OS, " %s %d", WRITE_SIZE_STR, WRITE_SIZE(mtd));
 	yaffs_trace(YAFFS_TRACE_OS, " oobsize %d", mtd->oobsize);
 	yaffs_trace(YAFFS_TRACE_OS, " erasesize %d", mtd->erasesize);

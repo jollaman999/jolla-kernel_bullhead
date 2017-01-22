@@ -1718,7 +1718,7 @@ static int au1200fb_drv_probe(struct platform_device *dev)
 		     page += PAGE_SIZE) {
 			SetPageReserved(pfn_to_page(page >> PAGE_SHIFT)); /* LCD DMA is NOT coherent on Au1200 */
 		}
-		print_dbg("Framebuffer memory map at %p", fbdev->fb_mem);
+		print_dbg("Framebuffer memory map at %pK", fbdev->fb_mem);
 		print_dbg("phys=0x%08x, size=%dK", fbdev->fb_phys, fbdev->fb_len / 1024);
 
 		/* Init FB data */

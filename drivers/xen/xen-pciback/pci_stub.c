@@ -540,7 +540,7 @@ static void pcistub_remove(struct pci_dev *dev)
 	spin_unlock_irqrestore(&pcistub_devices_lock, flags);
 
 	if (found_psdev) {
-		dev_dbg(&dev->dev, "found device to remove - in use? %p\n",
+		dev_dbg(&dev->dev, "found device to remove - in use? %pK\n",
 			found_psdev->pdev);
 
 		if (found_psdev->pdev) {

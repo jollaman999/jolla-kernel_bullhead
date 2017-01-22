@@ -417,7 +417,7 @@ static int sr_prep_fn(struct request_queue *q, struct request *rq)
 	if (!cd->device || !scsi_device_online(cd->device)) {
 		SCSI_LOG_HLQUEUE(2, printk("Finishing %u sectors\n",
 					   blk_rq_sectors(rq)));
-		SCSI_LOG_HLQUEUE(2, printk("Retry with 0x%p\n", SCpnt));
+		SCSI_LOG_HLQUEUE(2, printk("Retry with 0x%pK\n", SCpnt));
 		goto out;
 	}
 

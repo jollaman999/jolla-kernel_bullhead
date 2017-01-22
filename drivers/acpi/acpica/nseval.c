@@ -126,7 +126,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info * info)
 				  info->resolved_node->object);
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_NAMES, "%s [%p] Value %p\n", info->pathname,
+	ACPI_DEBUG_PRINT((ACPI_DB_NAMES, "%s [%pK] Value %pK\n", info->pathname,
 			  info->resolved_node,
 			  acpi_ns_get_attached_object(info->resolved_node)));
 
@@ -169,7 +169,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info * info)
 				   ACPI_LV_INFO, _COMPONENT);
 
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
-				  "Method at AML address %p Length %X\n",
+				  "Method at AML address %pK Length %X\n",
 				  info->obj_desc->method.aml_start + 1,
 				  info->obj_desc->method.aml_length - 1));
 
@@ -245,7 +245,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info * info)
 					  info->resolved_node);
 
 			ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
-					  "Returning object %p [%s]\n",
+					  "Returning object %pK [%s]\n",
 					  info->return_object,
 					  acpi_ut_get_object_type_name(info->
 								       return_object)));
@@ -428,7 +428,7 @@ acpi_ns_exec_module_code(union acpi_operand_object *method_obj,
 
 	status = acpi_ns_evaluate(info);
 
-	ACPI_DEBUG_PRINT((ACPI_DB_INIT, "Executed module-level code at %p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_INIT, "Executed module-level code at %pK\n",
 			  method_obj->method.aml_start));
 
 	/* Delete a possible implicit return value (in slack mode) */

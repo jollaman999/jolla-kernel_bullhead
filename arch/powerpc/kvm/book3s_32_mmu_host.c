@@ -190,7 +190,7 @@ next_pteg:
 		goto next_pteg;
 	}
 
-	dprintk_mmu("KVM: old PTEG: %p (%d)\n", pteg, rr);
+	dprintk_mmu("KVM: old PTEG: %pK (%d)\n", pteg, rr);
 	dprintk_mmu("KVM:   %08x - %08x\n", pteg[0], pteg[1]);
 	dprintk_mmu("KVM:   %08x - %08x\n", pteg[2], pteg[3]);
 	dprintk_mmu("KVM:   %08x - %08x\n", pteg[4], pteg[5]);
@@ -226,7 +226,7 @@ next_pteg:
 
 	local_irq_enable();
 
-	dprintk_mmu("KVM: new PTEG: %p\n", pteg);
+	dprintk_mmu("KVM: new PTEG: %pK\n", pteg);
 	dprintk_mmu("KVM:   %08x - %08x\n", pteg[0], pteg[1]);
 	dprintk_mmu("KVM:   %08x - %08x\n", pteg[2], pteg[3]);
 	dprintk_mmu("KVM:   %08x - %08x\n", pteg[4], pteg[5]);

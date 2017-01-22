@@ -738,7 +738,7 @@ static struct pcifront_device *alloc_pdev(struct xenbus_device *xdev)
 
 	INIT_WORK(&pdev->op_work, pcifront_do_aer);
 
-	dev_dbg(&xdev->dev, "Allocated pdev @ 0x%p pdev->sh_info @ 0x%p\n",
+	dev_dbg(&xdev->dev, "Allocated pdev @ 0x%pK pdev->sh_info @ 0x%pK\n",
 		pdev, pdev->sh_info);
 out:
 	return pdev;
@@ -746,7 +746,7 @@ out:
 
 static void free_pdev(struct pcifront_device *pdev)
 {
-	dev_dbg(&pdev->xdev->dev, "freeing pdev @ 0x%p\n", pdev);
+	dev_dbg(&pdev->xdev->dev, "freeing pdev @ 0x%pK\n", pdev);
 
 	pcifront_free_roots(pdev);
 

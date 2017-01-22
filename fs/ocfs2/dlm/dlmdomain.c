@@ -562,7 +562,7 @@ static int dlm_exit_domain_handler(struct o2net_msg *msg, u32 len, void *data,
 	unsigned int node;
 	struct dlm_exit_domain *exit_msg = (struct dlm_exit_domain *) msg->buf;
 
-	mlog(0, "%p %u %p", msg, len, data);
+	mlog(0, "%pK %u %pK", msg, len, data);
 
 	if (!dlm_grab(dlm))
 		return 0;
@@ -1619,7 +1619,7 @@ static int dlm_try_to_join_domain(struct dlm_ctxt *dlm)
 	struct domain_join_ctxt *ctxt;
 	enum dlm_query_join_response_code response = JOIN_DISALLOW;
 
-	mlog(0, "%p", dlm);
+	mlog(0, "%pK", dlm);
 
 	ctxt = kzalloc(sizeof(*ctxt), GFP_KERNEL);
 	if (!ctxt) {
@@ -2046,7 +2046,7 @@ static struct dlm_ctxt *dlm_alloc_ctxt(const char *domain,
 	INIT_LIST_HEAD(&dlm->pending_asts);
 	INIT_LIST_HEAD(&dlm->pending_basts);
 
-	mlog(0, "dlm->recovery_map=%p, &(dlm->recovery_map[0])=%p\n",
+	mlog(0, "dlm->recovery_map=%pK, &(dlm->recovery_map[0])=%pK\n",
 		  dlm->recovery_map, &(dlm->recovery_map[0]));
 
 	memset(dlm->recovery_map, 0, sizeof(dlm->recovery_map));

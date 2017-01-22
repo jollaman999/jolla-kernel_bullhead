@@ -1894,7 +1894,7 @@ static int sis190_init_one(struct pci_dev *pdev,
 		goto err_remove_mii;
 
 	if (netif_msg_probe(tp)) {
-		netdev_info(dev, "%s: %s at %p (IRQ: %d), %pM\n",
+		netdev_info(dev, "%s: %s at %pK (IRQ: %d), %pM\n",
 			    pci_name(pdev),
 			    sis_chip_info[ent->driver_data].name,
 			    ioaddr, pdev->irq, dev->dev_addr);

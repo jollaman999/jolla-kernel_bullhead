@@ -3520,7 +3520,7 @@ int ipa_pipe_mem_alloc(u32 *ofst, u32 size)
 	int res = -1;
 
 	if (!ipa_ctx->pipe_mem_pool || !size) {
-		IPAERR("failed size=%u pipe_mem_pool=%p\n", size,
+		IPAERR("failed size=%u pipe_mem_pool=%pK\n", size,
 				ipa_ctx->pipe_mem_pool);
 		return res;
 	}

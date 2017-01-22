@@ -190,7 +190,7 @@ c4_wk_chan_restart (mch_t * ch)
     mpi_t      *pi = ch->up;
 
 #ifdef RLD_RESTART_DEBUG
-    pr_info(">> %s: queueing Port %d Chan %d, mch_t @ %p\n",
+    pr_info(">> %s: queueing Port %d Chan %d, mch_t @ %pK\n",
             __func__, pi->portnum, ch->channum, ch);
 #endif
 

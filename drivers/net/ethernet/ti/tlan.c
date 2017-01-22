@@ -2030,7 +2030,7 @@ static void tlan_print_list(struct tlan_list *list, char *type, int num)
 {
 	int i;
 
-	pr_info("%s List %d at %p\n", type, num, list);
+	pr_info("%s List %d at %pK\n", type, num, list);
 	pr_info("   Forward    = 0x%08x\n",  list->forward);
 	pr_info("   CSTAT      = 0x%04hx\n", list->c_stat);
 	pr_info("   Frame Size = 0x%04hx\n", list->frame_size);

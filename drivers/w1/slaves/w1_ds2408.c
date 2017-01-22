@@ -46,7 +46,7 @@ static int _read_reg(struct w1_slave *sl, u8 address, unsigned char* buf)
 {
 	u8 wrbuf[3];
 	dev_dbg(&sl->dev,
-			"Reading with slave: %p, reg addr: %0#4x, buff addr: %p",
+			"Reading with slave: %pK, reg addr: %0#4x, buff addr: %pK",
 			sl, (unsigned int)address, buf);
 
 	if (!buf)
@@ -77,7 +77,7 @@ static ssize_t w1_f29_read_state(
 	char *buf, loff_t off, size_t count)
 {
 	dev_dbg(&kobj_to_w1_slave(kobj)->dev,
-		"Reading %s kobj: %p, off: %0#10x, count: %zu, buff addr: %p",
+		"Reading %s kobj: %pK, off: %0#10x, count: %zu, buff addr: %pK",
 		bin_attr->attr.name, kobj, (unsigned int)off, count, buf);
 	if (count != 1 || off != 0)
 		return -EFAULT;
@@ -90,7 +90,7 @@ static ssize_t w1_f29_read_output(
 	char *buf, loff_t off, size_t count)
 {
 	dev_dbg(&kobj_to_w1_slave(kobj)->dev,
-		"Reading %s kobj: %p, off: %0#10x, count: %zu, buff addr: %p",
+		"Reading %s kobj: %pK, off: %0#10x, count: %zu, buff addr: %pK",
 		bin_attr->attr.name, kobj, (unsigned int)off, count, buf);
 	if (count != 1 || off != 0)
 		return -EFAULT;
@@ -104,7 +104,7 @@ static ssize_t w1_f29_read_activity(
 	char *buf, loff_t off, size_t count)
 {
 	dev_dbg(&kobj_to_w1_slave(kobj)->dev,
-		"Reading %s kobj: %p, off: %0#10x, count: %zu, buff addr: %p",
+		"Reading %s kobj: %pK, off: %0#10x, count: %zu, buff addr: %pK",
 		bin_attr->attr.name, kobj, (unsigned int)off, count, buf);
 	if (count != 1 || off != 0)
 		return -EFAULT;
@@ -118,7 +118,7 @@ static ssize_t w1_f29_read_cond_search_mask(
 	char *buf, loff_t off, size_t count)
 {
 	dev_dbg(&kobj_to_w1_slave(kobj)->dev,
-		"Reading %s kobj: %p, off: %0#10x, count: %zu, buff addr: %p",
+		"Reading %s kobj: %pK, off: %0#10x, count: %zu, buff addr: %pK",
 		bin_attr->attr.name, kobj, (unsigned int)off, count, buf);
 	if (count != 1 || off != 0)
 		return -EFAULT;

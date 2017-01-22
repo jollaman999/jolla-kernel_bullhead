@@ -207,7 +207,7 @@ static int sja1000_isa_probe(struct platform_device *pdev)
 		goto exit_unmap;
 	}
 
-	dev_info(&pdev->dev, "%s device registered (reg_base=0x%p, irq=%d)\n",
+	dev_info(&pdev->dev, "%s device registered (reg_base=0x%pK, irq=%d)\n",
 		 DRV_NAME, priv->reg_base, dev->irq);
 	return 0;
 

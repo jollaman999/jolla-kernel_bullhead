@@ -91,7 +91,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
 	Elf32_Sym *sym_base = (Elf32_Sym *) sechdrs[symindex].sh_addr;
 	void *loc_base = (void *) sechdrs[sym_info].sh_addr;
 
-	DEBUGP("Applying relocations in section %u to section %u base=%p\n",
+	DEBUGP("Applying relocations in section %u to section %u base=%pK\n",
 	       relsec, sym_info, loc_base);
 
 	for (i = 0; i < nrelocs; i++) {
@@ -105,7 +105,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
 		/* `Everything is relative'. */
 		value = sym->st_value + rela[i].r_addend;
 
-		DEBUGP("%d: value=%08x loc=%p reloc=%d symbol=%s\n",
+		DEBUGP("%d: value=%08x loc=%pK reloc=%d symbol=%s\n",
 		       i, value, location, ELF32_R_TYPE(rela[i].r_info),
 		       sym->st_name ?
 		       &strtab[sym->st_name] : "(anonymous)");

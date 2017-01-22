@@ -308,7 +308,7 @@ static int ipa_uc_panic_notifier(struct notifier_block *this,
 {
 	int result = 0;
 
-	IPADBG("this=%p evt=%lu ptr=%p\n", this, event, ptr);
+	IPADBG("this=%pK evt=%lu ptr=%pK\n", this, event, ptr);
 
 	result = ipa_uc_state_check();
 	if (result)

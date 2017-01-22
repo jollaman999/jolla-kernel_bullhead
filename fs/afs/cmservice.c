@@ -300,7 +300,7 @@ static void SRXAFSCB_InitCallBackState(struct work_struct *work)
 {
 	struct afs_call *call = container_of(work, struct afs_call, work);
 
-	_enter("{%p}", call->server);
+	_enter("{%pK}", call->server);
 
 	afs_init_callback_state(call->server);
 	afs_send_empty_reply(call);

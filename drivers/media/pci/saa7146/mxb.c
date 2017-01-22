@@ -701,7 +701,7 @@ static int mxb_attach(struct saa7146_dev *dev, struct saa7146_pci_extension_data
 {
 	struct mxb *mxb;
 
-	DEB_EE("dev:%p\n", dev);
+	DEB_EE("dev:%pK\n", dev);
 
 	saa7146_vv_init(dev, &vv_data);
 	if (mxb_probe(dev)) {
@@ -749,7 +749,7 @@ static int mxb_detach(struct saa7146_dev *dev)
 {
 	struct mxb *mxb = (struct mxb *)dev->ext_priv;
 
-	DEB_EE("dev:%p\n", dev);
+	DEB_EE("dev:%pK\n", dev);
 
 	/* mute audio on tea6420s */
 	tea6420_route(mxb, 6);

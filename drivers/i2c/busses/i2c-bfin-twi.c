@@ -702,7 +702,7 @@ static int i2c_bfin_twi_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, iface);
 
 	dev_info(&pdev->dev, "Blackfin BF5xx on-chip I2C TWI Contoller, "
-		"regs_base@%p\n", iface->regs_base);
+		"regs_base@%pK\n", iface->regs_base);
 
 	return 0;
 

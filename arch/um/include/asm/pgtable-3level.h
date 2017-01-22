@@ -44,13 +44,13 @@
 #define FIRST_USER_ADDRESS	0
 
 #define pte_ERROR(e) \
-        printk("%s:%d: bad pte %p(%016lx).\n", __FILE__, __LINE__, &(e), \
+        printk("%s:%d: bad pte %pK(%016lx).\n", __FILE__, __LINE__, &(e), \
 	       pte_val(e))
 #define pmd_ERROR(e) \
-        printk("%s:%d: bad pmd %p(%016lx).\n", __FILE__, __LINE__, &(e), \
+        printk("%s:%d: bad pmd %pK(%016lx).\n", __FILE__, __LINE__, &(e), \
 	       pmd_val(e))
 #define pgd_ERROR(e) \
-        printk("%s:%d: bad pgd %p(%016lx).\n", __FILE__, __LINE__, &(e), \
+        printk("%s:%d: bad pgd %pK(%016lx).\n", __FILE__, __LINE__, &(e), \
 	       pgd_val(e))
 
 #define pud_none(x)	(!(pud_val(x) & ~_PAGE_NEWPAGE))

@@ -362,7 +362,7 @@ ssize_t uwb_est_get_size(struct uwb_rc *uwb_rc, struct uwb_est *est,
 
 	size = -ENOENT;
 	if (event_low >= est->entries) {	/* in range? */
-		dev_err(dev, "EST %p 0x%04x/%04x/%04x[%u]: event %u out of range\n",
+		dev_err(dev, "EST %pK 0x%04x/%04x/%04x[%u]: event %u out of range\n",
 			est, est->type_event_high, est->vendor, est->product,
 			est->entries, event_low);
 		goto out;
@@ -370,7 +370,7 @@ ssize_t uwb_est_get_size(struct uwb_rc *uwb_rc, struct uwb_est *est,
 	size = -ENOENT;
 	entry = &est->entry[event_low];
 	if (entry->size == 0 && entry->offset == 0) {	/* unknown? */
-		dev_err(dev, "EST %p 0x%04x/%04x/%04x[%u]: event %u unknown\n",
+		dev_err(dev, "EST %pK 0x%04x/%04x/%04x[%u]: event %u unknown\n",
 			est, est->type_event_high, est->vendor,	est->product,
 			est->entries, event_low);
 		goto out;
@@ -390,7 +390,7 @@ ssize_t uwb_est_get_size(struct uwb_rc *uwb_rc, struct uwb_est *est,
 		default: 	 BUG();
 		}
 		if (offset + type_size > rceb_size) {
-			dev_err(dev, "EST %p 0x%04x/%04x/%04x[%u]: "
+			dev_err(dev, "EST %pK 0x%04x/%04x/%04x[%u]: "
 				"not enough data to read extra size\n",
 				est, est->type_event_high, est->vendor,
 				est->product, est->entries);

@@ -274,7 +274,7 @@ static int merge_cluster_tables(void)
 	table[k].driver_data = k;
 	table[k].frequency = CPUFREQ_TABLE_END;
 
-	pr_debug("%s: End, table: %p, count: %d\n", __func__, table, k);
+	pr_debug("%s: End, table: %pK, count: %d\n", __func__, table, k);
 
 	return 0;
 }
@@ -342,7 +342,7 @@ static int _get_cluster_clk_and_freq_table(struct device *cpu_dev)
 	name[12] = cluster + '0';
 	clk[cluster] = clk_get(cpu_dev, name);
 	if (!IS_ERR(clk[cluster])) {
-		dev_dbg(cpu_dev, "%s: clk: %p & freq table: %p, cluster: %d\n",
+		dev_dbg(cpu_dev, "%s: clk: %pK & freq table: %pK, cluster: %d\n",
 				__func__, clk[cluster], freq_table[cluster],
 				cluster);
 		return 0;

@@ -177,7 +177,7 @@ void *of_vmlinux_alloc(unsigned long size)
 	 * the return value.
 	 */
 	addr = of_claim(start, end - start, 0);
-	printf("Trying to claim from 0x%lx to 0x%lx (0x%lx) got %p\r\n",
+	printf("Trying to claim from 0x%lx to 0x%lx (0x%lx) got %pK\r\n",
 	       start, end, end - start, addr);
 
 	p = malloc(size);

@@ -115,7 +115,7 @@ int __init zynq_slcr_init(void)
 	/* unlock the SLCR so that registers can be changed */
 	writel(SLCR_UNLOCK_MAGIC, zynq_slcr_base + SLCR_UNLOCK);
 
-	pr_info("%s mapped to %p\n", np->name, zynq_slcr_base);
+	pr_info("%s mapped to %pK\n", np->name, zynq_slcr_base);
 
 	xilinx_zynq_clocks_init(zynq_slcr_base);
 

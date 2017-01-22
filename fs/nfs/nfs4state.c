@@ -1104,7 +1104,7 @@ static void nfs_increment_seqid(int status, struct nfs_seqid *seqid)
 				return;
 			pr_warn_ratelimited("NFS: v4 server returned a bad"
 					" sequence-id error on an"
-					" unconfirmed sequence %p!\n",
+					" unconfirmed sequence %pK!\n",
 					seqid->sequence);
 		case -NFS4ERR_STALE_CLIENTID:
 		case -NFS4ERR_STALE_STATEID:

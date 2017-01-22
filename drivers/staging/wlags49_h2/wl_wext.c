@@ -214,7 +214,7 @@ static int hermes_set_wep_keys(struct wl_private *lp, u16 key_idx,
 		goto out;
 	}
 
-	DBG_NOTICE(DbgInfo, "pointer: %p, length: %d\n",
+	DBG_NOTICE(DbgInfo, "pointer: %pK, length: %d\n",
 		   key, key_len);
 
 	/* Check the size of the key */
@@ -3242,7 +3242,7 @@ struct iw_statistics * wl_wireless_stats( struct net_device *dev )
 
 	DBG_FUNC( "wl_wireless_stats" );
 	DBG_ENTER(DbgInfo);
-	DBG_PARAM(DbgInfo, "dev", "%s (0x%p)", dev->name, dev);
+	DBG_PARAM(DbgInfo, "dev", "%s (0x%pK)", dev->name, dev);
 
 	pStats = NULL;
 

@@ -170,7 +170,7 @@ static void axnet_detach(struct pcmcia_device *link)
 {
     struct net_device *dev = link->priv;
 
-    dev_dbg(&link->dev, "axnet_detach(0x%p)\n", link);
+    dev_dbg(&link->dev, "axnet_detach(0x%pK)\n", link);
 
     unregister_netdev(dev);
 
@@ -276,7 +276,7 @@ static int axnet_config(struct pcmcia_device *link)
     axnet_dev_t *info = PRIV(dev);
     int i, j, j2, ret;
 
-    dev_dbg(&link->dev, "axnet_config(0x%p)\n", link);
+    dev_dbg(&link->dev, "axnet_config(0x%pK)\n", link);
 
     /* don't trust the CIS on this; Linksys got it wrong */
     link->config_regs = 0x63;

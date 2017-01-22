@@ -123,7 +123,7 @@ static int logfs_writepage(struct page *page, struct writeback_control *wbc)
 	u64 bix;
 	level_t level;
 
-	log_file("logfs_writepage(%lx, %lx, %p)\n", inode->i_ino, page->index,
+	log_file("logfs_writepage(%lx, %lx, %pK)\n", inode->i_ino, page->index,
 			page);
 
 	logfs_unpack_index(page->index, &bix, &level);

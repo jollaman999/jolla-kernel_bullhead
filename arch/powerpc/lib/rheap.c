@@ -710,7 +710,7 @@ void rh_dump(rh_info_t * info)
 	maxnr = ARRAY_SIZE(st);
 
 	printk(KERN_INFO
-	       "info @0x%p (%d slots empty / %d max)\n",
+	       "info @0x%pK (%d slots empty / %d max)\n",
 	       info, info->empty_slots, info->max_blocks);
 
 	printk(KERN_INFO "  Free:\n");
@@ -740,7 +740,7 @@ EXPORT_SYMBOL_GPL(rh_dump);
 void rh_dump_blk(rh_info_t * info, rh_block_t * blk)
 {
 	printk(KERN_INFO
-	       "blk @0x%p: 0x%lx-0x%lx (%u)\n",
+	       "blk @0x%pK: 0x%lx-0x%lx (%u)\n",
 	       blk, blk->start, blk->start + blk->size, blk->size);
 }
 EXPORT_SYMBOL_GPL(rh_dump_blk);

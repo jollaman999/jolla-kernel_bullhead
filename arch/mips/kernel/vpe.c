@@ -896,7 +896,7 @@ static int vpe_elfload(struct vpe * v)
 	if (!v->load_addr)
 		return -ENOMEM;
 
-	pr_info("VPE loader: loading to %p\n", v->load_addr);
+	pr_info("VPE loader: loading to %pK\n", v->load_addr);
 
 	if (relocate) {
 		for (i = 0; i < hdr->e_shnum; i++) {

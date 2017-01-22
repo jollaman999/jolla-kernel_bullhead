@@ -860,7 +860,7 @@ void ubifs_dump_znode(const struct ubifs_info *c,
 	else
 		zbr = &c->zroot;
 
-	pr_err("znode %p, LEB %d:%d len %d parent %p iip %d level %d child_cnt %d flags %lx\n",
+	pr_err("znode %pK, LEB %d:%d len %d parent %pK iip %d level %d child_cnt %d flags %lx\n",
 	       znode, zbr->lnum, zbr->offs, zbr->len, znode->parent, znode->iip,
 	       znode->level, znode->child_cnt, znode->flags);
 
@@ -873,12 +873,12 @@ void ubifs_dump_znode(const struct ubifs_info *c,
 	for (n = 0; n < znode->child_cnt; n++) {
 		zbr = &znode->zbranch[n];
 		if (znode->level > 0)
-			pr_err("\t%d: znode %p LEB %d:%d len %d key %s\n",
+			pr_err("\t%d: znode %pK LEB %d:%d len %d key %s\n",
 			       n, zbr->znode, zbr->lnum, zbr->offs, zbr->len,
 			       dbg_snprintf_key(c, &zbr->key, key_buf,
 						DBG_KEY_BUF_LEN));
 		else
-			pr_err("\t%d: LNC %p LEB %d:%d len %d key %s\n",
+			pr_err("\t%d: LNC %pK LEB %d:%d len %d key %s\n",
 			       n, zbr->znode, zbr->lnum, zbr->offs, zbr->len,
 			       dbg_snprintf_key(c, &zbr->key, key_buf,
 						DBG_KEY_BUF_LEN));

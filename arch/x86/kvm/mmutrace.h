@@ -212,7 +212,7 @@ TRACE_EVENT(
 		__entry->access = access;
 	),
 
-	TP_printk("sptep:%p gfn %llx access %x", __entry->sptep, __entry->gfn,
+	TP_printk("sptep:%pK gfn %llx access %x", __entry->sptep, __entry->gfn,
 		  __entry->access)
 );
 
@@ -266,7 +266,7 @@ TRACE_EVENT(
 		__entry->retry = retry;
 	),
 
-	TP_printk("vcpu %d gva %lx error_code %s sptep %p old %#llx"
+	TP_printk("vcpu %d gva %lx error_code %s sptep %pK old %#llx"
 		  " new %llx spurious %d fixed %d", __entry->vcpu_id,
 		  __entry->gva, __print_flags(__entry->error_code, "|",
 		  kvm_mmu_trace_pferr_flags), __entry->sptep,

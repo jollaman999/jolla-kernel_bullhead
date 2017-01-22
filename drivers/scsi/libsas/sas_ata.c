@@ -456,7 +456,7 @@ static void sas_ata_internal_abort(struct sas_task *task)
 	if (task->task_state_flags & SAS_TASK_STATE_ABORTED ||
 	    task->task_state_flags & SAS_TASK_STATE_DONE) {
 		spin_unlock_irqrestore(&task->task_state_lock, flags);
-		SAS_DPRINTK("%s: Task %p already finished.\n", __func__,
+		SAS_DPRINTK("%s: Task %pK already finished.\n", __func__,
 			    task);
 		goto out;
 	}
@@ -477,7 +477,7 @@ static void sas_ata_internal_abort(struct sas_task *task)
 	 * aborted ata tasks, otherwise we (likely) leak the sas task
 	 * here
 	 */
-	SAS_DPRINTK("%s: Task %p leaked.\n", __func__, task);
+	SAS_DPRINTK("%s: Task %pK leaked.\n", __func__, task);
 
 	if (!(task->task_state_flags & SAS_TASK_STATE_DONE))
 		task->task_state_flags &= ~SAS_TASK_STATE_ABORTED;

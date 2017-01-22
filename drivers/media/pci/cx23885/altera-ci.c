@@ -674,7 +674,7 @@ static int altera_hw_filt_init(struct altera_ci_config *config, int hw_filt_nr)
 		ci_dbg_print("%s: Create New Internal Structure!\n", __func__);
 	}
 
-	ci_dbg_print("%s: setting hw pid filter = %p for ci = %d\n", __func__,
+	ci_dbg_print("%s: setting hw pid filter = %pK for ci = %d\n", __func__,
 						pid_filt, hw_filt_nr - 1);
 	inter->pid_filt[hw_filt_nr - 1] = pid_filt;
 	pid_filt->demux = config->demux;
@@ -743,7 +743,7 @@ int altera_ci_init(struct altera_ci_config *config, int ci_nr)
 		ci_dbg_print("%s: Create New Internal Structure!\n", __func__);
 	}
 
-	ci_dbg_print("%s: setting state = %p for ci = %d\n", __func__,
+	ci_dbg_print("%s: setting state = %pK for ci = %d\n", __func__,
 						state, ci_nr - 1);
 	state->internal = inter;
 	state->nr = ci_nr - 1;

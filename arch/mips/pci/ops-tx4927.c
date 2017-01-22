@@ -439,7 +439,7 @@ static void tx4927_dump_pcic_settings1(struct tx4927_pcic_reg __iomem *pcicptr)
 	int i;
 	__u32 __iomem *preg = (__u32 __iomem *)pcicptr;
 
-	printk(KERN_INFO "tx4927 pcic (0x%p) settings:", pcicptr);
+	printk(KERN_INFO "tx4927 pcic (0x%pK) settings:", pcicptr);
 	for (i = 0; i < sizeof(struct tx4927_pcic_reg); i += 4, preg++) {
 		if (i % 32 == 0) {
 			printk(KERN_CONT "\n");

@@ -354,7 +354,7 @@ static int hsic_write(int id, unsigned char *buf, int len, int ctxt)
 		return -EINVAL;
 	}
 	if (!buf || len <= 0) {
-		pr_err_ratelimited("diag: In %s, ch %d, invalid buf %p len %d\n",
+		pr_err_ratelimited("diag: In %s, ch %d, invalid buf %pK len %d\n",
 				   __func__, id, buf, len);
 		return -EINVAL;
 	}

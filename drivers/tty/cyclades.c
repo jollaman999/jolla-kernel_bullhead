@@ -1320,7 +1320,7 @@ static int cy_startup(struct cyclades_port *info, struct tty_struct *tty)
 
 #ifdef CY_DEBUG_OPEN
 		printk(KERN_DEBUG "cyc startup Z card %d, channel %d, "
-			"base_addr %p\n", card, channel, card->base_addr);
+			"base_addr %pK\n", card, channel, card->base_addr);
 #endif
 		spin_lock_irqsave(&card->card_lock, flags);
 
@@ -1454,7 +1454,7 @@ static void cy_shutdown(struct cyclades_port *info, struct tty_struct *tty)
 #ifdef CY_DEBUG_OPEN
 		int channel = info->line - card->first_line;
 		printk(KERN_DEBUG "cyc shutdown Z card %d, channel %d, "
-			"base_addr %p\n", card, channel, card->base_addr);
+			"base_addr %pK\n", card, channel, card->base_addr);
 #endif
 
 		if (!cyz_is_loaded(card))
@@ -3632,7 +3632,7 @@ static int cyz_load_fw(struct pci_dev *pdev, void __iomem *base_addr,
 	}
 	pt_zfwctrl = base_addr + readl(&fid->zfwctrl_addr);
 
-	dev_dbg(&pdev->dev, "fid=> %p, zfwctrl_addr=> %x, npt_zfwctrl=> %p\n",
+	dev_dbg(&pdev->dev, "fid=> %pK, zfwctrl_addr=> %x, npt_zfwctrl=> %pK\n",
 			base_addr + ID_ADDRESS, readl(&fid->zfwctrl_addr),
 			base_addr + readl(&fid->zfwctrl_addr));
 

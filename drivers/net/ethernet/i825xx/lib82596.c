@@ -409,11 +409,11 @@ static void i596_display_data(struct net_device *dev)
 	struct i596_rfd *rfd;
 	struct i596_rbd *rbd;
 
-	printk(KERN_DEBUG "lp and scp at %p, .sysbus = %08x, .iscp = %08x\n",
+	printk(KERN_DEBUG "lp and scp at %pK, .sysbus = %08x, .iscp = %08x\n",
 	       &dma->scp, dma->scp.sysbus, SWAP32(dma->scp.iscp));
-	printk(KERN_DEBUG "iscp at %p, iscp.stat = %08x, .scb = %08x\n",
+	printk(KERN_DEBUG "iscp at %pK, iscp.stat = %08x, .scb = %08x\n",
 	       &dma->iscp, SWAP32(dma->iscp.stat), SWAP32(dma->iscp.scb));
-	printk(KERN_DEBUG "scb at %p, scb.status = %04x, .command = %04x,"
+	printk(KERN_DEBUG "scb at %pK, scb.status = %04x, .command = %04x,"
 		" .cmd = %08x, .rfd = %08x\n",
 	       &dma->scb, SWAP16(dma->scb.status), SWAP16(dma->scb.command),
 		SWAP16(dma->scb.cmd), SWAP32(dma->scb.rfd));
@@ -425,17 +425,17 @@ static void i596_display_data(struct net_device *dev)
 	cmd = lp->cmd_head;
 	while (cmd != NULL) {
 		printk(KERN_DEBUG
-		       "cmd at %p, .status = %04x, .command = %04x,"
+		       "cmd at %pK, .status = %04x, .command = %04x,"
 		       " .b_next = %08x\n",
 		       cmd, SWAP16(cmd->status), SWAP16(cmd->command),
 		       SWAP32(cmd->b_next));
 		cmd = cmd->v_next;
 	}
 	rfd = lp->rfd_head;
-	printk(KERN_DEBUG "rfd_head = %p\n", rfd);
+	printk(KERN_DEBUG "rfd_head = %pK\n", rfd);
 	do {
 		printk(KERN_DEBUG
-		       "   %p .stat %04x, .cmd %04x, b_next %08x, rbd %08x,"
+		       "   %pK .stat %04x, .cmd %04x, b_next %08x, rbd %08x,"
 		       " count %04x\n",
 		       rfd, SWAP16(rfd->stat), SWAP16(rfd->cmd),
 		       SWAP32(rfd->b_next), SWAP32(rfd->rbd),
@@ -443,10 +443,10 @@ static void i596_display_data(struct net_device *dev)
 		rfd = rfd->v_next;
 	} while (rfd != lp->rfd_head);
 	rbd = lp->rbd_head;
-	printk(KERN_DEBUG "rbd_head = %p\n", rbd);
+	printk(KERN_DEBUG "rbd_head = %pK\n", rbd);
 	do {
 		printk(KERN_DEBUG
-		       "   %p .count %04x, b_next %08x, b_data %08x,"
+		       "   %pK .count %04x, b_next %08x, b_data %08x,"
 		       " size %04x\n",
 			rbd, SWAP16(rbd->count), SWAP32(rbd->b_next),
 		       SWAP32(rbd->b_data), SWAP16(rbd->size));
@@ -654,7 +654,7 @@ static inline int i596_rx(struct net_device *dev)
 	int frames = 0;
 
 	DEB(DEB_RXFRAME, printk(KERN_DEBUG
-				"i596_rx(), rfd_head %p, rbd_head %p\n",
+				"i596_rx(), rfd_head %pK, rbd_head %pK\n",
 				lp->rfd_head, lp->rbd_head));
 
 
@@ -673,7 +673,7 @@ static inline int i596_rx(struct net_device *dev)
 			rbd = NULL;
 		}
 		DEB(DEB_RXFRAME, printk(KERN_DEBUG
-				      "  rfd %p, rfd.rbd %08x, rfd.stat %04x\n",
+				      "  rfd %pK, rfd.rbd %08x, rfd.stat %04x\n",
 				      rfd, rfd->rbd, rfd->stat));
 
 		if (rbd != NULL && (rfd->stat & SWAP16(STAT_OK))) {
@@ -871,7 +871,7 @@ static void i596_add_cmd(struct net_device *dev, struct i596_cmd *cmd)
 	struct i596_dma *dma = lp->dma;
 	unsigned long flags;
 
-	DEB(DEB_ADDCMD, printk(KERN_DEBUG "i596_add_cmd cmd_head %p\n",
+	DEB(DEB_ADDCMD, printk(KERN_DEBUG "i596_add_cmd cmd_head %pK\n",
 			       lp->cmd_head));
 
 	cmd->status = 0;
@@ -974,7 +974,7 @@ static int i596_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	short length = skb->len;
 
 	DEB(DEB_STARTTX, printk(KERN_DEBUG
-				"%s: i596_start_xmit(%x,%p) called\n",
+				"%s: i596_start_xmit(%x,%pK) called\n",
 				dev->name, skb->len, skb->data));
 
 	if (length < ETH_ZLEN) {
@@ -1029,7 +1029,7 @@ static int i596_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 static void print_eth(unsigned char *add, char *str)
 {
-	printk(KERN_DEBUG "i596 0x%p, %pM --> %pM %02X%02X, %s\n",
+	printk(KERN_DEBUG "i596 0x%pK, %pM --> %pM %02X%02X, %s\n",
 	       add, add + 6, add, add[12], add[13], str);
 }
 static const struct net_device_ops i596_netdev_ops = {
@@ -1095,7 +1095,7 @@ static int i82596_probe(struct net_device *dev)
 			      dev->name, dev->base_addr, dev->dev_addr,
 			      dev->irq));
 	DEB(DEB_INIT, printk(KERN_INFO
-			     "%s: dma at 0x%p (%d bytes), lp->scb at 0x%p\n",
+			     "%s: dma at 0x%pK (%d bytes), lp->scb at 0x%pK\n",
 			     dev->name, dma, (int)sizeof(struct i596_dma),
 			     &dma->scb));
 

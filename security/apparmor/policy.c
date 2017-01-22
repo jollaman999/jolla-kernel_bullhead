@@ -278,7 +278,7 @@ static struct aa_namespace *alloc_namespace(const char *prefix,
 	struct aa_namespace *ns;
 
 	ns = kzalloc(sizeof(*ns), GFP_KERNEL);
-	AA_DEBUG("%s(%p)\n", __func__, ns);
+	AA_DEBUG("%s(%pK)\n", __func__, ns);
 	if (!ns)
 		return NULL;
 	if (!policy_init(&ns->base, prefix, name))
@@ -726,7 +726,7 @@ static void free_profile(struct aa_profile *profile)
 {
 	struct aa_profile *p;
 
-	AA_DEBUG("%s(%p)\n", __func__, profile);
+	AA_DEBUG("%s(%pK)\n", __func__, profile);
 
 	if (!profile)
 		return;

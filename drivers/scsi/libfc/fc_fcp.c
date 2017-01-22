@@ -598,7 +598,7 @@ static int fc_fcp_send_data(struct fc_fcp_pkt *fsp, struct fc_seq *seq,
 	t_blen = fsp->max_payload;
 	if (lport->seq_offload) {
 		t_blen = min(seq_blen, (size_t)lport->lso_max);
-		FC_FCP_DBG(fsp, "fsp=%p:lso:blen=%zx lso_max=0x%x t_blen=%zx\n",
+		FC_FCP_DBG(fsp, "fsp=%pK:lso:blen=%zx lso_max=0x%x t_blen=%zx\n",
 			   fsp, seq_blen, lport->lso_max, t_blen);
 	}
 
@@ -1612,7 +1612,7 @@ static void fc_fcp_rec_error(struct fc_fcp_pkt *fsp, struct fc_frame *fp)
 		break;
 
 	default:
-		FC_FCP_DBG(fsp, "REC %p fid %6.6x error unexpected error %d\n",
+		FC_FCP_DBG(fsp, "REC %pK fid %6.6x error unexpected error %d\n",
 			   fsp, fsp->rport->port_id, error);
 		fsp->status_code = FC_CMD_PLOGO;
 		/* fall through */

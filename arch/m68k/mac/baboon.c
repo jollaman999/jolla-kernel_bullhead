@@ -38,7 +38,7 @@ void __init baboon_init(void)
 	baboon = (struct baboon *) BABOON_BASE;
 	baboon_present = 1;
 
-	printk("Baboon detected at %p\n", baboon);
+	printk("Baboon detected at %pK\n", baboon);
 }
 
 /*

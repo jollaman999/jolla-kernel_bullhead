@@ -299,7 +299,7 @@ static ssize_t w1_master_attribute_show_pointer(struct device *dev, struct devic
 	ssize_t count;
 
 	mutex_lock(&md->mutex);
-	count = sprintf(buf, "0x%p\n", md->bus_master);
+	count = sprintf(buf, "0x%pK\n", md->bus_master);
 	mutex_unlock(&md->mutex);
 	return count;
 }
@@ -604,7 +604,7 @@ static int __w1_attach_slave_device(struct w1_slave *sl)
 		 (unsigned int) sl->reg_num.family,
 		 (unsigned long long) sl->reg_num.id);
 
-	dev_dbg(&sl->dev, "%s: registering %s as %p.\n", __func__,
+	dev_dbg(&sl->dev, "%s: registering %s as %pK.\n", __func__,
 		dev_name(&sl->dev), sl);
 
 	err = device_register(&sl->dev);
@@ -717,7 +717,7 @@ void w1_slave_detach(struct w1_slave *sl)
 {
 	struct w1_netlink_msg msg;
 
-	dev_dbg(&sl->dev, "%s: detaching %s [%p].\n", __func__, sl->name, sl);
+	dev_dbg(&sl->dev, "%s: detaching %s [%pK].\n", __func__, sl->name, sl);
 
 	list_del(&sl->w1_slave_entry);
 

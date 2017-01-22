@@ -794,7 +794,7 @@ static int starfire_init_one(struct pci_dev *pdev,
 	if (register_netdev(dev))
 		goto err_out_cleardev;
 
-	printk(KERN_INFO "%s: %s at %p, %pM, IRQ %d.\n",
+	printk(KERN_INFO "%s: %s at %pK, %pM, IRQ %d.\n",
 	       dev->name, netdrv_tbl[chip_idx].name, base,
 	       dev->dev_addr, irq);
 
@@ -1923,7 +1923,7 @@ static int netdev_close(struct net_device *dev)
 			       i, le32_to_cpu(np->tx_ring[i].status),
 			       (long long) dma_to_cpu(np->tx_ring[i].addr),
 			       le32_to_cpu(np->tx_done_q[i].status));
-		printk(KERN_DEBUG "  Rx ring at %#llx -> %p:\n",
+		printk(KERN_DEBUG "  Rx ring at %#llx -> %pK:\n",
 		       (long long) np->rx_ring_dma, np->rx_done_q);
 		if (np->rx_done_q)
 			for (i = 0; i < 8 /* RX_RING_SIZE */; i++) {

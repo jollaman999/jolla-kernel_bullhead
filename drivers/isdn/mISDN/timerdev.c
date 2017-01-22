@@ -53,7 +53,7 @@ mISDN_open(struct inode *ino, struct file *filep)
 	struct mISDNtimerdev	*dev;
 
 	if (*debug & DEBUG_TIMER)
-		printk(KERN_DEBUG "%s(%p,%p)\n", __func__, ino, filep);
+		printk(KERN_DEBUG "%s(%pK,%pK)\n", __func__, ino, filep);
 	dev = kmalloc(sizeof(struct mISDNtimerdev) , GFP_KERNEL);
 	if (!dev)
 		return -ENOMEM;
@@ -75,7 +75,7 @@ mISDN_close(struct inode *ino, struct file *filep)
 	struct mISDNtimer	*timer, *next;
 
 	if (*debug & DEBUG_TIMER)
-		printk(KERN_DEBUG "%s(%p,%p)\n", __func__, ino, filep);
+		printk(KERN_DEBUG "%s(%pK,%pK)\n", __func__, ino, filep);
 
 	spin_lock_irq(&dev->lock);
 	while (!list_empty(list)) {
@@ -105,7 +105,7 @@ mISDN_read(struct file *filep, char __user *buf, size_t count, loff_t *off)
 	int	ret = 0;
 
 	if (*debug & DEBUG_TIMER)
-		printk(KERN_DEBUG "%s(%p, %p, %d, %p)\n", __func__,
+		printk(KERN_DEBUG "%s(%pK, %pK, %d, %pK)\n", __func__,
 		       filep, buf, (int)count, off);
 
 	if (count < sizeof(int))
@@ -146,7 +146,7 @@ mISDN_poll(struct file *filep, poll_table *wait)
 	unsigned int		mask = POLLERR;
 
 	if (*debug & DEBUG_TIMER)
-		printk(KERN_DEBUG "%s(%p, %p)\n", __func__, filep, wait);
+		printk(KERN_DEBUG "%s(%pK, %pK)\n", __func__, filep, wait);
 	if (dev) {
 		poll_wait(filep, &dev->wait, wait);
 		mask = 0;
@@ -228,7 +228,7 @@ mISDN_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 
 
 	if (*debug & DEBUG_TIMER)
-		printk(KERN_DEBUG "%s(%p, %x, %lx)\n", __func__,
+		printk(KERN_DEBUG "%s(%pK, %x, %lx)\n", __func__,
 		       filep, cmd, arg);
 	mutex_lock(&mISDN_mutex);
 	switch (cmd) {

@@ -1048,7 +1048,7 @@ static int ca91cx42_dma_list_add(struct vme_dma_list *list,
 	/* Test descriptor alignment */
 	if ((unsigned long)&entry->descriptor & CA91CX42_DCPP_M) {
 		dev_err(dev, "Descriptor not aligned to 16 byte boundary as "
-			"required: %p\n", &entry->descriptor);
+			"required: %pK\n", &entry->descriptor);
 		retval = -EINVAL;
 		goto err_align;
 	}

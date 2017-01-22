@@ -695,7 +695,7 @@ spider_net_prepare_tx_descr(struct spider_net_card *card,
 	buf = pci_map_single(card->pdev, skb->data, skb->len, PCI_DMA_TODEVICE);
 	if (pci_dma_mapping_error(card->pdev, buf)) {
 		if (netif_msg_tx_err(card) && net_ratelimit())
-			dev_err(&card->netdev->dev, "could not iommu-map packet (%p, %i). "
+			dev_err(&card->netdev->dev, "could not iommu-map packet (%pK, %i). "
 				  "Dropping packet\n", skb->data, skb->len);
 		card->spider_stats.tx_iommu_map_error++;
 		return -ENOMEM;
@@ -1086,7 +1086,7 @@ static void show_rx_chain(struct spider_net_card *card)
 		struct spider_net_hw_descr *hwd = descr->hwdescr;
 		status = spider_net_get_descr_status(hwd);
 		cnt = descr - chain->ring;
-		dev_info(dev, "Descr %d stat=0x%08x skb=%p\n",
+		dev_info(dev, "Descr %d stat=0x%08x skb=%pK\n",
 		         cnt, status, descr->skb);
 		dev_info(dev, "bus addr=%08x buf addr=%08x sz=%d\n",
 		         descr->bus_addr, hwd->buf_addr, hwd->buf_size);

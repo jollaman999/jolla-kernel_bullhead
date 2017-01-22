@@ -286,7 +286,7 @@ SCTP_STATIC int sctp_bind(struct sock *sk, struct sockaddr *addr, int addr_len)
 
 	sctp_lock_sock(sk);
 
-	SCTP_DEBUG_PRINTK("sctp_bind(sk: %p, addr: %p, addr_len: %d)\n",
+	SCTP_DEBUG_PRINTK("sctp_bind(sk: %pK, addr: %pK, addr_len: %d)\n",
 			  sk, addr, addr_len);
 
 	/* Disallow binding twice. */
@@ -347,14 +347,14 @@ SCTP_STATIC int sctp_do_bind(struct sock *sk, union sctp_addr *addr, int len)
 	/* Common sockaddr verification. */
 	af = sctp_sockaddr_af(sp, addr, len);
 	if (!af) {
-		SCTP_DEBUG_PRINTK("sctp_do_bind(sk: %p, newaddr: %p, len: %d) EINVAL\n",
+		SCTP_DEBUG_PRINTK("sctp_do_bind(sk: %pK, newaddr: %pK, len: %d) EINVAL\n",
 				  sk, addr, len);
 		return -EINVAL;
 	}
 
 	snum = ntohs(addr->v4.sin_port);
 
-	SCTP_DEBUG_PRINTK_IPADDR("sctp_do_bind(sk: %p, new addr: ",
+	SCTP_DEBUG_PRINTK_IPADDR("sctp_do_bind(sk: %pK, new addr: ",
 				 ", port: %d, new port: %d, len: %d)\n",
 				 sk,
 				 addr,
@@ -473,7 +473,7 @@ static int sctp_bindx_add(struct sock *sk, struct sockaddr *addrs, int addrcnt)
 	struct sockaddr *sa_addr;
 	struct sctp_af *af;
 
-	SCTP_DEBUG_PRINTK("sctp_bindx_add (sk: %p, addrs: %p, addrcnt: %d)\n",
+	SCTP_DEBUG_PRINTK("sctp_bindx_add (sk: %pK, addrs: %pK, addrcnt: %d)\n",
 			  sk, addrs, addrcnt);
 
 	addr_buf = addrs;
@@ -540,7 +540,7 @@ static int sctp_send_asconf_add_ip(struct sock		*sk,
 	sp = sctp_sk(sk);
 	ep = sp->ep;
 
-	SCTP_DEBUG_PRINTK("%s: (sk: %p, addrs: %p, addrcnt: %d)\n",
+	SCTP_DEBUG_PRINTK("%s: (sk: %pK, addrs: %pK, addrcnt: %d)\n",
 			  __func__, sk, addrs, addrcnt);
 
 	list_for_each_entry(asoc, &ep->asocs, asocs) {
@@ -651,7 +651,7 @@ static int sctp_bindx_rem(struct sock *sk, struct sockaddr *addrs, int addrcnt)
 	union sctp_addr *sa_addr;
 	struct sctp_af *af;
 
-	SCTP_DEBUG_PRINTK("sctp_bindx_rem (sk: %p, addrs: %p, addrcnt: %d)\n",
+	SCTP_DEBUG_PRINTK("sctp_bindx_rem (sk: %pK, addrs: %pK, addrcnt: %d)\n",
 			  sk, addrs, addrcnt);
 
 	addr_buf = addrs;
@@ -745,7 +745,7 @@ static int sctp_send_asconf_del_ip(struct sock		*sk,
 	sp = sctp_sk(sk);
 	ep = sp->ep;
 
-	SCTP_DEBUG_PRINTK("%s: (sk: %p, addrs: %p, addrcnt: %d)\n",
+	SCTP_DEBUG_PRINTK("%s: (sk: %pK, addrs: %pK, addrcnt: %d)\n",
 			  __func__, sk, addrs, addrcnt);
 
 	list_for_each_entry(asoc, &ep->asocs, asocs) {
@@ -813,8 +813,8 @@ static int sctp_send_asconf_del_ip(struct sock		*sk,
 				sin6 = (struct sockaddr_in6 *)addrs;
 				asoc->asconf_addr_del_pending->v6.sin6_addr = sin6->sin6_addr;
 			}
-			SCTP_DEBUG_PRINTK_IPADDR("send_asconf_del_ip: keep the last address asoc: %p ",
-			    " at %p\n", asoc, asoc->asconf_addr_del_pending,
+			SCTP_DEBUG_PRINTK_IPADDR("send_asconf_del_ip: keep the last address asoc: %pK ",
+			    " at %pK\n", asoc, asoc->asconf_addr_del_pending,
 			    asoc->asconf_addr_del_pending);
 			asoc->src_out_of_asoc_ok = 1;
 			stored = 1;
@@ -980,7 +980,7 @@ SCTP_STATIC int sctp_setsockopt_bindx(struct sock* sk,
 	void *addr_buf;
 	struct sctp_af *af;
 
-	SCTP_DEBUG_PRINTK("sctp_setsockopt_bindx: sk %p addrs %p"
+	SCTP_DEBUG_PRINTK("sctp_setsockopt_bindx: sk %pK addrs %pK"
 			  " addrs_size %d opt %d\n", sk, addrs, addrs_size, op);
 
 	if (unlikely(addrs_size <= 0))
@@ -1240,8 +1240,8 @@ static int __sctp_connect(struct sock* sk,
 
 out_free:
 
-	SCTP_DEBUG_PRINTK("About to exit __sctp_connect() free asoc: %p"
-			  " kaddrs: %p err: %d\n",
+	SCTP_DEBUG_PRINTK("About to exit __sctp_connect() free asoc: %pK"
+			  " kaddrs: %pK err: %d\n",
 			  asoc, kaddrs, err);
 	if (asoc) {
 		/* sctp_primitive_ASSOCIATE may have added this association
@@ -1324,7 +1324,7 @@ SCTP_STATIC int __sctp_setsockopt_connectx(struct sock* sk,
 	int err = 0;
 	struct sockaddr *kaddrs;
 
-	SCTP_DEBUG_PRINTK("%s - sk %p addrs %p addrs_size %d\n",
+	SCTP_DEBUG_PRINTK("%s - sk %pK addrs %pK addrs_size %d\n",
 			  __func__, sk, addrs, addrs_size);
 
 	if (unlikely(addrs_size <= 0))
@@ -1498,7 +1498,7 @@ SCTP_STATIC void sctp_close(struct sock *sk, long timeout)
 	struct list_head *pos, *temp;
 	unsigned int data_was_unread;
 
-	SCTP_DEBUG_PRINTK("sctp_close(sk: 0x%p, timeout:%ld)\n", sk, timeout);
+	SCTP_DEBUG_PRINTK("sctp_close(sk: 0x%pK, timeout:%ld)\n", sk, timeout);
 
 	sctp_lock_sock(sk);
 	sk->sk_shutdown = SHUTDOWN_MASK;
@@ -1625,14 +1625,14 @@ SCTP_STATIC int sctp_sendmsg(struct kiocb *iocb, struct sock *sk,
 	struct sctp_datamsg *datamsg;
 	int msg_flags = msg->msg_flags;
 
-	SCTP_DEBUG_PRINTK("sctp_sendmsg(sk: %p, msg: %p, msg_len: %zu)\n",
+	SCTP_DEBUG_PRINTK("sctp_sendmsg(sk: %pK, msg: %pK, msg_len: %zu)\n",
 			  sk, msg, msg_len);
 
 	err = 0;
 	sp = sctp_sk(sk);
 	ep = sp->ep;
 
-	SCTP_DEBUG_PRINTK("Using endpoint: %p.\n", ep);
+	SCTP_DEBUG_PRINTK("Using endpoint: %pK.\n", ep);
 
 	/* We cannot send a message over a TCP-style listening socket. */
 	if (sctp_style(sk, TCP) && sctp_sstate(sk, LISTENING)) {
@@ -1736,7 +1736,7 @@ SCTP_STATIC int sctp_sendmsg(struct kiocb *iocb, struct sock *sk,
 	}
 
 	if (asoc) {
-		SCTP_DEBUG_PRINTK("Just looked up association: %p.\n", asoc);
+		SCTP_DEBUG_PRINTK("Just looked up association: %pK.\n", asoc);
 
 		/* We cannot send a message on a TCP-style SCTP_SS_ESTABLISHED
 		 * socket that has an association in CLOSED state. This can
@@ -1749,7 +1749,7 @@ SCTP_STATIC int sctp_sendmsg(struct kiocb *iocb, struct sock *sk,
 		}
 
 		if (sinfo_flags & SCTP_EOF) {
-			SCTP_DEBUG_PRINTK("Shutting down association: %p\n",
+			SCTP_DEBUG_PRINTK("Shutting down association: %pK\n",
 					  asoc);
 			sctp_primitive_SHUTDOWN(net, asoc, NULL);
 			err = 0;
@@ -1763,7 +1763,7 @@ SCTP_STATIC int sctp_sendmsg(struct kiocb *iocb, struct sock *sk,
 				goto out_unlock;
 			}
 
-			SCTP_DEBUG_PRINTK("Aborting association: %p\n", asoc);
+			SCTP_DEBUG_PRINTK("Aborting association: %pK\n", asoc);
 			sctp_primitive_ABORT(net, asoc, chunk);
 			err = 0;
 			goto out_unlock;
@@ -2072,8 +2072,8 @@ SCTP_STATIC int sctp_recvmsg(struct kiocb *iocb, struct sock *sk,
 	int err = 0;
 	int skb_len;
 
-	SCTP_DEBUG_PRINTK("sctp_recvmsg(%s: %p, %s: %p, %s: %zd, %s: %d, %s: "
-			  "0x%x, %s: %p)\n", "sk", sk, "msghdr", msg,
+	SCTP_DEBUG_PRINTK("sctp_recvmsg(%s: %pK, %s: %pK, %s: %zd, %s: %d, %s: "
+			  "0x%x, %s: %pK)\n", "sk", sk, "msghdr", msg,
 			  "len", len, "knoblauch", noblock,
 			  "flags", flags, "addr_len", addr_len);
 
@@ -3597,7 +3597,7 @@ SCTP_STATIC int sctp_setsockopt(struct sock *sk, int level, int optname,
 {
 	int retval = 0;
 
-	SCTP_DEBUG_PRINTK("sctp_setsockopt(sk: %p... optname: %d)\n",
+	SCTP_DEBUG_PRINTK("sctp_setsockopt(sk: %pK... optname: %d)\n",
 			  sk, optname);
 
 	/* I can hardly begin to describe how wrong this is.  This is
@@ -3760,7 +3760,7 @@ SCTP_STATIC int sctp_connect(struct sock *sk, struct sockaddr *addr,
 
 	sctp_lock_sock(sk);
 
-	SCTP_DEBUG_PRINTK("%s - sk: %p, sockaddr: %p, addr_len: %d\n",
+	SCTP_DEBUG_PRINTK("%s - sk: %pK, sockaddr: %pK, addr_len: %d\n",
 			  __func__, sk, addr, addr_len);
 
 	/* Validate addr_len before calling common connect/connectx routine. */
@@ -3892,7 +3892,7 @@ SCTP_STATIC int sctp_init_sock(struct sock *sk)
 	struct sctp_endpoint *ep;
 	struct sctp_sock *sp;
 
-	SCTP_DEBUG_PRINTK("sctp_init_sock(sk: %p)\n", sk);
+	SCTP_DEBUG_PRINTK("sctp_init_sock(sk: %pK)\n", sk);
 
 	sp = sctp_sk(sk);
 
@@ -4036,7 +4036,7 @@ SCTP_STATIC void sctp_destroy_sock(struct sock *sk)
 {
 	struct sctp_sock *sp;
 
-	SCTP_DEBUG_PRINTK("sctp_destroy_sock(sk: %p)\n", sk);
+	SCTP_DEBUG_PRINTK("sctp_destroy_sock(sk: %pK)\n", sk);
 
 	/* Release our hold on the endpoint. */
 	sp = sctp_sk(sk);
@@ -4368,7 +4368,7 @@ static int sctp_getsockopt_peeloff(struct sock *sk, int len, char __user *optval
 		return PTR_ERR(newfile);
 	}
 
-	SCTP_DEBUG_PRINTK("%s: sk: %p newsk: %p sd: %d\n",
+	SCTP_DEBUG_PRINTK("%s: sk: %pK newsk: %pK sd: %d\n",
 			  __func__, sk, newsock->sk, retval);
 
 	/* Return the fd mapped to the new socket.  */
@@ -5751,7 +5751,7 @@ SCTP_STATIC int sctp_getsockopt(struct sock *sk, int level, int optname,
 	int retval = 0;
 	int len;
 
-	SCTP_DEBUG_PRINTK("sctp_getsockopt(sk: %p... optname: %d)\n",
+	SCTP_DEBUG_PRINTK("sctp_getsockopt(sk: %pK... optname: %d)\n",
 			  sk, optname);
 
 	/* I can hardly begin to describe how wrong this is.  This is
@@ -6693,7 +6693,7 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
 	long current_timeo = *timeo_p;
 	DEFINE_WAIT(wait);
 
-	SCTP_DEBUG_PRINTK("wait_for_sndbuf: asoc=%p, timeo=%ld, msg_len=%zu\n",
+	SCTP_DEBUG_PRINTK("wait_for_sndbuf: asoc=%pK, timeo=%ld, msg_len=%zu\n",
 			  asoc, (long)(*timeo_p), msg_len);
 
 	/* Increment the association's refcnt.  */
@@ -6800,7 +6800,7 @@ static int sctp_wait_for_connect(struct sctp_association *asoc, long *timeo_p)
 	long current_timeo = *timeo_p;
 	DEFINE_WAIT(wait);
 
-	SCTP_DEBUG_PRINTK("%s: asoc=%p, timeo=%ld\n", __func__, asoc,
+	SCTP_DEBUG_PRINTK("%s: asoc=%pK, timeo=%ld\n", __func__, asoc,
 			  (long)(*timeo_p));
 
 	/* Increment the association's refcnt.  */

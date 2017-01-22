@@ -343,7 +343,7 @@ inittiger(struct tiger_hw *card)
 	card->send.size = NJ_DMA_TXSIZE;
 
 	if (debug & DEBUG_HW)
-		pr_notice("%s: send buffer phy %#x - %#x - %#x  virt %p"
+		pr_notice("%s: send buffer phy %#x - %#x - %#x  virt %pK"
 			  " size %zu u32\n", card->name,
 			  card->send.dmastart, card->send.dmairq,
 			  card->send.dmaend, card->send.start, card->send.size);
@@ -361,7 +361,7 @@ inittiger(struct tiger_hw *card)
 	card->recv.size = NJ_DMA_RXSIZE;
 
 	if (debug & DEBUG_HW)
-		pr_notice("%s: recv buffer phy %#x - %#x - %#x  virt %p"
+		pr_notice("%s: recv buffer phy %#x - %#x - %#x  virt %pK"
 			  " size %zu u32\n", card->name,
 			  card->recv.dmastart, card->recv.dmairq,
 			  card->recv.dmaend, card->recv.start, card->recv.size);
@@ -808,7 +808,7 @@ nj_bctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	int ret = -EINVAL;
 	u_long flags;
 
-	pr_debug("%s: %s cmd:%x %p\n", card->name, __func__, cmd, arg);
+	pr_debug("%s: %s cmd:%x %pK\n", card->name, __func__, cmd, arg);
 	switch (cmd) {
 	case CLOSE_CHANNEL:
 		test_and_clear_bit(FLG_OPEN, &bch->Flags);
@@ -889,7 +889,7 @@ nj_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 	struct channel_req	*rq;
 	int			err = 0;
 
-	pr_debug("%s: %s cmd:%x %p\n", card->name, __func__, cmd, arg);
+	pr_debug("%s: %s cmd:%x %pK\n", card->name, __func__, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
 		rq = arg;
@@ -903,7 +903,7 @@ nj_dctrl(struct mISDNchannel *ch, u32 cmd, void *arg)
 			pr_info("%s: cannot get module\n", card->name);
 		break;
 	case CLOSE_CHANNEL:
-		pr_debug("%s: dev(%d) close from %p\n", card->name, dch->dev.id,
+		pr_debug("%s: dev(%d) close from %pK\n", card->name, dch->dev.id,
 			 __builtin_return_address(0));
 		module_put(THIS_MODULE);
 		break;

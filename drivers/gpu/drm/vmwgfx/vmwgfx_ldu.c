@@ -236,7 +236,7 @@ static int vmw_ldu_crtc_set_config(struct drm_mode_set *set)
 
 	if (set->num_connectors == 1 &&
 	    set->connectors[0] != &ldu->base.connector) {
-		DRM_ERROR("connector doesn't match %p %p\n",
+		DRM_ERROR("connector doesn't match %pK %pK\n",
 			set->connectors[0], &ldu->base.connector);
 		return -EINVAL;
 	}

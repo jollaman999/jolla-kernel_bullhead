@@ -171,7 +171,7 @@ out:
 		kfree(map);
 	}
 
-	rdsdebug("map %p for addr %x\n", ret, be32_to_cpu(addr));
+	rdsdebug("map %pK for addr %x\n", ret, be32_to_cpu(addr));
 
 	return ret;
 }
@@ -184,7 +184,7 @@ void rds_cong_add_conn(struct rds_connection *conn)
 {
 	unsigned long flags;
 
-	rdsdebug("conn %p now on map %p\n", conn, conn->c_lcong);
+	rdsdebug("conn %pK now on map %pK\n", conn, conn->c_lcong);
 	spin_lock_irqsave(&rds_cong_lock, flags);
 	list_add_tail(&conn->c_map_item, &conn->c_lcong->m_conn_list);
 	spin_unlock_irqrestore(&rds_cong_lock, flags);
@@ -194,7 +194,7 @@ void rds_cong_remove_conn(struct rds_connection *conn)
 {
 	unsigned long flags;
 
-	rdsdebug("removing conn %p from map %p\n", conn, conn->c_lcong);
+	rdsdebug("removing conn %pK from map %pK\n", conn, conn->c_lcong);
 	spin_lock_irqsave(&rds_cong_lock, flags);
 	list_del_init(&conn->c_map_item);
 	spin_unlock_irqrestore(&rds_cong_lock, flags);
@@ -230,7 +230,7 @@ void rds_cong_queue_updates(struct rds_cong_map *map)
 
 void rds_cong_map_updated(struct rds_cong_map *map, uint64_t portmask)
 {
-	rdsdebug("waking map %p for %pI4\n",
+	rdsdebug("waking map %pK for %pI4\n",
 	  map, &map->m_addr);
 	rds_stats_inc(s_cong_update_received);
 	atomic_inc(&rds_cong_generation);
@@ -279,7 +279,7 @@ void rds_cong_set_bit(struct rds_cong_map *map, __be16 port)
 	unsigned long i;
 	unsigned long off;
 
-	rdsdebug("setting congestion for %pI4:%u in map %p\n",
+	rdsdebug("setting congestion for %pI4:%u in map %pK\n",
 	  &map->m_addr, ntohs(port), map);
 
 	i = be16_to_cpu(port) / RDS_CONG_MAP_PAGE_BITS;
@@ -293,7 +293,7 @@ void rds_cong_clear_bit(struct rds_cong_map *map, __be16 port)
 	unsigned long i;
 	unsigned long off;
 
-	rdsdebug("clearing congestion for %pI4:%u in map %p\n",
+	rdsdebug("clearing congestion for %pI4:%u in map %pK\n",
 	  &map->m_addr, ntohs(port), map);
 
 	i = be16_to_cpu(port) / RDS_CONG_MAP_PAGE_BITS;
@@ -368,7 +368,7 @@ int rds_cong_wait(struct rds_cong_map *map, __be16 port, int nonblock,
 	}
 
 	rds_stats_inc(s_cong_send_blocked);
-	rdsdebug("waiting on map %p for port %u\n", map, be16_to_cpu(port));
+	rdsdebug("waiting on map %pK for port %u\n", map, be16_to_cpu(port));
 
 	return wait_event_interruptible(map->m_waitq,
 					!rds_cong_test_bit(map, port));
@@ -382,7 +382,7 @@ void rds_cong_exit(void)
 
 	while ((node = rb_first(&rds_cong_tree))) {
 		map = rb_entry(node, struct rds_cong_map, m_rb_node);
-		rdsdebug("freeing map %p\n", map);
+		rdsdebug("freeing map %pK\n", map);
 		rb_erase(&map->m_rb_node, &rds_cong_tree);
 		for (i = 0; i < RDS_CONG_MAP_PAGES && map->m_page_addrs[i]; i++)
 			free_page(map->m_page_addrs[i]);

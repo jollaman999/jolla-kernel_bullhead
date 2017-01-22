@@ -464,7 +464,7 @@ gss_unwrap(struct gss_ctx	*ctx_id,
 u32
 gss_delete_sec_context(struct gss_ctx	**context_handle)
 {
-	dprintk("RPC:       gss_delete_sec_context deleting %p\n",
+	dprintk("RPC:       gss_delete_sec_context deleting %pK\n",
 			*context_handle);
 
 	if (!*context_handle)

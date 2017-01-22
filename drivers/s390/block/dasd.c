@@ -299,7 +299,7 @@ static int dasd_state_basic_to_known(struct dasd_device *device)
 	if (device->debugfs_dentry)
 		debugfs_remove(device->debugfs_dentry);
 
-	DBF_DEV_EVENT(DBF_EMERG, device, "%p debug area deleted", device);
+	DBF_DEV_EVENT(DBF_EMERG, device, "%pK debug area deleted", device);
 	if (device->debug_area != NULL) {
 		debug_unregister(device->debug_area);
 		device->debug_area = NULL;
@@ -1364,7 +1364,7 @@ int dasd_term_IO(struct dasd_ccw_req *cqr)
 			cqr->stopclk = get_tod_clock();
 			cqr->starttime = 0;
 			DBF_DEV_EVENT(DBF_DEBUG, device,
-				      "terminate cqr %p successful",
+				      "terminate cqr %pK successful",
 				      cqr);
 			break;
 		case -ENODEV:
@@ -1415,7 +1415,7 @@ int dasd_start_IO(struct dasd_ccw_req *cqr)
 	      test_bit(DASD_FLAG_LOCK_STOLEN, &cqr->block->base->flags)) ||
 	     test_bit(DASD_FLAG_LOCK_STOLEN, &device->flags)) &&
 	    !test_bit(DASD_CQR_ALLOW_SLOCK, &cqr->flags)) {
-		DBF_DEV_EVENT(DBF_DEBUG, device, "start_IO: return request %p "
+		DBF_DEV_EVENT(DBF_DEBUG, device, "start_IO: return request %pK "
 			      "because of stolen lock", cqr);
 		cqr->status = DASD_CQR_ERROR;
 		cqr->intrc = -EPERM;
@@ -1423,7 +1423,7 @@ int dasd_start_IO(struct dasd_ccw_req *cqr)
 	}
 	if (cqr->retries < 0) {
 		/* internal error 14 - start_IO run out of retries */
-		sprintf(errorstring, "14 %p", cqr);
+		sprintf(errorstring, "14 %pK", cqr);
 		dev_err(&device->cdev->dev, "An error occurred in the DASD "
 			"device driver, reason=%s\n", errorstring);
 		cqr->status = DASD_CQR_ERROR;
@@ -1834,7 +1834,7 @@ static void __dasd_device_process_final_queue(struct dasd_device *device,
 			break;
 		default:
 			/* internal error 12 - wrong cqr status*/
-			snprintf(errorstring, ERRORLENGTH, "12 %p %x02", cqr, cqr->status);
+			snprintf(errorstring, ERRORLENGTH, "12 %pK %x02", cqr, cqr->status);
 			dev_err(&device->cdev->dev,
 				"An error occurred in the DASD device driver, "
 				"reason=%s\n", errorstring);
@@ -1870,14 +1870,14 @@ static void __dasd_device_check_expire(struct dasd_device *device)
 		if (device->discipline->term_IO(cqr) != 0) {
 			/* Hmpf, try again in 5 sec */
 			dev_err(&device->cdev->dev,
-				"cqr %p timed out (%lus) but cannot be "
+				"cqr %pK timed out (%lus) but cannot be "
 				"ended, retrying in 5 s\n",
 				cqr, (cqr->expires/HZ));
 			cqr->expires += 5*HZ;
 			dasd_device_set_timer(device, 5*HZ);
 		} else {
 			dev_err(&device->cdev->dev,
-				"cqr %p timed out (%lus), %i retries "
+				"cqr %pK timed out (%lus), %i retries "
 				"remaining\n", cqr, (cqr->expires/HZ),
 				cqr->retries);
 		}
@@ -1966,7 +1966,7 @@ int dasd_flush_device_queue(struct dasd_device *device)
 				/* unable to terminate requeust */
 				dev_err(&device->cdev->dev,
 					"Flushing the DASD request queue "
-					"failed for request %p\n", cqr);
+					"failed for request %pK\n", cqr);
 				/* stop flush processing */
 				goto finished;
 			}
@@ -2426,7 +2426,7 @@ int dasd_cancel_req(struct dasd_ccw_req *cqr)
 		rc = device->discipline->term_IO(cqr);
 		if (rc) {
 			dev_err(&device->cdev->dev,
-				"Cancelling request %p failed with rc=%d\n",
+				"Cancelling request %pK failed with rc=%d\n",
 				cqr, rc);
 		} else {
 			cqr->stopclk = get_tod_clock();
@@ -2531,7 +2531,7 @@ static void __dasd_process_request_queue(struct dasd_block *block)
 		if (basedev->features & DASD_FEATURE_READONLY &&
 		    rq_data_dir(req) == WRITE) {
 			DBF_DEV_EVENT(DBF_ERR, basedev,
-				      "Rejecting write request %p",
+				      "Rejecting write request %pK",
 				      req);
 			blk_start_request(req);
 			__blk_end_request_all(req, -EIO);
@@ -2563,7 +2563,7 @@ static void __dasd_process_request_queue(struct dasd_block *block)
 			}
 			DBF_DEV_EVENT(DBF_ERR, basedev,
 				      "CCW creation failed (rc=%ld) "
-				      "on request %p",
+				      "on request %pK",
 				      PTR_ERR(cqr), req);
 			blk_start_request(req);
 			__blk_end_request_all(req, -EIO);
@@ -3522,7 +3522,7 @@ int dasd_generic_pm_freeze(struct ccw_device *cdev)
 			if (rc) {
 				/* unable to terminate requeust */
 				dev_err(&device->cdev->dev,
-					"Unable to terminate request %p "
+					"Unable to terminate request %pK "
 					"on suspend\n", cqr);
 				spin_unlock_irq(get_ccwdev_lock(cdev));
 				dasd_put_device(device);

@@ -179,7 +179,7 @@ void kvmppc_dump_regs(struct kvm_vcpu *vcpu)
 {
 	int r;
 
-	pr_err("vcpu %p (%d):\n", vcpu, vcpu->vcpu_id);
+	pr_err("vcpu %pK (%d):\n", vcpu, vcpu->vcpu_id);
 	pr_err("pc  = %.16lx  msr = %.16llx  trap = %x\n",
 	       vcpu->arch.pc, vcpu->arch.shregs.msr, vcpu->arch.trap);
 	for (r = 0; r < 16; ++r)

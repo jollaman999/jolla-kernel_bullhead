@@ -95,7 +95,7 @@ DECLARE_EVENT_CLASS(msm_vidc_common,
 		__entry->new_state = new_state;
 	),
 
-	TP_printk("Moved inst: %p from 0x%x to 0x%x",
+	TP_printk("Moved inst: %pK from 0x%x to 0x%x",
 		__entry->instp,
 		__entry->old_state,
 		__entry->new_state)

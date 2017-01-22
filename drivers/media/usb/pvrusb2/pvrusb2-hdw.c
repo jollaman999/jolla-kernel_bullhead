@@ -2249,12 +2249,12 @@ static void pvr2_hdw_setup_low(struct pvr2_hdw *hdw)
 	hdw->vid_stream = pvr2_stream_create();
 	if (!pvr2_hdw_dev_ok(hdw)) return;
 	pvr2_trace(PVR2_TRACE_INIT,
-		   "pvr2_hdw_setup: video stream is %p",hdw->vid_stream);
+		   "pvr2_hdw_setup: video stream is %pK",hdw->vid_stream);
 	if (hdw->vid_stream) {
 		idx = get_default_error_tolerance(hdw);
 		if (idx) {
 			pvr2_trace(PVR2_TRACE_INIT,
-				   "pvr2_hdw_setup: video stream %p"
+				   "pvr2_hdw_setup: video stream %pK"
 				   " setting tolerance %u",
 				   hdw->vid_stream,idx);
 		}
@@ -2275,11 +2275,11 @@ static void pvr2_hdw_setup_low(struct pvr2_hdw *hdw)
    internally as part of the create() step. */
 static void pvr2_hdw_setup(struct pvr2_hdw *hdw)
 {
-	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_setup(hdw=%p) begin",hdw);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_setup(hdw=%pK) begin",hdw);
 	do {
 		pvr2_hdw_setup_low(hdw);
 		pvr2_trace(PVR2_TRACE_INIT,
-			   "pvr2_hdw_setup(hdw=%p) done, ok=%d init_ok=%d",
+			   "pvr2_hdw_setup(hdw=%pK) done, ok=%d init_ok=%d",
 			   hdw,pvr2_hdw_dev_ok(hdw),hdw->flag_init_ok);
 		if (pvr2_hdw_dev_ok(hdw)) {
 			if (hdw->flag_init_ok) {
@@ -2347,7 +2347,7 @@ static void pvr2_hdw_setup(struct pvr2_hdw *hdw)
 				" in order to recover.");
 		}
 	} while (0);
-	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_setup(hdw=%p) end",hdw);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_setup(hdw=%pK) end",hdw);
 }
 
 
@@ -2406,7 +2406,7 @@ struct pvr2_hdw *pvr2_hdw_create(struct usb_interface *intf,
 	}
 
 	hdw = kzalloc(sizeof(*hdw),GFP_KERNEL);
-	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_create: hdw=%p, type \"%s\"",
+	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_create: hdw=%pK, type \"%s\"",
 		   hdw,hdw_desc->description);
 	pvr2_trace(PVR2_TRACE_INFO, "Hardware description: %s",
 		hdw_desc->description);
@@ -2675,7 +2675,7 @@ struct pvr2_hdw *pvr2_hdw_create(struct usb_interface *intf,
 static void pvr2_hdw_remove_usb_stuff(struct pvr2_hdw *hdw)
 {
 	if (hdw->flag_disconnected) return;
-	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_remove_usb_stuff: hdw=%p",hdw);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_remove_usb_stuff: hdw=%pK",hdw);
 	if (hdw->ctl_read_urb) {
 		usb_kill_urb(hdw->ctl_read_urb);
 		usb_free_urb(hdw->ctl_read_urb);
@@ -2709,7 +2709,7 @@ static void pvr2_hdw_remove_usb_stuff(struct pvr2_hdw *hdw)
 void pvr2_hdw_destroy(struct pvr2_hdw *hdw)
 {
 	if (!hdw) return;
-	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_destroy: hdw=%p",hdw);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_destroy: hdw=%pK",hdw);
 	if (hdw->workqueue) {
 		flush_workqueue(hdw->workqueue);
 		destroy_workqueue(hdw->workqueue);
@@ -2752,7 +2752,7 @@ int pvr2_hdw_dev_ok(struct pvr2_hdw *hdw)
 /* Called when hardware has been unplugged */
 void pvr2_hdw_disconnect(struct pvr2_hdw *hdw)
 {
-	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_disconnect(hdw=%p)",hdw);
+	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_disconnect(hdw=%pK)",hdw);
 	LOCK_TAKE(hdw->big_lock);
 	LOCK_TAKE(hdw->ctl_lock);
 	pvr2_hdw_remove_usb_stuff(hdw);

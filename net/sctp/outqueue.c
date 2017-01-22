@@ -299,7 +299,7 @@ int sctp_outq_tail(struct sctp_outq *q, struct sctp_chunk *chunk)
 	struct net *net = sock_net(q->asoc->base.sk);
 	int error = 0;
 
-	SCTP_DEBUG_PRINTK("sctp_outq_tail(%p, %p[%s])\n",
+	SCTP_DEBUG_PRINTK("sctp_outq_tail(%pK, %pK[%s])\n",
 			  q, chunk, chunk && chunk->chunk_hdr ?
 			  sctp_cname(SCTP_ST_CHUNK(chunk->chunk_hdr->type))
 			  : "Illegal Chunk");
@@ -328,7 +328,7 @@ int sctp_outq_tail(struct sctp_outq *q, struct sctp_chunk *chunk)
 			break;
 
 		default:
-			SCTP_DEBUG_PRINTK("outqueueing (%p, %p[%s])\n",
+			SCTP_DEBUG_PRINTK("outqueueing (%pK, %pK[%s])\n",
 			  q, chunk, chunk && chunk->chunk_hdr ?
 			  sctp_cname(SCTP_ST_CHUNK(chunk->chunk_hdr->type))
 			  : "Illegal Chunk");
@@ -460,7 +460,7 @@ void sctp_retransmit_mark(struct sctp_outq *q,
 		}
 	}
 
-	SCTP_DEBUG_PRINTK("%s: transport: %p, reason: %d, "
+	SCTP_DEBUG_PRINTK("%s: transport: %pK, reason: %d, "
 			  "cwnd: %d, ssthresh: %d, flight_size: %d, "
 			  "pba: %d\n", __func__,
 			  transport, reason,
@@ -1014,7 +1014,7 @@ static int sctp_outq_flush(struct sctp_outq *q, int rtx_timeout)
 				sctp_transport_burst_limited(transport);
 			}
 
-			SCTP_DEBUG_PRINTK("sctp_outq_flush(%p, %p[%s]), ",
+			SCTP_DEBUG_PRINTK("sctp_outq_flush(%pK, %pK[%s]), ",
 					  q, chunk,
 					  chunk && chunk->chunk_hdr ?
 					  sctp_cname(SCTP_ST_CHUNK(
@@ -1022,7 +1022,7 @@ static int sctp_outq_flush(struct sctp_outq *q, int rtx_timeout)
 					  : "Illegal Chunk");
 
 			SCTP_DEBUG_PRINTK("TX TSN 0x%x skb->head "
-					"%p skb->users %d.\n",
+					"%pK skb->users %d.\n",
 					ntohl(chunk->subh.data_hdr->tsn),
 					chunk->skb ?chunk->skb->head : NULL,
 					chunk->skb ?
@@ -1287,7 +1287,7 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 	SCTP_DEBUG_PRINTK("%s: sack Cumulative TSN Ack is 0x%x.\n",
 			  __func__, sack_ctsn);
 	SCTP_DEBUG_PRINTK("%s: Cumulative TSN Ack of association, "
-			  "%p is 0x%x. Adv peer ack point: 0x%x\n",
+			  "%pK is 0x%x. Adv peer ack point: 0x%x\n",
 			  __func__, asoc, ctsn, asoc->adv_peer_ack_point);
 
 	/* See if all chunks are acked.
@@ -1762,7 +1762,7 @@ static void sctp_mark_missing(struct sctp_outq *q,
 		if (do_fast_retransmit)
 			sctp_retransmit(q, transport, SCTP_RTXR_FAST_RTX);
 
-		SCTP_DEBUG_PRINTK("%s: transport: %p, cwnd: %d, "
+		SCTP_DEBUG_PRINTK("%s: transport: %pK, cwnd: %d, "
 				  "ssthresh: %d, flight_size: %d, pba: %d\n",
 				  __func__, transport, transport->cwnd,
 				  transport->ssthresh, transport->flight_size,

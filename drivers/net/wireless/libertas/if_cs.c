@@ -501,7 +501,7 @@ dat_err:
 	if_cs_write16(priv->card, IF_CS_HOST_INT_CAUSE, IF_CS_BIT_RX);
 
 out:
-	lbs_deb_leave_args(LBS_DEB_CS, "ret %p", skb);
+	lbs_deb_leave_args(LBS_DEB_CS, "ret %pK", skb);
 	return skb;
 }
 

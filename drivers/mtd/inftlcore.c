@@ -213,7 +213,7 @@ static u16 INFTL_findfreeblock(struct INFTLrecord *inftl, int desperate)
 	u16 pot = inftl->LastFreeEUN;
 	int silly = inftl->nb_blocks;
 
-	pr_debug("INFTL: INFTL_findfreeblock(inftl=%p,desperate=%d)\n",
+	pr_debug("INFTL: INFTL_findfreeblock(inftl=%pK,desperate=%d)\n",
 			inftl, desperate);
 
 	/*
@@ -257,7 +257,7 @@ static u16 INFTL_foldchain(struct INFTLrecord *inftl, unsigned thisVUC, unsigned
 	struct inftl_oob oob;
 	size_t retlen;
 
-	pr_debug("INFTL: INFTL_foldchain(inftl=%p,thisVUC=%d,pending=%d)\n",
+	pr_debug("INFTL: INFTL_foldchain(inftl=%pK,thisVUC=%d,pending=%d)\n",
 			inftl, thisVUC, pendingblock);
 
 	memset(BlockMap, 0xff, sizeof(BlockMap));
@@ -419,7 +419,7 @@ static u16 INFTL_makefreeblock(struct INFTLrecord *inftl, unsigned pendingblock)
 	u16 ChainLength = 0, thislen;
 	u16 chain, EUN;
 
-	pr_debug("INFTL: INFTL_makefreeblock(inftl=%p,"
+	pr_debug("INFTL: INFTL_makefreeblock(inftl=%pK,"
 		"pending=%d)\n", inftl, pendingblock);
 
 	for (chain = 0; chain < inftl->nb_blocks; chain++) {
@@ -482,7 +482,7 @@ static inline u16 INFTL_findwriteunit(struct INFTLrecord *inftl, unsigned block)
 	size_t retlen;
 	int silly, silly2 = 3;
 
-	pr_debug("INFTL: INFTL_findwriteunit(inftl=%p,block=%d)\n",
+	pr_debug("INFTL: INFTL_findwriteunit(inftl=%pK,block=%d)\n",
 			inftl, block);
 
 	do {
@@ -645,7 +645,7 @@ static void INFTL_trydeletechain(struct INFTLrecord *inftl, unsigned thisVUC)
 	struct inftl_bci bci;
 	size_t retlen;
 
-	pr_debug("INFTL: INFTL_trydeletechain(inftl=%p,"
+	pr_debug("INFTL: INFTL_trydeletechain(inftl=%pK,"
 		"thisVUC=%d)\n", inftl, thisVUC);
 
 	memset(BlockUsed, 0, sizeof(BlockUsed));
@@ -765,7 +765,7 @@ static int INFTL_deleteblock(struct INFTLrecord *inftl, unsigned block)
 	size_t retlen;
 	struct inftl_bci bci;
 
-	pr_debug("INFTL: INFTL_deleteblock(inftl=%p,"
+	pr_debug("INFTL: INFTL_deleteblock(inftl=%pK,"
 		"block=%d)\n", inftl, block);
 
 	while (thisEUN < inftl->nb_blocks) {
@@ -824,8 +824,8 @@ static int inftl_writeblock(struct mtd_blktrans_dev *mbd, unsigned long block,
 	struct inftl_oob oob;
 	char *p, *pend;
 
-	pr_debug("INFTL: inftl_writeblock(inftl=%p,block=%ld,"
-		"buffer=%p)\n", inftl, block, buffer);
+	pr_debug("INFTL: inftl_writeblock(inftl=%pK,block=%ld,"
+		"buffer=%pK)\n", inftl, block, buffer);
 
 	/* Is block all zero? */
 	pend = buffer + SECTORSIZE;
@@ -874,8 +874,8 @@ static int inftl_readblock(struct mtd_blktrans_dev *mbd, unsigned long block,
 	struct inftl_bci bci;
 	size_t retlen;
 
-	pr_debug("INFTL: inftl_readblock(inftl=%p,block=%ld,"
-		"buffer=%p)\n", inftl, block, buffer);
+	pr_debug("INFTL: inftl_readblock(inftl=%pK,block=%ld,"
+		"buffer=%pK)\n", inftl, block, buffer);
 
 	while (thisEUN < inftl->nb_blocks) {
 		if (inftl_read_oob(mtd, (thisEUN * inftl->EraseSize) +

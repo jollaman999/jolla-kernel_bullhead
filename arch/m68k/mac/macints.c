@@ -319,7 +319,7 @@ irqreturn_t mac_nmi_handler(int irq, void *dev_id)
 #if 0
 		struct pt_regs *fp = get_irq_regs();
 		show_state();
-		printk("PC: %08lx\nSR: %04x  SP: %p\n", fp->pc, fp->sr, fp);
+		printk("PC: %08lx\nSR: %04x  SP: %pK\n", fp->pc, fp->sr, fp);
 		printk("d0: %08lx    d1: %08lx    d2: %08lx    d3: %08lx\n",
 		       fp->d0, fp->d1, fp->d2, fp->d3);
 		printk("d4: %08lx    d5: %08lx    a0: %08lx    a1: %08lx\n",

@@ -670,8 +670,8 @@ func_cont:
 		drv_proc_node_update_status(node_res, true);
 	}
 func_end:
-	dev_dbg(bridge, "%s: hprocessor: %p pNodeId: %p pargs: %p attr_in: %p "
-		"node_res: %p status: 0x%x\n", __func__, hprocessor,
+	dev_dbg(bridge, "%s: hprocessor: %pK pNodeId: %pK pargs: %pK attr_in: %pK "
+		"node_res: %pK status: 0x%x\n", __func__, hprocessor,
 		node_uuid, pargs, attr_in, noderes, status);
 	return status;
 }
@@ -1092,8 +1092,8 @@ out_unlock:
 	if (status && pstr_dev_name)
 		kfree(pstr_dev_name);
 	mutex_unlock(&hnode_mgr->node_mgr_lock);
-	dev_dbg(bridge, "%s: node1: %p stream1: %d node2: %p stream2: %d"
-			"pattrs: %p status: 0x%x\n", __func__, node1,
+	dev_dbg(bridge, "%s: node1: %pK stream1: %d node2: %pK stream2: %d"
+			"pattrs: %pK status: 0x%x\n", __func__, node1,
 			stream1, node2, stream2, pattrs, status);
 	return status;
 }
@@ -1251,7 +1251,7 @@ func_end:
 		ntfy_notify(hnode->ntfy_obj, DSP_NODESTATECHANGE);
 	}
 
-	dev_dbg(bridge, "%s: hnode: %p status: 0x%x\n", __func__,
+	dev_dbg(bridge, "%s: hnode: %pK status: 0x%x\n", __func__,
 		hnode, status);
 	return status;
 }
@@ -1516,7 +1516,7 @@ func_cont1:
 	mutex_unlock(&hnode_mgr->node_mgr_lock);
 	proc_notify_clients(hprocessor, DSP_NODESTATECHANGE);
 func_end:
-	dev_dbg(bridge, "%s: pnode: %p status 0x%x\n", __func__, pnode, status);
+	dev_dbg(bridge, "%s: pnode: %pK status 0x%x\n", __func__, pnode, status);
 	return status;
 }
 
@@ -1756,7 +1756,7 @@ int node_get_message(struct node_object *hnode,
 		status = -ESRCH;
 	}
 func_end:
-	dev_dbg(bridge, "%s: hnode: %p message: %p utimeout: 0x%x\n", __func__,
+	dev_dbg(bridge, "%s: hnode: %pK message: %pK utimeout: 0x%x\n", __func__,
 		hnode, message, utimeout);
 	return status;
 }
@@ -1802,7 +1802,7 @@ int node_get_strm_mgr(struct node_object *hnode,
 enum nldr_loadtype node_get_load_type(struct node_object *hnode)
 {
 	if (!hnode) {
-		dev_dbg(bridge, "%s: Failed. hnode: %p\n", __func__, hnode);
+		dev_dbg(bridge, "%s: Failed. hnode: %pK\n", __func__, hnode);
 		return -1;
 	} else {
 		return hnode->dcd_props.obj_data.node_obj.load_type;
@@ -1817,7 +1817,7 @@ enum nldr_loadtype node_get_load_type(struct node_object *hnode)
 u32 node_get_timeout(struct node_object *hnode)
 {
 	if (!hnode) {
-		dev_dbg(bridge, "%s: failed. hnode: %p\n", __func__, hnode);
+		dev_dbg(bridge, "%s: failed. hnode: %pK\n", __func__, hnode);
 		return 0;
 	} else {
 		return hnode->timeout;
@@ -1944,7 +1944,7 @@ func_cont:
 		}
 	}
 func_end:
-	dev_dbg(bridge, "%s: hnode: %p status 0x%x\n", __func__, hnode, status);
+	dev_dbg(bridge, "%s: hnode: %pK status 0x%x\n", __func__, hnode, status);
 	return status;
 }
 
@@ -2040,7 +2040,7 @@ int node_put_message(struct node_object *hnode,
 						    &new_msg, utimeout);
 	}
 func_end:
-	dev_dbg(bridge, "%s: hnode: %p pmsg: %p utimeout: 0x%x, "
+	dev_dbg(bridge, "%s: hnode: %pK pmsg: %pK utimeout: 0x%x, "
 		"status 0x%x\n", __func__, hnode, pmsg, utimeout, status);
 	return status;
 }
@@ -2088,8 +2088,8 @@ int node_register_notify(struct node_object *hnode, u32 event_mask,
 		}
 
 	}
-	dev_dbg(bridge, "%s: hnode: %p event_mask: 0x%x notify_type: 0x%x "
-		"hnotification: %p status 0x%x\n", __func__, hnode,
+	dev_dbg(bridge, "%s: hnode: %pK event_mask: 0x%x notify_type: 0x%x "
+		"hnotification: %pK status 0x%x\n", __func__, hnode,
 		event_mask, notify_type, hnotification, status);
 	return status;
 }
@@ -2208,7 +2208,7 @@ func_cont1:
 		ntfy_notify(hnode->ntfy_obj, DSP_NODESTATECHANGE);
 	}
 func_end:
-	dev_dbg(bridge, "%s: hnode: %p status 0x%x\n", __func__, hnode, status);
+	dev_dbg(bridge, "%s: hnode: %pK status 0x%x\n", __func__, hnode, status);
 	return status;
 }
 
@@ -2335,7 +2335,7 @@ func_cont:
 			status = -EPERM;
 		} else {
 			*pstatus = hnode->exit_status;
-			dev_dbg(bridge, "%s: hnode: %p env 0x%x status 0x%x\n",
+			dev_dbg(bridge, "%s: hnode: %pK env 0x%x status 0x%x\n",
 				__func__, hnode, hnode->node_env, status);
 		}
 		mutex_unlock(&hnode_mgr->node_mgr_lock);

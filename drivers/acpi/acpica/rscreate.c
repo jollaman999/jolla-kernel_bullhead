@@ -144,7 +144,7 @@ acpi_rs_create_resource_list(union acpi_operand_object *aml_buffer,
 
 	ACPI_FUNCTION_TRACE(rs_create_resource_list);
 
-	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "AmlBuffer = %p\n", aml_buffer));
+	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "AmlBuffer = %pK\n", aml_buffer));
 
 	/* Params already validated, so we don't re-validate here */
 
@@ -181,7 +181,7 @@ acpi_rs_create_resource_list(union acpi_operand_object *aml_buffer,
 		return_ACPI_STATUS(status);
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "OutputBuffer %p Length %X\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "OutputBuffer %pK Length %X\n",
 			  output_buffer->pointer, (u32) output_buffer->length));
 	return_ACPI_STATUS(AE_OK);
 }
@@ -436,7 +436,7 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 		top_object_list++;
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "OutputBuffer %p Length %X\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "OutputBuffer %pK Length %X\n",
 			  output_buffer->pointer, (u32) output_buffer->length));
 	return_ACPI_STATUS(AE_OK);
 }
@@ -468,7 +468,7 @@ acpi_rs_create_aml_resources(struct acpi_resource *linked_list_buffer,
 
 	ACPI_FUNCTION_TRACE(rs_create_aml_resources);
 
-	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "LinkedListBuffer = %p\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "LinkedListBuffer = %pK\n",
 			  linked_list_buffer));
 
 	/*
@@ -502,7 +502,7 @@ acpi_rs_create_aml_resources(struct acpi_resource *linked_list_buffer,
 		return_ACPI_STATUS(status);
 	}
 
-	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "OutputBuffer %p Length %X\n",
+	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "OutputBuffer %pK Length %X\n",
 			  output_buffer->pointer, (u32) output_buffer->length));
 	return_ACPI_STATUS(AE_OK);
 }

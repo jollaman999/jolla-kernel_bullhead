@@ -849,7 +849,7 @@ static ssize_t i7core_inject_show_##param(			\
 	struct i7core_pvt *pvt;					\
 								\
 	pvt = mci->pvt_info;					\
-	edac_dbg(1, "pvt=%p\n", pvt);				\
+	edac_dbg(1, "pvt=%pK\n", pvt);				\
 	if (pvt->inject.param < 0)				\
 		return sprintf(data, "any\n");			\
 	else							\
@@ -1520,7 +1520,7 @@ static int mci_bind_devs(struct mem_ctl_info *mci,
 		} else
 			goto error;
 
-		edac_dbg(0, "Associated fn %d.%d, dev = %p, socket %d\n",
+		edac_dbg(0, "Associated fn %d.%d, dev = %pK, socket %d\n",
 			 PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn),
 			 pdev, i7core_dev->socket);
 
@@ -2174,7 +2174,7 @@ static void i7core_unregister_mci(struct i7core_dev *i7core_dev)
 	struct i7core_pvt *pvt;
 
 	if (unlikely(!mci || !mci->pvt_info)) {
-		edac_dbg(0, "MC: dev = %p\n", &i7core_dev->pdev[0]->dev);
+		edac_dbg(0, "MC: dev = %pK\n", &i7core_dev->pdev[0]->dev);
 
 		i7core_printk(KERN_ERR, "Couldn't find mci handler\n");
 		return;
@@ -2182,7 +2182,7 @@ static void i7core_unregister_mci(struct i7core_dev *i7core_dev)
 
 	pvt = mci->pvt_info;
 
-	edac_dbg(0, "MC: mci = %p, dev = %p\n", mci, &i7core_dev->pdev[0]->dev);
+	edac_dbg(0, "MC: mci = %pK, dev = %pK\n", mci, &i7core_dev->pdev[0]->dev);
 
 	/* Disable scrubrate setting */
 	if (pvt->enable_scrub)
@@ -2221,7 +2221,7 @@ static int i7core_register_mci(struct i7core_dev *i7core_dev)
 	if (unlikely(!mci))
 		return -ENOMEM;
 
-	edac_dbg(0, "MC: mci = %p, dev = %p\n", mci, &i7core_dev->pdev[0]->dev);
+	edac_dbg(0, "MC: mci = %pK, dev = %pK\n", mci, &i7core_dev->pdev[0]->dev);
 
 	pvt = mci->pvt_info;
 	memset(pvt, 0, sizeof(*pvt));

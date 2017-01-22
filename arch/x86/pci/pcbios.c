@@ -342,13 +342,13 @@ static const struct pci_raw_ops *pci_find_bios(void)
 		if (sum != 0)
 			continue;
 		if (check->fields.revision != 0) {
-			printk("PCI: unsupported BIOS32 revision %d at 0x%p\n",
+			printk("PCI: unsupported BIOS32 revision %d at 0x%pK\n",
 				check->fields.revision, check);
 			continue;
 		}
-		DBG("PCI: BIOS32 Service Directory structure at 0x%p\n", check);
+		DBG("PCI: BIOS32 Service Directory structure at 0x%pK\n", check);
 		if (check->fields.entry >= 0x100000) {
-			printk("PCI: BIOS32 entry (0x%p) in high memory, "
+			printk("PCI: BIOS32 entry (0x%pK) in high memory, "
 					"cannot use.\n", check);
 			return NULL;
 		} else {

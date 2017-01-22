@@ -255,7 +255,7 @@ void acornscsi_dumpdma(AS_Host *host, char *where)
 		dmac_read(host, DMAC_MASKREG));
 
 	printk("DMA @%06x, ", host->dma.start_addr);
-	printk("BH @%p +%04x, ", host->scsi.SCp.ptr,
+	printk("BH @%pK +%04x, ", host->scsi.SCp.ptr,
 		host->scsi.SCp.this_residual);
 	printk("DT @+%04x ST @+%04x", host->dma.transferred,
 		host->scsi.SCp.scsi_xferred);
@@ -1908,7 +1908,7 @@ int acornscsi_reconnect_finish(AS_Host *host)
 	 */
 	host->scsi.SCp = host->SCpnt->SCp;
 #if (DEBUG & (DEBUG_QUEUES|DEBUG_DISCON))
-	printk(", data pointers: [%p, %X]",
+	printk(", data pointers: [%pK, %X]",
 		host->scsi.SCp.ptr, host->scsi.SCp.this_residual);
 #endif
     }
@@ -2517,7 +2517,7 @@ static int acornscsi_queuecmd_lck(struct scsi_cmnd *SCpnt,
 
     if (!done) {
 	/* there should be some way of rejecting errors like this without panicing... */
-	panic("scsi%d: queuecommand called with NULL done function [cmd=%p]",
+	panic("scsi%d: queuecommand called with NULL done function [cmd=%pK]",
 		host->host->host_no, SCpnt);
 	return -EINVAL;
     }
@@ -2859,10 +2859,10 @@ static int acornscsi_show_info(struct seq_file *m, struct Scsi_Host *instance)
 #endif
 		"\n\n", VER_MAJOR, VER_MINOR, VER_PATCH);
 
-    seq_printf(m,	"SBIC: WD33C93A  Address: %p    IRQ : %d\n",
+    seq_printf(m,	"SBIC: WD33C93A  Address: %pK    IRQ : %d\n",
 			host->base + SBIC_REGIDX, host->scsi.irq);
 #ifdef USE_DMAC
-    seq_printf(m,	"DMAC: uPC71071  Address: %p  IRQ : %d\n\n",
+    seq_printf(m,	"DMAC: uPC71071  Address: %pK  IRQ : %d\n\n",
 			host->base + DMAC_OFFSET, host->scsi.irq);
 #endif
 

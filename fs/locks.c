@@ -1142,7 +1142,7 @@ int lease_modify(struct file_lock **before, int arg)
 		filp->f_owner.signum = 0;
 		fasync_helper(0, fl->fl_file, 0, &fl->fl_fasync);
 		if (fl->fl_fasync != NULL) {
-			printk(KERN_ERR "locks_delete_lock: fasync == %p\n", fl->fl_fasync);
+			printk(KERN_ERR "locks_delete_lock: fasync == %pK\n", fl->fl_fasync);
 			fl->fl_fasync = NULL;
 		}
 		locks_delete_lock(before);

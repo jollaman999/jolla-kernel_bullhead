@@ -43,7 +43,7 @@ static struct rxrpc_conn_bundle *rxrpc_alloc_bundle(gfp_t gfp)
 		atomic_set(&bundle->usage, 1);
 	}
 
-	_leave(" = %p", bundle);
+	_leave(" = %pK", bundle);
 	return bundle;
 }
 
@@ -71,7 +71,7 @@ struct rxrpc_conn_bundle *rxrpc_get_bundle(struct rxrpc_sock *rx,
 	struct rxrpc_conn_bundle *bundle, *candidate;
 	struct rb_node *p, *parent, **pp;
 
-	_enter("%p{%x},%x,%hx,",
+	_enter("%pK{%x},%x,%hx,",
 	       rx, key_serial(key), trans->debug_id, ntohs(service_id));
 
 	if (rx->trans == trans && rx->bundle) {
@@ -136,7 +136,7 @@ struct rxrpc_conn_bundle *rxrpc_get_bundle(struct rxrpc_sock *rx,
 		atomic_inc(&bundle->usage);
 		rx->bundle = bundle;
 	}
-	_leave(" = %p [new]", bundle);
+	_leave(" = %pK [new]", bundle);
 	return bundle;
 
 	/* we found the bundle in the list immediately */
@@ -148,7 +148,7 @@ found_extant_bundle:
 		atomic_inc(&bundle->usage);
 		rx->bundle = bundle;
 	}
-	_leave(" = %p [extant %d]", bundle, atomic_read(&bundle->usage));
+	_leave(" = %pK [extant %d]", bundle, atomic_read(&bundle->usage));
 	return bundle;
 
 	/* we found the bundle on the second time through the list */
@@ -161,7 +161,7 @@ found_extant_second:
 		atomic_inc(&bundle->usage);
 		rx->bundle = bundle;
 	}
-	_leave(" = %p [second %d]", bundle, atomic_read(&bundle->usage));
+	_leave(" = %pK [second %d]", bundle, atomic_read(&bundle->usage));
 	return bundle;
 }
 
@@ -171,7 +171,7 @@ found_extant_second:
 void rxrpc_put_bundle(struct rxrpc_transport *trans,
 		      struct rxrpc_conn_bundle *bundle)
 {
-	_enter("%p,%p{%d}",trans, bundle, atomic_read(&bundle->usage));
+	_enter("%pK,%pK{%d}",trans, bundle, atomic_read(&bundle->usage));
 
 	if (atomic_dec_and_lock(&bundle->usage, &trans->client_lock)) {
 		_debug("Destroy bundle");
@@ -212,7 +212,7 @@ static struct rxrpc_connection *rxrpc_alloc_connection(gfp_t gfp)
 		conn->header_size = sizeof(struct rxrpc_header);
 	}
 
-	_leave(" = %p{%d}", conn, conn ? conn->debug_id : 0);
+	_leave(" = %pK{%d}", conn, conn ? conn->debug_id : 0);
 	return conn;
 }
 
@@ -431,7 +431,7 @@ int rxrpc_connect_call(struct rxrpc_sock *rx,
 
 	DECLARE_WAITQUEUE(myself, current);
 
-	_enter("%p,%lx,", rx, call->user_call_ID);
+	_enter("%pK,%lx,", rx, call->user_call_ID);
 
 	if (test_bit(RXRPC_SOCK_EXCLUSIVE_CONN, &rx->flags))
 		return rxrpc_connect_exclusive(rx, trans, bundle->service_id,
@@ -710,7 +710,7 @@ rxrpc_incoming_connection(struct rxrpc_transport *trans,
 success:
 	_net("CONNECTION %s %d {%x}", new, conn->debug_id, conn->real_conn_id);
 
-	_leave(" = %p {u=%d}", conn, atomic_read(&conn->usage));
+	_leave(" = %pK {u=%d}", conn, atomic_read(&conn->usage));
 	return conn;
 
 	/* we found the connection in the list immediately */
@@ -788,7 +788,7 @@ struct rxrpc_connection *rxrpc_find_connection(struct rxrpc_transport *trans,
 found:
 	atomic_inc(&conn->usage);
 	read_unlock_bh(&trans->conn_lock);
-	_leave(" = %p", conn);
+	_leave(" = %pK", conn);
 	return conn;
 }
 
@@ -797,7 +797,7 @@ found:
  */
 void rxrpc_put_connection(struct rxrpc_connection *conn)
 {
-	_enter("%p{u=%d,d=%d}",
+	_enter("%pK{u=%d,d=%d}",
 	       conn, atomic_read(&conn->usage), conn->debug_id);
 
 	ASSERTCMP(atomic_read(&conn->usage), >, 0);
@@ -816,7 +816,7 @@ void rxrpc_put_connection(struct rxrpc_connection *conn)
  */
 static void rxrpc_destroy_connection(struct rxrpc_connection *conn)
 {
-	_enter("%p{%d}", conn, atomic_read(&conn->usage));
+	_enter("%pK{%d}", conn, atomic_read(&conn->usage));
 
 	ASSERTCMP(atomic_read(&conn->usage), ==, 0);
 

@@ -292,7 +292,7 @@ static void saa7164_work_enchandler_helper(struct saa7164_port *port, int bufnr)
 					(*(p + buf->actual_size + 0x11) != 0xff) ||
 					(*(p + buf->actual_size + 0x12) != 0xff) ||
 					(*(p + buf->actual_size + 0x13) != 0xff)) {
-						printk(KERN_ERR "%s() buf %p guard buffer breach\n",
+						printk(KERN_ERR "%s() buf %pK guard buffer breach\n",
 							__func__, buf);
 #if 0
 			print_hex_dump(KERN_INFO, "", DUMP_PREFIX_OFFSET, 16, 1,
@@ -336,7 +336,7 @@ static void saa7164_work_enchandler_helper(struct saa7164_port *port, int bufnr)
 					wake_up_interruptible(&port->wait_read);
 
 				} else {
-					printk(KERN_ERR "buf %p bufsize fails match\n", buf);
+					printk(KERN_ERR "buf %pK bufsize fails match\n", buf);
 				}
 
 			} else
@@ -789,7 +789,7 @@ void saa7164_dumpregs(struct saa7164_dev *dev, u32 addr)
 
 static void saa7164_dump_hwdesc(struct saa7164_dev *dev)
 {
-	dprintk(1, "@0x%p hwdesc sizeof(struct tmComResHWDescr) = %d bytes\n",
+	dprintk(1, "@0x%pK hwdesc sizeof(struct tmComResHWDescr) = %d bytes\n",
 		&dev->hwdesc, (u32)sizeof(struct tmComResHWDescr));
 
 	dprintk(1, " .bLength = 0x%x\n", dev->hwdesc.bLength);
@@ -819,7 +819,7 @@ static void saa7164_dump_hwdesc(struct saa7164_dev *dev)
 
 static void saa7164_dump_intfdesc(struct saa7164_dev *dev)
 {
-	dprintk(1, "@0x%p intfdesc "
+	dprintk(1, "@0x%pK intfdesc "
 		"sizeof(struct tmComResInterfaceDescr) = %d bytes\n",
 		&dev->intfdesc, (u32)sizeof(struct tmComResInterfaceDescr));
 
@@ -841,7 +841,7 @@ static void saa7164_dump_intfdesc(struct saa7164_dev *dev)
 
 static void saa7164_dump_busdesc(struct saa7164_dev *dev)
 {
-	dprintk(1, "@0x%p busdesc sizeof(struct tmComResBusDescr) = %d bytes\n",
+	dprintk(1, "@0x%pK busdesc sizeof(struct tmComResBusDescr) = %d bytes\n",
 		&dev->busdesc, (u32)sizeof(struct tmComResBusDescr));
 
 	dprintk(1, " .CommandRing   = 0x%016Lx\n", dev->busdesc.CommandRing);
@@ -1072,7 +1072,7 @@ static int saa7164_proc_show(struct seq_file *m, void *v)
 
 	list_for_each(list, &saa7164_devlist) {
 		dev = list_entry(list, struct saa7164_dev, devlist);
-		seq_printf(m, "%s = %p\n", dev->name, dev);
+		seq_printf(m, "%s = %pK\n", dev->name, dev);
 
 		/* Lock the bus from any other access */
 		b = &dev->bus;

@@ -118,7 +118,7 @@ static void __init sbus_iommu_init(struct platform_device *op)
 	else
 		iommu->usemap.num_colors = 1;
 
-	printk(KERN_INFO "IOMMU: impl %d vers %d table 0x%p[%d B] map [%d b]\n",
+	printk(KERN_INFO "IOMMU: impl %d vers %d table 0x%pK[%d B] map [%d b]\n",
 	       impl, vers, iommu->page_table,
 	       (int)(IOMMU_NPTES*sizeof(iopte_t)), (int)IOMMU_NPTES);
 

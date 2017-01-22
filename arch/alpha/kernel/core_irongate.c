@@ -86,7 +86,7 @@ mk_conf_addr(struct pci_bus *pbus, unsigned int device_fn, int where,
 	u8 bus = pbus->number;
 
 	DBG_CFG(("mk_conf_addr(bus=%d ,device_fn=0x%x, where=0x%x, "
-		 "pci_addr=0x%p, type1=0x%p)\n",
+		 "pci_addr=0x%pK, type1=0x%pK)\n",
 		 bus, device_fn, where, pci_addr, type1));
 
 	*type1 = (bus != 0);
@@ -364,14 +364,14 @@ irongate_ioremap(unsigned long addr, unsigned long size)
 	printk("irongate_ioremap(0x%lx, 0x%lx)\n", addr, size);
 	printk("irongate_ioremap:  gart_bus_addr  0x%lx\n", gart_bus_addr);
 	printk("irongate_ioremap:  gart_aper_size 0x%lx\n", gart_aper_size);
-	printk("irongate_ioremap:  mmio_regs      %p\n", mmio_regs);
-	printk("irongate_ioremap:  gatt_pages     %p\n", gatt_pages);
+	printk("irongate_ioremap:  mmio_regs      %pK\n", mmio_regs);
+	printk("irongate_ioremap:  gatt_pages     %pK\n", gatt_pages);
 	
 	for(baddr = addr; baddr <= last; baddr += PAGE_SIZE)
 	{
 		cur_gatt = phys_to_virt(GET_GATT(baddr) & ~1);
 		pte = cur_gatt[GET_GATT_OFF(baddr)] & ~1;
-		printk("irongate_ioremap:  cur_gatt %p pte 0x%x\n",
+		printk("irongate_ioremap:  cur_gatt %pK pte 0x%x\n",
 		       cur_gatt, pte);
 	}
 #endif

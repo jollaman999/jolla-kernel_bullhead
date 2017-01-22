@@ -282,7 +282,7 @@ int nfc_llcp_parse_connection_tlv(struct nfc_llcp_sock *sock,
 		tlv += length + 2;
 	}
 
-	pr_debug("sock %p rw %d miu %d\n", sock,
+	pr_debug("sock %pK rw %d miu %d\n", sock,
 		 sock->remote_rw, sock->remote_miu);
 
 	return 0;

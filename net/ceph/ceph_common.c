@@ -246,7 +246,7 @@ static match_table_t opt_tokens = {
 
 void ceph_destroy_options(struct ceph_options *opt)
 {
-	dout("destroy_options %p\n", opt);
+	dout("destroy_options %pK\n", opt);
 	kfree(opt->name);
 	if (opt->key) {
 		ceph_crypto_key_destroy(opt->key);
@@ -321,7 +321,7 @@ ceph_parse_options(char *options, const char *dev_name,
 	if (!opt->mon_addr)
 		goto out;
 
-	dout("parse_options %p options '%s' dev_name '%s'\n", opt, options,
+	dout("parse_options %pK options '%s' dev_name '%s'\n", opt, options,
 	     dev_name);
 
 	/* start with defaults */
@@ -513,7 +513,7 @@ EXPORT_SYMBOL(ceph_create_client);
 
 void ceph_destroy_client(struct ceph_client *client)
 {
-	dout("destroy_client %p\n", client);
+	dout("destroy_client %pK\n", client);
 
 	atomic_set(&client->msgr.stopping, 1);
 
@@ -527,7 +527,7 @@ void ceph_destroy_client(struct ceph_client *client)
 	ceph_destroy_options(client->options);
 
 	kfree(client);
-	dout("destroy_client %p done\n", client);
+	dout("destroy_client %pK done\n", client);
 }
 EXPORT_SYMBOL(ceph_destroy_client);
 

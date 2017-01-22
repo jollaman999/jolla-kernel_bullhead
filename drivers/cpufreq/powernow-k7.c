@@ -446,7 +446,7 @@ static int powernow_acpi_init(void)
 
 static void print_pst_entry(struct pst_s *pst, unsigned int j)
 {
-	pr_debug("PST:%d (@%p)\n", j, pst);
+	pr_debug("PST:%d (@%pK)\n", j, pst);
 	pr_debug(" cpuid: 0x%x  fsb: %d  maxFID: 0x%x  startvid: 0x%x\n",
 		pst->cpuid, pst->fsbspeed, pst->maxfid, pst->startvid);
 }
@@ -467,7 +467,7 @@ static int powernow_decode_bios(int maxfid, int startvid)
 		p = phys_to_virt(i);
 
 		if (memcmp(p, "AMDK7PNOW!",  10) == 0) {
-			pr_debug("Found PSB header at %p\n", p);
+			pr_debug("Found PSB header at %pK\n", p);
 			psb = (struct psb_s *) p;
 			pr_debug("Table version: 0x%x\n", psb->tableversion);
 			if (psb->tableversion != 0x12) {

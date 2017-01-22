@@ -48,7 +48,7 @@ static void svc_disconnect(struct atm_vcc *vcc)
 	struct sk_buff *skb;
 	struct sock *sk = sk_atm(vcc);
 
-	pr_debug("%p\n", vcc);
+	pr_debug("%pK\n", vcc);
 	if (test_bit(ATM_VF_REGIS, &vcc->flags)) {
 		prepare_to_wait(sk_sleep(sk), &wait, TASK_UNINTERRUPTIBLE);
 		sigd_enq(vcc, as_close, NULL, NULL, NULL);
@@ -78,7 +78,7 @@ static int svc_release(struct socket *sock)
 
 	if (sk) {
 		vcc = ATM_SD(sock);
-		pr_debug("%p\n", vcc);
+		pr_debug("%pK\n", vcc);
 		clear_bit(ATM_VF_READY, &vcc->flags);
 		/*
 		 * VCC pointer is used as a reference,
@@ -155,7 +155,7 @@ static int svc_connect(struct socket *sock, struct sockaddr *sockaddr,
 	struct atm_vcc *vcc = ATM_SD(sock);
 	int error;
 
-	pr_debug("%p\n", vcc);
+	pr_debug("%pK\n", vcc);
 	lock_sock(sk);
 	if (sockaddr_len != sizeof(struct sockaddr_atmsvc)) {
 		error = -EINVAL;
@@ -291,7 +291,7 @@ static int svc_listen(struct socket *sock, int backlog)
 	struct atm_vcc *vcc = ATM_SD(sock);
 	int error;
 
-	pr_debug("%p\n", vcc);
+	pr_debug("%pK\n", vcc);
 	lock_sock(sk);
 	/* let server handle listen on unbound sockets */
 	if (test_bit(ATM_VF_SESSION, &vcc->flags)) {
@@ -340,7 +340,7 @@ static int svc_accept(struct socket *sock, struct socket *newsock, int flags)
 
 	new_vcc = ATM_SD(newsock);
 
-	pr_debug("%p -> %p\n", old_vcc, new_vcc);
+	pr_debug("%pK -> %pK\n", old_vcc, new_vcc);
 	while (1) {
 		DEFINE_WAIT(wait);
 

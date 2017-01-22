@@ -800,7 +800,7 @@ hfcpci_fill_fifo(struct bchannel *bch)
 			/* end of fifo */
 			if (bch->debug & DEBUG_HW_BFIFO)
 				printk(KERN_DEBUG "hfcpci_FFt fillempty "
-				       "fcnt(%d) maxl(%d) nz1(%x) dst(%p)\n",
+				       "fcnt(%d) maxl(%d) nz1(%x) dst(%pK)\n",
 				       fcnt, maxlen, new_z1, dst);
 			if (maxlen > count)
 				maxlen = count;		/* limit size */
@@ -836,7 +836,7 @@ hfcpci_fill_fifo(struct bchannel *bch)
 		/* end of fifo */
 		if (bch->debug & DEBUG_HW_BFIFO)
 			printk(KERN_DEBUG "hfcpci_FFt fcnt(%d) "
-			       "maxl(%d) nz1(%x) dst(%p)\n",
+			       "maxl(%d) nz1(%x) dst(%pK)\n",
 			       fcnt, maxlen, new_z1, dst);
 		fcnt += count;
 		bch->tx_idx += count;
@@ -1544,7 +1544,7 @@ hfc_bctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 	u_long		flags;
 
 	if (bch->debug & DEBUG_HW)
-		printk(KERN_DEBUG "%s: cmd:%x %p\n", __func__, cmd, arg);
+		printk(KERN_DEBUG "%s: cmd:%x %pK\n", __func__, cmd, arg);
 	switch (cmd) {
 	case HW_TESTRX_RAW:
 		spin_lock_irqsave(&hc->lock, flags);
@@ -1892,7 +1892,7 @@ open_dchannel(struct hfc_pci *hc, struct mISDNchannel *ch,
 	int err = 0;
 
 	if (debug & DEBUG_HW_OPEN)
-		printk(KERN_DEBUG "%s: dev(%d) open from %p\n", __func__,
+		printk(KERN_DEBUG "%s: dev(%d) open from %pK\n", __func__,
 		       hc->dch.dev.id, __builtin_return_address(0));
 	if (rq->protocol == ISDN_P_NONE)
 		return -EINVAL;
@@ -1969,7 +1969,7 @@ hfc_dctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 	int			err = 0;
 
 	if (dch->debug & DEBUG_HW)
-		printk(KERN_DEBUG "%s: cmd:%x %p\n",
+		printk(KERN_DEBUG "%s: cmd:%x %pK\n",
 		       __func__, cmd, arg);
 	switch (cmd) {
 	case OPEN_CHANNEL:
@@ -1982,7 +1982,7 @@ hfc_dctrl(struct mISDNchannel *ch, u_int cmd, void *arg)
 		break;
 	case CLOSE_CHANNEL:
 		if (debug & DEBUG_HW_OPEN)
-			printk(KERN_DEBUG "%s: dev(%d) close from %p\n",
+			printk(KERN_DEBUG "%s: dev(%d) close from %pK\n",
 			       __func__, hc->dch.dev.id,
 			       __builtin_return_address(0));
 		module_put(THIS_MODULE);

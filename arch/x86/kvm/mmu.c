@@ -863,17 +863,17 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
 	int i, count = 0;
 
 	if (!*pte_list) {
-		rmap_printk("pte_list_add: %p %llx 0->1\n", spte, *spte);
+		rmap_printk("pte_list_add: %pK %llx 0->1\n", spte, *spte);
 		*pte_list = (unsigned long)spte;
 	} else if (!(*pte_list & 1)) {
-		rmap_printk("pte_list_add: %p %llx 1->many\n", spte, *spte);
+		rmap_printk("pte_list_add: %pK %llx 1->many\n", spte, *spte);
 		desc = mmu_alloc_pte_list_desc(vcpu);
 		desc->sptes[0] = (u64 *)*pte_list;
 		desc->sptes[1] = spte;
 		*pte_list = (unsigned long)desc | 1;
 		++count;
 	} else {
-		rmap_printk("pte_list_add: %p %llx many->many\n", spte, *spte);
+		rmap_printk("pte_list_add: %pK %llx many->many\n", spte, *spte);
 		desc = (struct pte_list_desc *)(*pte_list & ~1ul);
 		while (desc->sptes[PTE_LIST_EXT-1] && desc->more) {
 			desc = desc->more;
@@ -919,17 +919,17 @@ static void pte_list_remove(u64 *spte, unsigned long *pte_list)
 	int i;
 
 	if (!*pte_list) {
-		printk(KERN_ERR "pte_list_remove: %p 0->BUG\n", spte);
+		printk(KERN_ERR "pte_list_remove: %pK 0->BUG\n", spte);
 		BUG();
 	} else if (!(*pte_list & 1)) {
-		rmap_printk("pte_list_remove:  %p 1->0\n", spte);
+		rmap_printk("pte_list_remove:  %pK 1->0\n", spte);
 		if ((u64 *)*pte_list != spte) {
-			printk(KERN_ERR "pte_list_remove:  %p 1->BUG\n", spte);
+			printk(KERN_ERR "pte_list_remove:  %pK 1->BUG\n", spte);
 			BUG();
 		}
 		*pte_list = 0;
 	} else {
-		rmap_printk("pte_list_remove:  %p many->many\n", spte);
+		rmap_printk("pte_list_remove:  %pK many->many\n", spte);
 		desc = (struct pte_list_desc *)(*pte_list & ~1ul);
 		prev_desc = NULL;
 		while (desc) {
@@ -943,7 +943,7 @@ static void pte_list_remove(u64 *spte, unsigned long *pte_list)
 			prev_desc = desc;
 			desc = desc->more;
 		}
-		pr_err("pte_list_remove: %p many->many\n", spte);
+		pr_err("pte_list_remove: %pK many->many\n", spte);
 		BUG();
 	}
 }
@@ -1129,7 +1129,7 @@ spte_write_protect(struct kvm *kvm, u64 *sptep, bool *flush, bool pt_protect)
 	      !(pt_protect && spte_is_locklessly_modifiable(spte)))
 		return false;
 
-	rmap_printk("rmap_write_protect: spte %p %llx\n", sptep, *sptep);
+	rmap_printk("rmap_write_protect: spte %pK %llx\n", sptep, *sptep);
 
 	if (__drop_large_spte(kvm, sptep)) {
 		*flush |= true;
@@ -1217,7 +1217,7 @@ static int kvm_unmap_rmapp(struct kvm *kvm, unsigned long *rmapp,
 
 	while ((sptep = rmap_get_first(*rmapp, &iter))) {
 		BUG_ON(!(*sptep & PT_PRESENT_MASK));
-		rmap_printk("kvm_rmap_unmap_hva: spte %p %llx\n", sptep, *sptep);
+		rmap_printk("kvm_rmap_unmap_hva: spte %pK %llx\n", sptep, *sptep);
 
 		drop_spte(kvm, sptep);
 		need_tlb_flush = 1;
@@ -1241,7 +1241,7 @@ static int kvm_set_pte_rmapp(struct kvm *kvm, unsigned long *rmapp,
 
 	for (sptep = rmap_get_first(*rmapp, &iter); sptep;) {
 		BUG_ON(!is_shadow_present_pte(*sptep));
-		rmap_printk("kvm_set_pte_rmapp: spte %p %llx\n", sptep, *sptep);
+		rmap_printk("kvm_set_pte_rmapp: spte %pK %llx\n", sptep, *sptep);
 
 		need_flush = 1;
 
@@ -1443,7 +1443,7 @@ static int is_empty_shadow_page(u64 *spt)
 
 	for (pos = spt, end = pos + PAGE_SIZE / sizeof(u64); pos != end; pos++)
 		if (is_shadow_present_pte(*pos)) {
-			printk(KERN_ERR "%s: %p %llx\n", __func__,
+			printk(KERN_ERR "%s: %pK %llx\n", __func__,
 			       pos, *pos);
 			return 0;
 		}
@@ -2445,7 +2445,7 @@ static void mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
 		*emulate = 1;
 
 	pgprintk("%s: setting spte %llx\n", __func__, *sptep);
-	pgprintk("instantiating %s PTE (%s) at %llx (%llx) addr %p\n",
+	pgprintk("instantiating %s PTE (%s) at %llx (%llx) addr %pK\n",
 		 is_large_pte(*sptep)? "2MB" : "4kB",
 		 *sptep & PT_PRESENT_MASK ?"RW":"R", gfn,
 		 *sptep, sptep);

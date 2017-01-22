@@ -123,7 +123,7 @@ static unsigned long get_plt_size(const Elf32_Ehdr *hdr,
 
 		if (sechdrs[i].sh_type == SHT_RELA) {
 			DEBUGP("Found relocations in section %u\n", i);
-			DEBUGP("Ptr: %p.  Number: %u\n",
+			DEBUGP("Ptr: %pK.  Number: %u\n",
 			       (void *)hdr + sechdrs[i].sh_offset,
 			       sechdrs[i].sh_size / sizeof(Elf32_Rela));
 
@@ -209,7 +209,7 @@ static uint32_t do_plt_call(void *location,
 	entry->jump[2] = 0x7d8903a6;                    /* mtctr r12 */
 	entry->jump[3] = 0x4e800420;			/* bctr */
 
-	DEBUGP("Initialized plt for 0x%x at %p\n", val, entry);
+	DEBUGP("Initialized plt for 0x%x at %pK\n", val, entry);
 	return (uint32_t)entry;
 }
 

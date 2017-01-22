@@ -25,9 +25,9 @@ static inline __attribute_const__ __u32 __c6x_swab32(__u32 val)
 
 static inline __attribute_const__ __u64 __c6x_swab64(__u64 val)
 {
-	asm("   swap2 .s1 %p0,%P0\n"
-	    "|| swap2 .l1 %P0,%p0\n"
-	    "   swap4 .l1 %p0,%p0\n"
+	asm("   swap2 .s1 %pK0,%P0\n"
+	    "|| swap2 .l1 %P0,%pK0\n"
+	    "   swap4 .l1 %pK0,%pK0\n"
 	    "   swap4 .l1 %P0,%P0\n"
 	    : "+a"(val));
 	return val;

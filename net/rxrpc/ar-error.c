@@ -35,7 +35,7 @@ void rxrpc_UDP_error_report(struct sock *sk)
 	__be32 addr;
 	__be16 port;
 
-	_enter("%p{%d}", sk, local->debug_id);
+	_enter("%pK{%d}", sk, local->debug_id);
 
 	skb = skb_dequeue(&sk->sk_error_queue);
 	if (!skb) {

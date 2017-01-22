@@ -41,7 +41,7 @@ nv_printk_(struct nouveau_object *object, const char *pfx, int level,
 		char obuf[64], *ofmt = "";
 
 		if (object->engine) {
-			snprintf(obuf, sizeof(obuf), "[0x%08x][%p]",
+			snprintf(obuf, sizeof(obuf), "[0x%08x][%pK]",
 				 nv_hclass(object), object);
 			ofmt = obuf;
 			subdev = object->engine;

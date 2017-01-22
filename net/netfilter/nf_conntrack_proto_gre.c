@@ -132,7 +132,7 @@ int nf_ct_gre_keymap_add(struct nf_conn *ct, enum ip_conntrack_dir dir,
 			}
 		}
 		read_unlock_bh(&net_gre->keymap_lock);
-		pr_debug("trying to override keymap_%s for ct %p\n",
+		pr_debug("trying to override keymap_%s for ct %pK\n",
 			 dir == IP_CT_DIR_REPLY ? "reply" : "orig", ct);
 		return -EEXIST;
 	}
@@ -143,7 +143,7 @@ int nf_ct_gre_keymap_add(struct nf_conn *ct, enum ip_conntrack_dir dir,
 	memcpy(&km->tuple, t, sizeof(*t));
 	*kmp = km;
 
-	pr_debug("adding new entry %p: ", km);
+	pr_debug("adding new entry %pK: ", km);
 	nf_ct_dump_tuple(&km->tuple);
 
 	write_lock_bh(&net_gre->keymap_lock);
@@ -162,12 +162,12 @@ void nf_ct_gre_keymap_destroy(struct nf_conn *ct)
 	struct nf_ct_pptp_master *ct_pptp_info = nfct_help_data(ct);
 	enum ip_conntrack_dir dir;
 
-	pr_debug("entering for ct %p\n", ct);
+	pr_debug("entering for ct %pK\n", ct);
 
 	write_lock_bh(&net_gre->keymap_lock);
 	for (dir = IP_CT_DIR_ORIGINAL; dir < IP_CT_DIR_MAX; dir++) {
 		if (ct_pptp_info->keymap[dir]) {
-			pr_debug("removing %p from list\n",
+			pr_debug("removing %pK from list\n",
 				 ct_pptp_info->keymap[dir]);
 			list_del(&ct_pptp_info->keymap[dir]->list);
 			kfree(ct_pptp_info->keymap[dir]);

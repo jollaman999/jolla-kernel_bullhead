@@ -246,7 +246,7 @@ int qxl_bo_pin(struct qxl_bo *bo, u32 domain, u64 *gpu_addr)
 			*gpu_addr = qxl_bo_gpu_offset(bo);
 	}
 	if (unlikely(r != 0))
-		dev_err(qdev->dev, "%p pin failed\n", bo);
+		dev_err(qdev->dev, "%pK pin failed\n", bo);
 	return r;
 }
 
@@ -256,7 +256,7 @@ int qxl_bo_unpin(struct qxl_bo *bo)
 	int r, i;
 
 	if (!bo->pin_count) {
-		dev_warn(qdev->dev, "%p unpin not necessary\n", bo);
+		dev_warn(qdev->dev, "%pK unpin not necessary\n", bo);
 		return 0;
 	}
 	bo->pin_count--;
@@ -266,7 +266,7 @@ int qxl_bo_unpin(struct qxl_bo *bo)
 		bo->placements[i] &= ~TTM_PL_FLAG_NO_EVICT;
 	r = ttm_bo_validate(&bo->tbo, &bo->placement, false, false);
 	if (unlikely(r != 0))
-		dev_err(qdev->dev, "%p validate failed for unpin\n", bo);
+		dev_err(qdev->dev, "%pK validate failed for unpin\n", bo);
 	return r;
 }
 
@@ -279,7 +279,7 @@ void qxl_bo_force_delete(struct qxl_device *qdev)
 	dev_err(qdev->dev, "Userspace still has active objects !\n");
 	list_for_each_entry_safe(bo, n, &qdev->gem.objects, list) {
 		mutex_lock(&qdev->ddev->struct_mutex);
-		dev_err(qdev->dev, "%p %p %lu %lu force free\n",
+		dev_err(qdev->dev, "%pK %pK %lu %lu force free\n",
 			&bo->gem_base, bo, (unsigned long)bo->gem_base.size,
 			*((unsigned long *)&bo->gem_base.refcount));
 		mutex_lock(&qdev->gem.mutex);

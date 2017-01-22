@@ -1000,7 +1000,7 @@ xtSplitPage(tid_t tid, struct inode *ip,
 		goto clean_up;
 	}
 
-	jfs_info("xtSplitPage: ip:0x%p smp:0x%p rmp:0x%p", ip, smp, rmp);
+	jfs_info("xtSplitPage: ip:0x%pK smp:0x%pK rmp:0x%pK", ip, smp, rmp);
 
 	BT_MARK_DIRTY(rmp, ip);
 	/*
@@ -1073,7 +1073,7 @@ xtSplitPage(tid_t tid, struct inode *ip,
 		*rmpp = rmp;
 		*rbnp = rbn;
 
-		jfs_info("xtSplitPage: sp:0x%p rp:0x%p", sp, rp);
+		jfs_info("xtSplitPage: sp:0x%pK rp:0x%pK", sp, rp);
 		return 0;
 	}
 
@@ -1187,7 +1187,7 @@ xtSplitPage(tid_t tid, struct inode *ip,
 	*rmpp = rmp;
 	*rbnp = rbn;
 
-	jfs_info("xtSplitPage: sp:0x%p rp:0x%p", sp, rp);
+	jfs_info("xtSplitPage: sp:0x%pK rp:0x%pK", sp, rp);
 	return rc;
 
       clean_up:
@@ -1258,7 +1258,7 @@ xtSplitRoot(tid_t tid,
 		return rc;
 	}
 
-	jfs_info("xtSplitRoot: ip:0x%p rmp:0x%p", ip, rmp);
+	jfs_info("xtSplitRoot: ip:0x%pK rmp:0x%pK", ip, rmp);
 
 	/*
 	 * acquire a transaction lock on the new right page;
@@ -1341,7 +1341,7 @@ xtSplitRoot(tid_t tid,
 
 	*rmpp = rmp;
 
-	jfs_info("xtSplitRoot: sp:0x%p rp:0x%p", sp, rp);
+	jfs_info("xtSplitRoot: sp:0x%pK rp:0x%pK", sp, rp);
 	return 0;
 }
 
@@ -2079,7 +2079,7 @@ int xtUpdate(tid_t tid, struct inode *ip, xad_t * nxad)
 	xaddr = xaddr + nxlen;
 	if (nextindex == le16_to_cpu(p->header.maxentry)) {
 /*
-printf("xtUpdate.updateLeft.split p:0x%p\n", p);
+printf("xtUpdate.updateLeft.split p:0x%pK\n", p);
 */
 		/* xtSpliUp() unpins leaf pages */
 		split.mp = mp;

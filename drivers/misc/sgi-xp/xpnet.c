@@ -196,7 +196,7 @@ xpnet_receive(short partid, int channel, struct xpnet_message *msg)
 	 */
 	if ((XPNET_VERSION_MINOR(msg->version) == 1) &&
 	    (msg->embedded_bytes != 0)) {
-		dev_dbg(xpnet, "copying embedded message. memcpy(0x%p, 0x%p, "
+		dev_dbg(xpnet, "copying embedded message. memcpy(0x%pK, 0x%pK, "
 			"%lu)\n", skb->data, &msg->data,
 			(size_t)msg->embedded_bytes);
 
@@ -205,7 +205,7 @@ xpnet_receive(short partid, int channel, struct xpnet_message *msg)
 	} else {
 		dst = (void *)((u64)skb->data & ~(L1_CACHE_BYTES - 1));
 		dev_dbg(xpnet, "transferring buffer to the skb->data area;\n\t"
-			"xp_remote_memcpy(0x%p, 0x%p, %hu)\n", dst,
+			"xp_remote_memcpy(0x%pK, 0x%pK, %hu)\n", dst,
 					  (void *)msg->buf_pa, msg->size);
 
 		ret = xp_remote_memcpy(xp_pa(dst), msg->buf_pa, msg->size);
@@ -215,7 +215,7 @@ xpnet_receive(short partid, int channel, struct xpnet_message *msg)
 			 * !!! appears in_use and we can't just call
 			 * !!! dev_kfree_skb.
 			 */
-			dev_err(xpnet, "xp_remote_memcpy(0x%p, 0x%p, 0x%hx) "
+			dev_err(xpnet, "xp_remote_memcpy(0x%pK, 0x%pK, 0x%hx) "
 				"returned error=0x%x\n", dst,
 				(void *)msg->buf_pa, msg->size, ret);
 
@@ -227,8 +227,8 @@ xpnet_receive(short partid, int channel, struct xpnet_message *msg)
 		}
 	}
 
-	dev_dbg(xpnet, "<skb->head=0x%p skb->data=0x%p skb->tail=0x%p "
-		"skb->end=0x%p skb->len=%d\n", (void *)skb->head,
+	dev_dbg(xpnet, "<skb->head=0x%pK skb->data=0x%pK skb->tail=0x%pK "
+		"skb->end=0x%pK skb->len=%d\n", (void *)skb->head,
 		(void *)skb->data, skb_tail_pointer(skb), skb_end_pointer(skb),
 		skb->len);
 
@@ -236,8 +236,8 @@ xpnet_receive(short partid, int channel, struct xpnet_message *msg)
 	skb->ip_summed = CHECKSUM_UNNECESSARY;
 
 	dev_dbg(xpnet, "passing skb to network layer\n"
-		"\tskb->head=0x%p skb->data=0x%p skb->tail=0x%p "
-		"skb->end=0x%p skb->len=%d\n",
+		"\tskb->head=0x%pK skb->data=0x%pK skb->tail=0x%pK "
+		"skb->end=0x%pK skb->len=%d\n",
 		(void *)skb->head, (void *)skb->data, skb_tail_pointer(skb),
 		skb_end_pointer(skb), skb->len);
 
@@ -298,7 +298,7 @@ xpnet_dev_open(struct net_device *dev)
 {
 	enum xp_retval ret;
 
-	dev_dbg(xpnet, "calling xpc_connect(%d, 0x%p, NULL, %ld, %ld, %ld, "
+	dev_dbg(xpnet, "calling xpc_connect(%d, 0x%pK, NULL, %ld, %ld, %ld, "
 		"%ld)\n", XPC_NET_CHANNEL, xpnet_connection_activity,
 		(unsigned long)XPNET_MSG_SIZE,
 		(unsigned long)XPNET_MSG_NENTRIES,
@@ -364,7 +364,7 @@ xpnet_send_completed(enum xp_retval reason, short partid, int channel,
 		partid, reason);
 
 	if (atomic_dec_return(&queued_msg->use_count) == 0) {
-		dev_dbg(xpnet, "all acks for skb->head=-x%p\n",
+		dev_dbg(xpnet, "all acks for skb->head=-x%pK\n",
 			(void *)queued_msg->skb->head);
 
 		dev_kfree_skb_any(queued_msg->skb);
@@ -384,7 +384,7 @@ xpnet_send(struct sk_buff *skb, struct xpnet_pending_msg *queued_msg,
 	msg->embedded_bytes = embedded_bytes;
 	if (unlikely(embedded_bytes != 0)) {
 		msg->version = XPNET_VERSION_EMBED;
-		dev_dbg(xpnet, "calling memcpy(0x%p, 0x%p, 0x%lx)\n",
+		dev_dbg(xpnet, "calling memcpy(0x%pK, 0x%pK, 0x%lx)\n",
 			&msg->data, skb->data, (size_t)embedded_bytes);
 		skb_copy_from_linear_data(skb, &msg->data,
 					  (size_t)embedded_bytes);
@@ -429,8 +429,8 @@ xpnet_dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	short dest_partid;
 	u16 embedded_bytes = 0;
 
-	dev_dbg(xpnet, ">skb->head=0x%p skb->data=0x%p skb->tail=0x%p "
-		"skb->end=0x%p skb->len=%d\n", (void *)skb->head,
+	dev_dbg(xpnet, ">skb->head=0x%pK skb->data=0x%pK skb->tail=0x%pK "
+		"skb->end=0x%pK skb->len=%d\n", (void *)skb->head,
 		(void *)skb->data, skb_tail_pointer(skb), skb_end_pointer(skb),
 		skb->len);
 

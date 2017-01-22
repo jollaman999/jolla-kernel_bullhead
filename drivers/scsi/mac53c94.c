@@ -73,11 +73,11 @@ static int mac53c94_queue_lck(struct scsi_cmnd *cmd, void (*done)(struct scsi_cm
 #if 0
 	if (cmd->sc_data_direction == DMA_TO_DEVICE) {
 		int i;
-		printk(KERN_DEBUG "mac53c94_queue %p: command is", cmd);
+		printk(KERN_DEBUG "mac53c94_queue %pK: command is", cmd);
 		for (i = 0; i < cmd->cmd_len; ++i)
 			printk(KERN_CONT " %.2x", cmd->cmnd[i]);
 		printk(KERN_CONT "\n");
-		printk(KERN_DEBUG "use_sg=%d request_bufflen=%d request_buffer=%p\n",
+		printk(KERN_DEBUG "use_sg=%d request_bufflen=%d request_buffer=%pK\n",
 		       scsi_sg_count(cmd), scsi_bufflen(cmd), scsi_sglist(cmd));
 	}
 #endif
@@ -150,7 +150,7 @@ static void mac53c94_start(struct fsc_state *state)
 	int i;
 
 	if (state->phase != idle || state->current_req != NULL)
-		panic("inappropriate mac53c94_start (state=%p)", state);
+		panic("inappropriate mac53c94_start (state=%pK)", state);
 	if (state->request_q == NULL)
 		return;
 	state->current_req = cmd = state->request_q;

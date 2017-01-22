@@ -667,7 +667,7 @@ void stk1160_clear_queue(struct stk1160 *dev)
 			struct stk1160_buffer, list);
 		list_del(&buf->list);
 		vb2_buffer_done(&buf->vb, VB2_BUF_STATE_ERROR);
-		stk1160_info("buffer [%p/%d] aborted\n",
+		stk1160_info("buffer [%pK/%d] aborted\n",
 				buf, buf->vb.v4l2_buf.index);
 	}
 
@@ -677,7 +677,7 @@ void stk1160_clear_queue(struct stk1160 *dev)
 		dev->isoc_ctl.buf = NULL;
 
 		vb2_buffer_done(&buf->vb, VB2_BUF_STATE_ERROR);
-		stk1160_info("buffer [%p/%d] aborted\n",
+		stk1160_info("buffer [%pK/%d] aborted\n",
 				buf, buf->vb.v4l2_buf.index);
 	}
 	spin_unlock_irqrestore(&dev->buf_lock, flags);

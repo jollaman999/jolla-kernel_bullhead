@@ -245,7 +245,7 @@ static int usb_alloc_stream_buffers(struct usb_data_stream *stream, int num,
 			return -ENOMEM;
 		}
 
-		dev_dbg(&stream->udev->dev, "%s: alloc buf=%d %p (dma %llu)\n",
+		dev_dbg(&stream->udev->dev, "%s: alloc buf=%d %pK (dma %llu)\n",
 				__func__, stream->buf_num,
 				stream->buf_list[stream->buf_num],
 				(long long)stream->dma_addr[stream->buf_num]);

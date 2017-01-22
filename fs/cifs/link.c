@@ -521,7 +521,7 @@ cifs_follow_link(struct dentry *direntry, struct nameidata *nd)
 	if (!full_path)
 		goto out;
 
-	cifs_dbg(FYI, "Full path: %s inode = 0x%p\n", full_path, inode);
+	cifs_dbg(FYI, "Full path: %s inode = 0x%pK\n", full_path, inode);
 
 	rc = -EACCES;
 	/*

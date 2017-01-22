@@ -816,7 +816,7 @@ iscsi_sw_tcp_session_create(struct iscsi_endpoint *ep, uint16_t cmds_max,
 	struct Scsi_Host *shost;
 
 	if (ep) {
-		printk(KERN_ERR "iscsi_tcp: invalid ep %p.\n", ep);
+		printk(KERN_ERR "iscsi_tcp: invalid ep %pK.\n", ep);
 		return NULL;
 	}
 

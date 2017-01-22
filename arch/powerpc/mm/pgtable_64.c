@@ -315,7 +315,7 @@ void __iounmap(volatile void __iomem *token)
 			 PCI_FIX_ADDR(token) & PAGE_MASK);
 	if ((unsigned long)addr < ioremap_bot) {
 		printk(KERN_WARNING "Attempt to iounmap early bolted mapping"
-		       " at 0x%p\n", addr);
+		       " at 0x%pK\n", addr);
 		return;
 	}
 	vunmap(addr);

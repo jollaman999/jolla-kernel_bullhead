@@ -6929,7 +6929,7 @@ static int qla4xxx_probe_adapter(struct pci_dev *pdev,
 	if (ret)
 		goto probe_failed_ioconfig;
 
-	ql4_printk(KERN_INFO, ha, "Found an ISP%04x, irq %d, iobase 0x%p\n",
+	ql4_printk(KERN_INFO, ha, "Found an ISP%04x, irq %d, iobase 0x%pK\n",
 		   pdev->device, pdev->irq, ha->reg);
 
 	qla4xxx_config_dma_addressing(ha);
@@ -7457,7 +7457,7 @@ static int qla4xxx_eh_abort(struct scsi_cmnd *cmd)
 	int wait = 0;
 
 	ql4_printk(KERN_INFO, ha,
-	    "scsi%ld:%d:%d: Abort command issued cmd=%p\n",
+	    "scsi%ld:%d:%d: Abort command issued cmd=%pK\n",
 	    ha->host_no, id, lun, cmd);
 
 	spin_lock_irqsave(&ha->hardware_lock, flags);
@@ -7523,7 +7523,7 @@ static int qla4xxx_eh_device_reset(struct scsi_cmnd *cmd)
 		   cmd->device->channel, cmd->device->id, cmd->device->lun);
 
 	DEBUG2(printk(KERN_INFO
-		      "scsi%ld: DEVICE_RESET cmd=%p jiffies = 0x%lx, to=%x,"
+		      "scsi%ld: DEVICE_RESET cmd=%pK jiffies = 0x%lx, to=%x,"
 		      "dpc_flags=%lx, status=%x allowed=%d\n", ha->host_no,
 		      cmd, jiffies, cmd->request->timeout / HZ,
 		      ha->dpc_flags, cmd->result, cmd->allowed));
@@ -7583,7 +7583,7 @@ static int qla4xxx_eh_target_reset(struct scsi_cmnd *cmd)
 		       "WARM TARGET RESET ISSUED.\n");
 
 	DEBUG2(printk(KERN_INFO
-		      "scsi%ld: TARGET_DEVICE_RESET cmd=%p jiffies = 0x%lx, "
+		      "scsi%ld: TARGET_DEVICE_RESET cmd=%pK jiffies = 0x%lx, "
 		      "to=%x,dpc_flags=%lx, status=%x allowed=%d\n",
 		      ha->host_no, cmd, jiffies, cmd->request->timeout / HZ,
 		      ha->dpc_flags, cmd->result, cmd->allowed));

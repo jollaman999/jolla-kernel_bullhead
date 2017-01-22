@@ -1513,7 +1513,7 @@ static int coda_open(struct file *file)
 	clk_prepare_enable(dev->clk_per);
 	clk_prepare_enable(dev->clk_ahb);
 
-	v4l2_dbg(1, coda_debug, &dev->v4l2_dev, "Created instance %d (%p)\n",
+	v4l2_dbg(1, coda_debug, &dev->v4l2_dev, "Created instance %d (%pK)\n",
 		 ctx->idx, ctx);
 
 	return 0;
@@ -1530,7 +1530,7 @@ static int coda_release(struct file *file)
 	struct coda_dev *dev = video_drvdata(file);
 	struct coda_ctx *ctx = fh_to_ctx(file->private_data);
 
-	v4l2_dbg(1, coda_debug, &dev->v4l2_dev, "Releasing instance %p\n",
+	v4l2_dbg(1, coda_debug, &dev->v4l2_dev, "Releasing instance %pK\n",
 		 ctx);
 
 	coda_lock(ctx);

@@ -205,7 +205,7 @@ static int usbbcm_device_probe(struct usb_interface *intf, const struct usb_devi
 	usb_set_intfdata(intf, psIntfAdapter);
 
 	BCM_DEBUG_PRINT(psAdapter, DBG_TYPE_INITEXIT, DRV_ENTRY, DBG_LVL_ALL,
-		"psIntfAdapter 0x%p\n", psIntfAdapter);
+		"psIntfAdapter 0x%pK\n", psIntfAdapter);
 	retval = InterfaceAdapterInit(psIntfAdapter);
 	if (retval) {
 		/* If the Firmware/Cfg File is not present

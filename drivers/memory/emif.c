@@ -1588,7 +1588,7 @@ static int __init_or_module emif_probe(struct platform_device *pdev)
 		 */
 	}
 
-	dev_info(&pdev->dev, "%s: device configured with addr = %p and IRQ%d\n",
+	dev_info(&pdev->dev, "%s: device configured with addr = %pK and IRQ%d\n",
 		__func__, emif->base, irq);
 
 	return 0;

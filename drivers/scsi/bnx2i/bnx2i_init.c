@@ -299,7 +299,7 @@ static int bnx2i_init_one(struct bnx2i_hba *hba, struct cnic_dev *cnic)
 		adapter_count++;
 	} else if (rc == -EBUSY) 	/* duplicate registration */
 		printk(KERN_ALERT "bnx2i, duplicate registration"
-				  "hba=%p, cnic=%p\n", hba, cnic);
+				  "hba=%pK, cnic=%pK\n", hba, cnic);
 	else if (rc == -EAGAIN)
 		printk(KERN_ERR "bnx2i, driver not registered\n");
 	else if (rc == -EINVAL)
@@ -336,7 +336,7 @@ void bnx2i_ulp_init(struct cnic_dev *dev)
 	/* Get PCI related information and update hba struct members */
 	clear_bit(BNX2I_CNIC_REGISTERED, &hba->reg_with_cnic);
 	if (bnx2i_init_one(hba, dev)) {
-		printk(KERN_ERR "bnx2i - hba %p init failed\n", hba);
+		printk(KERN_ERR "bnx2i - hba %pK init failed\n", hba);
 		bnx2i_free_hba(hba);
 	}
 }
@@ -354,7 +354,7 @@ void bnx2i_ulp_exit(struct cnic_dev *dev)
 	hba = bnx2i_find_hba_for_cnic(dev);
 	if (!hba) {
 		printk(KERN_INFO "bnx2i_ulp_exit: hba not "
-				 "found, dev 0x%p\n", dev);
+				 "found, dev 0x%pK\n", dev);
 		return;
 	}
 	mutex_lock(&bnx2i_dev_lock);

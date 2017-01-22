@@ -144,7 +144,7 @@ static ssize_t bcm_char_read(struct file *filp, char __user *buf, size_t size,
 			return -EFAULT;
 		}
 		BCM_DEBUG_PRINT(Adapter, DBG_TYPE_OTHERS, OSAL_DBG, DBG_LVL_ALL,
-				"Read %zd Bytes From Adapter packet = %p by process %d!\n",
+				"Read %zd Bytes From Adapter packet = %pK by process %d!\n",
 				PktLen, Packet, current->pid);
 		dev_kfree_skb(Packet);
 	}

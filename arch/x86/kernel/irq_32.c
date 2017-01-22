@@ -145,7 +145,7 @@ void irq_ctx_init(int cpu)
 
 	per_cpu(softirq_ctx, cpu) = irqctx;
 
-	printk(KERN_DEBUG "CPU %u irqstacks, hard=%p soft=%p\n",
+	printk(KERN_DEBUG "CPU %u irqstacks, hard=%pK soft=%pK\n",
 	       cpu, per_cpu(hardirq_ctx, cpu),  per_cpu(softirq_ctx, cpu));
 }
 

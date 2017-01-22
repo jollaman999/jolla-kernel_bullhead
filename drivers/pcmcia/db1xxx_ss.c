@@ -543,7 +543,7 @@ static int db1x_pcmcia_socket_probe(struct platform_device *pdev)
 	}
 
 	printk(KERN_INFO "Alchemy Db/Pb1xxx pcmcia%d @ io/attr/mem %09llx"
-		"(%p) %09llx %09llx  card/insert/stschg/eject irqs @ %d "
+		"(%pK) %09llx %09llx  card/insert/stschg/eject irqs @ %d "
 		"%d %d %d\n", sock->nr, sock->phys_io, sock->virt_io,
 		sock->phys_attr, sock->phys_mem, sock->card_irq,
 		sock->insert_irq, sock->stschg_irq, sock->eject_irq);

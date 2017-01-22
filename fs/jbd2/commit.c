@@ -624,7 +624,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 				continue;
 			}
 
-			jbd_debug(4, "JBD2: got buffer %llu (%p)\n",
+			jbd_debug(4, "JBD2: got buffer %llu (%pK)\n",
 				(unsigned long long)descriptor->b_blocknr,
 				descriptor->b_data);
 			header = (journal_header_t *)descriptor->b_data;

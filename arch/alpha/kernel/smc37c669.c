@@ -2529,7 +2529,7 @@ void __init SMC669_Init ( int index )
         SMC37c669_display_device_info( );
 #endif
 	local_irq_restore(flags);
-        printk( "SMC37c669 Super I/O Controller found @ 0x%p\n",
+        printk( "SMC37c669 Super I/O Controller found @ 0x%pK\n",
 		SMC_base );
     }
     else {
