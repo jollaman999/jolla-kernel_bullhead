@@ -116,6 +116,7 @@ static int big_core_start;
  */
 unsigned int poll_ms;
 unsigned int temp_threshold;
+unsigned int temp_big_threshold;
 unsigned int temp_big_off_threshold;
 unsigned int temp_step_little = 4;
 unsigned int temp_step_big = 2;
@@ -125,6 +126,7 @@ unsigned int temp_count_max_little = 4;
 unsigned int temp_count_max_big = 6;
 module_param(poll_ms, int, 0644);
 module_param(temp_threshold, int, 0644);
+module_param(temp_big_threshold, int, 0644);
 module_param(temp_big_off_threshold, int, 0644);
 module_param(temp_step_little, int, 0644);
 module_param(temp_step_big, int, 0644);
@@ -1317,53 +1319,74 @@ static void update_cluster_freq(void)
 }
 
 static int cur_index_little = 0, cur_index_big = 0;
-static bool restored = true;
+static bool restored_little = true, restored_big = true;
 
 static void do_cluster_freq_ctrl(long temp)
 {
 	uint32_t _cluster = 0;
 	int _cpu = -1, freq_idx = 0;
-	int temp_diff;
+	int temp_diff_little, temp_diff_big;
 	int index, step;
 	int index_little, index_big;
 	bool skip_little = false, skip_big = false;
 	struct cluster_info *cluster_ptr = NULL;
 
+	/* LITTLE */
 	if (temp < temp_threshold) {
-		if (restored)
+		if (restored_little && restored_big)
 			return;
-		else {
-			index_little = index_big = 0;
-			cur_index_big = cur_index_little = 0;
-			restored = true;
-			goto freq_control;
+		if (restored_little) {
+			skip_little = true;
+		} else {
+			index_little = 0;
+			cur_index_little = 0;
+			restored_little = true;
 		}
+	} else {
+		temp_diff_little = temp - temp_threshold;
+		if (temp_diff_little > 0) {
+			index_little = temp_diff_little / temp_step_little + 1;
+			if (index_little > temp_count_max_little)
+				index_little = temp_count_max_little;
+		} else
+			index_little = 1;
+
+		if (index_little == cur_index_little)
+			skip_little = true;
+		else
+			cur_index_little = index_little;
+
+		restored_little = false;
 	}
 
-	temp_diff = temp - temp_threshold;
-	if (temp_diff > 0) {
-		index_little = temp_diff / temp_step_little + 1;
-		index_big = temp_diff / temp_step_big + 1;
-		if (index_little > temp_count_max_little)
-			index_little = temp_count_max_little;
-		if (index_big > temp_count_max_big)
-			index_big = temp_count_max_big;
-	} else
-		index_big = index_little = 1;
+	/* big */
+	if (temp < temp_big_threshold) {
+		if (restored_little && restored_big)
+			return;
+		if (restored_big) {
+			skip_big = true;
+		} else {
+			index_big = 0;
+			cur_index_big = 0;
+			restored_big = true;
+		}
+	} else {
+		temp_diff_big = temp - temp_big_threshold;
+		if (temp_diff_big > 0) {
+			index_big = temp_diff_big / temp_step_big + 1;
+			if (index_big > temp_count_max_big)
+				index_big = temp_count_max_big;
+		} else
+			index_big = 1;
 
-	if (index_little == cur_index_little)
-		skip_little = true;
-	else
-		cur_index_little = index_little;
+		if (index_big == cur_index_big)
+			skip_big = true;
+		else
+			cur_index_big = index_big;
 
-	if (index_big == cur_index_big)
-		skip_big = true;
-	else
-		cur_index_big = index_big;
+		restored_big = false;
+	}
 
-	restored = false;
-
-freq_control:
 	get_online_cpus();
 	for (; _cluster < core_ptr->entity_count; _cluster++) {
 		cluster_ptr = &core_ptr->child_entity_ptr[_cluster];
@@ -5877,6 +5900,11 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 
 	key = "qcom,limit-temp-little";
 	ret = of_property_read_u32(node, key, &temp_threshold);
+	if (ret)
+		goto fail;
+
+	key = "qcom,limit-temp-big";
+	ret = of_property_read_u32(node, key, &temp_big_threshold);
 	if (ret)
 		goto fail;
 
