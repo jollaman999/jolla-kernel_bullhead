@@ -62,6 +62,9 @@ module_param_named(adreno_idler_active, adreno_idler_active, bool, 0664);
 
 static unsigned int idlecount = 0;
 
+/* Boolean to let us know if the display is on*/
+static bool display_on;
+
 int adreno_idler(struct devfreq_dev_status stats, struct devfreq *devfreq,
 		 unsigned long *freq)
 {
