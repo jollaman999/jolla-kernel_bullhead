@@ -20,13 +20,10 @@
 #include <linux/ftrace.h>
 #include <linux/mm.h>
 #include <linux/msm_adreno_devfreq.h>
+#include <linux/display_state.h>
 #include <asm/cacheflush.h>
 #include <soc/qcom/scm.h>
 #include "governor.h"
-
-#ifdef CONFIG_ADRENO_IDLER
-#include <linux/fb.h>
-#endif
 
 static DEFINE_SPINLOCK(tz_lock);
 static DEFINE_SPINLOCK(sample_lock);
@@ -77,11 +74,9 @@ static void do_partner_stop_event(struct work_struct *work);
 static void do_partner_suspend_event(struct work_struct *work);
 static void do_partner_resume_event(struct work_struct *work);
 
-#ifdef CONFIG_ADRENO_IDLER
 /* Display and suspend state booleans */ 
-static bool mdss_is_off;
+static bool display_on;
 static bool suspended = false;
-#endif
 
 static struct workqueue_struct *workqueue;
 
@@ -305,26 +300,24 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 		return result;
 	}
 
-#ifdef CONFIG_ADRENO_IDLER
 	/* Prevent overflow */
 	if (stats.busy_time >= (1 << 24) || stats.total_time >= (1 << 24)) {
 		stats.busy_time >>= 7;
 		stats.total_time >>= 7;
 	}
-#endif
 
 	*freq = stats.current_frequency;
 
-#ifdef CONFIG_ADRENO_IDLER
 	/*
 	 * Force to use & record as min freq when system has
 	 * entered pm-suspend or screen-off state.
 	 */
-	if (suspended || mdss_is_off) {
+	if (suspended || !display_on) {
 		*freq = devfreq->profile->freq_table[devfreq->profile->max_state - 1];
 		return 0;
 	}
 
+#ifdef CONFIG_ADRENO_IDLER
 	if (adreno_idler(stats, devfreq, freq)) {
 		/* adreno_idler has asked to bail out now */
 		return 0;
@@ -502,9 +495,8 @@ static int tz_suspend(struct devfreq *devfreq)
 	struct devfreq_msm_adreno_tz_data *priv = devfreq->data;
 	unsigned int scm_data[2] = {0, 0};
 	__secure_tz_reset_entry2(scm_data, sizeof(scm_data), priv->is_64);
-#ifdef CONFIG_ADRENO_IDLER
+	display_on = is_display_on();
 	suspended = true;
-#endif
 
 	priv->bin.total_time = 0;
 	priv->bin.busy_time = 0;
@@ -551,9 +543,8 @@ static int tz_handler(struct devfreq *devfreq, unsigned int event, void *data)
 	case DEVFREQ_GOV_RESUME:
 		spin_lock(&suspend_lock);
 		suspend_time += suspend_time_ms();
-#ifdef CONFIG_ADRENO_IDLER
+		display_on = is_display_on();
 		suspended = false;
-#endif
 		/* Reset the suspend_start when gpu resumes */
 		suspend_start = 0;
 		spin_unlock(&suspend_lock);
@@ -619,34 +610,6 @@ static void do_partner_resume_event(struct work_struct *work)
 	_do_partner_event(work, DEVFREQ_GOV_RESUME);
 }
 
-#ifdef CONFIG_ADRENO_IDLER
-static int adreno_fb_notifier_callback(struct notifier_block *self,
-				unsigned long event, void *data)
-{
-	struct fb_event *evdata = data;
-	int *blank;
-
-	if (event == FB_EVENT_BLANK) {
-		blank = evdata->data;
-
-		switch (*blank) {
-		case FB_BLANK_UNBLANK:
-		case FB_BLANK_VSYNC_SUSPEND:
-			mdss_is_off = false;
-			break;
-		case FB_BLANK_POWERDOWN:
-			mdss_is_off = true;
-			break;
-		}
-	}
-
-	return 0;
-}
-
-struct notifier_block adreno_fb_notif = {
-	.notifier_call = adreno_fb_notifier_callback,
-};
-#endif
 
 static struct devfreq_governor msm_adreno_tz = {
 	.name = "msm-adreno-tz",
@@ -656,33 +619,17 @@ static struct devfreq_governor msm_adreno_tz = {
 
 static int __init msm_adreno_tz_init(void)
 {
-#ifdef CONFIG_ADRENO_IDLER
-	int ret;
-#endif
-
 	workqueue = create_freezable_workqueue("governor_msm_adreno_tz_wq");
 	if (workqueue == NULL)
 		return -ENOMEM;
 
-#ifdef CONFIG_ADRENO_IDLER
-	ret = fb_register_client(&adreno_fb_notif);
-	if (ret)
-		pr_err(TAG "failed to register fb %d\n", ret);
-#endif
 	return devfreq_add_governor(&msm_adreno_tz);
 }
 subsys_initcall(msm_adreno_tz_init);
 
 static void __exit msm_adreno_tz_exit(void)
 {
-	int ret;
-
-#ifdef CONFIG_ADRENO_IDLER
-	ret = fb_unregister_client(&adreno_fb_notif);
-	if (ret)
-		pr_err(TAG "failed to unregister fb %d\n", ret);
-#endif
-	ret = devfreq_remove_governor(&msm_adreno_tz);
+	int ret = devfreq_remove_governor(&msm_adreno_tz);
 	if (ret)
 		pr_err(TAG "failed to remove governor %d\n", ret);
 
