@@ -93,26 +93,27 @@ static int big_core_start;
 /*
  * Tunable options
  *
- * poll_ms - msm_thermal will check device's temperature every this milli seconds.
- * temp_threshold - Limit the frequency when temp is reached to 'temp_threshold'.
- * temp_big_off_threshold - Turn off the big cores when temp is reached to 'temp_big_off_threshold'.
+ * poll_ms - msm_thermal will check the device's temperature every this milli seconds.
+ * temp_threshold - Limit the frequency of LITTLE when the temp is reached to this value.
+ * temp_big_threshold - Limit the frequency of big when the temp is reached to this value.
+ * temp_big_off_threshold - Turn off the big cores when the temp is reached to this value.
  * temp_step_little - If 'temp_step_little = 4' and 'temp_threshold = 60', frequency will decrease like below.
-		temp = 60 --> Little's max frequency will decrease one time.
-		temp = 62 --> Little's max frequency will decrease one time.
-		temp = 63 --> Little's max frequency will decrease one time.
-		temp = 64 --> Little's max frequency will decrease two times.
-		temp = 65 --> Little's max frequency will decrease two times.
-		temp = 68 --> Little's max frequency will decrease three times.
+		temp = 60 --> LITTLE's max frequency will decrease one step.
+		temp = 62 --> LITTLE's max frequency will decrease one step.
+		temp = 63 --> LITTLE's max frequency will decrease one step.
+		temp = 64 --> LITTLE's max frequency will decrease two steps.
+		temp = 65 --> LITTLE's max frequency will decrease two steps.
+		temp = 68 --> LITTLE's max frequency will decrease three steps.
  * temp_step_big - If 'temp_step_big = 2' and 'temp_threshold = 60', frequency will decrease like below.
-		temp = 60 --> Big's max frequency will decrease one time.
-		temp = 61 --> Big's max frequency will decrease one time.
-		temp = 62 --> Big's max frequency will decrease two time.
-		temp = 63 --> Big's max frequency will decrease two times.
-		temp = 64 --> Big's max frequency will decrease three times.
+		temp = 60 --> big's max frequency will decrease one step.
+		temp = 61 --> big's max frequency will decrease one step.
+		temp = 62 --> big's max frequency will decrease two steps.
+		temp = 63 --> big's max frequency will decrease two steps.
+		temp = 64 --> big's max frequency will decrease three steps.
  * freq_step_little - Frequency decrease step for little.
  * freq_step_big - Frequency decrease step for big.
- * temp_count_max_little - If this value is 3, little's max frequency will decrease 1 to 3 times.
- * temp_count_max_big - If this value is 5, big's max frequency will decrease 1 to 5 times.
+ * temp_count_max_little - If this value is 3, LITTLE's max frequency will decrease 1 to 3 steps.
+ * temp_count_max_big - If this value is 5, big's max frequency will decrease 1 to 5 steps.
  */
 unsigned int poll_ms;
 unsigned int temp_threshold;
