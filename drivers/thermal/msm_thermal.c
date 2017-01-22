@@ -95,7 +95,7 @@ static int big_core_start;
  *
  * poll_ms - msm_thermal will check device's temperature every this milli seconds.
  * temp_threshold - Limit the frequency when temp is reached to 'temp_threshold'.
- * temp_big_threshold - Turn off the big cores when temp is reached to 'temp_big_threshold'.
+ * temp_big_off_threshold - Turn off the big cores when temp is reached to 'temp_big_off_threshold'.
  * temp_step_little - If 'temp_step_little = 4' and 'temp_threshold = 60', frequency will decrease like below.
 		temp = 60 --> Little's max frequency will decrease one time.
 		temp = 62 --> Little's max frequency will decrease one time.
@@ -116,7 +116,7 @@ static int big_core_start;
  */
 unsigned int poll_ms;
 unsigned int temp_threshold;
-unsigned int temp_big_threshold;
+unsigned int temp_big_off_threshold;
 unsigned int temp_step_little = 4;
 unsigned int temp_step_big = 2;
 unsigned int freq_step_little = 1;
@@ -125,7 +125,7 @@ unsigned int temp_count_max_little = 4;
 unsigned int temp_count_max_big = 6;
 module_param(poll_ms, int, 0644);
 module_param(temp_threshold, int, 0644);
-module_param(temp_big_threshold, int, 0644);
+module_param(temp_big_off_threshold, int, 0644);
 module_param(temp_step_little, int, 0644);
 module_param(temp_step_big, int, 0644);
 module_param(freq_step_little, int, 0644);
@@ -2477,7 +2477,7 @@ static void __ref do_core_control(long temp)
 
 	mutex_lock(&core_control_mutex);
 	if (msm_thermal_info.core_control_mask &&
-		temp >= temp_big_threshold) {
+		temp >= temp_big_off_threshold) {
 		for (i = big_core_start; i < num_possible_cpus(); i++) { // Only on/off big cores
 			if (!(msm_thermal_info.core_control_mask & BIT(i)))
 				continue;
@@ -2499,7 +2499,7 @@ static void __ref do_core_control(long temp)
 			break;
 		}
 	} else if (msm_thermal_info.core_control_mask && cpus_offlined &&
-		temp <= (temp_big_threshold - msm_thermal_info.core_temp_hysteresis_degC)) {
+		temp <= (temp_big_off_threshold - msm_thermal_info.core_temp_hysteresis_degC)) {
 		for (i = big_core_start; i < num_possible_cpus(); i++) { // Only on/off big cores
 			if (!(cpus_offlined & BIT(i)))
 				continue;
@@ -5875,13 +5875,13 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 	if (ret)
 		goto fail;
 
-	key = "qcom,limit-temp";
+	key = "qcom,limit-temp-little";
 	ret = of_property_read_u32(node, key, &temp_threshold);
 	if (ret)
 		goto fail;
 
-	key = "qcom,limit-temp-big";
-	ret = of_property_read_u32(node, key, &temp_big_threshold);
+	key = "qcom,temp-big-off";
+	ret = of_property_read_u32(node, key, &temp_big_off_threshold);
 	if (ret)
 		goto fail;
 
