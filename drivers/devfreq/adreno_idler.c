@@ -100,6 +100,7 @@ int adreno_idler(struct devfreq_dev_status stats, struct devfreq *devfreq,
 	}
 	return 0;
 }
+EXPORT_SYMBOL(adreno_idler);
 
 static int __init adreno_idler_init(void)
 {
