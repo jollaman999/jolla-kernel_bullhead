@@ -4530,7 +4530,7 @@ static int tomtom_notifier_callback(struct notifier_block *self,
 		container_of(self, struct synaptics_rmi4_data, tomtom_notif);
 	unsigned int delay = SOVC_TOUCH_OFF_DELAY;
 
-	if (!sovc_switch)
+	if (!sovc_switch || !scr_suspended)
 		return 0;
 
 	cancel_delayed_work(&rmi4_data->touch_off_work);
