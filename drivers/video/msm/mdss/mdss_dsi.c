@@ -46,6 +46,8 @@
 extern bool tomtom_mic_detected;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+extern bool is_touch_on(void);
+
 extern bool sovc_do_not_turn_off_mdss;
 static bool mdss_vreg_off_end = false;
 
@@ -2184,6 +2186,8 @@ static int tomtom_notifier_callback(struct notifier_block *self,
 	cancel_delayed_work(&ctrl_pdata->mdss_off_work);
 
 	if (event == TOMTOM_EVENT_STOPPED) {
+		if (is_touch_on())
+			return 0;
 		if (sovc_force_off)
 			delay = 0;
 		queue_delayed_work(ctrl_pdata->mdss_off_workqueue,
