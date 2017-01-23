@@ -29,12 +29,6 @@
 #include "mdss_dsi.h"
 #include "mdss_debug.h"
 
-#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-#include <linux/input/sweep2wake.h>
-#endif
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-#include <linux/input/doubletap2wake.h>
-#endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 #include <linux/input/scroff_volctr.h>
 #include <linux/wcd9330_notifier.h>
@@ -43,11 +37,9 @@
 #define XO_CLK_RATE	19200000
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
-extern bool tomtom_mic_detected;
+extern bool is_touch_on(void);
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-extern bool is_touch_on(void);
-
 extern bool sovc_do_not_turn_off_mdss;
 static bool mdss_vreg_off_end = false;
 
@@ -282,25 +274,11 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 	}
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
-	if (tomtom_mic_detected)
-		goto off;
+	if (!is_touch_on())
 #endif
-#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-	if (s2w_switch == 1)
-		goto end;
-#endif
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-	if (dt2w_switch)
-		goto end;
-#endif
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (sovc_switch && sovc_tmp_onoff)
-		goto end;
-#endif
-#if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
-off:
-#endif
-	ret = mdss_dsi_panel_vreg_off_trigger(ctrl_pdata);
+	{
+		ret = mdss_dsi_panel_vreg_off_trigger(ctrl_pdata);
+	}
 
 end:
 	return ret;
