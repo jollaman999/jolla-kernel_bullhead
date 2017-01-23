@@ -215,7 +215,7 @@ static acpi_status acpi_ex_name_segment(u8 ** in_aml_address, char *name_string)
 		 */
 		status = AE_AML_BAD_NAME;
 		ACPI_ERROR((AE_INFO,
-			    "Bad character 0x%02x in name, at %pK",
+			    "Bad character 0x%02x in name, at %p",
 			    *aml_address, aml_address));
 	}
 
@@ -276,7 +276,7 @@ acpi_ex_get_name_string(acpi_object_type data_type,
 		case AML_ROOT_PREFIX:
 
 			ACPI_DEBUG_PRINT((ACPI_DB_LOAD,
-					  "RootPrefix(\\) at %pK\n",
+					  "RootPrefix(\\) at %p\n",
 					  aml_address));
 
 			/*
@@ -294,7 +294,7 @@ acpi_ex_get_name_string(acpi_object_type data_type,
 
 			do {
 				ACPI_DEBUG_PRINT((ACPI_DB_LOAD,
-						  "ParentPrefix (^) at %pK\n",
+						  "ParentPrefix (^) at %p\n",
 						  aml_address));
 
 				aml_address++;
@@ -318,7 +318,7 @@ acpi_ex_get_name_string(acpi_object_type data_type,
 		case AML_DUAL_NAME_PREFIX:
 
 			ACPI_DEBUG_PRINT((ACPI_DB_LOAD,
-					  "DualNamePrefix at %pK\n",
+					  "DualNamePrefix at %p\n",
 					  aml_address));
 
 			aml_address++;
@@ -345,7 +345,7 @@ acpi_ex_get_name_string(acpi_object_type data_type,
 		case AML_MULTI_NAME_PREFIX_OP:
 
 			ACPI_DEBUG_PRINT((ACPI_DB_LOAD,
-					  "MultiNamePrefix at %pK\n",
+					  "MultiNamePrefix at %p\n",
 					  aml_address));
 
 			/* Fetch count of segments remaining in name path */
@@ -417,7 +417,7 @@ acpi_ex_get_name_string(acpi_object_type data_type,
 
 		/* Ran out of segments after processing a prefix */
 
-		ACPI_ERROR((AE_INFO, "Malformed Name at %pK", name_string));
+		ACPI_ERROR((AE_INFO, "Malformed Name at %p", name_string));
 		status = AE_AML_BAD_NAME;
 	}
 

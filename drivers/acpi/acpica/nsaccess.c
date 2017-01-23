@@ -315,7 +315,7 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 
 	if ((!scope_info) || (!scope_info->scope.node)) {
 		ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
-				  "Null scope prefix, using root node (%pK)\n",
+				  "Null scope prefix, using root node (%p)\n",
 				  acpi_gbl_root_node));
 
 		prefix_node = acpi_gbl_root_node;
@@ -323,7 +323,7 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 		prefix_node = scope_info->scope.node;
 		if (ACPI_GET_DESCRIPTOR_TYPE(prefix_node) !=
 		    ACPI_DESC_TYPE_NAMED) {
-			ACPI_ERROR((AE_INFO, "%pK is not a namespace node [%s]",
+			ACPI_ERROR((AE_INFO, "%p is not a namespace node [%s]",
 				    prefix_node,
 				    acpi_ut_get_descriptor_name(prefix_node)));
 			return_ACPI_STATUS(AE_AML_INTERNAL);
@@ -386,13 +386,13 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 			path++;
 
 			ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
-					  "Path is absolute from root [%pK]\n",
+					  "Path is absolute from root [%p]\n",
 					  this_node));
 		} else {
 			/* Pathname is relative to current scope, start there */
 
 			ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
-					  "Searching relative to prefix scope [%4.4s] (%pK)\n",
+					  "Searching relative to prefix scope [%4.4s] (%p)\n",
 					  acpi_ut_get_node_name(prefix_node),
 					  prefix_node));
 
@@ -564,7 +564,7 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 				/* Name not found in ACPI namespace */
 
 				ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
-						  "Name [%4.4s] not found in scope [%4.4s] %pK\n",
+						  "Name [%4.4s] not found in scope [%4.4s] %p\n",
 						  (char *)&simple_name,
 						  (char *)&current_node->name,
 						  current_node));

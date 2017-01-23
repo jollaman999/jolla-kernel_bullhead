@@ -461,7 +461,7 @@ static int msm_cpe_lab_thread(void *data)
 				next_buf = &lab->pcm_buf[buf_count + 1];
 				buf_count++;
 			}
-			pr_debug("%s: Cur buf = %pK Next Buf = %pK\n"
+			pr_debug("%s: Cur buf = %p Next Buf = %p\n"
 				 " buf count = 0x%x\n",
 				 __func__, cur_buf, next_buf, buf_count);
 		} else {
@@ -1261,7 +1261,7 @@ static int msm_cpe_lsm_lab_start(struct snd_pcm_substream *substream,
 	int rc;
 
 	if (!substream || !substream->private_data) {
-		pr_err("%s: invalid substream (%pK)\n",
+		pr_err("%s: invalid substream (%p)\n",
 			__func__, substream);
 		return -EINVAL;
 	}
@@ -1350,7 +1350,7 @@ static int msm_cpe_lsm_ioctl(struct snd_pcm_substream *substream,
 	struct wcd_cpe_lsm_ops *lsm_ops;
 
 	if (!substream || !substream->private_data) {
-		pr_err("%s: invalid substream (%pK)\n",
+		pr_err("%s: invalid substream (%p)\n",
 			__func__, substream);
 		return -EINVAL;
 	}
@@ -1525,7 +1525,7 @@ static int msm_cpe_lsm_ioctl_compat(struct snd_pcm_substream *substream,
 	struct wcd_cpe_lsm_ops *lsm_ops;
 
 	if (!substream || !substream->private_data) {
-		pr_err("%s: invalid substream (%pK)\n",
+		pr_err("%s: invalid substream (%p)\n",
 			__func__, substream);
 		return -EINVAL;
 	}

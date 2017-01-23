@@ -46,7 +46,7 @@ static void event_abort_undef_instr(void *ignore,
 {
 	if (user_mode(regs)) {
 		coresight_abort();
-		pr_debug("coresight_event: pc: %pK", pc);
+		pr_debug("coresight_event: pc: %p", pc);
 	}
 }
 

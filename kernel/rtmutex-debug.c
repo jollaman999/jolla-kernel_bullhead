@@ -33,7 +33,7 @@
 static void printk_task(struct task_struct *p)
 {
 	if (p)
-		printk("%16s:%5d [%pK, %3d]", p->comm, task_pid_nr(p), p, p->prio);
+		printk("%16s:%5d [%p, %3d]", p->comm, task_pid_nr(p), p, p->prio);
 	else
 		printk("<none>");
 }
@@ -41,14 +41,14 @@ static void printk_task(struct task_struct *p)
 static void printk_lock(struct rt_mutex *lock, int print_owner)
 {
 	if (lock->name)
-		printk(" [%pK] {%s}\n",
+		printk(" [%p] {%s}\n",
 			lock, lock->name);
 	else
-		printk(" [%pK] {%s:%d}\n",
+		printk(" [%p] {%s:%d}\n",
 			lock, lock->file, lock->line);
 
 	if (print_owner && rt_mutex_owner(lock)) {
-		printk(".. ->owner: %pK\n", lock->owner);
+		printk(".. ->owner: %p\n", lock->owner);
 		printk(".. held by:  ");
 		printk_task(rt_mutex_owner(lock));
 		printk("\n");

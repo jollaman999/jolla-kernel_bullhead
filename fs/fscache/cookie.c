@@ -64,7 +64,7 @@ struct fscache_cookie *__fscache_acquire_cookie(
 
 	BUG_ON(!def);
 
-	_enter("{%s},{%s},%pK",
+	_enter("{%s},{%s},%p",
 	       parent ? (char *) parent->def->name : "<no-parent>",
 	       def->name, netfs_data);
 
@@ -133,7 +133,7 @@ struct fscache_cookie *__fscache_acquire_cookie(
 	}
 
 	fscache_stat(&fscache_n_acquires_ok);
-	_leave(" = %pK", cookie);
+	_leave(" = %p", cookie);
 	return cookie;
 }
 EXPORT_SYMBOL(__fscache_acquire_cookie);
@@ -211,7 +211,7 @@ static int fscache_acquire_non_index_cookie(struct fscache_cookie *cookie)
 
 	/* we may be required to wait for lookup to complete at this point */
 	if (!fscache_defer_lookup) {
-		_debug("non-deferred lookup %pK", &cookie->flags);
+		_debug("non-deferred lookup %p", &cookie->flags);
 		wait_on_bit(&cookie->flags, FSCACHE_COOKIE_LOOKING_UP,
 			    fscache_wait_bit, TASK_UNINTERRUPTIBLE);
 		_debug("complete");
@@ -239,7 +239,7 @@ static int fscache_alloc_object(struct fscache_cache *cache,
 	struct fscache_object *object;
 	int ret;
 
-	_enter("%pK,%pK{%s}", cache, cookie, cookie->def->name);
+	_enter("%p,%p{%s}", cache, cookie, cookie->def->name);
 
 	spin_lock(&cookie->lock);
 	hlist_for_each_entry(object, &cookie->backing_objects,
@@ -417,7 +417,7 @@ EXPORT_SYMBOL(__fscache_invalidate);
  */
 void __fscache_wait_on_invalidate(struct fscache_cookie *cookie)
 {
-	_enter("%pK", cookie);
+	_enter("%p", cookie);
 
 	wait_on_bit(&cookie->flags, FSCACHE_COOKIE_INVALIDATING,
 		    fscache_wait_bit_interruptible,
@@ -481,7 +481,7 @@ void __fscache_relinquish_cookie(struct fscache_cookie *cookie, int retire)
 		return;
 	}
 
-	_enter("%pK{%s,%pK},%d",
+	_enter("%p{%s,%p},%d",
 	       cookie, cookie->def->name, cookie->netfs_data, retire);
 
 	if (atomic_read(&cookie->n_children) != 0) {
@@ -568,10 +568,10 @@ void __fscache_cookie_put(struct fscache_cookie *cookie)
 {
 	struct fscache_cookie *parent;
 
-	_enter("%pK", cookie);
+	_enter("%p", cookie);
 
 	for (;;) {
-		_debug("FREE COOKIE %pK", cookie);
+		_debug("FREE COOKIE %p", cookie);
 		parent = cookie->parent;
 		BUG_ON(!hlist_empty(&cookie->backing_objects));
 		kmem_cache_free(fscache_cookie_jar, cookie);

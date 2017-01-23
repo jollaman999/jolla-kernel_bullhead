@@ -1039,7 +1039,7 @@ static void setup_DMA(void)
 		return;
 	}
 	if (((unsigned long)raw_cmd->kernel_data) % 512) {
-		pr_info("non aligned address: %pK\n", raw_cmd->kernel_data);
+		pr_info("non aligned address: %p\n", raw_cmd->kernel_data);
 		cont->done(0);
 		FDCS->reset = 1;
 		return;
@@ -1796,16 +1796,16 @@ static void show_floppy(void)
 	if (work_pending(&floppy_work))
 		pr_info("floppy_work.func=%pf\n", floppy_work.func);
 	if (delayed_work_pending(&fd_timer))
-		pr_info("delayed work.function=%pK expires=%ld\n",
+		pr_info("delayed work.function=%p expires=%ld\n",
 		       fd_timer.work.func,
 		       fd_timer.timer.expires - jiffies);
 	if (delayed_work_pending(&fd_timeout))
-		pr_info("timer_function=%pK expires=%ld\n",
+		pr_info("timer_function=%p expires=%ld\n",
 		       fd_timeout.work.func,
 		       fd_timeout.timer.expires - jiffies);
 
-	pr_info("cont=%pK\n", cont);
-	pr_info("current_req=%pK\n", current_req);
+	pr_info("cont=%p\n", cont);
+	pr_info("current_req=%p\n", current_req);
 	pr_info("command_status=%d\n", command_status);
 	pr_info("\n");
 }
@@ -2447,7 +2447,7 @@ static void copy_buffer(int ssize, int max_sector, int max_sector_2)
 			break;
 		}
 		if (((unsigned long)buffer) % 512)
-			DPRINT("%pK buffer not aligned\n", buffer);
+			DPRINT("%p buffer not aligned\n", buffer);
 
 		if (CT(COMMAND) == FD_READ)
 			memcpy(buffer, dma_buffer, size);
@@ -2886,7 +2886,7 @@ static void do_fd_request(struct request_queue *q)
 		return;
 
 	if (WARN(atomic_read(&usage_count) == 0,
-		 "warning: usage count=0, current_req=%pK sect=%ld type=%x flags=%x\n",
+		 "warning: usage count=0, current_req=%p sect=%ld type=%x flags=%x\n",
 		 current_req, (long)blk_rq_pos(current_req), current_req->cmd_type,
 		 current_req->cmd_flags))
 		return;

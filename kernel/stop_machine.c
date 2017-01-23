@@ -289,7 +289,7 @@ repeat:
 		/* restore preemption and check it's still balanced */
 		preempt_enable();
 		WARN_ONCE(preempt_count(),
-			  "cpu_stop: %s(%pK) leaked preempt count\n",
+			  "cpu_stop: %s(%p) leaked preempt count\n",
 			  kallsyms_lookup((unsigned long)fn, NULL, NULL, NULL,
 					  ksym_buf), arg);
 

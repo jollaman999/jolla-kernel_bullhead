@@ -495,7 +495,7 @@ retry:
 
 	/* keep this for memory release */
 	buffer->priv_virt = info;
-	dev_dbg(sheap->dev, "Allocate buffer %pK\n", buffer);
+	dev_dbg(sheap->dev, "Allocate buffer %p\n", buffer);
 	return info;
 
 err:
@@ -628,7 +628,7 @@ retry:
 		sg = sg_next(sg);
 	}
 	buffer->priv_virt = info;
-	dev_dbg(sheap->dev, "Allocate buffer %pK\n", buffer);
+	dev_dbg(sheap->dev, "Allocate buffer %p\n", buffer);
 	return info;
 
 err2:
@@ -714,7 +714,7 @@ static void ion_secure_cma_free(struct ion_buffer *buffer)
 	struct ion_secure_cma_buffer_info *info = buffer->priv_virt;
 	int ret = 0;
 
-	dev_dbg(sheap->dev, "Release buffer %pK\n", buffer);
+	dev_dbg(sheap->dev, "Release buffer %p\n", buffer);
 	if (msm_secure_v2_is_supported())
 		ret = msm_ion_unsecure_table(info->table);
 	atomic_sub(buffer->size, &sheap->total_allocated);
@@ -736,7 +736,7 @@ static int ion_secure_cma_phys(struct ion_heap *heap, struct ion_buffer *buffer,
 		container_of(heap, struct ion_cma_secure_heap, heap);
 	struct ion_secure_cma_buffer_info *info = buffer->priv_virt;
 
-	dev_dbg(sheap->dev, "Return buffer %pK physical address 0x%pa\n", buffer,
+	dev_dbg(sheap->dev, "Return buffer %p physical address 0x%pa\n", buffer,
 		&info->phys);
 
 	*addr = info->phys;

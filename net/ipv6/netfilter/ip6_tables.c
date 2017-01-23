@@ -723,13 +723,13 @@ check_entry_size_and_hooks(struct ip6t_entry *e,
 	if ((unsigned long)e % __alignof__(struct ip6t_entry) != 0 ||
 	    (unsigned char *)e + sizeof(struct ip6t_entry) >= limit ||
 	    (unsigned char *)e + e->next_offset > limit) {
-		duprintf("Bad offset %pK\n", e);
+		duprintf("Bad offset %p\n", e);
 		return -EINVAL;
 	}
 
 	if (e->next_offset
 	    < sizeof(struct ip6t_entry) + sizeof(struct xt_entry_target)) {
-		duprintf("checking: element %pK size %u\n",
+		duprintf("checking: element %p size %u\n",
 			 e, e->next_offset);
 		return -EINVAL;
 	}
@@ -1448,17 +1448,17 @@ check_compat_entry_size_and_hooks(struct compat_ip6t_entry *e,
 	unsigned int j;
 	int ret, off;
 
-	duprintf("check_compat_entry_size_and_hooks %pK\n", e);
+	duprintf("check_compat_entry_size_and_hooks %p\n", e);
 	if ((unsigned long)e % __alignof__(struct compat_ip6t_entry) != 0 ||
 	    (unsigned char *)e + sizeof(struct compat_ip6t_entry) >= limit ||
 	    (unsigned char *)e + e->next_offset > limit) {
-		duprintf("Bad offset %pK, limit = %pK\n", e, limit);
+		duprintf("Bad offset %p, limit = %p\n", e, limit);
 		return -EINVAL;
 	}
 
 	if (e->next_offset < sizeof(struct compat_ip6t_entry) +
 			     sizeof(struct compat_xt_entry_target)) {
-		duprintf("checking: element %pK size %u\n",
+		duprintf("checking: element %p size %u\n",
 			 e, e->next_offset);
 		return -EINVAL;
 	}

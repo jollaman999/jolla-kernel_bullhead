@@ -2017,7 +2017,7 @@ void tcp_set_state(struct sock *sk, int state)
 	sk->sk_state = state;
 
 #ifdef STATE_TRACE
-	SOCK_DEBUG(sk, "TCP sk=%pK, State %s -> %s\n", sk, statename[oldstate], statename[state]);
+	SOCK_DEBUG(sk, "TCP sk=%p, State %s -> %s\n", sk, statename[oldstate], statename[state]);
 #endif
 }
 EXPORT_SYMBOL_GPL(tcp_set_state);

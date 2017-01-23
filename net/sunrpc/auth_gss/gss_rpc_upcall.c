@@ -126,7 +126,7 @@ static int gssp_rpc_create(struct net *net, struct rpc_clnt **_clnt)
 	}
 
 	dprintk("RPC:       created new gssp local client (gssp_local_clnt: "
-			"%pK)\n", clnt);
+			"%p)\n", clnt);
 	*_clnt = clnt;
 
 out:

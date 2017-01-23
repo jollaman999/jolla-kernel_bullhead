@@ -6463,7 +6463,7 @@ static void dump_page_flags(unsigned long flags)
 void dump_page(struct page *page)
 {
 	printk(KERN_ALERT
-	       "page:%pK count:%d mapcount:%d mapping:%pK index:%#lx\n",
+	       "page:%p count:%d mapcount:%d mapping:%p index:%#lx\n",
 		page, atomic_read(&page->_count), page_mapcount(page),
 		page->mapping, page->index);
 	dump_page_flags(page->flags);

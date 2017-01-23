@@ -318,7 +318,7 @@ acpi_evaluate_reference(acpi_handle handle,
 	package = buffer.pointer;
 
 	if ((buffer.length == 0) || !package) {
-		printk(KERN_ERR PREFIX "No return object (len %X ptr %pK)\n",
+		printk(KERN_ERR PREFIX "No return object (len %X ptr %p)\n",
 			    (unsigned)buffer.length, package);
 		status = AE_BAD_DATA;
 		acpi_util_eval_error(handle, pathname, status);
@@ -332,7 +332,7 @@ acpi_evaluate_reference(acpi_handle handle,
 		goto end;
 	}
 	if (!package->package.count) {
-		printk(KERN_ERR PREFIX "[Package] has zero elements (%pK)\n",
+		printk(KERN_ERR PREFIX "[Package] has zero elements (%p)\n",
 			    package);
 		status = AE_BAD_DATA;
 		acpi_util_eval_error(handle, pathname, status);
@@ -368,7 +368,7 @@ acpi_evaluate_reference(acpi_handle handle,
 		/* Get the  acpi_handle. */
 
 		list->handles[i] = element->reference.handle;
-		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Found reference [%pK]\n",
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Found reference [%p]\n",
 				  list->handles[i]));
 	}
 

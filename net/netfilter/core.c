@@ -151,7 +151,7 @@ repeat:
 #ifdef CONFIG_NETFILTER_DEBUG
 			if (unlikely((verdict & NF_VERDICT_MASK)
 							> NF_MAX_VERDICT)) {
-				NFDEBUG("Evil return from %pK(%u).\n",
+				NFDEBUG("Evil return from %p(%u).\n",
 					(*elemp)->hook, hook);
 				continue;
 			}

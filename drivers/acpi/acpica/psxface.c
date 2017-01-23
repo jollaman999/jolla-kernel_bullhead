@@ -252,7 +252,7 @@ acpi_status acpi_ps_execute_method(struct acpi_evaluate_info *info)
 	 * Execute the method. Performs parse simultaneously
 	 */
 	ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
-			  "**** Begin Method Parse/Execute [%4.4s] **** Node=%pK Obj=%pK\n",
+			  "**** Begin Method Parse/Execute [%4.4s] **** Node=%p Obj=%p\n",
 			  info->resolved_node->name.ascii, info->resolved_node,
 			  info->obj_desc));
 
@@ -347,7 +347,7 @@ acpi_status acpi_ps_execute_method(struct acpi_evaluate_info *info)
 	 * a control exception code
 	 */
 	if (info->return_object) {
-		ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "Method returned ObjDesc=%pK\n",
+		ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "Method returned ObjDesc=%p\n",
 				  info->return_object));
 		ACPI_DUMP_STACK_ENTRY(info->return_object);
 

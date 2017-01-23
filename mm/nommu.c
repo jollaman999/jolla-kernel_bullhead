@@ -625,7 +625,7 @@ static void free_page_series(unsigned long from, unsigned long to)
 		kdebug("- free %lx", from);
 		atomic_long_dec(&mmap_pages_allocated);
 		if (page_count(page) != 1)
-			kdebug("free page %pK: refcount not one: %d",
+			kdebug("free page %p: refcount not one: %d",
 			       page, page_count(page));
 		put_page(page);
 	}
@@ -640,7 +640,7 @@ static void free_page_series(unsigned long from, unsigned long to)
 static void __put_nommu_region(struct vm_region *region)
 	__releases(nommu_region_sem)
 {
-	kenter("%pK{%d}", region, region->vm_usage);
+	kenter("%p{%d}", region, region->vm_usage);
 
 	BUG_ON(!nommu_region_tree.rb_node);
 
@@ -701,7 +701,7 @@ static void add_vma_to_mm(struct mm_struct *mm, struct vm_area_struct *vma)
 	struct address_space *mapping;
 	struct rb_node **p, *parent, *rb_prev;
 
-	kenter(",%pK", vma);
+	kenter(",%p", vma);
 
 	BUG_ON(!vma->vm_region);
 
@@ -768,7 +768,7 @@ static void delete_vma_from_mm(struct vm_area_struct *vma)
 	struct address_space *mapping;
 	struct mm_struct *mm = vma->vm_mm;
 
-	kenter("%pK", vma);
+	kenter("%p", vma);
 
 	protect_vma(vma, 0);
 
@@ -804,7 +804,7 @@ static void delete_vma_from_mm(struct vm_area_struct *vma)
  */
 static void delete_vma(struct mm_struct *mm, struct vm_area_struct *vma)
 {
-	kenter("%pK", vma);
+	kenter("%p", vma);
 	if (vma->vm_ops && vma->vm_ops->close)
 		vma->vm_ops->close(vma);
 	if (vma->vm_file)

@@ -170,7 +170,7 @@ static inline void debug_isoc_completed(struct imx21 *imx21,
 static char *format_ep(struct usb_host_endpoint *ep, char *buf, int bufsize)
 {
 	if (ep)
-		snprintf(buf, bufsize, "ep_%02x (type:%02X kaddr:%pK)",
+		snprintf(buf, bufsize, "ep_%02x (type:%02X kaddr:%p)",
 			ep->desc.bEndpointAddress,
 			usb_endpoint_type(&ep->desc),
 			ep);
@@ -304,7 +304,7 @@ static int debug_etd_show(struct seq_file *s, void *v)
 			"busy sw: %d\n"
 			"busy hw: %d\n"
 			"urb state: %d\n"
-			"current urb: %pK\n",
+			"current urb: %p\n",
 
 			i,
 			format_ep(etd->ep, buf, sizeof(buf)),

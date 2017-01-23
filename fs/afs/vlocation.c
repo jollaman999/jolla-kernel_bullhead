@@ -186,7 +186,7 @@ static struct afs_vlocation *afs_vlocation_alloc(struct afs_cell *cell,
 		memcpy(vl->vldb.name, name, namesz);
 	}
 
-	_leave(" = %pK", vl);
+	_leave(" = %p", vl);
 	return vl;
 }
 
@@ -470,7 +470,7 @@ found_in_memory:
 	spin_unlock(&vl->lock);
 
 success:
-	_leave(" = %pK", vl);
+	_leave(" = %p", vl);
 	return vl;
 
 error_abandon:
@@ -526,7 +526,7 @@ void afs_put_vlocation(struct afs_vlocation *vl)
  */
 static void afs_vlocation_destroy(struct afs_vlocation *vl)
 {
-	_enter("%pK", vl);
+	_enter("%p", vl);
 
 #ifdef CONFIG_AFS_FSCACHE
 	fscache_relinquish_cookie(vl->cache, 0);
@@ -554,7 +554,7 @@ static void afs_vlocation_reaper(struct work_struct *work)
 		vl = list_entry(afs_vlocation_graveyard.next,
 				struct afs_vlocation, grave);
 
-		_debug("check %pK", vl);
+		_debug("check %p", vl);
 
 		/* the queue is ordered most dead first */
 		expiry = vl->time_of_death + afs_vlocation_timeout;

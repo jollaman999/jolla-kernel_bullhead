@@ -31,7 +31,7 @@ TRACE_EVENT(ath5k_rx,
 		memcpy(__get_dynamic_array(frame), skb->data, skb->len);
 	),
 	TP_printk(
-		"[%pK] RX skb=%lx", __entry->priv, __entry->skbaddr
+		"[%p] RX skb=%lx", __entry->priv, __entry->skbaddr
 	)
 );
 
@@ -56,7 +56,7 @@ TRACE_EVENT(ath5k_tx,
 	),
 
 	TP_printk(
-		"[%pK] TX skb=%lx q=%d", __entry->priv, __entry->skbaddr,
+		"[%p] TX skb=%lx q=%d", __entry->priv, __entry->skbaddr,
 		__entry->qnum
 	)
 );
@@ -86,7 +86,7 @@ TRACE_EVENT(ath5k_tx_complete,
 	),
 
 	TP_printk(
-		"[%pK] TX end skb=%lx q=%d stat=%x rssi=%d ant=%x",
+		"[%p] TX end skb=%lx q=%d stat=%x rssi=%d ant=%x",
 		__entry->priv, __entry->skbaddr, __entry->qnum,
 		__entry->ts_status, __entry->ts_rssi, __entry->ts_antenna
 	)

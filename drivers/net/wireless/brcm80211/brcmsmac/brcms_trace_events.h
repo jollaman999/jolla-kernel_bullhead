@@ -80,7 +80,7 @@ TRACE_EVENT(brcms_dpc,
 		__entry->data = data;
 	),
 	TP_printk(
-		"data=%pK",
+		"data=%p",
 		(void *)__entry->data
 	)
 );

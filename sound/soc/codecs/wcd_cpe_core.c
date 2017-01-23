@@ -422,7 +422,7 @@ static int wcd_cpe_load_fw(struct wcd_cpe_core *core,
 	bool load_segment;
 
 	if (!core || !core->cpe_handle) {
-		pr_err("%s: Error CPE core %pK\n", __func__,
+		pr_err("%s: Error CPE core %p\n", __func__,
 		       core);
 		return -EINVAL;
 	}
@@ -2799,7 +2799,7 @@ static int wcd_cpe_buf_alloc(void *core_handle,
 				rc = -EINVAL;
 				goto fail;
 		}
-		pr_debug("%s: pcm_buf[%d].mem %pK pcm_buf[%d].phys %pa\n",
+		pr_debug("%s: pcm_buf[%d].mem %p pcm_buf[%d].phys %pa\n",
 			 __func__, count,
 			 (void *)pcm_buf[count].mem,
 			 count, &(pcm_buf[count].phys));

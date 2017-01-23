@@ -985,7 +985,7 @@ char *netdev_feature_string(char *buf, char *end, const u8 *addr,
 int kptr_restrict __read_mostly;
 
 /*
- * Show a '%pK' thing.  A kernel extension is that the '%pK' is followed
+ * Show a '%p' thing.  A kernel extension is that the '%p' is followed
  * by an extra set of alphanumeric characters that are extended format
  * specifiers.
  *

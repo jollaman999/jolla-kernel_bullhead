@@ -805,7 +805,7 @@ xfs_do_force_shutdown(
 
 	if (!(flags & SHUTDOWN_FORCE_UMOUNT)) {
 		xfs_notice(mp,
-	"%s(0x%x) called from line %d of file %s.  Return address = 0x%pK",
+	"%s(0x%x) called from line %d of file %s.  Return address = 0x%p",
 			__func__, flags, lnnum, fname, __return_address);
 	}
 	/*

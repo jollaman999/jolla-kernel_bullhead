@@ -1697,7 +1697,7 @@ int __init pcpu_embed_first_chunk(size_t reserved_size, size_t dyn_size,
 #endif
 	}
 
-	pr_info("PERCPU: Embedded %zu pages/cpu @%pK s%zu r%zu d%zu u%zu\n",
+	pr_info("PERCPU: Embedded %zu pages/cpu @%p s%zu r%zu d%zu u%zu\n",
 		PFN_DOWN(size_sum), base, ai->static_size, ai->reserved_size,
 		ai->dyn_size, ai->unit_size);
 
@@ -1810,7 +1810,7 @@ int __init pcpu_page_first_chunk(size_t reserved_size,
 	}
 
 	/* we're ready, commit */
-	pr_info("PERCPU: %d %s pages/cpu @%pK s%zu r%zu d%zu\n",
+	pr_info("PERCPU: %d %s pages/cpu @%p s%zu r%zu d%zu\n",
 		unit_pages, psize_str, vm.addr, ai->static_size,
 		ai->reserved_size, ai->dyn_size);
 

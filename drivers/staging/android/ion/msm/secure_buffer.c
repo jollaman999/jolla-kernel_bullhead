@@ -99,7 +99,7 @@ static int secure_buffer_change_table(struct sg_table *table, int lock)
 		u32 base;
 		u64 tmp = sg_dma_address(sg);
 		WARN((tmp >> 32) & 0xffffffff,
-			"%s: there are ones in the upper 32 bits of the sg at %pK! They will be truncated! Address: 0x%llx\n",
+			"%s: there are ones in the upper 32 bits of the sg at %p! They will be truncated! Address: 0x%llx\n",
 			__func__, sg, tmp);
 		if (unlikely(!size || (size % V2_CHUNK_SIZE))) {
 			WARN(1,

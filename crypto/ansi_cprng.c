@@ -92,7 +92,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
 	unsigned char *output = NULL;
 
 
-	dbgprint(KERN_CRIT "Calling _get_more_prng_bytes for context %pK\n",
+	dbgprint(KERN_CRIT "Calling _get_more_prng_bytes for context %p\n",
 		ctx);
 
 	hexdump("Input DT: ", ctx->DT, DEFAULT_BLK_SZ);
@@ -133,12 +133,12 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
 			if (!memcmp(ctx->rand_data, ctx->last_rand_data,
 					DEFAULT_BLK_SZ)) {
 				if (cont_test) {
-					panic("cprng %pK Failed repetition check!\n",
+					panic("cprng %p Failed repetition check!\n",
 						ctx);
 				}
 
 				printk(KERN_ERR
-					"ctx %pK Failed repetition check!\n",
+					"ctx %p Failed repetition check!\n",
 					ctx);
 
 				ctx->flags |= PRNG_NEED_RESET;
@@ -173,7 +173,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
 			break;
 	}
 
-	dbgprint("Returning new block for context %pK\n", ctx);
+	dbgprint("Returning new block for context %p\n", ctx);
 	ctx->rand_data_valid = 0;
 
 	hexdump("Output DT: ", ctx->DT, DEFAULT_BLK_SZ);
@@ -212,7 +212,7 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
 
 	err = byte_count;
 
-	dbgprint(KERN_CRIT "getting %d random bytes for context %pK\n",
+	dbgprint(KERN_CRIT "getting %d random bytes for context %p\n",
 		byte_count, ctx);
 
 
@@ -266,7 +266,7 @@ empty_rbuf:
 
 done:
 	spin_unlock_bh(&ctx->prng_lock);
-	dbgprint(KERN_CRIT "returning %d from get_prng_bytes in context %pK\n",
+	dbgprint(KERN_CRIT "returning %d from get_prng_bytes in context %p\n",
 		err, ctx);
 	return err;
 }
@@ -327,7 +327,7 @@ static int cprng_init(struct crypto_tfm *tfm)
 	spin_lock_init(&ctx->prng_lock);
 	ctx->tfm = crypto_alloc_cipher("aes", 0, 0);
 	if (IS_ERR(ctx->tfm)) {
-		dbgprint(KERN_CRIT "Failed to alloc tfm for context %pK\n",
+		dbgprint(KERN_CRIT "Failed to alloc tfm for context %p\n",
 				ctx);
 		return PTR_ERR(ctx->tfm);
 	}
