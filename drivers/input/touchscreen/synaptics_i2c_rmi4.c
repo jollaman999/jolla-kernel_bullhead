@@ -136,7 +136,7 @@ static s64 wake_lock_start_time = 0;
 
 extern bool tomtom_mic_detected;
 
-static bool is_touch_on(void)
+bool is_touch_on(void)
 {
 	if (tomtom_mic_detected)
 		return false;
@@ -158,6 +158,7 @@ static bool is_touch_on(void)
 #endif
 	return false;
 }
+EXPORT_SYMBOL(is_touch_on)
 #endif
 
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
