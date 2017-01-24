@@ -2671,7 +2671,7 @@
 	qcom,msm-thermal {
 		compatible = "qcom,msm-thermal";
 		qcom,sensor-id = <7>;
-		qcom,poll-ms = <500>;
+		qcom,poll-ms = <250>;
 		qcom,limit-temp-little = <60>;
 		qcom,limit-temp-big = <70>;
 		qcom,temp-big-off = <80>;
