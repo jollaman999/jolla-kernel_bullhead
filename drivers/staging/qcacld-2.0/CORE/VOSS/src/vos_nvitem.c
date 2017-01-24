@@ -428,6 +428,7 @@ static CountryInfoTable_t countryInfoTable =
       {REGDOMAIN_ETSI, {'Y', 'T'}}, //MAYOTTE
       {REGDOMAIN_ETSI, {'Z', 'A'}}, //SOUTH AFRICA
       {REGDOMAIN_ETSI, {'Z', 'W'}}, //ZIMBABWE
+      {REGDOMAIN_JAPAN, {'X', 'A'}}, //JAPAN PASSIVE
     }
 };
 
@@ -623,6 +624,19 @@ struct ieee80211_regdomain *vos_world_regdomain(struct regulatory *reg)
    }
 }
 
+/**
+ * vos_reset_global_reg_params - Reset global static reg params
+ *
+ * This function is helpful in static driver to reset
+ * the global params.
+ *
+ * Return: void
+ */
+void vos_reset_global_reg_params()
+{
+	init_by_driver = false;
+	init_by_reg_core = false;
+}
 
 static int regd_init_wiphy(hdd_context_t *pHddCtx, struct regulatory *reg,
 			   struct wiphy *wiphy)
@@ -2125,6 +2139,16 @@ int __wlan_hdd_linux_reg_notifier(struct wiphy *wiphy,
             return;
 #else
             return 0;
+#endif
+    }
+
+    if (pHddCtx->isWiphySuspended == TRUE) {
+        VOS_TRACE( VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
+                  "system/cfg80211 is already suspend");
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,9,0)) || defined(WITH_BACKPORTS)
+        return;
+#else
+        return 0;
 #endif
     }
 

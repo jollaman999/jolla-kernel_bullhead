@@ -1180,6 +1180,7 @@ limProcessMlmAuthInd(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
         // Log error
         limLog(pMac, LOGP,
            FL("call to AllocateMemory failed for eWNI_SME_AUTH_IND"));
+        return;
     }
     limCopyU16((tANI_U8 *) &pSirSmeAuthInd->messageType, eWNI_SME_AUTH_IND);
     limAuthIndSerDes(pMac, (tpLimMlmAuthInd) pMsgBuf,
@@ -2316,32 +2317,50 @@ void limProcessBtAmpApMlmDelBssRsp( tpAniSirGlobal pMac, tpSirMsgQ limMsgQ,tpPES
     }
 }
 
+/**
+ * limProcessMlmDelStaRsp() - Process WDA_DELETE_STA_RSP
+ * @pMac: Global MAC context
+ * @limMsgQ: LIM Message pointer
+ *
+ * Return: None
+ */
 void limProcessMlmDelStaRsp( tpAniSirGlobal pMac, tpSirMsgQ limMsgQ )
 {
- //we need to process the deferred message since the initiating req. there might be nested request.
-  //in the case of nested request the new request initiated from the response will take care of resetting
-  //the deffered flag.
-
     tpPESession         psessionEntry;
     tpDeleteStaParams   pDeleteStaParams;
     pDeleteStaParams = (tpDeleteStaParams)limMsgQ->bodyptr;
+
+    /*
+     * we need to process the message deferred since the initiating req.
+     * There might be nested request. In the case of nested request,
+     * the new request initiated from the response will take care of resetting
+     * the deferred flag.
+     */
+
     SET_LIM_PROCESS_DEFD_MESGS(pMac, true);
 
-    if(NULL == pDeleteStaParams ||
-       NULL == (psessionEntry = peFindSessionBySessionId(pMac, pDeleteStaParams->sessionId)))
-    {
-        limLog(pMac, LOGP,FL("Session Does not exist or invalid body pointer in message"));
-        if(pDeleteStaParams != NULL)
-        {
-            vos_mem_free(pDeleteStaParams);
-            limMsgQ->bodyptr = NULL;
-        }
+    if(!pDeleteStaParams) {
+        limLog(pMac, LOGP, FL("Invalid pDeleteStaParams message"));
+        return;
+    }
+
+    psessionEntry = peFindSessionBySessionId(pMac, pDeleteStaParams->sessionId);
+    if (!psessionEntry) {
+        limLog(pMac, LOGP, FL("Session Does not exist or invalid body pointer in message: %d"),
+                pDeleteStaParams->sessionId);
+        vos_mem_free(pDeleteStaParams);
+        limMsgQ->bodyptr = NULL;
         return;
     }
 
     if (LIM_IS_BT_AMP_AP_ROLE(psessionEntry) ||
          LIM_IS_AP_ROLE(psessionEntry)) {
         limProcessBtAmpApMlmDelStaRsp(pMac,limMsgQ,psessionEntry);
+        return;
+    }
+
+    if (LIM_IS_NDI_ROLE(psessionEntry)) {
+        lim_process_ndi_del_sta_rsp(pMac, limMsgQ, psessionEntry);
         return;
     }
     limProcessStaMlmDelStaRsp(pMac, limMsgQ,psessionEntry);
@@ -2354,8 +2373,7 @@ void limProcessBtAmpApMlmDelStaRsp( tpAniSirGlobal pMac, tpSirMsgQ limMsgQ,tpPES
     tSirResultCodes statusCode = eSIR_SME_SUCCESS;
     if(limMsgQ->bodyptr == NULL)
     {
-      limLog( pMac, LOGE,
-           FL( "limMsgQ->bodyptry NULL"));
+      limLog(pMac, LOGE, FL("limMsgQ->bodyptr NULL"));
       return;
     }
     pStaDs = dphGetHashEntry(pMac, pDelStaParams->assocId, &psessionEntry->dph.dphHashTable);
@@ -4297,6 +4315,8 @@ void limProcessFinishScanRsp(tpAniSirGlobal pMac,  void *body)
     {
         case eLIM_HAL_FINISH_SCAN_WAIT_STATE:
             pMac->lim.gLimHalScanState = eLIM_HAL_IDLE_SCAN_STATE;
+            if (pMac->lim.abortScan)
+                pMac->lim.abortScan = 0;
             limCompleteMlmScan(pMac, eSIR_SME_SUCCESS);
             if (limIsChanSwitchRunning(pMac))
             {
@@ -4730,7 +4750,7 @@ limHandleDelBssInReAssocContext(tpAniSirGlobal pMac, tpDphHashNode pStaDs,tpPESe
                     pBeaconStruct );
             if(pMac->lim.gLimProtectionControl != WNI_CFG_FORCE_POLICY_PROTECTION_DISABLE)
                 limDecideStaProtectionOnAssoc(pMac, pBeaconStruct, psessionEntry);
-            if(pBeaconStruct->erpPresent) {
+                if(pBeaconStruct->erpPresent) {
                 if (pBeaconStruct->erpIEInfo.barkerPreambleMode)
                     psessionEntry->beaconParams.fShortPreamble = 0;
                 else
@@ -5072,9 +5092,7 @@ void limProcessRxScanEvent(tpAniSirGlobal pMac, void *buf)
                  * pending then indicate confirmation with status failure
                  */
                 if (pMac->lim.mgmtFrameSessionId != 0xff) {
-                    limSendSmeRsp(pMac, eWNI_SME_ACTION_FRAME_SEND_CNF,
-                                        eSIR_SME_SEND_ACTION_FAIL,
-                                        pMac->lim.mgmtFrameSessionId, 0);
+                    limP2PActionCnf(pMac, false);
                     pMac->lim.mgmtFrameSessionId = 0xff;
                 }
 

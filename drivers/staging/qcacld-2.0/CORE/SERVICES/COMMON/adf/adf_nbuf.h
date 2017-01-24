@@ -58,6 +58,7 @@
 #define NBUF_PKT_TRAC_MAX_STRING   12
 #define NBUF_PKT_TRAC_PROTO_STRING 4
 #define ADF_NBUF_PKT_ERROR         1
+#define ADF_NBUF_FWD_FLAG          1
 
 #define ADF_NBUF_TRAC_IPV4_OFFSET       14
 #define ADF_NBUF_TRAC_IPV4_HEADER_SIZE  20
@@ -79,6 +80,7 @@
 #define ADF_NBUF_TRAC_TCP_TYPE          6
 #define ADF_NBUF_TRAC_UDP_TYPE          17
 #define ADF_NBUF_TRAC_ICMPV6_TYPE       0x3a
+#define ADF_NBUF_TRAC_WAI_ETH_TYPE      0x88b4
 
 /* EAPOL Related MASK */
 #define EAPOL_PACKET_TYPE_OFFSET        15
@@ -1287,6 +1289,31 @@ adf_nbuf_trace_set_proto_type(adf_nbuf_t buf, uint8_t proto_type)
 }
 
 /**
+ * adf_nbuf_get_fwd_flag() - get packet forwarding flag
+ * @buf: pointer to adf_nbuf_t structure
+ *
+ * Returns: packet forwarding flag
+*/
+static inline uint8_t
+adf_nbuf_get_fwd_flag(adf_nbuf_t buf)
+{
+   return __adf_nbuf_get_fwd_flag(buf);
+}
+
+/**
+ * adf_nbuf_get_fwd_flag() - update packet forwarding flag
+ * @buf: pointer to adf_nbuf_t structure
+ * @flag: forwarding flag
+ *
+ * Returns: none
+*/
+static inline void
+adf_nbuf_set_fwd_flag(adf_nbuf_t buf, uint8_t flag)
+{
+   __adf_nbuf_set_fwd_flag(buf, flag);
+}
+
+/**
  * @brief This function registers protocol trace callback
  *
  * @param[in] adf_nbuf_trace_update_t   callback pointer
@@ -1522,11 +1549,11 @@ adf_nbuf_data_get_ipv6_proto(uint8_t *data)
  *
  * This func. checks whether it is a DHCP packet or not.
  *
- * Return: A_STATUS_OK if it is a DHCP packet
- *         A_STATUS_FAILED if not
+ * Return: TRUE if it is a DHCP packet
+ *         FALSE if not
  */
-static inline a_status_t
-adf_nbuf_is_dhcp_pkt(adf_nbuf_t buf)
+static inline
+bool adf_nbuf_is_dhcp_pkt(adf_nbuf_t buf)
 {
 	return __adf_nbuf_data_is_dhcp_pkt(adf_nbuf_data(buf));
 }
@@ -1537,11 +1564,11 @@ adf_nbuf_is_dhcp_pkt(adf_nbuf_t buf)
  *
  * This func. checks whether it is a DHCP packet or not.
  *
- * Return: A_STATUS_OK if it is a DHCP packet
- *         A_STATUS_FAILED if not
+ * Return: TRUE if it is a DHCP packet
+ *         FALSE if not
  */
-static inline a_status_t
-adf_nbuf_data_is_dhcp_pkt(uint8_t *data)
+static inline
+bool adf_nbuf_data_is_dhcp_pkt(uint8_t *data)
 {
 	return __adf_nbuf_data_is_dhcp_pkt(data);
 }
@@ -1552,11 +1579,11 @@ adf_nbuf_data_is_dhcp_pkt(uint8_t *data)
  *
  * This func. checks whether it is a EAPOL packet or not.
  *
- * Return: A_STATUS_OK if it is a EAPOL packet
- *         A_STATUS_FAILED if not
+ * Return: TRUE if it is a EAPOL packet
+ *         FALSE if not
  */
-static inline a_status_t
-adf_nbuf_is_eapol_pkt(adf_nbuf_t buf)
+static inline
+bool adf_nbuf_is_eapol_pkt(adf_nbuf_t buf)
 {
 	return __adf_nbuf_data_is_eapol_pkt(adf_nbuf_data(buf));
 }
@@ -1567,11 +1594,11 @@ adf_nbuf_is_eapol_pkt(adf_nbuf_t buf)
  *
  * This func. checks whether it is a EAPOL packet or not.
  *
- * Return: A_STATUS_OK if it is a EAPOL packet
- *         A_STATUS_FAILED if not
+ * Return: TRUE if it is a EAPOL packet
+ *         FALSE if not
  */
-static inline a_status_t
-adf_nbuf_data_is_eapol_pkt(uint8_t *data)
+static inline
+bool adf_nbuf_data_is_eapol_pkt(uint8_t *data)
 {
 	return __adf_nbuf_data_is_eapol_pkt(data);
 }
@@ -1652,12 +1679,12 @@ bool adf_nbuf_data_is_ipv4_mcast_pkt(uint8_t *data)
 }
 
 /**
- * adf_nbuf_data_is_ipv6_mcast_pkt() - check if it is IPv6 multicast packet.
+ * adf_nbuf_data_is_ipv6_mcast_pkt() - check if it is IPV6 multicast packet.
  * @data: Pointer to IPV6 packet data buffer
  *
- * This func. checks whether it is a IPv6 multicast packet or not.
+ * This func. checks whether it is a IPV6 multicast packet or not.
  *
- * Return: TRUE if it is a IPv6 multicast packet
+ * Return: TRUE if it is a IPV6 multicast packet
  *         FALSE if not
  */
 static inline
@@ -1899,6 +1926,51 @@ adf_nbuf_update_skb_mark(adf_nbuf_t skb, uint32_t mask)
 {
 	 __adf_nbuf_update_skb_mark(skb, mask);
 }
+
+/**
+ * adf_nbuf_is_wai() - Check if frame is WAI
+ * @skb: Pointer to skb
+ *
+ * This function checks if the frame is WAPI.
+ *
+ * Return: true (1) if WAPI
+ *
+ */
+static inline bool adf_nbuf_is_wai_pkt(struct sk_buff *skb)
+{
+	return __adf_nbuf_is_wai_pkt(skb->data);
+}
+
+/**
+ * adf_nbuf_is_multicast_pkt() - Check if frame is multicast packet
+ * @skb: Pointer to skb
+ *
+ * This function checks if the frame is multicast packet.
+ *
+ * Return: true (1) if multicast
+ *
+ */
+static inline bool adf_nbuf_is_multicast_pkt(struct sk_buff *skb)
+{
+	return __adf_nbuf_is_multicast_pkt(skb->data);
+}
+
+/**
+ * adf_nbuf_is_bcast_pkt() - Check if frame is broadcast packet
+ * @skb: Pointer to skb
+ *
+ * This function checks if the frame is broadcast packet.
+ *
+ * Return: true (1) if broadcast
+ *
+ */
+static inline bool adf_nbuf_is_bcast_pkt(struct sk_buff *skb)
+{
+	return __adf_nbuf_is_bcast_pkt(skb->data);
+}
+
+
+
 
 void adf_nbuf_set_state(adf_nbuf_t nbuf, uint8_t current_state);
 void adf_nbuf_tx_desc_count_display(void);

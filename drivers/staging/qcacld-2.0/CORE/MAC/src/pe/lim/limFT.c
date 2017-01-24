@@ -390,6 +390,9 @@ void limPerformFTPreAuth(tpAniSirGlobal pMac, eHalStatus status,
     authFrame.authTransactionSeqNumber = SIR_MAC_AUTH_FRAME_1;
     authFrame.authStatusCode = 0;
 
+    pMac->lim.limTimers.g_lim_periodic_auth_retry_timer.sessionId =
+                                          psessionEntry->peSessionId;
+
     /* Start timer here to come back to operating channel */
     pMac->lim.limTimers.gLimFTPreAuthRspTimer.sessionId =
                                        psessionEntry->peSessionId;
@@ -413,7 +416,7 @@ void limPerformFTPreAuth(tpAniSirGlobal pMac, eHalStatus status,
 
     limSendAuthMgmtFrame(pMac, &authFrame,
         psessionEntry->ftPEContext.pFTPreAuthReq->preAuthbssId,
-        LIM_NO_WEP_IN_FC, psessionEntry, eSIR_FALSE);
+        LIM_NO_WEP_IN_FC, psessionEntry, eSIR_TRUE);
     return;
 
 preauth_fail:
@@ -827,7 +830,9 @@ void limFillFTSession(tpAniSirGlobal pMac,
    tSchBeaconStruct  *pBeaconStruct;
    tANI_U32          selfDot11Mode;
    ePhyChanBondState cbEnabledMode;
+#ifdef WLAN_FEATURE_11W
    VOS_STATUS vosStatus;
+#endif
 
    pBeaconStruct = vos_mem_malloc(sizeof(tSchBeaconStruct));
    if (NULL == pBeaconStruct) {
@@ -939,7 +944,7 @@ void limFillFTSession(tpAniSirGlobal pMac,
          limGetIElenFromBssDescription(pbssDescription),
          &pftSessionEntry->limCurrentBssQosCaps,
          &pftSessionEntry->limCurrentBssPropCap,
-         &currentBssUapsd , &localPowerConstraint, psessionEntry);
+         &currentBssUapsd , &localPowerConstraint, pftSessionEntry);
 
    pftSessionEntry->limReassocBssQosCaps =
       pftSessionEntry->limCurrentBssQosCaps;
@@ -1292,6 +1297,11 @@ void limHandleFTPreAuthRsp(tpAniSirGlobal pMac, tSirRetStatus status,
       pftSessionEntry->limSmeState = eLIM_SME_WT_REASSOC_STATE;
       pftSessionEntry->smpsMode = psessionEntry->smpsMode;
 
+      if (IS_5G_CH(psessionEntry->ftPEContext.pFTPreAuthReq->preAuthchannelNum))
+          pftSessionEntry->vdev_nss = pMac->vdev_type_nss_5g.sta;
+      else
+          pftSessionEntry->vdev_nss = pMac->vdev_type_nss_2g.sta;
+
       PELOGE(limLog(pMac, LOG1, "%s:created session (%p) with id = %d",
                __func__, pftSessionEntry, pftSessionEntry->peSessionId);)
 
@@ -1301,8 +1311,9 @@ void limHandleFTPreAuthRsp(tpAniSirGlobal pMac, tSirRetStatus status,
    }
 
 send_rsp:
-   if (psessionEntry->currentOperChannel !=
-         psessionEntry->ftPEContext.pFTPreAuthReq->preAuthchannelNum) {
+   if ((psessionEntry->currentOperChannel !=
+         psessionEntry->ftPEContext.pFTPreAuthReq->preAuthchannelNum)
+         || limIsInMCC(pMac)) {
       /* Need to move to the original AP channel */
       limChangeChannelWithCallback(pMac, psessionEntry->currentOperChannel,
             limPerformPostFTPreAuthAndChannelChange,

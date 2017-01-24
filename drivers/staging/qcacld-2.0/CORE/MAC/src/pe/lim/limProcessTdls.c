@@ -548,7 +548,8 @@ tSirRetStatus limSendTdlsDisReqFrame(tpAniSirGlobal pMac, tSirMacAddr peer_mac,
                             TID_AC_VI,
                             limTxComplete, pFrame,
                             lim_mgmt_tdls_tx_complete,
-                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME,
+                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME |
+                            HAL_USE_PEER_STA_REQUESTED_MASK,
                             smeSessionId, false );
     if ( ! HAL_STATUS_SUCCESS ( halstatus ) )
     {
@@ -1180,7 +1181,8 @@ tSirRetStatus limSendTdlsLinkSetupReqFrame(tpAniSirGlobal pMac,
                             TID_AC_VI,
                             limTxComplete, pFrame,
                             lim_mgmt_tdls_tx_complete,
-                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME,
+                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME |
+                            HAL_USE_PEER_STA_REQUESTED_MASK,
                             smeSessionId, true );
 #else
     halstatus = halTxFrameWithTxComplete( pMac, pPacket, ( tANI_U16 ) nBytes,
@@ -1189,7 +1191,8 @@ tSirRetStatus limSendTdlsLinkSetupReqFrame(tpAniSirGlobal pMac,
                             TID_AC_VI,
                             limTxComplete, pFrame,
                             lim_mgmt_tdls_tx_complete,
-                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME,
+                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME |
+                            HAL_USE_PEER_STA_REQUESTED_MASK,
                             smeSessionId, false );
 #endif
     if ( ! HAL_STATUS_SUCCESS ( halstatus ) )
@@ -1389,7 +1392,8 @@ tSirRetStatus limSendTdlsTeardownFrame(tpAniSirGlobal pMac,
                             TID_AC_VI,
                             limTxComplete, pFrame,
                             lim_mgmt_tdls_tx_complete,
-                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME,
+                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME |
+                            HAL_USE_PEER_STA_REQUESTED_MASK,
                             smeSessionId,
                             (reason == eSIR_MAC_TDLS_TEARDOWN_PEER_UNREACHABLE) ? true : false );
 #else
@@ -1399,7 +1403,8 @@ tSirRetStatus limSendTdlsTeardownFrame(tpAniSirGlobal pMac,
                             TID_AC_VI,
                             limTxComplete, pFrame,
                             lim_mgmt_tdls_tx_complete,
-                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME,
+                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME |
+                            HAL_USE_PEER_STA_REQUESTED_MASK,
                             smeSessionId,
                             false );
 #endif
@@ -1668,7 +1673,8 @@ static tSirRetStatus limSendTdlsSetupRspFrame(tpAniSirGlobal pMac,
                             TID_AC_VI,
                             limTxComplete, pFrame,
                             lim_mgmt_tdls_tx_complete,
-                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME,
+                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME |
+                            HAL_USE_PEER_STA_REQUESTED_MASK,
                             smeSessionId, true );
 #else
     halstatus = halTxFrameWithTxComplete( pMac, pPacket, ( tANI_U16 ) nBytes,
@@ -1677,7 +1683,8 @@ static tSirRetStatus limSendTdlsSetupRspFrame(tpAniSirGlobal pMac,
                             TID_AC_VI,
                             limTxComplete, pFrame,
                             lim_mgmt_tdls_tx_complete,
-                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME,
+                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME |
+                            HAL_USE_PEER_STA_REQUESTED_MASK,
                             smeSessionId, false );
 #endif
     if ( ! HAL_STATUS_SUCCESS ( halstatus ) )
@@ -1899,7 +1906,8 @@ tSirRetStatus limSendTdlsLinkSetupCnfFrame(tpAniSirGlobal pMac,
                             TID_AC_VI,
                             limTxComplete, pFrame,
                             lim_mgmt_tdls_tx_complete,
-                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME,
+                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME |
+                            HAL_USE_PEER_STA_REQUESTED_MASK,
                             smeSessionId, true );
 #else
     halstatus = halTxFrameWithTxComplete( pMac, pPacket, ( tANI_U16 ) nBytes,
@@ -1908,7 +1916,8 @@ tSirRetStatus limSendTdlsLinkSetupCnfFrame(tpAniSirGlobal pMac,
                             TID_AC_VI,
                             limTxComplete, pFrame,
                             lim_mgmt_tdls_tx_complete,
-                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME,
+                            HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME |
+                            HAL_USE_PEER_STA_REQUESTED_MASK,
                             smeSessionId, false );
 #endif
 
@@ -2806,8 +2815,7 @@ void PopulateDot11fTdlsExtCapability(tpAniSirGlobal pMac,
     p_ext_cap->TDLSProhibited = TDLS_PROHIBITED ;
 
     extCapability->present = 1 ;
-    /* For STA cases we alwasy support 11mc - Allow MAX length */
-    extCapability->num_bytes = DOT11F_IE_EXTCAP_MAX_LEN;
+    extCapability->num_bytes = lim_compute_ext_cap_ie_length(extCapability);
 
     return ;
 }

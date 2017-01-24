@@ -51,6 +51,77 @@
 
 static struct hdd_context_s *pHddCtx;
 
+/**
+ * populate_oem_data_cap() - populate oem capabilities
+ * @adapter: device adapter
+ * @data_cap: pointer to populate the capabilities
+ *
+ * Return: error code
+ */
+static int populate_oem_data_cap(hdd_adapter_t *adapter,
+				 t_iw_oem_data_cap *data_cap)
+{
+	VOS_STATUS status;
+	hdd_config_t *config;
+	uint32_t num_chan;
+	uint8_t *chan_list;
+	hdd_context_t *hdd_ctx = adapter->pHddCtx;
+
+	config = hdd_ctx->cfg_ini;
+	if (!config) {
+		hddLog(LOGE, FL("HDD configuration is null"));
+		return -EINVAL;
+	}
+	chan_list = vos_mem_malloc(sizeof(uint8_t) * OEM_CAP_MAX_NUM_CHANNELS);
+	if (NULL == chan_list) {
+		hddLog(LOGE, FL("Memory allocation failed"));
+		return -ENOMEM;
+	}
+
+	strlcpy(data_cap->oem_target_signature, OEM_TARGET_SIGNATURE,
+		OEM_TARGET_SIGNATURE_LEN);
+	data_cap->oem_target_type = hdd_ctx->target_type;
+	data_cap->oem_fw_version = hdd_ctx->target_fw_version;
+	data_cap->driver_version.major = QWLAN_VERSION_MAJOR;
+	data_cap->driver_version.minor = QWLAN_VERSION_MINOR;
+	data_cap->driver_version.patch = QWLAN_VERSION_PATCH;
+	data_cap->driver_version.build = QWLAN_VERSION_BUILD;
+	data_cap->allowed_dwell_time_min = config->nNeighborScanMinChanTime;
+	data_cap->allowed_dwell_time_max = config->nNeighborScanMaxChanTime;
+	data_cap->curr_dwell_time_min =
+		sme_getNeighborScanMinChanTime(hdd_ctx->hHal,
+					       adapter->sessionId);
+	data_cap->curr_dwell_time_max =
+		sme_getNeighborScanMaxChanTime(hdd_ctx->hHal,
+					       adapter->sessionId);
+	data_cap->supported_bands = config->nBandCapability;
+
+	/* request for max num of channels */
+	num_chan = OEM_CAP_MAX_NUM_CHANNELS;
+	status = sme_GetCfgValidChannels(hdd_ctx->hHal, &chan_list[0],
+					 &num_chan);
+	if (VOS_STATUS_SUCCESS != status) {
+		hddLog(LOGE, FL("failed to get valid channel list, status: %d"),
+			     status);
+		vos_mem_free(chan_list);
+		return -EINVAL;
+	}
+
+	/* make sure num channels is not more than chan list array */
+	if (num_chan > OEM_CAP_MAX_NUM_CHANNELS) {
+		hddLog(LOGE, FL("Num of channels-%d > length-%d of chan_list"),
+			     num_chan, OEM_CAP_MAX_NUM_CHANNELS);
+		vos_mem_free(chan_list);
+		return -EINVAL;
+	}
+
+	data_cap->num_channels = num_chan;
+	vos_mem_copy(data_cap->channel_list, chan_list,
+		     sizeof(uint8_t) * num_chan);
+
+	vos_mem_free(chan_list);
+	return 0;
+}
 
 /**---------------------------------------------------------------------------
 
@@ -73,15 +144,11 @@ int iw_get_oem_data_cap(
         union iwreq_data *wrqu,
         char *extra)
 {
-    eHalStatus status;
-    t_iw_oem_data_cap oemDataCap;
+    int status;
+    t_iw_oem_data_cap oemDataCap = { {0} };
     t_iw_oem_data_cap *pHddOemDataCap;
     hdd_adapter_t *pAdapter = netdev_priv(dev);
     hdd_context_t *pHddContext;
-    hdd_config_t *pConfig;
-    tANI_U32 numChannels;
-    tANI_U8 chanList[OEM_CAP_MAX_NUM_CHANNELS];
-    tANI_U32 i;
     int ret;
 
     ENTER();
@@ -98,61 +165,14 @@ int iw_get_oem_data_cap(
     if (0 != ret)
       return ret;
 
-    pConfig = pHddContext->cfg_ini;
+    status = populate_oem_data_cap(pAdapter, &oemDataCap);
+    if (0 != status) {
+        hddLog(LOGE, FL("Failed to populate oem data capabilities"));
+        return status;
+    }
 
-    do
-    {
-       vos_mem_zero(&oemDataCap, sizeof(oemDataCap));
-       strlcpy(oemDataCap.oem_target_signature, OEM_TARGET_SIGNATURE,
-               OEM_TARGET_SIGNATURE_LEN);
-       oemDataCap.oem_target_type = pHddContext->target_type;
-       oemDataCap.oem_fw_version = pHddContext->target_fw_version;
-       oemDataCap.driver_version.major = QWLAN_VERSION_MAJOR;
-       oemDataCap.driver_version.minor = QWLAN_VERSION_MINOR;
-       oemDataCap.driver_version.patch = QWLAN_VERSION_PATCH;
-       oemDataCap.driver_version.build = QWLAN_VERSION_BUILD;
-       oemDataCap.allowed_dwell_time_min = pConfig->nNeighborScanMinChanTime;
-       oemDataCap.allowed_dwell_time_max = pConfig->nNeighborScanMaxChanTime;
-       oemDataCap.curr_dwell_time_min =
-               sme_getNeighborScanMinChanTime(pHddContext->hHal,
-                                              pAdapter->sessionId);
-       oemDataCap.curr_dwell_time_max =
-               sme_getNeighborScanMaxChanTime(pHddContext->hHal,
-                                              pAdapter->sessionId);
-       oemDataCap.supported_bands = pConfig->nBandCapability;
-
-       /* request for max num of channels */
-       numChannels = WNI_CFG_VALID_CHANNEL_LIST_LEN;
-       status = sme_GetCfgValidChannels(pHddContext->hHal,
-                                        &chanList[0],
-                                        &numChannels);
-       if (eHAL_STATUS_SUCCESS != status)
-       {
-         VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                   "%s:failed to get valid channel list", __func__);
-         return -ENOENT;
-       }
-       else
-       {
-         /* make sure num channels is not more than chan list array */
-         if (numChannels > OEM_CAP_MAX_NUM_CHANNELS)
-         {
-           VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                     "%s:Num of channels(%d) more than length(%d) of chanlist",
-                     __func__, numChannels, OEM_CAP_MAX_NUM_CHANNELS);
-           return -ENOMEM;
-         }
-
-         oemDataCap.num_channels = numChannels;
-         for (i = 0; i < numChannels; i++)
-         {
-           oemDataCap.channel_list[i] = chanList[i];
-         }
-       }
-
-       pHddOemDataCap = (t_iw_oem_data_cap *)(extra);
-       vos_mem_copy(pHddOemDataCap, &oemDataCap, sizeof(*pHddOemDataCap));
-    } while (0);
+    pHddOemDataCap = (t_iw_oem_data_cap *) (extra);
+    *pHddOemDataCap = oemDataCap;
 
     EXIT();
     return 0;
@@ -451,9 +471,11 @@ static inline void hdd_update_channel_bw_info(hdd_context_t *hdd_ctx,
 	uint16_t sec_ch_2g = 0;
 	uint8_t vht_capable;
 	WLAN_PHY_MODE phy_mode;
-	uint8_t dot11_mode = hdd_ctx->cfg_ini->dot11Mode;
+	uint32_t wni_dot11_mode;
 
-	vht_capable = IS_DOT11_MODE_VHT(dot11_mode);
+	wni_dot11_mode = sme_get_wni_dot11_mode(hdd_ctx->hHal);
+
+	vht_capable = IS_DOT11_MODE_VHT(wni_dot11_mode);
 
 	if (chan <= SIR_11B_CHANNEL_END) {
 		if (chan <= 5)
@@ -468,15 +490,16 @@ static inline void hdd_update_channel_bw_info(hdd_context_t *hdd_ctx,
 
 	vos_set_channel_params(chan, sec_ch_2g, &ch_params);
 	if (ch_params.center_freq_seg0)
-		hdd_chan_info->band_center_freq1 = ch_params.center_freq_seg0;
+		hdd_chan_info->band_center_freq1 =
+			ch_params.center_freq_seg0;
 
 	hddLog(LOG1,
-		FL("chan %d ch_width %d sec offset %d center_freq_seg0 %d"),
-		chan, ch_params.ch_width, ch_params.sec_ch_offset,
-		ch_params.center_freq_seg0);
+		FL("chan %d wni_dot11_mode %d ch_width %d sec offset %d center_freq_seg0 %d"),
+		chan, wni_dot11_mode, ch_params.ch_width,
+		ch_params.sec_ch_offset, ch_params.center_freq_seg0);
 
 	phy_mode = wma_chan_to_mode(chan, ch_params.sec_ch_offset,
-				vht_capable, dot11_mode);
+				vht_capable, wni_dot11_mode);
 	WMI_SET_CHANNEL_MODE(hdd_chan_info, phy_mode);
 }
 
@@ -607,6 +630,133 @@ static int oem_process_channel_info_req_msg(int numOfChannels, char *chanList)
 }
 
 /**
+ * oem_process_set_cap_req_msg() - process oem set capability request
+ * @oem_cap_len: Length of OEM capability
+ * @oem_cap: Pointer to OEM capability buffer
+ * @app_pid: process ID, to which rsp message is to be sent
+ *
+ * This function sends oem message to SME
+ *
+ * Return: error code
+ */
+static int oem_process_set_cap_req_msg(int oem_cap_len,
+				       char *oem_cap, int32_t app_pid)
+{
+	VOS_STATUS status;
+	int error_code;
+	struct sk_buff *skb;
+	struct nlmsghdr *nlh;
+	tAniMsgHdr *ani_hdr;
+	uint8_t *buf;
+
+	if (!oem_cap) {
+		hddLog(LOGE, FL("oem_cap is null"));
+		return -EINVAL;
+	}
+
+	status = sme_oem_update_capability(pHddCtx->hHal,
+					(struct sme_oem_capability *)oem_cap);
+	if (!VOS_IS_STATUS_SUCCESS(status))
+		hddLog(LOGE, FL("error updating rm capability, status: %d"),
+			     status);
+	error_code = vos_status_to_os_return(status);
+
+	skb = alloc_skb(NLMSG_SPACE(WLAN_NL_MAX_PAYLOAD), GFP_KERNEL);
+	if (skb == NULL) {
+		hddLog(LOGE, FL("alloc_skb failed"));
+		return -ENOMEM;
+	}
+
+	nlh = (struct nlmsghdr *)skb->data;
+	nlh->nlmsg_pid = 0;     /* from kernel */
+	nlh->nlmsg_flags = 0;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_type = WLAN_NL_MSG_OEM;
+	ani_hdr = NLMSG_DATA(nlh);
+	ani_hdr->type = ANI_MSG_SET_OEM_CAP_RSP;
+	/* 64 bit alignment */
+	ani_hdr->length = sizeof(error_code);
+	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(tAniMsgHdr) + ani_hdr->length);
+
+	/* message body will contain only status code */
+	buf = (char *)((char *)ani_hdr + sizeof(tAniMsgHdr));
+	vos_mem_copy(buf, &error_code, ani_hdr->length);
+
+	skb_put(skb, NLMSG_SPACE(sizeof(tAniMsgHdr) + ani_hdr->length));
+
+	hddLog(LOG1, FL("sending oem response to process pid %d"), app_pid);
+
+	(void)nl_srv_ucast(skb, app_pid, MSG_DONTWAIT);
+
+	return error_code;
+}
+
+/**
+ * oem_process_get_cap_req_msg() - process oem get capability request
+ *
+ * This function process the get capability request from OEM and responds
+ * with the capability.
+ *
+ * Return: error code
+ */
+static int oem_process_get_cap_req_msg(void)
+{
+	int error_code;
+	struct oem_get_capability_rsp *cap_rsp;
+	t_iw_oem_data_cap data_cap = { {0} };
+	struct sme_oem_capability oem_cap;
+	hdd_adapter_t *adapter;
+	struct sk_buff *skb;
+	struct nlmsghdr *nlh;
+	tAniMsgHdr *ani_hdr;
+	uint8_t *buf;
+
+	/* for now, STA interface only */
+	adapter = hdd_get_adapter(pHddCtx, WLAN_HDD_INFRA_STATION);
+	if (!adapter) {
+		hddLog(LOGE, FL("No adapter for STA mode"));
+		return -EINVAL;
+	}
+
+	error_code = populate_oem_data_cap(adapter, &data_cap);
+	if (0 != error_code)
+		return error_code;
+
+	skb = alloc_skb(NLMSG_SPACE(sizeof(tAniMsgHdr) + sizeof(*cap_rsp)),
+			GFP_KERNEL);
+	if (skb == NULL) {
+		hddLog(LOGE, FL("alloc_skb failed"));
+		return -ENOMEM;
+	}
+
+	nlh = (struct nlmsghdr *)skb->data;
+	nlh->nlmsg_pid = 0;     /* from kernel */
+	nlh->nlmsg_flags = 0;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_type = WLAN_NL_MSG_OEM;
+	ani_hdr = NLMSG_DATA(nlh);
+	ani_hdr->type = ANI_MSG_GET_OEM_CAP_RSP;
+
+	ani_hdr->length = sizeof(*cap_rsp);
+	nlh->nlmsg_len = NLMSG_LENGTH((sizeof(tAniMsgHdr) + ani_hdr->length));
+
+	buf = (char *)((char *)ani_hdr + sizeof(tAniMsgHdr));
+	vos_mem_copy(buf, &data_cap, sizeof(data_cap));
+
+	buf = (char *) buf +  sizeof(data_cap);
+	vos_mem_zero(&oem_cap, sizeof(oem_cap));
+	sme_oem_get_capability(pHddCtx->hHal, &oem_cap);
+	vos_mem_copy(buf, &oem_cap, sizeof(oem_cap));
+
+	skb_put(skb, NLMSG_SPACE((sizeof(tAniMsgHdr) + ani_hdr->length)));
+	hddLog(LOG1, FL("send rsp to oem-pid:%d for get_capability"),
+		pHddCtx->oem_pid);
+
+	(void)nl_srv_ucast(skb, pHddCtx->oem_pid, MSG_DONTWAIT);
+	return 0;
+}
+
+/**
  * hdd_SendPeerStatusIndToOemApp() - sends peer status indication to OEM
  * @peerMac : MAC address of peer
  * @peerStatus : ePeerConnected or ePeerDisconnected
@@ -725,6 +875,196 @@ void hdd_SendPeerStatusIndToOemApp(v_MACADDR_t *peerMac,
    return;
 }
 
+/**
+ * oem_app_reg_req_handler() - function to handle APP registration request
+ *                             from userspace
+ * @hdd_ctx: handle to HDD context
+ * @msg_hdr: pointer to ANI message header
+ * @nlh: pointer to NL message header
+ *
+ * Return: 0 if success, error code otherwise
+ */
+static int oem_app_reg_req_handler(struct hdd_context_s *hdd_ctx,
+				   tAniMsgHdr *msg_hdr, struct nlmsghdr *nlh)
+{
+	char *sign_str = NULL;
+
+	/* Registration request is only allowed for Qualcomm Application */
+	hddLog(LOG1,
+	       FL("Received App Reg Req from App process pid(%d), len(%d)"),
+	       nlh->nlmsg_pid, msg_hdr->length);
+
+	sign_str = (char *)((char *)msg_hdr + sizeof(tAniMsgHdr));
+	if ((OEM_APP_SIGNATURE_LEN == msg_hdr->length) &&
+	    (0 == strncmp(sign_str, OEM_APP_SIGNATURE_STR,
+			  OEM_APP_SIGNATURE_LEN))) {
+		hddLog(LOG1,
+		       FL("Valid App Reg Req from oem app process pid(%d)"),
+		       nlh->nlmsg_pid);
+
+		hdd_ctx->oem_app_registered = TRUE;
+		hdd_ctx->oem_pid = nlh->nlmsg_pid;
+		send_oem_reg_rsp_nlink_msg();
+	} else {
+		hddLog(LOGE,
+		       FL("Invalid signature in App Reg Req from pid(%d)"),
+		       nlh->nlmsg_pid);
+		send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
+					   OEM_ERR_INVALID_SIGNATURE);
+		return -EPERM;
+	}
+
+	return 0;
+}
+
+/**
+ * oem_data_req_handler() - function to handle data_req from userspace
+ * @hdd_ctx: handle to HDD context
+ * @msg_hdr: pointer to ANI message header
+ * @nlh: pointer to NL message header
+ *
+ * Return: 0 if success, error code otherwise
+ */
+static int oem_data_req_handler(struct hdd_context_s *hdd_ctx,
+				tAniMsgHdr *msg_hdr, struct nlmsghdr *nlh)
+{
+	hddLog(LOG1, FL("Received Oem Data Request length(%d) from pid: %d"),
+		     msg_hdr->length, nlh->nlmsg_pid);
+
+	if ((!hdd_ctx->oem_app_registered) ||
+	    (nlh->nlmsg_pid != hdd_ctx->oem_pid)) {
+		/* either oem app is not registered yet or pid is different */
+		hddLog(LOGE, FL("OEM DataReq: app not registered(%d) or incorrect pid(%d)"),
+			     hdd_ctx->oem_app_registered, nlh->nlmsg_pid);
+		send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
+					   OEM_ERR_APP_NOT_REGISTERED);
+		return -EPERM;
+	}
+
+	if ((!msg_hdr->length) || (OEM_DATA_REQ_SIZE < msg_hdr->length)) {
+		hddLog(LOGE, FL("Invalid length (%d) in Oem Data Request"),
+			     msg_hdr->length);
+		send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
+					   OEM_ERR_INVALID_MESSAGE_LENGTH);
+		return -EPERM;
+	}
+
+	oem_process_data_req_msg(msg_hdr->length,
+				 (char *) ((char *)msg_hdr +
+				 sizeof(tAniMsgHdr)));
+
+	return 0;
+}
+
+/**
+ * oem_chan_info_req_handler() - function to handle chan_info_req from userspace
+ * @hdd_ctx: handle to HDD context
+ * @msg_hdr: pointer to ANI message header
+ * @nlh: pointer to NL message header
+ *
+ * Return: 0 if success, error code otherwise
+ */
+static int oem_chan_info_req_handler(struct hdd_context_s *hdd_ctx,
+				     tAniMsgHdr *msg_hdr, struct nlmsghdr *nlh)
+{
+	hddLog(LOG1,
+	       FL("Received channel info request, num channel(%d) from pid: %d"),
+	       msg_hdr->length, nlh->nlmsg_pid);
+
+	if ((!hdd_ctx->oem_app_registered) ||
+	    (nlh->nlmsg_pid != hdd_ctx->oem_pid)) {
+		/* either oem app is not registered yet or pid is different */
+		hddLog(LOGE,
+		       FL("Chan InfoReq: app not registered(%d) or incorrect pid(%d)"),
+		       hdd_ctx->oem_app_registered, nlh->nlmsg_pid);
+		send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
+					   OEM_ERR_APP_NOT_REGISTERED);
+		return -EPERM;
+	}
+
+	/* message length contains list of channel ids */
+	if ((!msg_hdr->length) ||
+	    (WNI_CFG_VALID_CHANNEL_LIST_LEN < msg_hdr->length)) {
+		hddLog(LOGE,
+		       FL("Invalid length (%d) in channel info request"),
+		       msg_hdr->length);
+		send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
+					   OEM_ERR_INVALID_MESSAGE_LENGTH);
+		return -EPERM;
+	}
+	oem_process_channel_info_req_msg(msg_hdr->length,
+		(char *)((char *)msg_hdr + sizeof(tAniMsgHdr)));
+
+	return 0;
+}
+
+/**
+ * oem_set_cap_req_handler() - function to handle set_cap_req from userspace
+ * @hdd_ctx: handle to HDD context
+ * @msg_hdr: pointer to ANI message header
+ * @nlh: pointer to NL message header
+ *
+ * Return: 0 if success, error code otherwise
+ */
+static int oem_set_cap_req_handler(struct hdd_context_s *hdd_ctx,
+				   tAniMsgHdr *msg_hdr, struct nlmsghdr *nlh)
+{
+	hddLog(LOG1, FL("Received set oem cap req of length:%d from pid: %d"),
+		     msg_hdr->length, nlh->nlmsg_pid);
+
+	if ((!hdd_ctx->oem_app_registered) ||
+	    (nlh->nlmsg_pid != hdd_ctx->oem_pid)) {
+		/* oem app is not registered yet or pid is different */
+		hddLog(LOGE, FL("set_oem_capability : app not registered(%d) or incorrect pid(%d)"),
+			     hdd_ctx->oem_app_registered, nlh->nlmsg_pid);
+		send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
+					   OEM_ERR_APP_NOT_REGISTERED);
+		return -EPERM;
+	}
+
+	if ((!msg_hdr->length) ||
+		(sizeof(struct sme_oem_capability) < msg_hdr->length)) {
+		hddLog(LOGE, FL("Invalid length (%d) in set_oem_capability"),
+			     msg_hdr->length);
+		send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
+					   OEM_ERR_INVALID_MESSAGE_LENGTH);
+		return -EPERM;
+	}
+
+	oem_process_set_cap_req_msg(msg_hdr->length, (char *)
+				    ((char *)msg_hdr + sizeof(tAniMsgHdr)),
+				    nlh->nlmsg_pid);
+	return 0;
+}
+
+/**
+ * oem_get_cap_req_handler() - function to handle get_cap_req from userspace
+ * @hdd_ctx: handle to HDD context
+ * @msg_hdr: pointer to ANI message header
+ * @nlh: pointer to NL message header
+ *
+ * Return: 0 if success, error code otherwise
+ */
+static int oem_get_cap_req_handler(struct hdd_context_s *hdd_ctx,
+				   tAniMsgHdr *msg_hdr, struct nlmsghdr *nlh)
+{
+	hddLog(LOG1, FL("Rcvd get oem capability req - length:%d from pid: %d"),
+		     msg_hdr->length, nlh->nlmsg_pid);
+
+	if ((!hdd_ctx->oem_app_registered) ||
+	    (nlh->nlmsg_pid != hdd_ctx->oem_pid)) {
+		/* oem app is not registered yet or pid is different */
+		hddLog(LOGE, FL("get_oem_capability : app not registered(%d) or incorrect pid(%d)"),
+			     hdd_ctx->oem_app_registered, nlh->nlmsg_pid);
+		send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
+					   OEM_ERR_APP_NOT_REGISTERED);
+		return -EPERM;
+	}
+
+	oem_process_get_cap_req_msg();
+	return 0;
+}
+
 /*
  * Callback function invoked by Netlink service for all netlink
  * messages (from user space) addressed to WLAN_NL_MSG_OEM
@@ -745,7 +1085,7 @@ static int oem_msg_callback(struct sk_buff *skb)
    struct nlmsghdr *nlh;
    tAniMsgHdr *msg_hdr;
    int ret;
-   char *sign_str = NULL;
+
    nlh = (struct nlmsghdr *)skb->data;
 
    if (!nlh) {
@@ -775,83 +1115,23 @@ static int oem_msg_callback(struct sk_buff *skb)
 
    switch (msg_hdr->type) {
    case ANI_MSG_APP_REG_REQ:
-      /* Registration request is only allowed for Qualcomm Application */
-      hddLog(LOG1, FL("Received App Req Req from App process pid(%d), len(%d)"),
-                   nlh->nlmsg_pid, msg_hdr->length);
-
-      sign_str = (char *)((char *)msg_hdr + sizeof(tAniMsgHdr));
-      if ((OEM_APP_SIGNATURE_LEN == msg_hdr->length) &&
-          (0 == strncmp(sign_str, OEM_APP_SIGNATURE_STR,
-                        OEM_APP_SIGNATURE_LEN))) {
-          hddLog(LOG1, FL("Valid App Req Req from oem app process pid(%d)"),
-                       nlh->nlmsg_pid);
-
-          pHddCtx->oem_app_registered = TRUE;
-          pHddCtx->oem_pid = nlh->nlmsg_pid;
-          send_oem_reg_rsp_nlink_msg();
-      } else {
-          hddLog(LOGE, FL("Invalid signature in App Reg Request from pid(%d)"),
-                 nlh->nlmsg_pid);
-          send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
-                                       OEM_ERR_INVALID_SIGNATURE);
-          return -EPERM;
-      }
+      ret = oem_app_reg_req_handler(pHddCtx, msg_hdr, nlh);
       break;
 
    case ANI_MSG_OEM_DATA_REQ:
-      hddLog(LOG1, FL("Received Oem Data Request length(%d) from pid: %d"),
-                   msg_hdr->length, nlh->nlmsg_pid);
-
-      if ((!pHddCtx->oem_app_registered) ||
-          (nlh->nlmsg_pid != pHddCtx->oem_pid)) {
-          /* either oem app is not registered yet or pid is different */
-          hddLog(LOGE, FL("OEM DataReq: app not registered(%d) or incorrect pid(%d)"),
-                 pHddCtx->oem_app_registered, nlh->nlmsg_pid);
-          send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
-                                       OEM_ERR_APP_NOT_REGISTERED);
-          return -EPERM;
-      }
-
-      if ((!msg_hdr->length) || (OEM_DATA_REQ_SIZE < msg_hdr->length)) {
-          hddLog(LOGE, FL("Invalid length (%d) in Oem Data Request"),
-                       msg_hdr->length);
-          send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
-                                       OEM_ERR_INVALID_MESSAGE_LENGTH);
-          return -EPERM;
-      }
-      oem_process_data_req_msg(msg_hdr->length,
-                              (char *) ((char *)msg_hdr +
-                              sizeof(tAniMsgHdr)));
+      ret = oem_data_req_handler(pHddCtx, msg_hdr, nlh);
       break;
 
    case ANI_MSG_CHANNEL_INFO_REQ:
-      hddLog(LOG1,
-             FL("Received channel info request, num channel(%d) from pid: %d"),
-             msg_hdr->length, nlh->nlmsg_pid);
+      ret = oem_chan_info_req_handler(pHddCtx, msg_hdr, nlh);
+      break;
 
-      if ((!pHddCtx->oem_app_registered) ||
-          (nlh->nlmsg_pid != pHddCtx->oem_pid)) {
-          /* either oem app is not registered yet or pid is different */
-          hddLog(LOGE,
-                 FL("Chan InfoReq: app not registered(%d) or incorrect pid(%d)"),
-                 pHddCtx->oem_app_registered, nlh->nlmsg_pid);
-          send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
-                                     OEM_ERR_APP_NOT_REGISTERED);
-          return -EPERM;
-      }
+   case ANI_MSG_SET_OEM_CAP_REQ:
+      ret = oem_set_cap_req_handler(pHddCtx, msg_hdr, nlh);
+      break;
 
-      /* message length contains list of channel ids */
-      if ((!msg_hdr->length) ||
-          (WNI_CFG_VALID_CHANNEL_LIST_LEN < msg_hdr->length)) {
-          hddLog(LOGE,
-                 FL("Invalid length (%d) in channel info request"),
-                 msg_hdr->length);
-          send_oem_err_rsp_nlink_msg(nlh->nlmsg_pid,
-                                    OEM_ERR_INVALID_MESSAGE_LENGTH);
-          return -EPERM;
-      }
-      oem_process_channel_info_req_msg(msg_hdr->length,
-                            (char *)((char*)msg_hdr + sizeof(tAniMsgHdr)));
+   case ANI_MSG_GET_OEM_CAP_REQ:
+      ret = oem_get_cap_req_handler(pHddCtx, msg_hdr, nlh);
       break;
 
    default:
@@ -862,7 +1142,7 @@ static int oem_msg_callback(struct sk_buff *skb)
                                  OEM_ERR_INVALID_MESSAGE_TYPE);
       return -EPERM;
    }
-   return 0;
+   return ret;
 }
 
 static int __oem_msg_callback(struct sk_buff *skb)

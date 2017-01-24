@@ -192,6 +192,16 @@ WLANSAP_ScanCallback
                           "%s: ACS scan id: %d (skipped ACS SCAN)", __func__, scanID);
 #endif
             operChannel = sapSelectChannel(halHandle, psapContext, pResult);
+            if (!operChannel) {
+                VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
+                          FL("No channel was selected from preferred channel for Operating channel"));
+
+                operChannel = psapContext->acs_cfg->start_ch;
+
+                VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
+                          FL("Selecting operating channel as starting channel from preferred channel list: %d"),
+                          operChannel);
+            }
 
             sme_ScanResultPurge(halHandle, pResult);
             break;
@@ -410,6 +420,16 @@ WLANSAP_PreStartBssAcsScanCallback
             }
 #endif
             operChannel = sapSelectChannel(halHandle, psapContext, pResult);
+            if (!operChannel) {
+                VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
+                          FL("No channel was selected from preferred channel for Operating channel"));
+
+                operChannel = psapContext->acs_cfg->start_ch;
+
+                VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
+                          FL("Selecting operating channel as starting channel from preferred channel list: %d"),
+                          operChannel);
+            }
 
             sme_ScanResultPurge(halHandle, pResult);
         }
@@ -513,17 +533,6 @@ WLANSAP_PreStartBssAcsScanCallback
                                       eSAP_ACS_CHANNEL_SELECTED,
                                       (v_PVOID_t) eSAP_STATUS_SUCCESS);
     }
-
-    if(eHAL_STATUS_SUCCESS != sme_CloseSession(halHandle,
-                                      psapContext->sessionId, NULL, NULL))
-    {
-        VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_ERROR,
-            "In %s CloseSession error", __func__);
-    } else {
-        psapContext->isScanSessionOpen = eSAP_FALSE;
-    }
-    psapContext->sessionId = 0xff;
-
     return halStatus;
 }
 
@@ -592,12 +601,10 @@ WLANSAP_RoamCallback
         case eCSR_ROAM_SESSION_OPENED:
         {
             VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
-                      FL("Before switch on roamStatus = %d"),
-                                 roamStatus);
+                      FL("Session %d opened successfully"),
+                                 sapContext->sessionId);
             sapContext->isSapSessionOpen = eSAP_TRUE;
-            halStatus = sme_RoamConnect(hHal, sapContext->sessionId,
-                                        &sapContext->csrRoamProfile,
-                                        &sapContext->csrRoamId);
+            vos_event_set(&sapContext->sap_session_opened_evt);
             break;
         }
 
@@ -691,16 +698,6 @@ WLANSAP_RoamCallback
                               eSAP_REMAIN_CHAN_READY,
                               (v_PVOID_t) eSAP_STATUS_SUCCESS);
             break;
-        case eCSR_ROAM_SEND_ACTION_CNF:
-            VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
-                        FL("CSR roamStatus = %s (%d)"),
-                        "eCSR_ROAM_SEND_ACTION_CNF", roamStatus);
-            sapSignalHDDevent(sapContext, pCsrRoamInfo,
-                            eSAP_SEND_ACTION_CNF,
-                            (v_PVOID_t)((eSapStatus)((roamResult == eCSR_ROAM_RESULT_NONE)
-                            ? eSAP_STATUS_SUCCESS : eSAP_STATUS_FAILURE)));
-            break;
-
        case eCSR_ROAM_DISCONNECT_ALL_P2P_CLIENTS:
             VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
                         FL("CSR roamStatus = %s (%d)"),
