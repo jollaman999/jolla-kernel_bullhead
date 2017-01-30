@@ -2683,7 +2683,6 @@
 		qcom,disable-gfx-phase-ctrl;
 		qcom,disable-cx-phase-ctrl;
 		qcom,freq-control-mask = <0x3f>;
-		qcom,core-limit-temp = <80>;
 		qcom,core-temp-hysteresis = <2>;
 		qcom,core-control-mask = <0x3e>;
 		qcom,hotplug-temp = <105>;
