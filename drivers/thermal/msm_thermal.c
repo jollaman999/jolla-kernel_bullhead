@@ -1321,7 +1321,7 @@ static void update_cluster_freq(void)
 
 static bool restored_little = true, restored_big = true;
 
-static void do_cluster_freq_ctrl(long temp)
+static void do_cluster_freq_ctrl(long temp, bool force_reset)
 {
 	uint32_t _cluster = 0;
 	int _cpu = -1, freq_idx = 0;
@@ -1332,7 +1332,7 @@ static void do_cluster_freq_ctrl(long temp)
 	struct cluster_info *cluster_ptr = NULL;
 
 	/* LITTLE */
-	if (temp < temp_threshold) {
+	if (temp < temp_threshold || force_reset) {
 		if (restored_little && restored_big)
 			return;
 		if (restored_little) {
@@ -1354,7 +1354,7 @@ static void do_cluster_freq_ctrl(long temp)
 	}
 
 	/* big */
-	if (temp < temp_big_threshold) {
+	if (temp < temp_big_threshold || force_reset) {
 		if (restored_little && restored_big)
 			return;
 		if (restored_big) {
@@ -2990,7 +2990,7 @@ static void do_freq_control(long temp)
 	uint32_t max_freq = cpus[cpu].limited_max_freq;
 
 	if (core_ptr)
-		return do_cluster_freq_ctrl(temp);
+		return do_cluster_freq_ctrl(temp, false);
 	if (!freq_table_get)
 		return;
 
@@ -4208,19 +4208,23 @@ static void __ref disable_msm_thermal(void)
 	/* make sure check_temp is no longer running */
 	cancel_delayed_work_sync(&check_temp_work);
 
-	get_online_cpus();
-	for_each_possible_cpu(cpu) {
-		if (cpus[cpu].limited_max_freq == UINT_MAX &&
-			cpus[cpu].limited_min_freq == 0)
-			continue;
-		pr_info("Max frequency reset for CPU%d\n", cpu);
-		cpus[cpu].limited_max_freq = UINT_MAX;
-		cpus[cpu].limited_min_freq = 0;
-		if (!SYNC_CORE(cpu))
-			update_cpu_freq(cpu);
+	if (core_ptr) {
+		do_cluster_freq_ctrl(0, true);
+	} else {
+		get_online_cpus();
+		for_each_possible_cpu(cpu) {
+			if (cpus[cpu].limited_max_freq == UINT_MAX &&
+				cpus[cpu].limited_min_freq == 0)
+				continue;
+			pr_info("Max frequency reset for CPU%d\n", cpu);
+			cpus[cpu].limited_max_freq = UINT_MAX;
+			cpus[cpu].limited_min_freq = 0;
+			if (!SYNC_CORE(cpu))
+				update_cpu_freq(cpu);
+		}
+		update_cluster_freq();
+		put_online_cpus();
 	}
-	update_cluster_freq();
-	put_online_cpus();
 }
 
 static void interrupt_mode_init(void)
