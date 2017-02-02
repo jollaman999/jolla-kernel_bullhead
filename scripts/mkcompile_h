@@ -66,6 +66,9 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
 
 # Generate a temporary compile.h
 
+JOLLA_KERNEL_TIMESTAMP=`date +%Y%m%d-%H%M`
+echo $JOLLA_KERNEL_TIMESTAMP > ~/jolla_kernel_timestamp
+
 ( echo /\* This file is auto generated, version $VERSION \*/
   if [ -n "$CONFIG_FLAGS" ] ; then echo "/* $CONFIG_FLAGS */"; fi
   
@@ -73,7 +76,7 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
 
   echo \#define UTS_VERSION \"`echo $UTS_VERSION | $UTS_TRUNCATE`\"
 
-  echo \#define JOLLA_KERNEL_TIMESTAMP \"`date +%Y%m%d-%H%M`\"
+  echo \#define JOLLA_KERNEL_TIMESTAMP \"$JOLLA_KERNEL_TIMESTAMP\"
 
   echo \#define LINUX_COMPILE_BY \"`echo $LINUX_COMPILE_BY | $UTS_TRUNCATE`\"
   echo \#define LINUX_COMPILE_HOST \"`echo $LINUX_COMPILE_HOST | $UTS_TRUNCATE`\"
