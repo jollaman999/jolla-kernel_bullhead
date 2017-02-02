@@ -1328,13 +1328,16 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 	int temp_diff_little, temp_diff_big;
 	int index, step;
 	int index_little, index_big;
+	bool skip_little = false, skip_big = false;
 	struct cluster_info *cluster_ptr = NULL;
 
 	/* LITTLE */
 	if (temp < temp_threshold || force_reset) {
 		if (restored_little && restored_big)
 			return;
-		if (!restored_little) {
+		if (restored_little) {
+			skip_little = true;
+		} else {
 			index_little = 0;
 			restored_little = true;
 		}
@@ -1354,7 +1357,9 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 	if (temp < temp_big_threshold || force_reset) {
 		if (restored_little && restored_big)
 			return;
-		if (!restored_big) {
+		if (restored_big) {
+			skip_big = true;
+		} else {
 			index_big = 0;
 			restored_big = true;
 		}
@@ -1377,12 +1382,12 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 			continue;
 
 		if (first_cpu(cluster_ptr->cluster_cores) >= big_core_start) {
-			if (restored_big)
+			if (skip_big)
 				continue;
 			index = index_big;
 			step = freq_step_big;
 		} else {
-			if (restored_little)
+			if (skip_little)
 				continue;
 			index = index_little;
 			step = freq_step_little;
