@@ -2673,7 +2673,7 @@
 		compatible = "qcom,msm-thermal";
 		qcom,sensor-id = <7>;
 		qcom,poll-ms = <250>;
-		qcom,limit-temp-little = <58>;
+		qcom,limit-temp-little = <61>;
 		qcom,limit-temp-big = <54>;
 		qcom,temp-big-off = <78>;
 		qcom,big-core-start = <4>;
