@@ -119,7 +119,7 @@ unsigned int poll_ms;
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
 unsigned int temp_big_off_threshold;
-unsigned int temp_step_little = 3;
+unsigned int temp_step_little = 4;
 unsigned int temp_step_big = 2;
 unsigned int freq_step_little = 1;
 unsigned int freq_step_big = 1;
