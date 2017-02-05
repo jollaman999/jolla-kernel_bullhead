@@ -113,6 +113,8 @@ static int big_core_start;
  * freq_step_little - Frequency decrease step for little.
  * freq_step_big - Frequency decrease step for big.
  * temp_count_max_little - If this value is 3, LITTLE's max frequency will decrease 1 to 3 steps.
+ * temp_count_max_little_big_off - If this value is 1 and the temp is above 'temp_threshold' and below
+ * 					'temp_big_off_threshold', LITTLE's max frequency will decrease 1 step.
  * temp_count_max_big - If this value is 5, big's max frequency will decrease 1 to 5 steps.
  */
 unsigned int poll_ms;
@@ -124,6 +126,7 @@ unsigned int temp_step_big = 2;
 unsigned int freq_step_little = 1;
 unsigned int freq_step_big = 1;
 unsigned int temp_count_max_little = 2;
+unsigned int temp_count_max_little_with_big_off = 1;
 unsigned int temp_count_max_big = 10;
 module_param(poll_ms, int, 0644);
 module_param(temp_threshold, int, 0644);
@@ -134,6 +137,7 @@ module_param(temp_step_big, int, 0644);
 module_param(freq_step_little, int, 0644);
 module_param(freq_step_big, int, 0644);
 module_param(temp_count_max_little, int, 0644);
+module_param(temp_count_max_little_with_big_off, int, 0644);
 module_param(temp_count_max_big, int, 0644);
 
 // Debug
@@ -1328,6 +1332,7 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 	int temp_diff_little, temp_diff_big;
 	int index, step;
 	int index_little, index_big;
+	int max_little;
 	bool skip_little = false, skip_big = false;
 	struct cluster_info *cluster_ptr = NULL;
 
@@ -1344,9 +1349,13 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 	} else {
 		temp_diff_little = temp - temp_threshold;
 		if (temp_diff_little > 0) {
+			if (temp < temp_big_off_threshold)
+				max_little = temp_count_max_little;
+			else
+				max_little = temp_count_max_little_with_big_off;
 			index_little = temp_diff_little / temp_step_little + 1;
-			if (index_little > temp_count_max_little)
-				index_little = temp_count_max_little;
+			if (index_little > max_little)
+				index_little = max_little;
 		} else
 			index_little = 1;
 
