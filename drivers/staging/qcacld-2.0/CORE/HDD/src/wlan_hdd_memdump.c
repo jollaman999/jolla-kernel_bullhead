@@ -241,8 +241,6 @@ __wlan_hdd_cfg80211_get_fw_mem_dump(struct wiphy *wiphy,
 			return -ENOMEM;
 		}
 		hdd_ctx->dump_loc_paddr = paddr;
-	} else {
-		paddr = hdd_ctx->dump_loc_paddr;
 	}
 	mutex_unlock(&hdd_ctx->memdump_lock);
 
@@ -353,11 +351,7 @@ int wlan_hdd_cfg80211_get_fw_mem_dump(struct wiphy *wiphy,
 	return ret;
 }
 
-#ifdef MULTI_IF_NAME
-#define PROCFS_MEMDUMP_DIR "debug" MULTI_IF_NAME
-#else
 #define PROCFS_MEMDUMP_DIR "debug"
-#endif
 #define PROCFS_MEMDUMP_NAME "fwdump"
 #define PROCFS_MEMDUMP_PERM 0444
 
@@ -673,12 +667,14 @@ void memdump_deinit(void) {
 	}
 }
 
-#ifdef MULTI_IF_NAME
-#define PROCFS_DRIVER_DUMP_DIR "debugdriver" MULTI_IF_NAME
-#else
 #define PROCFS_DRIVER_DUMP_DIR "debugdriver"
-#endif
+
+#ifdef MULTI_IF_NAME
+#define PROCFS_DRIVER_DUMP_NAME "driverdump" MULTI_IF_NAME
+#else
 #define PROCFS_DRIVER_DUMP_NAME "driverdump"
+#endif
+
 #define PROCFS_DRIVER_DUMP_PERM 0444
 
 static struct proc_dir_entry *proc_file_driver, *proc_dir_driver;

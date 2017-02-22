@@ -56,22 +56,30 @@ typedef int (* nl_srv_msg_callback)(struct sk_buff * skb);
  * and the diagnotics netlink socket will not be available since this
  * diagnostics netlink socket can only be exposed by one instance of the driver.
  */
+#ifndef MULTI_IF_NAME
 
-#if defined(CONFIG_CNSS_LOGGER) || !defined(MULTI_IF_NAME)
-
-int nl_srv_init(void *wiphy);
+int nl_srv_init(void);
+#ifdef WLAN_KD_READY_NOTIFIER
+void nl_srv_exit(int dst_pid);
+#else
 void nl_srv_exit(void);
-int nl_srv_register(tWlanNlModTypes msg_type,
-		    nl_srv_msg_callback msg_handler);
-int nl_srv_unregister(tWlanNlModTypes msg_type,
-		       nl_srv_msg_callback msg_handler);
+#endif /* WLAN_KD_READY_NOTIFIER */
+int nl_srv_register(tWlanNlModTypes msg_type, nl_srv_msg_callback msg_handler);
+int nl_srv_unregister(tWlanNlModTypes msg_type, nl_srv_msg_callback msg_handler);
 int nl_srv_ucast(struct sk_buff * skb, int dst_pid, int flag);
 int nl_srv_bcast(struct sk_buff * skb);
 int nl_srv_is_initialized(void);
 
 #else
-static inline int nl_srv_init(void *wiphy) { return 0; }
-static inline void nl_srv_exit(void) {}
+static inline int nl_srv_init(void) { return 0; }
+
+#ifdef WLAN_KD_READY_NOTIFIER
+static inline void nl_srv_exit(int dst_pid)
+#else
+void nl_srv_exit(void)
+#endif /* WLAN_KD_READY_NOTIFIER */
+{
+}
 
 static inline int nl_srv_register(tWlanNlModTypes msg_type,
 				  nl_srv_msg_callback msg_handler)
@@ -97,10 +105,10 @@ static inline int nl_srv_bcast(struct sk_buff *skb)
 	return 0;
 }
 
-static inline int nl_srv_is_initialized(void)
+static inline int nl_srv_is_initialized()
 {
 	return -EPERM;
 }
 
-#endif /* defined(CONFIG_CNSS_LOGGER) || !defined(MULTI_IF_NAME) */
+#endif /* MULTI_IF_NAME */
 #endif

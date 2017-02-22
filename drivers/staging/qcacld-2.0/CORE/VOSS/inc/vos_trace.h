@@ -116,7 +116,7 @@ typedef enum
   ------------------------------------------------------------------------*/
 typedef struct  svosTraceRecord
 {
-    char time[20];
+    v_U64_t time;
     v_U8_t module;
     v_U8_t code;
     v_U16_t session;
