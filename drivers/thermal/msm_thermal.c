@@ -1183,7 +1183,7 @@ static void update_cpu_topology(struct device *dev)
 	core_ptr->child_entity_ptr = temp_ptr;
 }
 
-static int __ref init_cluster_freq_table(void)
+static int init_cluster_freq_table(void)
 {
 	uint32_t _cluster = 0, _cpu = 0, table_len = 0, idx = 0;
 	int ret = 0, cpu_set;
@@ -2487,7 +2487,7 @@ static void therm_reset_notify(struct therm_threshold *thresh_data)
 }
 
 #ifdef CONFIG_SMP
-static void __ref do_core_control(long temp, bool force_off)
+static void do_core_control(long temp, bool force_off)
 {
 	int i = 0;
 	int ret = 0;
@@ -2555,7 +2555,7 @@ static void __ref do_core_control(long temp, bool force_off)
 	mutex_unlock(&core_control_mutex);
 }
 /* Call with core_control_mutex locked */
-static int __ref update_offline_cores(int val)
+static int update_offline_cores(int val)
 {
 	uint32_t cpu = 0;
 	int ret = 0;
@@ -2610,7 +2610,7 @@ static int __ref update_offline_cores(int val)
 	return ret;
 }
 
-static __ref int do_hotplug(void *data)
+static int do_hotplug(void *data)
 {
 	int ret = 0;
 	uint32_t cpu = 0, mask = 0;
@@ -2682,17 +2682,17 @@ static __ref int do_hotplug(void *data)
 	return ret;
 }
 #else
-static void __ref do_core_control(long temp, bool force_off)
+static void do_core_control(long temp, bool force_off)
 {
 	return;
 }
 
-static __ref int do_hotplug(void *data)
+static int do_hotplug(void *data)
 {
 	return 0;
 }
 
-static int __ref update_offline_cores(int val)
+static int update_offline_cores(int val)
 {
 	return 0;
 }
@@ -3090,7 +3090,7 @@ reschedule:
 				msecs_to_jiffies(poll_ms));
 }
 
-static int __ref msm_thermal_cpu_callback(struct notifier_block *nfb,
+static int msm_thermal_cpu_callback(struct notifier_block *nfb,
 		unsigned long action, void *hcpu)
 {
 	uint32_t cpu = (uintptr_t)hcpu;
@@ -3117,7 +3117,7 @@ static int __ref msm_thermal_cpu_callback(struct notifier_block *nfb,
 	return NOTIFY_OK;
 }
 
-static struct notifier_block __refdata msm_thermal_cpu_notifier = {
+static struct notifier_block msm_thermal_cpu_notifier = {
 	.notifier_call = msm_thermal_cpu_callback,
 };
 static int hotplug_notify(enum thermal_trip_type type, int temp, void *data)
@@ -3236,7 +3236,7 @@ init_kthread:
 		kthread_stop(hotplug_task);
 }
 
-static __ref int do_freq_mitigation(void *data)
+static int do_freq_mitigation(void *data)
 {
 	int ret = 0;
 	uint32_t cpu = 0, max_freq_req = 0, min_freq_req = 0;
@@ -3873,7 +3873,7 @@ set_and_exit:
 	return;
 }
 
-static __ref int do_thermal_monitor(void *data)
+static int do_thermal_monitor(void *data)
 {
 	int ret = 0, j;
 	struct therm_threshold *sensor_list;
@@ -4220,7 +4220,7 @@ cx_node_exit:
  * status will be carried over to the process stopping the msm_thermal, as
  * we dont want to online a core and bring in the thermal issues.
  */
-static void __ref disable_msm_thermal(void)
+static void disable_msm_thermal(void)
 {
 	uint32_t cpu = 0;
 
@@ -4271,7 +4271,7 @@ static void msm_thermal_suspend(bool suspend)
 	}
 }
 
-static int __ref set_enabled(const char *val, const struct kernel_param *kp)
+static int set_enabled(const char *val, const struct kernel_param *kp)
 {
 	int ret = 0;
 
@@ -4301,7 +4301,7 @@ static ssize_t show_cc_enabled(struct kobject *kobj,
 	return snprintf(buf, PAGE_SIZE, "%d\n", core_control_enabled);
 }
 
-static ssize_t __ref store_cc_enabled(struct kobject *kobj,
+static ssize_t store_cc_enabled(struct kobject *kobj,
 		struct kobj_attribute *attr, const char *buf, size_t count)
 {
 	int ret = 0;
@@ -4354,7 +4354,7 @@ static ssize_t show_cpus_offlined(struct kobject *kobj,
 	return snprintf(buf, PAGE_SIZE, "%d\n", cpus_offlined);
 }
 
-static ssize_t __ref store_cpus_offlined(struct kobject *kobj,
+static ssize_t store_cpus_offlined(struct kobject *kobj,
 		struct kobj_attribute *attr, const char *buf, size_t count)
 {
 	int ret = 0;
@@ -4391,19 +4391,19 @@ done_cc:
 	return count;
 }
 
-static __refdata struct kobj_attribute cc_enabled_attr =
+static struct kobj_attribute cc_enabled_attr =
 __ATTR(enabled, 0644, show_cc_enabled, store_cc_enabled);
 
-static __refdata struct kobj_attribute cpus_offlined_attr =
+static struct kobj_attribute cpus_offlined_attr =
 __ATTR(cpus_offlined, 0644, show_cpus_offlined, store_cpus_offlined);
 
-static __refdata struct attribute *cc_attrs[] = {
+static struct attribute *cc_attrs[] = {
 	&cc_enabled_attr.attr,
 	&cpus_offlined_attr.attr,
 	NULL,
 };
 
-static __refdata struct attribute_group cc_attr_group = {
+static struct attribute_group cc_attr_group = {
 	.attrs = cc_attrs,
 };
 static __init int msm_thermal_add_cc_nodes(void)
@@ -4445,7 +4445,7 @@ static ssize_t show_mx_enabled(struct kobject *kobj,
 	return snprintf(buf, PAGE_SIZE, "%d\n", vdd_mx_enabled);
 }
 
-static ssize_t __ref store_mx_enabled(struct kobject *kobj,
+static ssize_t store_mx_enabled(struct kobject *kobj,
 		struct kobj_attribute *attr, const char *buf, size_t count)
 {
 	int ret = 0;
