@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 3.10.105-jolla-kernel_bullhead_II-v17.3 Kernel Configuration
+# Linux/arm64 3.10.105-jolla-kernel_bullhead_II-v17.4 Kernel Configuration
 #
 CONFIG_ARM64=y
 CONFIG_64BIT=y
