@@ -150,8 +150,7 @@ static int msm_eeprom_config(struct msm_eeprom_ctrl_t *e_ctrl,
 			break;
 		}
 		memcpy(cdata->cfg.eeprom_name,
-			e_ctrl->eboard_info->eeprom_name,
-			sizeof(cdata->cfg.eeprom_name));
+			e_ctrl->eboard_info->eeprom_name, length);
 		break;
 	case CFG_EEPROM_GET_CAL_DATA:
 		CDBG("%s E CFG_EEPROM_GET_CAL_DATA\n", __func__);
