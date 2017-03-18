@@ -146,8 +146,12 @@ unsigned int debug_freq_control = 0;
 module_param(debug_core_control, int, 0644);
 module_param(debug_freq_control, int, 0644);
 
+static bool is_screen_on = true;
+static bool core_boost_queued = false;
+
 static struct msm_thermal_data msm_thermal_info;
 static struct delayed_work check_temp_work;
+static struct delayed_work queue_force_off_work;
 static bool core_control_enabled;
 uint32_t cpus_offlined;
 static cpumask_var_t cpus_previously_online;
@@ -2492,7 +2496,7 @@ static void do_core_control(long temp, bool force_off)
 	int i = 0;
 	int ret = 0;
 
-	if (!core_control_enabled && !force_off)
+	if (temp > 0 && !core_control_enabled && !force_off)
 		return;
 
 	mutex_lock(&core_control_mutex);
@@ -2523,6 +2527,7 @@ static void do_core_control(long temp, bool force_off)
 			if (!force_off)
 				break;
 		}
+	// If temp == 0, turn on all of big cores.
 	} else if (msm_thermal_info.core_control_mask && cpus_offlined &&
 		temp <= (temp_big_off_threshold - msm_thermal_info.core_temp_hysteresis_degC)) {
 		for (i = big_core_start; i < num_possible_cpus(); i++) { // Only on/off big cores
@@ -2549,11 +2554,32 @@ static void do_core_control(long temp, bool force_off)
 						ret, i);
 			trace_thermal_post_core_online(i,
 				cpumask_test_cpu(i, cpu_online_mask));
-			break;
+			if (temp > 0)
+				break;
 		}
 	}
 	mutex_unlock(&core_control_mutex);
 }
+
+void msm_thermal_core_boost(void)
+{
+	if (core_boost_queued)
+		return;
+
+	core_boost_queued = true;
+	do_core_control(0, false);
+	schedule_delayed_work(&queue_force_off_work,
+			msecs_to_jiffies(2000));
+}
+EXPORT_SYMBOL(msm_thermal_core_boost);
+
+static void queue_force_off(struct work_struct *work)
+{
+	if (!is_screen_on)
+		do_core_control(temp_big_off_threshold, true);
+	core_boost_queued = false;
+}
+
 /* Call with core_control_mutex locked */
 static int update_offline_cores(int val)
 {
@@ -4692,6 +4718,7 @@ int msm_thermal_init(struct msm_thermal_data *pdata)
 
 	register_reboot_notifier(&msm_thermal_reboot_notifier);
 	pm_notifier(msm_thermal_suspend_callback, 0);
+	INIT_DELAYED_WORK(&queue_force_off_work, queue_force_off);
 	INIT_DELAYED_WORK(&check_temp_work, check_temp);
 	schedule_delayed_work(&check_temp_work, 0);
 
@@ -6082,9 +6109,13 @@ static int msm_thermal_fb_notifier_callback(struct notifier_block *self,
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
 		case FB_BLANK_VSYNC_SUSPEND:
+			cancel_delayed_work_sync(&queue_force_off_work);
+			core_boost_queued = false;
+			is_screen_on = true;
 			msm_thermal_suspend(false);
 			break;
 		case FB_BLANK_POWERDOWN:
+			is_screen_on = false;
 			msm_thermal_suspend(true);
 			do_core_control(temp_big_off_threshold, true);
 			break;
