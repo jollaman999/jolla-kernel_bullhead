@@ -348,6 +348,9 @@ static int cpufreq_sched_policy_exit(struct cpufreq_policy *policy)
 	pr_info("%s: exit CPU%d cluster\n", __func__, cpu);
 	WARN_ON(!policy->governor_data);
 
+	if (!gd)
+		return -EBUSY;
+
 	for_each_cpu(cpu, policy->cpus)
 		per_cpu(governor_started, cpu) = 0;
 
