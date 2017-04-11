@@ -147,6 +147,7 @@ static int __zcomp_cpu_notifier(struct zcomp *comp,
 		}
 		*per_cpu_ptr(comp->stream, cpu) = zstrm;
 		break;
+	case CPU_DOWN_PREPARE:
 	case CPU_DEAD:
 	case CPU_UP_CANCELED:
 		zstrm = *per_cpu_ptr(comp->stream, cpu);
