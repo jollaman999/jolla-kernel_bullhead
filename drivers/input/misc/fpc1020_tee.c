@@ -112,9 +112,6 @@ struct fpc1020_data {
 	int rst_gpio;
 	int qup_id;
 	struct mutex lock;
-#if defined(CONFIG_THERMAL_MONITOR) && defined(CONFIG_SMP)
-	struct mutex msm_thermal_core_lock;
-#endif
 	bool prepared;
 	bool wakeup_enabled;
 	bool power_enabled;
@@ -738,9 +735,7 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 
 	if (!is_display_on() && fpc1020->wakeup_enabled) {
 #if defined(CONFIG_THERMAL_MONITOR) && defined(CONFIG_SMP)
-		mutex_lock(&fpc1020->msm_thermal_core_lock);
 		msm_thermal_core_boost();
-		mutex_unlock(&fpc1020->msm_thermal_core_lock);
 #endif
 		wake_lock_timeout(&fpc1020->ttw_wl, msecs_to_jiffies(FPC_TTW_HOLD_TIME));
 	}
@@ -889,9 +884,6 @@ static int fpc1020_probe(struct spi_device *spi)
 	}
 
 	mutex_init(&fpc1020->lock);
-#if defined(CONFIG_THERMAL_MONITOR) && defined(CONFIG_SMP)
-	mutex_init(&fpc1020->msm_thermal_core_lock);
-#endif
 	rc = devm_request_threaded_irq(dev, gpio_to_irq(fpc1020->irq_gpio),
 			NULL, fpc1020_irq_handler, irqf,
 			dev_name(dev), fpc1020);
@@ -930,9 +922,6 @@ static int fpc1020_remove(struct spi_device *spi)
 	struct fpc1020_data *fpc1020 = dev_get_drvdata(&spi->dev);
 
 	sysfs_remove_group(&spi->dev.kobj, &attribute_group);
-#if defined(CONFIG_THERMAL_MONITOR) && defined(CONFIG_SMP)
-	mutex_destroy(&fpc1020->msm_thermal_core_lock);
-#endif
 	mutex_destroy(&fpc1020->lock);
 	wake_lock_destroy(&fpc1020->ttw_wl);
 	(void)vreg_setup(fpc1020, "vdd_io", false);
