@@ -2487,29 +2487,25 @@ static void therm_reset_notify(struct therm_threshold *thresh_data)
 }
 
 #ifdef CONFIG_SMP
-static void do_core_control(long temp, bool force_off)
+static void do_core_control(long temp)
 {
 	int i = 0;
 	int ret = 0;
 
-	if (!core_control_enabled && !force_off)
+	if (!core_control_enabled)
 		return;
 
 	mutex_lock(&core_control_mutex);
 	if (msm_thermal_info.core_control_mask &&
-		(temp >= temp_big_off_threshold || force_off)) {
+		temp >= temp_big_off_threshold) {
 		for (i = big_core_start; i < num_possible_cpus(); i++) { // Only on/off big cores
 			if (!(msm_thermal_info.core_control_mask & BIT(i)))
 				continue;
 			if (cpus_offlined & BIT(i) && !cpu_online(i))
 				continue;
-			if (debug_core_control) {
-				if (force_off)
-					pr_info("Set Offline: CPU%d Force off\n", i);
-				else
-					pr_info("Set Offline: CPU%d Temp: %ld\n", i, temp);
-			}
-
+			if (debug_core_control)
+				pr_info("Set Offline: CPU%d Temp: %ld\n",
+						i, temp);
 			if (cpu_online(i)) {
 				trace_thermal_pre_core_offline(i);
 				ret = cpu_down(i);
@@ -2520,8 +2516,7 @@ static void do_core_control(long temp, bool force_off)
 					cpumask_test_cpu(i, cpu_online_mask));
 			}
 			cpus_offlined |= BIT(i);
-			if (!force_off)
-				break;
+			break;
 		}
 	} else if (msm_thermal_info.core_control_mask && cpus_offlined &&
 		temp <= (temp_big_off_threshold - msm_thermal_info.core_temp_hysteresis_degC)) {
@@ -2682,7 +2677,7 @@ static int do_hotplug(void *data)
 	return ret;
 }
 #else
-static void do_core_control(long temp, bool force_off)
+static void do_core_control(long temp)
 {
 	return;
 }
@@ -3066,7 +3061,7 @@ static void check_temp(struct work_struct *work)
 				msm_thermal_info.sensor_id, ret);
 		goto reschedule;
 	}
-	do_core_control(temp, false);
+	do_core_control(temp);
 	do_vdd_mx();
 	do_psm();
 	do_gfx_phase_cond();
@@ -6086,7 +6081,6 @@ static int msm_thermal_fb_notifier_callback(struct notifier_block *self,
 			break;
 		case FB_BLANK_POWERDOWN:
 			msm_thermal_suspend(true);
-			do_core_control(temp_big_off_threshold, true);
 			break;
 		}
 	}
