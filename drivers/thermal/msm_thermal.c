@@ -113,7 +113,7 @@ static int big_core_start;
  * freq_step_little - Frequency decrease step for little.
  * freq_step_big - Frequency decrease step for big.
  * temp_count_max_little - If this value is 3, LITTLE's max frequency will decrease 1 to 3 steps.
- * temp_count_max_little_big_off - If this value is 1 and the temp is above 'temp_threshold' and below
+ * temp_count_max_little_with_big_off - If this value is 2 and the temp is above 'temp_threshold' and below
  * 					'temp_big_off_threshold', LITTLE's max frequency will decrease 1 step.
  * temp_count_max_big - If this value is 5, big's max frequency will decrease 1 to 5 steps.
  */
