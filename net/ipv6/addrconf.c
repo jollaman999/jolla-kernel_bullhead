@@ -5036,6 +5036,7 @@ static struct addrconf_sysctl_table
 			.mode		= 0644,
 			.proc_handler	= proc_dointvec_jiffies,
 		},
+		{
 			.procname	= "router_solicitation_delay",
 			.data		= &ipv6_devconf.rtr_solicit_delay,
 			.maxlen		= sizeof(int),
