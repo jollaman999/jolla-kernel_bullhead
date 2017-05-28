@@ -97,7 +97,7 @@ static void fp_boost_main(struct work_struct *work)
 static void fp_unboost_main(struct work_struct *work)
 {
 	struct boost_policy *b = boost_policy_g;
-	pr_info("Unboosting\n");
+	pr_debug("Unboosting\n");
 	touched = false;
 	/* This clears the wake-boost bit and unboosts everything */
 	unboost_all_cpus(b);
@@ -125,7 +125,7 @@ static int do_cpu_boost(struct notifier_block *nb,
 
 	/* Boost CPU to max frequency for fingerprint boost */
 	if (state & FINGERPRINT_BOOST) {
-		pr_info("Boosting\n");
+		pr_debug("Boosting cpu%u\n", policy->cpu);
 		policy->cur = policy->max;
 		policy->min = policy->max;
 		return NOTIFY_OK;
