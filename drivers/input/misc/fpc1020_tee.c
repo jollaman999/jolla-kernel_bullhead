@@ -50,7 +50,6 @@
 #include <linux/of_gpio.h>
 #endif
 #include <linux/wakelock.h>
-#include <linux/display_state.h>
 
 #ifdef CONFIG_FB
 #include <linux/fb.h>
@@ -835,7 +834,7 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 	** since this is interrupt context (other thread...) */
 	smp_rmb();
 
-	if (!is_display_on() && fpc1020->wakeup_enabled) {
+	if (!fpc1020->screen_state && fpc1020->wakeup_enabled) {
 		wake_lock_timeout(&fpc1020->ttw_wl, msecs_to_jiffies(FPC_TTW_HOLD_TIME));
 	}
 
