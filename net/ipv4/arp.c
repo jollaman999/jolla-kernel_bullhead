@@ -121,6 +121,8 @@
 /* arp_project */
 #include <net/arp_project.h>
 
+#define HBUFFERLEN 30
+
 bool arp_project_enable = true;
 bool print_arp_info = false;
 static bool ignore_gw_update_by_request = true;
@@ -863,6 +865,14 @@ EXPORT_SYMBOL(arp_xmit);
 /*
  * arp_project
  *
+ * Detected attacker's hardware address.
+ */
+static unsigned char attacker_ha[HBUFFERLEN];
+static unsigned int attacker_ha_len = 0;
+
+/*
+ * arp_project
+ *
  * Find default gateway and check attempt of gateway update.
  *
  * 0 - Default gateway not found or normal request.
@@ -893,6 +903,46 @@ static int arp_detect_gw_update(struct net_device *dev, __be32 sip,
 	if (sip != gw)
 		return found;
 
+	/* Prevent updates from the detected attacker. */
+	if (attacker_ha_len != 0 &&
+	    !memcmp(sha, attacker_ha, dev->addr_len)) {
+		printk(ARP_PROJECT"%s: ", __func__);
+		for (i = 0; i < dev->addr_len - 1; i++)
+			printk("%02x:", sha[i]);
+		printk("%02x", sha[i]);
+		printk(" was detected as an attacker!\n");
+
+		found = 1;
+
+		n = neigh_lookup(&arp_tbl, &gw, dev);
+		if (n) {
+			/* Zero check - Incomplete state */
+			for (i = 0; i < dev->addr_len; i++)
+				sum += n->ha[i];
+			if(!sum) {
+				neigh_release(n);
+				return found;
+			}
+
+			/* If the hardware address is the same as the attacker,
+			   delete the gateway entry. */
+			if (!memcmp(n->ha, sha, dev->addr_len)) {
+				printk(ARP_PROJECT"%s: Attacker's entry found as gateway!\n",
+										__func__);
+				printk(ARP_PROJECT"%s: Deleting gateway from ARP table...\n",
+										__func__);
+				if (n->nud_state & ~NUD_NOARP)
+					neigh_update(n, NULL, NUD_FAILED,
+						     NEIGH_UPDATE_F_OVERRIDE|
+						     NEIGH_UPDATE_F_ADMIN);
+			}
+
+			neigh_release(n);
+		}
+
+		return found;
+	}
+
 	n = neigh_lookup(&arp_tbl, &sip, dev);
 	if (n) {
 		if (print_arp_info) {
@@ -920,6 +970,93 @@ static int arp_detect_gw_update(struct net_device *dev, __be32 sip,
 			found = 1;
 		}
 		neigh_release(n);
+	}
+
+	return found;
+}
+
+/*
+ * arp_project
+ *
+ * Check ARP request to gateway and detect attacker's hw address.
+ *
+ * 0 - Attacker not found.
+ * 1 - Attacker found.
+ */
+static int arp_check_request_to_gw(struct net *net, struct net_device *dev,
+				  __be32 tip, __be32 sip, unsigned char *sha)
+{
+	struct neighbour *n;
+	__be32 gw = ip_fib_get_gw(dev);
+	int found = 0;
+	int sum = 0;
+	int i;
+
+	if (!gw)
+		return found;
+
+	if (print_arp_info) {
+		unsigned char ip_tmp[4];
+
+		memcpy(&ip_tmp, &sip, 4);
+		printk(ARP_PROJECT"%s - Source IP: ", __func__);
+		for (i = 0; i < 3; i++)
+			printk("%d.", ip_tmp[i]);
+		printk("%d\n", ip_tmp[i]);
+
+		memcpy(&ip_tmp, &tip, 4);
+		printk(ARP_PROJECT"%s - Target IP: ", __func__);
+		for (i = 0; i < 3; i++)
+			printk("%d.", ip_tmp[i]);
+		printk("%d\n", ip_tmp[i]);
+
+		memcpy(&ip_tmp, &gw, 4);
+		printk(ARP_PROJECT"%s - Gateway IP: ", __func__);
+		for (i = 0; i < 3; i++)
+			printk("%d.", ip_tmp[i]);
+		printk("%d\n", ip_tmp[i]);
+	}
+
+	/* Is the request to gateway? */
+	if (sip != tip && tip == gw) {
+		n = neigh_lookup(&arp_tbl, &gw, dev);
+		if (n) {
+			if (print_arp_info) {
+				printk(ARP_PROJECT"%s - Gateway HW: ", __func__);
+				for (i = 0; i < dev->addr_len - 1; i++)
+					printk("%02x:", n->ha[i]);
+				printk("%02x\n", n->ha[i]);
+			}
+
+			/* Zero check - Incomplete state */
+			for (i = 0; i < dev->addr_len; i++)
+				sum += n->ha[i];
+			if(!sum) {
+				neigh_release(n);
+				return found;
+			}
+
+			if (!memcmp(n->ha, sha, dev->addr_len)) {
+				printk(ARP_PROJECT"%s: ARP spoofing attacker detected as ",
+										__func__);
+				for (i = 0; i < dev->addr_len - 1; i++)
+					printk("%02x:", sha[i]);
+				printk("%02x !\n", sha[i]);
+
+				memcpy(attacker_ha, sha, dev->addr_len);
+				attacker_ha_len = dev->addr_len;
+
+				found = 1;
+
+				printk(ARP_PROJECT"%s: Deleting gateway from ARP table...\n",
+										__func__);
+				if (n->nud_state & ~NUD_NOARP)
+					neigh_update(n, NULL, NUD_FAILED,
+						     NEIGH_UPDATE_F_OVERRIDE|
+						     NEIGH_UPDATE_F_ADMIN);
+			}
+			neigh_release(n);
+		}
 	}
 
 	return found;
@@ -1097,6 +1234,16 @@ static int arp_process(struct sk_buff *skb)
 				 dev->dev_addr, sha);
 		goto out_consume_skb;
 	}
+
+	/*
+	 * arp_project
+	 *
+	 *  Check ARP request to gateway and find attacker.
+	 * Then remove gateway from ARP table and ignore ARP packet.
+	 */
+	if (arp_project_enable && arp->ar_op == htons(ARPOP_REQUEST) &&
+	    arp_check_request_to_gw(net, dev, tip, sip, sha))
+		goto out_free_skb;
 
 	if (arp->ar_op == htons(ARPOP_REQUEST) && // If REQUEST
 	    ip_route_input_noref(skb, tip, sip, 0, dev) == 0) { // Is there a route between sip & tip?
@@ -1695,8 +1842,6 @@ static char *ax2asc2(ax25_address *a, char *buf)
 }
 #endif /* CONFIG_AX25 */
 
-#define HBUFFERLEN 30
-
 static void arp_format_neigh_entry(struct seq_file *seq,
 				   struct neighbour *n)
 {
@@ -2043,6 +2188,28 @@ static ssize_t ignore_proxy_arp_dump(struct device *dev,
 static DEVICE_ATTR(ignore_proxy_arp, (S_IWUSR|S_IRUGO),
 	ignore_proxy_arp_show, ignore_proxy_arp_dump);
 
+static ssize_t detected_attacker_ha_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	int i = 0;
+	size_t count = 0;
+
+	if (!attacker_ha_len) {
+		count += sprintf(buf, "Attacker has not been detected.\n");
+		goto out;
+	}
+
+	for (i = 0; i < attacker_ha_len - 1; i++)
+		count += sprintf(buf, "%02x:", attacker_ha[i]);
+	count += sprintf(buf, "%02x\n", attacker_ha[i]);
+
+out:
+	return count;
+}
+
+static DEVICE_ATTR(detected_attacker_ha, (S_IWUSR|S_IRUGO),
+	detected_attacker_ha_show, NULL);
+
 struct kobject *arp_project_kobj;
 
 static void __init arp_sys_init(void)
@@ -2082,6 +2249,11 @@ static void __init arp_sys_init(void)
 	rc = sysfs_create_file(arp_project_kobj, &dev_attr_ignore_proxy_arp.attr);
 	if (rc) {
 		pr_warn("%s: sysfs_create_file failed for ignore_proxy_arp\n", __func__);
+	}
+
+	rc = sysfs_create_file(arp_project_kobj, &dev_attr_detected_attacker_ha.attr);
+	if (rc) {
+		pr_warn("%s: sysfs_create_file failed for detected_attacker_ha\n", __func__);
 	}
 }
 /********************** arp_project sysfs **********************/
