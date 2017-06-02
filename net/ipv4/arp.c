@@ -124,6 +124,7 @@ bool arp_project_enable = true;
 bool print_arp_info = false;
 static bool ignore_gw_update_by_request = true;
 static bool ignore_gw_update_by_reply = true;
+static bool ignore_proxy_arp = true;
 EXPORT_SYMBOL(arp_project_enable);
 EXPORT_SYMBOL(print_arp_info);
 
@@ -1128,7 +1129,7 @@ static int arp_process(struct sk_buff *skb)
 				// Is there already a neighbour entry for sip?
 				// No -> Create it.
 				// Yes -> Update it.
-				// Return created or updated neigh if succes
+				// Return created or updated neigh if success
 				n = neigh_event_ns(&arp_tbl, sha, &sip, dev);
 				if (n) {
 					// Send ARP reply
@@ -1140,6 +1141,18 @@ static int arp_process(struct sk_buff *skb)
 			}
 			goto out_consume_skb; // End
 		} else if (IN_DEV_FORWARD(in_dev)) { // Is IPv4 forwarding enabled?
+			/*
+			 * arp_project
+			 *
+			 *  Ignore proxy ARP if 'ignore_proxy_arp' is enabled.
+			 */
+			if (arp_project_enable && ignore_proxy_arp) {
+				printk(ARP_PROJECT"%s: "
+				       "Ignoring proxy ARP...\n",
+				       __func__);
+				goto out_free_skb;
+			}
+
 			// Proxy ARP
 			if (addr_type == RTN_UNICAST  &&
 			    (arp_fwd_proxy(in_dev, dev, rt) ||
@@ -2003,6 +2016,46 @@ static ssize_t ignore_gw_update_by_reply_dump(struct device *dev,
 static DEVICE_ATTR(ignore_gw_update_by_reply, (S_IWUSR|S_IRUGO),
 	ignore_gw_update_by_reply_show, ignore_gw_update_by_reply_dump);
 
+static ssize_t ignore_proxy_arp_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+
+	count += sprintf(buf, "%d\n", ignore_proxy_arp);
+
+	return count;
+}
+
+static ssize_t ignore_proxy_arp_dump(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	int val = 0;
+
+	if (ignore_proxy_arp)
+		val = 1;
+
+	if ((buf[0] == '0' || buf[0] == '1') && buf[1] == '\n') {
+		if (val != buf[0] - '0')
+			val = buf[0] - '0';
+		else
+			return count;
+	} else
+		return -EINVAL;
+
+	if (val) {
+		ignore_proxy_arp = true;
+		printk(ARP_PROJECT"%s: Enabled\n", __func__);
+	} else {
+		ignore_proxy_arp = false;
+		printk(ARP_PROJECT"%s: Disabled\n", __func__);
+	}
+
+	return count;
+}
+
+static DEVICE_ATTR(ignore_proxy_arp, (S_IWUSR|S_IRUGO),
+	ignore_proxy_arp_show, ignore_proxy_arp_dump);
+
 struct kobject *arp_project_kobj;
 
 static void __init arp_sys_init(void)
@@ -2037,6 +2090,11 @@ static void __init arp_sys_init(void)
 	rc = sysfs_create_file(arp_project_kobj, &dev_attr_ignore_gw_update_by_reply.attr);
 	if (rc) {
 		pr_warn("%s: sysfs_create_file failed for ignore_gw_update_by_reply\n", __func__);
+	}
+
+	rc = sysfs_create_file(arp_project_kobj, &dev_attr_ignore_proxy_arp.attr);
+	if (rc) {
+		pr_warn("%s: sysfs_create_file failed for ignore_proxy_arp\n", __func__);
 	}
 }
 /********************** arp_project sysfs **********************/
