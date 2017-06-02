@@ -1,5 +1,6 @@
 /* linux/net/ipv4/arp.c
  *
+ * Copyright (C) 2017 arp_project by jollaman999
  * Copyright (C) 1994 by Florian  La Roche
  *
  * This module implements the Address Resolution Protocol ARP (RFC 826),
@@ -1663,7 +1664,7 @@ void __init arp_init(void)
 	arp_proc_init();
 
 	/* arp_project */
-	printk("(C) 2016 arp_project by jollaman999, hasuk58, peace7944\n");
+	printk("(C) 2017 arp_project by jollaman999\n");
 	arp_sys_init();
 
 #ifdef CONFIG_SYSCTL
