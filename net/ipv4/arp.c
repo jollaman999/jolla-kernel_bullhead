@@ -2192,19 +2192,16 @@ static ssize_t detected_attacker_ha_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
 	int i = 0;
-	size_t count = 0;
 
-	if (!attacker_ha_len) {
-		count += sprintf(buf, "Attacker has not been detected.\n");
-		goto out;
-	}
+	if (!attacker_ha_len)
+		return sprintf(buf, "Attacker has not been detected.\n");
 
+	printk(ARP_PROJECT"%s: Detected attacker: ", __func__);
 	for (i = 0; i < attacker_ha_len - 1; i++)
-		count += sprintf(buf, "%02x:", attacker_ha[i]);
-	count += sprintf(buf, "%02x\n", attacker_ha[i]);
+		printk("%02x:", attacker_ha[i]);
+	printk("%02x\n", attacker_ha[i]);
 
-out:
-	return count;
+	return sprintf(buf, "Attacker has been detected! See the kernel log.\n");
 }
 
 static DEVICE_ATTR(detected_attacker_ha, (S_IWUSR|S_IRUGO),
