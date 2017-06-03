@@ -3,6 +3,6 @@
 #define _ARP_PROJECT_H
 
 #define ARP_PROJECT "arp_project: "
-#define ARP_PROJECT_VERSION "0.1"
+#define ARP_PROJECT_VERSION "1.0"
 
 #endif	/* _ARP_PROJECT_H */
