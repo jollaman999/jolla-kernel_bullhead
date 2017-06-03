@@ -870,13 +870,6 @@ EXPORT_SYMBOL(arp_xmit);
 static unsigned char attacker_ha[HBUFFERLEN];
 static unsigned int attacker_ha_len = 0;
 
-/* arp_project - Reset attacker's hardware address. */
-void arp_reset_attacker_ha(void)
-{
-	attacker_ha_len = 0;
-	memset(attacker_ha, 0, HBUFFERLEN);
-}
-
 /*
  * arp_project
  *

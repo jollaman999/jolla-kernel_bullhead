@@ -5,6 +5,4 @@
 #define ARP_PROJECT "arp_project: "
 #define ARP_PROJECT_VERSION "1.0"
 
-void arp_reset_attacker_ha(void);
-
 #endif	/* _ARP_PROJECT_H */
