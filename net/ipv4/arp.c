@@ -1160,20 +1160,6 @@ static int arp_process(struct sk_buff *skb)
 			     arp_fwd_pvlan(in_dev, dev, rt, sip, tip) ||
 			     (rt->dst.dev != dev &&
 			      pneigh_lookup(&arp_tbl, net, &tip, dev, 0)))) { // Is the request entry present in the proxy ARP table?
-				/*
-				 * arp_project
-				 *
-				 *  Find default gateway from route table and
-				 * ignore updates when hardware address is different.
-				 */
-				if (arp_project_enable && ignore_gw_update_by_request) {
-					if (arp_detect_gw_update(dev, sip, sha)) {
-						printk(ARP_PROJECT"%s: "
-						       "Ignoring ARP request...\n",
-						       __func__);
-						goto out_free_skb;
-					}
-				}
 
 				// Is there already a neibour entry for sip?
 				// Create or update
