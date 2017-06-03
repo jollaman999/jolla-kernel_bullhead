@@ -2207,6 +2207,25 @@ static ssize_t detected_attacker_ha_show(struct device *dev,
 static DEVICE_ATTR(detected_attacker_ha, (S_IWUSR|S_IRUGO),
 	detected_attacker_ha_show, NULL);
 
+static ssize_t clear_attacker_ha_dump(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	if (buf[0] != '1')
+		return -EINVAL;
+
+	/* arp_project - Clear attacker's hardware address. */
+	attacker_ha_len = 0;
+	memset(attacker_ha, 0, HBUFFERLEN);
+
+	printk(ARP_PROJECT"%s: Attacker's hardware address is cleared.\n",
+								__func__);
+
+	return count;
+}
+
+static DEVICE_ATTR(clear_attacker_ha, (S_IWUSR|S_IRUGO),
+	NULL, clear_attacker_ha_dump);
+
 struct kobject *arp_project_kobj;
 
 static void __init arp_sys_init(void)
@@ -2251,6 +2270,11 @@ static void __init arp_sys_init(void)
 	rc = sysfs_create_file(arp_project_kobj, &dev_attr_detected_attacker_ha.attr);
 	if (rc) {
 		pr_warn("%s: sysfs_create_file failed for detected_attacker_ha\n", __func__);
+	}
+
+	rc = sysfs_create_file(arp_project_kobj, &dev_attr_clear_attacker_ha.attr);
+	if (rc) {
+		pr_warn("%s: sysfs_create_file failed for clear_attacker_ha\n", __func__);
 	}
 }
 /********************** arp_project sysfs **********************/
