@@ -73,6 +73,9 @@
 #include "tl_shim.h"
 #include "wlan_hdd_oemdata.h"
 
+/* arp_project */
+#include <net/arp_project.h>
+
 struct ether_addr
 {
     u_char  ether_addr_octet[6];
@@ -816,6 +819,10 @@ static void hdd_SendAssociationEvent(struct net_device *dev,tCsrRoamInfo *pCsrRo
     else /* Not Associated */
     {
         pr_info("wlan: disconnected\n");
+
+	/* arp_project - Reset attacker's hardware address. */
+	arp_reset_attacker_ha();
+
         type = WLAN_STA_DISASSOC_DONE_IND;
         memset(wrqu.ap_addr.sa_data,'\0',ETH_ALEN);
         wlan_hdd_decr_active_session(pHddCtx, pAdapter->device_mode);
