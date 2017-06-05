@@ -1538,6 +1538,7 @@ CONFIG_CNSS_MAC_BUG=y
 CONFIG_CLD_LL_CORE=y
 # CONFIG_CNSS_SECURE_FW is not set
 CONFIG_BUS_AUTO_SUSPEND=y
+CONFIG_CNSS_GENL=y
 
 #
 # Enable WiMAX (Networking options) to see the WiMAX drivers
