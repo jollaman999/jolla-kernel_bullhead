@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
- * Copyright (c) 2016, jollaman999 <admin@jollaman999.com>. All rights reserved.
+ * Copyright (c) 2016-2017, jollaman999 <admin@jollaman999.com>. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -89,27 +89,33 @@
 struct notifier_block msm_thermal_fb_notif;
 
 static int big_core_start;
+static unsigned int current_poll_ms;
+static bool scr_suspended = false;
 
 /*
  * Tunable options
  *
  * poll_ms - msm_thermal will check the device's temperature every this milli seconds.
+ * poll_ms_cool - 'poll_ms' will be increase to this value when the device is cool.
+ *		  It will not check screen state.
+ * poll_ms_cool_screen_off - 'poll_ms' will be increase to this value when the device is cool and
+ *			     the screen is turned off.
  * temp_threshold - Limit the frequency of LITTLE when the temp is reached to this value.
  * temp_big_threshold - Limit the frequency of big when the temp is reached to this value.
  * temp_big_off_threshold - Turn off the big cores when the temp is reached to this value.
  * temp_step_little - If 'temp_step_little = 4' and 'temp_threshold = 60', frequency will decrease like below.
-		temp = 60 --> LITTLE's max frequency will decrease one step.
-		temp = 62 --> LITTLE's max frequency will decrease one step.
-		temp = 63 --> LITTLE's max frequency will decrease one step.
-		temp = 64 --> LITTLE's max frequency will decrease two steps.
-		temp = 65 --> LITTLE's max frequency will decrease two steps.
-		temp = 68 --> LITTLE's max frequency will decrease three steps.
+ *		temp = 60 --> LITTLE's max frequency will decrease one step.
+ *		temp = 62 --> LITTLE's max frequency will decrease one step.
+ *		temp = 63 --> LITTLE's max frequency will decrease one step.
+ *		temp = 64 --> LITTLE's max frequency will decrease two steps.
+ *		temp = 65 --> LITTLE's max frequency will decrease two steps.
+ *		temp = 68 --> LITTLE's max frequency will decrease three steps.
  * temp_step_big - If 'temp_step_big = 2' and 'temp_threshold = 60', frequency will decrease like below.
-		temp = 60 --> big's max frequency will decrease one step.
-		temp = 61 --> big's max frequency will decrease one step.
-		temp = 62 --> big's max frequency will decrease two steps.
-		temp = 63 --> big's max frequency will decrease two steps.
-		temp = 64 --> big's max frequency will decrease three steps.
+ *		temp = 60 --> big's max frequency will decrease one step.
+ *		temp = 61 --> big's max frequency will decrease one step.
+ *		temp = 62 --> big's max frequency will decrease two steps.
+ *		temp = 63 --> big's max frequency will decrease two steps.
+ *		temp = 64 --> big's max frequency will decrease three steps.
  * freq_step_little - Frequency decrease step for little.
  * freq_step_big - Frequency decrease step for big.
  * temp_count_max_little - If this value is 3, LITTLE's max frequency will decrease 1 to 3 steps.
@@ -119,9 +125,13 @@ static int big_core_start;
  * 					 LITTLE's max frequency will decrease 1 to 5 steps.
  * temp_count_max_big - If this value is 5, big's max frequency will decrease 1 to 5 steps.
  * high_temp - If temp is higher than this value, LITTLE's max frequency will decrease 1 to
-	       'temp_count_max_little_with_high_temp' steps.
+ *	       'temp_count_max_little_with_high_temp' steps.
  */
+#define DEFAULT_POLL_MS_COOL			1000
+#define DEFAULT_POLL_MS_COOL_SCREEN_OFF		5000
 unsigned int poll_ms;
+unsigned int poll_ms_cool = 1000;
+unsigned int poll_ms_cool_screen_off = 5000;
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
 unsigned int temp_big_off_threshold;
@@ -135,6 +145,8 @@ unsigned int temp_count_max_little_with_high_temp = 5;
 unsigned int temp_count_max_big = 10;
 unsigned int high_temp = 80;
 module_param(poll_ms, int, 0644);
+module_param(poll_ms_cool, int, 0644);
+module_param(poll_ms_cool_screen_off, int, 0644);
 module_param(temp_threshold, int, 0644);
 module_param(temp_big_threshold, int, 0644);
 module_param(temp_big_off_threshold, int, 0644);
@@ -3089,10 +3101,19 @@ static void check_temp(struct work_struct *work)
 	do_vdd_restriction();
 	do_freq_control(temp);
 
+	if (temp < temp_threshold) {
+		if (scr_suspended)
+			current_poll_ms = poll_ms_cool_screen_off;
+		else
+			current_poll_ms = poll_ms_cool;
+	} else {
+		current_poll_ms = poll_ms;
+	}
+
 reschedule:
 	if (polling_enabled)
 		schedule_delayed_work(&check_temp_work,
-				msecs_to_jiffies(poll_ms));
+				msecs_to_jiffies(current_poll_ms));
 }
 
 static int msm_thermal_cpu_callback(struct notifier_block *nfb,
@@ -4262,17 +4283,6 @@ static void interrupt_mode_init(void)
 		thermal_monitor_init();
 		msm_thermal_add_cx_nodes();
 		msm_thermal_add_gfx_nodes();
-	}
-}
-
-static void msm_thermal_suspend(bool suspend)
-{
-	if (suspend) {
-		disable_msm_thermal();
-		pr_info("suspended\n");
-	} else {
-		schedule_delayed_work(&check_temp_work, 0);
-		pr_info("resumed\n");
 	}
 }
 
@@ -5914,6 +5924,18 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 	if (ret)
 		goto fail;
 
+	if (poll_ms <= 0)
+		poll_ms = 250;
+	current_poll_ms = poll_ms;
+
+	poll_ms_cool = DEFAULT_POLL_MS_COOL;
+	if (poll_ms_cool < poll_ms)
+		poll_ms_cool = poll_ms;
+
+	poll_ms_cool_screen_off = DEFAULT_POLL_MS_COOL_SCREEN_OFF;
+	if (poll_ms_cool_screen_off < poll_ms)
+		poll_ms_cool_screen_off = poll_ms;
+
 	key = "qcom,limit-temp-little";
 	ret = of_property_read_u32(node, key, &temp_threshold);
 	if (ret)
@@ -6087,10 +6109,10 @@ static int msm_thermal_fb_notifier_callback(struct notifier_block *self,
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
 		case FB_BLANK_VSYNC_SUSPEND:
-			msm_thermal_suspend(false);
+			scr_suspended = false;
 			break;
 		case FB_BLANK_POWERDOWN:
-			msm_thermal_suspend(true);
+			scr_suspended = true;
 			break;
 		}
 	}
