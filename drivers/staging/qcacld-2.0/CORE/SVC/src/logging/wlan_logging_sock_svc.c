@@ -316,14 +316,6 @@ static int wlan_queue_logmsg_for_app(void)
 		gwlan_logging.pcur_node =
 			(struct log_msg *)(gwlan_logging.filled_list.next);
 		++gwlan_logging.drop_count;
-		/* print every 64th drop count */
-		if (vos_is_multicast_logging() &&
-				(!(gwlan_logging.drop_count % 0x40))) {
-			pr_info("%s: drop_count = %u index = %d filled_length = %d\n",
-				__func__, gwlan_logging.drop_count,
-				gwlan_logging.pcur_node->index,
-				gwlan_logging.pcur_node->filled_length);
-		}
 		list_del_init(gwlan_logging.filled_list.next);
 		ret = 1;
 	}
@@ -347,9 +339,12 @@ int wlan_log_to_user(VOS_TRACE_LEVEL log_level, char *to_be_sent, int length)
 	struct timeval tv;
 	struct rtc_time tm;
 	unsigned long local_time;
+	int radio;
 
-	if ((!vos_is_multicast_logging()) ||
-              (!gwlan_logging.is_active)) {
+	radio = vos_get_radio_index();
+
+	if ((!vos_is_multicast_logging()) || (!gwlan_logging.is_active) ||
+	    (radio == -EINVAL)) {
 		/*
 		 * This is to make sure that we print the logs to kmsg console
 		 * when no logger app is running. This is also needed to
@@ -358,18 +353,25 @@ int wlan_log_to_user(VOS_TRACE_LEVEL log_level, char *to_be_sent, int length)
 		 * register with driver immediately and start logging all the
 		 * messages.
 		 */
-		pr_info("%s\n", to_be_sent);
+		/*
+		 * R%d: if the radio index is invalid, just post the message
+		 * to console.
+		 * Also the radio index shouldn't happen to be EINVAL, but if
+		 * that happen just print it, so that the logging would be
+		 * aware the cnss_logger is somehow failed.
+		 */
+		pr_info("R%d: %s\n", radio, to_be_sent);
 	} else {
 
-		/* Format the Log time [hr:min:sec.microsec] */
+		/* Format the Log time R#: [hr:min:sec.microsec] */
 		do_gettimeofday(&tv);
 		/* Convert rtc to local time */
 		local_time = (u32)(tv.tv_sec - (sys_tz.tz_minuteswest * 60));
 		rtc_time_to_tm(local_time, &tm);
 		tlen = snprintf(tbuf, sizeof(tbuf),
-				"[%s][%02d:%02d:%02d.%06lu] ",
-				current->comm, tm.tm_hour, tm.tm_min, tm.tm_sec,
-				tv.tv_usec);
+				"R%d: [%s][%02d:%02d:%02d.%06lu] ",
+				radio, current->comm, tm.tm_hour,
+				tm.tm_min, tm.tm_sec, tv.tv_usec);
 
 		/* 1+1 indicate '\n'+'\0' */
 		total_log_len = length + tlen + 1 + 1;
@@ -407,11 +409,9 @@ int wlan_log_to_user(VOS_TRACE_LEVEL log_level, char *to_be_sent, int length)
 		 * Continue and copy logs to the available length and
 		 * discard the rest.
 		 */
-		if (MAX_LOGMSG_LENGTH < (sizeof(tAniNlHdr) + total_log_len)) {
-			VOS_ASSERT(0);
+		if (MAX_LOGMSG_LENGTH < (sizeof(tAniNlHdr) + total_log_len))
 			total_log_len = MAX_LOGMSG_LENGTH -
 						sizeof(tAniNlHdr) - 2;
-		}
 
 		memcpy(&ptr[*pfilled_length], tbuf, tlen);
 		memcpy(&ptr[*pfilled_length + tlen], to_be_sent,
@@ -435,7 +435,7 @@ int wlan_log_to_user(VOS_TRACE_LEVEL log_level, char *to_be_sent, int length)
 		if (gwlan_logging.log_fe_to_console
 			&& ((VOS_TRACE_LEVEL_FATAL == log_level)
 			|| (VOS_TRACE_LEVEL_ERROR == log_level))) {
-			pr_info("%s\n", to_be_sent);
+			pr_info("%s %s\n", tbuf, to_be_sent);
 		}
 	}
 	return 0;
@@ -553,7 +553,7 @@ int pktlog_send_per_pkt_stats_to_user(void)
 			goto err;
 		}
 		ret = nl_srv_bcast(pstats_msg->skb);
-		if (ret < 0) {
+		if ((ret < 0) && (ret != -ESRCH)) {
 			pr_info("%s: Send Failed %d drop_count = %u\n",
 				__func__, ret,
 				++gwlan_logging.pkt_stat_drop_cnt);
@@ -751,7 +751,6 @@ static int wlan_logging_thread(void *Arg)
 		}
 
 		if (gwlan_logging.exit) {
-			pr_err("%s: Exiting the thread\n", __func__);
 			break;
 		}
 
@@ -805,7 +804,6 @@ static int wlan_logging_thread(void *Arg)
 		}
 	}
 
-	pr_info("%s: Terminating\n", __func__);
 
 	complete_and_exit(&gwlan_logging.shutdown_comp, 0);
 
@@ -875,8 +873,6 @@ int wlan_logging_sock_activate_svc(int log_fe_to_console, int num_buf)
 	int i, j, pkt_stats_size;
 	unsigned long irq_flag;
 
-	pr_info("%s: Initalizing FEConsoleLog = %d NumBuff = %d\n",
-			__func__, log_fe_to_console, num_buf);
 
 	gapp_pid = INVALID_PID;
 
@@ -964,7 +960,6 @@ int wlan_logging_sock_activate_svc(int log_fe_to_console, int num_buf)
 
 	nl_srv_register(ANI_NL_MSG_LOG, wlan_logging_proc_sock_rx_msg);
 
-	pr_info("%s: Activated wlan_logging svc\n", __func__);
 	return 0;
 
 err3:
@@ -1027,7 +1022,6 @@ int wlan_logging_sock_deactivate_svc(void)
 
 	vfree(gpkt_stats_buffers);
 	gpkt_stats_buffers = NULL;
-	pr_info("%s: Deactivate wlan_logging svc\n", __func__);
 
 	return 0;
 }

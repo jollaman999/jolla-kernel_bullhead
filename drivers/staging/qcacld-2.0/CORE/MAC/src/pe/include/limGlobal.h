@@ -54,10 +54,6 @@
 /// Maximum number of scan hash table entries
 #define LIM_MAX_NUM_OF_SCAN_RESULTS 256
 
-// Sending Disassociate frames threshold
-#define LIM_SEND_DISASSOC_FRAME_THRESHOLD       2
-#define LIM_HASH_MISS_TIMER_MS                  10000
-
 // Deferred Message Queue Length
 #define MAX_DEFERRED_QUEUE_LEN                  80
 
@@ -313,18 +309,11 @@ struct tLimScanResultNode
 
 #ifdef FEATURE_OEM_DATA_SUPPORT
 
-#ifndef OEM_DATA_REQ_SIZE
-#define OEM_DATA_REQ_SIZE 280
-#endif
-#ifndef OEM_DATA_RSP_SIZE
-#define OEM_DATA_RSP_SIZE 1724
-#endif
-
 // OEM Data related structure definitions
 typedef struct sLimMlmOemDataReq
 {
     tSirMacAddr           selfMacAddr;
-    uint8_t               data_len;
+    uint32_t              data_len;
     uint8_t               *data;
 } tLimMlmOemDataReq, *tpLimMlmOemDataReq;
 

@@ -49,6 +49,7 @@
 #ifdef FEATURE_WLAN_TDLS
 #define STA_ENTRY_TDLS_PEER         4
 #endif /* FEATURE_WLAN_TDLS */
+#define STA_ENTRY_NDI_PEER          5
 
 #define STA_ENTRY_TRANSMITTER       STA_ENTRY_SELF
 #define STA_ENTRY_RECEIVER          STA_ENTRY_OTHER
@@ -543,6 +544,7 @@ typedef struct
     uint8_t nss_5g;
     uint32_t tx_aggregation_size;
     uint32_t rx_aggregation_size;
+    uint16_t beacon_tx_rate;
 } tAddBssParams, * tpAddBssParams;
 
 typedef struct
@@ -741,18 +743,11 @@ typedef struct {
 
 #ifdef FEATURE_OEM_DATA_SUPPORT
 
-#ifndef OEM_DATA_REQ_SIZE
-#define OEM_DATA_REQ_SIZE 280
-#endif
-#ifndef OEM_DATA_RSP_SIZE
-#define OEM_DATA_RSP_SIZE 1724
-#endif
-
 typedef struct
 {
     tSirMacAddr          selfMacAddr;
     eHalStatus           status;
-    uint8_t              data_len;
+    uint32_t             data_len;
     uint8_t              *data;
 } tStartOemDataReq, *tpStartOemDataReq;
 
@@ -930,7 +925,8 @@ typedef struct
 #ifdef WLAN_FEATURE_11AC
 typedef struct
 {
-   tANI_U16   opMode;
+   tANI_U16  opMode;
+   tANI_U16  chanMode;
    tANI_U16  staId;
    tANI_U16  smesessionId;
    tSirMacAddr peer_mac;

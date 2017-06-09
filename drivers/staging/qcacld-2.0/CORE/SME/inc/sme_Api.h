@@ -74,6 +74,7 @@
 #define SME_GLOBAL_CLASSC_STATS   8
 #define SME_GLOBAL_CLASSD_STATS  16
 #define SME_PER_STA_STATS        32
+#define SME_PER_CHAIN_RSSI_STATS 64
 
 #define SME_INVALID_COUNTRY_CODE "XX"
 
@@ -249,6 +250,21 @@ struct sme_ap_find_request_req{
     const u_int8_t* request_data;
 };
 #endif /* WLAN_FEATURE_APFIND */
+
+/**
+ * struct sme_oem_capability - OEM capability to be exchanged between host
+ *                             and userspace
+ * @ftm_rr: FTM range report capability bit
+ * @lci_capability: LCI capability bit
+ * @reserved1: reserved
+ * @reserved2: reserved
+ */
+struct sme_oem_capability {
+	uint32_t ftm_rr:1;
+	uint32_t lci_capability:1;
+	uint32_t reserved1:30;
+	uint32_t reserved2;
+};
 
 /*-------------------------------------------------------------------------
   Function declarations and documentation
@@ -1953,6 +1969,11 @@ eHalStatus sme_OemDataReq(tHalHandle hHal,
                                        tOemDataReqConfig *,
                                        tANI_U32 *pOemDataReqID);
 
+VOS_STATUS sme_oem_update_capability(tHalHandle hHal,
+				     struct sme_oem_capability *cap);
+VOS_STATUS sme_oem_get_capability(tHalHandle hHal,
+				  struct sme_oem_capability *cap);
+
 #endif /*FEATURE_OEM_DATA_SUPPORT*/
 
 
@@ -2795,6 +2816,9 @@ eHalStatus sme_SetRoamScanControl(tHalHandle hHal, tANI_U8 sessionId,
 eHalStatus sme_UpdateIsFastRoamIniFeatureEnabled(tHalHandle hHal,
                                                  tANI_U8 sessionId,
         const v_BOOL_t isFastRoamIniFeatureEnabled);
+
+eHalStatus sme_config_fast_roaming(tHalHandle hhal, tANI_U8 session_id,
+				   const bool is_fast_roam_enabled);
 
 /*--------------------------------------------------------------------------
   \brief sme_UpdateIsMAWCIniFeatureEnabled() -
@@ -3691,10 +3715,15 @@ eHalStatus sme_set_mib_stats_enable(tHalHandle hal, uint8_t value);
 eHalStatus sme_ConfigEnablePowerSave (tHalHandle hHal, tPmcPowerSavingMode psMode);
 eHalStatus sme_ConfigDisablePowerSave (tHalHandle hHal, tPmcPowerSavingMode psMode);
 eHalStatus sme_PsOffloadEnablePowerSave (tHalHandle hHal, tANI_U32 sessionId);
-eHalStatus sme_PsOffloadDisablePowerSave (tHalHandle hHal, tANI_U32 sessionId);
 eHalStatus sme_PsOffloadEnableDeferredPowerSave (tHalHandle hHal,
                                                  tANI_U32 sessionId,
                                                  tANI_BOOLEAN isReassoc);
+
+eHalStatus sme_PsOffloadDisablePowerSave(tHalHandle hHal,
+					 FullPowerReqCb callback,
+					 void *callback_context,
+					 tANI_U32 sessionId);
+
 eHalStatus sme_PsOffloadDisableDeferredPowerSave (tHalHandle hHal,
                                                   tANI_U32 sessionId);
 
@@ -3715,6 +3744,7 @@ eHalStatus sme_SetHT2040Mode(tHalHandle hHal, tANI_U8 sessionId,
 
 eHalStatus sme_getRegInfo(tHalHandle hHal, tANI_U8 chanId,
                           tANI_U32 *regInfo1, tANI_U32 *regInfo2);
+uint32_t sme_get_wni_dot11_mode(tHalHandle hal);
 
 #ifdef FEATURE_WLAN_TDLS
 eHalStatus sme_UpdateFwTdlsState(tHalHandle hHal, void *psmeTdlsParams,
@@ -3903,6 +3933,7 @@ eHalStatus sme_StatsExtEvent (tHalHandle hHal, void* pMsg);
    \param enable_dot11p - 802.11p config param
    \return eHalStatus
 ---------------------------------------------------------------------------*/
+#ifdef WLAN_FEATURE_DSRC
 void sme_set_dot11p_config(tHalHandle hal, bool enable_dot11p);
 
 eHalStatus sme_ocb_set_config(tHalHandle hHal, void *context,
@@ -3937,6 +3968,78 @@ eHalStatus sme_dcc_update_ndl(tHalHandle hHal, void* context,
 
 eHalStatus sme_register_for_dcc_stats_event(tHalHandle hHal, void* context,
                                             ocb_callback callback);
+#else
+static inline void sme_set_dot11p_config(tHalHandle hal, bool enable_dot11p)
+{
+	return;
+}
+
+static inline eHalStatus sme_ocb_set_config(tHalHandle hHal, void *context,
+		ocb_callback callback,
+		struct sir_ocb_config *config)
+{
+	return eHAL_STATUS_SUCCESS;
+}
+
+static inline eHalStatus sme_ocb_set_utc_time(struct sir_ocb_utc *utc)
+{
+	return eHAL_STATUS_SUCCESS;
+}
+
+static inline eHalStatus sme_ocb_start_timing_advert(
+		struct sir_ocb_timing_advert *timing_advert)
+{
+	return eHAL_STATUS_SUCCESS;
+}
+
+static inline eHalStatus sme_ocb_stop_timing_advert(struct sir_ocb_timing_advert
+		*timing_advert)
+{
+	return eHAL_STATUS_SUCCESS;
+}
+
+static inline int sme_ocb_gen_timing_advert_frame(tHalHandle hHal,
+		tSirMacAddr self_addr, uint8_t **buf,
+		uint32_t *timestamp_offset,
+		uint32_t *time_value_offset)
+{
+	return 0;
+}
+
+static inline eHalStatus sme_ocb_get_tsf_timer(tHalHandle hHal, void *context,
+		ocb_callback callback,
+		struct sir_ocb_get_tsf_timer *request)
+{
+	return eHAL_STATUS_SUCCESS;
+}
+
+static inline eHalStatus sme_dcc_get_stats(tHalHandle hHal, void *context,
+		ocb_callback callback,
+		struct sir_dcc_get_stats *request)
+{
+	return eHAL_STATUS_SUCCESS;
+}
+
+static inline eHalStatus sme_dcc_clear_stats(uint32_t vdev_id,
+		uint32_t dcc_stats_bitmap)
+{
+	return eHAL_STATUS_SUCCESS;
+}
+
+static inline eHalStatus sme_dcc_update_ndl(tHalHandle hHal, void* context,
+		ocb_callback callback,
+		struct sir_dcc_update_ndl *request)
+{
+	return eHAL_STATUS_SUCCESS;
+}
+
+static inline eHalStatus sme_register_for_dcc_stats_event(tHalHandle hHal,
+		void* context, ocb_callback callback)
+{
+	return eHAL_STATUS_SUCCESS;
+}
+
+#endif
 
 /* ---------------------------------------------------------------------------
     \fn sme_UpdateDFSScanMode
@@ -4045,6 +4148,10 @@ eHalStatus sme_SetBssHotlist (tHalHandle hHal,
     -------------------------------------------------------------------------*/
 eHalStatus sme_ResetBssHotlist (tHalHandle hHal,
                              tSirExtScanResetBssidHotlistReqParams *pResetReq);
+
+eHalStatus
+sme_set_ssid_hotlist(tHalHandle hal,
+		     struct sir_set_ssid_hotlist_request *request);
 
 /* ---------------------------------------------------------------------------
     \fn sme_SetSignificantChange
@@ -4431,6 +4538,10 @@ VOS_STATUS sme_set_btc_bt_wlan_interval_page_sta(uint32_t bt_interval,
 					uint32_t sta_interval);
 VOS_STATUS sme_set_btc_bt_wlan_interval_page_sap(uint32_t bt_interval,
 					uint32_t sap_interval);
+VOS_STATUS sme_set_btc_wlan_conn_params(uint32_t conn_val0,
+                                        uint32_t conn_val1);
+VOS_STATUS sme_set_btc_dynamic_bt_wlan_coex(uint32_t dynamic_wlan_bt_coex,
+					uint32_t antenna_isolation);
 
 uint8_t    sme_is_any_session_in_connected_state(tHalHandle h_hal);
 
@@ -4439,7 +4550,8 @@ void sme_add_set_thermal_level_callback(tHalHandle hHal,
                    tSmeSetThermalLevelCallback callback);
 
 eHalStatus sme_handle_set_fcc_channel(tHalHandle hHal,
-				       bool fcc_constraint);
+		bool fcc_constraint,
+		uint32_t scan_pending);
 
 eHalStatus sme_set_rssi_monitoring(tHalHandle hal,
 					struct rssi_monitor_req *input);
@@ -4546,4 +4658,23 @@ eHalStatus sme_enable_disable_chanavoidind_event(tHalHandle hHal,
 							tANI_U8 set_value);
 eHalStatus sme_remove_bssid_from_scan_list(tHalHandle hal,
 	tSirMacAddr bssid);
+eHalStatus sme_update_sta_roam_policy(tHalHandle hal_handle,
+		enum sta_roam_policy_dfs_mode dfs_mode,
+		bool skip_unsafe_channels,
+		uint8_t session_id);
+eHalStatus sme_register_p2p_ack_ind_callback(tHalHandle hal,
+					sir_p2p_ack_ind_callback callback);
+
+void sme_set_allowed_action_frames(tHalHandle hal, uint32_t bitmap0);
+
+eHalStatus sme_update_access_policy_vendor_ie(tHalHandle hal,
+		uint8_t session_id, uint8_t *vendor_ie, int access_policy);
+eHalStatus sme_update_tx_fail_cnt_threshold(tHalHandle hal_handle,
+		uint8_t session_id, uint32_t tx_fail_count);
+eHalStatus sme_update_short_retry_limit_threshold(tHalHandle hal_handle,
+		uint8_t session_id, uint8_t short_limit_count_th);
+eHalStatus sme_update_long_retry_limit_threshold(tHalHandle hal_handle,
+		uint8_t session_id, uint8_t long_limit_count_th);
+eHalStatus sme_update_sta_inactivity_timeout(tHalHandle hal_handle,
+		uint8_t session_id, uint32_t sta_inactivity_timeout);
 #endif //#if !defined( __SME_API_H )

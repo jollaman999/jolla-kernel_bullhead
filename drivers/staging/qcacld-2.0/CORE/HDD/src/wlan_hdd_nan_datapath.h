@@ -39,16 +39,21 @@ struct wireless_dev;
 
 #define NDP_APP_INFO_LEN 255
 #define NDP_QOS_INFO_LEN 255
+#define NDP_NUM_INSTANCE_ID 255
+
+
+#define HDD_MAX_NUM_NDP_STA           (HDD_MAX_NUM_IBSS_STA)
+#define NDP_BROADCAST_STAID           (IBSS_BROADCAST_STAID)
 
 #ifdef WLAN_FEATURE_NAN_DATAPATH
-#define WLAN_HDD_NDP_GET_SSID(adapter) ( \
-	&(adapter)->sessionCtx.ndp_ctx.conn_info.SSID)
+#define WLAN_HDD_IS_NDI(adapter) ((adapter)->device_mode == WLAN_HDD_NDI)
 
-#define WLAN_HDD_NDP_GET_BSSID(adapter) ( \
-	&(adapter)->sessionCtx.ndp_ctx.conn_info.bssId)
+#define WLAN_HDD_IS_NDI_CONNECTED(adapter) ( \
+	eConnectionState_NdiConnected ==\
+		(adapter)->sessionCtx.station.conn_info.connState)
 #else
-#define WLAN_HDD_NDP_GET_SSID(adapter)  (NULL)
-#define WLAN_HDD_NDP_GET_BSSID(adapter) (NULL)
+#define WLAN_HDD_IS_NDI(adapter)	(false)
+#define WLAN_HDD_IS_NDI_CONNECTED(adapter) (false)
 #endif /* WLAN_FEATURE_NAN_DATAPATH */
 
 /**
@@ -57,18 +62,15 @@ struct wireless_dev;
  * @QCA_WLAN_VENDOR_ATTR_NDP_TRANSACTION_ID: Transaction id reference
  * @QCA_WLAN_VENDOR_ATTR_NDP_STATUS_ID: NDP status id
  * @QCA_WLAN_VENDOR_ATTR_NDP_SERVICE_INSTANCE_ID: Service instance id
- * @QCA_WLAN_VENDOR_ATTR_NDP_CHANNEL_SPEC_CHANNEL: Requested channel
+ * @QCA_WLAN_VENDOR_ATTR_NDP_CHANNEL: Requested channel
  * @QCA_WLAN_VENDOR_ATTR_NDP_PEER_DISCOVERY_MAC_ADDR: Peer discovery mac addr
  * @QCA_WLAN_VENDOR_ATTR_NDP_IFACE_STR: Iface name
  * @QCA_WLAN_VENDOR_ATTR_NDP_CONFIG_SECURITY: Security configuration
  * @QCA_WLAN_VENDOR_ATTR_NDP_CONFIG_QOS: Qos configuration
- * @QCA_WLAN_VENDOR_ATTR_NDP_APP_INFO_LEN: Application info length
  * @QCA_WLAN_VENDOR_ATTR_NDP_APP_INFO: Application info
  * @QCA_WLAN_VENDOR_ATTR_NDP_INSTANCE_ID: NDP instance id
- * @QCA_WLAN_VENDOR_ATTR_NDP_NUM_INSTANCE_ID: Number of NDP instance ids
  * @QCA_WLAN_VENDOR_ATTR_NDP_INSTANCE_ID_ARRAY: NDP instance id array
- * @QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_RESPONSE_CODE: Schedule response
- * @QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_STATUS_CODE: schedule status
+ * @QCA_WLAN_VENDOR_ATTR_NDP_RESPONSE_CODE: Schedule response
  * @QCA_WLAN_VENDOR_ATTR_NDP_NDI_MAC_ADDR: NDI mac address
  * @QCA_WLAN_VENDOR_ATTR_NDP_DRV_RETURN_TYPE: Driver return status
  * @QCA_WLAN_VENDOR_ATTR_NDP_DRV_RETURN_VALUE: Driver return value
@@ -78,18 +80,15 @@ enum qca_wlan_vendor_attr_ndp_params {
 	QCA_WLAN_VENDOR_ATTR_NDP_SUBCMD,
 	QCA_WLAN_VENDOR_ATTR_NDP_TRANSACTION_ID,
 	QCA_WLAN_VENDOR_ATTR_NDP_SERVICE_INSTANCE_ID,
-	QCA_WLAN_VENDOR_ATTR_NDP_CHANNEL_SPEC_CHANNEL,
+	QCA_WLAN_VENDOR_ATTR_NDP_CHANNEL,
 	QCA_WLAN_VENDOR_ATTR_NDP_PEER_DISCOVERY_MAC_ADDR,
 	QCA_WLAN_VENDOR_ATTR_NDP_IFACE_STR,
 	QCA_WLAN_VENDOR_ATTR_NDP_CONFIG_SECURITY,
 	QCA_WLAN_VENDOR_ATTR_NDP_CONFIG_QOS,
-	QCA_WLAN_VENDOR_ATTR_NDP_APP_INFO_LEN,
 	QCA_WLAN_VENDOR_ATTR_NDP_APP_INFO,
 	QCA_WLAN_VENDOR_ATTR_NDP_INSTANCE_ID,
-	QCA_WLAN_VENDOR_ATTR_NDP_NUM_INSTANCE_ID,
 	QCA_WLAN_VENDOR_ATTR_NDP_INSTANCE_ID_ARRAY,
-	QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_RESPONSE_CODE,
-	QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_STATUS_CODE,
+	QCA_WLAN_VENDOR_ATTR_NDP_RESPONSE_CODE,
 	QCA_WLAN_VENDOR_ATTR_NDP_NDI_MAC_ADDR,
 	QCA_WLAN_VENDOR_ATTR_NDP_DRV_RETURN_TYPE,
 	QCA_WLAN_VENDOR_ATTR_NDP_DRV_RETURN_VALUE,
@@ -126,11 +125,8 @@ enum qca_wlan_vendor_attr_ndp_qos {
  * @QCA_WLAN_VENDOR_ATTR_NDP_RESPONDER_RESPONSE: NDP responder response
  * @QCA_WLAN_VENDOR_ATTR_NDP_END_REQUEST: NDP end request
  * @QCA_WLAN_VENDOR_ATTR_NDP_END_RESPONSE: NDP end response
- * @QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_UPDATE_REQUEST: NDP update request
- * @QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_UPDATE_RESPONSE: NDP update response
  * @QCA_WLAN_VENDOR_ATTR_NDP_REQUEST_IND: NDP request indication
  * @QCA_WLAN_VENDOR_ATTR_NDP_CONFIRM_IND: NDP confirm indication
- * @QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_UPDATE_IND: NDP sched update indication
  * @QCA_WLAN_VENDOR_ATTR_NDP_END_IND: NDP End indication
  */
 enum qca_wlan_vendor_attr_ndp_sub_cmd_value {
@@ -143,12 +139,9 @@ enum qca_wlan_vendor_attr_ndp_sub_cmd_value {
 	QCA_WLAN_VENDOR_ATTR_NDP_RESPONDER_RESPONSE = 6,
 	QCA_WLAN_VENDOR_ATTR_NDP_END_REQUEST = 7,
 	QCA_WLAN_VENDOR_ATTR_NDP_END_RESPONSE = 8,
-	QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_UPDATE_REQUEST = 9,
-	QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_UPDATE_RESPONSE = 10,
-	QCA_WLAN_VENDOR_ATTR_NDP_REQUEST_IND = 11,
-	QCA_WLAN_VENDOR_ATTR_NDP_CONFIRM_IND = 12,
-	QCA_WLAN_VENDOR_ATTR_NDP_SCHEDULE_UPDATE_IND = 13,
-	QCA_WLAN_VENDOR_ATTR_NDP_END_IND = 14
+	QCA_WLAN_VENDOR_ATTR_NDP_REQUEST_IND = 9,
+	QCA_WLAN_VENDOR_ATTR_NDP_CONFIRM_IND = 10,
+	QCA_WLAN_VENDOR_ATTR_NDP_END_IND = 11
 };
 
 /** enum nan_datapath_state - NAN datapath states
@@ -180,29 +173,27 @@ enum nan_datapath_state {
  * struct nan_datapath_ctx - context for nan data path
  * @state: Current state of NDP
  * @active_ndp_sessions: active ndp sessions per adapter
+ * @active_ndp_peers: number of active ndp peers
  * @ndp_create_transaction_id: transaction id for create req
  * @ndp_delete_transaction_id: transaction id for delete req
- * @wext_state: Wext state variable
- * @conn_info: NDP connection info
- * @roam_info: NDP roam info
- * @gtk_offload_req_params: GTK offload request params
  * @ndp_key_installed: NDP security key installed
  * @ndp_enc_key: NDP encryption key info
  * @ndp_debug_state: debug state info
+ * @ndi_delete_rsp_reason: reason code for ndi_delete rsp
+ * @ndi_delete_rsp_status: status for ndi_delete rsp
  */
 struct nan_datapath_ctx {
 	enum nan_datapath_state state;
-	uint32_t active_ndp_sessions;
+	/* idx in following array should follow conn_info.peerMacAddress */
+	uint32_t active_ndp_sessions[HDD_MAX_NUM_NDP_STA];
+	uint32_t active_ndp_peers;
 	uint16_t ndp_create_transaction_id;
 	uint16_t ndp_delete_transaction_id;
-	hdd_wext_state_t wext_state;
-	connection_info_t conn_info;
-#ifdef WLAN_FEATURE_GTK_OFFLOAD
-	tSirGtkOffloadParams gtk_offload_req_params;
-#endif
 	bool ndp_key_installed;
 	tCsrRoamSetKey ndp_enc_key;
 	uint32_t ndp_debug_state;
+	uint32_t ndi_delete_rsp_reason;
+	uint32_t ndi_delete_rsp_status;
 };
 
 #ifdef WLAN_FEATURE_NAN_DATAPATH

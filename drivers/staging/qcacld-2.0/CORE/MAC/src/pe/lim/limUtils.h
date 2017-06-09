@@ -454,7 +454,7 @@ uint32_t lim_get_max_rate_flags(tpAniSirGlobal mac_ctx, tpDphHashNode sta_ds);
 
 #ifdef WLAN_FEATURE_11AC
 tANI_BOOLEAN limCheckVHTOpModeChange( tpAniSirGlobal pMac, tpPESession psessionEntry,
-                                      tANI_U8 chanWidth, tANI_U8 staId, tANI_U8 *peerMac);
+                                      tANI_U8 chanWidth, tANI_U8 chanMode, tANI_U8 staId, tANI_U8 *peerMac);
 tANI_BOOLEAN limSetNssChange( tpAniSirGlobal pMac, tpPESession psessionEntry,
                               tANI_U8 rxNss, tANI_U8 staId, tANI_U8 *peerMac);
 tANI_BOOLEAN limCheckMembershipUserPosition( tpAniSirGlobal pMac, tpPESession psessionEntry,
@@ -663,12 +663,17 @@ void lim_update_extcap_struct(tpAniSirGlobal mac_ctx, uint8_t *buf,
 			       tDot11fIEExtCap *ext_cap);
 tSirRetStatus lim_strip_extcap_update_struct(tpAniSirGlobal mac_ctx,
 		uint8_t* addn_ie, uint16_t *addn_ielen, tDot11fIEExtCap *dst);
-void lim_merge_extcap_struct(tDot11fIEExtCap *dst, tDot11fIEExtCap *src);
+void lim_merge_extcap_struct(tDot11fIEExtCap *dst, tDot11fIEExtCap *src,
+			bool add);
 uint8_t
 lim_get_80Mhz_center_channel(uint8_t primary_channel);
-bool lim_is_ext_cap_ie_present (struct s_ext_cap *ext_cap);
+tANI_U8 lim_compute_ext_cap_ie_length (tDot11fIEExtCap *ext_cap);
 bool lim_is_robust_mgmt_action_frame(uint8_t action_catagory);
 void lim_update_caps_info_for_bss(tpAniSirGlobal mac_ctx,
 				uint16_t *caps, uint16_t bss_caps);
+void lim_parse_beacon_for_tim(tpAniSirGlobal mac_ctx, uint8_t* rx_packet_info,
+	tpPESession session);
+eHalStatus limP2PActionCnf(tpAniSirGlobal mac_ctx,
+				uint32_t tx_complete_success);
 
 #endif /* __LIM_UTILS_H */

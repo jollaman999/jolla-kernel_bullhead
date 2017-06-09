@@ -131,11 +131,11 @@ static void ptt_sock_proc_reg_req(tAniHdr *wmsg, int radio)
    pAdapterHandle->ptt_pid = reg_req->pid;
    rspmsg.regReq.pid= reg_req->pid;
    rspmsg.wniHdr.type = cpu_to_be16(ANI_MSG_APP_REG_RSP);
-   rspmsg.wniHdr.length = cpu_to_be16(sizeof(rspmsg));
+   rspmsg.wniHdr.length = cpu_to_be16(sizeof(rspmsg.wniHdr));
    if (ptt_sock_send_msg_to_app((tAniHdr *)&rspmsg.wniHdr, radio,
       ANI_NL_MSG_PUMAC, reg_req->pid) < 0)
    {
-      PTT_TRACE(VOS_TRACE_LEVEL_ERROR, "%s: Error sending ANI_MSG_APP_REG_RSP to pid[%d]\n",
+      PTT_TRACE(VOS_TRACE_LEVEL_INFO, "%s: Error sending ANI_MSG_APP_REG_RSP to pid[%d]\n",
          __func__, reg_req->pid);
    }
 }
