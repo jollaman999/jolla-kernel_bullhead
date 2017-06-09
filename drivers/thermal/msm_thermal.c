@@ -130,8 +130,8 @@ static bool scr_suspended = false;
 #define DEFAULT_POLL_MS_COOL			1000
 #define DEFAULT_POLL_MS_COOL_SCREEN_OFF		5000
 unsigned int poll_ms;
-unsigned int poll_ms_cool = 1000;
-unsigned int poll_ms_cool_screen_off = 5000;
+unsigned int poll_ms_cool = DEFAULT_POLL_MS_COOL;
+unsigned int poll_ms_cool_screen_off = DEFAULT_POLL_MS_COOL_SCREEN_OFF;
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
 unsigned int temp_big_off_threshold;
@@ -5928,11 +5928,9 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 		poll_ms = 250;
 	current_poll_ms = poll_ms;
 
-	poll_ms_cool = DEFAULT_POLL_MS_COOL;
 	if (poll_ms_cool < poll_ms)
 		poll_ms_cool = poll_ms;
 
-	poll_ms_cool_screen_off = DEFAULT_POLL_MS_COOL_SCREEN_OFF;
 	if (poll_ms_cool_screen_off < poll_ms)
 		poll_ms_cool_screen_off = poll_ms;
 
