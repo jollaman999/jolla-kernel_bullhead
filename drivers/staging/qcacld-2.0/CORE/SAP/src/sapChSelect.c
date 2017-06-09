@@ -319,9 +319,7 @@ sap_process_avoid_ie(tHalHandle hal,
 	node = sme_ScanResultGetFirst(hal, scan_result);
 
 	while (node) {
-		total_ie_len = (node->BssDescriptor.length +
-				sizeof(tANI_U16) + sizeof(tANI_U32) -
-				sizeof(tSirBssDescription));
+		total_ie_len = GET_IE_LEN_IN_BSS(node->BssDescriptor.length);
 		temp_ptr = cfg_get_vendor_ie_ptr_from_oui(mac_ctx,
 				SIR_MAC_QCOM_VENDOR_OUI,
 				SIR_MAC_QCOM_VENDOR_SIZE,
@@ -414,8 +412,7 @@ void sapUpdateUnsafeChannelList(ptSapContext pSapCtx)
    }
 
    /* Try to find unsafe channel */
-#if defined(FEATURE_WLAN_STA_AP_MODE_DFS_DISABLE) || \
-    defined(WLAN_FEATURE_MBSSID)
+#if defined(FEATURE_WLAN_STA_AP_MODE_DFS_DISABLE)
    for (i = 0; i < NUM_20MHZ_RF_CHANNELS; i++) {
         if (pSapCtx->dfs_ch_disable == VOS_TRUE) {
             if (VOS_IS_DFS_CH(safeChannels[i].channelNumber)) {
@@ -467,18 +464,8 @@ void sapUpdateUnsafeChannelList(ptSapContext pSapCtx)
     NULL
 ============================================================================*/
 
-void sapCleanupChannelList
-(
-#ifdef WLAN_FEATURE_MBSSID
-    v_PVOID_t pvosGCtx
-#else
-    void
-#endif
-)
+void sapCleanupChannelList(v_PVOID_t pvosGCtx)
 {
-#ifndef WLAN_FEATURE_MBSSID
-    v_PVOID_t pvosGCtx = vos_get_global_context(VOS_MODULE_ID_SAP, NULL);
-#endif
     ptSapContext pSapCtx;
 
     VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
@@ -629,13 +616,14 @@ v_BOOL_t sapChanSelInit(tHalHandle halHandle,
     pSpectInfoParams->pSpectCh = pSpectCh;
 
     pChans = pMac->scan.base20MHzChannels.channelList;
-#if defined(FEATURE_WLAN_STA_AP_MODE_DFS_DISABLE) || defined(WLAN_FEATURE_MBSSID)
+#if defined(FEATURE_WLAN_STA_AP_MODE_DFS_DISABLE)
         if (pSapCtx->dfs_ch_disable == VOS_TRUE)
             include_dfs_ch = VOS_FALSE;
 #endif
         ccmCfgGetInt(halHandle, WNI_CFG_DFS_MASTER_ENABLED,
                                                      &dfs_master_cap_enabled);
-        if (dfs_master_cap_enabled == 0)
+        if (dfs_master_cap_enabled == 0 ||
+                ACS_DFS_MODE_DISABLE == pSapCtx->dfs_mode)
             include_dfs_ch = VOS_FALSE;
 
     // Fill the channel number in the spectrum in the operating freq band
@@ -684,6 +672,9 @@ v_BOOL_t sapChanSelInit(tHalHandle halHandle,
         {
             continue;
         }
+        /* Skip DSRC channels */
+        if (vos_is_dsrc_channel(vos_chan_to_freq(*pChans)))
+            continue;
 
         if (VOS_TRUE == chSafe)
         {
@@ -1566,7 +1557,7 @@ void sapComputeSpectWeight( tSapChSelSpectInfo* pSpectInfoParams,
 
         if (pScanResult->BssDescriptor.ieFields != NULL)
         {
-            ieLen = (pScanResult->BssDescriptor.length + sizeof(tANI_U16) + sizeof(tANI_U32) - sizeof(tSirBssDescription));
+            ieLen = GET_IE_LEN_IN_BSS(pScanResult->BssDescriptor.length);
             vos_mem_set((tANI_U8 *) pBeaconStruct, sizeof(tSirProbeRespBeacon), 0);
 
             if ((sirParseBeaconIE(pMac, pBeaconStruct,(tANI_U8 *)( pScanResult->BssDescriptor.ieFields), ieLen)) == eSIR_SUCCESS)
@@ -2472,6 +2463,9 @@ v_U8_t sapSelectChannel(tHalHandle halHandle, ptSapContext pSapCtx,  tScanResult
                    vos_nv_getChannelEnabledState(safeChannels[i].channelNumber);
                 if ((NV_CHANNEL_DISABLE == enable_type) ||
                     (NV_CHANNEL_INVALID == enable_type))
+                    continue;
+                if ((pSapCtx->dfs_mode == ACS_DFS_MODE_DISABLE) &&
+                      (NV_CHANNEL_DFS == enable_type))
                     continue;
 
                 if ((!dfs_master_cap_enabled) &&

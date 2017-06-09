@@ -958,7 +958,6 @@ limSendHalStartScanReq(tpAniSirGlobal pMac, tANI_U8 channelNum, tLimLimHalScanSt
         SET_LIM_PROCESS_DEFD_MESGS(pMac, false);
 
         MTRACE(macTraceMsgTx(pMac, NO_SESSION, msg.type));
-        limLog(pMac, LOG1, FL("Channel %d"), channelNum);
 
             rc = wdaPostCtrlMsg(pMac, &msg);
         if (rc == eSIR_SUCCESS) {
@@ -1425,88 +1424,6 @@ error:
 
     return;
 }
-/**
- * limSetOemDataReqModeFailed()
- *
- * FUNCTION:
- *  This function is used as callback to resume link after the suspend fails while
- *  starting oem data req mode.
- * LOGIC:
- *  NA
- *
- * ASSUMPTIONS:
- *  NA
- *
- * NOTE:
- *
- * @param pMac - Pointer to Global MAC structure
- * @return None
- */
-
-void limSetOemDataReqModeFailed(tpAniSirGlobal pMac, eHalStatus status, tANI_U32* data)
-{
-    tpLimMlmOemDataRsp pMlmOemDataRsp;
-
-    pMac->lim.gLimMlmState = pMac->lim.gLimPrevMlmState;
-    MTRACE(macTrace(pMac, TRACE_CODE_MLM_STATE, NO_SESSION, pMac->lim.gLimMlmState));
-
-    pMlmOemDataRsp = vos_mem_malloc(sizeof(tLimMlmOemDataRsp));
-    if ( NULL == pMlmOemDataRsp )
-    {
-        limLog(pMac->hHdd, LOGP, FL("OEM_DATA: memory allocation for pMlmOemDataRsp failed under suspend link failure"));
-        return;
-    }
-
-    if (NULL != pMac->lim.gpLimMlmOemDataReq)
-    {
-        vos_mem_free(pMac->lim.gpLimMlmOemDataReq);
-        pMac->lim.gpLimMlmOemDataReq = NULL;
-    }
-
-    vos_mem_set(pMlmOemDataRsp, sizeof(tLimMlmOemDataRsp), 0);
-
-    limPostSmeMessage(pMac, LIM_MLM_OEM_DATA_CNF, (tANI_U32*)pMlmOemDataRsp);
-
-    return;
-}
-
-/**
- * limSetOemDataReqMode()
- *
- *FUNCTION:
- * This function is called to setup system into OEM DATA REQ mode
- *
- *LOGIC:
- * NA
- *
- *ASSUMPTIONS:
- * NA
- *
- *NOTE:
- *
- * @param  pMac - Pointer to Global MAC structure
- * @return None
- */
-
-void limSetOemDataReqMode(tpAniSirGlobal pMac, eHalStatus status, tANI_U32* data)
-{
-    if(status != eHAL_STATUS_SUCCESS)
-    {
-        limLog(pMac, LOGE, FL("OEM_DATA: failed in suspend link"));
-        /* If failed to suspend the link, there is no need
-         * to resume link. Return failure.
-         */
-        limSetOemDataReqModeFailed(pMac, status, data);
-    }
-    else
-    {
-        PELOGE(limLog(pMac, LOGE, FL("OEM_DATA: Calling limSendHalOemDataReq"));)
-        limSendHalOemDataReq(pMac);
-    }
-
-    return;
-} /*** end limSendHalOemDataReq() ***/
-
 #endif //FEATURE_OEM_DATA_SUPPORT
 
 static void
@@ -1738,6 +1655,9 @@ limMlmAddBss (
                  pMac->roam.configParam.rx_aggregation_size;
     }
     pAddBssParams->dot11_mode = psessionEntry->dot11mode;
+
+    pAddBssParams->beacon_tx_rate = pMlmStartReq->beacon_tx_rate;
+
     limLog(pMac, LOG2, FL("dot11_mode:%d"), pAddBssParams->dot11_mode);
 
     msgQ.type       = WDA_ADD_BSS_REQ;
@@ -2042,8 +1962,10 @@ static void limProcessMlmOemDataReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
 
         limPrintMlmState(pMac, LOGW, pMac->lim.gLimMlmState);
 
-        /// Free up buffer allocated
-        vos_mem_free(pMsgBuf);
+        /* Free up incoming buffer */
+        if (data_req->data)
+            vos_mem_free(data_req->data);
+        vos_mem_free(data_req);
 
         /// Return Meas confirm with INVALID_PARAMETERS
         pMlmOemDataRsp = vos_mem_malloc(sizeof(tLimMlmOemDataRsp));
@@ -2824,12 +2746,10 @@ limProcessMlmDisassocReqNtf(tpAniSirGlobal pMac, eHalStatus suspendStatus, tANI_
         mlmDisassocCnf.resultCode = eSIR_SME_INVALID_PARAMETERS;
         goto end;
     }
-    limLog(pMac, LOGE, FL("Process DisAssoc Req on sessionID %d Systemrole %d "
-    "reason code: %d mlmstate %d from: "MAC_ADDRESS_STR),
-        pMlmDisassocReq->sessionId,
-        GET_LIM_SYSTEM_ROLE(psessionEntry), pMlmDisassocReq->reasonCode,
-        psessionEntry->limMlmState,
-        MAC_ADDR_ARRAY(pMlmDisassocReq->peerMacAddr));
+    limLog(pMac, LOG1,FL("Process DisAssoc Req on sessionID %d Systemrole %d "
+    "mlmstate %d from: "MAC_ADDRESS_STR), pMlmDisassocReq->sessionId,
+    GET_LIM_SYSTEM_ROLE(psessionEntry), psessionEntry->limMlmState,
+    MAC_ADDR_ARRAY(pMlmDisassocReq->peerMacAddr));
 
     sirCopyMacAddr(currentBssId,psessionEntry->bssId);
 
@@ -3703,34 +3623,34 @@ tLimMlmRemoveKeyCnf  mlmRemoveKeyCnf;
         return;
     }
 
-    /**
-      * Check if there exists a context for the
-      * peer entity for which keys need to be removed.
-      */
-    pStaDs = dphLookupHashEntry( pMac, pMlmRemoveKeyReq->peerMacAddr, &aid, &psessionEntry->dph.dphHashTable );
-    if ((pStaDs == NULL) ||
-           (pStaDs &&
-           (pStaDs->mlmStaContext.mlmState !=
-                         eLIM_MLM_LINK_ESTABLISHED_STATE)))
-    {
-       /**
-         * Received LIM_MLM_REMOVEKEY_REQ for STA
-         * that does not have context or in some
-         * transit state. Log error.
-         */
-        limLog( pMac, LOGW,
-            FL("Received MLM_REMOVEKEYS_REQ for STA that either has no context or in some transit state, Addr = "));
-        limPrintMacAddr( pMac, pMlmRemoveKeyReq->peerMacAddr, LOGW );
+  /**
+    * Check if there exists a context for the
+    * peer entity for which keys need to be removed.
+    */
+  pStaDs = dphLookupHashEntry( pMac, pMlmRemoveKeyReq->peerMacAddr, &aid, &psessionEntry->dph.dphHashTable );
+  if ((pStaDs == NULL) ||
+         (pStaDs &&
+         (pStaDs->mlmStaContext.mlmState !=
+                       eLIM_MLM_LINK_ESTABLISHED_STATE)))
+  {
+     /**
+       * Received LIM_MLM_REMOVEKEY_REQ for STA
+       * that does not have context or in some
+       * transit state. Log error.
+       */
+      limLog( pMac, LOGW,
+          FL("Received MLM_REMOVEKEYS_REQ for STA that either has no context or in some transit state, Addr = "));
+      limPrintMacAddr( pMac, pMlmRemoveKeyReq->peerMacAddr, LOGW );
 
-        // Prepare and Send LIM_MLM_REMOVEKEY_CNF
-        mlmRemoveKeyCnf.resultCode = eSIR_SME_INVALID_PARAMETERS;
-        mlmRemoveKeyCnf.sessionId = pMlmRemoveKeyReq->sessionId;
+      // Prepare and Send LIM_MLM_REMOVEKEY_CNF
+      mlmRemoveKeyCnf.resultCode = eSIR_SME_INVALID_PARAMETERS;
+      mlmRemoveKeyCnf.sessionId = pMlmRemoveKeyReq->sessionId;
 
 
-        goto end;
-    }
-    else
-        staIdx = pStaDs->staIndex;
+      goto end;
+  }
+  else
+    staIdx = pStaDs->staIndex;
 
 
 
@@ -3778,8 +3698,6 @@ limProcessMinChannelTimeout(tpAniSirGlobal pMac)
     if (pMac->lim.gLimMlmState == eLIM_MLM_WT_PROBE_RESP_STATE &&
         pMac->lim.gLimHalScanState != eLIM_HAL_FINISH_SCAN_WAIT_STATE)
     {
-        PELOG1(limLog(pMac, LOG1, FL("Scanning : min channel timeout occurred"));)
-
         /// Min channel timer timed out
         pMac->lim.limTimers.gLimPeriodicProbeReqTimer.sessionId = 0xff;
         limDeactivateAndChangeTimer(pMac, eLIM_MIN_CHANNEL_TIMER);

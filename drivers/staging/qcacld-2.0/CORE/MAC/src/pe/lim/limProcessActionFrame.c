@@ -562,8 +562,10 @@ __limProcessOperatingModeActionFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo
     }
     pSta = dphLookupHashEntry(pMac, pHdr->sa, &aid, &psessionEntry->dph.dphHashTable);
 
-    if (pSta == NULL)
+    if (pSta == NULL) {
+        limLog(pMac, LOGE, FL("Station context not found"));
         goto end;
+    }
 
     operMode = pSta->vhtSupportedChannelWidthSet ? eHT_CHANNEL_WIDTH_80MHZ : pSta->htSupportedChannelWidthSet ? eHT_CHANNEL_WIDTH_40MHZ: eHT_CHANNEL_WIDTH_20MHZ;
 
@@ -616,7 +618,7 @@ __limProcessOperatingModeActionFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo
             ch_bw = eHT_CHANNEL_WIDTH_20MHZ;
         }
         limCheckVHTOpModeChange(pMac, psessionEntry,
-                                 ch_bw,
+                                 ch_bw, MODE_MAX,
                                  pSta->staIndex, pHdr->sa);
     }
 
@@ -2188,6 +2190,11 @@ limProcessActionFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo,tpPESession ps
 
     switch (pActionHdr->category)
     {
+        /*
+         * WARNING: If you add Action frame category case here, set the
+         * corresponding bit to 1 in sme_set_allowed_action_frames() for
+         * the FW to hand over that frame to host without dropping itself
+         */
         case SIR_MAC_ACTION_QOS_MGMT:
             if ( (psessionEntry->limQosEnabled) ||
                   (pActionHdr->actionID == SIR_MAC_QOS_MAP_CONFIGURE) )

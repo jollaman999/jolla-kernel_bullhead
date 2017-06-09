@@ -73,21 +73,21 @@
 #include <vos_lock.h>
 #include <vos_timer.h>
 
-#define TX_POST_EVENT_MASK               0x001
-#define TX_SUSPEND_EVENT_MASK            0x002
-#define MC_POST_EVENT_MASK               0x001
-#define MC_SUSPEND_EVENT_MASK            0x002
-#define RX_POST_EVENT_MASK               0x001
-#define RX_SUSPEND_EVENT_MASK            0x002
-#define TX_SHUTDOWN_EVENT_MASK           0x010
-#define MC_SHUTDOWN_EVENT_MASK           0x010
-#define RX_SHUTDOWN_EVENT_MASK           0x010
-#define WD_POST_EVENT_MASK               0x001
-#define WD_SHUTDOWN_EVENT_MASK           0x002
-#define WD_CHIP_RESET_EVENT_MASK         0x004
-#define WD_WLAN_SHUTDOWN_EVENT_MASK      0x008
-#define WD_WLAN_REINIT_EVENT_MASK        0x010
-#define WD_WLAN_DETECT_THREAD_STUCK_MASK 0x020
+#define TX_POST_EVENT               0x000
+#define TX_SUSPEND_EVENT            0x001
+#define MC_POST_EVENT               0x000
+#define MC_SUSPEND_EVENT            0x001
+#define RX_POST_EVENT               0x000
+#define RX_SUSPEND_EVENT            0x001
+#define TX_SHUTDOWN_EVENT           0x002
+#define MC_SHUTDOWN_EVENT           0x002
+#define RX_SHUTDOWN_EVENT           0x002
+#define WD_POST_EVENT               0x000
+#define WD_SHUTDOWN_EVENT           0x001
+#define WD_CHIP_RESET_EVENT         0x002
+#define WD_WLAN_SHUTDOWN_EVENT      0x003
+#define WD_WLAN_REINIT_EVENT        0x004
+#define WD_WLAN_DETECT_THREAD_STUCK 0x005
 
 
 
@@ -322,6 +322,20 @@ struct vos_log_complete {
 	bool is_report_in_progress;
 };
 
+/**
+ * struct vos_wdthread_timer_work - Watchdog timer thread structure
+ * @callback: Watchdog timer work call back
+ * @userdata: Input to the timer call back function
+ * @node: wdthread timer work Linklist
+ *
+ * This structure internally stores wdthread timer work related params
+ */
+struct vos_wdthread_timer_work {
+	vos_timer_callback_t callback;
+	void *userdata;
+	struct list_head node;
+};
+
 typedef struct _VosContextType
 {
    /* Messages buffers */
@@ -346,11 +360,6 @@ typedef struct _VosContextType
 
    /* MAC Module Context  */
    v_VOID_t           *pMACContext;
-
-#ifndef WLAN_FEATURE_MBSSID
-   /* SAP Context */
-   v_VOID_t           *pSAPContext;
-#endif
 
    vos_event_t         ProbeEvent;
 
@@ -399,6 +408,13 @@ typedef struct _VosContextType
 
    bool crash_indication_pending;
    bool enable_fatal_event;
+
+   /* radio index per driver */
+   int radio_index;
+   struct vos_wdthread_timer_work wdthread_timer_work;
+   struct list_head wdthread_timer_work_list;
+   struct work_struct wdthread_work;
+   spinlock_t wdthread_work_lock;
 } VosContextType, *pVosContextType;
 
 

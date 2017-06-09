@@ -60,6 +60,7 @@
 #include <ol_vowext_dbg_defs.h>
 #include <wma.h>
 #include "pktlog_ac_fmt.h"
+#include "adf_trace.h"
 
 #ifdef HTT_RX_RESTORE
 #include "vos_cnss.h"
@@ -1144,6 +1145,10 @@ ol_rx_peer_init(struct ol_txrx_pdev_t *pdev, struct ol_txrx_peer_t *peer)
     peer->security[txrx_sec_ucast].sec_type =
         peer->security[txrx_sec_mcast].sec_type = htt_sec_type_none;
     peer->keyinstalled = 0;
+    peer->last_assoc_rcvd = 0;
+    peer->last_disassoc_rcvd = 0;
+    peer->last_deauth_rcvd = 0;
+
     adf_os_atomic_init(&peer->fw_pn_check);
 }
 
@@ -1151,6 +1156,9 @@ void
 ol_rx_peer_cleanup(struct ol_txrx_vdev_t *vdev, struct ol_txrx_peer_t *peer)
 {
     peer->keyinstalled = 0;
+    peer->last_assoc_rcvd = 0;
+    peer->last_disassoc_rcvd = 0;
+    peer->last_deauth_rcvd = 0;
     ol_rx_reorder_peer_cleanup(vdev, peer);
     adf_os_mem_free(peer->reorder_history);
     peer->reorder_history = NULL;
@@ -1260,12 +1268,11 @@ ol_rx_in_order_indication_handler(
  */
 void ol_rx_pkt_dump_call(
 	adf_nbuf_t msdu,
-	uint16_t peer_id,
+	struct ol_txrx_peer_t *peer,
 	uint8_t status)
 {
 	v_CONTEXT_t vos_context;
 	ol_txrx_pdev_handle pdev;
-	struct ol_txrx_peer_t *peer = NULL;
 
 	vos_context = vos_get_global_context(VOS_MODULE_ID_TXRX, NULL);
 	pdev = vos_get_context(VOS_MODULE_ID_TXRX, vos_context);
@@ -1277,13 +1284,8 @@ void ol_rx_pkt_dump_call(
 	}
 
 	if (pdev->ol_rx_packetdump_cb) {
-		peer = ol_txrx_peer_find_by_id(pdev, peer_id);
-		if (!peer) {
-			TXRX_PRINT(TXRX_PRINT_LEVEL_ERR,
-				"%s: peer with peer id %d is NULL", __func__,
-				peer_id);
+		if (!peer)
 			return;
-		}
 		pdev->ol_rx_packetdump_cb(msdu, status, peer->vdev->vdev_id,
 						RX_DATA_PKT);
 	}
@@ -1310,6 +1312,11 @@ ol_rx_in_order_deliver(
     while (msdu) {
         adf_nbuf_t next = adf_nbuf_next(msdu);
 
+        DPTRACE(adf_dp_trace(msdu,
+                ADF_DP_TRACE_RX_TXRX_PACKET_PTR_RECORD,
+                adf_nbuf_data_addr(msdu),
+                sizeof(adf_nbuf_data(msdu)), ADF_RX));
+
         OL_RX_PEER_STATS_UPDATE(peer, msdu);
         OL_RX_ERR_STATISTICS_1(vdev->pdev, vdev, peer, rx_desc, OL_RX_ERR_NONE);
         TXRX_STATS_MSDU_INCR(vdev->pdev, rx.delivered, msdu);
@@ -1324,6 +1331,24 @@ ol_rx_in_order_deliver(
         0 /* don't print contents */);
 
     OL_RX_OSIF_DELIVER(vdev, peer, msdu_list);
+}
+
+/**
+ * ol_rx_log_packet() - log rx packet
+ * @htt_pdev: htt pdev
+ * @peer_id: peer_id
+ * @msdu: skb
+ *
+ * Return: none
+ */
+void ol_rx_log_packet(htt_pdev_handle htt_pdev,
+                      uint8_t peer_id, adf_nbuf_t msdu)
+{
+    struct ol_txrx_peer_t *peer;
+
+    peer = ol_txrx_peer_find_by_id(htt_pdev->txrx_pdev, peer_id);
+    if (peer)
+        adf_dp_trace_log_pkt(peer->vdev->vdev_id, msdu, ADF_RX);
 }
 
 void
@@ -1346,6 +1371,14 @@ ol_rx_offload_paddr_deliver_ind_handler(
 
         peer = ol_txrx_peer_find_by_id(htt_pdev->txrx_pdev, peer_id);
         if (peer && peer->vdev) {
+            adf_dp_trace_set_track(head_buf, ADF_RX);
+            NBUF_SET_PACKET_TRACK(head_buf, NBUF_TX_PKT_DATA_TRACK);
+            adf_dp_trace_log_pkt(peer->vdev->vdev_id,
+                                 head_buf, ADF_RX);
+            DPTRACE(adf_dp_trace(head_buf,
+                    ADF_DP_TRACE_RX_OFFLOAD_HTT_PACKET_PTR_RECORD,
+                    adf_nbuf_data_addr(head_buf),
+                    sizeof(adf_nbuf_data(head_buf)), ADF_RX));
             vdev = peer->vdev;
             OL_RX_OSIF_DELIVER(vdev, peer, head_buf);
         } else {

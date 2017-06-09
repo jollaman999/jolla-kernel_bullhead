@@ -48,8 +48,10 @@
 #include <ol_cfg.h>
 #include <ol_rx.h>
 #include <ol_htt_rx_api.h>
+#include <ol_txrx_peer_find.h>
 #include <htt_internal.h> /* HTT_ASSERT, htt_pdev_t, HTT_RX_BUF_SIZE */
 #include "regtable.h"
+#include "adf_trace.h"
 
 #include <ieee80211_common.h>         /* ieee80211_frame, ieee80211_qoscntl */
 #include <ieee80211_defines.h> /* ieee80211_rx_status */
@@ -107,21 +109,6 @@ extern int process_wma_set_command(int sessid, int paramid,
 
 void
 htt_rx_hash_deinit(struct htt_pdev_t *pdev);
-
-static int
-CEIL_PWR2(int value)
-{
-    int log2;
-    if (IS_PWR2(value)) {
-        return value;
-    }
-    log2 = 0;
-    while (value) {
-        value >>= 1;
-        log2++;
-    }
-    return (1 << log2);
-}
 
 /*
  * This function is used both below within this file (which the compiler
@@ -192,7 +179,7 @@ htt_rx_ring_size(struct htt_pdev_t *pdev)
     if (size > HTT_RX_RING_SIZE_MAX) {
         size = HTT_RX_RING_SIZE_MAX;
     }
-    size = CEIL_PWR2(size);
+    size = adf_os_get_pwr2(size);
     return size;
 }
 
@@ -1856,6 +1843,7 @@ htt_rx_amsdu_rx_in_order_pop_ll(
     struct htt_host_rx_desc_base *rx_desc;
     enum rx_pkt_fate status = RX_PKT_FATE_SUCCESS;
     uint16_t peer_id;
+    struct ol_txrx_peer_t *peer;
 
     HTT_ASSERT1(htt_rx_in_order_ring_elems(pdev) != 0);
 
@@ -1867,6 +1855,8 @@ htt_rx_amsdu_rx_in_order_pop_ll(
     /* Get the total number of MSDUs */
     msdu_count = HTT_RX_IN_ORD_PADDR_IND_MSDU_CNT_GET(*(msg_word + 1));
     HTT_RX_CHECK_MSDU_COUNT(msdu_count);
+    peer_id = HTT_RX_IN_ORD_PADDR_IND_PEER_ID_GET(
+                                 *(u_int32_t *)rx_ind_data);
 
     msg_word = (u_int32_t *)(rx_ind_data + HTT_RX_IN_ORD_PADDR_IND_HDR_BYTES);
     if (offload_ind) {
@@ -1875,6 +1865,11 @@ htt_rx_amsdu_rx_in_order_pop_ll(
         *head_msdu = *tail_msdu = NULL;
         return 0;
     }
+
+    peer = ol_txrx_peer_find_by_id(pdev->txrx_pdev, peer_id);
+    if (!peer)
+        adf_os_print(KERN_DEBUG "%s: invalid peer id %d and msdu count %d\n",
+                     __func__, peer_id, msdu_count);
 
     (*head_msdu) = msdu =
         htt_rx_in_order_netbuf_pop(pdev,
@@ -1908,6 +1903,14 @@ htt_rx_amsdu_rx_in_order_pop_ll(
          */
         adf_nbuf_pull_head(msdu, HTT_RX_STD_DESC_RESERVATION);
 
+        adf_dp_trace_set_track(msdu, ADF_RX);
+        NBUF_SET_PACKET_TRACK(msdu, NBUF_TX_PKT_DATA_TRACK);
+        ol_rx_log_packet(pdev, peer_id, msdu);
+        DPTRACE(adf_dp_trace(msdu,
+                ADF_DP_TRACE_RX_HTT_PACKET_PTR_RECORD,
+                adf_nbuf_data_addr(msdu),
+                sizeof(adf_nbuf_data(msdu)), ADF_RX));
+
         adf_nbuf_trim_tail(
            msdu, HTT_RX_BUF_SIZE - (RX_STD_DESC_SIZE +
                               HTT_RX_IN_ORD_PADDR_IND_MSDU_LEN_GET(*(msg_word + 1))));
@@ -1918,13 +1921,12 @@ htt_rx_amsdu_rx_in_order_pop_ll(
         msdu_count--;
 
         /* calling callback function for packet logging */
-        peer_id = HTT_RX_IN_ORD_PADDR_IND_PEER_ID_GET(
-                                 *(u_int32_t *)rx_ind_data);
+
         if (adf_os_unlikely((*((u_int8_t *) &rx_desc->fw_desc.u.val)) &
                     FW_RX_DESC_MIC_ERR_M))
             status = RX_PKT_FATE_FW_DROP_INVALID;
         if (pdev->rx_pkt_dump_cb)
-            pdev->rx_pkt_dump_cb(msdu, peer_id, status);
+            pdev->rx_pkt_dump_cb(msdu, peer, status);
 
         if (adf_os_unlikely((*((u_int8_t *) &rx_desc->fw_desc.u.val)) &
                              FW_RX_DESC_MIC_ERR_M)) {
@@ -2990,7 +2992,7 @@ htt_rx_hash_init(struct htt_pdev_t *pdev)
 {
     int i,j;
 
-    HTT_ASSERT2(IS_PWR2(RX_NUM_HASH_BUCKETS));
+    HTT_ASSERT2(ADF_OS_IS_PWR2(RX_NUM_HASH_BUCKETS));
 
     /* hash table is array of bucket pointers */
     pdev->rx_ring.hash_table = adf_os_mem_alloc(
@@ -3124,7 +3126,7 @@ htt_rx_attach(struct htt_pdev_t *pdev)
     adf_os_dma_addr_t paddr;
     if (!pdev->cfg.is_high_latency) {
         pdev->rx_ring.size = htt_rx_ring_size(pdev);
-        HTT_ASSERT2(IS_PWR2(pdev->rx_ring.size));
+        HTT_ASSERT2(ADF_OS_IS_PWR2(pdev->rx_ring.size));
         pdev->rx_ring.size_mask = pdev->rx_ring.size - 1;
 
         /*
@@ -3249,7 +3251,7 @@ htt_rx_attach(struct htt_pdev_t *pdev)
         htt_rx_msdu_center_freq = htt_rx_msdu_center_freq_ll;
     } else {
         pdev->rx_ring.size = HTT_RX_RING_SIZE_MIN;
-        HTT_ASSERT2(IS_PWR2(pdev->rx_ring.size));
+        HTT_ASSERT2(ADF_OS_IS_PWR2(pdev->rx_ring.size));
         pdev->rx_ring.size_mask = pdev->rx_ring.size - 1;
 
         /* host can force ring base address if it wish to do so */

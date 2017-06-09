@@ -45,6 +45,7 @@
 #define HIF_USE_DMA_BOUNCE_BUFFER 1
 #define ATH_MODULE_NAME hif
 #include "a_debug.h"
+#include "vos_sched.h"
 
 #if HIF_USE_DMA_BOUNCE_BUFFER
 /* macro to check if DMA buffer is WORD-aligned and DMA-able.  Most host controllers assume the
@@ -367,7 +368,7 @@ __HIFReadWrite(HIF_DEVICE *device,
 {
     A_UINT8 opcode;
     A_STATUS    status = A_OK;
-    int     ret;
+    int ret = 0;
     A_UINT8 *tbuffer;
     A_BOOL   bounced = FALSE;
 
@@ -820,6 +821,7 @@ static int tx_completion_task(void *param)
  */
 static inline void tx_completion_sem_init(HIF_DEVICE *device)
 {
+	spin_lock_init(&device->tx_completion_lock);
 	sema_init(&device->sem_tx_completion, 0);
 }
 
@@ -1503,39 +1505,6 @@ HIFSetMboxSleep(HIF_DEVICE *device, bool sleep, bool wait, bool cache)
 }
 #endif
 
-/* handle HTC startup via thread*/
-static int startup_task(void *param)
-{
-    HIF_DEVICE *device;
-
-    device = (HIF_DEVICE *)param;
-    AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: call HTC from startup_task\n"));
-        /* start  up inform DRV layer */
-    if ((osdrvCallbacks.deviceInsertedHandler(osdrvCallbacks.context,device)) != A_OK) {
-        AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: Device rejected\n"));
-    }
-    return 0;
-}
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27) && defined(CONFIG_PM)
-static int enable_task(void *param)
-{
-    HIF_DEVICE *device;
-    device = (HIF_DEVICE *)param;
-    AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: call  from resume_task\n"));
-
-        /* start  up inform DRV layer */
-    if (device &&
-        device->claimedContext &&
-        osdrvCallbacks.devicePowerChangeHandler &&
-        osdrvCallbacks.devicePowerChangeHandler(device->claimedContext, HIF_DEVICE_POWER_UP) != A_OK)
-    {
-        AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: Device rejected\n"));
-    }
-
-    return 0;
-}
-#endif
 static int hifDeviceInserted(struct sdio_func *func, const struct sdio_device_id *id)
 {
     int i;
@@ -1994,15 +1963,17 @@ static A_STATUS hifDisableFunc(HIF_DEVICE *device, struct sdio_func *func)
 
 static A_STATUS hifEnableFunc(HIF_DEVICE *device, struct sdio_func *func)
 {
-    struct task_struct* pTask;
-    const char *taskName = NULL;
-    int (*taskFunc)(void *) = NULL;
     int ret = A_OK;
 
     ENTER("sdio_func 0x%p", func);
 
     AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: +hifEnableFunc\n"));
     device = getHifDevice(func);
+
+    if (!device) {
+        AR_DEBUG_PRINTF(ATH_DEBUG_ERR, ("HIF device is NULL\n"));
+        return A_EINVAL;
+    }
 
     if (device->is_disabled) {
         int setAsyncIRQ = 0;
@@ -2116,23 +2087,27 @@ static A_STATUS hifEnableFunc(HIF_DEVICE *device, struct sdio_func *func)
     }
 
     if (!device->claimedContext) {
-        taskFunc = startup_task;
-        taskName = "AR6K startup";
-        ret = A_OK;
+        AR_DEBUG_PRINTF(ATH_DEBUG_TRACE,
+            ("AR6k: call deviceInsertedHandler\n"));
+        ret = osdrvCallbacks.deviceInsertedHandler(
+            osdrvCallbacks.context,device);
+        /* start  up inform DRV layer */
+        if (ret != A_OK)
+            AR_DEBUG_PRINTF(ATH_DEBUG_TRACE,
+                ("AR6k: Device rejected error:%d \n", ret));
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27) && defined(CONFIG_PM)
     } else {
-        taskFunc = enable_task;
-        taskName = "AR6K enable";
-        ret = A_PENDING;
+        AR_DEBUG_PRINTF(ATH_DEBUG_TRACE,
+             ("AR6k: call devicePwrChangeApi\n"));
+        /* start  up inform DRV layer */
+        if (device->claimedContext &&
+            osdrvCallbacks.devicePowerChangeHandler &&
+            ((ret = osdrvCallbacks.devicePowerChangeHandler(
+                  device->claimedContext, HIF_DEVICE_POWER_UP)) != A_OK))
+                AR_DEBUG_PRINTF(ATH_DEBUG_TRACE,
+                    ("AR6k: Device rejected error:%d \n", ret));
 #endif /* CONFIG_PM */
     }
-    /* create resume thread */
-    pTask = kthread_create(taskFunc, (void *)device, taskName);
-    if (IS_ERR(pTask)) {
-        AR_DEBUG_PRINTF(ATH_DEBUG_ERROR, ("AR6000: %s(), to create enabel task\n", __FUNCTION__));
-        return A_ERROR;
-    }
-    wake_up_process(pTask);
     AR_DEBUG_PRINTF(ATH_DEBUG_TRACE, ("AR6000: -hifEnableFunc\n"));
 
     /* task will call the enable func, indicate pending */
@@ -2763,9 +2738,13 @@ static int hif_sdio_device_reinit(struct sdio_func *func, const struct sdio_devi
 static void hif_sdio_device_shutdown(struct sdio_func *func)
 {
 	vos_set_logp_in_progress(VOS_MODULE_ID_HIF, TRUE);
+	vos_set_shutdown_in_progress(VOS_MODULE_ID_HIF, TRUE);
+	if (!vos_is_ssr_ready(__func__))
+		pr_err(" %s Host driver is not ready for SSR, attempting anyway\n", __func__);
 
 	if (func != NULL)
 		hifDeviceRemoved(func);
+	vos_set_shutdown_in_progress(VOS_MODULE_ID_HIF, FALSE);
 }
 
 static void hif_sdio_crash_shutdown(struct sdio_func *func)
@@ -2782,5 +2761,47 @@ static int hif_sdio_device_resume(struct device *dev)
 {
 	return hifDeviceResume(dev);
 }
+
 #endif
 #endif
+
+/**
+ * hif_reset_target() - Reset target device
+ * @hif_device: pointer to hif_device structure
+ *
+ * Reset the target by invoking power off and power on
+ * sequence to bring back target into active state.
+ * This API shall be called only when driver load/unload
+ * is in progress.
+ *
+ * Return: 0 on success, error for failure case.
+ */
+int hif_reset_target(HIF_DEVICE *hif_device)
+{
+	int ret;
+
+	if (!hif_device || !hif_device->func|| !hif_device->func->card) {
+		AR_DEBUG_PRINTF(ATH_DEBUG_ERROR,
+			("AR6000: %s invalid HIF DEVICE \n", __func__));
+		return -ENODEV;
+	}
+	/* Disable sdio func->pull down WLAN_EN-->pull down DAT_2 line */
+	ret = mmc_power_save_host(hif_device->func->card->host);
+	if(ret) {
+		AR_DEBUG_PRINTF(ATH_DEBUG_ERROR,
+			("AR6000: %s Failed to save mmc Power host %d\n",
+			__func__, ret));
+		goto done;
+	}
+
+	/* pull up DAT_2 line->pull up WLAN_EN-->Enable sdio func */
+	ret = mmc_power_restore_host(hif_device->func->card->host);
+	if(ret) {
+		AR_DEBUG_PRINTF(ATH_DEBUG_ERROR,
+			("AR6000: %s Failed to restore mmc Power host %d\n",
+			__func__, ret));
+	}
+
+done:
+	return ret;
+}

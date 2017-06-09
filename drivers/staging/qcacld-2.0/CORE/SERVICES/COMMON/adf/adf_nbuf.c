@@ -804,11 +804,10 @@ __adf_nbuf_data_get_ipv6_proto(uint8_t *data)
  *
  * This func. checks whether it is a DHCP packet or not.
  *
- * Return: A_STATUS_OK if it is a DHCP packet
- *         A_STATUS_FAILED if not
+ * Return: TRUE if it is a DHCP packet
+ *         FALSE if not
  */
-a_status_t
-__adf_nbuf_data_is_dhcp_pkt(uint8_t *data)
+bool __adf_nbuf_data_is_dhcp_pkt(uint8_t *data)
 {
    a_uint16_t    SPort;
    a_uint16_t    DPort;
@@ -823,11 +822,11 @@ __adf_nbuf_data_is_dhcp_pkt(uint8_t *data)
        ((ADF_NBUF_TRAC_DHCP_CLI_PORT == adf_os_cpu_to_be16(SPort)) &&
        (ADF_NBUF_TRAC_DHCP_SRV_PORT == adf_os_cpu_to_be16(DPort))))
     {
-        return A_STATUS_OK;
+        return true;
     }
     else
     {
-        return A_STATUS_FAILED;
+        return false;
     }
 }
 
@@ -837,11 +836,10 @@ __adf_nbuf_data_is_dhcp_pkt(uint8_t *data)
  *
  * This func. checks whether it is a EAPOL packet or not.
  *
- * Return: A_STATUS_OK if it is a EAPOL packet
- *         A_STATUS_FAILED if not
+ * Return: TRUE if it is a EAPOL packet
+ *         FALSE if not
  */
-a_status_t
-__adf_nbuf_data_is_eapol_pkt(uint8_t *data)
+bool __adf_nbuf_data_is_eapol_pkt(uint8_t *data)
 {
     a_uint16_t    ether_type;
 
@@ -849,11 +847,11 @@ __adf_nbuf_data_is_eapol_pkt(uint8_t *data)
 			ADF_NBUF_TRAC_ETH_TYPE_OFFSET));
     if (ADF_NBUF_TRAC_EAPOL_ETH_TYPE == adf_os_cpu_to_be16(ether_type))
     {
-        return A_STATUS_OK;
+        return true;
     }
     else
     {
-        return A_STATUS_FAILED;
+        return false;
     }
 }
 
@@ -929,10 +927,10 @@ bool __adf_nbuf_data_is_ipv4_mcast_pkt(uint8_t *data)
 }
 
 /**
- * __adf_nbuf_data_is_ipv6_mcast_pkt() - check if it is IPv6 multicast packet.
- * @data: Pointer to IPv6 packet data buffer
+ * __adf_nbuf_data_is_ipv6_mcast_pkt() - check if it is IPV6 multicast packet.
+ * @data: Pointer to IPV6 packet data buffer
  *
- * This func. checks whether it is a IPv6 multicast packet or not.
+ * This func. checks whether it is a IPV6 muticast packet or not.
  *
  * Return: TRUE if it is a IPV6 multicast packet
  *         FALSE if not
@@ -942,13 +940,15 @@ bool __adf_nbuf_data_is_ipv6_mcast_pkt(uint8_t *data)
 	if (__adf_nbuf_data_is_ipv6_pkt(data)) {
 		uint16_t *dst_addr;
 
-		dst_addr = (uint16_t *)(data + ADF_NBUF_TRAC_IPV6_DEST_ADDR_OFFSET);
+		dst_addr = (uint16_t *)
+			(data + ADF_NBUF_TRAC_IPV6_DEST_ADDR_OFFSET);
 
 		/*
 		 * Check first byte of the IP address and if it
 		 * 0xFF00 then it is a IPV6 mcast packet.
 		 */
-		if (*dst_addr == adf_os_cpu_to_be16(ADF_NBUF_TRAC_IPV6_DEST_ADDR))
+		if (*dst_addr ==
+		     adf_os_cpu_to_be16(ADF_NBUF_TRAC_IPV6_DEST_ADDR))
 			return true;
 		else
 			return false;
@@ -1155,27 +1155,27 @@ __adf_nbuf_trace_update(struct sk_buff *buf, char *event_string)
    switch (adf_nbuf_trace_get_proto_type(buf)) {
    case NBUF_PKT_TRAC_TYPE_EAPOL:
       adf_os_mem_copy(string_buf + adf_os_str_len(event_string),
-                      "EPL", NBUF_PKT_TRAC_PROTO_STRING);
+                      "EPL", adf_os_str_len("EPL"));
       break;
    case NBUF_PKT_TRAC_TYPE_DHCP:
       adf_os_mem_copy(string_buf + adf_os_str_len(event_string),
-                      "DHC", NBUF_PKT_TRAC_PROTO_STRING);
+                      "DHC", adf_os_str_len("DHC"));
       break;
    case NBUF_PKT_TRAC_TYPE_MGMT_ACTION:
       adf_os_mem_copy(string_buf + adf_os_str_len(event_string),
-                      "MACT", NBUF_PKT_TRAC_PROTO_STRING);
+                      "MACT", adf_os_str_len("MACT"));
       break;
    case NBUF_PKT_TRAC_TYPE_ARP:
       adf_os_mem_copy(string_buf + adf_os_str_len(event_string),
-                      "ARP", NBUF_PKT_TRAC_PROTO_STRING);
+                      "ARP", adf_os_str_len("ARP"));
       break;
    case NBUF_PKT_TRAC_TYPE_NS:
       adf_os_mem_copy(string_buf + adf_os_str_len(event_string),
-                      "NS", NBUF_PKT_TRAC_PROTO_STRING);
+                      "NS", adf_os_str_len("NS"));
       break;
    case NBUF_PKT_TRAC_TYPE_NA:
       adf_os_mem_copy(string_buf + adf_os_str_len(event_string),
-                      "NA", NBUF_PKT_TRAC_PROTO_STRING);
+                      "NA", adf_os_str_len("NA"));
       break;
    default:
       break;
@@ -1250,3 +1250,84 @@ int adf_nbuf_update_radiotap(struct mon_rx_status *rx_status, adf_nbuf_t nbuf,
 			rtap_hdr_len, rtap_len - rtap_hdr_len);
 	return rtap_len;
 }
+
+/**
+ * __adf_nbuf_validate_skb_cb() - validate skb CB
+ *
+ * SKB control block size limit is 48 byte, add compile time
+ * assert if SKB control block is exceeding 48 byte.
+ *
+ * Return: none
+ */
+void
+__adf_nbuf_validate_skb_cb(void)
+{
+	/*
+	 * Add compile time assert if SKB control block is exceeding
+	 * 48 byte.
+	 */
+	BUILD_BUG_ON(sizeof(struct cvg_nbuf_cb) >
+		FIELD_SIZEOF(struct sk_buff, cb));
+}
+
+/**
+ * __adf_nbuf_is_wai() - Check if frame is WAI
+ * @data: pointer to skb data buffer
+ *
+ * This function checks if the frame is WAPI.
+ *
+ * Return: true (1) if WAPI
+ *
+ */
+bool __adf_nbuf_is_wai_pkt(uint8_t *data)
+{
+	uint16_t ether_type;
+
+	ether_type = (uint16_t)(*(uint16_t *)
+			(data + ADF_NBUF_TRAC_ETH_TYPE_OFFSET));
+
+	if (ether_type == VOS_SWAP_U16(ADF_NBUF_TRAC_WAI_ETH_TYPE))
+		return true;
+
+	return false;
+}
+
+/**
+ * __adf_nbuf_is_group_pkt() - Check if frame is multicast packet
+ * @data: pointer to skb data buffer
+ *
+ * This function checks if the frame is multicast packet.
+ *
+ * Return: true (1) if multicast
+ *
+ */
+bool __adf_nbuf_is_multicast_pkt(uint8_t *data)
+{
+	struct adf_mac_addr *mac_addr = (struct adf_mac_addr*)data;
+
+	if ( mac_addr->bytes[0] & 0x01 )
+		return true;
+
+	return false;
+}
+
+/**
+ * __adf_nbuf_is_bcast_pkt() - Check if frame is broadcast packet
+ * @data: pointer to skb data buffer
+ *
+ * This function checks if the frame is broadcast packet.
+ *
+ * Return: true (1) if broadcast
+ *
+ */
+bool __adf_nbuf_is_bcast_pkt(uint8_t *data)
+{
+	struct adf_mac_addr *mac_addr = (struct adf_mac_addr*)data;
+	struct adf_mac_addr bcast_addr = VOS_MAC_ADDR_BROADCAST_INITIALIZER;
+
+	if (!memcmp( mac_addr, &bcast_addr, VOS_MAC_ADDR_SIZE))
+		return true;
+
+	return false;
+}
+
