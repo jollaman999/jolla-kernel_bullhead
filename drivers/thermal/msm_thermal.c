@@ -3099,7 +3099,7 @@ static void check_temp(struct work_struct *work)
 	do_vdd_restriction();
 	do_freq_control(temp);
 
-	if (temp < temp_threshold) {
+	if (temp < temp_threshold && temp < temp_big_threshold) {
 		if (scr_suspended) {
 			mutex_lock(&check_temp_suspend_mutex);
 			pr_info("Suspending check_temp...\n");
