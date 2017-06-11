@@ -92,7 +92,7 @@ static int big_core_start;
 static unsigned int current_poll_ms;
 static bool scr_suspended = false;
 static bool msm_thermal_suspended = false;
-static void msm_thermal_suspend(bool suspend);
+static void reset_all_cores(void);
 
 /*
  * Tunable options
@@ -169,6 +169,7 @@ static bool core_control_enabled;
 uint32_t cpus_offlined;
 static cpumask_var_t cpus_previously_online;
 static DEFINE_MUTEX(core_control_mutex);
+static DEFINE_MUTEX(check_temp_suspend_mutex);
 static struct kobject *cc_kobj;
 static struct kobject *mx_kobj;
 static struct task_struct *hotplug_task;
@@ -3100,7 +3101,11 @@ static void check_temp(struct work_struct *work)
 
 	if (temp < temp_threshold) {
 		if (scr_suspended) {
-			msm_thermal_suspend(true);
+			mutex_lock(&check_temp_suspend_mutex);
+			pr_info("Suspending check_temp...\n");
+			reset_all_cores();
+			msm_thermal_suspended = true;
+			mutex_unlock(&check_temp_suspend_mutex);
 			return;
 		} else {
 			current_poll_ms = poll_ms_cool;
@@ -4240,17 +4245,9 @@ cx_node_exit:
 	return ret;
 }
 
-/*
- * We will reset the cpu frequencies limits here. The core online/offline
- * status will be carried over to the process stopping the msm_thermal, as
- * we dont want to online a core and bring in the thermal issues.
- */
-static void disable_msm_thermal(void)
+static void reset_all_cores(void)
 {
 	uint32_t cpu = 0;
-
-	/* make sure check_temp is no longer running */
-	cancel_delayed_work_sync(&check_temp_work);
 
 	if (core_ptr) {
 		do_cluster_freq_ctrl(0, true);
@@ -4271,6 +4268,19 @@ static void disable_msm_thermal(void)
 	}
 }
 
+/*
+ * We will reset the cpu frequencies limits here. The core online/offline
+ * status will be carried over to the process stopping the msm_thermal, as
+ * we dont want to online a core and bring in the thermal issues.
+ */
+static void disable_msm_thermal(void)
+{
+	/* make sure check_temp is no longer running */
+	cancel_delayed_work_sync(&check_temp_work);
+
+	reset_all_cores();
+}
+
 static void interrupt_mode_init(void)
 {
 	if (polling_enabled) {
@@ -4282,22 +4292,6 @@ static void interrupt_mode_init(void)
 		thermal_monitor_init();
 		msm_thermal_add_cx_nodes();
 		msm_thermal_add_gfx_nodes();
-	}
-}
-
-static void msm_thermal_suspend(bool suspend)
-{
-	if (suspend == msm_thermal_suspended)
-		return;
-
-	if (suspend) {
-		disable_msm_thermal();
-		pr_info("suspended\n");
-		msm_thermal_suspended = true;
-	} else {
-		schedule_delayed_work(&check_temp_work, 0);
-		pr_info("resumed\n");
-		msm_thermal_suspended = false;
 	}
 }
 
@@ -6119,7 +6113,13 @@ static int msm_thermal_fb_notifier_callback(struct notifier_block *self,
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
 		case FB_BLANK_VSYNC_SUSPEND:
-			msm_thermal_suspend(false);
+			mutex_lock(&check_temp_suspend_mutex);
+			if (msm_thermal_suspended) {
+				pr_info("Resuming check_temp...\n");
+				schedule_delayed_work(&check_temp_work, 0);
+				msm_thermal_suspended = false;
+			}
+			mutex_unlock(&check_temp_suspend_mutex);
 			scr_suspended = false;
 			break;
 		case FB_BLANK_POWERDOWN:
