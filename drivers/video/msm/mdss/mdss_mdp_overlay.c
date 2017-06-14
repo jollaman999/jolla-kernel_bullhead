@@ -4591,7 +4591,7 @@ static int mdss_mdp_overlay_off(struct msm_fb_data_type *mfd)
 		/*
 		 * the retire work can still schedule after above retire_signal
 		 * api call. Flush workqueue guarantees that current caller
-		 * context is blocked till retire_work finishes. Any work
+		 * context is blocked till vsync_work finishes. Any work
 		 * schedule after flush call should not cause any issue because
 		 * retire_signal api checks for retire_cnt with sync_mutex lock.
 		 */
@@ -4899,7 +4899,6 @@ static int __vsync_retire_setup(struct msm_fb_data_type *mfd)
 	}
 
 	sched_setscheduler(mdp5_data->thread, SCHED_FIFO, &param);
-
 	mfd->mdp_sync_pt_data.get_retire_fence = __vsync_retire_get_fence;
 
 	mdp5_data->vsync_retire_handler.vsync_handler =
