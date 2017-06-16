@@ -91,8 +91,6 @@ struct notifier_block msm_thermal_fb_notif;
 static int big_core_start;
 static unsigned int current_poll_ms;
 static bool scr_suspended = false;
-static bool msm_thermal_suspended = false;
-static void msm_thermal_suspend(bool suspend);
 
 /*
  * Tunable options
@@ -100,6 +98,8 @@ static void msm_thermal_suspend(bool suspend);
  * poll_ms - msm_thermal will check the device's temperature every this milli seconds.
  * poll_ms_cool - 'poll_ms' will be increase to this value when the device is cool.
  *		  It will not check screen state.
+ * poll_ms_cool_screen_off - 'poll_ms' will be increase to this value when the device is cool and
+ *			     the screen is turned off.
  * temp_threshold - Limit the frequency of LITTLE when the temp is reached to this value.
  * temp_big_threshold - Limit the frequency of big when the temp is reached to this value.
  * temp_big_off_threshold - Turn off the big cores when the temp is reached to this value.
@@ -128,8 +128,10 @@ static void msm_thermal_suspend(bool suspend);
  *	       'temp_count_max_little_with_high_temp' steps.
  */
 #define DEFAULT_POLL_MS_COOL			1000
+#define DEFAULT_POLL_MS_COOL_SCREEN_OFF		5000
 unsigned int poll_ms;
 unsigned int poll_ms_cool = DEFAULT_POLL_MS_COOL;
+unsigned int poll_ms_cool_screen_off = DEFAULT_POLL_MS_COOL_SCREEN_OFF;
 unsigned int temp_threshold;
 unsigned int temp_big_threshold;
 unsigned int temp_big_off_threshold;
@@ -144,6 +146,7 @@ unsigned int temp_count_max_big = 10;
 unsigned int high_temp = 80;
 module_param(poll_ms, int, 0644);
 module_param(poll_ms_cool, int, 0644);
+module_param(poll_ms_cool_screen_off, int, 0644);
 module_param(temp_threshold, int, 0644);
 module_param(temp_big_threshold, int, 0644);
 module_param(temp_big_off_threshold, int, 0644);
@@ -3094,12 +3097,10 @@ static void check_temp(struct work_struct *work)
 	do_freq_control(temp);
 
 	if (temp < temp_threshold) {
-		if (scr_suspended) {
-			msm_thermal_suspend(true);
-			return;
-		} else {
+		if (scr_suspended)
+			current_poll_ms = poll_ms_cool_screen_off;
+		else
 			current_poll_ms = poll_ms_cool;
-		}
 	} else {
 		current_poll_ms = poll_ms;
 	}
@@ -4277,22 +4278,6 @@ static void interrupt_mode_init(void)
 		thermal_monitor_init();
 		msm_thermal_add_cx_nodes();
 		msm_thermal_add_gfx_nodes();
-	}
-}
-
-static void msm_thermal_suspend(bool suspend)
-{
-	if (suspend == msm_thermal_suspended)
-		return;
-
-	if (suspend) {
-		disable_msm_thermal();
-		pr_info("suspended\n");
-		msm_thermal_suspended = true;
-	} else {
-		schedule_delayed_work(&check_temp_work, 0);
-		pr_info("resumed\n");
-		msm_thermal_suspended = false;
 	}
 }
 
@@ -5941,6 +5926,9 @@ static int msm_thermal_dev_probe(struct platform_device *pdev)
 	if (poll_ms_cool < poll_ms)
 		poll_ms_cool = poll_ms;
 
+	if (poll_ms_cool_screen_off < poll_ms)
+		poll_ms_cool_screen_off = poll_ms;
+
 	key = "qcom,limit-temp-little";
 	ret = of_property_read_u32(node, key, &temp_threshold);
 	if (ret)
@@ -6114,7 +6102,6 @@ static int msm_thermal_fb_notifier_callback(struct notifier_block *self,
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
 		case FB_BLANK_VSYNC_SUSPEND:
-			msm_thermal_suspend(false);
 			scr_suspended = false;
 			break;
 		case FB_BLANK_POWERDOWN:
