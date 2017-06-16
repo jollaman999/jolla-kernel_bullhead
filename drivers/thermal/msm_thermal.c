@@ -92,6 +92,7 @@ static int big_core_start;
 static unsigned int current_poll_ms;
 static bool scr_suspended = false;
 static bool msm_thermal_suspended = false;
+static void reset_all_cores(void);
 
 /*
  * Tunable options
@@ -1351,16 +1352,10 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 	int index_little, index_big;
 	int max_little;
 	bool skip_little = false, skip_big = false;
-	bool do_restore = false;
 	struct cluster_info *cluster_ptr = NULL;
 
-	if (temp < temp_threshold || force_reset)
-		do_restore = true;
-	else
-		do_restore = false;
-
 	/* LITTLE */
-	if (do_restore) {
+	if (temp < temp_threshold || force_reset) {
 		if (restored_little && restored_big)
 			return;
 		if (restored_little) {
@@ -1368,8 +1363,6 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 		} else {
 			index_little = 0;
 			restored_little = true;
-			if (debug_freq_control)
-				pr_info("Restoring LITTLE cores...\n");
 		}
 	} else {
 		temp_diff_little = temp - temp_threshold;
@@ -1390,7 +1383,7 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 	}
 
 	/* big */
-	if (do_restore) {
+	if (temp < temp_big_threshold || force_reset) {
 		if (restored_little && restored_big)
 			return;
 		if (restored_big) {
@@ -1398,8 +1391,6 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 		} else {
 			index_big = 0;
 			restored_big = true;
-			if (debug_freq_control)
-				pr_info("Restoring big cores...\n");
 		}
 	} else {
 		temp_diff_big = temp - temp_big_threshold;
@@ -3045,8 +3036,6 @@ static void do_freq_control(long temp)
 		if (limit_idx < limit_idx_low)
 			limit_idx = limit_idx_low;
 		max_freq = table[limit_idx].frequency;
-		restored_little = false;
-		restored_big = false;
 	} else if (temp < temp_threshold -
 		 msm_thermal_info.temp_hysteresis_degC) {
 		if (limit_idx == limit_idx_high)
@@ -3058,8 +3047,6 @@ static void do_freq_control(long temp)
 			max_freq = UINT_MAX;
 		} else
 			max_freq = table[limit_idx].frequency;
-		restored_little = true;
-		restored_big = true;
 	}
 
 	if (max_freq == cpus[cpu].limited_max_freq)
@@ -3112,10 +3099,11 @@ static void check_temp(struct work_struct *work)
 	do_vdd_restriction();
 	do_freq_control(temp);
 
-	if (restored_little && restored_big) {
+	if (temp < temp_threshold && temp < temp_big_threshold) {
 		if (scr_suspended) {
 			mutex_lock(&check_temp_suspend_mutex);
 			pr_info("Suspending check_temp...\n");
+			reset_all_cores();
 			msm_thermal_suspended = true;
 			mutex_unlock(&check_temp_suspend_mutex);
 			return;
@@ -4257,17 +4245,9 @@ cx_node_exit:
 	return ret;
 }
 
-/*
- * We will reset the cpu frequencies limits here. The core online/offline
- * status will be carried over to the process stopping the msm_thermal, as
- * we dont want to online a core and bring in the thermal issues.
- */
-static void disable_msm_thermal(void)
+static void reset_all_cores(void)
 {
 	uint32_t cpu = 0;
-
-	/* make sure check_temp is no longer running */
-	cancel_delayed_work_sync(&check_temp_work);
 
 	if (core_ptr) {
 		do_cluster_freq_ctrl(0, true);
@@ -4286,6 +4266,19 @@ static void disable_msm_thermal(void)
 		update_cluster_freq();
 		put_online_cpus();
 	}
+}
+
+/*
+ * We will reset the cpu frequencies limits here. The core online/offline
+ * status will be carried over to the process stopping the msm_thermal, as
+ * we dont want to online a core and bring in the thermal issues.
+ */
+static void disable_msm_thermal(void)
+{
+	/* make sure check_temp is no longer running */
+	cancel_delayed_work_sync(&check_temp_work);
+
+	reset_all_cores();
 }
 
 static void interrupt_mode_init(void)
