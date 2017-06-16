@@ -128,7 +128,7 @@ static bool scr_suspended = false;
  *	       'temp_count_max_little_with_high_temp' steps.
  */
 #define DEFAULT_POLL_MS_COOL			1000
-#define DEFAULT_POLL_MS_COOL_SCREEN_OFF		5000
+#define DEFAULT_POLL_MS_COOL_SCREEN_OFF		10000
 unsigned int poll_ms;
 unsigned int poll_ms_cool = DEFAULT_POLL_MS_COOL;
 unsigned int poll_ms_cool_screen_off = DEFAULT_POLL_MS_COOL_SCREEN_OFF;
