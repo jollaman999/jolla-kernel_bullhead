@@ -121,11 +121,7 @@ static bool scr_suspended = false;
  * temp_count_max_little - If this value is 3, LITTLE's max frequency will decrease 1 to 3 steps.
  * temp_count_max_little_with_big_off - If this value is 2 and the temp is above 'temp_threshold' and below
  * 					'temp_big_off_threshold', LITTLE's max frequency will decrease 1 to 2 steps.
- * temp_count_max_little_with_high_temp - If this value is 5 and the temp is above 'high_temp',
- * 					 LITTLE's max frequency will decrease 1 to 5 steps.
  * temp_count_max_big - If this value is 5, big's max frequency will decrease 1 to 5 steps.
- * high_temp - If temp is higher than this value, LITTLE's max frequency will decrease 1 to
- *	       'temp_count_max_little_with_high_temp' steps.
  */
 #define DEFAULT_POLL_MS_COOL			1000
 #define DEFAULT_POLL_MS_COOL_SCREEN_OFF		10000
@@ -141,9 +137,7 @@ unsigned int freq_step_little = 1;
 unsigned int freq_step_big = 1;
 unsigned int temp_count_max_little = 3;
 unsigned int temp_count_max_little_with_big_off = 2;
-unsigned int temp_count_max_little_with_high_temp = 5;
 unsigned int temp_count_max_big = 10;
-unsigned int high_temp = 80;
 module_param(poll_ms, int, 0644);
 module_param(poll_ms_cool, int, 0644);
 module_param(poll_ms_cool_screen_off, int, 0644);
@@ -156,9 +150,7 @@ module_param(freq_step_little, int, 0644);
 module_param(freq_step_big, int, 0644);
 module_param(temp_count_max_little, int, 0644);
 module_param(temp_count_max_little_with_big_off, int, 0644);
-module_param(temp_count_max_little_with_high_temp, int, 0644);
 module_param(temp_count_max_big, int, 0644);
-module_param(high_temp, int, 0644);
 
 // Debug
 unsigned int debug_core_control = 0;
@@ -1371,8 +1363,6 @@ static void do_cluster_freq_ctrl(long temp, bool force_reset)
 		if (temp_diff_little > 0) {
 			if (temp < temp_big_off_threshold)
 				max_little = temp_count_max_little;
-			else if (temp > high_temp)
-				max_little = temp_count_max_little_with_high_temp;
 			else
 				max_little = temp_count_max_little_with_big_off;
 			index_little = temp_diff_little / temp_step_little + 1;
