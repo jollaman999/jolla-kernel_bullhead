@@ -3095,15 +3095,17 @@ static void check_temp(struct work_struct *work)
 		current_poll_ms = poll_ms;
 	}
 
-	if (temp > temp_max) {
-		temp_max = temp;
-		time_diff = ktime_to_ms(ktime_get()) - time_pre;
-		if (time_diff >= threshold_delay_ms)
+	if (!scr_suspended) {
+		if (temp > temp_max) {
+			temp_max = temp;
+			time_diff = ktime_to_ms(ktime_get()) - time_pre;
+			if (time_diff >= threshold_delay_ms)
+				time_pre = ktime_to_ms(ktime_get());
+			else
+				goto reschedule;
+		} else {
 			time_pre = ktime_to_ms(ktime_get());
-		else
-			goto reschedule;
-	} else {
-		time_pre = ktime_to_ms(ktime_get());
+		}
 	}
 
 	do_core_control(temp);
