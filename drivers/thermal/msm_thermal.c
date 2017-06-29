@@ -3081,7 +3081,18 @@ static void check_temp(struct work_struct *work)
 	if (ret) {
 		pr_err("Unable to read TSENS sensor:%d. err:%d\n",
 				msm_thermal_info.sensor_id, ret);
+		current_poll_ms = poll_ms;
+
 		goto reschedule;
+	}
+
+	if (temp < temp_threshold) {
+		if (scr_suspended)
+			current_poll_ms = poll_ms_cool_screen_off;
+		else
+			current_poll_ms = poll_ms_cool;
+	} else {
+		current_poll_ms = poll_ms;
 	}
 
 	if (temp > temp_max) {
@@ -3112,15 +3123,6 @@ static void check_temp(struct work_struct *work)
 
 	do_vdd_restriction();
 	do_freq_control(temp);
-
-	if (temp < temp_threshold) {
-		if (scr_suspended)
-			current_poll_ms = poll_ms_cool_screen_off;
-		else
-			current_poll_ms = poll_ms_cool;
-	} else {
-		current_poll_ms = poll_ms;
-	}
 
 reschedule:
 	if (polling_enabled)
