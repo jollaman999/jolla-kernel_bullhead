@@ -2673,7 +2673,7 @@
 		qcom,sensor-id = <7>;
 		qcom,poll-ms = <250>;
 		qcom,limit-temp-little = <60>;
-		qcom,limit-temp-big = <60>;
+		qcom,limit-temp-big = <50>;
 		qcom,temp-big-off = <74>;
 		qcom,big-core-start = <4>;
 		qcom,temp-hysteresis = <10>;
