@@ -134,12 +134,9 @@ unsigned int poll_ms;
 unsigned int poll_ms_cool = DEFAULT_POLL_MS_COOL;
 unsigned int poll_ms_cool_screen_off = DEFAULT_POLL_MS_COOL_SCREEN_OFF;
 unsigned int temp_threshold;
-unsigned int temp_little_off_low = 62;
-unsigned int temp_little_off_mid = 64;
-unsigned int temp_little_off_high = 66;
-unsigned int little_off_low_cpus = 1;
-unsigned int little_off_mid_cpus = 2;
-unsigned int little_off_high_cpus = 3;
+unsigned int temp_little_off_threshold = 58;
+unsigned int temp_little_off_temp_step = 2;
+unsigned int temp_little_off_cpus_max = 2;
 unsigned int temp_big_threshold;
 unsigned int temp_big_off_threshold;
 unsigned int temp_step_little = 4;
@@ -154,12 +151,9 @@ module_param(poll_ms, int, 0644);
 module_param(poll_ms_cool, int, 0644);
 module_param(poll_ms_cool_screen_off, int, 0644);
 module_param(temp_threshold, int, 0644);
-module_param(temp_little_off_low, int, 0644);
-module_param(temp_little_off_mid, int, 0644);
-module_param(temp_little_off_high, int, 0644);
-module_param(little_off_low_cpus, int, 0644);
-module_param(little_off_mid_cpus, int, 0644);
-module_param(little_off_high_cpus, int, 0644);
+module_param(temp_little_off_threshold, int, 0644);
+module_param(temp_little_off_temp_step, int, 0644);
+module_param(temp_little_off_cpus_max, int, 0644);
 module_param(temp_big_threshold, int, 0644);
 module_param(temp_big_off_threshold, int, 0644);
 module_param(temp_step_little, int, 0644);
@@ -2532,14 +2526,16 @@ static void __ref do_core_control(long temp)
 
 	if (msm_thermal_info.core_control_mask) {
 		/* Little */
-		if (temp >= temp_little_off_high)
-			little_off_cpus = little_off_high_cpus;
-		else if (temp >= temp_little_off_mid)
-			little_off_cpus = little_off_mid_cpus;
-		else if (temp >= temp_little_off_low)
-			little_off_cpus = little_off_low_cpus;
-		else
+		if (temp == temp_little_off_threshold) {
+			little_off_cpus = 1;
+		} else if (temp > temp_little_off_threshold) {
+			little_off_cpus = (temp - temp_little_off_threshold) /
+					  temp_little_off_temp_step + 1;
+			if (little_off_cpus > temp_little_off_cpus_max)
+				little_off_cpus = temp_little_off_cpus_max;
+		} else {
 			little_off_cpus = 0;
+		}
 
 		for (i = 0; i < big_core_start; i++) {
 			if (cpus_offlined & BIT(i) && !cpu_online(i))
