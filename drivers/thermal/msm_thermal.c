@@ -134,6 +134,12 @@ unsigned int poll_ms;
 unsigned int poll_ms_cool = DEFAULT_POLL_MS_COOL;
 unsigned int poll_ms_cool_screen_off = DEFAULT_POLL_MS_COOL_SCREEN_OFF;
 unsigned int temp_threshold;
+unsigned int temp_little_off_low = 62;
+unsigned int temp_little_off_mid = 64;
+unsigned int temp_little_off_high = 66;
+unsigned int little_off_low_cpus = 1;
+unsigned int little_off_mid_cpus = 2;
+unsigned int little_off_high_cpus = 3;
 unsigned int temp_big_threshold;
 unsigned int temp_big_off_threshold;
 unsigned int temp_step_little = 4;
@@ -148,6 +154,12 @@ module_param(poll_ms, int, 0644);
 module_param(poll_ms_cool, int, 0644);
 module_param(poll_ms_cool_screen_off, int, 0644);
 module_param(temp_threshold, int, 0644);
+module_param(temp_little_off_low, int, 0644);
+module_param(temp_little_off_mid, int, 0644);
+module_param(temp_little_off_high, int, 0644);
+module_param(little_off_low_cpus, int, 0644);
+module_param(little_off_mid_cpus, int, 0644);
+module_param(little_off_high_cpus, int, 0644);
 module_param(temp_big_threshold, int, 0644);
 module_param(temp_big_off_threshold, int, 0644);
 module_param(temp_step_little, int, 0644);
@@ -2510,62 +2522,139 @@ static void __ref do_core_control(long temp)
 {
 	int i = 0;
 	int ret = 0;
+	int offlined_little_cpus = 0;
+	int little_off_cpus;
 
 	if (!core_control_enabled)
 		return;
 
 	mutex_lock(&core_control_mutex);
-	if (msm_thermal_info.core_control_mask &&
-		temp >= temp_big_off_threshold) {
-		for (i = big_core_start; i < num_possible_cpus(); i++) { // Only on/off big cores
-			if (!(msm_thermal_info.core_control_mask & BIT(i)))
-				continue;
+
+	if (msm_thermal_info.core_control_mask) {
+		/* Little */
+		if (temp >= temp_little_off_high)
+			little_off_cpus = little_off_high_cpus;
+		else if (temp >= temp_little_off_mid)
+			little_off_cpus = little_off_mid_cpus;
+		else if (temp >= temp_little_off_low)
+			little_off_cpus = little_off_low_cpus;
+		else
+			little_off_cpus = 0;
+
+		for (i = 0; i < big_core_start; i++) {
 			if (cpus_offlined & BIT(i) && !cpu_online(i))
-				continue;
-			if (debug_core_control)
-				pr_info("Set Offline: CPU%d Temp: %ld\n",
-						i, temp);
-			if (cpu_online(i)) {
-				trace_thermal_pre_core_offline(i);
-				ret = cpu_down(i);
+				offlined_little_cpus++;
+		}
+
+		if (offlined_little_cpus < little_off_cpus) { // Little offline
+			for (i = 0; i < big_core_start; i++) {
+				if (offlined_little_cpus == little_off_cpus)
+					break;
+				if (!(msm_thermal_info.core_control_mask & BIT(i)))
+					continue;
+				if (cpus_offlined & BIT(i) && !cpu_online(i))
+					continue;
+				if (debug_core_control)
+					pr_info("Set Offline: Little CPU%d Temp: %ld\n",
+							i, temp);
+				if (cpu_online(i)) {
+					trace_thermal_pre_core_offline(i);
+					ret = cpu_down(i);
+					if (ret)
+						pr_err("Error %d offline Little core %d\n",
+						       ret, i);
+					trace_thermal_post_core_offline(i,
+						cpumask_test_cpu(i, cpu_online_mask));
+				}
+				cpus_offlined |= BIT(i);
+				offlined_little_cpus++;
+			}
+		} else { // Little online
+			for (i = 0; i < big_core_start; i++) {
+				if (offlined_little_cpus == little_off_cpus)
+					break;
+				if (!(cpus_offlined & BIT(i)))
+					continue;
+				cpus_offlined &= ~BIT(i);
+				offlined_little_cpus--;
+				if (debug_core_control)
+					pr_info("Allow Online Little CPU%d Temp: %ld\n",
+							i, temp);
+				/*
+				 * If this core is already online, then bring up the
+				 * next offlined core.
+				 */
+				if (cpu_online(i))
+					continue;
+				/* If this core wasn't previously online don't put it
+				   online */
+				if (!(cpumask_test_cpu(i, cpus_previously_online)))
+					continue;
+				trace_thermal_pre_core_online(i);
+				ret = cpu_up(i);
 				if (ret)
-					pr_err("Error %d offline core %d\n",
-					       ret, i);
-				trace_thermal_post_core_offline(i,
+					pr_err("Error %d online Little core %d\n",
+							ret, i);
+				trace_thermal_post_core_online(i,
 					cpumask_test_cpu(i, cpu_online_mask));
 			}
-			cpus_offlined |= BIT(i);
-			break;
 		}
-	} else if (msm_thermal_info.core_control_mask && cpus_offlined &&
-		temp <= (temp_big_off_threshold - msm_thermal_info.core_temp_hysteresis_degC)) {
-		for (i = big_core_start; i < num_possible_cpus(); i++) { // Only on/off big cores
-			if (!(cpus_offlined & BIT(i)))
-				continue;
-			cpus_offlined &= ~BIT(i);
-			if (debug_core_control)
-				pr_info("Allow Online CPU%d Temp: %ld\n",
-						i, temp);
-			/*
-			 * If this core is already online, then bring up the
-			 * next offlined core.
-			 */
-			if (cpu_online(i))
-				continue;
-			/* If this core wasn't previously online don't put it
-			   online */
-			if (!(cpumask_test_cpu(i, cpus_previously_online)))
-				continue;
-			trace_thermal_pre_core_online(i);
-			ret = cpu_up(i);
-			if (ret)
-				pr_err("Error %d online core %d\n",
-						ret, i);
-			trace_thermal_post_core_online(i,
-				cpumask_test_cpu(i, cpu_online_mask));
-			break;
+
+		/* big offline */
+		if (temp >= temp_big_off_threshold) {
+			for (i = big_core_start; i < num_possible_cpus(); i++) {
+				if (!(msm_thermal_info.core_control_mask & BIT(i)))
+					continue;
+				if (cpus_offlined & BIT(i) && !cpu_online(i))
+					continue;
+				if (debug_core_control)
+					pr_info("Set Offline: big CPU%d Temp: %ld\n",
+							i, temp);
+				if (cpu_online(i)) {
+					trace_thermal_pre_core_offline(i);
+					ret = cpu_down(i);
+					if (ret)
+						pr_err("Error %d offline big core %d\n",
+						       ret, i);
+					trace_thermal_post_core_offline(i,
+						cpumask_test_cpu(i, cpu_online_mask));
+				}
+				cpus_offlined |= BIT(i);
+				break;
+			}
+		}
+	} else if (cpus_offlined) {
+		/* big online */
+		if (temp <= (temp_big_off_threshold - msm_thermal_info.core_temp_hysteresis_degC)) {
+			for (i = big_core_start; i < num_possible_cpus(); i++) {
+				if (!(cpus_offlined & BIT(i)))
+					continue;
+				cpus_offlined &= ~BIT(i);
+				if (debug_core_control)
+					pr_info("Allow Online big CPU%d Temp: %ld\n",
+							i, temp);
+				/*
+				 * If this core is already online, then bring up the
+				 * next offlined core.
+				 */
+				if (cpu_online(i))
+					continue;
+				/* If this core wasn't previously online don't put it
+				   online */
+				if (!(cpumask_test_cpu(i, cpus_previously_online)))
+					continue;
+				trace_thermal_pre_core_online(i);
+				ret = cpu_up(i);
+				if (ret)
+					pr_err("Error %d online big core %d\n",
+							ret, i);
+				trace_thermal_post_core_online(i,
+					cpumask_test_cpu(i, cpu_online_mask));
+				break;
+			}
 		}
 	}
+
 	mutex_unlock(&core_control_mutex);
 }
 /* Call with core_control_mutex locked */
