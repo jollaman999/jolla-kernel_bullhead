@@ -134,7 +134,7 @@ unsigned int poll_ms;
 unsigned int poll_ms_cool = DEFAULT_POLL_MS_COOL;
 unsigned int poll_ms_cool_screen_off = DEFAULT_POLL_MS_COOL_SCREEN_OFF;
 unsigned int temp_threshold;
-unsigned int temp_little_off_threshold = 58;
+unsigned int temp_little_off_threshold = 62;
 unsigned int temp_little_off_temp_step = 2;
 unsigned int temp_little_off_cpus_max = 2;
 unsigned int temp_big_threshold;
