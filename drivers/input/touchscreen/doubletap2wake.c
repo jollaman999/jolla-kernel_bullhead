@@ -78,6 +78,7 @@ static
 int dt2s_switch = DT2S_DEFAULT;
 static s64 tap_time_pre = 0;
 static int touch_x = 0, touch_y = 0, touch_nr = 0, x_pre = 0, y_pre = 0;
+static int dt2w_vibration = 0;
 static bool is_touching = false;
 static bool scr_suspended = false;
 static struct input_dev * doubletap2wake_pwrdev;
@@ -134,7 +135,8 @@ static void doubletap2wake_presspwr(struct work_struct * doubletap2wake_presspwr
 
 	// Vibrate when screen on
 #ifdef CONFIG_QPNP_HAPTIC
-	qpnp_hap_td_enable(DT2W_VIB_STRENGTH);
+	if (dt2w_vibration)
+		qpnp_hap_td_enable(DT2W_VIB_STRENGTH);
 #endif
 	mutex_unlock(&pwrkeyworklock);
 }
@@ -527,6 +529,37 @@ static ssize_t dt2w_doubletap2sleep_dump(struct device *dev,
 static DEVICE_ATTR(doubletap2sleep, (S_IWUSR|S_IRUGO),
 	dt2w_doubletap2sleep_show, dt2w_doubletap2sleep_dump);
 
+static ssize_t dt2w_doubletap2wake_vibration_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+
+	count += sprintf(buf, "%d\n", dt2w_vibration);
+
+	return count;
+}
+
+static ssize_t dt2w_doubletap2wake_vibration_dump(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	int rc, val;
+
+	rc = kstrtoint(buf, 10, &val);
+	if (rc)
+		return -EINVAL;
+
+	if (val == 0 || val == 1) {
+		if (dt2w_vibration != val)
+			dt2w_vibration = val;
+	} else
+		return -EINVAL;
+
+	return count;
+}
+
+static DEVICE_ATTR(doubletap2wake_vibration, (S_IWUSR|S_IRUGO),
+	dt2w_doubletap2wake_vibration_show, dt2w_doubletap2wake_vibration_dump);
+
 static ssize_t dt2w_version_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -683,6 +716,10 @@ static int __init doubletap2wake_init(void)
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_doubletap2sleep.attr);
 	if (rc) {
 		pr_warn("%s: sysfs_create_file failed for doubletap2sleep\n", __func__);
+	}
+	rc = sysfs_create_file(android_touch_kobj, &dev_attr_doubletap2wake_vibration.attr);
+	if (rc) {
+		pr_warn("%s: sysfs_create_file failed for doubletap2wake_vibration\n", __func__);
 	}
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_doubletap2wake_version.attr);
 	if (rc) {
