@@ -4674,7 +4674,7 @@ retry:
 
 static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
 				  ext4_lblk_t len, loff_t new_size,
-				  int flags, int mode)
+				  int flags)
 {
 	struct inode *inode = file_inode(file);
 	handle_t *handle;
@@ -4847,7 +4847,7 @@ static long ext4_zero_range(struct file *file, loff_t offset,
 		inode_dio_wait(inode);
 
 		ret = ext4_alloc_file_blocks(file, lblk, max_blocks, new_size,
-					     flags, mode);
+					     flags);
 		if (ret)
 			goto out_dio;
 		/*
@@ -4988,7 +4988,7 @@ long ext4_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
 	}
 
 	ret = ext4_alloc_file_blocks(file, lblk, max_blocks, new_size,
-				     flags, mode);
+				     flags);
 	if (ret)
 		goto out;
 
