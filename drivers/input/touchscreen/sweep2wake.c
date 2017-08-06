@@ -63,6 +63,7 @@ MODULE_LICENSE("GPLv2");
 /* If s2w_switch is 1 or 2, sweep2sleep will work when s2s_switch is 1. */
 int s2w_switch = S2W_DEFAULT;
 static int s2s_switch = S2S_DEFAULT;
+static int s2w_vibration = 0;
 static s64 tap_time_pre = 0;
 static int touch_x = 0;
 static int prev_x = 0;
@@ -111,7 +112,8 @@ static void sweep2wake_presspwr(struct work_struct * sweep2wake_presspwr_work)
 
 	// Vibrate when screen on
 #ifdef CONFIG_QPNP_HAPTIC
-	qpnp_hap_td_enable(S2W_VIB_STRENGTH);
+	if (s2w_vibration)
+		qpnp_hap_td_enable(S2W_VIB_STRENGTH);
 #endif
 	mutex_unlock(&pwrkeyworklock);
 }
@@ -425,6 +427,37 @@ static ssize_t s2w_sweep2sleep_dump(struct device *dev,
 static DEVICE_ATTR(sweep2sleep, (S_IWUSR|S_IRUGO),
 	s2w_sweep2sleep_show, s2w_sweep2sleep_dump);
 
+static ssize_t s2w_sweep2wake_vibration_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+
+	count += sprintf(buf, "%d\n", s2w_vibration);
+
+	return count;
+}
+
+static ssize_t s2w_sweep2wake_vibration_dump(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	int rc, val;
+
+	rc = kstrtoint(buf, 10, &val);
+	if (rc)
+		return -EINVAL;
+
+	if (val == 0 || val == 1) {
+		if (s2w_vibration != val)
+			s2w_vibration = val;
+	} else
+		return -EINVAL;
+
+	return count;
+}
+
+static DEVICE_ATTR(sweep2wake_vibration, (S_IWUSR|S_IRUGO),
+	s2w_sweep2wake_vibration_show, s2w_sweep2wake_vibration_dump);
+
 static ssize_t s2w_version_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -534,6 +567,10 @@ static int __init sweep2wake_init(void)
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_sweep2sleep.attr);
 	if (rc) {
 		pr_warn("%s: sysfs_create_file failed for sweep2sleep\n", __func__);
+	}
+	rc = sysfs_create_file(android_touch_kobj, &dev_attr_sweep2wake_vibration.attr);
+	if (rc) {
+		pr_warn("%s: sysfs_create_file failed for sweep2wake_vibration\n", __func__);
 	}
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_sweep2wake_version.attr);
 	if (rc) {
