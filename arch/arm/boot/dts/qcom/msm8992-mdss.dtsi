@@ -103,7 +103,6 @@
 		qcom,mdss-has-rotator-downscale;
 		qcom,mdss-wfd-mode = "intf";
 		qcom,mdss-has-source-split;
-		qcom,mdss-idle-power-collapse-enabled;
 		qcom,mdss-has-dst-split;
 		qcom,mdss-highest-bank-bit = <0x3>;
 		qcom,mdss-has-bwc;
