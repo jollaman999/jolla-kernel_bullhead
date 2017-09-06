@@ -1424,6 +1424,9 @@ struct task_struct {
 #ifdef CONFIG_TREE_PREEMPT_RCU
 	struct rcu_node *rcu_blocked_node;
 #endif /* #ifdef CONFIG_TREE_PREEMPT_RCU */
+#ifdef CONFIG_RCU_BOOST
+	struct rt_mutex *rcu_boost_mutex;
+#endif /* #ifdef CONFIG_RCU_BOOST */
 #ifdef CONFIG_TASKS_RCU
 	unsigned long rcu_tasks_nvcsw;
 	bool rcu_tasks_holdout;
@@ -1804,6 +1807,9 @@ struct task_struct {
 		unsigned int may_oom:1;
 	} memcg_oom;
 #endif
+#ifdef CONFIG_HAVE_HW_BREAKPOINT
+	atomic_t ptrace_bp_refcnt;
+#endif
 #ifdef CONFIG_UPROBES
 	struct uprobe_task *utask;
 #endif
@@ -1941,6 +1947,8 @@ static inline pid_t task_tgid_nr(struct task_struct *tsk)
 
 
 static inline int pid_alive(const struct task_struct *p);
+static inline pid_t task_tgid_nr_ns(struct task_struct *tsk, struct pid_namespace *ns);
+
 static inline pid_t task_ppid_nr_ns(const struct task_struct *tsk, struct pid_namespace *ns)
 {
 	pid_t pid = 0;
@@ -2261,6 +2269,9 @@ static inline void rcu_copy_process(struct task_struct *p)
 	p->rcu_read_lock_nesting = 0;
 	p->rcu_read_unlock_special = 0;
 	p->rcu_blocked_node = NULL;
+#ifdef CONFIG_RCU_BOOST
+	p->rcu_boost_mutex = NULL;
+#endif /* #ifdef CONFIG_RCU_BOOST */
 	INIT_LIST_HEAD(&p->rcu_node_entry);
 #endif /* #ifdef CONFIG_PREEMPT_RCU */
 #ifdef CONFIG_TASKS_RCU
