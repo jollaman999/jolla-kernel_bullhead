@@ -387,7 +387,7 @@ static int cpufreq_sched_setup(struct cpufreq_policy *policy, unsigned int event
 				policy->cpu, policy->min, policy->max,
 				policy->cur);
 
-			clamp_freq = clamp(gd->requested_freq, policy->min, policy->max);
+			clamp_freq = clamp(gd->freq, policy->min, policy->max);
 
 			if (policy->cur != clamp_freq)
 				__cpufreq_driver_target(policy, clamp_freq, CPUFREQ_RELATION_L);
