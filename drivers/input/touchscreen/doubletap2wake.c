@@ -86,9 +86,6 @@ static DEFINE_MUTEX(pwrkeyworklock);
 static struct workqueue_struct *dt2w_input_wq;
 static struct work_struct dt2w_input_work;
 extern bool tomtom_mic_detected;
-#ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-extern bool tomtom_playing;
-#endif
 
 static bool registered = false;
 static DEFINE_MUTEX(reg_lock);
