@@ -121,7 +121,6 @@ static struct workqueue_struct *sovc_track_input_wq;
 static struct work_struct sovc_volume_input_work;
 static struct work_struct sovc_track_input_work;
 extern bool tomtom_mic_detected;
-extern bool tomtom_playing;
 
 static void touch_off(void);
 static void unregister_sovc(void);
