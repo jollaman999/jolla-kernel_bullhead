@@ -147,13 +147,11 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
 {
     tANI_U8                 *pBody, keyId, cfgPrivacyOptImp,
                             defaultKey[SIR_MAC_KEY_LENGTH],
-                            *encrAuthFrame = NULL,
-                            *plainBody = NULL;
+                            encrAuthFrame[LIM_ENCR_AUTH_BODY_LEN],
+                            plainBody[256];
     tANI_U16                frameLen;
     tANI_U32                maxNumPreAuth, val;
-    tSirMacAuthFrameBody    *pRxAuthFrameBody,
-                            *rxAuthFrame = NULL,
-                            *authFrame = NULL;
+    tSirMacAuthFrameBody    *pRxAuthFrameBody, rxAuthFrame, authFrame;
     tpSirMacMgmtHdr         pHdr;
     tCfgWepKeyEntry         *pKeyMapEntry = NULL;
     struct tLimPreAuthNode  *pAuthNode;
@@ -161,7 +159,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
     tANI_U8                 decryptResult;
     tANI_U8                 *pChallenge;
     tANI_U32                key_length=8;
-    tANI_U8                 *challengeTextArray = NULL;
+    tANI_U8                 challengeTextArray[SIR_MAC_AUTH_CHALLENGE_LENGTH];
     tpDphHashNode           pStaDs = NULL;
     tANI_U16                assocId = 0;
     tANI_U16                currSeqNum = 0;
@@ -178,7 +176,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                FL("received Authentication frame with no body from "));
         limPrintMacAddr(pMac, pHdr->sa, LOGE);
 
-        goto free;
+        return;
     }
 
     if (limIsGroupAddr(pHdr->sa))
@@ -189,7 +187,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                FL("received Auth frame from a BC/MC address - "));)
         PELOGE( limPrintMacAddr(pMac, pHdr->sa, LOGE);)
 
-        goto free;
+        return;
     }
     currSeqNum = (pHdr->seqControl.seqNumHi << 4) |
                     (pHdr->seqControl.seqNumLo);
@@ -210,42 +208,6 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                           psessionEntry->defaultAuthFailureTimeout, NULL, eANI_BOOLEAN_FALSE);
     }
 
-    rxAuthFrame = vos_mem_malloc(sizeof(tSirMacAuthFrameBody));
-    if (!rxAuthFrame) {
-        limLog(pMac, LOGE, FL("Failed to allocate memory"));
-        return;
-    }
-
-    authFrame = vos_mem_malloc(sizeof(tSirMacAuthFrameBody));
-    if (!authFrame) {
-        limLog(pMac, LOGE, FL("failed to allocate memory"));
-        goto free;
-    }
-
-    encrAuthFrame = vos_mem_malloc(LIM_ENCR_AUTH_BODY_LEN);
-    if (!encrAuthFrame) {
-        limLog(pMac, LOGE, FL("failed to allocate memory"));
-        goto free;
-    }
-
-    plainBody = vos_mem_malloc(LIM_ENCR_AUTH_BODY_LEN);
-    if (!plainBody) {
-        limLog(pMac, LOGE, FL("failed to allocate memory"));
-        goto free;
-    }
-
-    challengeTextArray = vos_mem_malloc(SIR_MAC_AUTH_CHALLENGE_LENGTH);
-    if(!challengeTextArray) {
-        limLog(pMac, LOGE, FL("failed to allocate memory"));
-        goto free;
-    }
-
-    vos_mem_set(rxAuthFrame, sizeof(tSirMacAuthFrameBody), 0);
-    vos_mem_set(authFrame, sizeof(tSirMacAuthFrameBody), 0);
-    vos_mem_set(encrAuthFrame, LIM_ENCR_AUTH_BODY_LEN, 0);
-    vos_mem_set(plainBody, LIM_ENCR_AUTH_BODY_LEN, 0);
-    vos_mem_set(challengeTextArray, SIR_MAC_AUTH_CHALLENGE_LENGTH, 0);
-
     /// Determine if WEP bit is set in the FC or received MAC header
     if (pHdr->fc.wep)
     {
@@ -262,7 +224,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
 
             limSendDeauthMgmtFrame( pMac, eSIR_MAC_MIC_FAILURE_REASON,
                                     pHdr->sa, psessionEntry, FALSE );
-            goto free;
+            return;
         }
 
         // Extract key ID from IV (most 2 bits of 4th byte of IV)
@@ -280,21 +242,21 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
 
         if (LIM_IS_STA_ROLE(psessionEntry) ||
             LIM_IS_BT_AMP_STA_ROLE(psessionEntry)) {
-            authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-            authFrame->authTransactionSeqNumber = SIR_MAC_AUTH_FRAME_4;
-            authFrame->authStatusCode = eSIR_MAC_CHALLENGE_FAILURE_STATUS;
+            authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+            authFrame.authTransactionSeqNumber = SIR_MAC_AUTH_FRAME_4;
+            authFrame.authStatusCode = eSIR_MAC_CHALLENGE_FAILURE_STATUS;
             // Log error
             PELOGE(limLog(pMac, LOGE,
                    FL("received Authentication frame with wep bit set on role=%d"
                    MAC_ADDRESS_STR), GET_LIM_SYSTEM_ROLE(psessionEntry),
                    MAC_ADDR_ARRAY(pHdr->sa));)
 
-            limSendAuthMgmtFrame(pMac, authFrame,
+            limSendAuthMgmtFrame(pMac, &authFrame,
                                  pHdr->sa,
                                  LIM_NO_WEP_IN_FC,
                                  psessionEntry,
                                  eSIR_FALSE);
-            goto free;
+            return;
         }
 
         if (frameLen < LIM_ENCR_AUTH_BODY_LEN)
@@ -305,7 +267,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                    frameLen);
             limPrintMacAddr(pMac, pHdr->sa, LOGE);
 
-            goto free;
+            return;
         }
         if (LIM_IS_AP_ROLE(psessionEntry)) {
             val = psessionEntry->privacy;
@@ -345,18 +307,18 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                  * an Authentication frame with FC bit set.
                  * Send Auth frame4 with 'out of sequence' status code.
                  */
-                authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                authFrame->authTransactionSeqNumber =
+                authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                authFrame.authTransactionSeqNumber =
                 SIR_MAC_AUTH_FRAME_4;
-                authFrame->authStatusCode =
+                authFrame.authStatusCode =
                 eSIR_MAC_AUTH_FRAME_OUT_OF_SEQ_STATUS;
 
-                limSendAuthMgmtFrame(pMac, authFrame,
+                limSendAuthMgmtFrame(pMac, &authFrame,
                                      pHdr->sa,
                                      LIM_NO_WEP_IN_FC,
                                      psessionEntry,
                                      eSIR_FALSE);
-                goto free;
+                return;
             }
             else
             {
@@ -383,18 +345,18 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                      * out of sequence Auth frame status code.
                      */
 
-                    authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                    authFrame->authTransactionSeqNumber =
+                    authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                    authFrame.authTransactionSeqNumber =
                     SIR_MAC_AUTH_FRAME_4;
-                    authFrame->authStatusCode =
+                    authFrame.authStatusCode =
                     eSIR_MAC_AUTH_FRAME_OUT_OF_SEQ_STATUS;
 
-                    limSendAuthMgmtFrame(pMac, authFrame,
+                    limSendAuthMgmtFrame(pMac, &authFrame,
                                          pHdr->sa,
                                          LIM_NO_WEP_IN_FC,
                                          psessionEntry,
                                          eSIR_FALSE);
-                    goto free;
+                    return;
                 }
             }
 
@@ -417,18 +379,18 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                      * Send Authentication frame
                      * with challenge failure status code
                      */
-                    authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                    authFrame->authTransactionSeqNumber =
+                    authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                    authFrame.authTransactionSeqNumber =
                     SIR_MAC_AUTH_FRAME_4;
-                    authFrame->authStatusCode =
+                    authFrame.authStatusCode =
                     eSIR_MAC_CHALLENGE_FAILURE_STATUS;
 
-                    limSendAuthMgmtFrame(pMac, authFrame,
+                    limSendAuthMgmtFrame(pMac, &authFrame,
                                          pHdr->sa,
                                          LIM_NO_WEP_IN_FC,
                                          psessionEntry,
                                          eSIR_FALSE);
-                    goto free;
+                    return;
                 } // if (!pKeyMapEntry->wepOn)
                 else
                 {
@@ -446,30 +408,30 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
 
                         limDeletePreAuthNode(pMac,
                                              pHdr->sa);
-                        authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                        authFrame->authTransactionSeqNumber =
+                        authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                        authFrame.authTransactionSeqNumber =
                         SIR_MAC_AUTH_FRAME_4;
-                        authFrame->authStatusCode =
+                        authFrame.authStatusCode =
                         eSIR_MAC_CHALLENGE_FAILURE_STATUS;
 
                         limSendAuthMgmtFrame(
-                                            pMac, authFrame,
+                                            pMac, &authFrame,
                                             pHdr->sa,
                                             LIM_NO_WEP_IN_FC,
                                             psessionEntry,
                                             eSIR_FALSE);
 
 
-                        goto free;
+                        return;
                     }
 
                     if ((sirConvertAuthFrame2Struct(pMac, plainBody, frameLen-8,
-                         rxAuthFrame)!=eSIR_SUCCESS ) ||
-                        ( !isAuthValid(pMac, rxAuthFrame,psessionEntry)))
+                         &rxAuthFrame)!=eSIR_SUCCESS ) ||
+                        ( !isAuthValid(pMac, &rxAuthFrame,psessionEntry)))
                     {
                         PELOGE(limLog(pMac, LOGE, FL(
                                "failed to convert Auth Frame to structure or Auth is not valid "));)
-                        goto free;
+                        return;
                     }
                 } // end if (pKeyMapEntry->key == NULL)
             } // if keyMappings has entry
@@ -496,19 +458,19 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                      * with challenge failure status code
                      */
 
-                    authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                    authFrame->authTransactionSeqNumber =
+                    authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                    authFrame.authTransactionSeqNumber =
                     SIR_MAC_AUTH_FRAME_4;
-                    authFrame->authStatusCode =
+                    authFrame.authStatusCode =
                     eSIR_MAC_CHALLENGE_FAILURE_STATUS;
 
-                    limSendAuthMgmtFrame(pMac, authFrame,
+                    limSendAuthMgmtFrame(pMac, &authFrame,
                                          pHdr->sa,
                                          LIM_NO_WEP_IN_FC,
                                          psessionEntry,
                                          eSIR_FALSE);
 
-                    goto free;
+                    return;
                 }
 
                     key_length=val;
@@ -527,27 +489,27 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                        /// ICV failure
                         limDeletePreAuthNode(pMac,
                                              pHdr->sa);
-                        authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                        authFrame->authTransactionSeqNumber =
+                        authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                        authFrame.authTransactionSeqNumber =
                         SIR_MAC_AUTH_FRAME_4;
-                        authFrame->authStatusCode =
+                        authFrame.authStatusCode =
                         eSIR_MAC_CHALLENGE_FAILURE_STATUS;
 
                         limSendAuthMgmtFrame(
-                                            pMac, authFrame,
+                                            pMac, &authFrame,
                                             pHdr->sa,
                                             LIM_NO_WEP_IN_FC,
                                             psessionEntry,
                                             eSIR_FALSE);
-                        goto free;
+                        return;
                     }
                     if ( ( sirConvertAuthFrame2Struct(pMac, plainBody, frameLen-8,
-                          rxAuthFrame)!=eSIR_SUCCESS ) ||
-                        ( !isAuthValid(pMac, rxAuthFrame, psessionEntry) ) )
+                          &rxAuthFrame)!=eSIR_SUCCESS ) ||
+                        ( !isAuthValid(pMac, &rxAuthFrame, psessionEntry) ) )
                     {
                         limLog(pMac, LOGE,
                                FL("failed to convert Auth Frame to structure or Auth is not valid "));
-                        goto free;
+                        return;
                     }
             } // End of check for Key Mapping/Default key presence
         }
@@ -566,34 +528,34 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
              * should have been 'unsupported algorithm' status code.
              */
 
-            authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-            authFrame->authTransactionSeqNumber =
+            authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+            authFrame.authTransactionSeqNumber =
             SIR_MAC_AUTH_FRAME_4;
-            authFrame->authStatusCode =
+            authFrame.authStatusCode =
             eSIR_MAC_CHALLENGE_FAILURE_STATUS;
 
-            limSendAuthMgmtFrame(pMac, authFrame,
+            limSendAuthMgmtFrame(pMac, &authFrame,
                                  pHdr->sa,
                                  LIM_NO_WEP_IN_FC,
                                  psessionEntry,
                                  eSIR_FALSE);
-            goto free;
+            return;
         } // else if (wlan_cfgGetInt(CFG_PRIVACY_OPTION_IMPLEMENTED))
     } // if (fc.wep)
     else
     {
         if ( ( sirConvertAuthFrame2Struct(pMac, pBody,
-            frameLen, rxAuthFrame)!=eSIR_SUCCESS ) ||
-            ( !isAuthValid(pMac, rxAuthFrame,psessionEntry) ) )
+            frameLen, &rxAuthFrame)!=eSIR_SUCCESS ) ||
+            ( !isAuthValid(pMac, &rxAuthFrame,psessionEntry) ) )
         {
             PELOGE(limLog(pMac, LOGE,
                    FL("failed to convert Auth Frame to structure or Auth is not valid "));)
-            goto free;
+            return;
         }
     }
 
 
-    pRxAuthFrameBody = rxAuthFrame;
+    pRxAuthFrameBody = &rxAuthFrame;
 
    PELOGW(limLog(pMac, LOGW,
            FL("Received Auth frame with type=%d seqnum=%d, status=%d (%d)"),
@@ -676,7 +638,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                                 "(staId: %d, assocId: %d) "),
                             pStaDs->staIndex, assocId);
                     limTriggerSTAdeletion(pMac, pStaDs, psessionEntry);
-                    goto free;
+                    return;
                 }
             }
 
@@ -738,7 +700,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                         limSendDeauthMgmtFrame(pMac,
                                eSIR_MAC_UNSPEC_FAILURE_REASON, (tANI_U8 *) pAuthNode->peerMacAddr, psessionEntry, FALSE);
                         limTriggerSTAdeletion(pMac, pStaDs, psessionEntry);
-                        goto free;
+                        return;
                     }
                 }
                 else
@@ -749,7 +711,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                      * in transmission queue
                      * */
                     limLog(pMac, LOGW, FL("STA is initiating Authentication after ACK lost..."));
-                    goto free;
+                    return;
                 }
             }
             if (wlan_cfgGetInt(pMac, WNI_CFG_MAX_NUM_PRE_AUTH,
@@ -771,20 +733,20 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                  * reached. Send Authentication frame
                  * with unspecified failure
                  */
-                authFrame->authAlgoNumber =
+                authFrame.authAlgoNumber =
                 pRxAuthFrameBody->authAlgoNumber;
-                authFrame->authTransactionSeqNumber =
+                authFrame.authTransactionSeqNumber =
                 pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                authFrame->authStatusCode =
+                authFrame.authStatusCode =
                 eSIR_MAC_UNSPEC_FAILURE_STATUS;
 
-                limSendAuthMgmtFrame(pMac, authFrame,
+                limSendAuthMgmtFrame(pMac, &authFrame,
                                      pHdr->sa,
                                      LIM_NO_WEP_IN_FC,
                                      psessionEntry,
                                      eSIR_FALSE);
 
-                goto free;
+                return;
             }
             /// No Pre-auth context exists for the STA.
             if (limIsAuthAlgoSupported(
@@ -804,7 +766,8 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                             limLog(pMac, LOGW,
                                    FL("Max pre-auth nodes reached "));
                             limPrintMacAddr(pMac, pHdr->sa, LOGW);
-                            goto free;
+
+                            return;
                         }
 
                         PELOG1(limLog(pMac, LOG1, FL("Alloc new data: %p peer"), pAuthNode);
@@ -830,13 +793,13 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                          * status code.
                          */
 
-                        authFrame->authAlgoNumber =
+                        authFrame.authAlgoNumber =
                         pRxAuthFrameBody->authAlgoNumber;
-                        authFrame->authTransactionSeqNumber =
+                        authFrame.authTransactionSeqNumber =
                         pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                        authFrame->authStatusCode = eSIR_MAC_SUCCESS_STATUS;
+                        authFrame.authStatusCode = eSIR_MAC_SUCCESS_STATUS;
                         limSendAuthMgmtFrame(
-                                            pMac, authFrame,
+                                            pMac, &authFrame,
                                             pHdr->sa,
                                             LIM_NO_WEP_IN_FC,
                                             psessionEntry,
@@ -886,20 +849,20 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                              * code.
                              */
 
-                            authFrame->authAlgoNumber =
+                            authFrame.authAlgoNumber =
                             pRxAuthFrameBody->authAlgoNumber;
-                            authFrame->authTransactionSeqNumber =
+                            authFrame.authTransactionSeqNumber =
                             pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                            authFrame->authStatusCode =
+                            authFrame.authStatusCode =
                             eSIR_MAC_AUTH_ALGO_NOT_SUPPORTED_STATUS;
 
                             limSendAuthMgmtFrame(
-                                                pMac, authFrame,
+                                                pMac, &authFrame,
                                                 pHdr->sa,
                                                 LIM_NO_WEP_IN_FC,
                                                 psessionEntry,
                                                 eSIR_FALSE);
-                            goto free;
+                            return;
                         }
                         else
                         {
@@ -913,7 +876,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                                        FL("Max pre-auth nodes reached "));
                                 limPrintMacAddr(pMac, pHdr->sa, LOGW);
 
-                                goto free;
+                                return;
                             }
 
                             vos_mem_copy((tANI_U8 *) pAuthNode->peerMacAddr,
@@ -951,34 +914,32 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                                  * unspecified failure status code.
                                  */
 
-                                authFrame->authAlgoNumber =
+                                authFrame.authAlgoNumber =
                                         pRxAuthFrameBody->authAlgoNumber;
-                                authFrame->authTransactionSeqNumber =
+                                authFrame.authTransactionSeqNumber =
                                         pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                                authFrame->authStatusCode =
+                                authFrame.authStatusCode =
                                         eSIR_MAC_UNSPEC_FAILURE_STATUS;
 
-                                limSendAuthMgmtFrame(pMac, authFrame,
+                                limSendAuthMgmtFrame(pMac, &authFrame,
                                                      pHdr->sa,
                                                      LIM_NO_WEP_IN_FC,
                                                      psessionEntry,
                                                      eSIR_FALSE);
 
                                 limDeletePreAuthNode(pMac, pHdr->sa);
-                                goto free;
+                                return;
                             }
 
                             limActivateAuthRspTimer(pMac, pAuthNode);
 
                             pAuthNode->fTimerStarted = 1;
 
-                            /*
-                             * get random bytes and use as challenge text.
-                             */
+                            // get random bytes and use as
+                            // challenge text. If it fails we already have random stack bytes.
                             if( !VOS_IS_STATUS_SUCCESS( vos_rand_get_bytes( 0, (tANI_U8 *)challengeTextArray, SIR_MAC_AUTH_CHALLENGE_LENGTH ) ) )
                             {
                                limLog(pMac, LOGE,FL("Challenge text preparation failed in limProcessAuthFrame"));
-                               goto free;
                             }
 
                             pChallenge = pAuthNode->challengeText;
@@ -991,20 +952,20 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                              * Sending Authenticaton frame with challenge.
                              */
 
-                            authFrame->authAlgoNumber =
+                            authFrame.authAlgoNumber =
                             pRxAuthFrameBody->authAlgoNumber;
-                            authFrame->authTransactionSeqNumber =
+                            authFrame.authTransactionSeqNumber =
                             pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                            authFrame->authStatusCode =
+                            authFrame.authStatusCode =
                             eSIR_MAC_SUCCESS_STATUS;
-                            authFrame->type   = SIR_MAC_CHALLENGE_TEXT_EID;
-                            authFrame->length = SIR_MAC_AUTH_CHALLENGE_LENGTH;
-                            vos_mem_copy(authFrame->challengeText,
+                            authFrame.type   = SIR_MAC_CHALLENGE_TEXT_EID;
+                            authFrame.length = SIR_MAC_AUTH_CHALLENGE_LENGTH;
+                            vos_mem_copy(authFrame.challengeText,
                                          pAuthNode->challengeText,
                                          SIR_MAC_AUTH_CHALLENGE_LENGTH);
 
                             limSendAuthMgmtFrame(
-                                                pMac, authFrame,
+                                                pMac, &authFrame,
                                                 pHdr->sa,
                                                 LIM_NO_WEP_IN_FC,
                                                 psessionEntry,
@@ -1028,20 +989,20 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                          * with auth algorithm not supported status code
                          */
 
-                        authFrame->authAlgoNumber =
+                        authFrame.authAlgoNumber =
                         pRxAuthFrameBody->authAlgoNumber;
-                        authFrame->authTransactionSeqNumber =
+                        authFrame.authTransactionSeqNumber =
                         pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                        authFrame->authStatusCode =
+                        authFrame.authStatusCode =
                         eSIR_MAC_AUTH_ALGO_NOT_SUPPORTED_STATUS;
 
                         limSendAuthMgmtFrame(
-                                            pMac, authFrame,
+                                            pMac, &authFrame,
                                             pHdr->sa,
                                             LIM_NO_WEP_IN_FC,
                                             psessionEntry,
                                             eSIR_FALSE);
-                        goto free;
+                        return;
                 } // end switch(pRxAuthFrameBody->authAlgoNumber)
             } // if (limIsAuthAlgoSupported(pRxAuthFrameBody->authAlgoNumber))
             else
@@ -1057,19 +1018,19 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                  * authentication algorithm requested by sending party.
                  * Reject Authentication with StatusCode=13.
                  */
-                authFrame->authAlgoNumber =
+                authFrame.authAlgoNumber =
                 pRxAuthFrameBody->authAlgoNumber;
-                authFrame->authTransactionSeqNumber =
+                authFrame.authTransactionSeqNumber =
                 pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                authFrame->authStatusCode =
+                authFrame.authStatusCode =
                 eSIR_MAC_AUTH_ALGO_NOT_SUPPORTED_STATUS;
 
-                limSendAuthMgmtFrame(pMac, authFrame,
+                limSendAuthMgmtFrame(pMac, &authFrame,
                                      pHdr->sa,
                                      LIM_NO_WEP_IN_FC,
                                      psessionEntry,
                                      eSIR_FALSE);
-                goto free;
+                return;
             } //end if (limIsAuthAlgoSupported(pRxAuthFrameBody->authAlgoNumber))
             break;
 
@@ -1120,7 +1081,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                     PELOG1(limPrintMacAddr(pMac, pHdr->sa, LOG1);)
                 }
 
-                goto free;
+                return;
 
             }
 
@@ -1196,7 +1157,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                                FL("Max pre-auth nodes reached "));
                         limPrintMacAddr(pMac, pHdr->sa, LOGW);
 
-                        goto free;
+                        return;
                     }
 
                     PELOG1(limLog(pMac, LOG1, FL("Alloc new data: %p peer "), pAuthNode);)
@@ -1245,19 +1206,19 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                                MAC_ADDRESS_STR), pRxAuthFrameBody->authAlgoNumber,
                                MAC_ADDR_ARRAY(pHdr->sa));)
 
-                        authFrame->authAlgoNumber =
+                        authFrame.authAlgoNumber =
                         pRxAuthFrameBody->authAlgoNumber;
-                        authFrame->authTransactionSeqNumber =
+                        authFrame.authTransactionSeqNumber =
                         pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                        authFrame->authStatusCode =
+                        authFrame.authStatusCode =
                         eSIR_MAC_AUTH_ALGO_NOT_SUPPORTED_STATUS;
 
-                        limSendAuthMgmtFrame(pMac, authFrame,
+                        limSendAuthMgmtFrame(pMac, &authFrame,
                                             pHdr->sa,
                                             LIM_NO_WEP_IN_FC,
                                             psessionEntry,
                                             eSIR_FALSE);
-                        goto free;
+                        return;
                     }
                     else
                     {
@@ -1269,7 +1230,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                             PELOGE(limLog(pMac, LOGE,
                                    FL("received Auth frame with invalid challenge text IE"));)
 
-                            goto free;
+                            return;
                         }
 
                         /**
@@ -1293,14 +1254,14 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                                  * Send Auth frame with
                                  * challenge failure status code
                                  */
-                                authFrame->authAlgoNumber =
+                                authFrame.authAlgoNumber =
                                 pRxAuthFrameBody->authAlgoNumber;
-                                authFrame->authTransactionSeqNumber =
+                                authFrame.authTransactionSeqNumber =
                                 pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                                authFrame->authStatusCode =
+                                authFrame.authStatusCode =
                                 eSIR_MAC_CHALLENGE_FAILURE_STATUS;
 
-                                limSendAuthMgmtFrame(pMac, authFrame,
+                                limSendAuthMgmtFrame(pMac, &authFrame,
                                                      pHdr->sa,
                                                      LIM_NO_WEP_IN_FC,
                                                      psessionEntry,
@@ -1309,7 +1270,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                                 limRestoreFromAuthState(pMac, eSIR_SME_NO_KEY_MAPPING_KEY_FOR_PEER,
                                                               eSIR_MAC_UNSPEC_FAILURE_REASON,psessionEntry);
 
-                                goto free;
+                                return;
                             } // if (pKeyMapEntry->key == NULL)
                             else
                             {
@@ -1370,15 +1331,15 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                                 limLog(pMac, LOGP,
                                        FL("could not retrieve Default key"));
 
-                                authFrame->authAlgoNumber =
+                                authFrame.authAlgoNumber =
                                 pRxAuthFrameBody->authAlgoNumber;
-                                authFrame->authTransactionSeqNumber =
+                                authFrame.authTransactionSeqNumber =
                                 pRxAuthFrameBody->authTransactionSeqNumber + 1;
-                                authFrame->authStatusCode =
+                                authFrame.authStatusCode =
                                 eSIR_MAC_CHALLENGE_FAILURE_STATUS;
 
                                 limSendAuthMgmtFrame(
-                                                    pMac, authFrame,
+                                                    pMac, &authFrame,
                                                     pHdr->sa,
                                                     LIM_NO_WEP_IN_FC,
                                                     psessionEntry,
@@ -1457,18 +1418,18 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                  * Shared Key authentication type. Reject with Auth frame4
                  * with 'out of sequence' status code.
                  */
-                authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                authFrame->authTransactionSeqNumber =
+                authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                authFrame.authTransactionSeqNumber =
                 SIR_MAC_AUTH_FRAME_4;
-                authFrame->authStatusCode =
+                authFrame.authStatusCode =
                 eSIR_MAC_AUTH_FRAME_OUT_OF_SEQ_STATUS;
 
-                limSendAuthMgmtFrame(pMac, authFrame,
+                limSendAuthMgmtFrame(pMac, &authFrame,
                                      pHdr->sa,
                                      LIM_NO_WEP_IN_FC,
                                      psessionEntry,
                                      eSIR_FALSE);
-                goto free;
+                return;
             }
 
             if (LIM_IS_AP_ROLE(psessionEntry) ||
@@ -1487,18 +1448,18 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                            MAC_ADDR_ARRAY(pHdr->sa));)
 
                     /// WEP bit is not set in FC of Auth Frame3
-                    authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                    authFrame->authTransactionSeqNumber =
+                    authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                    authFrame.authTransactionSeqNumber =
                     SIR_MAC_AUTH_FRAME_4;
-                    authFrame->authStatusCode =
+                    authFrame.authStatusCode =
                     eSIR_MAC_CHALLENGE_FAILURE_STATUS;
 
-                    limSendAuthMgmtFrame(pMac, authFrame,
+                    limSendAuthMgmtFrame(pMac, &authFrame,
                                          pHdr->sa,
                                          LIM_NO_WEP_IN_FC,
                                          psessionEntry,
                                          eSIR_FALSE);
-                    goto free;
+                    return;
                 }
 
                 pAuthNode = limSearchPreAuthList(pMac,
@@ -1516,18 +1477,18 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                      * Send Auth frame4 with 'out of sequence'
                      * status code.
                      */
-                    authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                    authFrame->authTransactionSeqNumber =
+                    authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                    authFrame.authTransactionSeqNumber =
                     SIR_MAC_AUTH_FRAME_4;
-                    authFrame->authStatusCode =
+                    authFrame.authStatusCode =
                     eSIR_MAC_AUTH_FRAME_OUT_OF_SEQ_STATUS;
 
-                    limSendAuthMgmtFrame(pMac, authFrame,
+                    limSendAuthMgmtFrame(pMac, &authFrame,
                                          pHdr->sa,
                                          LIM_NO_WEP_IN_FC,
                                          psessionEntry,
                                          eSIR_FALSE);
-                    goto free;
+                    return;
                 }
 
                 if (pAuthNode->mlmState == eLIM_MLM_AUTH_RSP_TIMEOUT_STATE)
@@ -1542,14 +1503,14 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                      * Reject by sending Auth Frame4 with
                      * Auth respone timeout Status Code.
                      */
-                    authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                    authFrame->authTransactionSeqNumber =
+                    authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                    authFrame.authTransactionSeqNumber =
                     SIR_MAC_AUTH_FRAME_4;
-                    authFrame->authStatusCode =
+                    authFrame.authStatusCode =
                     eSIR_MAC_AUTH_RSP_TIMEOUT_STATUS;
 
                     limSendAuthMgmtFrame(
-                                        pMac, authFrame,
+                                        pMac, &authFrame,
                                         pHdr->sa,
                                         LIM_NO_WEP_IN_FC,
                                         psessionEntry,
@@ -1559,7 +1520,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                     limDeletePreAuthNode(pMac,
                                          pHdr->sa);
 
-                    goto free;
+                    return;
                 } // end switch (pAuthNode->mlmState)
 
                 if (pRxAuthFrameBody->authStatusCode != eSIR_MAC_SUCCESS_STATUS)
@@ -1576,7 +1537,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                            MAC_ADDRESS_STR), pRxAuthFrameBody->authStatusCode,
                            MAC_ADDR_ARRAY(pHdr->sa));)
 
-                    goto free;
+                    return;
                 }
 
                 /**
@@ -1601,12 +1562,12 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                     /**
                      * Send Authentication Frame4 with 'success' Status Code.
                      */
-                    authFrame->authAlgoNumber = eSIR_SHARED_KEY;
-                    authFrame->authTransactionSeqNumber =
+                    authFrame.authAlgoNumber = eSIR_SHARED_KEY;
+                    authFrame.authTransactionSeqNumber =
                         SIR_MAC_AUTH_FRAME_4;
-                    authFrame->authStatusCode = eSIR_MAC_SUCCESS_STATUS;
+                    authFrame.authStatusCode = eSIR_MAC_SUCCESS_STATUS;
 
-                    limSendAuthMgmtFrame(pMac, authFrame,
+                    limSendAuthMgmtFrame(pMac, &authFrame,
                                          pHdr->sa,
                                          LIM_NO_WEP_IN_FC,
                                          psessionEntry,
@@ -1639,19 +1600,19 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                      * delete STA context.
                      */
 
-                    authFrame->authAlgoNumber =
+                    authFrame.authAlgoNumber =
                         pRxAuthFrameBody->authAlgoNumber;
-                    authFrame->authTransactionSeqNumber =
+                    authFrame.authTransactionSeqNumber =
                         SIR_MAC_AUTH_FRAME_4;
-                    authFrame->authStatusCode =
+                    authFrame.authStatusCode =
                         eSIR_MAC_CHALLENGE_FAILURE_STATUS;
 
-                    limSendAuthMgmtFrame(pMac, authFrame,
+                    limSendAuthMgmtFrame(pMac, &authFrame,
                                          pHdr->sa,
                                          LIM_NO_WEP_IN_FC,
                                          psessionEntry,
                                          eSIR_FALSE);
-                    goto free;
+                    return;
                 }
             } // if (pMac->lim.gLimSystemRole == eLIM_AP_ROLE || ...
 
@@ -1672,7 +1633,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                        MAC_ADDRESS_STR), psessionEntry->limMlmState,
                        MAC_ADDR_ARRAY(pHdr->sa));)
 
-                goto free;
+                return;
             }
 
             if (pRxAuthFrameBody->authAlgoNumber != eSIR_SHARED_KEY)
@@ -1690,7 +1651,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                            MAC_ADDRESS_STR), pRxAuthFrameBody->authAlgoNumber,
                        MAC_ADDR_ARRAY(pHdr->sa));)
 
-                goto free;
+                return;
             }
 
             if ( !vos_mem_compare((tANI_U8 *) pHdr->sa,
@@ -1745,7 +1706,7 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
                            FL("Max pre-auth nodes reached "));
                     limPrintMacAddr(pMac, pHdr->sa, LOGW);
 
-                    goto free;
+                    return;
                 }
                 PELOG1(limLog(pMac, LOG1, FL("Alloc new data: %p peer "), pAuthNode);
                 limPrintMacAddr(pMac, pHdr->sa, LOG1);)
@@ -1793,19 +1754,6 @@ limProcessAuthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession pse
 
             break;
     } // end switch (pRxAuthFrameBody->authTransactionSeqNumber)
-
-free:
-    if (authFrame)
-        vos_mem_free(authFrame);
-    if (rxAuthFrame)
-        vos_mem_free(rxAuthFrame);
-    if (encrAuthFrame)
-        vos_mem_free(encrAuthFrame);
-    if (plainBody)
-        vos_mem_free(plainBody);
-    if (challengeTextArray)
-        vos_mem_free(challengeTextArray);
-
 } /*** end limProcessAuthFrame() ***/
 
 
