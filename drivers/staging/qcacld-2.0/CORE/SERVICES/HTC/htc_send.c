@@ -645,9 +645,9 @@ static A_STATUS HTCIssuePackets(HTC_TARGET       *target,
 	target->CE_send_cnt++;
 
         if (adf_os_unlikely(A_FAILED(status))) {
-            /* TODO : if more than 1 endpoint maps to the same PipeID it is possible
-             * to run out of resources in the HIF layer. Don't emit the error */
-            AR_DEBUG_PRINTF(ATH_DEBUG_ERR, ("HIFSend Failed status: %d\n", status));
+                /* TODO : if more than 1 endpoint maps to the same PipeID it is possible
+                 * to run out of resources in the HIF layer. Don't emit the error */
+                AR_DEBUG_PRINTF(ATH_DEBUG_ERR, ("HIFSend Failed status:%d \n",status));
             LOCK_HTC_TX(target);
 	    target->CE_send_cnt--;
             pEndpoint->ul_outstanding_cnt--;
@@ -1114,14 +1114,10 @@ static HTC_SEND_QUEUE_RESULT HTCTrySend(HTC_TARGET       *target,
             /*
              * Header and payload belongs to the different fragments and
              * consume 2 resource for one HTC package but USB conbime into
-             * one transfer. And one WMI message only consumes one single
-             * resource.
+             * one transfer.
              */
             if (HTC_ENABLE_BUNDLE(target) && tx_resources) {
-                if (pEndpoint->ServiceID == WMI_CONTROL_SVC)
-                    tx_resources = HTC_MAX_MSG_PER_BUNDLE_TX;
-                else
-                    tx_resources = (HTC_MAX_MSG_PER_BUNDLE_TX * 2);
+                tx_resources = (HTC_MAX_MSG_PER_BUNDLE_TX * 2);
             }
 #endif
 #endif
@@ -1330,7 +1326,7 @@ A_STATUS HTCSendDataPkt(HTC_HANDLE HTCHandle, adf_nbuf_t       netbuf, int Epid,
     NBUF_UPDATE_TX_PKT_COUNT(netbuf, NBUF_TX_PKT_HTC);
     DPTRACE(adf_dp_trace(netbuf, ADF_DP_TRACE_HTC_PACKET_PTR_RECORD,
                 adf_nbuf_data_addr(netbuf),
-                sizeof(adf_nbuf_data(netbuf)), ADF_TX));
+                sizeof(adf_nbuf_data(netbuf))));
 
     status = HIFSend_head(target->hif_dev,
             pEndpoint->UL_PipeID,
@@ -1844,7 +1840,21 @@ void HTCProcessCreditRpt(HTC_TARGET *target, HTC_CREDIT_REPORT *pRpt, int NumEnt
             if (pEndpoint->ServiceID == HTT_DATA_MSG_SVC){
                 HTCSendDataPkt(target, NULL, 0);
             } else {
-                HTCTrySend(target,pEndpoint,NULL);
+#ifdef HIF_SDIO
+                if (WLAN_IS_EPPING_ENABLED(vos_get_conparam())) {
+                    if (((pEndpoint->ServiceID == WMI_DATA_BE_SVC) &&
+                        (pEndpoint->TxCreditFlowEnabled)          &&
+                        (pEndpoint->TxCredits >= HTC_MAX_MSG_PER_BUNDLE_TX + 1)) ||
+                        (target->is_nodrop_pkt)) {
+                        /* Bundle TX for mboxping test */
+                        HTCTrySend(target, pEndpoint, NULL);
+                    }
+                } else {
+#endif
+                    HTCTrySend(target,pEndpoint,NULL);
+#ifdef HIF_SDIO
+                }
+#endif
             }
 #endif
             LOCK_HTC_TX(target);

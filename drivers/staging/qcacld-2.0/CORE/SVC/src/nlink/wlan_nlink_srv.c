@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -32,6 +32,15 @@
 *
 ******************************************************************************/
 
+/*
+ * If MULTI_IF_NAME is not defined, then this is the primary instance of the
+ * driver and the diagnostics netlink socket will be available. If
+ * MULTI_IF_NAME is defined then this is not the primary instance of the driver
+ * and the diagnotics netlink socket will not be available since this
+ * diagnostics netlink socket can only be exposed by one instance of the driver.
+ */
+#ifndef MULTI_IF_NAME
+
 #include <linux/version.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -43,207 +52,13 @@
 #include <wlan_nlink_srv.h>
 #include <vos_trace.h>
 
-#if defined(CONFIG_CNSS_LOGGER)
-
-#include <net/cnss_logger.h>
-
-static int radio_idx = -EINVAL;
-static void *wiphy_ptr;
-static bool logger_initialized;
-
-/**
- * nl_srv_init() - wrapper function to register to cnss_logger
- * @wiphy:	the pointer to the wiphy structure
- *
- * The netlink socket is no longer initialized in the driver itself, instead
- * will be initialized in the cnss_logger module, the driver should register
- * itself to cnss_logger module to get the radio_index for all the netlink
- * operation. (cfg80211 vendor command is using different netlink socket).
- *
- * The cnss_logger_device_register() use to register the driver with the
- * wiphy structure and the module name (debug purpose) and then return the
- * radio_index depending on the availibility.
- *
- * Return: radio index for success and -EINVAL for failure
- */
-int nl_srv_init(void *wiphy)
-{
-	if (logger_initialized)
-		goto initialized;
-
-	wiphy_ptr = wiphy;
-	radio_idx = cnss_logger_device_register(wiphy, THIS_MODULE->name);
-	VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-		  "%s: radio_index: %d", __func__, radio_idx);
-
-	if (radio_idx >= 0)
-		logger_initialized = true;
-
-initialized:
-	return radio_idx;
-}
-
-/**
- * nl_srv_exit() - wrapper function to unregister from cnss_logger
- *
- * The cnss_logger_device_unregister() use to unregister the driver with
- * the radio_index assigned and wiphy structure from cnss_logger.
- *
- * Return: None
- */
-void nl_srv_exit(void)
-{
-	if (logger_initialized) {
-		cnss_logger_device_unregister(radio_idx, wiphy_ptr);
-		radio_idx = -EINVAL;
-		wiphy_ptr = NULL;
-		logger_initialized = false;
-	}
-}
-
-/**
- * nl_srv_ucast() - wrapper function to do unicast tx through cnss_logger
- * @skb:	the socket buffer to send
- * @dst_pid:	the port id
- * @flag:	the blocking or nonblocking flag
- *
- * The nl_srv_is_initialized() is used to do sanity check if the netlink
- * service is ready, e.g if the radio_index is assigned properly, if not
- * the driver should take the responsibility to free the skb.
- *
- * The cnss_logger_nl_ucast() use the same parameters to send the socket
- * buffers.
- *
- * Return: the error of the transmission status
- */
-int nl_srv_ucast(struct sk_buff *skb, int dst_pid, int flag)
-{
-	int err = -EINVAL;
-
-	/* sender's pid */
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 7, 0))
-	NETLINK_CB(skb).pid = 0;
-#else
-	NETLINK_CB(skb).portid = 0;
+#ifdef CNSS_GENL
+#include <vos_memory.h>
+#include <wlan_nlink_common.h>
+#include <net/genetlink.h>
+#include <net/cnss_nl.h>
 #endif
-	/* not multicast */
-	NETLINK_CB(skb).dst_group = 0;
 
-	if (nl_srv_is_initialized() == 0)
-		err = cnss_logger_nl_ucast(skb, dst_pid, flag);
-	else
-		dev_kfree_skb(skb);
-	return err;
-}
-
-/**
- * nl_srv_bcast() - wrapper function to do broadcast tx through cnss_logger
- * @skb:	the socket buffer to send
- *
- * The cnss_logger_nl_bcast() is used to transmit the socket buffer.
- *
- * Return: status of transmission
- */
-int nl_srv_bcast(struct sk_buff *skb)
-{
-	int err = -EINVAL;
-	int flags = GFP_KERNEL;
-
-	if (in_interrupt() || irqs_disabled() || in_atomic())
-		flags = GFP_ATOMIC;
-
-	/* sender's pid */
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 7, 0))
-	NETLINK_CB(skb).pid = 0;
-#else
-	NETLINK_CB(skb).portid = 0;
-#endif
-	 /* destination group */
-	NETLINK_CB(skb).dst_group = WLAN_NLINK_MCAST_GRP_ID;
-
-	if (nl_srv_is_initialized() == 0)
-		err = cnss_logger_nl_bcast(skb, WLAN_NLINK_MCAST_GRP_ID, flags);
-	else
-		dev_kfree_skb(skb);
-	return err;
-}
-
-/**
- * nl_srv_unregister() - wrapper function to unregister event to cnss_logger
- * @msg_type:		the message to unregister
- * @msg_handler:	the message handler
- *
- * The cnss_logger_event_unregister() is used to unregister the message and
- * message handler.
- *
- * Return: 0 if successfully unregister, otherwise proper error code
- */
-int nl_srv_unregister(tWlanNlModTypes msg_type, nl_srv_msg_callback msg_handler)
-{
-	int ret = -EINVAL;
-
-	if (nl_srv_is_initialized() != 0)
-		return ret;
-
-	if ((msg_type >= WLAN_NL_MSG_BASE) && (msg_type < WLAN_NL_MSG_MAX) &&
-	    msg_handler != NULL) {
-		ret = cnss_logger_event_unregister(radio_idx, msg_type,
-						   msg_handler);
-	} else {
-		VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-			  "NLINK: nl_srv_unregister failed for msg_type %d",
-			  msg_type);
-		ret = -EINVAL;
-	}
-
-	return ret;
-}
-
-/**
- * nl_srv_register() - wrapper function to register event to cnss_logger
- * @msg_type:		the message to register
- * @msg_handler:	the message handler
- *
- * The cnss_logger_event_register() is used to register the message and
- * message handler.
- *
- * Return: 0 if successfully register, otherwise proper error code
- */
-int nl_srv_register(tWlanNlModTypes msg_type, nl_srv_msg_callback msg_handler)
-{
-	int ret = -EINVAL;
-
-	if (nl_srv_is_initialized() != 0)
-		return ret;
-
-	if ((msg_type >= WLAN_NL_MSG_BASE) && (msg_type < WLAN_NL_MSG_MAX) &&
-	    msg_handler != NULL) {
-		ret = cnss_logger_event_register(radio_idx, msg_type,
-						 msg_handler);
-	} else {
-		VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-			  "NLINK: nl_srv_register failed for msg_type %d",
-			  msg_type);
-		ret = -EINVAL;
-	}
-
-	return ret;
-}
-
-/**
- * nl_srv_is_initialized() - check if netlink service is initialized
- *
- * Return: 0 if it is initialized, otherwise error code
- */
-inline int nl_srv_is_initialized(void)
-{
-	if (logger_initialized)
-		return 0;
-	else
-		return -EPERM;
-}
-
-#elif !defined(MULTI_IF_NAME)
 /* Global variables */
 static DEFINE_MUTEX(nl_srv_sem);
 static struct sock *nl_srv_sock;
@@ -258,7 +73,7 @@ static void nl_srv_rcv_msg (struct sk_buff *skb, struct nlmsghdr *nlh);
  * Initialize the netlink service.
  * Netlink service is usable after this.
  */
-int nl_srv_init(void *wiphy)
+int nl_srv_init(void)
 {
    int retcode = 0;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,6,0))
@@ -293,7 +108,11 @@ int nl_srv_init(void *wiphy)
  * Deinit the netlink service.
  * Netlink service is unusable after this.
  */
+#ifdef WLAN_KD_READY_NOTIFIER
+void nl_srv_exit(int dst_pid)
+#else
 void nl_srv_exit(void)
+#endif /* WLAN_KD_READY_NOTIFIER */
 {
    netlink_kernel_release(nl_srv_sock);
    nl_srv_sock = NULL;
@@ -343,6 +162,195 @@ int nl_srv_unregister(tWlanNlModTypes msg_type, nl_srv_msg_callback msg_handler)
    return retcode;
 }
 
+#ifdef CNSS_GENL
+
+/**
+ * nl80211hdr_put() - API to fill genlmsg header
+ * @skb: Sk buffer
+ * @portid: Port ID
+ * @seq: Sequence number
+ * @flags: Flags
+ * @cmd: Command id
+ *
+ * API to fill genl message header for brodcast events to user space
+ *
+ * Return: Pointer to user specific header/payload
+ */
+static inline void *nl80211hdr_put(struct sk_buff *skb, uint32_t portid,
+					uint32_t seq, int flags, uint8_t cmd)
+{
+	struct genl_family *cld80211_fam = cld80211_get_genl_family();
+
+	return genlmsg_put(skb, portid, seq, cld80211_fam, flags, cmd);
+}
+
+/**
+ * cld80211_fill_data() - API to fill payload to nl message
+ * @msg: Sk buffer
+ * @portid: Port ID
+ * @seq: Sequence number
+ * @flags: Flags
+ * @cmd: Command ID
+ * @buf: data buffer/payload to be filled
+ * @len: length of the payload ie. @buf
+ *
+ * API to fill the payload/data of the nl message to be sent
+ *
+ * Return: zero on success
+ */
+static int cld80211_fill_data(struct sk_buff *msg, uint32_t portid,
+					uint32_t seq, int flags, uint8_t cmd,
+					uint8_t *buf, int len)
+{
+	void *hdr;
+	struct nlattr *nest;
+
+	hdr = nl80211hdr_put(msg, portid, seq, flags, cmd);
+	if (!hdr) {
+		VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+						"nl80211 hdr put failed");
+		return -EPERM;
+	}
+
+	nest = nla_nest_start(msg, CLD80211_ATTR_VENDOR_DATA);
+	if (!nest) {
+		VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+						"nla_nest_start failed");
+		goto nla_put_failure;
+	}
+
+	if (nla_put(msg, CLD80211_ATTR_DATA, len, buf)) {
+		VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+							"nla_put failed");
+		goto nla_put_failure;
+	}
+
+	nla_nest_end(msg, nest);
+	genlmsg_end(msg, hdr);
+
+	return 0;
+nla_put_failure:
+	genlmsg_cancel(msg, hdr);
+	return -EPERM;
+}
+
+/**
+ * send_msg_to_cld80211() - API to send message to user space Application
+ * @cld_mcgroup_id: Multicast group ID
+ * @pid: Port ID
+ * @app_id: Application ID
+ * @buf: Data/payload buffer to be sent
+ * @len: Length of the data ie. @buf
+ *
+ * API to send the nl message to user space application.
+ *
+ * Return: zero on success
+ */
+static int send_msg_to_cld80211(enum cld80211_multicast_groups cld_mcgroup_id,
+				int pid, int app_id, uint8_t *buf, int len)
+{
+	struct sk_buff *msg;
+	int status;
+	int flags = GFP_KERNEL;
+	int mcgroup_id;
+
+	if (in_interrupt() || irqs_disabled() || in_atomic())
+		flags = GFP_ATOMIC;
+
+	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, flags);
+	if (!msg) {
+		VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+						"nlmsg malloc fails");
+		return -EPERM;
+	}
+
+	status = cld80211_fill_data(msg, pid, 0, 0, app_id, buf, len);
+	if (status) {
+		nlmsg_free(msg);
+		return -EPERM;
+	}
+	mcgroup_id = cld80211_get_mcgrp_id(cld_mcgroup_id);
+	if (mcgroup_id == -1) {
+		nlmsg_free(msg);
+		return -EINVAL;
+	}
+	genlmsg_multicast_netns(&init_net, msg, 0, mcgroup_id, flags);
+	return 0;
+}
+
+/**
+ * nl_srv_bcast() - wrapper function to do broadcast events to user space apps
+ * @skb: the socket buffer to send
+ * @mcgroup_id: multicast group id
+ * @app_id: application id
+ *
+ * This function is common wrapper to send broadcast events to different
+ * user space applications.
+ *
+ * return: none
+ */
+int nl_srv_bcast(struct sk_buff *skb, int mcgroup_id, int app_id)
+{
+	struct nlmsghdr *nlh = (struct nlmsghdr *)skb->data;
+	void *msg = NLMSG_DATA(nlh);
+	uint32_t msg_len = nlmsg_len(nlh);
+	uint8_t *tempbuf;
+	int status;
+
+	tempbuf = (uint8_t *)vos_mem_malloc(msg_len);
+	vos_mem_copy(tempbuf, msg, msg_len);
+	status = send_msg_to_cld80211(mcgroup_id, 0, app_id, tempbuf, msg_len);
+	if (status) {
+		VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+			"send msg to cld80211 fails for app id %d", app_id);
+		return -EPERM;
+	}
+
+	dev_kfree_skb(skb);
+	vos_mem_free(tempbuf);
+	return 0;
+}
+
+/**
+ * nl_srv_ucast() - wrapper function to do unicast events to user space apps
+ * @skb: the socket buffer to send
+ * @dst_pid: destination process IF
+ * @flag: flags
+ * @app_id: application id
+ * @mcgroup_id: Multicast group ID
+ *
+ * This function is common wrapper to send unicast events to different
+ * user space applications. This internally used broadcast API with multicast
+ * group mcgrp_id. This wrapper serves as a common API in both
+ * new generic netlink infra and legacy implementation.
+ *
+ * return: zero on success, error code otherwise
+ */
+int nl_srv_ucast(struct sk_buff *skb, int dst_pid, int flag,
+					int app_id, int mcgroup_id)
+{
+	struct nlmsghdr *nlh = (struct nlmsghdr *)skb->data;
+	void *msg = NLMSG_DATA(nlh);
+	uint32_t msg_len = nlmsg_len(nlh);
+	uint8_t *tempbuf;
+	int status;
+
+	tempbuf = (uint8_t *)vos_mem_malloc(msg_len);
+	vos_mem_copy(tempbuf, msg, msg_len);
+	status = send_msg_to_cld80211(mcgroup_id, dst_pid, app_id,
+					tempbuf, msg_len);
+	if (status) {
+		VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
+			"send msg to cld80211 fails for app id %d", app_id);
+		return -EPERM;
+	}
+
+	dev_kfree_skb(skb);
+	vos_mem_free(tempbuf);
+	return 0;
+}
+
+#else
 /*
  * Unicast the message to the process in user space identfied
  * by the dst-pid
@@ -371,10 +379,6 @@ int nl_srv_ucast(struct sk_buff *skb, int dst_pid, int flag)
    return err;
 }
 
-/*
- *  Broadcast the message. Broadcast will return an error if
- *  there are no listeners
- */
 int nl_srv_bcast(struct sk_buff *skb)
 {
    int err = 0;
@@ -395,7 +399,7 @@ int nl_srv_bcast(struct sk_buff *skb)
    } else {
        dev_kfree_skb(skb);
    }
-   if ((err < 0) && (err != -ESRCH))
+   if (err < 0)
    {
       VOS_TRACE( VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_WARN,
          "NLINK: netlink_broadcast failed err = %d", err);
@@ -403,13 +407,15 @@ int nl_srv_bcast(struct sk_buff *skb)
    return err;
 }
 
+#endif
+
 /*
  *  Processes the Netlink socket input queue.
  *  Dequeue skb's from the socket input queue and process
  *  all the netlink messages in that skb, before moving
  *  to the next skb.
  */
-static void nl_srv_rcv(struct sk_buff *sk)
+static void nl_srv_rcv (struct sk_buff *sk)
 {
    mutex_lock(&nl_srv_sem);
    nl_srv_rcv_skb(sk);

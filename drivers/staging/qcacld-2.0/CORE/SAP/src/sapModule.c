@@ -93,6 +93,9 @@
 /*----------------------------------------------------------------------------
  *  External declarations for global context
  * -------------------------------------------------------------------------*/
+//  No!  Get this from VOS.
+//  The main per-Physical Link (per WLAN association) context.
+ptSapContext  gpSapCtx;
 
 /*----------------------------------------------------------------------------
  * Static Variable Definitions
@@ -110,32 +113,76 @@
  * Function Declarations and Documentation
  * -------------------------------------------------------------------------*/
 
-/**
- * WLANSAP_Open() - WLAN SAP open function call
- * @pvosGCtx: Pointer to the global vos context; a handle to SAP's
- *
- * Called at driver initialization (vos_open). SAP will initialize
- * all its internal resources and will wait for the call to start to
- * register with the other modules.
- *
- * Return: Pointer to the SAP context
- */
-v_PVOID_t WLANSAP_Open(v_PVOID_t  pvosGCtx)
+/*==========================================================================
+  FUNCTION    WLANSAP_Open
+
+  DESCRIPTION
+    Called at driver initialization (vos_open). SAP will initialize
+    all its internal resources and will wait for the call to start to
+    register with the other modules.
+
+  DEPENDENCIES
+
+  PARAMETERS
+
+    IN
+    pvosGCtx    : Pointer to the global vos context; a handle to SAP's
+
+  RETURN VALUE
+    The result code associated with performing the operation
+
+#ifdef WLAN_FEATURE_MBSSID
+    v_PVOID_t   : Pointer to the SAP context
+#else
+    VOS_STATUS_E_FAULT: Pointer to SAP cb is NULL ; access would cause a page
+                         fault
+    VOS_STATUS_SUCCESS: Success
+#endif
+
+  SIDE EFFECTS
+============================================================================*/
+#ifdef WLAN_FEATURE_MBSSID
+v_PVOID_t
+#else
+VOS_STATUS
+#endif
+WLANSAP_Open
+(
+    v_PVOID_t  pvosGCtx
+)
 {
     ptSapContext pSapCtx = NULL;
 
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-    /* dyamically allocate the sapContext */
+#ifdef WLAN_FEATURE_MBSSID
+    // amically allocate the sapContext
     pSapCtx = (ptSapContext)vos_mem_malloc(sizeof(tSapContext));
+#else
+    if (NULL == pvosGCtx)
+    {
+       VOS_ASSERT(pvosGCtx);
+       return VOS_STATUS_E_FAULT;
+    }
+    /*------------------------------------------------------------------------
+         Allocate (and sanity check?!) SAP control block
+       ------------------------------------------------------------------------*/
+    vos_alloc_context(pvosGCtx, VOS_MODULE_ID_SAP, (v_VOID_t **)&pSapCtx, sizeof(tSapContext));
+#endif
 
     if (NULL == pSapCtx)
     {
         VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_ERROR,
                    "%s: Invalid SAP pointer from pvosGCtx", __func__);
+#ifdef WLAN_FEATURE_MBSSID
         return NULL;
+#else
+        return VOS_STATUS_E_FAULT;
+#endif
     }
 
-    /* Clean up SAP control block, initialize all values */
+    /*------------------------------------------------------------------------
+        Clean up SAP control block, initialize all values
+       ------------------------------------------------------------------------*/
     VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH, "WLANSAP_Open");
 
     WLANSAP_CleanCB(pSapCtx, 0 /*do not empty*/);
@@ -143,66 +190,82 @@ v_PVOID_t WLANSAP_Open(v_PVOID_t  pvosGCtx)
     // Setup the "link back" to the VOSS context
     pSapCtx->pvosGCtx = pvosGCtx;
 
+    // Store a pointer to the SAP context provided by VOSS
+    gpSapCtx = pSapCtx;
+
+    /*------------------------------------------------------------------------
+        Allocate internal resources
+       ------------------------------------------------------------------------*/
+
+#ifdef WLAN_FEATURE_MBSSID
     return pSapCtx;
+#else
+    return VOS_STATUS_SUCCESS;
+#endif
 }// WLANSAP_Open
 
-/**
- * WLANSAP_Start() - wlan start SAP.
- * @pCtx: Pointer to the global cds context; a handle to SAP's
- * control block can be extracted from its context
- * When MBSSID feature is enabled, SAP context is directly
- * passed to SAP APIs
- * @mode: Device mode
- * @addr: MAC address of the SAP
- * @session_id: Pointer to the session id
- *
- * Called as part of the overall start procedure (cds_enable). SAP will
- * use this call to register with TL as the SAP entity for SAP RSN frames.
- *
- * Return: The result code associated with performing the operation
- *         VOS_STATUS_E_FAULT: Pointer to SAP cb is NULL;
- *         access would cause a page fault.
- *         VOS_STATUS_SUCCESS: Success
- */
+/*==========================================================================
+  FUNCTION    WLANSAP_Start
+
+  DESCRIPTION
+    Called as part of the overall start procedure (vos_start). SAP will
+    use this call to register with TL as the SAP entity for
+    SAP RSN frames.
+
+  DEPENDENCIES
+
+  PARAMETERS
+
+    IN
+    pCtx    : Pointer to the global vos context; a handle to SAP's
+                  control block can be extracted from its context
+                  When MBSSID feature is enabled, SAP context is directly
+                  passed to SAP APIs
+
+  RETURN VALUE
+    The result code associated with performing the operation
+
+    VOS_STATUS_E_FAULT: Pointer to SAP cb is NULL ; access would cause a page
+                         fault
+    VOS_STATUS_SUCCESS: Success
+
+  SIDE EFFECTS
+============================================================================*/
+
 VOS_STATUS
 WLANSAP_Start
 (
-    v_PVOID_t pCtx,
-    tVOS_CON_MODE mode,
-    uint8_t *addr,
-    uint32_t *session_id
+    v_PVOID_t pCtx
 )
 {
     ptSapContext pSapCtx = NULL;
-    VOS_STATUS vos_status;
-    tHalHandle hal;
 
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
-            "WLANSAP_Start invoked successfully");
+                 "WLANSAP_Start invoked successfully");
     /*------------------------------------------------------------------------
-      Sanity check
-      Extract SAP control block
-      ------------------------------------------------------------------------*/
+        Sanity check
+        Extract SAP control block
+    ------------------------------------------------------------------------*/
     pSapCtx = VOS_GET_SAP_CB(pCtx);
 
     if ( NULL == pSapCtx )
     {
         VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_ERROR,
-                "%s: Invalid SAP pointer from pCtx", __func__);
+                   "%s: Invalid SAP pointer from pCtx", __func__);
         return VOS_STATUS_E_FAULT;
     }
 
     /*------------------------------------------------------------------------
-      For now, presume security is not enabled.
-      -----------------------------------------------------------------------*/
+        For now, presume security is not enabled.
+    -----------------------------------------------------------------------*/
     pSapCtx->ucSecEnabled = WLANSAP_SECURITY_ENABLED_STATE;
 
 
     /*------------------------------------------------------------------------
-      Now configure the roaming profile links. To SSID and bssid.
-      ------------------------------------------------------------------------*/
+        Now configure the roaming profile links. To SSID and bssid.
+    ------------------------------------------------------------------------*/
     // We have room for two SSIDs.
     pSapCtx->csrRoamProfile.SSIDs.numOfSSIDs = 1; // This is true for now.
     pSapCtx->csrRoamProfile.SSIDs.SSIDList = pSapCtx->SSIDList;  //Array of two
@@ -212,9 +275,6 @@ WLANSAP_Start
 
     pSapCtx->csrRoamProfile.BSSIDs.numOfBSSIDs = 1; // This is true for now.
     pSapCtx->csrRoamProfile.BSSIDs.bssid = &pSapCtx->bssid;
-    pSapCtx->csrRoamProfile.csrPersona = mode;
-    vos_mem_copy(pSapCtx->self_mac_addr, addr, VOS_MAC_ADDR_SIZE);
-    vos_event_init(&pSapCtx->sap_session_opened_evt);
 
     // Now configure the auth type in the roaming profile. To open.
     pSapCtx->csrRoamProfile.negotiatedAuthType = eCSR_AUTH_TYPE_OPEN_SYSTEM; // open is the default
@@ -222,22 +282,10 @@ WLANSAP_Start
     if( !VOS_IS_STATUS_SUCCESS( vos_lock_init( &pSapCtx->SapGlobalLock)))
     {
         VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_ERROR,
-                "WLANSAP_Start failed init lock");
+                 "WLANSAP_Start failed init lock");
         return VOS_STATUS_E_FAULT;
     }
-    hal = (tHalHandle) VOS_GET_HAL_CB(pSapCtx->pvosGCtx);
-    if (!hal) {
-        VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_ERROR,
-                  FL("Invalid HAL pointer"));
-        return VOS_STATUS_E_FAULT;
-    }
-    vos_status = sap_OpenSession(hal, pSapCtx, session_id);
-    if (VOS_STATUS_SUCCESS != vos_status) {
-        VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_ERROR,
-                "Error: In %s calling sap_OpenSession status = %d",
-                __func__, vos_status);
-        return VOS_STATUS_E_FAILURE;
-    }
+
     return VOS_STATUS_SUCCESS;
 }/* WLANSAP_Start */
 
@@ -277,7 +325,10 @@ WLANSAP_Stop
 {
     ptSapContext pSapCtx = NULL;
 
-    /* Sanity check - Extract SAP control block */
+    /*------------------------------------------------------------------------
+        Sanity check
+        Extract SAP control block
+    ------------------------------------------------------------------------*/
     VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
                 "WLANSAP_Stop invoked successfully ");
 
@@ -297,6 +348,9 @@ WLANSAP_Stop
                  "WLANSAP_Stop failed destroy lock");
         return VOS_STATUS_E_FAULT;
     }
+    /*------------------------------------------------------------------------
+        Stop SAP (de-register RSN handler!?)
+    ------------------------------------------------------------------------*/
 
     return VOS_STATUS_SUCCESS;
 }/* WLANSAP_Stop */
@@ -335,7 +389,12 @@ WLANSAP_Close
 {
     ptSapContext pSapCtx = NULL;
 
-    /* Sanity check - Extract SAP control block */
+    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+
+    /*------------------------------------------------------------------------
+        Sanity check
+        Extract SAP control block
+    ------------------------------------------------------------------------*/
     VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
                  "WLANSAP_Close invoked");
 
@@ -348,13 +407,26 @@ WLANSAP_Close
         return VOS_STATUS_E_FAULT;
     }
 
-    /* Cleanup SAP control block. */
+    /*------------------------------------------------------------------------
+        Cleanup SAP control block.
+    ------------------------------------------------------------------------*/
     VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH, "WLANSAP_Close");
+#ifdef WLAN_FEATURE_MBSSID
     sapCleanupChannelList(pCtx);
+#else
+    sapCleanupChannelList();
+#endif
 
     WLANSAP_CleanCB(pSapCtx, VOS_TRUE /* empty queues/lists/pkts if any*/);
 
+#ifdef WLAN_FEATURE_MBSSID
     vos_mem_free(pSapCtx);
+#else
+    /*------------------------------------------------------------------------
+        Free SAP context from VOSS global
+    ------------------------------------------------------------------------*/
+    vos_free_context(pCtx, VOS_MODULE_ID_SAP, pSapCtx);
+#endif
 
     return VOS_STATUS_SUCCESS;
 }/* WLANSAP_Close */
@@ -393,7 +465,6 @@ WLANSAP_CleanCB
     v_U32_t freeFlag // 0 /*do not empty*/);
 )
 {
-    tHalHandle hal;
     /*------------------------------------------------------------------------
         Sanity check SAP control block
     ------------------------------------------------------------------------*/
@@ -410,13 +481,6 @@ WLANSAP_CleanCB
     ------------------------------------------------------------------------*/
     VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH, "WLANSAP_CleanCB");
 
-    hal = (tHalHandle) VOS_GET_HAL_CB(pSapCtx->pvosGCtx);
-    if (eSAP_TRUE == pSapCtx->isSapSessionOpen && hal) {
-        VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
-                "close existing SAP session");
-        sap_CloseSession(hal, pSapCtx, NULL, false);
-    }
-
     vos_mem_zero( pSapCtx, sizeof(tSapContext));
 
     pSapCtx->pvosGCtx = NULL;
@@ -427,6 +491,7 @@ WLANSAP_CleanCB
             __func__, pSapCtx->sapsMachine, pSapCtx);
     pSapCtx->sessionId = 0;
     pSapCtx->channel = 0;
+    pSapCtx->isSapSessionOpen  = eSAP_FALSE;
 
     return VOS_STATUS_SUCCESS;
 }// WLANSAP_CleanCB
@@ -648,7 +713,6 @@ WLANSAP_SetScanAcsChannelParams(tsap_Config_t *pConfig,
 
     /* Channel selection is auto or configured */
     pSapCtx->channel = pConfig->channel;
-    pSapCtx->dfs_mode = pConfig->acs_dfs_mode;
 #ifdef FEATURE_WLAN_MCC_TO_SCC_SWITCH
     pSapCtx->cc_switch_mode = pConfig->cc_switch_mode;
 #endif
@@ -766,7 +830,6 @@ WLANSAP_StartBss
 
         /* Channel selection is auto or configured */
         pSapCtx->channel = pConfig->channel;
-        pSapCtx->dfs_mode = pConfig->acs_dfs_mode;
         pSapCtx->vht_channel_width = pConfig->vht_channel_width;
         pSapCtx->ch_width_orig = pConfig->ch_width_orig;
 #ifdef FEATURE_WLAN_MCC_TO_SCC_SWITCH
@@ -827,9 +890,6 @@ WLANSAP_StartBss
         vos_mem_copy(pSapCtx->denyMacList, pConfig->deny_mac, sizeof(pConfig->deny_mac));
         pSapCtx->nDenyMac = pConfig->num_deny_mac;
         sapSortMacList(pSapCtx->denyMacList, pSapCtx->nDenyMac);
-
-        pSapCtx->beacon_tx_rate = pConfig->beacon_tx_rate;
-
         /* Fill in the event structure for FSM */
         sapEvent.event = eSAP_HDD_START_INFRA_BSS;
         sapEvent.params = 0;//pSapPhysLinkCreate
@@ -3787,10 +3847,37 @@ WLANSAP_ACS_CHSelect(v_PVOID_t pvosGCtx,
         return VOS_STATUS_E_FAULT;
     }
 
+    if (sapContext->isSapSessionOpen == eSAP_TRUE) {
+        VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_FATAL,
+                   "%s:SME Session is already opened\n",__func__);
+        return VOS_STATUS_E_EXISTS;
+    }
+
+    sapContext->sessionId = 0xff;
 
     pMac = PMAC_STRUCT( hHal );
     sapContext->acs_cfg = &pConfig->acs_cfg;
     sapContext->csrRoamProfile.phyMode = sapContext->acs_cfg->hw_mode;
+
+    if (sapContext->isScanSessionOpen == eSAP_FALSE) {
+        tANI_U32 type, subType;
+
+        if(VOS_STATUS_SUCCESS ==
+                      vos_get_vdev_types(VOS_STA_MODE, &type, &subType)) {
+            /*
+             * Open SME Session for scan
+             */
+            if(eHAL_STATUS_SUCCESS  != sme_OpenSession(hHal, NULL, sapContext,
+                                                   sapContext->self_mac_addr,
+                                                   &sapContext->sessionId,
+                                                   type, subType)) {
+                VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_ERROR,
+                           "Error: In %s calling sme_OpenSession", __func__);
+                return VOS_STATUS_E_FAILURE;
+            }
+            else
+                sapContext->isScanSessionOpen = eSAP_TRUE;
+        }
 
         /*
          * Copy the HDD callback function to report the
@@ -3839,12 +3926,32 @@ WLANSAP_ACS_CHSelect(v_PVOID_t pvosGCtx,
                  FL("Scan Req Failed/ACS Overridden, Selected channel = %d"),
                  sapContext->channel);
 
+             if (sapContext->isScanSessionOpen == eSAP_TRUE) {
+                 /* acs scan not needed so close the session */
+                 tHalHandle  hHal = VOS_GET_HAL_CB(sapContext->pvosGCtx);
+                 if (hHal == NULL) {
+                     VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_ERROR,
+                         "%s: HAL Handle NULL. ACS Scan session close fail!",
+                         __func__);
+                     return VOS_STATUS_E_FAILURE;
+                 }
+                 if (eHAL_STATUS_SUCCESS == sme_CloseSession(hHal,
+                                      sapContext->sessionId, NULL, NULL)) {
+                         sapContext->isScanSessionOpen = eSAP_FALSE;
+                 } else {
+                     VOS_TRACE(VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_ERROR,
+                         "%s: ACS Scan session close fail!", __func__);
+                 }
+                 sapContext->sessionId = 0xff;
+             }
+
              return sapSignalHDDevent(sapContext, NULL,
                      eSAP_ACS_CHANNEL_SELECTED, (v_PVOID_t) eSAP_STATUS_SUCCESS);
         }
         else if (VOS_STATUS_SUCCESS == vosStatus)
             VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO_HIGH,
                        FL("Successfully Issued a Pre Start Bss Scan Request"));
+    }
     return vosStatus;
 }
 /**
@@ -3895,25 +4002,6 @@ VOS_STATUS wlansap_set_tx_leakage_threshold(tHalHandle hal,
 	VOS_TRACE( VOS_MODULE_ID_SAP, VOS_TRACE_LEVEL_INFO,
 			"%s: leakage_threshold %d", __func__,
 			mac->sap.SapDfsInfo.tx_leakage_threshold);
-	return VOS_STATUS_SUCCESS;
-}
-
-/**
- * wlansap_get_chan_width() - get sap channel width.
- * @pvosctx: pointer of global vos context
- * @pchanwidth: pointer of channel width
- *
- * This function get channel width of sap.
- *
- * Return: VOS_STATUS.
- */
-VOS_STATUS
-wlansap_get_chan_width(void *pvosctx, uint32_t *pchanwidth)
-{
-	ptSapContext sapcontext;
-	sapcontext = VOS_GET_SAP_CB(pvosctx);
-	*pchanwidth = wlan_sap_get_vht_ch_width(sapcontext);
-
 	return VOS_STATUS_SUCCESS;
 }
 

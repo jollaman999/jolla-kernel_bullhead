@@ -76,8 +76,7 @@
 #define MAX_SSR_PROTECT_LOG (16)
 
 /* Timer value for detecting thread stuck issues */
-#define THREAD_STUCK_TIMER_VAL 10000 /* 10 seconds */
-#define THREAD_STUCK_THRESHOLD 3
+#define THREAD_STUCK_TIMER_VAL 5000 /* 5 seconds */
 
 static atomic_t ssr_protect_entry_count;
 static atomic_t load_unload_protect_count;
@@ -626,8 +625,8 @@ TLSHIM_RX_THREAD_START_FAILURE:
 #endif
 MC_THREAD_START_FAILURE:
     //Try and force the Main thread controller to exit
-    set_bit(MC_SHUTDOWN_EVENT, &pSchedContext->mcEventFlag);
-    set_bit(MC_POST_EVENT, &pSchedContext->mcEventFlag);
+    set_bit(MC_SHUTDOWN_EVENT_MASK, &pSchedContext->mcEventFlag);
+    set_bit(MC_POST_EVENT_MASK, &pSchedContext->mcEventFlag);
     wake_up_interruptible(&pSchedContext->mcWaitQueue);
     //Wait for MC to exit
     wait_for_completion_interruptible(&pSchedContext->McShutdown);
@@ -764,8 +763,8 @@ VosMCThread
   {
     // This implements the execution model algorithm
     retWaitStatus = wait_event_interruptible(pSchedContext->mcWaitQueue,
-       test_bit(MC_POST_EVENT, &pSchedContext->mcEventFlag) ||
-       test_bit(MC_SUSPEND_EVENT, &pSchedContext->mcEventFlag));
+       test_bit(MC_POST_EVENT_MASK, &pSchedContext->mcEventFlag) ||
+       test_bit(MC_SUSPEND_EVENT_MASK, &pSchedContext->mcEventFlag));
 
     if(retWaitStatus == -ERESTARTSYS)
     {
@@ -773,20 +772,20 @@ VosMCThread
          "%s: wait_event_interruptible returned -ERESTARTSYS", __func__);
       VOS_BUG(0);
     }
-    clear_bit(MC_POST_EVENT, &pSchedContext->mcEventFlag);
+    clear_bit(MC_POST_EVENT_MASK, &pSchedContext->mcEventFlag);
 
     while(1)
     {
       // Check if MC needs to shutdown
-      if(test_bit(MC_SHUTDOWN_EVENT, &pSchedContext->mcEventFlag))
+      if(test_bit(MC_SHUTDOWN_EVENT_MASK, &pSchedContext->mcEventFlag))
       {
         VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
                 "%s: MC thread signaled to shutdown", __func__);
         shutdown = VOS_TRUE;
         /* Check for any Suspend Indication */
-        if(test_bit(MC_SUSPEND_EVENT, &pSchedContext->mcEventFlag))
+        if(test_bit(MC_SUSPEND_EVENT_MASK, &pSchedContext->mcEventFlag))
         {
-           clear_bit(MC_SUSPEND_EVENT, &pSchedContext->mcEventFlag);
+           clear_bit(MC_SUSPEND_EVENT_MASK, &pSchedContext->mcEventFlag);
 
            /* Unblock anyone waiting on suspend */
            complete(&pHddCtx->mc_sus_event_var);
@@ -939,9 +938,9 @@ VosMCThread
         continue;
       }
       /* Check for any Suspend Indication */
-      if(test_bit(MC_SUSPEND_EVENT, &pSchedContext->mcEventFlag))
+      if(test_bit(MC_SUSPEND_EVENT_MASK, &pSchedContext->mcEventFlag))
       {
-        clear_bit(MC_SUSPEND_EVENT, &pSchedContext->mcEventFlag);
+        clear_bit(MC_SUSPEND_EVENT_MASK, &pSchedContext->mcEventFlag);
         spin_lock(&pSchedContext->McThreadLock);
 
         INIT_COMPLETION(pSchedContext->ResumeMcEvent);
@@ -989,11 +988,12 @@ static void vos_wd_detect_thread_stuck(void)
 
 	spin_lock_irqsave(&gpVosWatchdogContext->thread_stuck_lock, flags);
 
-	if (gpVosWatchdogContext->mc_thread_stuck_count ==
-				THREAD_STUCK_THRESHOLD) {
+	if (gpVosWatchdogContext->mc_thread_stuck_count) {
 		spin_unlock_irqrestore(&gpVosWatchdogContext->thread_stuck_lock,
 				flags);
-		hddLog(LOGE, FL("MC Thread Stuck!!!"));
+		VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
+				"%s: Thread Stuck!!! MC Count %d", __func__,
+				gpVosWatchdogContext->mc_thread_stuck_count);
 
 		vos_dump_stack(gpVosSchedContext->McThread);
 		vos_flush_logs(WLAN_LOG_TYPE_FATAL,
@@ -1004,18 +1004,11 @@ static void vos_wd_detect_thread_stuck(void)
 			flags);
 	}
 
-	if (!gpVosWatchdogContext->mc_thread_stuck_count) {
-		spin_unlock_irqrestore(&gpVosWatchdogContext->thread_stuck_lock,
-				flags);
-		vos_probe_threads();
-		spin_lock_irqsave(&gpVosWatchdogContext->thread_stuck_lock,
-				flags);
-	}
-
 	/* Increment the thread stuck count for all threads */
 	gpVosWatchdogContext->mc_thread_stuck_count++;
 
 	spin_unlock_irqrestore(&gpVosWatchdogContext->thread_stuck_lock, flags);
+	vos_probe_threads();
 
 	/* Restart the timer */
 	if (VOS_STATUS_SUCCESS !=
@@ -1038,9 +1031,9 @@ static void vos_wd_detect_thread_stuck_cb(void *priv)
 	if (!(vos_is_logp_in_progress(VOS_MODULE_ID_SYS, NULL) ||
 				vos_is_load_unload_in_progress(VOS_MODULE_ID_SYS
 					, NULL))) {
-		set_bit(WD_WLAN_DETECT_THREAD_STUCK,
+		set_bit(WD_WLAN_DETECT_THREAD_STUCK_MASK,
 				&gpVosWatchdogContext->wdEventFlag);
-		set_bit(WD_POST_EVENT, &gpVosWatchdogContext->wdEventFlag);
+		set_bit(WD_POST_EVENT_MASK, &gpVosWatchdogContext->wdEventFlag);
 		wake_up_interruptible(&gpVosWatchdogContext->wdWaitQueue);
 	}
 }
@@ -1125,26 +1118,26 @@ VosWDThread
   {
     // This implements the Watchdog execution model algorithm
     retWaitStatus = wait_event_interruptible(pWdContext->wdWaitQueue,
-       test_bit(WD_POST_EVENT, &pWdContext->wdEventFlag));
+       test_bit(WD_POST_EVENT_MASK, &pWdContext->wdEventFlag));
     if(retWaitStatus == -ERESTARTSYS)
     {
       VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
          "%s: wait_event_interruptible returned -ERESTARTSYS", __func__);
       break;
     }
-    clear_bit(WD_POST_EVENT, &pWdContext->wdEventFlag);
+    clear_bit(WD_POST_EVENT_MASK, &pWdContext->wdEventFlag);
     while(1)
     {
       /* Post Msg to detect thread stuck */
-      if (test_and_clear_bit(WD_WLAN_DETECT_THREAD_STUCK,
+      if (test_and_clear_bit(WD_WLAN_DETECT_THREAD_STUCK_MASK,
                                    &pWdContext->wdEventFlag)) {
 
-       if (!test_bit(MC_SUSPEND_EVENT, &gpVosSchedContext->mcEventFlag))
-            vos_wd_detect_thread_stuck();
-       else
-            VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
-               "%s: controller thread %s id: %d is suspended do not attemp probing",
-               __func__, current->comm, current->pid);
+        if (!test_bit(MC_SUSPEND_EVENT_MASK, &gpVosSchedContext->mcEventFlag))
+             vos_wd_detect_thread_stuck();
+        else
+             VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
+                "%s: controller thread %s id: %d is suspended do not attemp probing",
+                __func__, current->comm, current->pid);
         /*
          * Process here and return without processing any SSR
          * related logic.
@@ -1179,21 +1172,21 @@ VosWDThread
                      __func__, atomic_read(&ssr_protect_entry_count));
       }
       // Check if Watchdog needs to shutdown
-      if(test_bit(WD_SHUTDOWN_EVENT, &pWdContext->wdEventFlag))
+      if(test_bit(WD_SHUTDOWN_EVENT_MASK, &pWdContext->wdEventFlag))
       {
         VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
                 "%s: Watchdog thread signaled to shutdown", __func__);
 
-        clear_bit(WD_SHUTDOWN_EVENT, &pWdContext->wdEventFlag);
+        clear_bit(WD_SHUTDOWN_EVENT_MASK, &pWdContext->wdEventFlag);
         shutdown = VOS_TRUE;
         break;
       }
       /* subsystem restart: shutdown event handler */
-      else if(test_bit(WD_WLAN_SHUTDOWN_EVENT, &pWdContext->wdEventFlag))
+      else if(test_bit(WD_WLAN_SHUTDOWN_EVENT_MASK, &pWdContext->wdEventFlag))
       {
         VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_FATAL,
                 "%s: Watchdog thread signaled to perform WLAN shutdown",__func__);
-        clear_bit(WD_WLAN_SHUTDOWN_EVENT, &pWdContext->wdEventFlag);
+        clear_bit(WD_WLAN_SHUTDOWN_EVENT_MASK, &pWdContext->wdEventFlag);
 
         //Perform WLAN shutdown
         if(!pWdContext->resetInProgress)
@@ -1211,11 +1204,11 @@ VosWDThread
         }
       }
       /* subsystem restart: re-init event handler */
-      else if(test_bit(WD_WLAN_REINIT_EVENT, &pWdContext->wdEventFlag))
+      else if(test_bit(WD_WLAN_REINIT_EVENT_MASK, &pWdContext->wdEventFlag))
       {
         VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_FATAL,
                 "%s: Watchdog thread signaled to perform WLAN re-init",__func__);
-        clear_bit(WD_WLAN_REINIT_EVENT, &pWdContext->wdEventFlag);
+        clear_bit(WD_WLAN_REINIT_EVENT_MASK, &pWdContext->wdEventFlag);
 
         //Perform WLAN re-init
         if(!pWdContext->resetInProgress)
@@ -1382,7 +1375,7 @@ void vos_indicate_rxpkt(pVosSchedContext pSchedContext,
    spin_lock_bh(&pSchedContext->TlshimRxQLock);
    list_add_tail(&pkt->list, &pSchedContext->tlshimRxQueue);
    spin_unlock_bh(&pSchedContext->TlshimRxQLock);
-   set_bit(RX_POST_EVENT, &pSchedContext->tlshimRxEvtFlg);
+   set_bit(RX_POST_EVENT_MASK, &pSchedContext->tlshimRxEvtFlg);
    wake_up_interruptible(&pSchedContext->tlshimRxWaitQueue);
 }
 
@@ -1495,22 +1488,22 @@ static int VosTlshimRxThread(void *arg)
 
    while (!shutdown) {
        status = wait_event_interruptible(pSchedContext->tlshimRxWaitQueue,
-                         test_bit(RX_POST_EVENT,
+                         test_bit(RX_POST_EVENT_MASK,
                                   &pSchedContext->tlshimRxEvtFlg) ||
-                         test_bit(RX_SUSPEND_EVENT,
+                         test_bit(RX_SUSPEND_EVENT_MASK,
                                   &pSchedContext->tlshimRxEvtFlg));
        if (status == -ERESTARTSYS)
            break;
 
-       clear_bit(RX_POST_EVENT, &pSchedContext->tlshimRxEvtFlg);
+       clear_bit(RX_POST_EVENT_MASK, &pSchedContext->tlshimRxEvtFlg);
        while (true) {
-           if (test_bit(RX_SHUTDOWN_EVENT,
+           if (test_bit(RX_SHUTDOWN_EVENT_MASK,
                       &pSchedContext->tlshimRxEvtFlg)) {
-               clear_bit(RX_SHUTDOWN_EVENT,
+               clear_bit(RX_SHUTDOWN_EVENT_MASK,
                          &pSchedContext->tlshimRxEvtFlg);
-               if (test_bit(RX_SUSPEND_EVENT,
+               if (test_bit(RX_SUSPEND_EVENT_MASK,
                             &pSchedContext->tlshimRxEvtFlg)) {
-                   clear_bit(RX_SUSPEND_EVENT,
+                   clear_bit(RX_SUSPEND_EVENT_MASK,
                              &pSchedContext->tlshimRxEvtFlg);
                    complete(&pSchedContext->SuspndTlshimRxEvent);
                }
@@ -1521,9 +1514,9 @@ static int VosTlshimRxThread(void *arg)
            }
            vos_rx_from_queue(pSchedContext);
 
-           if (test_bit(RX_SUSPEND_EVENT,
+           if (test_bit(RX_SUSPEND_EVENT_MASK,
                         &pSchedContext->tlshimRxEvtFlg)) {
-               clear_bit(RX_SUSPEND_EVENT,
+               clear_bit(RX_SUSPEND_EVENT_MASK,
                          &pSchedContext->tlshimRxEvtFlg);
                spin_lock(&pSchedContext->TlshimRxThreadLock);
                INIT_COMPLETION(pSchedContext->ResumeTlshimRxEvent);
@@ -1570,8 +1563,8 @@ VOS_STATUS vos_sched_close ( v_PVOID_t pVosContext )
     }
 
     // shut down MC Thread
-    set_bit(MC_SHUTDOWN_EVENT, &gpVosSchedContext->mcEventFlag);
-    set_bit(MC_POST_EVENT, &gpVosSchedContext->mcEventFlag);
+    set_bit(MC_SHUTDOWN_EVENT_MASK, &gpVosSchedContext->mcEventFlag);
+    set_bit(MC_POST_EVENT_MASK, &gpVosSchedContext->mcEventFlag);
     wake_up_interruptible(&gpVosSchedContext->mcWaitQueue);
     //Wait for MC to exit
     wait_for_completion(&gpVosSchedContext->McShutdown);
@@ -1586,8 +1579,8 @@ VOS_STATUS vos_sched_close ( v_PVOID_t pVosContext )
 #ifdef QCA_CONFIG_SMP
     vos_lock_destroy(&gpVosSchedContext->affinity_lock);
     // Shut down Tlshim Rx thread
-    set_bit(RX_SHUTDOWN_EVENT, &gpVosSchedContext->tlshimRxEvtFlg);
-    set_bit(RX_POST_EVENT, &gpVosSchedContext->tlshimRxEvtFlg);
+    set_bit(RX_SHUTDOWN_EVENT_MASK, &gpVosSchedContext->tlshimRxEvtFlg);
+    set_bit(RX_POST_EVENT_MASK, &gpVosSchedContext->tlshimRxEvtFlg);
     wake_up_interruptible(&gpVosSchedContext->tlshimRxWaitQueue);
     wait_for_completion(&gpVosSchedContext->TlshimRxShutdown);
     gpVosSchedContext->TlshimRxThread = NULL;
@@ -1608,8 +1601,8 @@ VOS_STATUS vos_watchdog_close ( v_PVOID_t pVosContext )
            "%s: gpVosWatchdogContext is NULL",__func__);
        return VOS_STATUS_E_FAILURE;
     }
-    set_bit(WD_SHUTDOWN_EVENT, &gpVosWatchdogContext->wdEventFlag);
-    set_bit(WD_POST_EVENT, &gpVosWatchdogContext->wdEventFlag);
+    set_bit(WD_SHUTDOWN_EVENT_MASK, &gpVosWatchdogContext->wdEventFlag);
+    set_bit(WD_POST_EVENT_MASK, &gpVosWatchdogContext->wdEventFlag);
     wake_up_interruptible(&gpVosWatchdogContext->wdWaitQueue);
     //Wait for Watchdog thread to exit
     wait_for_completion(&gpVosWatchdogContext->WdShutdown);
@@ -1955,8 +1948,8 @@ VOS_STATUS vos_watchdog_wlan_shutdown(void)
     }
 #endif
 
-    set_bit(WD_WLAN_SHUTDOWN_EVENT, &gpVosWatchdogContext->wdEventFlag);
-    set_bit(WD_POST_EVENT, &gpVosWatchdogContext->wdEventFlag);
+    set_bit(WD_WLAN_SHUTDOWN_EVENT_MASK, &gpVosWatchdogContext->wdEventFlag);
+    set_bit(WD_POST_EVENT_MASK, &gpVosWatchdogContext->wdEventFlag);
     wake_up_interruptible(&gpVosWatchdogContext->wdWaitQueue);
 
     return VOS_STATUS_SUCCESS;
@@ -1977,15 +1970,9 @@ VOS_STATUS vos_watchdog_wlan_shutdown(void)
 */
 VOS_STATUS vos_watchdog_wlan_re_init(void)
 {
-    /* Make sure that Vos Watchdog context has been initialized */
-    if (gpVosWatchdogContext == NULL) {
-        VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
-            "%s: gpVosWatchdogContext == NULL", __func__);
-        return VOS_STATUS_SUCCESS;
-    }
     /* watchdog task is still running, it is not closed in shutdown */
-    set_bit(WD_WLAN_REINIT_EVENT, &gpVosWatchdogContext->wdEventFlag);
-    set_bit(WD_POST_EVENT, &gpVosWatchdogContext->wdEventFlag);
+    set_bit(WD_WLAN_REINIT_EVENT_MASK, &gpVosWatchdogContext->wdEventFlag);
+    set_bit(WD_POST_EVENT_MASK, &gpVosWatchdogContext->wdEventFlag);
     wake_up_interruptible(&gpVosWatchdogContext->wdWaitQueue);
 
     return VOS_STATUS_SUCCESS;

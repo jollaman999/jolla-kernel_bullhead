@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -428,7 +428,6 @@ static CountryInfoTable_t countryInfoTable =
       {REGDOMAIN_ETSI, {'Y', 'T'}}, //MAYOTTE
       {REGDOMAIN_ETSI, {'Z', 'A'}}, //SOUTH AFRICA
       {REGDOMAIN_ETSI, {'Z', 'W'}}, //ZIMBABWE
-      {REGDOMAIN_JAPAN, {'X', 'A'}}, //JAPAN PASSIVE
     }
 };
 
@@ -624,19 +623,6 @@ struct ieee80211_regdomain *vos_world_regdomain(struct regulatory *reg)
    }
 }
 
-/**
- * vos_reset_global_reg_params - Reset global static reg params
- *
- * This function is helpful in static driver to reset
- * the global params.
- *
- * Return: void
- */
-void vos_reset_global_reg_params()
-{
-	init_by_driver = false;
-	init_by_reg_core = false;
-}
 
 static int regd_init_wiphy(hdd_context_t *pHddCtx, struct regulatory *reg,
 			   struct wiphy *wiphy)
@@ -909,7 +895,7 @@ static void vos_set_5g_channel_params(uint16_t oper_ch,
 				      struct ch_params_s *ch_params)
 {
 	eNVChannelEnabledType chan_state = NV_CHANNEL_ENABLE;
-	const struct bonded_chan *bonded_chan_ptr;
+	const struct bonded_chan *bonded_chan_ptr = NULL;
 	uint16_t center_chan;
 
 	if (CH_WIDTH_MAX <= ch_params->ch_width)
@@ -2142,16 +2128,6 @@ int __wlan_hdd_linux_reg_notifier(struct wiphy *wiphy,
 #endif
     }
 
-    if (pHddCtx->isWiphySuspended == TRUE) {
-        VOS_TRACE( VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_ERROR,
-                  "system/cfg80211 is already suspend");
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,9,0)) || defined(WITH_BACKPORTS)
-        return;
-#else
-        return 0;
-#endif
-    }
-
     sme_GetFreqBand(pHddCtx->hHal, &nBandCapability);
 
     /* first check if this callback is in response to the driver callback */
@@ -2274,8 +2250,6 @@ int __wlan_hdd_linux_reg_notifier(struct wiphy *wiphy,
         vos_nv_set_dfs_region(request->dfs_region);
 
         regdmn_set_dfs_region(&pHddCtx->reg);
-
-        hdd_set_dfs_regdomain(pHddCtx,false);
 
     default:
         break;

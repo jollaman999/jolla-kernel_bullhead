@@ -211,6 +211,13 @@ struct rx_buf_debug {
 };
 #endif
 
+struct htt_tx_desc_page_t
+{
+	char* page_v_addr_start;
+	char* page_v_addr_end;
+	adf_os_dma_addr_t page_p_addr;
+};
+
 struct htt_pdev_t {
     ol_pdev_handle ctrl_pdev;
     ol_txrx_pdev_handle txrx_pdev;
@@ -341,9 +348,10 @@ struct htt_pdev_t {
 
     struct {
         int size; /* of each HTT tx desc */
-        uint16_t pool_elems;
-        uint16_t alloc_cnt;
-        struct adf_os_mem_multi_page_t desc_pages;
+        int pool_elems;
+        int alloc_cnt;
+        char *pool_vaddr;
+        u_int32_t pool_paddr;
         u_int32_t *freelist;
         adf_os_dma_mem_context(memctx);
     } tx_descs;
@@ -377,6 +385,9 @@ struct htt_pdev_t {
     /* callback function for packetdump */
     tp_rx_pkt_dump_cb rx_pkt_dump_cb;
 
+    int num_pages;
+    int num_desc_per_page;
+    struct htt_tx_desc_page_t *desc_pages;
 };
 
 #endif /* _HTT_TYPES__H_ */

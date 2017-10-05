@@ -741,10 +741,8 @@ err_vos_status_failure:
 static int hdd_ftm_service_registration(hdd_context_t *pHddCtx)
 {
     hdd_adapter_t *pAdapter;
-    pAdapter = hdd_open_adapter(pHddCtx, WLAN_HDD_FTM, "wlan%d",
-                                wlan_hdd_get_intf_addr(pHddCtx),
-                                NET_NAME_UNKNOWN,
-                                FALSE);
+    pAdapter = hdd_open_adapter( pHddCtx, WLAN_HDD_FTM, "wlan%d",
+                wlan_hdd_get_intf_addr(pHddCtx), FALSE);
     if( NULL == pAdapter )
     {
        hddLog(VOS_TRACE_LEVEL_ERROR,"%s: hdd_open_adapter failed", __func__);
@@ -932,7 +930,7 @@ err_status_failure:
 }
 
 #if  defined(QCA_WIFI_FTM)
-VOS_STATUS hdd_ftm_start(hdd_context_t *pHddCtx)
+int hdd_ftm_start(hdd_context_t *pHddCtx)
 {
     return wlan_hdd_ftm_start(pHddCtx);
 }

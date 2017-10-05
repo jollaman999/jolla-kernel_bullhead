@@ -97,6 +97,9 @@ HIF_ACCESS_LOG pcie_access_log[PCIE_ACCESS_LOG_NUM];
 static void HIFTargetDumpAccessLog(void);
 #endif
 
+/* Forward references */
+static int hif_post_recv_buffers_for_pipe(struct HIF_CE_pipe_info *pipe_info);
+
 /*
  * Host software's Copy Engine configuration.
  * This table is derived from the CE_PCI TABLE, above.
@@ -372,7 +375,7 @@ HIFSend_head(HIF_DEVICE *hif_device,
     NBUF_UPDATE_TX_PKT_COUNT(nbuf, NBUF_TX_PKT_HIF);
     DPTRACE(adf_dp_trace(nbuf, ADF_DP_TRACE_HIF_PACKET_PTR_RECORD,
                 adf_nbuf_data_addr(nbuf),
-                sizeof(adf_nbuf_data(nbuf)), ADF_TX));
+                sizeof(adf_nbuf_data(nbuf))));
     status = CE_sendlist_send(ce_hdl, nbuf, &sendlist, transfer_id);
     A_ASSERT(status == A_OK);
 
@@ -1587,7 +1590,6 @@ hif_post_recv_buffers_for_pipe(struct HIF_CE_pipe_info *pipe_info)
                 ("%s CE_recv_buf_enqueue error [%d] needed %d\n",
                 __func__, pipe_info->pipe_num,
                 atomic_read(&pipe_info->recv_bufs_needed)));
-            adf_nbuf_unmap_single(scn->adf_dev, nbuf, ADF_OS_DMA_FROM_DEVICE);
             atomic_inc(&pipe_info->recv_bufs_needed);
             adf_nbuf_free(nbuf);
             adf_os_spin_lock_bh(&pipe_info->recv_bufs_needed_lock);
@@ -1810,9 +1812,8 @@ hif_send_buffer_cleanup_on_pipe(struct HIF_CE_pipe_info *pipe_info)
                 return;
             }
             /* Indicate the completion to higer layer to free the buffer */
-            if (hif_state->msg_callbacks_current.txCompletionHandler)
-                hif_state->msg_callbacks_current.txCompletionHandler(
-                    hif_state->msg_callbacks_current.Context, netbuf, id);
+            hif_state->msg_callbacks_current.txCompletionHandler(
+                hif_state->msg_callbacks_current.Context, netbuf, id);
         }
     }
 }
@@ -2757,7 +2758,9 @@ HIFTargetSleepStateAdjust(A_target_id_t targid,
     struct HIF_CE_state *hif_state = (struct HIF_CE_state *)TARGID_TO_HIF(targid);
     A_target_id_t pci_addr = TARGID_TO_PCI_ADDR(targid);
     static int max_delay;
+#if 0
     static int debug = 0;
+#endif
     struct hif_pci_softc *sc = hif_state->sc;
 
 
@@ -2765,19 +2768,24 @@ HIFTargetSleepStateAdjust(A_target_id_t targid,
         return -EACCES;
 
     if (adf_os_atomic_read(&sc->pci_link_suspended)) {
+        pr_err("invalid access, PCIe link is suspended");
+#if 0
         VOS_TRACE(VOS_MODULE_ID_HIF, VOS_TRACE_LEVEL_ERROR,
                  "invalid access, PCIe link is suspended");
         debug = 1;
         VOS_ASSERT(0);
+#endif
         return -EACCES;
     }
 
+#if 0
     if(debug) {
         wait_for_it = TRUE;
         VOS_TRACE(VOS_MODULE_ID_HIF, VOS_TRACE_LEVEL_ERROR,
                  "doing debug for invalid access, PCIe link is suspended");
         VOS_ASSERT(0);
     }
+#endif
 
     if (sleep_ok) {
         adf_os_spin_lock_irqsave(&hif_state->keep_awake_lock);
@@ -2885,6 +2893,7 @@ HIFTargetSleepStateAdjust(A_target_id_t targid,
         }
     }
 
+#if 0
     if(debug && hif_state->verified_awake) {
         debug = 0;
         VOS_TRACE(VOS_MODULE_ID_HIF, VOS_TRACE_LEVEL_ERROR,
@@ -2902,6 +2911,7 @@ HIFTargetSleepStateAdjust(A_target_id_t targid,
                 A_PCI_READ32(sc->mem + CE_WRAPPER_BASE_ADDRESS +
                              CE_WRAPPER_INTERRUPT_SUMMARY_ADDRESS));
     }
+#endif
 
     return EOK;
 }

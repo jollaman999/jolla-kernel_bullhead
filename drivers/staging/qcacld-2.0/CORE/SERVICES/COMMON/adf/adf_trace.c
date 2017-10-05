@@ -75,10 +75,9 @@ void adf_dp_trace_init(void)
 	g_adf_dp_trace_data.head = INVALID_ADF_DP_TRACE_ADDR;
 	g_adf_dp_trace_data.tail = INVALID_ADF_DP_TRACE_ADDR;
 	g_adf_dp_trace_data.num = 0;
-	g_adf_dp_trace_data.proto_bitmap = NBUF_PKT_TRAC_TYPE_DHCP |
-			NBUF_PKT_TRAC_TYPE_EAPOL;
+	g_adf_dp_trace_data.proto_bitmap = 0;
 	g_adf_dp_trace_data.no_of_record = 0;
-	g_adf_dp_trace_data.verbosity    = ADF_DP_TRACE_VERBOSITY_LOW;
+	g_adf_dp_trace_data.verbosity    = ADF_DP_TRACE_VERBOSITY_DEFAULT;
 	g_adf_dp_trace_data.enable = true;
 
 	for (i = 0; i < ADF_DP_TRACE_MAX; i++)
@@ -156,26 +155,17 @@ uint8_t adf_dp_get_proto_bitmap(void)
 /**
  * adf_dp_trace_set_track() - Marks whether the packet needs to be traced
  * @nbuf  : defines the netbuf
- * @dir: direction
  *
  * Return: None
  */
-void adf_dp_trace_set_track(adf_nbuf_t nbuf,  enum adf_proto_dir dir)
+void adf_dp_trace_set_track(adf_nbuf_t nbuf)
 {
-	uint32_t count = 0;
-
 	spin_lock_bh(&l_dp_trace_lock);
-	if (ADF_TX == dir)
-		count = ++g_adf_dp_trace_data.tx_count;
-	else if (ADF_RX == dir)
-		count = ++g_adf_dp_trace_data.rx_count;
-
+	g_adf_dp_trace_data.count++;
 	if ((g_adf_dp_trace_data.no_of_record != 0) &&
-		(count % g_adf_dp_trace_data.no_of_record == 0)) {
-		if (ADF_TX == dir)
-			ADF_NBUF_CB_TX_DP_TRACE(nbuf) = 1;
-		else if (ADF_RX == dir)
-			ADF_NBUF_CB_RX_DP_TRACE(nbuf) = 1;
+	    (g_adf_dp_trace_data.count %
+			g_adf_dp_trace_data.no_of_record == 0)) {
+		ADF_NBUF_SET_DP_TRACE(nbuf, 1);
 	}
 	spin_unlock_bh(&l_dp_trace_lock);
 }
@@ -193,10 +183,10 @@ static void dump_hex_trace(char *str, uint8_t *buf, uint8_t buf_len)
 	uint8_t i;
 
 	/* Dump the bytes in the last line */
-	adf_os_print("%s: ", str);
+	printk("%s: ", str);
 	for (i = 0; i < buf_len; i++)
-		adf_os_print("%02x ", buf[i]);
-	adf_os_print("\n");
+		printk("%02x ", buf[i]);
+	printk("\n");
 }
 
 /**
@@ -216,40 +206,32 @@ const char *adf_dp_code_to_string(enum ADF_DP_TRACE_ID code)
 		return "DHCP:";
 	case ADF_DP_TRACE_ARP_PACKET_RECORD:
 		return "ARP:";
-	case ADF_DP_TRACE_HDD_TX_PACKET_PTR_RECORD:
-		return "HDD: TX: PTR:";
-	case ADF_DP_TRACE_HDD_TX_PACKET_RECORD:
-		return "HDD: TX: DATA:";
+	case ADF_DP_TRACE_HDD_PACKET_PTR_RECORD:
+		return "HDD: PTR:";
+	case ADF_DP_TRACE_HDD_PACKET_RECORD:
+		return "HDD: DATA:";
 	case ADF_DP_TRACE_CE_PACKET_PTR_RECORD:
-		return "CE: TX: PTR:";
+		return "CE: PTR:";
 	case ADF_DP_TRACE_CE_FAST_PACKET_PTR_RECORD:
-		return "CE: TX: FAST: PTR:";
+		return "CE:F: PTR:";
 	case ADF_DP_TRACE_FREE_PACKET_PTR_RECORD:
-		return "FREE: TX: PTR:";
-	case ADF_DP_TRACE_RX_HTT_PACKET_PTR_RECORD:
-		return "HTT: RX: PTR:";
-	case ADF_DP_TRACE_RX_OFFLOAD_HTT_PACKET_PTR_RECORD:
-		return "HTT: RX: OF: PTR:";
-	case ADF_DP_TRACE_RX_HDD_PACKET_PTR_RECORD:
-		return "HDD: RX: PTR:";
+		return "FREE: PTR:";
 	case ADF_DP_TRACE_TXRX_QUEUE_PACKET_PTR_RECORD:
-		return "TXRX: TX: Q: PTR:";
+		return "TX:Q: PTR:";
 	case ADF_DP_TRACE_TXRX_PACKET_PTR_RECORD:
-		return "TXRX: TX: PTR:";
+		return "TX: PTR:";
 	case ADF_DP_TRACE_TXRX_FAST_PACKET_PTR_RECORD:
-		return "TXRX: TX: FAST: PTR:";
+		return "TX:F: PTR:";
 	case ADF_DP_TRACE_HTT_PACKET_PTR_RECORD:
-		return "HTT: TX: PTR:";
+		return "HTT: PTR:";
 	case ADF_DP_TRACE_HTC_PACKET_PTR_RECORD:
-		return "HTC: TX: PTR:";
+		return "HTC: PTR:";
 	case ADF_DP_TRACE_HIF_PACKET_PTR_RECORD:
-		return "HIF: TX: PTR:";
-	case ADF_DP_TRACE_RX_TXRX_PACKET_PTR_RECORD:
-		return "TXRX: RX: PTR:";
+		return "HIF: PTR:";
 	case ADF_DP_TRACE_HDD_TX_TIMEOUT:
-		return "HDD: STA: TO:";
+		return "STA: TO:";
 	case ADF_DP_TRACE_HDD_SOFTAP_TX_TIMEOUT:
-		return "HDD: SAP: TO:";
+		return "SAP: TO:";
 	default:
 		return "Invalid";
 	}
@@ -265,9 +247,9 @@ const char *adf_dp_dir_to_str(enum adf_proto_dir dir)
 {
 	switch (dir) {
 	case ADF_TX:
-		return " --> ";
+		return "->";
 	case ADF_RX:
-		return " <-- ";
+		return "<-";
 	default:
 		return "invalid";
 	}
@@ -342,8 +324,7 @@ const char *adf_dp_subtype_to_str(enum adf_proto_subtype subtype)
  *
  * Return: true/false
  */
-bool adf_dp_enable_check(adf_nbuf_t nbuf, enum ADF_DP_TRACE_ID code,
-		enum adf_proto_dir dir)
+bool adf_dp_enable_check(adf_nbuf_t nbuf, enum ADF_DP_TRACE_ID code)
 {
 	/* Return when Dp trace is not enabled */
 	if (!g_adf_dp_trace_data.enable)
@@ -354,8 +335,7 @@ bool adf_dp_enable_check(adf_nbuf_t nbuf, enum ADF_DP_TRACE_ID code,
 
 	if ((nbuf) && ((NBUF_GET_PACKET_TRACK(nbuf) !=
 		 NBUF_TX_PKT_DATA_TRACK) ||
-		 ((dir == ADF_TX) && (ADF_NBUF_CB_TX_DP_TRACE(nbuf) == 0)) ||
-		 ((dir == ADF_RX) && (ADF_NBUF_CB_RX_DP_TRACE(nbuf) == 0))))
+		 (!ADF_NBUF_GET_DP_TRACE(nbuf))))
 		return false;
 
 	return true;
@@ -366,15 +346,13 @@ bool adf_dp_enable_check(adf_nbuf_t nbuf, enum ADF_DP_TRACE_ID code,
  * @code: dptrace code
  * @data: data pointer
  * @size: size of buffer
- * @print: print it in kmsg
  *
  * Return: none
  */
 void adf_dp_add_record(enum ADF_DP_TRACE_ID code,
-		       uint8_t *data, uint8_t size, bool print)
+		       uint8_t *data, uint8_t size)
 {
 	struct adf_dp_trace_record_s *rec = NULL;
-	int index;
 
 	spin_lock_bh(&l_dp_trace_lock);
 
@@ -403,7 +381,6 @@ void adf_dp_add_record(enum ADF_DP_TRACE_ID code,
 	}
 
 	rec = &g_adf_dp_trace_tbl[g_adf_dp_trace_data.tail];
-	index = g_adf_dp_trace_data.tail;
 	rec->code = code;
 	rec->size = 0;
 	if (data != NULL && size > 0) {
@@ -417,39 +394,32 @@ void adf_dp_add_record(enum ADF_DP_TRACE_ID code,
 	rec->time = adf_os_gettimestamp();
 	rec->pid = (in_interrupt() ? 0 : current->pid);
 	spin_unlock_bh(&l_dp_trace_lock);
-
-	if ((g_adf_dp_trace_data.live_mode || print == true) &&
-	    (rec->code < ADF_DP_TRACE_MAX))
-		adf_dp_trace_cb_table[rec->code] (rec, index);
 }
 
 /**
  * adf_log_eapol_pkt() - log EAPOL packet
  * @session_id: vdev_id
  * @skb: skb pointer
- * @dir: direction
+ * @event_type: event_type
  *
  * Return: true/false
  */
 bool adf_log_eapol_pkt(uint8_t session_id, struct sk_buff *skb,
-		       enum adf_proto_dir dir)
+		       uint8_t event_type)
 {
 	enum adf_proto_subtype subtype;
 
 	if ((adf_dp_get_proto_bitmap() & NBUF_PKT_TRAC_TYPE_EAPOL) &&
-		((dir == ADF_TX && ADF_NBUF_GET_IS_EAPOL(skb)) ||
-		(dir == ADF_RX && adf_nbuf_is_eapol_pkt(skb)))) {
+		adf_nbuf_is_eapol_pkt(skb) == A_STATUS_OK) {
 
 		subtype = adf_nbuf_get_eapol_subtype(skb);
 		DPTRACE(adf_dp_trace_proto_pkt(ADF_DP_TRACE_EAPOL_PACKET_RECORD,
 			session_id, (skb->data + ADF_NBUF_SRC_MAC_OFFSET),
 			(skb->data + ADF_NBUF_DEST_MAC_OFFSET),
 			ADF_PROTO_TYPE_EAPOL, subtype,
-			dir));
-		if (ADF_TX == dir)
-			ADF_NBUF_CB_TX_DP_TRACE(skb) = 1;
-		else if (ADF_RX == dir)
-			ADF_NBUF_CB_RX_DP_TRACE(skb) = 1;
+			event_type == ADF_RX ?
+			 ADF_RX : ADF_TX));
+		ADF_NBUF_SET_DP_TRACE(skb, 1);
 		return true;
 	}
 	return false;
@@ -459,30 +429,26 @@ bool adf_log_eapol_pkt(uint8_t session_id, struct sk_buff *skb,
  * adf_log_dhcp_pkt() - log DHCP packet
  * @session_id: vdev_id
  * @skb: skb pointer
- * @dir: direction
+ * @event_type: event_type
  *
  * Return: true/false
  */
 bool adf_log_dhcp_pkt(uint8_t session_id, struct sk_buff *skb,
-		      enum adf_proto_dir dir)
+		      uint8_t event_type)
 {
 	enum adf_proto_subtype subtype = ADF_PROTO_INVALID;
 
 	if ((adf_dp_get_proto_bitmap() & NBUF_PKT_TRAC_TYPE_DHCP) &&
-		((dir == ADF_TX && ADF_NBUF_GET_IS_DHCP(skb)) ||
-		(dir == ADF_RX && adf_nbuf_is_dhcp_pkt(skb)))) {
+		adf_nbuf_is_dhcp_pkt(skb) == A_STATUS_OK) {
 
 		subtype = adf_nbuf_get_dhcp_subtype(skb);
 		DPTRACE(adf_dp_trace_proto_pkt(ADF_DP_TRACE_DHCP_PACKET_RECORD,
 			session_id, (skb->data + ADF_NBUF_SRC_MAC_OFFSET),
 			(skb->data + ADF_NBUF_DEST_MAC_OFFSET),
 			ADF_PROTO_TYPE_DHCP, subtype,
-			dir));
-		if (ADF_TX == dir)
-			ADF_NBUF_CB_TX_DP_TRACE(skb) = 1;
-		else if (ADF_RX == dir)
-			ADF_NBUF_CB_RX_DP_TRACE(skb) = 1;
-
+			event_type == ADF_RX ?
+			ADF_RX : ADF_TX));
+		ADF_NBUF_SET_DP_TRACE(skb, 1);
 		return true;
 	}
 	return false;
@@ -492,18 +458,17 @@ bool adf_log_dhcp_pkt(uint8_t session_id, struct sk_buff *skb,
  * adf_log_arp_pkt() - log ARP packet
  * @session_id: vdev_id
  * @skb: skb pointer
- * @dir: direction
+ * @event_type: event_type
  *
  * Return: true/false
  */
 bool adf_log_arp_pkt(uint8_t session_id, struct sk_buff *skb,
-		     enum adf_proto_dir dir)
+		     uint8_t event_type)
 {
 	enum adf_proto_subtype proto_subtype;
 
 	if ((adf_dp_get_proto_bitmap() & NBUF_PKT_TRAC_TYPE_ARP) &&
-	    ((dir == ADF_TX && ADF_NBUF_GET_IS_ARP(skb)) ||
-	    (dir == ADF_RX && adf_nbuf_is_ipv4_arp_pkt(skb)))){
+	     adf_nbuf_is_ipv4_arp_pkt(skb) == true) {
 
 		proto_subtype = adf_nbuf_get_arp_subtype(skb);
 
@@ -511,12 +476,9 @@ bool adf_log_arp_pkt(uint8_t session_id, struct sk_buff *skb,
 			session_id, (skb->data + ADF_NBUF_SRC_MAC_OFFSET),
 			(skb->data + ADF_NBUF_DEST_MAC_OFFSET),
 			ADF_PROTO_TYPE_ARP, proto_subtype,
-			dir));
-		if (ADF_TX == dir)
-			ADF_NBUF_CB_TX_DP_TRACE(skb) = 1;
-		else if (ADF_RX == dir)
-			ADF_NBUF_CB_RX_DP_TRACE(skb) = 1;
-
+			event_type == ADF_RX ?
+			ADF_RX : ADF_TX));
+		ADF_NBUF_SET_DP_TRACE(skb, 1);
 		return true;
 	}
 	return false;
@@ -526,20 +488,20 @@ bool adf_log_arp_pkt(uint8_t session_id, struct sk_buff *skb,
  * adf_dp_trace_log_pkt() - log packet type enabled through iwpriv
  * @session_id: vdev_id
  * @skb: skb pointer
- * @dir: direction
+ * @event_type: event type
  *
  * Return: none
  */
 void adf_dp_trace_log_pkt(uint8_t session_id, struct sk_buff *skb,
-			  enum adf_proto_dir dir)
+			  uint8_t event_type)
 {
 	if (adf_dp_get_proto_bitmap()) {
 		if (adf_log_arp_pkt(session_id,
-			skb, dir) == false) {
+			skb, event_type) == false) {
 			if (adf_log_dhcp_pkt(session_id,
-				skb, dir) == false) {
+				skb, event_type) == false) {
 				if (adf_log_eapol_pkt(session_id,
-					skb, dir) == false) {
+					skb, event_type) == false) {
 					return;
 				}
 			}
@@ -560,10 +522,10 @@ void adf_dp_display_proto_pkt(struct adf_dp_trace_record_s *record,
 	struct adf_dp_trace_proto_buf *buf =
 		(struct adf_dp_trace_proto_buf *)record->data;
 
-	adf_os_print("DPT: %04d: %012llu: %s vdev_id %d\n", index,
+	adf_os_print("%04d: %012llu: %s vdev_id %d\n", index,
 		record->time, adf_dp_code_to_string(record->code),
 		buf->vdev_id);
-	adf_os_print("DPT: SA: " MAC_ADDRESS_STR " %s DA: " MAC_ADDRESS_STR
+	adf_os_print("SA: " MAC_ADDRESS_STR " %s DA: " MAC_ADDRESS_STR
 						" Type %s Subtype %s\n",
 		MAC_ADDR_ARRAY(buf->sa.bytes), adf_dp_dir_to_str(buf->dir),
 		MAC_ADDR_ARRAY(buf->da.bytes), adf_dp_type_to_str(buf->type),
@@ -589,7 +551,7 @@ void adf_dp_trace_proto_pkt(enum ADF_DP_TRACE_ID code, uint8_t vdev_id,
 	struct adf_dp_trace_proto_buf buf;
 	int buf_size = sizeof(struct adf_dp_trace_ptr_buf);
 
-	if (adf_dp_enable_check(NULL, code, dir) == false)
+	if (adf_dp_enable_check(NULL, code) == false)
 		return;
 
 	if (buf_size > ADF_DP_TRACE_RECORD_SIZE)
@@ -601,7 +563,7 @@ void adf_dp_trace_proto_pkt(enum ADF_DP_TRACE_ID code, uint8_t vdev_id,
 	buf.type = type;
 	buf.subtype = subtype;
 	buf.vdev_id = vdev_id;
-	adf_dp_add_record(code, (uint8_t *)&buf, buf_size, true);
+	adf_dp_add_record(code, (uint8_t *)&buf, buf_size);
 }
 
 /**
@@ -617,15 +579,9 @@ void adf_dp_display_ptr_record(struct adf_dp_trace_record_s *record,
 	struct adf_dp_trace_ptr_buf *buf =
 		(struct adf_dp_trace_ptr_buf *)record->data;
 
-	if (record->code == ADF_DP_TRACE_FREE_PACKET_PTR_RECORD)
-		adf_os_print("%04d: %012llu: %s msdu_id: %d, status: %d\n", index,
-			record->time, adf_dp_code_to_string(record->code),
-			buf->msdu_id, buf->status);
-	else
-		adf_os_print("%04d: %012llu: %s msdu_id: %d, vdev_id: %d\n", index,
-			record->time, adf_dp_code_to_string(record->code),
-			buf->msdu_id, buf->status);
-
+	adf_os_print("%04d: %012llu: %s msdu_id: %d, status: %d", index,
+		record->time, adf_dp_code_to_string(record->code),
+		buf->msdu_id, buf->status);
 	dump_hex_trace("cookie", (uint8_t *)&buf->cookie, sizeof(buf->cookie));
 }
 
@@ -645,7 +601,7 @@ void adf_dp_trace_ptr(adf_nbuf_t nbuf, enum ADF_DP_TRACE_ID code,
 	struct adf_dp_trace_ptr_buf buf;
 	int buf_size = sizeof(struct adf_dp_trace_ptr_buf);
 
-	if (adf_dp_enable_check(nbuf, code, ADF_TX) == false)
+	if (adf_dp_enable_check(nbuf, code) == false)
 		return;
 
 	if (buf_size > ADF_DP_TRACE_RECORD_SIZE)
@@ -654,7 +610,7 @@ void adf_dp_trace_ptr(adf_nbuf_t nbuf, enum ADF_DP_TRACE_ID code,
 	adf_os_mem_copy(&buf.cookie, data, size);
 	buf.msdu_id = msdu_id;
 	buf.status = status;
-	adf_dp_add_record(code, (uint8_t *)&buf, buf_size, false);
+	adf_dp_add_record(code, (uint8_t *)&buf, buf_size);
 }
 
 /**
@@ -667,7 +623,7 @@ void adf_dp_trace_ptr(adf_nbuf_t nbuf, enum ADF_DP_TRACE_ID code,
 void adf_dp_display_record(struct adf_dp_trace_record_s *pRecord,
 				uint16_t recIndex)
 {
-	adf_os_print("DPT: %04d: %012llu: %s\n", recIndex,
+	adf_os_print("%04d: %012llu: %s", recIndex,
 		pRecord->time, adf_dp_code_to_string(pRecord->code));
 	switch (pRecord->code) {
 	case  ADF_DP_TRACE_HDD_TX_TIMEOUT:
@@ -678,7 +634,7 @@ void adf_dp_display_record(struct adf_dp_trace_record_s *pRecord,
 		VOS_TRACE(VOS_MODULE_ID_ADF, VOS_TRACE_LEVEL_ERROR,
 						"HDD SoftAP TX Timeout\n");
 		break;
-	case ADF_DP_TRACE_HDD_TX_PACKET_RECORD:
+	case ADF_DP_TRACE_HDD_PACKET_RECORD:
 		dump_hex_trace("DATA", pRecord->data, pRecord->size);
 		break;
 	default:
@@ -696,38 +652,12 @@ void adf_dp_display_record(struct adf_dp_trace_record_s *pRecord,
  * Return: None
  */
 void adf_dp_trace(adf_nbuf_t nbuf, enum ADF_DP_TRACE_ID code,
-			uint8_t *data, uint8_t size, enum adf_proto_dir dir)
+			uint8_t *data, uint8_t size)
 {
-
-	if (adf_dp_enable_check(nbuf, code, dir) == false)
+	if (adf_dp_enable_check(nbuf, code) == false)
 		return;
 
-	adf_dp_add_record(code, data, size, false);
-}
-
-/**
- * adf_dp_trace_enable_live_mode() - enable live mode
- *
- * Return: none
- */
-void adf_dp_trace_enable_live_mode(void)
-{
-	g_adf_dp_trace_data.live_mode = 1;
-}
-
-void adf_dp_trace_clear_buffer(void)
-{
-	g_adf_dp_trace_data.head = INVALID_ADF_DP_TRACE_ADDR;
-	g_adf_dp_trace_data.tail = INVALID_ADF_DP_TRACE_ADDR;
-	g_adf_dp_trace_data.num = 0;
-	g_adf_dp_trace_data.proto_bitmap = 0;
-	g_adf_dp_trace_data.no_of_record = 0;
-	g_adf_dp_trace_data.verbosity	 = ADF_DP_TRACE_VERBOSITY_DEFAULT;
-	g_adf_dp_trace_data.enable = true;
-
-	memset(g_adf_dp_trace_tbl, 0,
-		MAX_ADF_DP_TRACE_RECORDS * sizeof(struct adf_dp_trace_record_s));
-
+	adf_dp_add_record(code, data, size);
 }
 
 /**

@@ -43,7 +43,6 @@
 #include <vos_api.h>
 #include <linux/skbuff.h>
 #include <wlan_qct_tl.h>
-#include "tl_shim.h"
 
 /*---------------------------------------------------------------------------
   Preprocessor definitions and constants
@@ -77,9 +76,6 @@
 #define SME_QOS_UAPSD_CFG_VO_CHANGED_MASK     0xF8
 
 #define HDD_ETH_HEADER_LEN      14
-
-#define HDD_BUG_REPORT_MIN_COUNT  3
-#define HDD_BUG_REPORT_MIN_TIME   300000     /* 5 minutes */
 
 #define TX_PATH 1
 #define RX_PATH 0
@@ -185,18 +181,15 @@ extern VOS_STATUS hdd_rx_packet_cbk(v_VOID_t *vosContext, adf_nbuf_t rxBufChain,
   ===========================================================================*/
 extern v_BOOL_t hdd_IsEAPOLPacket( vos_pkt_t *pVosPacket );
 
- /**
- * hdd_get_peer_sta_id() - Get the StationID using the Peer Mac address
- * @sta_ctx: pointer to HDD Station Context
- * @peer_mac_addr: pointer to Peer Mac address
- * @sta_id: pointer to Station Index
- *
- * Returns: VOS_STATUS_SUCCESS on success, VOS_STATUS_E_FAILURE on error
- */
-VOS_STATUS hdd_get_peer_sta_id(hdd_station_ctx_t *sta_ctx,
-                               v_MACADDR_t *peer_mac_addr, uint8_t *sta_id);
-
-int hdd_get_peer_idx(hdd_station_ctx_t *sta_ctx, v_MACADDR_t *addr);
+/**============================================================================
+  @brief hdd_Ibss_GetStaId() - Get the StationID using the Peer Mac address
+  @param pHddStaCtx : [in] pointer to HDD Station Context
+  pMacAddress [in]  pointer to Peer Mac address
+  staID [out]  pointer to Station Index
+  @return    : VOS_STATUS_SUCCESS/VOS_STATUS_E_FAILURE
+  ===========================================================================*/
+VOS_STATUS hdd_Ibss_GetStaId(hdd_station_ctx_t *pHddStaCtx,
+                                  v_MACADDR_t *pMacAddress, v_U8_t *staId);
 
 /**============================================================================
   @brief hdd_flush_ibss_tx_queues() -
@@ -244,16 +237,6 @@ void hdd_tx_resume_timer_expired_handler(void *adapter_context);
 #endif /* QCA_LL_TX_FLOW_CT */
 
 /**
- * hdd_rst_tcp_delack() - Reset tcp delack value to original level.
- * @hdd_context_t : HDD context
- *
- * HDD will call this API on unloading path to clear delack value.
- *
- * Return: None
- */
-void hdd_rst_tcp_delack(hdd_context_t *hdd_ctx);
-
-/**
  * hdd_mon_rx_packet_cbk() - Receive callback registered with TL.
  * @vosContext: [in] pointer to VOS context
  * @staId:      [in] Station Id
@@ -267,13 +250,6 @@ void hdd_rst_tcp_delack(hdd_context_t *hdd_ctx);
  */
 VOS_STATUS hdd_mon_rx_packet_cbk(v_VOID_t *vos_ctx, adf_nbuf_t rx_buf,
 				 uint8_t sta_id);
-
-void wlan_display_tx_timeout_stats(hdd_adapter_t *adapter);
-
-const char *hdd_reason_type_to_string(enum netif_reason_type reason);
-const char *hdd_action_type_to_string(enum netif_action_type action);
-void wlan_hdd_netif_queue_control(hdd_adapter_t *adapter,
-		enum netif_action_type action, enum netif_reason_type reason);
 
 #ifdef QCA_PKT_PROTO_TRACE
 void hdd_dhcp_pkt_trace_buf_update(struct sk_buff *skb, int is_transmission,
