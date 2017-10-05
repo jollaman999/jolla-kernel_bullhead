@@ -1,7 +1,7 @@
 /*
  * drivers/input/touchscreen/doubletap2wake.c
  *
- * Copyright (c) 2016, jollaman999 <admin@jollaman999.com>
+ * Copyright (c) 2017, jollaman999 <admin@jollaman999.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Doubletap2wake for almost any device"
-#define DRIVER_VERSION "4.2"
+#define DRIVER_VERSION "4.3"
 #define LOGTAG "[doubletap2wake]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -336,8 +336,6 @@ static int register_dt2w(void)
 {
 	int rc = 0;
 
-	doubletap2wake_reset();
-
 	mutex_lock(&reg_lock);
 
 	if (registered) {
@@ -367,6 +365,7 @@ out:
 	pr_info(LOGTAG"%s done\n", __func__);
 #endif
 
+	doubletap2wake_reset();
 	return rc;
 err:
 	flush_workqueue(dt2w_input_wq);
@@ -374,6 +373,7 @@ err:
 	cancel_work_sync(&dt2w_input_work);
 	mutex_unlock(&reg_lock);
 
+	doubletap2wake_reset();
 	return rc;
 }
 
