@@ -211,6 +211,9 @@ static void bcl_update_online_mask(void)
 }
 
 #ifdef CONFIG_SMP
+#ifdef CONFIG_THERMAL_MONITOR
+extern bool msm_thermal_stop_little_hotplug;
+#endif
 static void __ref bcl_handle_hotplug(struct work_struct *work)
 {
 	int ret = 0, _cpu = 0;
@@ -226,6 +229,13 @@ static void __ref bcl_handle_hotplug(struct work_struct *work)
 		bcl_hotplug_request = bcl_hotplug_mask;
 	else
 		bcl_hotplug_request = 0;
+
+#ifdef CONFIG_THERMAL_MONITOR
+	if (bcl_hotplug_request)
+		msm_thermal_stop_little_hotplug = true;
+	else
+		msm_thermal_stop_little_hotplug = false;
+#endif
 
 	for_each_possible_cpu(_cpu) {
 		if ((!(bcl_hotplug_mask & BIT(_cpu))

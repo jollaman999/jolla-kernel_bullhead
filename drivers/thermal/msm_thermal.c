@@ -2512,6 +2512,11 @@ static void therm_reset_notify(struct therm_threshold *thresh_data)
 }
 
 #ifdef CONFIG_SMP
+#ifdef CONFIG_BATTERY_BCL
+bool msm_thermal_stop_little_hotplug = false;
+EXPORT_SYMBOL(msm_thermal_stop_little_hotplug);
+#endif
+
 static void __ref do_core_control(long temp)
 {
 	int i = 0;
@@ -2536,6 +2541,11 @@ static void __ref do_core_control(long temp)
 		} else {
 			little_off_cpus = 0;
 		}
+
+#ifdef CONFIG_BATTERY_BCL
+		if (msm_thermal_stop_little_hotplug)
+			little_off_cpus = 0;
+#endif
 
 		for (i = 0; i < big_core_start; i++) {
 			if (cpus_offlined & BIT(i) && !cpu_online(i))
