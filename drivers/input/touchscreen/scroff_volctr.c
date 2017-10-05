@@ -107,7 +107,7 @@ static s64 touch_time_pre_x = 0, touch_time_pre_y = 0;
 static int touch_x = 0, touch_y = 0;
 static int prev_x = 0, prev_y = 0;
 static bool is_new_touch_x = false, is_new_touch_y = false;
-static bool is_touching = false;
+static bool is_executing = false;
 static bool sovc_auto_off_scheduled = false;
 static struct input_dev *sovc_input;
 static DEFINE_MUTEX(keyworklock);
@@ -182,7 +182,7 @@ static void sovc_auto_off_schedule(void)
 /* Key work func */
 static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 {
-	if (!sovc_scr_suspended || !is_touching)
+	if (!sovc_scr_suspended || !is_executing)
 		return;
 
 	if (!mutex_trylock(&keyworklock))
@@ -239,7 +239,7 @@ static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 #endif
 	mutex_unlock(&keyworklock);
 
-	if (is_touching) {
+	if (is_executing) {
 		// It should be canceled to prevent to turn off the touchscreen.
 		cancel_delayed_work(&sovc_auto_off_check_work);
 		scroff_volctr_key_delayed_trigger();
@@ -276,7 +276,7 @@ static void scroff_volctr_key_delayed_trigger(void)
 /* reset on finger release */
 static void scroff_volctr_reset(void)
 {
-	is_touching = false;
+	is_executing = false;
 	is_new_touch_x = false;
 	is_new_touch_y = false;
 	sovc_auto_off_scheduled = false;
@@ -310,7 +310,7 @@ static void new_touch_y(int y)
 /* exec key control */
 static void exec_key(int key)
 {
-	is_touching = true;
+	is_executing = true;
 	control = key;
 	scroff_volctr_key_trigger();
 }
@@ -411,7 +411,7 @@ static void sovc_volume_input_event(struct input_handle *handle, unsigned int ty
 	if (out)
 		return;
 
-	if (is_touching)
+	if (is_executing)
 		return;
 
 	/* You can debug here with 'adb shell getevent -l' command. */
@@ -435,7 +435,7 @@ static void sovc_track_input_event(struct input_handle *handle, unsigned int typ
 	if (out)
 		return;
 
-	if (is_touching)
+	if (is_executing)
 		return;
 
 	/* You can debug here with 'adb shell getevent -l' command. */
