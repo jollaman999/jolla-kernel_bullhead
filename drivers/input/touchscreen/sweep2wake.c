@@ -1,9 +1,7 @@
 /*
  * drivers/input/touchscreen/sweep2wake.c
  *
- *
- * Copyright (c) 2013, Dennis Rassmann <showp1984@gmail.com>
- * Copyright (c) 2016, jollaman999 <admin@jollaman999.com>
+ * Copyright (c) 2017, jollaman999 <admin@jollaman999.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +39,7 @@ struct notifier_block s2w_fb_notif;
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Sweep2wake for almost any device"
-#define DRIVER_VERSION "2.3"
+#define DRIVER_VERSION "2.4"
 #define LOGTAG "[sweep2wake]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -280,8 +278,6 @@ static int register_s2w(void)
 {
 	int rc = 0;
 
-	sweep2wake_reset();
-
 	mutex_lock(&reg_lock);
 
 	if (registered) {
@@ -311,6 +307,7 @@ out:
 	pr_info(LOGTAG"%s done\n", __func__);
 #endif
 
+	sweep2wake_reset();
 	return rc;
 err:
 	flush_workqueue(s2w_input_wq);
@@ -318,6 +315,7 @@ err:
 	cancel_work_sync(&s2w_input_work);
 	mutex_unlock(&reg_lock);
 
+	sweep2wake_reset();
 	return rc;
 }
 
