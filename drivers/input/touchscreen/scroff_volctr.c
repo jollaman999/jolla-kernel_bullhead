@@ -76,7 +76,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Screen Off Volume & Track Control for almost any device"
-#define DRIVER_VERSION "4.4"
+#define DRIVER_VERSION "4.5"
 #define LOGTAG "[scroff_volctr]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -386,14 +386,14 @@ static int sovc_input_common_event(struct input_handle *handle, unsigned int typ
 	switch(code) {
 		case ABS_MT_SLOT:
 			scroff_volctr_reset();
-			break;
+			return 1;
 
 		case ABS_MT_TRACKING_ID:
 			if (value == 0xffffffff) {
 				cancel_delayed_work(&sovc_auto_off_check_work);
 				scroff_volctr_reset();
 			}
-			break;
+			return 1;
 
 		default:
 			break;
