@@ -204,7 +204,6 @@ eHalStatus pmcStart (tHalHandle hHal)
     pMac->pmc.wowlModeRequired = FALSE;
     pMac->pmc.bmpsRequestedByHdd = FALSE;
     pMac->pmc.remainInPowerActiveTillDHCP = FALSE;
-    pMac->pmc.full_power_till_set_key = false;
     pMac->pmc.remainInPowerActiveThreshold = 0;
 
     /* WLAN Switch initial states. */
@@ -890,8 +889,7 @@ eHalStatus pmcRequestFullPower (tHalHandle hHal, void (*callbackRoutine) (void *
                                 void *callbackContext, tRequestFullPowerReason fullPowerReason)
 {
     tpAniSirGlobal pMac = PMAC_STRUCT(hHal);
-    tpRequestFullPowerEntry request_full_power_entry;
-    tListElem *pEntry;
+    tpRequestFullPowerEntry pEntry;
 
 #ifdef FEATURE_WLAN_DIAG_SUPPORT
     WLAN_VOS_DIAG_EVENT_DEF(psRequest, vos_event_wlan_powersave_payload_type);
@@ -931,41 +929,30 @@ eHalStatus pmcRequestFullPower (tHalHandle hHal, void (*callbackRoutine) (void *
         {
             pmcLog(pMac, LOGE, FL("Cannot cancel IMPS timer"));
         }
+    /* Enter Request Full Power State. */
+    if (pmcEnterRequestFullPowerState(hHal, fullPowerReason) != eHAL_STATUS_SUCCESS)
+        return eHAL_STATUS_FAILURE;
 
     /* If able to enter Request Full Power State, then request is pending.
        Allocate entry for request full power callback routine list. */
     //If caller doesn't need a callback, simply waits up the chip.
-    if (callbackRoutine) {
-        request_full_power_entry = vos_mem_malloc(sizeof(tRequestFullPowerEntry));
-        if (NULL == request_full_power_entry) {
+    if( callbackRoutine )
+    {
+        pEntry = vos_mem_malloc(sizeof(tRequestFullPowerEntry));
+        if ( NULL == pEntry )
+        {
             pmcLog(pMac, LOGE,
-                    FL("Cannot allocate memory for request full power routine list entry"));
+                   FL("Cannot allocate memory for request full power routine list entry"));
             PMC_ABORT;
             return eHAL_STATUS_FAILURE;
         }
 
         /* Store routine and context in entry. */
-        request_full_power_entry->callbackRoutine = callbackRoutine;
-        request_full_power_entry->callbackContext = callbackContext;
+        pEntry->callbackRoutine = callbackRoutine;
+        pEntry->callbackContext = callbackContext;
 
         /* Add entry to list. */
-        csrLLInsertTail(&pMac->pmc.requestFullPowerList,
-                &request_full_power_entry->link, TRUE);
-    }
-    /* Enter Request Full Power State. */
-    if (pmcEnterRequestFullPowerState(hHal, fullPowerReason) !=
-            eHAL_STATUS_SUCCESS) {
-        /*
-         * If pmcEnterRequestFullPowerState fails, driver need to
-         * remove callback from requestFullPowerList
-         */
-        if (callbackRoutine) {
-            pEntry = csrLLRemoveTail(&pMac->pmc.requestFullPowerList, TRUE);
-            request_full_power_entry = GET_BASE_ADDR(pEntry,
-                    tRequestFullPowerEntry, link);
-            vos_mem_free(request_full_power_entry);
-        }
-        return eHAL_STATUS_FAILURE;
+        csrLLInsertTail(&pMac->pmc.requestFullPowerList, &pEntry->link, TRUE);
     }
 
     return eHAL_STATUS_PMC_PENDING;
@@ -2867,14 +2854,17 @@ eHalStatus pmcSetPreferredNetworkList
         return eHAL_STATUS_FAILURE;
     }
 
-    pRequestBuf = vos_mem_malloc(sizeof(tSirPNOScanReq));
+    pRequestBuf = vos_mem_malloc(sizeof(tSirPNOScanReq) +
+                  (pRequest->num_vendor_oui) *
+                  (sizeof(struct vendor_oui)));
     if (NULL == pRequestBuf)
     {
         VOS_TRACE(VOS_MODULE_ID_SME, VOS_TRACE_LEVEL_ERROR, "%s: Not able to allocate memory for PNO request", __func__);
         return eHAL_STATUS_FAILED_ALLOC;
     }
 
-    vos_mem_copy(pRequestBuf, pRequest, sizeof(tSirPNOScanReq));
+    vos_mem_copy(pRequestBuf, pRequest, sizeof(tSirPNOScanReq) +
+                 (pRequest->num_vendor_oui) * (sizeof(struct vendor_oui)));
 
     /*Must translate the mode first*/
     ucDot11Mode = (tANI_U8) csrTranslateToWNICfgDot11Mode(pMac,
@@ -3571,6 +3561,8 @@ eHalStatus PmcOffloadEnableStaModePowerSave(tHalHandle hHal,
     if(!pmc->configStaPsEnabled)
     {
         eHalStatus status;
+
+        pmc->configStaPsEnabled = TRUE;
         status = pmcOffloadEnableStaPsHandler(pMac, sessionId);
 
         if((eHAL_STATUS_SUCCESS == status) ||
@@ -3580,7 +3572,6 @@ eHalStatus PmcOffloadEnableStaModePowerSave(tHalHandle hHal,
             smsLog(pMac, LOG2,
                    FL("Successful Queued Enabling Sta Mode Ps Request"));
 
-            pmc->configStaPsEnabled = TRUE;
             return eHAL_STATUS_SUCCESS;
         }
         else
@@ -3606,40 +3597,15 @@ eHalStatus PmcOffloadEnableStaModePowerSave(tHalHandle hHal,
 }
 
 eHalStatus PmcOffloadDisableStaModePowerSave(tHalHandle hHal,
-                                             FullPowerReqCb callback_routine,
-                                             void *callback_context,
                                              tANI_U32 sessionId)
 {
     tpAniSirGlobal pMac = PMAC_STRUCT(hHal);
     tpPsOffloadPerSessionInfo pmc = &pMac->pmcOffloadInfo.pmc[sessionId];
     eHalStatus status = eHAL_STATUS_SUCCESS;
-    tpPmcOffloadReqFullPowerEntry power_entry;
-    tListElem *pEntry;
 
     if (pmc->configStaPsEnabled) {
-        if (callback_routine) {
-            /* Allocate entry for Full Power Cb list. */
-            power_entry = vos_mem_malloc(sizeof(*power_entry));
-            if (!power_entry) {
-                smsLog(pMac, LOGE,
-                       FL("Cannot allocate memory for Full Pwr routine list"));
-                return eHAL_STATUS_FAILED_ALLOC;
-            }
-            /* Store routine and context in entry. */
-            power_entry->fullPwrCb = callback_routine;
-            power_entry->callbackContext = callback_context;
-            power_entry->sessionId = sessionId;
-            /* Add entry to list. */
-            csrLLInsertTail(&pmc->fullPowerCbList, &power_entry->link, FALSE);
-        }
+        pmc->configDefStaPsEnabled = FALSE;
         status = pmcOffloadDisableStaPsHandler(pMac, sessionId);
-        if ((eHAL_STATUS_SUCCESS != status) && callback_routine) {
-            pEntry = csrLLRemoveTail(&pmc->fullPowerCbList, TRUE);
-            power_entry = GET_BASE_ADDR(pEntry,
-                    tPmcOffloadReqFullPowerEntry, link);
-            vos_mem_free(power_entry);
-            return eHAL_STATUS_FAILURE;
-        }
     } else {
         /*
          * configStaPsEnabled is the master flag
@@ -3652,9 +3618,8 @@ eHalStatus PmcOffloadDisableStaModePowerSave(tHalHandle hHal,
         /* Stop the Auto Sta Ps Timer if running */
         pmcOffloadStopAutoStaPsTimer(pMac, sessionId);
         pmc->configDefStaPsEnabled = FALSE;
-        return eHAL_STATUS_SUCCESS;
     }
-    return eHAL_STATUS_PMC_PENDING;
+    return status;
 }
 
 eHalStatus pmcOffloadRequestFullPower (tHalHandle hHal, tANI_U32 sessionId,
@@ -4152,6 +4117,13 @@ eHalStatus PmcOffloadEnableDeferredStaModePowerSave(tHalHandle hHal,
     tpPsOffloadPerSessionInfo pmc = &pMac->pmcOffloadInfo.pmc[sessionId];
     eHalStatus status = eHAL_STATUS_FAILURE;
     tANI_U32 timer_value;
+
+    if (!pmc->configStaPsEnabled)
+    {
+        smsLog(pMac, LOGE,
+               FL("STA Mode Config PowerSave is not enabled"));
+        return status;
+    }
 
     if (!pMac->pmcOffloadInfo.staPsEnabled)
     {

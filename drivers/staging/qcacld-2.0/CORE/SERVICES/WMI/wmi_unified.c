@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014-2017 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -702,7 +702,6 @@ static u_int8_t* get_wmi_cmd_string(WMI_CMD_ID wmi_command)
 		CASE_RETURN_STRING(WMI_WOW_SET_ACTION_WAKE_UP_CMDID);
 		CASE_RETURN_STRING(WMI_PEER_BWF_REQUEST_CMDID);
 		CASE_RETURN_STRING(WMI_DBGLOG_TIME_STAMP_SYNC_CMDID);
-		CASE_RETURN_STRING(_place_holder_cmd_1);
 		CASE_RETURN_STRING(WMI_P2P_LISTEN_OFFLOAD_START_CMDID);
 		CASE_RETURN_STRING(WMI_P2P_LISTEN_OFFLOAD_STOP_CMDID);
 		CASE_RETURN_STRING(WMI_PEER_REORDER_QUEUE_SETUP_CMDID);
@@ -719,6 +718,14 @@ static u_int8_t* get_wmi_cmd_string(WMI_CMD_ID wmi_command)
 		CASE_RETURN_STRING(WMI_COEX_GET_ANTENNA_ISOLATION_CMDID);
 		CASE_RETURN_STRING(WMI_PDEV_SET_STATS_THRESHOLD_CMDID);
 		CASE_RETURN_STRING(WMI_REQUEST_WLAN_STATS_CMDID);
+		CASE_RETURN_STRING(WMI_VDEV_ENCRYPT_DECRYPT_DATA_REQ_CMDID);
+		CASE_RETURN_STRING(WMI_SAR_LIMITS_CMDID);
+		CASE_RETURN_STRING(WMI_PDEV_DFS_PHYERR_OFFLOAD_ENABLE_CMDID);
+		CASE_RETURN_STRING(WMI_PDEV_DFS_PHYERR_OFFLOAD_DISABLE_CMDID);
+		CASE_RETURN_STRING(WMI_VDEV_ADFS_CH_CFG_CMDID);
+		CASE_RETURN_STRING(WMI_VDEV_ADFS_OCAC_ABORT_CMDID);
+		CASE_RETURN_STRING(WMI_REQUEST_RCPI_CMDID);
+		CASE_RETURN_STRING(WMI_REQUEST_PEER_STATS_INFO_CMDID);
 	}
 	return "Invalid WMI cmd";
 }
@@ -754,8 +761,6 @@ static uint16_t wmi_tag_sta_powersave_cmd(wmi_unified_t wmi_hdl, wmi_buf_t buf)
 	ps_cmd = (wmi_sta_powersave_param_cmd_fixed_param *)wmi_buf_data(buf);
 
 	switch(ps_cmd->param) {
-	case WMI_STA_PS_PARAM_TX_WAKE_THRESHOLD:
-	case WMI_STA_PS_PARAM_INACTIVITY_TIME:
 	case WMI_STA_PS_ENABLE_QPOWER:
 		return HTC_TX_PACKET_TAG_AUTO_PM;
 	default:
@@ -789,12 +794,6 @@ static uint16_t wmi_tag_fw_hang_cmd(wmi_unified_t wmi_handle)
 {
 	uint16_t tag = 0;
 
-	if (adf_os_atomic_read(&wmi_handle->is_target_suspended)) {
-		pr_err("%s: Target is already suspended, Ignore FW Hang Command\n",
-			__func__);
-		return tag;
-	}
-
 	if (wmi_handle->tag_crash_inject)
 		tag = HTC_TX_PACKET_TAG_AUTO_PM;
 
@@ -824,7 +823,6 @@ static uint16_t wmi_set_htc_tx_tag(wmi_unified_t wmi_handle,
 	case WMI_WOW_HOSTWAKEUP_FROM_SLEEP_CMDID:
 	case WMI_PDEV_RESUME_CMDID:
 	case WMI_WOW_DEL_WAKE_PATTERN_CMDID:
-	case WMI_WOW_SET_ACTION_WAKE_UP_CMDID:
 #ifdef FEATURE_WLAN_D0WOW
 	case WMI_D0_WOW_ENABLE_DISABLE_CMDID:
 #endif
@@ -1066,8 +1064,11 @@ void wmi_control_rx(void *ctx, HTC_PACKET *htc_packet)
 	void *wmi_cmd_struct_ptr = NULL;
 	u_int32_t idx = 0;
 	int tlv_ok_status = 0;
+
+#if  defined(WMI_INTERFACE_EVENT_LOGGING) || !defined(QCA_CONFIG_SMP)
 	u_int32_t id;
 	u_int8_t *data;
+#endif
 
 	evt_buf = (wmi_buf_t) htc_packet->pPktContext;
 	id = WMI_GET_FIELD(adf_nbuf_data(evt_buf), WMI_CMD_HDR, COMMANDID);
@@ -1257,11 +1258,13 @@ wmi_unified_detach(struct wmi_unified* wmi_handle)
 	wmi_buf_t buf;
 
 	vos_flush_work(&wmi_handle->rx_event_work);
+	adf_os_spin_lock_bh(&wmi_handle->eventq_lock);
 	buf = adf_nbuf_queue_remove(&wmi_handle->event_queue);
 	while (buf) {
 		adf_nbuf_free(buf);
 		buf = adf_nbuf_queue_remove(&wmi_handle->event_queue);
 	}
+	adf_os_spin_unlock_bh(&wmi_handle->eventq_lock);
 
 	OS_FREE(wmi_handle);
 }

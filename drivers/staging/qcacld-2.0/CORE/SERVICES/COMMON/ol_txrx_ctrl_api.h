@@ -67,49 +67,11 @@ enum wlan_op_mode {
 #define OL_TXQ_PAUSE_REASON_MCC_VDEV_START    (1 << 5)
 #define OL_TXQ_PAUSE_REASON_THROTTLE          (1 << 6)
 
-/**
- * enum netif_action_type - Type of actions on netif queues
- * @WLAN_STOP_ALL_NETIF_QUEUE: stop all netif queues
- * @WLAN_START_ALL_NETIF_QUEUE: start all netif queues
- * @WLAN_WAKE_ALL_NETIF_QUEUE: wake all netif queues
- * @WLAN_STOP_ALL_NETIF_QUEUE_N_CARRIER: stop all queues and off carrier
- * @WLAN_START_ALL_NETIF_QUEUE_N_CARRIER: start all queues and on carrier
- * @WLAN_NETIF_TX_DISABLE: disable tx
- * @WLAN_NETIF_TX_DISABLE_N_CARRIER: disable tx and off carrier
- * @WLAN_NETIF_CARRIER_ON: on carrier
- * @WLAN_NETIF_CARRIER_OFF: off carrier
- */
-enum netif_action_type {
-	WLAN_STOP_ALL_NETIF_QUEUE = 1,
-	WLAN_START_ALL_NETIF_QUEUE,
-	WLAN_WAKE_ALL_NETIF_QUEUE,
-	WLAN_STOP_ALL_NETIF_QUEUE_N_CARRIER,
-	WLAN_START_ALL_NETIF_QUEUE_N_CARRIER,
-	WLAN_NETIF_TX_DISABLE,
-	WLAN_NETIF_TX_DISABLE_N_CARRIER,
-	WLAN_NETIF_CARRIER_ON,
-	WLAN_NETIF_CARRIER_OFF,
-	WLAN_NETIF_ACTION_TYPE_MAX,
-};
-
-/**
- * enum netif_reason_type - reason for netif queue action
- * @WLAN_CONTROL_PATH: action from control path
- * @WLAN_DATA_FLOW_CONTROL: because of flow control
- * @WLAN_REASON_TYPE_MAX: max netif reason
- */
-enum netif_reason_type {
-	WLAN_CONTROL_PATH = 1,
-	WLAN_DATA_FLOW_CONTROL,
-	WLAN_REASON_TYPE_MAX,
-};
-
 /* command options for dumpStats*/
 #define WLAN_HDD_STATS               0
 #define WLAN_TXRX_STATS              1
 #define WLAN_TXRX_HIST_STATS         2
 #define WLAN_TXRX_DESC_STATS         3
-#define WLAN_HDD_NETIF_OPER_HISTORY  4
 #ifdef CONFIG_HL_SUPPORT
 #define WLAN_SCHEDULER_STATS        21
 #define WLAN_TX_QUEUE_STATS         22
@@ -247,12 +209,12 @@ ol_txrx_peer_update(ol_txrx_vdev_handle data_vdev, u_int8_t *peer_mac,
 		    ol_txrx_peer_update_select_t select);
 
 enum {
-	OL_TX_WMM_AC_BE,
-	OL_TX_WMM_AC_BK,
-	OL_TX_WMM_AC_VI,
-	OL_TX_WMM_AC_VO,
+    OL_TX_WMM_AC_BE,
+    OL_TX_WMM_AC_BK,
+    OL_TX_WMM_AC_VI,
+    OL_TX_WMM_AC_VO,
 
-	OL_TX_NUM_WMM_AC
+    OL_TX_NUM_WMM_AC
 };
 
 /**
@@ -967,30 +929,6 @@ ol_txrx_peer_stats_copy(
 #define ol_txrx_peer_stats_copy(pdev, peer, stats) A_ERROR /* failure */
 #endif /* QCA_ENABLE_OL_TXRX_PEER_STATS */
 
-/**
- * struct ol_tx_sched_wrr_ac_specs_t - the wrr ac specs params structure
- * @wrr_skip_weight: map to ol_tx_sched_wrr_adv_category_info_t.specs.
- *                            wrr_skip_weight
- * @credit_threshold: map to ol_tx_sched_wrr_adv_category_info_t.specs.
- *                            credit_threshold
- * @send_limit: map to ol_tx_sched_wrr_adv_category_info_t.specs.
- *                            send_limit
- * @credit_reserve: map to ol_tx_sched_wrr_adv_category_info_t.specs.
- *                            credit_reserve
- * @discard_weight: map to ol_tx_sched_wrr_adv_category_info_t.specs.
- *                            discard_weight
- *
- * This structure is for wrr ac specs params set from user, it will update
- * its content corresponding to the ol_tx_sched_wrr_adv_category_info_t.specs.
- */
-struct ol_tx_sched_wrr_ac_specs_t {
-	int wrr_skip_weight;
-	uint32_t credit_threshold;
-	uint16_t send_limit;
-	int credit_reserve;
-	int discard_weight;
-};
-
 /* Config parameters for txrx_pdev */
 struct txrx_pdev_cfg_param_t {
     u_int8_t is_full_reorder_offload;
@@ -1006,8 +944,6 @@ struct txrx_pdev_cfg_param_t {
     u_int32_t uc_tx_partition_base;
     uint16_t pkt_bundle_timer_value;
     uint16_t pkt_bundle_size;
-
-    struct ol_tx_sched_wrr_ac_specs_t ac_specs[OL_TX_NUM_WMM_AC];
 };
 
 /**

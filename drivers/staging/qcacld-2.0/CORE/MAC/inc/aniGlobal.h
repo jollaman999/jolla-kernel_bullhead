@@ -74,7 +74,6 @@ typedef struct sAniSirGlobal *tpAniSirGlobal;
 #include "smeInternal.h"
 #include "sapApi.h"
 #include "ccmApi.h"
-#include "btcApi.h"
 #include "csrInternal.h"
 
 #ifdef FEATURE_OEM_DATA_SUPPORT
@@ -98,8 +97,6 @@ typedef struct sAniSirGlobal *tpAniSirGlobal;
 
 // New HAL API interface defs.
 #include "logDump.h"
-
-#include "ol_txrx_ctrl_api.h"
 
 //Check if this definition can actually move here from halInternal.h even for Volans. In that case
 //this featurization can be removed.
@@ -250,7 +247,6 @@ enum log_event_host_reason_code {
 	WLAN_LOG_REASON_MGMT_FRAME_TIMEOUT,
 	WLAN_LOG_REASON_SME_OUT_OF_CMD_BUF,
 	WLAN_LOG_REASON_NO_SCAN_RESULTS,
-	WLAN_LOG_REASON_STALE_SESSION_FOUND,
 };
 
 
@@ -379,6 +375,9 @@ typedef struct sLimTimers
 
     // CNF_WAIT timer
     TX_TIMER            *gpLimCnfWaitTimer;
+
+    // Send Disassociate frame threshold parameters
+    TX_TIMER            gLimSendDisassocFrameThresholdTimer;
 
     TX_TIMER       gLimAddtsRspTimer;   // max wait for a response
 
@@ -603,8 +602,6 @@ typedef struct sAniSirLim
     /// Variable to keep track of number of currently associated STAs
     tANI_U16  gLimNumOfAniSTAs;      // count of ANI peers
     tANI_U16  gLimAssocStaLimit;
-    uint16_t  glim_assoc_sta_limit_ap;
-    uint16_t  glim_assoc_sta_limit_go;
 
     // Heart-Beat interval value
     tANI_U32   gLimHeartBeatCount;
@@ -854,6 +851,10 @@ typedef struct sAniSirLim
     // Place holder for Pre-authentication node list
     struct tLimPreAuthNode *  pLimPreAuthList;
 
+    // Send Disassociate frame threshold parameters
+    tANI_U16            gLimDisassocFrameThreshold;
+    tANI_U16            gLimDisassocFrameCredit;
+
     // Assoc or ReAssoc Response Data/Frame
     void                *gLimAssocResponseData;
 
@@ -1090,7 +1091,6 @@ typedef struct sMacOpenParameters
  */
     tANI_U8 olIniInfo;
     v_BOOL_t ssdp;
-    bool enable_mc_list;
     bool enable_bcst_ptrn;
     /*
      * DFS Phyerror Filtering offload status from ini
@@ -1142,9 +1142,6 @@ typedef struct sMacOpenParameters
     bool force_target_assert_enabled;
     uint16_t pkt_bundle_timer_value;
     uint16_t pkt_bundle_size;
-    bool bpf_packet_filter_enable;
-
-    struct ol_tx_sched_wrr_ac_specs_t ac_specs[OL_TX_NUM_WMM_AC];
 } tMacOpenParameters;
 
 typedef struct sHalMacStartParameters
@@ -1213,7 +1210,6 @@ typedef struct sAniSirGlobal
     tOemDataStruct oemData;
 #endif
     tPmcInfo     pmc;
-    tSmeBtcInfo  btc;
 
     tCcm ccm;
 
@@ -1282,7 +1278,6 @@ typedef struct sAniSirGlobal
     bool first_scan_done;
     int8_t first_scan_bucket_threshold;
     sir_mgmt_frame_ind_callback mgmt_frame_ind_cb;
-    sir_p2p_ack_ind_callback p2p_ack_ind_cb;
 } tAniSirGlobal;
 
 typedef enum

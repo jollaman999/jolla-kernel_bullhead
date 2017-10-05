@@ -40,7 +40,6 @@
 #include <vos_getBin.h>
 #include "epping_main.h"
 #include "adf_trace.h"
-#include "vos_api.h"
 
 #define CE_POLL_TIMEOUT 10 /* ms */
 
@@ -104,7 +103,7 @@ static void CE_init_ce_desc_event_log(int ce_id, int size);
  * trying to access the array, full locking of the recording process would
  * be needed to have sane logging.
  */
-int get_next_record_index(adf_os_atomic_t *table_index, int array_size)
+static int get_next_record_index(adf_os_atomic_t *table_index, int array_size)
 {
 	int record_index = adf_os_atomic_inc_return(table_index);
 	if (record_index == array_size)
@@ -429,7 +428,7 @@ CE_sendlist_send(struct CE_handle *copyeng,
         DPTRACE(adf_dp_trace((adf_nbuf_t)per_transfer_context,
                 ADF_DP_TRACE_CE_PACKET_PTR_RECORD,
                (uint8_t *)&(((adf_nbuf_t)per_transfer_context)->data),
-               sizeof(((adf_nbuf_t)per_transfer_context)->data), ADF_TX));
+               sizeof(((adf_nbuf_t)per_transfer_context)->data)));
     } else {
         /*
          * Probably not worth the additional complexity to support
@@ -1027,52 +1026,6 @@ CE_per_engine_servicereap(struct hif_pci_softc *sc, unsigned int CE_id)
 
 #endif /*ATH_11AC_TXCOMPACT*/
 
-/**
- * ce_is_valid_entries() - check if ce ring delta is valid
- * @sc: pointer to hif_pci_softc
- * @ce_state: pointer to CE_state
- * @ring_delta: delta packets in CE ring
- *
- * check if difference between hw index and read index is
- * with in limit.
- *
- * Return: true if ring delta is valid.
- */
-static inline bool ce_is_valid_entries(struct hif_pci_softc *sc,
-		struct CE_state *ce_state, unsigned int ring_delta)
-{
-	bool status;
-	A_target_id_t targid = TARGID(sc);
-	unsigned int hw_index =
-			CE_DEST_RING_READ_IDX_GET(targid, ce_state->ctrl_addr);
-
-	/* check if difference between hw index and read index is with in
-	* nentries_mask limit.
-	*/
-	if ((ring_delta < ce_state->dest_ring->nentries_mask) &&
-		(hw_index != CE_HW_INDEX_LINK_DOWN)) {
-		adf_os_print("%s: spent more time during rx proceesing for CE%d, allow other CE to process Rx packet.\n",
-				__func__, ce_state->id);
-		status = true;
-	} else if (hw_index  == CE_HW_INDEX_LINK_DOWN) {
-		status = false;
-		adf_os_print("%s: hw index is invalid due to link down \n", __func__);
-	} else {
-		adf_os_print("%s:Potential infinite loop detected during rx processing for CE%d\n",
-			__func__, ce_state->id);
-		VOS_BUG(0);
-		status = false;
-	}
-
-	adf_os_print("nentries_mask:0x%x sw read_idx:0x%x hw read_idx:0x%x ring_delta:0x%x\n",
-		ce_state->dest_ring->nentries_mask,
-		ce_state->dest_ring->sw_index,
-		CE_DEST_RING_READ_IDX_GET(targid, ce_state->ctrl_addr),
-		ring_delta);
-
-	return status;
-}
-
 /*
  * Number of times to check for any pending tx/rx completion on
  * a copy engine, this count should be big enough. Once we hit
@@ -1105,9 +1058,6 @@ CE_per_engine_service(struct hif_pci_softc *sc, unsigned int CE_id)
     unsigned int more_comp_cnt = 0;
     unsigned int more_snd_comp_cnt = 0;
     unsigned int sw_idx, hw_idx;
-    bool is_pkt_pending = 0;
-    unsigned int ring_delta = 0;
-
 
     A_TARGET_ACCESS_BEGIN(targid);
 
@@ -1215,16 +1165,16 @@ more_watermarks:
      * misc interrupts.Go back and check again.Keep checking until
      * we find no more events to process.
      */
-    if (CE_state->recv_cb) {
-        ring_delta = CE_recv_entries_done_nolock(sc, CE_state);
-        if(ring_delta) {
-            if (WLAN_IS_EPPING_ENABLED(vos_get_conparam()) ||
-                more_comp_cnt++ < CE_TXRX_COMP_CHECK_THRESHOLD) {
-                goto more_completions;
-            } else {
-                if (ce_is_valid_entries(sc, CE_state, ring_delta))
-                    is_pkt_pending = true;
-            }
+    if (CE_state->recv_cb && CE_recv_entries_done_nolock(sc, CE_state)) {
+        if (WLAN_IS_EPPING_ENABLED(vos_get_conparam()) ||
+            more_comp_cnt++ < CE_TXRX_COMP_CHECK_THRESHOLD) {
+            goto more_completions;
+        } else {
+            adf_os_print("%s:Potential infinite loop detected during Rx processing"
+                         "nentries_mask:0x%x sw read_idx:0x%x hw read_idx:0x%x\n",
+                        __func__, CE_state->dest_ring->nentries_mask,
+                        CE_state->dest_ring->sw_index,
+                        CE_DEST_RING_READ_IDX_GET(targid, CE_state->ctrl_addr));
         }
     }
 
@@ -1233,7 +1183,7 @@ more_watermarks:
             more_snd_comp_cnt++ < CE_TXRX_COMP_CHECK_THRESHOLD) {
             goto more_completions;
         } else {
-            adf_os_print("%s:Potential infinite loop detected during send completion "
+            adf_os_print("%s:Potential infinite loop detected during send completion"
                          "nentries_mask:0x%x sw read_idx:0x%x hw read_idx:0x%x\n",
                          __func__, CE_state->src_ring->nentries_mask,
                          CE_state->src_ring->sw_index,
@@ -1252,10 +1202,7 @@ more_watermarks:
     }
 
     adf_os_spin_unlock(&sc->target_lock);
-    if (is_pkt_pending)
-        adf_os_atomic_set(&CE_state->rx_pending, 1);
-    else
-        adf_os_atomic_set(&CE_state->rx_pending, 0);
+    adf_os_atomic_set(&CE_state->rx_pending, 0);
     A_TARGET_ACCESS_END(targid);
 }
 

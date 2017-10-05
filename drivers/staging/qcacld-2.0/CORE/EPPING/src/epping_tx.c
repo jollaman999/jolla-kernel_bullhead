@@ -45,7 +45,6 @@
 #include <wlan_hdd_tx_rx.h>
 #include <wniApi.h>
 #include <wlan_nlink_srv.h>
-#include <wlan_btc_svc.h>
 #include <wlan_hdd_cfg.h>
 #include <wlan_ptt_sock_svc.h>
 #include <wlan_hdd_wowl.h>
@@ -353,28 +352,15 @@ void epping_tx_complete_multiple(void *ctx,
       pktSkb=GET_HTC_PACKET_NET_BUF_CONTEXT(htc_pkt);
       cookie = htc_pkt->pPktContext;
 
-      if (!pktSkb) {
-         EPPING_LOG(VOS_TRACE_LEVEL_ERROR,
-            "%s: pktSkb is NULL", __func__);
-         ASSERT(0);
-      } else {
-         if (htc_pkt->pBuffer != adf_nbuf_data(pktSkb)) {
-            EPPING_LOG(VOS_TRACE_LEVEL_ERROR,
-               "%s: htc_pkt buffer not equal to skb->data", __func__);
-            ASSERT(0);
-         }
+      ASSERT(pktSkb);
+      ASSERT(htc_pkt->pBuffer == adf_nbuf_data(pktSkb));
 
-         /* add this to the list, use faster non-lock API */
-         adf_nbuf_queue_add(&skb_queue,pktSkb);
+      /* add this to the list, use faster non-lock API */
+      adf_nbuf_queue_add(&skb_queue,pktSkb);
 
-         if (A_SUCCESS(status))
-            if (htc_pkt->ActualLength != adf_nbuf_len(pktSkb)) {
-               EPPING_LOG(VOS_TRACE_LEVEL_ERROR,
-                  "%s: htc_pkt length not equal to skb->len", __func__);
-               ASSERT(0);
-            }
+      if (A_SUCCESS(status)) {
+         ASSERT(htc_pkt->ActualLength == adf_nbuf_len(pktSkb));
       }
-
       EPPING_LOG(VOS_TRACE_LEVEL_INFO,
          "%s skb=%p data=%p len=0x%x eid=%d ",
          __func__, pktSkb, htc_pkt->pBuffer,
