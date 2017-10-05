@@ -750,18 +750,10 @@ limProcessAssocReqFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo,
                 if(pAssocReq->rsn.length)
                 {
                     // Unpack the RSN IE
-                    if (dot11fUnpackIeRSN(pMac,
+                    dot11fUnpackIeRSN(pMac,
                                         &pAssocReq->rsn.info[0],
                                         pAssocReq->rsn.length,
-                                        &Dot11fIERSN) != DOT11F_PARSE_SUCCESS)
-                    {
-                        limLog(pMac, LOG1,
-                            FL("Invalid RSNIE received"));
-                        limSendAssocRspMgmtFrame(pMac,
-                            eSIR_MAC_INVALID_RSN_IE_CAPABILITIES_STATUS,
-                            1, pHdr->sa, subType, 0,psessionEntry);
-                        goto error;
-                    }
+                                        &Dot11fIERSN);
 
                     /* Check RSN version is supported or not */
                     if(SIR_MAC_OUI_VERSION_1 == Dot11fIERSN.version)
@@ -827,17 +819,10 @@ limProcessAssocReqFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo,
                 // Unpack the WPA IE
                 if(pAssocReq->wpa.length)
                 {
-                    if (dot11fUnpackIeWPA(pMac,
+                    dot11fUnpackIeWPA(pMac,
                                         &pAssocReq->wpa.info[4], //OUI is not taken care
                                         pAssocReq->wpa.length,
-                                        &Dot11fIEWPA) != DOT11F_PARSE_SUCCESS)
-                    {
-                        limLog(pMac, LOGE, FL("Invalid WPA IE"));
-                        limSendAssocRspMgmtFrame(pMac,
-                                eSIR_MAC_INVALID_INFORMATION_ELEMENT_STATUS,
-                                1, pHdr->sa, subType, 0,psessionEntry);
-                        goto error;
-                    }
+                                        &Dot11fIEWPA);
                     /* check the groupwise and pairwise cipher suites */
                     if(eSIR_SUCCESS != (status = limCheckRxWPAIeMatch(pMac, Dot11fIEWPA, psessionEntry, pAssocReq->HTCaps.present)))
                     {
