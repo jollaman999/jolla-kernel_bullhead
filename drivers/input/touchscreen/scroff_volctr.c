@@ -580,8 +580,6 @@ static int register_sovc(void)
 		goto err;
 	}
 
-	scroff_volctr_reset();
-
 	registered = true;
 out:
 	mutex_unlock(&reg_lock);
