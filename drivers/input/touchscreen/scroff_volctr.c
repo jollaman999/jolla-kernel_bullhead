@@ -1,9 +1,7 @@
 /*
  * drivers/input/touchscreen/scroff_volctr.c
  *
- *
- * Copyright (c) 2013, Dennis Rassmann <showp1984@gmail.com>
- * Copyright (c) 2016, jollaman999 <admin@jollaman999.com>
+ * Copyright (c) 2017, jollaman999 <admin@jollaman999.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,7 +76,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Screen Off Volume & Track Control for almost any device"
-#define DRIVER_VERSION "4.3"
+#define DRIVER_VERSION "4.4"
 #define LOGTAG "[scroff_volctr]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -543,8 +541,6 @@ static int register_sovc(void)
 {
 	int rc = 0;
 
-	scroff_volctr_reset();
-
 	mutex_lock(&reg_lock);
 
 	if (registered) {
@@ -587,6 +583,7 @@ out:
 	pr_info(LOGTAG"%s done\n", __func__);
 #endif
 
+	scroff_volctr_reset();
 	return rc;
 err:
 	flush_workqueue(sovc_volume_input_wq);
@@ -597,6 +594,7 @@ err:
 	cancel_work_sync(&sovc_track_input_work);
 	mutex_unlock(&reg_lock);
 
+	scroff_volctr_reset();
 	return rc;
 }
 
