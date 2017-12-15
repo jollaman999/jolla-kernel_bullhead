@@ -7,7 +7,7 @@
 static int jolla_kernel_proc_show(struct seq_file *m, void *v)
 {
 	seq_printf(m, "{\"kernel-name\": \"jolla-kernel_bullhead_II\","
-			"\"version\": \"v27.0\","
+			"\"version\": \"v28.0\","
 			"\"buildtime\": \"%s\"}\n", JOLLA_KERNEL_TIMESTAMP);
 	return 0;
 }
