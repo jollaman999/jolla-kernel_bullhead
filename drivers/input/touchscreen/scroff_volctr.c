@@ -411,6 +411,9 @@ static int sovc_input_common_event(struct input_handle *handle, unsigned int typ
 			break;
 	}
 
+	if (is_executing)
+		return 1;
+
 	return 0;
 }
 
@@ -421,9 +424,6 @@ static void sovc_volume_input_event(struct input_handle *handle, unsigned int ty
 
 	out = sovc_input_common_event(handle, type, code, value);
 	if (out)
-		return;
-
-	if (is_executing)
 		return;
 
 	/* You can debug here with 'adb shell getevent -l' command. */
@@ -445,9 +445,6 @@ static void sovc_track_input_event(struct input_handle *handle, unsigned int typ
 
 	out = sovc_input_common_event(handle, type, code, value);
 	if (out)
-		return;
-
-	if (is_executing)
 		return;
 
 	/* You can debug here with 'adb shell getevent -l' command. */
