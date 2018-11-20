@@ -22,10 +22,23 @@
 #include <linux/writeback.h>
 #include <linux/fb.h>
 
+#ifdef CONFIG_DYNAMIC_FSYNC_BG_SYNC
+#include <linux/delay.h>
+#endif
+
 #define DYN_FSYNC_VERSION_MAJOR 1
 #define DYN_FSYNC_VERSION_MINOR 1
 
 struct notifier_block dyn_fsync_fb_notif;
+
+#ifdef CONFIG_DYNAMIC_FSYNC_BG_SYNC
+#define BG_SYNC_TIMEOUT 10	// 10*10ms
+
+static struct workqueue_struct *suspend_sync_wq;
+static void work_sync_fn(struct work_struct *work);
+static DECLARE_WORK(work_sync, work_sync_fn);
+static int suspend_sync_done;
+#endif
 
 /*
  * fsync_mutex protects dyn_fsync_active during fb suspend / resume
@@ -36,6 +49,45 @@ bool dyn_sync_scr_suspended = false;
 bool dyn_fsync_active __read_mostly = true;
 
 extern void dyn_fsync_suspend_actions(void);
+
+#ifdef CONFIG_DYNAMIC_FSYNC_BG_SYNC
+static int bg_sync(void)
+{
+	int timeout_in_ms = BG_SYNC_TIMEOUT;
+	bool ret = false;
+
+	if (work_busy(&work_sync)) {
+		pr_info("[dynamic_fsync_bg_sync] work_sync already run\n");
+		return -EBUSY;
+	}
+
+	pr_info("[dynamic_fsync_bg_sync] queue start\n");
+	suspend_sync_done = 0;
+	ret = queue_work(suspend_sync_wq, &work_sync);
+	pr_info("[dynamic_fsync_bg_sync] queue end, ret = %s\n", ret?"true":"false");
+
+	while (timeout_in_ms--) {
+		if (suspend_sync_done)
+			break;
+		msleep(10);
+	}
+
+	if (suspend_sync_done) {
+		pr_info("[dynamic_fsync_bg_sync] (%d * 10ms) ...\n", BG_SYNC_TIMEOUT - timeout_in_ms);
+		return 0;
+	}
+
+	return -EBUSY;
+}
+
+static void work_sync_fn(struct work_struct *work)
+{
+	pr_info("[dynamic_fsync_bg_sync] sync start\n");
+	dyn_fsync_suspend_actions();
+	pr_info("[dynamic_fsync_bg_sync] sync done\n");
+	suspend_sync_done = 1;
+}
+#endif
 
 static ssize_t dyn_fsync_active_show(struct kobject *kobj,
 		struct kobj_attribute *attr, char *buf)
@@ -97,10 +149,17 @@ static struct kobject *dyn_fsync_kobj;
 
 static void dyn_fsync_suspend(void)
 {
-	mutex_lock(&fsync_mutex);
+	if (!mutex_trylock(&fsync_mutex))
+		return;
 	/* flush all outstanding buffers */
-	if (dyn_fsync_active)
+	if (dyn_fsync_active) {
+#ifdef CONFIG_DYNAMIC_FSYNC_BG_SYNC
+		if (bg_sync())
+			pr_info("[dynamic_fsync_bg_sync] Syncing busy ...\n");
+#else
 		dyn_fsync_suspend_actions();
+#endif
+	}
 	mutex_unlock(&fsync_mutex);
 
 	pr_info("%s: flushing work finished.\n", __FUNCTION__);
@@ -146,6 +205,14 @@ static int __init dyn_fsync_init(void)
 		pr_info("%s fb register failed!\n", __FUNCTION__);
 		return ret;
 	}
+
+#ifdef CONFIG_DYNAMIC_FSYNC_BG_SYNC
+	suspend_sync_wq = create_singlethread_workqueue("suspend_sync");
+	if (!suspend_sync_wq) {
+		pr_info("%s suspend_sync_wq register failed!\n", __FUNCTION__);
+		return ret;
+	}
+#endif
 
 	dyn_fsync_kobj = kobject_create_and_add("dyn_fsync", kernel_kobj);
 	if (!dyn_fsync_kobj) {

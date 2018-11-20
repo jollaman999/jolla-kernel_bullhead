@@ -282,5 +282,11 @@ config DYNAMIC_FSYNC
 	help
 	  An experimental file sync control using pm suspend / resume drivers
 
+config DYNAMIC_FSYNC_BG_SYNC
+	bool "dynamic background file sync control"
+	default y
+	depends on DYNAMIC_FSYNC
+	help
+	  Use LGE's background file sync function for dynamic file sync control
 
 endmenu
