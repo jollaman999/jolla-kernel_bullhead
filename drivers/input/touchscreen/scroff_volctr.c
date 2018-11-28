@@ -799,6 +799,8 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 			unregister_sovc();
 			break;
 		case FB_BLANK_POWERDOWN:
+			if (is_executing)
+				return 0;
 			sovc_scr_suspended = true;
 			if (sovc_switch && (track_changed || sovc_tmp_onoff)) {
 				if (tomtom_mic_detected) {
