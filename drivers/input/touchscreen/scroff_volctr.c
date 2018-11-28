@@ -87,8 +87,10 @@ MODULE_LICENSE("GPLv2");
 /* Tuneables */
 //#define SOVC_DEBUG			// Uncomment this to turn on the debug
 #define SOVC_DEFAULT		1	// Default On/Off
-#define SOVC_VOL_FEATHER	350	// Touch degree for volume control
+#define SOVC_VOL_FEATHER	400	// Touch degree for volume control
 #define SOVC_TRACK_FEATHER	500	// Touch degree for track control
+#define SOVC_VOL_DETERMINE_WIDTH	250	// Width range for determine volume gestures
+#define SOVC_TRACK_DETERMINE_WIDTH	300	// Width range for determine track gestures
 #define SOVC_TIME_GAP		250	// Ignore touch after this time (ms)
 #define SOVC_VOL_REEXEC_DELAY	250	// Re-exec delay for volume control (ms)
 #define SOVC_TRACK_NEXT_REEXEC_DELAY		4000	// Re-exec delay for track-next control (ms)
@@ -308,6 +310,16 @@ static void new_touch_x(int x)
 
 }
 
+static unsigned int calc_feather(int coord, int prev_coord)
+{
+	int calc_coord = 0;
+
+	calc_coord = coord - prev_coord;
+	if (calc_coord < 0)
+		calc_coord *= -1;
+	return calc_coord;
+}
+
 static void new_touch_y(int y)
 {
 	touch_time_pre_y = ktime_to_ms(ktime_get());
@@ -359,7 +371,8 @@ static void sovc_volume_input_callback(struct work_struct *unused)
 
 	time = ktime_to_ms(ktime_get()) - touch_time_pre_y;
 
-	if (time > 0 && time < SOVC_TIME_GAP) {
+	if (time > 0 && time < SOVC_TIME_GAP &&
+	    calc_feather(touch_x, prev_x) < SOVC_VOL_DETERMINE_WIDTH) {
 		if (prev_y - touch_y > SOVC_VOL_FEATHER) // Volume Up (down->up)
 			exec_key(VOL_UP);
 		else if (touch_y - prev_y > SOVC_VOL_FEATHER) // Volume Down (up->down)
@@ -377,7 +390,8 @@ static void sovc_track_input_callback(struct work_struct *unused)
 
 	time = ktime_to_ms(ktime_get()) - touch_time_pre_x;
 
-	if (time > 0 && time < SOVC_TIME_GAP) {
+	if (time > 0 && time < SOVC_TIME_GAP &&
+	    calc_feather(touch_y, prev_y) < SOVC_TRACK_DETERMINE_WIDTH) {
 		if (prev_x - touch_x > SOVC_TRACK_FEATHER) // Track Next (right->left)
 			exec_key(TRACK_NEXT);
 		else if (touch_x - prev_x > SOVC_TRACK_FEATHER) // Track Previous (left->right)
