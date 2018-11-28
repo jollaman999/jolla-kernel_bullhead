@@ -123,7 +123,7 @@ static int dyn_fsync_fb_notifier_callback(struct notifier_block *self,
 		case FB_BLANK_VSYNC_SUSPEND:
 			dyn_sync_scr_suspended = false;
 			break;
-		case FB_BLANK_POWERDOWN:
+		default:
 			dyn_sync_scr_suspended = true;
 			dyn_fsync_suspend();
 			break;
