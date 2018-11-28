@@ -4529,7 +4529,7 @@ static int tomtom_notifier_callback(struct notifier_block *self,
 	switch (event) {
 	case TOMTOM_EVENT_PLAYING:
 	case TOMTOM_EVENT_TRACK_CHANGED:
-		cancel_delayed_work(&d->touch_off_work);
+		cancel_delayed_work(&rmi4_data->touch_off_work);
 		break;
 	case TOMTOM_EVENT_STOPPED:
 		if (sovc_force_off)

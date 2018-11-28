@@ -229,7 +229,7 @@ static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 		input_event(sovc_input, EV_KEY, KEY_NEXTSONG, 0);
 		input_event(sovc_input, EV_SYN, 0, 0);
 
-		sovc_notifier_call_chain(TOMTOM_EVENT_TRACK_CHANGED, NULL);
+		tomtom_notifier_call_chain(TOMTOM_EVENT_TRACK_CHANGED, NULL);
 		break;
 	case TRACK_PREVIOUS:
 #ifdef SOVC_DEBUG
@@ -242,7 +242,7 @@ static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 		input_event(sovc_input, EV_KEY, KEY_PREVIOUSSONG, 0);
 		input_event(sovc_input, EV_SYN, 0, 0);
 
-		sovc_notifier_call_chain(TOMTOM_EVENT_TRACK_CHANGED, NULL);
+		tomtom_notifier_call_chain(TOMTOM_EVENT_TRACK_CHANGED, NULL);
 		break;
 	}
 
@@ -722,14 +722,14 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 			sovc_tmp_userspace_playing = true;
 			if (sovc_switch && !sovc_tmp_onoff) {
 				mutex_lock(&sovc_playing_state_lock);
-				sovc_notifier_call_chain(SOVC_EVENT_PLAYING, NULL);
+				tomtom_notifier_call_chain(TOMTOM_EVENT_PLAYING, NULL);
 				mutex_unlock(&sovc_playing_state_lock);
 			}
 		} else {
 			sovc_tmp_userspace_playing = false;
 			if (sovc_switch && sovc_tmp_onoff && !tomtom_playing) {
 				mutex_lock(&sovc_playing_state_lock);
-				sovc_notifier_call_chain(SOVC_EVENT_STOPPED, NULL);
+				tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
 				mutex_unlock(&sovc_playing_state_lock);
 			}
 		}
