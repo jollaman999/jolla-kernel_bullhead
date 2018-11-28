@@ -812,7 +812,7 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 			cancel_delayed_work(&sovc_auto_off_check_work);
 			unregister_sovc();
 			break;
-		case FB_BLANK_POWERDOWN:
+		default:
 			if (sovc_scr_suspended)
 				return 0;
 			sovc_scr_suspended = true;
