@@ -116,18 +116,22 @@ static struct input_dev *sovc_input;
 static DEFINE_MUTEX(keyworklock);
 static DEFINE_MUTEX(touch_off_lock);
 static DEFINE_MUTEX(auto_off_schedule_lock);
-static DEFINE_MUTEX(a2dp_lock);
 static struct workqueue_struct *sovc_volume_input_wq;
 static struct workqueue_struct *sovc_track_input_wq;
 static struct work_struct sovc_volume_input_work;
 static struct work_struct sovc_track_input_work;
 extern bool tomtom_mic_detected;
 
+bool tomtom_playing = false;
+bool sovc_tmp_userspace_playing = false;
+
 static void touch_off(void);
 static void unregister_sovc(void);
 
 static bool registered = false;
 static DEFINE_MUTEX(reg_lock);
+
+struct mutex sovc_playing_state_lock;
 
 enum CONTROL {
 	NO_CONTROL,
@@ -710,45 +714,29 @@ static ssize_t sovc_scroff_volctr_temp_dump(struct device *dev,
 {
 	int rc, val;
 
-	mutex_lock(&a2dp_lock);
-
 	rc = kstrtoint(buf, 10, &val);
 	if (rc)
-		goto invalid_value;
+		return -EINVAL;
 
 	if (val == 0 || val == 1) {
-		if (val == sovc_tmp_onoff)
-			goto out;
-		if (val == 0 && track_changed)
-			goto out;
-		sovc_tmp_onoff = val;
-	} else
-		goto invalid_value;
-
-	if (sovc_tmp_onoff)
-		track_changed = false;
-
-	if (sovc_switch && sovc_scr_suspended) {
-		if (sovc_tmp_onoff) {
-			if (tomtom_mic_detected)
-				unregister_sovc();
-			else
-				register_sovc();
+		if (val) {
+			sovc_tmp_userspace_playing = true;
+			if (sovc_switch && !sovc_tmp_onoff) {
+				mutex_lock(&sovc_playing_state_lock);
+				sovc_notifier_call_chain(SOVC_EVENT_PLAYING, NULL);
+				mutex_unlock(&sovc_playing_state_lock);
+			}
 		} else {
-			mutex_lock(&touch_off_lock);
-			unregister_sovc();
-			tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
-			mutex_unlock(&touch_off_lock);
+			sovc_tmp_userspace_playing = false;
+			if (sovc_switch && sovc_tmp_onoff && !tomtom_playing) {
+				mutex_lock(&sovc_playing_state_lock);
+				sovc_notifier_call_chain(SOVC_EVENT_STOPPED, NULL);
+				mutex_unlock(&sovc_playing_state_lock);
+			}
 		}
-	} else
-		unregister_sovc();
+	}
 
-out:
-	mutex_unlock(&a2dp_lock);
 	return count;
-invalid_value:
-	mutex_unlock(&a2dp_lock);
-	return -EINVAL;
 }
 
 static DEVICE_ATTR(scroff_volctr_temp, (S_IWUSR|S_IRUGO),
@@ -934,6 +922,8 @@ static int __init scroff_volctr_init(void)
 	if (rc) {
 		pr_warn("%s: sysfs_create_file failed for scroff_volctr_version\n", __func__);
 	}
+
+	mutex_init(&sovc_playing_state_lock);
 
 err_input_dev:
 	input_free_device(sovc_input);

@@ -29,6 +29,11 @@ extern bool sovc_force_off;
 extern bool track_changed;
 extern bool sovc_scr_suspended;
 
+extern bool tomtom_playing;
+extern bool sovc_tmp_userspace_playing;
+
+extern struct mutex sovc_playing_state_lock;
+
 extern void sovc_press_power_key_trigger(int delay);
 
 extern bool sovc_state_playing(void);

@@ -43,8 +43,6 @@
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
 #include <linux/input/scroff_volctr.h>
 #include <linux/wcd9330_notifier.h>
-
-static DEFINE_MUTEX(tomtom_state_lock);
 #endif
 
 #if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) || defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SCROFF_VOLCTR)
@@ -5434,10 +5432,11 @@ static int tomtom_startup(struct snd_pcm_substream *substream,
 		tomtom_mic_detected = true;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
+	tomtom_playing = true;
 	if (sovc_switch && !sovc_tmp_onoff) {
-		mutex_lock(&tomtom_state_lock);
+		mutex_lock(&sovc_playing_state_lock);
 		tomtom_notifier_call_chain(TOMTOM_EVENT_PLAYING, NULL);
-		mutex_unlock(&tomtom_state_lock);
+		mutex_unlock(&sovc_playing_state_lock);
 	}
 #endif
 	return 0;
@@ -5454,10 +5453,11 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 		tomtom_mic_detected = false;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	if (sovc_switch && sovc_tmp_onoff) {
-		mutex_lock(&tomtom_state_lock);
+	tomtom_playing = false;
+	if (sovc_switch && sovc_tmp_onoff && !sovc_tmp_userspace_playing) {
+		mutex_lock(&sovc_playing_state_lock);
 		tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
-		mutex_unlock(&tomtom_state_lock);
+		mutex_unlock(&sovc_playing_state_lock);
 	}
 #endif
 }
