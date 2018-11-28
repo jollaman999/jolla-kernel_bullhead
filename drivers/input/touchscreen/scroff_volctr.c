@@ -1,7 +1,7 @@
 /*
  * drivers/input/touchscreen/scroff_volctr.c
  *
- * Copyright (c) 2016-2017, jollaman999 <admin@jollaman999.com>
+ * Copyright (c) 2016-2018, jollaman999 <admin@jollaman999.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,9 +60,6 @@
  *  Also if you swipe the touchscreen right or left and
  * hold your finger on touchscreen, track will change
  * continuously based on SOVC_TRACK_REEXEC_DELAY (ms) time.
- *
- * See the demo video.
- * http://tp.jollaman999.com/jolla-kernel_AIO-bullhead/Screen_Off_Volume_Control.mp4
  */
 
 /* uncomment since no touchscreen defines android touch, do that here */
@@ -76,7 +73,7 @@
 /* Version, author, desc, etc */
 #define DRIVER_AUTHOR "jollaman999 <admin@jollaman999.com>"
 #define DRIVER_DESCRIPTION "Screen Off Volume & Track Control for almost any device"
-#define DRIVER_VERSION "4.5"
+#define DRIVER_VERSION "5.0"
 #define LOGTAG "[scroff_volctr]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
