@@ -25,6 +25,7 @@
 
 #define TOMTOM_EVENT_PLAYING		0x01
 #define TOMTOM_EVENT_STOPPED		0x02
+#define TOMTOM_EVENT_TRACK_CHANGED	0x03
 
 int tomtom_register_client(struct notifier_block *nb);
 int tomtom_unregister_client(struct notifier_block *nb);
