@@ -153,7 +153,7 @@ bool is_touch_on(void)
 	if (sovc_force_off)
 		return false;
 
-	if (sovc_switch && (track_changed || sovc_tmp_onoff))
+	if (sovc_state_playing())
 		return true;
 #endif
 	return false;
