@@ -825,7 +825,7 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 			unregister_sovc();
 			break;
 		case FB_BLANK_POWERDOWN:
-			if (is_executing)
+			if (sovc_scr_suspended)
 				return 0;
 			sovc_scr_suspended = true;
 			if (sovc_state_playing()) {
