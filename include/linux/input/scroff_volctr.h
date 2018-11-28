@@ -31,4 +31,6 @@ extern bool sovc_scr_suspended;
 
 extern void sovc_press_power_key_trigger(int delay);
 
+extern bool sovc_state_playing(void);
+
 #endif	/* _LINUX_SCROFF_VOLCTR_H */

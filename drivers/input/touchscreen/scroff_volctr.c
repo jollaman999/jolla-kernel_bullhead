@@ -142,6 +142,11 @@ extern void qpnp_hap_td_enable(int value);
 
 static void scroff_volctr_key_delayed_trigger(void);
 
+bool sovc_state_playing(void)
+{
+	return 	sovc_switch & (track_changed | sovc_tmp_onoff);
+}
+
 /* Read cmdline for sovc */
 static int __init read_sovc_cmdline(char *sovc)
 {
@@ -795,6 +800,7 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 		case FB_BLANK_VSYNC_SUSPEND:
 			sovc_scr_suspended = false;
 			sovc_force_off = false;
+			track_changed = false;
 			cancel_delayed_work(&sovc_auto_off_check_work);
 			unregister_sovc();
 			break;
@@ -802,7 +808,7 @@ static int sovc_fb_notifier_callback(struct notifier_block *self,
 			if (is_executing)
 				return 0;
 			sovc_scr_suspended = true;
-			if (sovc_switch && (track_changed || sovc_tmp_onoff)) {
+			if (sovc_state_playing()) {
 				if (tomtom_mic_detected) {
 					unregister_sovc();
 					break;
