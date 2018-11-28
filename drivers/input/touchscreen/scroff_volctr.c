@@ -224,6 +224,8 @@ static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 		msleep(SOVC_KEY_PRESS_DUR);
 		input_event(sovc_input, EV_KEY, KEY_NEXTSONG, 0);
 		input_event(sovc_input, EV_SYN, 0, 0);
+
+		sovc_notifier_call_chain(TOMTOM_EVENT_TRACK_CHANGED, NULL);
 		break;
 	case TRACK_PREVIOUS:
 #ifdef SOVC_DEBUG
@@ -235,6 +237,8 @@ static void scroff_volctr_key(struct work_struct *scroff_volctr_key_work)
 		msleep(SOVC_KEY_PRESS_DUR);
 		input_event(sovc_input, EV_KEY, KEY_PREVIOUSSONG, 0);
 		input_event(sovc_input, EV_SYN, 0, 0);
+
+		sovc_notifier_call_chain(TOMTOM_EVENT_TRACK_CHANGED, NULL);
 		break;
 	}
 

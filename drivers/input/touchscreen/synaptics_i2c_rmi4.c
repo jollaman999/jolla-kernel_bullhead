@@ -4554,14 +4554,18 @@ static int tomtom_notifier_callback(struct notifier_block *self,
 	if (!sovc_switch || !scr_suspended)
 		return 0;
 
-	cancel_delayed_work(&rmi4_data->touch_off_work);
-
-	if (event == TOMTOM_EVENT_STOPPED) {
+	switch (event) {
+	case TOMTOM_EVENT_PLAYING:
+	case TOMTOM_EVENT_TRACK_CHANGED:
+		cancel_delayed_work(&d->touch_off_work);
+		break;
+	case TOMTOM_EVENT_STOPPED:
 		if (sovc_force_off)
 			delay = 0;
 		queue_delayed_work(rmi4_data->touch_off_workqueue,
 				&rmi4_data->touch_off_work,
 				msecs_to_jiffies(delay));
+		break;
 	}
 
 	return 0;
