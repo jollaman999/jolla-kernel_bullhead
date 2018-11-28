@@ -653,6 +653,11 @@ static inline void inode_lock(struct inode *inode)
 	mutex_lock(&inode->i_mutex);
 }
 
+static inline void inode_unlock(struct inode *inode)
+{
+	mutex_unlock(&inode->i_mutex);
+}
+
 #define QSTR_LITERAL(string) QSTR_INIT(string, sizeof(string)-1)
 
 #endif	/* not _SDCARDFS_H_ */
