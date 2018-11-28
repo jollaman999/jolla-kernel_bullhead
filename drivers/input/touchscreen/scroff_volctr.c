@@ -680,6 +680,8 @@ static ssize_t sovc_scroff_volctr_dump(struct device *dev,
 	if (val == 0 || val == 1) {
 		if (sovc_switch != val)
 			sovc_switch = val;
+		else
+			return count;
 	} else
 		return -EINVAL;
 
