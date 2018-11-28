@@ -5379,9 +5379,11 @@ static int tomtom_startup(struct snd_pcm_substream *substream,
 		tomtom_mic_detected = true;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mutex_lock(&tomtom_state_lock);
-	tomtom_notifier_call_chain(TOMTOM_EVENT_PLAYING, NULL);
-	mutex_unlock(&tomtom_state_lock);
+	if (sovc_switch) {
+		mutex_lock(&tomtom_state_lock);
+		tomtom_notifier_call_chain(TOMTOM_EVENT_PLAYING, NULL);
+		mutex_unlock(&tomtom_state_lock);
+	}
 #endif
 	return 0;
 }
@@ -5397,9 +5399,11 @@ static void tomtom_shutdown(struct snd_pcm_substream *substream,
 		tomtom_mic_detected = false;
 #endif
 #ifdef CONFIG_TOUCHSCREEN_SCROFF_VOLCTR
-	mutex_lock(&tomtom_state_lock);
-	tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
-	mutex_unlock(&tomtom_state_lock);
+	if (sovc_switch) {
+		mutex_lock(&tomtom_state_lock);
+		tomtom_notifier_call_chain(TOMTOM_EVENT_STOPPED, NULL);
+		mutex_unlock(&tomtom_state_lock);
+	}
 #endif
 }
 
